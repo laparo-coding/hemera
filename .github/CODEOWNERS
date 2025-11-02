@@ -1,0 +1,16 @@
+# CODEOWNERS
+#
+# Diese Datei steuert, wer automatisch als Reviewer:in angefragt wird,
+# wenn sich Dateien in bestimmten Pfaden ändern. Syntax:
+# <pattern> <owner> [<owner> ...]
+# Owner können GitHub-User (@user) oder Teams (@org/team) sein.
+
+# Standard: Alles gehört der/dem Repo-Owner
+* @Laparo
+
+# Beispiele für spezifischere Bereiche (bei Bedarf anpassen/ergänzen):
+# app/** @Laparo
+# components/** @Laparo
+# lib/** @Laparo
+# prisma/** @Laparo
+# .github/** @Laparo
