@@ -84,7 +84,7 @@ jobs:
 
       - name: Upload Lighthouse report artifact
         if: always() && steps.target.outputs.url != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: lighthouse-report
           path: ./lhci-report
