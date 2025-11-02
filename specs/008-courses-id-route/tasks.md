@@ -1,10 +1,10 @@
-# Tasks: Dynamische Kurs-Detailseite `/courses/[id]`
+# Tasks: Dynamic course detail page `/courses/[id]`
 
-1. Datenmodell prüfen: Prisma-Modell `Course` validieren
-2. Neue Route: `app/courses/[id]/page.tsx` anlegen
-3. Daten aus DB holen und anzeigen
-4. Fehlerhandling für ungültige IDs implementieren
-5. Material-UI Card für Kursdetails verwenden
-6. E2E-Test: `tests/e2e/courses-id.spec.ts` erstellen
-7. Quality Gates prüfen (Lint, Typecheck, Build, Test)
-8. Constitution-Check: Test-First, Error Handling, Auth (falls protected)
+1. Verify data model: validate Prisma model `Course`
+2. Create route: `app/courses/[id]/page.tsx`
+3. Fetch data from DB and render
+4. Implement error handling for invalid IDs
+5. Use Material UI Card to display course details
+6. E2E test: create `tests/e2e/courses-id.spec.ts`
+7. Verify quality gates (lint, typecheck, build, test)
+8. Constitution check: test-first, error handling, auth if protected
