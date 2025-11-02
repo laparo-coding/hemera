@@ -69,8 +69,8 @@ Legend:
    and close/merged; uses secret `PREVIEW_DATABASE_URL`. [X]
 4. Vercel env: use pooled DSN with `?sslmode=require` (no `schema` parameter in Vercel; app sets
    schema at runtime), document in `docs/ops/vercel.md`. [X]
-5. Auto-detect Preview-Schema in Vercel (`hemera_pr_<PR_ID>` via `VERCEL_ENV` +
-   `VERCEL_GIT_PULL_REQUEST_ID`), mit manuellen Overrides (`PREVIEW_SCHEMA`/`PR_SCHEMA`). [X]
+5. Auto-detect preview schema on Vercel (`hemera_pr_<PR_ID>` via `VERCEL_ENV` +
+   `VERCEL_GIT_PULL_REQUEST_ID`), with manual overrides (`PREVIEW_SCHEMA`/`PR_SCHEMA`). [X]
 
 ## Phase 7 — UI/A11y and Theming
 
@@ -87,8 +87,8 @@ Legend:
 3. Validate governance: run markdownlint, link-check, and cspell; fix any issues introduced.
 4. Update `spec.md` checklist boxes once acceptance scenarios demonstrably pass (documentation-only
    change).
-5. [x] Performance: run Lighthouse CI gegen Preview-Deployment mit Budgets (Fail on Regression).
-6. [x] Performance: Web Vitals Ziele und Vorgehen dokumentiert in `docs/ops/performance.md`.
+5. [x] Performance: run Lighthouse CI against preview deployment with budgets (fail on regression).
+6. [x] Performance: Web Vitals goals and approach documented in `docs/ops/performance.md`.
 
 ## Notes
 
