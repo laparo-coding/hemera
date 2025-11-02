@@ -1,5 +1,4 @@
 import { expect, Page, test } from '@playwright/test';
-import { AuthHelper, TEST_USERS } from './auth-helper';
 import { gotoStable } from './helpers/nav';
 
 /**
