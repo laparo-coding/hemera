@@ -1,14 +1,14 @@
 # 009 – Course Preparation: Quickstart
 
-Erstellt: 2025-11-02
+Created: 2025-11-02
 
-## Lokal starten
+## Run locally
 
-1. Repository klonen und Abhängigkeiten installieren
-2. Lokale Vorschauseiten (statisch/MDX/Platzhalter) verlinken
-3. Lint/Typecheck/Build ausführen
+1. Clone repository and install dependencies
+2. Link local preview pages (static/MDX/placeholders)
+3. Run lint/typecheck/build
 
-## Nützliche Hinweise
+## Tips
 
-- Für SEO‑Tests mit `next build` + `next start` arbeiten
-- Playwright‑Smoke optional (Navigation, Render)
+- For SEO checks use `next build` + `next start`
+- Optional Playwright smoke (navigation, render)

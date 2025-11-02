@@ -1,9 +1,9 @@
-# Contracts (Platzhalter)
+# Contracts (placeholder)
 
-Hier werden API‑Verträge, OpenAPI‑Spezifikationen und ggf. Contract‑Tests für den
-Kurs‑Vorbereitungs‑Scope abgelegt.
+Store API contracts, OpenAPI specifications, and potential contract tests for the course preparation
+scope here.
 
-Strukturvorschlag:
+Suggested structure:
 
 - openapi.yaml
 - tests/

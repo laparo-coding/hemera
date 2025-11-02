@@ -1,36 +1,36 @@
 # 009 – Course Preparation: Plan
 
-Erstellt: 2025-11-02
+Created: 2025-11-02
 
-Ziel: Vorbereitung der Kursinhalte und Infrastruktur für den Kursbereich (Content, Datenmodell,
-Routen, Observability, QA).
+Purpose: Prepare course content and the technical baseline for the course area (content, data model,
+routes, observability, QA).
 
-## Ziele und Nicht‑Ziele
+## Goals and Non‑Goals
 
-- Ziele:
-  - Inhaltsstruktur und Navigationskonzept definieren
-  - Minimale technische Basis (Routen, SEO, Tracking) festlegen
-  - Datenmodell für Kursvorbereitung (z. B. Units, Assets, Status) skizzieren
-  - Qualitäts- und Release-Kriterien festlegen
-- Nicht‑Ziele:
-  - Vollständige Kursimplementierung (separate Spezifikation)
+- Goals:
+  - Define content structure and navigation concept
+  - Establish minimal technical baseline (routes, SEO, tracking)
+  - Sketch the data model for course preparation (e.g., units, assets, status)
+  - Define quality and release criteria
+- Non‑Goals:
+  - Full course implementation (covered by separate specifications)
 
 ## Deliverables
 
-- `spec.md` mit funktionalen Anforderungen
-- `data-model.md` mit Kern-Entities
-- `quickstart.md` für lokale Vorschau der Kursseiten
-- `contracts/` (Platzhalter) für API/Contract-Tests
-- `tasks.md` als Umsetzungsliste
+- `spec.md` with functional requirements
+- `data-model.md` with core entities
+- `quickstart.md` for local preview of course pages
+- `contracts/` (placeholder) for API/contract tests
+- `tasks.md` as implementation checklist
 
-## Meilensteine
+## Milestones
 
-1. Grundlagen & Scope abstecken (Spec Draft)
-2. Datenmodellierung (erste Iteration)
-3. Navigations- und SEO-Grundlagen
-4. QA und Observability-Baseline
+1. Establish foundations and scope (spec draft)
+2. Data modeling (first iteration)
+3. Navigation and SEO basics
+4. QA and observability baseline
 
-## Risiken
+## Risks
 
-- Unklare Abgrenzung zu späteren Implementations-Specs → klare Schnittstellen definieren
-- Datenmodell ändert sich nach Inhaltsreview → Iterationspuffer einplanen
+- Ambiguity with later implementation specs → define clear interfaces
+- Data model may change after content review → plan for iteration buffer

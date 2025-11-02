@@ -1,10 +1,10 @@
 # 009 – Course Preparation: Tasks
 
-Erstellt: 2025-11-02
+Created: 2025-11-02
 
-- [ ] Seitenstruktur entwerfen (Übersicht, Detail, Kapitelnavigation)
-- [ ] SEO‑Metadaten definieren (sitewide + per Seite)
-- [ ] Datenmodell entwerfen (siehe data-model.md)
-- [ ] Quickstart für lokale Vorschau schreiben
-- [ ] Observability‑Hooks prüfen (Logs/Telemetry)
-- [ ] E2E‑Smoke für Navigationspfade (optional)
+- [ ] Design page structure (overview, detail, chapter navigation)
+- [ ] Define SEO metadata (site-wide + per page)
+- [ ] Draft data model (see data-model.md)
+- [ ] Write quickstart for local preview
+- [ ] Verify observability hooks (logs/telemetry)
+- [ ] Optional: E2E smoke for navigation paths

@@ -1,15 +1,15 @@
 # 009 – Course Preparation: Research
 
-Erstellt: 2025-11-02
+Created: 2025-11-02
 
-## Quellen
+## Sources
 
-- Wettbewerbsanalyse Kursseiten (UX, IA)
-- SEO‑Best Practices für Kurs‑Landingpages
-- Performance‑Patterns (Next.js App Router)
+- Competitive analysis of course pages (UX, IA)
+- SEO best practices for course landing pages
+- Performance patterns (Next.js App Router)
 
-## Notizen
+## Notes
 
-- Struktur: Übersicht → Kursdetail → Kapitel/Units → Assets
-- Content‑Modelle evaluieren (Markdown/MDX, CMS, statisch)
-- Navigation: klare Next/Prev, Inhaltsverzeichnis
+- Structure: overview → course detail → chapters/units → assets
+- Evaluate content models (Markdown/MDX, CMS, static)
+- Navigation: clear next/prev and table of contents

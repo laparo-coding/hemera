@@ -1,41 +1,41 @@
-# 009 – Course Preparation: Spezifikation
+# 009 – Course Preparation: Specification
 
-Erstellt: 2025-11-02
+Created: 2025-11-02
 
-## Kontext
+## Context
 
-Vorbereitung des Kursbereichs: grundlegende Seitenstruktur, Inhalte, SEO, und technische Leitplanken
-für spätere Umsetzungen.
+Preparing the course area: basic page structure, content, SEO, and technical guardrails for
+subsequent implementations.
 
-## Anforderungen (funktional)
+## Functional Requirements
 
-- Öffentliche Kurs-Übersichtsseite (SEO-fähig)
-- Kurs-Detail-Vorbereitung (Struktur, Platzhalterinhalte)
-- Navigationskonzept (BreadCrumbs, Sidebar, Next/Prev)
-- Basis-Metadaten (Title, Description, OpenGraph)
+- Public course overview page (SEO-friendly)
+- Course detail preparation (structure, placeholder content)
+- Navigation concept (breadcrumbs, sidebar, next/prev)
+- Base metadata (title, description, OpenGraph)
 
-## Anforderungen (nicht-funktional)
+## Non‑Functional Requirements
 
-- Performance: LCP/CLS im Rahmen der bestehenden Budgets
-- Zugänglichkeit: Standard-ARIA und Keyboard-Navigation
-- Observability: minimale Logs/Telemetry Hooks (falls vorhanden)
+- Performance: LCP/CLS within existing budgets
+- Accessibility: standard ARIA patterns and keyboard navigation
+- Observability: minimal logs/telemetry hooks (if available)
 
-## Akzeptanzkriterien
+## Acceptance Criteria
 
-- Alle Kernseiten rendern lokal ohne Backend-Abhängigkeit
-- Lint/Typecheck/Build grün
-- E2E‑Smoke für die wichtigsten Navigationspfade (optional)
+- All core pages render locally without backend dependencies
+- Lint/typecheck/build pass
+- Optional E2E smoke for key navigation paths
 
 ## Out of Scope
 
-- Auth/Bezahllogik (separate Specs)
+- Authentication/payment logic (covered by separate specs)
 
-## Abhängigkeiten
+## Dependencies
 
-- Bestehende App‑Router Struktur (Next.js)
-- Designsystem/Theme
+- Existing App Router structure (Next.js)
+- Design system/theme
 
-## Offene Punkte
+## Open Questions
 
-- Inhaltliche Strukturierung finalisieren (Inhaltsautor:in)
-- Mögliche Schnittstellen zu zukünftigen API‑Endpoints klären
+- Finalize content structure (content author)
+- Clarify potential interfaces to future API endpoints
