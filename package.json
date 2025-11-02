@@ -49,7 +49,7 @@
     ]
   },
   "dependencies": {
-    "@clerk/localizations": "^3.26.3",
+    "@clerk/localizations": "^3.26.4",
     "@clerk/nextjs": "^6.33.2",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
@@ -95,7 +95,8 @@
     "testcontainers": "^10.12.0",
     "ts-jest": "^29.4.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "webpack": "^5.102.1"
   },
   "engines": {
     "node": "22.x"
