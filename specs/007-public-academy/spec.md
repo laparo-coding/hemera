@@ -75,19 +75,18 @@ and view available courses so that I can choose a suitable course and start a bo
 
 ### Acceptance Scenarios
 
-1. Gegeben ich befinde mich im öffentlichen Akademie-Bereich, Wenn ich die Kursübersicht öffne, Dann
-   sehe ich eine Liste aktueller Kurse mit Titel, Kurzbeschreibung, Dauer/Umfang,
-   Startdatum/Verfügbarkeit, Preis (brutto inkl. MwSt.) und einen klaren CTA zur Kursdetailansicht
-   (keine direkte Buchung).
-2. Gegeben ein Kurs hat mehrere zukünftige Termine/Varianten, Wenn ich die Kursdetailseite öffne,
-   Dann sehe ich eine vollständige Beschreibung, Lernziele, Zielgruppe, Voraussetzungen,
-   Termine/Varianten und eine Buchungs-CTA.
-3. Gegeben ich befinde mich auf der Kursdetailseite, Wenn ich auf „Jetzt buchen“ klicke, Dann werde
-   ich zur Buchung weitergeleitet und ein klarer Buchungsprozess beginnt (mindestens Termin/Variante
-   auswählen und Buchungsanfrage starten).
-4. Gegeben ein Kurs ist ausgebucht, Wenn ich die Kursübersicht und die Kursdetailseite betrachte,
-   Dann sehe ich ein sichtbares Badge „Ausgebucht“, die Buchungs-CTA ist deaktiviert oder nicht
-   vorhanden, und eine direkte Buchung ist auf keiner der Seiten möglich.
+1. Given I am on the public academy section, When I open the course overview, Then I see a list of
+   current courses with title, short description, duration/scope, start date/availability, price
+   (gross incl. VAT), and a clear CTA to the course details page (no direct booking from the list).
+2. Given a course has multiple upcoming dates/variants, When I open the course details page, Then I
+   see a full description, learning objectives, target audience, prerequisites, dates/variants, and
+   a booking CTA.
+3. Given I am on the course details page, When I click "Jetzt buchen" (booking CTA in German UI),
+   Then I am taken into the booking flow and a clear process starts (at least select a date/variant
+   and start a booking request).
+4. Given a course is sold out, When I view the course overview and the course details page, Then I
+   see a visible badge "Ausgebucht" (sold out), the booking CTA is disabled or absent, and no direct
+   booking is possible on either page.
 
 ### Edge Cases
 
@@ -108,14 +107,14 @@ and view available courses so that I can choose a suitable course and start a bo
 - FR-002: The system MUST display a public course list including at least title, short description,
   duration/scope, and availability/start date(s).
 - FR-003: The system MUST provide a course details view with full description, learning objectives,
-  target audience, prerequisites, dates/variants, and a Buchungs-CTA.
+  target audience, prerequisites, dates/variants, and a booking CTA.
 - FR-004: The system MUST display an appropriate empty state when no courses are available or only
   sold-out courses exist.
-- FR-005: The system MUST provide a Buchungs-CTA on the course details page that initiates an
+- FR-005: The system MUST provide a booking CTA on the course details page that initiates an
   internal booking process. The course list MUST NOT start the booking directly; its CTA links to
   the course details.
-- FR-006: The system MUST clearly indicate when a course is sold out (label “Ausgebucht”) and
-  prevent booking accordingly.
+- FR-006: The system MUST clearly indicate when a course is sold out (UI label "Ausgebucht" in
+  German) and prevent booking accordingly.
 - FR-007: The system SHOULD offer a selectable option (e.g., date selection) for courses with
   multiple dates/variants before starting the booking.
 - FR-008: The system MUST NOT include search or filter options in the initial release (out of scope
@@ -125,8 +124,8 @@ and view available courses so that I can choose a suitable course and start a bo
 - FR-010: The system MUST consider basic accessibility (readable labels, keyboard navigation,
   contrasts).
 - FR-011: The system MUST determine availability from internal capacity inventory and clearly
-  represent at least “Verfügbar” vs. “Ausgebucht” for each date/variant (optionally “Wenige
-  Plätze”).
+  represent at least "Verfügbar" (available) vs. "Ausgebucht" (sold out) for each date/variant
+  (optionally "Wenige Plätze").
 - FR-012: The system MUST display prices publicly as gross (incl. VAT), including currency and a tax
   notice.
 - FR-013: The system MUST operate as single locale in the public area (language: DE, currency: EUR).

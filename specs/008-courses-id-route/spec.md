@@ -1,21 +1,21 @@
-# Spezifikation: Dynamische Kurs-Detailseite `/courses/[id]`
+# Specification: Dynamic course detail page `/courses/[id]`
 
-## Zweck
+## Purpose
 
-Stellt eine dynamische Seite bereit, die Kursdetails anhand der ID aus der Datenbank anzeigt.
+Provide a dynamic page that renders course details by ID from the database.
 
-## Anforderungen
+## Requirements
 
 - Route: `/courses/[id]` (Next.js App Router)
-- Datenquelle: Prisma-Modell `Course`
-- Anzeige: Kursname, Beschreibung, ggf. weitere Felder
-- Fehlerhandling: 404 bei ungültiger ID
-- UI: Material-UI Card
-- E2E-Test: Routing und Anzeige validieren
+- Data source: Prisma model `Course`
+- Display: course name, description, and optional fields as needed
+- Error handling: 404 for invalid/nonexistent ID
+- UI: Material UI Card
+- E2E test: validate routing and rendering
 
-## Akzeptanzkriterien
+## Acceptance criteria
 
-- Gültige ID zeigt Kursdetails
-- Ungültige ID zeigt Fehlerseite
-- E2E-Test besteht
-- Quality Gates: Lint, Typecheck, Build, Test
+- Valid ID shows course details
+- Invalid ID shows a not found page
+- E2E test passes
+- Quality gates: lint, typecheck, build, test
