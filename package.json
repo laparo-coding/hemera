@@ -54,7 +54,7 @@
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.15.20",
-    "@mui/material": "^5.15.20",
+    "@mui/material": "^7.3.4",
     "@prisma/client": "^6.16.3",
     "@rollbar/react": "^1.0.0",
     "@stripe/react-stripe-js": "^5.2.0",
