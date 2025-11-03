@@ -165,3 +165,11 @@ zgkd
 zipjs
 Überschriftenstruktur
 Überwachbarkeit
+
+Vorbereitungs
+Iterationspuffer
+Landingpages
+Platzhalterinhalte
+Bezahllogik
+Kapitelnavigation
+sitewide
