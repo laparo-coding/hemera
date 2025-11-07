@@ -16,11 +16,11 @@ import {
   CardContent,
   Chip,
   Divider,
-  Grid,
   Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 

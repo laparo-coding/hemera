@@ -7,7 +7,6 @@ import {
   CardContent,
   Chip,
   Container,
-  Grid,
   Paper,
   Table,
   TableBody,
@@ -17,6 +16,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import { useEffect, useState } from 'react';
 
 interface Course {

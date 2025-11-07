@@ -11,13 +11,13 @@ import {
   Chip,
   Container,
   Divider,
-  Grid,
   Paper,
   Stack,
   Tooltip,
   Typography,
   type AlertColor,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import Link from 'next/link';
 
 export interface BookingSuccessViewModel {

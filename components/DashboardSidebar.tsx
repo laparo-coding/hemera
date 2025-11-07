@@ -6,6 +6,7 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Typography,
@@ -72,24 +73,24 @@ export default function DashboardSidebar() {
       <Divider sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
       <List>
         {routes.map(route => (
-          <ListItem
-            button
-            key={route.path}
-            component={Link}
-            href={route.path}
-            sx={{
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.1)',
-              },
-              ...(activeRoute(route.path) && {
-                backgroundColor: 'rgba(255,255,255,0.2)',
-              }),
-            }}
-          >
-            <ListItemIcon sx={{ color: 'white' }}>
-              <route.icon />
-            </ListItemIcon>
-            <ListItemText primary={route.name} />
+          <ListItem key={route.path} disablePadding>
+            <ListItemButton
+              component={Link}
+              href={route.path}
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                },
+                ...(activeRoute(route.path) && {
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                }),
+              }}
+            >
+              <ListItemIcon sx={{ color: 'white' }}>
+                <route.icon />
+              </ListItemIcon>
+              <ListItemText primary={route.name} />
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
