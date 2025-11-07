@@ -4,7 +4,8 @@ import { generateLandingPageMetadata } from '@/lib/seo/metadata';
 import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { Box, Button, Container, Grid, Typography } from '@mui/material';
+import { Box, Button, Container, Typography } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import { Metadata } from 'next';
 import Link from 'next/link';
 

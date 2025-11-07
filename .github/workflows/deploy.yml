@@ -60,10 +60,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22.x'
           cache: 'npm'
@@ -131,7 +131,7 @@ jobs:
         run: npm test -- --coverage
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: coverage
@@ -161,7 +161,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -201,7 +201,7 @@ jobs:
 
       - name: Comment PR with Preview URL
         if: github.event_name == 'pull_request' && steps.deploy.outputs.url != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             github.rest.issues.createComment({
@@ -227,7 +227,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -389,7 +389,7 @@ jobs:
       has_frontend_changes: ${{ steps.check.outputs.has_frontend_changes }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -464,10 +464,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22.x'
           cache: 'npm'
@@ -485,7 +485,7 @@ jobs:
           NEXT_PUBLIC_APP_URL: ${{ env.PRODUCTION_ALIAS }}
 
       - name: Upload Playwright Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: playwright-report-production

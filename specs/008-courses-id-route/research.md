@@ -1,24 +1,24 @@
-# Research: Dynamische Kurs-Detailseite `/courses/[id]`
+# Research: Dynamic course detail page `/courses/[id]`
 
-## Next.js Dynamic Routing
+## Next.js dynamic routing
 
-- Verwendung von `[id]` im App Router für dynamische Seiten.
-- `page.tsx` kann mit `params` auf die ID zugreifen.
+- Use `[id]` in the App Router for dynamic pages
+- `page.tsx` can access the ID via `params`
 
-## Prisma Integration
+## Prisma integration
 
-- Datenmodell `Course` prüfen: Felder wie `id`, `name`, `description`.
-- Datenbankabfrage mit Prisma Client im Server-Component.
+- Verify `Course` model: fields like `id`, `name`, `description`
+- Query database via Prisma Client in a server component
 
-## Fehlerhandling
+## Error handling
 
-- 404-Seite bei ungültiger ID.
-- Next.js: `notFound()` verwenden.
+- Show 404 page for invalid IDs
+- Next.js: use `notFound()`
 
 ## UI
 
-- Material-UI Card für ansprechende Darstellung.
+- Material UI Card for presentable layout
 
 ## Test
 
-- Playwright E2E-Test für Routing und Anzeige.
+- Playwright E2E test for routing and rendering

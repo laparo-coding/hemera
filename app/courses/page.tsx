@@ -10,9 +10,9 @@ import {
   CardActionArea,
   CardContent,
   Container,
-  Grid,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
