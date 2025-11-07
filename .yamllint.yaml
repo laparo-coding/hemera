@@ -3,10 +3,10 @@
 extends: default
 
 rules:
-  line-length: disable  # allow long lines in workflows/specs
-  truthy: disable  # GitHub Actions uses on: [push], etc.
-  comments-indentation: disable  # comments vary in generated files
-  document-start: disable  # '---' not common in GH workflows
+  line-length: disable # allow long lines in workflows/specs
+  truthy: disable # GitHub Actions uses on: [push], etc.
+  comments-indentation: disable # comments vary in generated files
+  document-start: disable # '---' not common in GH workflows
   indentation:
     indent-sequences: consistent
 
