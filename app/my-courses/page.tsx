@@ -6,11 +6,11 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   Button,
   Chip,
   LinearProgress,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

@@ -16,7 +16,6 @@ import {
   Chip,
   CircularProgress,
   Container,
-  Grid,
   IconButton,
   Tab,
   Table,
@@ -28,6 +27,7 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import { useCallback, useEffect, useState } from 'react';
 
 interface ErrorMetrics {

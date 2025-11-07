@@ -11,7 +11,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   Chip,
   LinearProgress,
   Alert,
@@ -24,6 +23,7 @@ import {
   ListItemText,
   ListItemIcon,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import {
   ExpandMore as ExpandMoreIcon,
   CheckCircle as CheckCircleIcon,

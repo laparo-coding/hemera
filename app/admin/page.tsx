@@ -5,10 +5,10 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
   Paper,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
