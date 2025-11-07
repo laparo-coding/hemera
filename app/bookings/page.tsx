@@ -17,7 +17,6 @@ import {
   Card,
   CardContent,
   Chip,
-  Grid,
   IconButton,
   List,
   ListItem,
@@ -27,6 +26,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import { Metadata } from 'next';
 import Link from 'next/link';
 

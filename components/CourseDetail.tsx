@@ -13,7 +13,6 @@ import {
   CardMedia,
   Chip,
   Divider,
-  Grid,
   List,
   ListItem,
   ListItemIcon,
@@ -24,6 +23,7 @@ import {
   type SvgIconProps,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 import HistoryEduRoundedIcon from '@mui/icons-material/HistoryEduRounded';
