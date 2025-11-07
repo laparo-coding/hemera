@@ -53,7 +53,7 @@
     "@clerk/nextjs": "^6.33.2",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
-    "@mui/icons-material": "^5.15.20",
+    "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
     "@prisma/client": "^6.16.3",
     "@rollbar/react": "^1.0.0",
