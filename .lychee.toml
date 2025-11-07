@@ -3,7 +3,8 @@ exclude = [
   "http://localhost",
   "https://127.0.0.1",
   "http://127.0.0.1",
-  "https://vercel.com/*/deployments*"
+  "https://vercel.com/*/deployments*",
+  "https://platform.openai.com/api-keys"
 ]
 retry_wait_time = 2
 max_retries = 2
