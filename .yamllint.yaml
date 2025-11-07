@@ -5,6 +5,7 @@ extends: default
 rules:
   line-length: disable # allow long lines in workflows/specs
   truthy: disable # GitHub Actions uses on: [push], etc.
+  comments: disable # Prettier uses single space, yamllint wants 2
   comments-indentation: disable # comments vary in generated files
   document-start: disable # '---' not common in GH workflows
   indentation:
