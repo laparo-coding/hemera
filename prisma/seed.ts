@@ -476,11 +476,9 @@ async function main() {
 
 main()
   .then(() => {
-    // eslint-disable-next-line no-console
     console.log('✅ Seed completed successfully');
   })
   .catch(e => {
-    // eslint-disable-next-line no-console
     console.error('❌ Seed failed:', e);
     process.exit(1);
   })
