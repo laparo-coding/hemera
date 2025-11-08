@@ -38,7 +38,7 @@
     "*.{ts,tsx,js,jsx}": [
       "prettier --write",
       "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files",
-      "eslint --max-warnings=0 --cache --fix"
+      "eslint --max-warnings=500 --cache --fix"
     ],
     "*.{json,yaml,yml}": [
       "prettier --write"

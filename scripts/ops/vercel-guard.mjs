@@ -69,7 +69,7 @@ function pickProductionBranch(project) {
     const project = await getProject();
     const deployments = await getRecentDeployments(25);
 
-    let violations = [];
+    const violations = [];
 
     // 1) Production branch policy
     const prodBranch = pickProductionBranch(project);
