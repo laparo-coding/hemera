@@ -320,6 +320,40 @@ jobs:
           echo "Deployment candidate URL: $url"
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
+      - name: Assign Production Alias
+        if: ${{ steps.deploy.outputs.url != '' }}
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          deployment="$DEPLOY_URL"
+          if [[ -z "$deployment" ]]; then
+            echo "No deployment URL available for alias assignment." >&2
+            exit 1
+          fi
+
+          # Ensure deployment value includes scheme for the CLI
+          if [[ ! "$deployment" =~ ^https?:// ]]; then
+            deployment="https://$deployment"
+          fi
+
+          # Derive bare domain from configured production alias (strip scheme and path)
+          alias_domain="${PRODUCTION_ALIAS#https://}"
+          alias_domain="${alias_domain#http://}"
+          alias_domain="${alias_domain%%/*}"
+
+          if [[ -z "$alias_domain" ]]; then
+            echo "Unable to derive alias domain from PRODUCTION_ALIAS=$PRODUCTION_ALIAS" >&2
+            exit 1
+          fi
+
+          echo "Assigning alias ${alias_domain} to deployment ${deployment}" | tee -a "$GITHUB_STEP_SUMMARY"
+          vercel alias set "$deployment" "$alias_domain" --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" >/tmp/vercel-alias.log
+          echo "Vercel alias response:" >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/vercel-alias.log | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Poll Deployment Readiness (health check)
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
