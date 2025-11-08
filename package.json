@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.1.2",
   "type": "module",
+  "overrides": {
+    "test-exclude": "^7.0.1"
+  },
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "node scripts/verify-env.mjs && next build",
@@ -96,6 +99,7 @@
     "prettier": "^3.6.2",
     "prisma": "^6.18.0",
     "testcontainers": "^11.7.2",
+    "test-exclude": "^7.0.1",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
