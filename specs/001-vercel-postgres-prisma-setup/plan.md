@@ -3,8 +3,8 @@
 **Branch**: `001-vercel-postgres-prisma-setup` | **Date**: 2025-10-01 | **Spec**: `./spec.md`
 **Input**: Feature specification from `/specs/001-vercel-postgres-prisma-setup/spec.md`
 
-> Hinweis – Documentation Quality Gates: PRs prüfen Markdown-Lint, Rechtschreibung (DE/EN) und
-> Links. Bei Fehlschlägen siehe README Abschnitt „Docs checks – fixing failures“.
+> Note – Documentation Quality Gates: PRs check markdown linting, spelling (DE/EN), and links. If
+> checks fail, see README section "Docs checks – fixing failures".
 
 ## Execution Flow (/plan command scope)
 
@@ -37,10 +37,10 @@ implementation has been performed for this feature; repository remains in planni
 
 ## Summary
 
-Einrichtung von Vercel Postgres (Neon) mit Prisma ORM in einem Next.js (App Router) Projekt
-inklusive NextAuth.js (Prisma Adapter, JWT Sessions) und MUI (Material Design) UI-Basis.
-Öffentlicher Bereich wird SEO-freundlich via SSG/ISR ausgeliefert, nicht-öffentlicher Bereich
-(Buchungen/Materialien) per SSR auf Node mit serverseitiger AuthZ und noindex.
+Set up Vercel Postgres (Neon) with Prisma ORM in a Next.js (App Router) project, including
+NextAuth.js (Prisma Adapter, JWT sessions) and an MUI (Material Design) UI baseline. Public pages
+are delivered SEO-friendly via SSG/ISR; non-public areas (bookings/materials) use SSR on Node with
+server-side authorization and noindex.
 
 ## Technical Context
 
@@ -48,12 +48,14 @@ inklusive NextAuth.js (Prisma Adapter, JWT Sessions) und MUI (Material Design) U
 **Primary Dependencies**: Next.js (App Router), React 18, Prisma Client, NextAuth.js, @mui/material,
 @mui/icons-material  
 **Storage**: PostgreSQL (Vercel Postgres/Neon) via Prisma ORM  
-**Identity**: NextAuth.js mit Prisma Adapter, JWT Sessions  
+**Identity**: NextAuth.js with Prisma Adapter, JWT sessions  
 **Testing**: Vitest + Playwright (smoke), jest-compat optional  
-**Target Platform**: Web (SSR/SSG/ISR), Deployment auf Vercel **Project Type**: web (Next.js app)  
-**Performance Goals**: Gute CWV; SSG/ISR für SEO-Seiten; minimale TTFB für SSR-geschützte Seiten  
-**Constraints**: Prisma/NextAuth nur auf Node Runtime; Non-Public Seiten noindex; A11y WCAG 2.1 AA  
-**Scale/Scope**: Klein bis mittel (erste Auth/DB-Basis, wenige Seiten)  
+**Target Platform**: Web (SSR/SSG/ISR), deployment on Vercel  
+**Project Type**: web (Next.js app)  
+**Performance Goals**: Good CWV; SSG/ISR for SEO pages; minimal TTFB for SSR-protected pages  
+**Constraints**: Prisma/NextAuth must run on Node runtime; non-public pages noindex; A11y WCAG 2.1
+AA  
+**Scale/Scope**: Small to medium (initial auth/DB baseline, few pages)  
 **Design System**: Material Design via MUI
 
 ## Constitution Check
@@ -62,13 +64,13 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 PASS (v1.7.0):
 
-- Hybrid Rendering Policy eingehalten (SSG/ISR bevorzugt, SSR nur wenn nötig)
-- Prisma & NextAuth auf Node Runtime dokumentiert
-- Domain & Access Segmentation (Öffentlich vs Nicht-Öffentlich) umgesetzt inkl. SEO/noindex
-- MUI als einziges UI-Toolkit, SSR-Styling via AppRouterCacheProvider
+- Hybrid Rendering Policy observed (prefer SSG/ISR; SSR only when necessary)
+- Prisma & NextAuth documented on Node runtime
+- Domain & access segmentation (public vs non‑public) implemented incl. SEO/noindex
+- MUI as the only UI toolkit; SSR styling via AppRouterCacheProvider
 
-Hinweis: FR-007 (Retention Policy) ist bewusst DEFERRED und blockiert die Umsetzung dieser
-Basisfunktion nicht. Klärung nach MVP.
+Note: FR-007 (Retention Policy) is intentionally DEFERRED and does not block this baseline. Resolve
+post‑MVP.
 
 ## Rendering Strategy Matrix
 
@@ -89,9 +91,9 @@ Notes:
 
 ### Domain Segmentation Notes
 
-- Öffentlich: Inhalte wie Kurs-/Eventlisten sind SEO-relevant → SSG/ISR, strukturierte Daten
-  optional, Open Graph/Meta gepflegt.
-- Nicht-öffentlich: Teilnehmerbereiche (Buchungen/Materialien) → SSR auf Node, serverseitige AuthZ
+- Public: content like course/event listings is SEO‑relevant → use SSG/ISR, optionally structured
+  data, maintain Open Graph/meta.
+- Non‑public: participant areas (bookings/materials) → SSR on Node, server‑side authZ
   (getServerSession), robots noindex/nofollow.
 
 ## Project Structure
@@ -261,12 +263,12 @@ Ensure the plan respects branching and CI rules defined in the constitution:
 
 ## Monitoring & Access Segmentation
 
-- GitHub Checks: required → Lint, Typecheck, Unit/E2E Smoke, Next Build; Branch Protection aktiv.
-- Security: Dependabot/Code Scanning aktiv; Prisma Migrate nur via CI/CD (deploy-time
-  `prisma migrate deploy`).
-- Access: Nicht-öffentliche Routen prüfen serverseitig via `getServerSession` (Node Runtime);
-  `robots`-Header/meta auf noindex setzen.
-- Observability (lightweight): Vercel Analytics optional; Log-Inspection über Vercel Dashboard.
+- GitHub Checks: required → lint, typecheck, unit/E2E smoke, Next build; branch protection enabled.
+- Security: Dependabot/Code Scanning enabled; Prisma Migrate only via CI/CD
+  (`prisma migrate deploy`).
+- Access: validate non‑public routes server‑side via `getServerSession` (Node runtime); set `robots`
+  headers/meta to noindex.
+- Observability (lightweight): Vercel Analytics optional; inspect logs via Vercel Dashboard.
 
 ## Documentation Quality Gates
 
@@ -334,8 +336,8 @@ This checklist is updated during execution flow.
 
 - [ ] Initial Constitution Check: PASS
 - [ ] Post-Design Constitution Check: PASS
-- [ ] All NEEDS CLARIFICATION resolved - Ausnahme: FR-007 ist DEFERRED (Retention Policy) → kein
-      Blocker für diese Implementierung
+- [ ] All NEEDS CLARIFICATION resolved — exception: FR‑007 is DEFERRED (Retention Policy) → not a
+      blocker for this implementation
 - [ ] Complexity deviations documented
 
 ---
