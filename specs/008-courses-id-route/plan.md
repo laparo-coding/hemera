@@ -1,22 +1,21 @@
-# Plan: Courses [id]-Route
+# Plan: Courses [id] route
 
-## Ziel
+## Goal
 
-Implementiere eine dynamische Next.js-Route `/courses/[id]`, die Kursdetails aus der Datenbank
-rendert.
+Implement a dynamic Next.js route `/courses/[id]` that renders course details from the database.
 
-## Schritte
+## Steps
 
-1. Datenmodell prüfen (Prisma: Course).
-2. Neue Datei: `app/courses/[id]/page.tsx` mit dynamischem Fetch.
-3. E2E-Test: `tests/e2e/courses-id.spec.ts` prüft Routing und Anzeige.
-4. API-Absicherung: Fehlerhandling für ungültige IDs.
-5. UI: Material-UI Card für Kursdetails.
+1. Verify data model (Prisma: Course)
+2. Create `app/courses/[id]/page.tsx` with dynamic fetch
+3. E2E test: `tests/e2e/courses-id.spec.ts` validates routing and rendering
+4. API hardening: error handling for invalid IDs
+5. UI: Material UI Card for course details
 
-## Quality Gates
+## Quality gates
 
-- TypeScript, ESLint, Prettier, E2E-Test, Build.
+- TypeScript, ESLint, Prettier, E2E test, build
 
-## Constitution Check
+## Constitution check
 
-- Test-First, Error Handling, Auth (falls protected), Quality Gates.
+- Test-first, error handling, auth (if protected), quality gates

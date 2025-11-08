@@ -22,7 +22,7 @@ jobs:
       has_frontend_changes: ${{ steps.check.outputs.has_frontend_changes }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -106,12 +106,12 @@ jobs:
           fi
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ steps.ref.outputs.ref }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'npm'
@@ -286,7 +286,7 @@ jobs:
 
       - name: Upload Playwright HTML report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-report
           path: playwright-report
@@ -295,7 +295,7 @@ jobs:
       - name: Comment E2E result on PR
         if: ${{ github.event_name == 'pull_request' }}
         continue-on-error: true
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           BASE_URL: ${{ steps.basecheck.outputs.final_base }}
           OUTCOME: ${{ steps.e2e.outcome }}

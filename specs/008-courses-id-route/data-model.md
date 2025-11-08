@@ -1,6 +1,6 @@
-# Data Model: Course
+# Data model: Course
 
-## Prisma-Modell (Beispiel)
+## Prisma model (example)
 
 ```prisma
 model Course {
@@ -12,9 +12,9 @@ model Course {
 }
 ```
 
-## Hinweise
+## Notes
 
-- `id`: Primärschlüssel, UUID
-- `name`: Kursname
-- `description`: Beschreibung (optional)
-- `createdAt`, `updatedAt`: Timestamps
+- `id`: primary key, UUID
+- `name`: course name
+- `description`: optional description
+- `createdAt`, `updatedAt`: timestamps
