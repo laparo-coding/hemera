@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     // Processing Stripe webhook event: ${event.type}
 
     // Process the webhook event based on type
-    let result = { success: true, processed: false };
+    const result = { success: true, processed: false };
 
     switch (event.type) {
       case 'checkout.session.completed':
