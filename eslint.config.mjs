@@ -57,8 +57,17 @@ export default tseslint.config(
 
   // Server/API routes: strict no-console
   {
-    files: ['app/api/**/*.ts', 'app/**/route.ts', 'lib/api/**/*.ts', 'lib/services/**/*.ts'],
-    ignores: ['app/api/stripe/webhook/**/*.ts', 'app/api/stripe/webhook/*.ts', 'app/api/webhooks/**/*.ts'],
+    files: [
+      'app/api/**/*.ts',
+      'app/**/route.ts',
+      'lib/api/**/*.ts',
+      'lib/services/**/*.ts',
+    ],
+    ignores: [
+      'app/api/stripe/webhook/**/*.ts',
+      'app/api/stripe/webhook/*.ts',
+      'app/api/webhooks/**/*.ts',
+    ],
     rules: {
       'no-console': ['error'],
     },
@@ -82,9 +91,13 @@ export default tseslint.config(
 
   // Scripts and tests: allow console
   {
-    files: ['scripts/**/*.{js,mjs,ts}', 'tests/**/*.{js,ts}', 'prisma/**/*.{js,ts}'],
+    files: [
+      'scripts/**/*.{js,mjs,ts}',
+      'tests/**/*.{js,ts}',
+      'prisma/**/*.{js,ts}',
+    ],
     rules: {
       'no-console': 'off',
     },
-  },
+  }
 );
