@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
 
   return createSuccessResponse(
     { accepted: true, event: eventData },
-    requestId,
+    _requestId,
     202
   );
 }

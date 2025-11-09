@@ -36,7 +36,7 @@ export async function GET(
       );
     }
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(_request.url);
     const includeStats = searchParams.get('includeStats') === 'true';
 
     const [profile, stats] = await Promise.all([
@@ -91,7 +91,7 @@ export async function PUT(
 
     let body;
     try {
-      body = await request.json();
+      body = await _request.json();
     } catch (error) {
       return NextResponse.json(
         { error: 'Invalid JSON in request body' },
