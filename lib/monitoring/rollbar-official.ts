@@ -6,6 +6,17 @@
 import Rollbar from 'rollbar';
 import { isTelemetryConsentGranted } from './privacy';
 
+interface RollbarTestInstance {
+  critical: () => void;
+  error: () => void;
+  warning: () => void;
+  warn: () => void;
+  info: () => void;
+  debug: () => void;
+  log: () => void;
+  wait: (cb?: () => void) => void;
+}
+
 // Enablement rules unify various legacy flags used across the repo/scripts
 const isE2EMode = process.env.E2E_TEST === 'true';
 const isTestMode =
@@ -42,7 +53,7 @@ export const clientConfig = {
 
 // Server-side instance (for API routes and server components)
 // In test mode, export a no-op instance to avoid network calls.
-export const serverInstance: any = isTestMode
+export const serverInstance: Rollbar | RollbarTestInstance = isTestMode
   ? {
       critical: () => {},
       error: () => {},

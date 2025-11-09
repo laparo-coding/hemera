@@ -265,7 +265,7 @@ export async function updateBookingPaymentStatus(
   paymentStatus: PaymentStatus,
   stripePaymentIntentId?: string
 ): Promise<Booking> {
-  const updateData: any = { paymentStatus };
+  const updateData: Prisma.BookingUpdateInput = { paymentStatus };
 
   if (stripePaymentIntentId) {
     updateData.stripePaymentIntentId = stripePaymentIntentId;
@@ -286,7 +286,7 @@ export async function cancelBooking(
   bookingId: string,
   userId?: string
 ): Promise<Booking> {
-  const where: any = { id: bookingId };
+  const where: Prisma.BookingWhereUniqueInput = { id: bookingId };
 
   if (userId) {
     where.userId = userId;
@@ -302,7 +302,7 @@ export async function cancelBooking(
   }
 
   // Can only cancel pending or paid bookings
-  const currentStatus = (existingBooking as any).paymentStatus;
+  const currentStatus = existingBooking.paymentStatus;
   if (![PaymentStatus.PENDING, PaymentStatus.PAID].includes(currentStatus)) {
     throw new Error(`Cannot cancel booking with status: ${currentStatus}`);
   }
@@ -319,7 +319,7 @@ export async function getBookingByStripeSessionId(
   return (await prisma.booking.findFirst({
     where: {
       ...(sessionId && { stripeSessionId: sessionId }),
-    } as any,
+    },
   })) as unknown as Booking | null;
 }
 
@@ -332,7 +332,7 @@ export async function getBookingByStripePaymentIntentId(
   return (await prisma.booking.findFirst({
     where: {
       ...(paymentIntentId && { stripePaymentIntentId: paymentIntentId }),
-    } as any,
+    },
   })) as unknown as Booking | null;
 }
 

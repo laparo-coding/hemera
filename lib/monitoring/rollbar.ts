@@ -29,7 +29,7 @@ export const rollbarConfig: Rollbar.Configuration = {
   // },
 
   // Transform function to add custom data
-  transform: (payload: any) => {
+  transform: (payload: Record<string, unknown>) => {
     // Add deployment info
     if (process.env.VERCEL_URL) {
       payload.server = {
@@ -105,7 +105,7 @@ export interface ErrorContext {
   userAgent?: string;
   ip?: string;
   timestamp?: Date;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
 }
 
 /**
@@ -268,7 +268,7 @@ export function createErrorContext(
 export function recordUserAction(
   action: string,
   userId?: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): void {
   if (!rollbarConfig.enabled) return;
 
