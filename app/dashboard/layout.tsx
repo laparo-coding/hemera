@@ -116,11 +116,11 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
         const role = (parsed?.user?.role as string) || 'user';
         return role === 'admin' ? 'admin' : 'user';
       }
-    } catch {}
+    } catch {
+      // Ignore parsing errors, return default
+    }
     return 'user';
-  });
-
-  // Read role from localStorage and react to changes
+  }); // Read role from localStorage and react to changes
   useEffect(() => {
     const readRole = () => {
       try {
@@ -133,7 +133,9 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
           setUserRole(role === 'admin' ? 'admin' : 'user');
           return;
         }
-      } catch {}
+      } catch {
+        // Ignore parsing errors
+      }
       setUserRole('user');
     };
     // Initial read before first paint
@@ -157,9 +159,10 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
         const role = (parsed?.user?.role as string) || 'user';
         setUserRole(role === 'admin' ? 'admin' : 'user');
       }
-    } catch {}
+    } catch {
+      // Ignore parsing errors
+    }
   }, []);
-
   const handleSignOut = useCallback(() => {
     try {
       // Clear local mock session
@@ -173,10 +176,11 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
           .replace(/^ +/, '')
           .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
       });
-    } catch {}
+    } catch {
+      // Ignore cookie clearing errors
+    }
     router.push('/');
   }, [router]);
-
   return (
     <Box
       data-testid='dashboard-layout'
@@ -283,7 +287,9 @@ export default function DashboardLayout({
       const raw = window.localStorage?.getItem('clerk-session');
       if (raw) isE2E = true;
     }
-  } catch {}
+  } catch {
+    // Ignore localStorage errors
+  }
 
   return isE2E ? (
     <DashboardLayoutE2E>{children}</DashboardLayoutE2E>

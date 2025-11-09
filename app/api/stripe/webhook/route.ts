@@ -40,11 +40,6 @@ const getWebhookSecret = () => {
 const processedEvents = new Set<string>();
 const _EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 
-interface ProcessedEvent {
-  id: string;
-  timestamp: number;
-}
-
 // Clean up old events periodically
 setInterval(
   () => {

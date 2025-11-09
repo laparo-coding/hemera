@@ -101,7 +101,7 @@ export const syncExternalDataAction = withRetry(
 
 // Example 6: Transaction-based server action
 export const transferCreditsAction = withTransaction(async context => {
-  const { tx, userId } = context;
+  const { tx: _tx, userId } = context;
 
   // Simulate credit transfer within transaction
   // Implementation would use actual Prisma transaction
@@ -138,7 +138,7 @@ export const uploadCourseImageAction = createFormAction(
 // Example 8: Complex server action with error boundaries
 export const enrollInCourseAction = withAuthenticatedServerAction(
   async context => {
-    const { userId, requestId } = context;
+    const { userId, requestId: _requestId } = context;
     // Check if user is already enrolled
     const existingEnrollment = await checkExistingEnrollment(
       userId,

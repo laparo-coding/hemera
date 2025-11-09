@@ -65,13 +65,6 @@ export function mapPrismaError(
         prismaError
       );
 
-    // Record to delete does not exist
-    case 'P2025':
-      return new DatabaseConnectionError(
-        'Cannot delete non-existent record',
-        prismaError
-      );
-
     // Required field missing
     case 'P2012':
       return new FieldValidationError('unknown', 'Required field missing');

@@ -20,7 +20,8 @@ export function generateRequestId(): string {
       (globalThis as GlobalWithCrypto).crypto &&
       typeof (globalThis as GlobalWithCrypto).crypto?.randomUUID === 'function'
     ) {
-      return (globalThis as GlobalWithCrypto).crypto?.randomUUID?.();
+      const uuid = (globalThis as GlobalWithCrypto).crypto?.randomUUID?.();
+      if (uuid) return uuid;
     }
   } catch (_) {
     // fall through to fallback
