@@ -51,7 +51,7 @@ interface ErrorLogEntry {
   message: string;
   statusCode: number;
   requestId: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   resolved: boolean;
 }
 
@@ -122,7 +122,9 @@ export default function ErrorDashboard() {
     }
   };
 
-  const getCategoryColor = (category: string) => {
+  const getCategoryColor = (
+    category: string
+  ): 'warning' | 'info' | 'error' | 'default' => {
     switch (category) {
       case 'business':
         return 'warning';
@@ -241,7 +243,7 @@ export default function ErrorDashboard() {
                         key={category}
                         icon={getCategoryIcon(category)}
                         label={`${category}: ${count}`}
-                        color={getCategoryColor(category) as any}
+                        color={getCategoryColor(category)}
                         variant='outlined'
                       />
                     )
@@ -325,7 +327,7 @@ export default function ErrorDashboard() {
                           icon={getCategoryIcon(log.category)}
                           label={log.category}
                           size='small'
-                          color={getCategoryColor(log.category) as any}
+                          color={getCategoryColor(log.category)}
                         />
                       </TableCell>
                       <TableCell
