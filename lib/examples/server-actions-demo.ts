@@ -50,8 +50,9 @@ export const updateProfileAction = withAuthenticatedServerAction(
 
 // Example 3: Form validation server action
 const bookingSchema = {
-  parse: (data: any) => {
-    if (!data.courseId || !data.userId || !data.date) {
+  parse: (data: unknown) => {
+    const record = data as Record<string, unknown>;
+    if (!record.courseId || !record.userId || !record.date) {
       throw new Error('Course ID, User ID, and date are required');
     }
     return data;
@@ -60,10 +61,18 @@ const bookingSchema = {
 
 export const createBookingAction = withFormValidation(
   bookingSchema,
-  async (_context: ServerActionContext, validatedData: any) => {
+  async (
+    _context: ServerActionContext,
+    validatedData: Record<string, unknown>
+  ) => {
+    const data = validatedData as {
+      courseId: string;
+      userId: string;
+      date: string;
+    };
     const booking = await createBooking({
-      courseId: validatedData.courseId,
-      userId: validatedData.userId,
+      courseId: data.courseId,
+      userId: data.userId,
       paymentStatus: 'PENDING',
     });
 

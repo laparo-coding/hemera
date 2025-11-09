@@ -101,7 +101,8 @@ export async function GET(request: NextRequest) {
     // Sortierung anwenden
     if (validatedParams.sortBy) {
       filteredCourses.sort((a: CourseWithBookings, b: CourseWithBookings) => {
-        let aValue: any, bValue: any;
+        let aValue: string | number | Date;
+        let bValue: string | number | Date;
 
         switch (validatedParams.sortBy) {
           case 'title':
@@ -113,8 +114,8 @@ export async function GET(request: NextRequest) {
             bValue = b.price || 0;
             break;
           case 'date':
-            aValue = a.date;
-            bValue = b.date;
+            aValue = a.date || new Date(0);
+            bValue = b.date || new Date(0);
             break;
           default:
             aValue = a.title;
