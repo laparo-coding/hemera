@@ -204,18 +204,21 @@ const UserDashboardClerk: React.FC = () => {
   }, [userLoaded, user, fetchBookings]);
 
   // Memoized helper functions for better performance
-  const getStatusColor = useCallback((status: string) => {
-    switch (status) {
-      case 'PAID':
-        return 'success';
-      case 'PENDING':
-        return 'warning';
-      case 'FAILED':
-        return 'error';
-      default:
-        return 'default';
-    }
-  }, []);
+  const getStatusColor = useCallback(
+    (status: string): 'success' | 'warning' | 'error' | 'default' => {
+      switch (status) {
+        case 'PAID':
+          return 'success';
+        case 'PENDING':
+          return 'warning';
+        case 'FAILED':
+          return 'error';
+        default:
+          return 'default';
+      }
+    },
+    []
+  );
 
   const getStatusIcon = useCallback((status: string) => {
     switch (status) {
@@ -382,7 +385,7 @@ const UserDashboardClerk: React.FC = () => {
                                 ? 'Bezahlt'
                                 : 'Ausstehend'
                             }
-                            color={getStatusColor(booking.paymentStatus) as any}
+                            color={getStatusColor(booking.paymentStatus)}
                             size='small'
                           />
                         </Stack>

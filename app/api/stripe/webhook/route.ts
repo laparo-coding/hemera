@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
     // Handle different event types
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as any;
+        const session = event.data.object as Stripe.Checkout.Session;
         console.log(`[${requestId}] Processing checkout.session.completed`, {
           sessionId: session.id,
           customerEmail: session.customer_email,
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'payment_intent.payment_failed': {
-        const paymentIntent = event.data.object as any;
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log(`[${requestId}] Processing payment_intent.payment_failed`, {
           paymentIntentId: paymentIntent.id,
           lastPaymentError: paymentIntent.last_payment_error?.message,

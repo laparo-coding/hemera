@@ -199,7 +199,15 @@ export const SCHEMA_COMBINATIONS = {
       type: 'CollectionPage',
     }),
   ],
-  courseList: (courses: any[] = []) => [
+  courseList: (
+    courses: Array<{
+      id: string;
+      slug?: string | null;
+      title: string;
+      description?: string | null;
+      price?: number | null;
+    }> = []
+  ) => [
     generateOrganizationSchema(),
     generateWebPageSchema({
       title: `Courses - ${ORGANIZATION_CONFIG.name}`,

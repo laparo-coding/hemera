@@ -38,7 +38,7 @@ interface HealthCheck {
   name: string;
   status: 'pass' | 'fail' | 'warn';
   responseTime: number;
-  details?: any;
+  details?: unknown;
   lastChecked: string;
 }
 
@@ -127,7 +127,9 @@ export default function DeploymentMonitoringDashboard() {
     return () => clearInterval(interval);
   }, [fetchHealthStatus]);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (
+    status: string
+  ): 'success' | 'warning' | 'error' | 'default' => {
     switch (status) {
       case 'healthy':
       case 'pass':
@@ -236,7 +238,7 @@ export default function DeploymentMonitoringDashboard() {
                 {getStatusIcon(healthData.deployment.status)}
                 <Chip
                   label={healthData.deployment.status.toUpperCase()}
-                  color={getStatusColor(healthData.deployment.status) as any}
+                  color={getStatusColor(healthData.deployment.status)}
                   variant='filled'
                 />
               </Box>
@@ -302,7 +304,7 @@ export default function DeploymentMonitoringDashboard() {
                     </Typography>
                     <Chip
                       label={healthCheck.status.toUpperCase()}
-                      color={getStatusColor(healthCheck.status) as any}
+                      color={getStatusColor(healthCheck.status)}
                       size='small'
                     />
                     <Typography
