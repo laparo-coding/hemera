@@ -3,6 +3,7 @@
  * Allows testing different error types in development
  */
 
+import { type NextRequest, NextResponse } from 'next/server';
 import {
   CourseNotFoundError,
   DatabaseConnectionError,
@@ -11,7 +12,6 @@ import {
   UnauthorizedError,
   withErrorHandling,
 } from '@/lib/errors';
-import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = withErrorHandling(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);

@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/db/prisma';
 import { PaymentStatus } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 
 export { PaymentStatus } from '@prisma/client';
 

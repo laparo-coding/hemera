@@ -1,7 +1,7 @@
 'use client';
 
 import { loadStripe } from '@stripe/stripe-js';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 // Expose the Stripe promise and shared appearance config so pages can
 // instantiate <Elements> with the correct clientSecret when it becomes available.

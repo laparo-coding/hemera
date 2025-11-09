@@ -6,7 +6,7 @@ const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 function decodeJsonLd(content: string): any {
   try {
     return JSON.parse(content);
-  } catch (e) {
+  } catch (_e) {
     return null;
   }
 }

@@ -1,9 +1,9 @@
-import { prisma } from '@/lib/db/prisma';
-import { STRIPE_API_VERSION } from '@/lib/stripe/config';
 import { currentUser } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { z } from 'zod';
+import { prisma } from '@/lib/db/prisma';
+import { STRIPE_API_VERSION } from '@/lib/stripe/config';
 
 // Skip Stripe initialization during build process
 const isBuildTime =

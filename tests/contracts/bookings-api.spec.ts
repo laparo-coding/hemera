@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 describe('GET /api/bookings - Contract Tests', () => {
-  const BOOKINGS_ENDPOINT = '/api/bookings';
+  const _BOOKINGS_ENDPOINT = '/api/bookings';
 
   describe('Request Schema Validation', () => {
     it('should support query parameters for filtering', () => {

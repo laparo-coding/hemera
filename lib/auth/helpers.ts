@@ -91,7 +91,7 @@ export async function isAdmin() {
 /**
  * Check if a specific user has admin role by ID
  */
-export async function checkUserAdminStatus(userId: string): Promise<boolean> {
+export async function checkUserAdminStatus(_userId: string): Promise<boolean> {
   if (isMockAuthEnvironment()) return true;
   const user = await currentUser();
   // Check if the current authenticated user is an admin

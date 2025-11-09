@@ -9,7 +9,7 @@ import { createBooking } from '@/lib/api/bookings';
 import { BookingAlreadyExistsError } from '@/lib/errors/domain';
 import {
   createFormAction,
-  ServerActionContext,
+  type ServerActionContext,
   withAuthenticatedServerAction,
   withFormValidation,
   withOptimisticUpdate,
@@ -20,7 +20,7 @@ import {
 
 // Example 1: Basic server action with error handling
 export const createCourseAction = withServerActionErrorHandling(
-  async (context: ServerActionContext) => {
+  async (_context: ServerActionContext) => {
     // Simulate course creation
     const course = {
       id: 'course-1',
@@ -60,7 +60,7 @@ const bookingSchema = {
 
 export const createBookingAction = withFormValidation(
   bookingSchema,
-  async (context: ServerActionContext, validatedData: any) => {
+  async (_context: ServerActionContext, validatedData: any) => {
     const booking = await createBooking({
       courseId: validatedData.courseId,
       userId: validatedData.userId,
@@ -73,7 +73,7 @@ export const createBookingAction = withFormValidation(
 
 // Example 4: Optimistic update server action
 export const toggleBookmarkAction = withOptimisticUpdate(
-  async (context: ServerActionContext) => {
+  async (_context: ServerActionContext) => {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -87,7 +87,7 @@ export const toggleBookmarkAction = withOptimisticUpdate(
 
 // Example 5: Server action with retry logic
 export const syncExternalDataAction = withRetry(
-  async (context: ServerActionContext) => {
+  async (_context: ServerActionContext) => {
     // Simulate external API call that might fail
     if (Math.random() > 0.7) {
       throw new Error('External API temporarily unavailable');
@@ -139,34 +139,28 @@ export const uploadCourseImageAction = createFormAction(
 export const enrollInCourseAction = withAuthenticatedServerAction(
   async context => {
     const { userId, requestId } = context;
+    // Check if user is already enrolled
+    const existingEnrollment = await checkExistingEnrollment(
+      userId,
+      'course-id'
+    );
 
-    try {
-      // Check if user is already enrolled
-      const existingEnrollment = await checkExistingEnrollment(
-        userId,
-        'course-id'
-      );
-
-      if (existingEnrollment) {
-        throw new BookingAlreadyExistsError(userId, 'course-id');
-      }
-
-      // Create enrollment
-      const enrollment = await createEnrollment(userId, 'course-id');
-
-      // Send welcome email (fire and forget)
-      sendWelcomeEmail(userId, 'course-id').catch(error => {});
-
-      return enrollment;
-    } catch (error) {
-      // Additional error context
-      throw error;
+    if (existingEnrollment) {
+      throw new BookingAlreadyExistsError(userId, 'course-id');
     }
+
+    // Create enrollment
+    const enrollment = await createEnrollment(userId, 'course-id');
+
+    // Send welcome email (fire and forget)
+    sendWelcomeEmail(userId, 'course-id').catch(_error => {});
+
+    return enrollment;
   }
 );
 
 // Helper functions (placeholders)
-async function checkExistingEnrollment(userId: string, courseId: string) {
+async function checkExistingEnrollment(_userId: string, _courseId: string) {
   return null; // Placeholder
 }
 
@@ -179,7 +173,7 @@ async function createEnrollment(userId: string, courseId: string) {
   };
 }
 
-async function sendWelcomeEmail(userId: string, courseId: string) {
+async function sendWelcomeEmail(_userId: string, _courseId: string) {
   // Email sending logic
   return true;
 }

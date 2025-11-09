@@ -6,7 +6,7 @@
 'use client';
 
 import { Provider as RollbarProvider } from '@rollbar/react';
-import React from 'react';
+import type React from 'react';
 import { clientConfig } from './rollbar-official';
 
 interface RollbarProviderWrapperProps {

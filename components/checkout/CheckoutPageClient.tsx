@@ -1,10 +1,5 @@
 'use client';
 
-import StripeCheckoutForm from '@/components/payment/StripeCheckoutForm';
-import {
-  stripeAppearance,
-  stripePromise,
-} from '@/components/payment/StripeProvider';
 import { useUser } from '@clerk/nextjs';
 import {
   Alert,
@@ -18,6 +13,11 @@ import {
 import { Elements } from '@stripe/react-stripe-js';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import StripeCheckoutForm from '@/components/payment/StripeCheckoutForm';
+import {
+  stripeAppearance,
+  stripePromise,
+} from '@/components/payment/StripeProvider';
 
 const STRIPE_ENABLED = Boolean(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 const STRIPE_UNAVAILABLE_MESSAGE =
@@ -150,7 +150,7 @@ function CheckoutContent() {
 
       const confirmationData = await response.json();
       router.push(`/booking-success?bookingId=${confirmationData.bookingId}`);
-    } catch (err) {
+    } catch (_err) {
       setError(
         'Zahlung konnte nicht verarbeitet werden. Bitte wende dich an den Support.'
       );

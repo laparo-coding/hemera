@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useMemo, useState } from 'react';
+import { type FormEvent, useMemo, useState } from 'react';
 
 export default function CustomSignUpClient() {
   const { isLoaded, signUp, setActive } = useSignUp();

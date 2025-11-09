@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 describe('GET /api/courses - Contract Tests', () => {
-  const COURSES_ENDPOINT = '/api/courses';
+  const _COURSES_ENDPOINT = '/api/courses';
 
   describe('Request Schema Validation', () => {
     it('should support query parameters for filtering and pagination', () => {
@@ -33,7 +33,7 @@ describe('GET /api/courses - Contract Tests', () => {
       expect(validQuery.priceMin).toBeGreaterThanOrEqual(0);
       expect(validQuery.priceMax).toBeGreaterThan(validQuery.priceMin!);
       expect(typeof validQuery.available).toBe('boolean');
-      expect(validQuery.search!.length).toBeGreaterThan(0);
+      expect(validQuery.search?.length).toBeGreaterThan(0);
       expect(validQuery.limit).toBeGreaterThan(0);
       expect(validQuery.offset).toBeGreaterThanOrEqual(0);
       expect(['name', 'price', 'createdAt', 'capacity']).toContain(
@@ -214,7 +214,7 @@ describe('GET /api/courses - Contract Tests', () => {
 
       expect(validCourseDetail.id).toMatch(/^course_/);
       expect(validCourseDetail.name.length).toBeGreaterThan(0);
-      expect(validCourseDetail.slug).toMatch(/^[a-z0-9\-]+$/);
+      expect(validCourseDetail.slug).toMatch(/^[a-z0-9-]+$/);
       expect(validCourseDetail.price).toBeGreaterThanOrEqual(0);
       expect(validCourseDetail.capacity).toBeGreaterThan(0);
       expect(['beginner', 'intermediate', 'advanced']).toContain(
@@ -298,7 +298,7 @@ describe('GET /api/courses - Contract Tests', () => {
         'marketing',
         'data-science',
       ];
-      const categoryPattern = /^[a-z\-]+$/;
+      const categoryPattern = /^[a-z-]+$/;
 
       validCategories.forEach(category => {
         expect(category).toMatch(categoryPattern);
@@ -401,8 +401,7 @@ describe('GET /api/courses - Contract Tests', () => {
         courses.filter(
           course =>
             course.name.toLowerCase().includes(term.toLowerCase()) ||
-            (course.description &&
-              course.description.toLowerCase().includes(term.toLowerCase()))
+            course.description?.toLowerCase().includes(term.toLowerCase())
         );
 
       const searchResults = searchFilter('typescript');
@@ -521,7 +520,7 @@ describe('GET /api/courses - Contract Tests', () => {
 
       expect(validCourse.id).toMatch(/^course_/);
       expect(validCourse.name.length).toBeGreaterThan(0);
-      expect(validCourse.slug).toMatch(/^[a-z0-9\-]+$/);
+      expect(validCourse.slug).toMatch(/^[a-z0-9-]+$/);
       expect(validCourse.price).toBeGreaterThanOrEqual(0);
       expect(validCourse.capacity).toBeGreaterThan(0);
       expect(validCourse.createdAt).toMatch(
@@ -580,7 +579,7 @@ describe('GET /api/courses - Contract Tests', () => {
       };
 
       expect(cacheHeaders['Cache-Control']).toContain('max-age');
-      expect(cacheHeaders['ETag']).toMatch(/^".*"$/);
+      expect(cacheHeaders.ETag).toMatch(/^".*"$/);
       expect(cacheHeaders['Last-Modified']).toMatch(
         /^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/
       );

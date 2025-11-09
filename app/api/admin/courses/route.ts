@@ -1,13 +1,13 @@
-import { prisma } from '@/lib/db/prisma';
+import { auth } from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { checkUserAdminStatus } from '@/lib/auth/helpers';
+import { prisma } from '@/lib/db/prisma';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
 import { getOrCreateRequestId } from '@/lib/utils/request-id';
-import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
 
 // CORS headers for external app access
 const corsHeaders = {
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     try {
       const authResult = await auth();
       userId = authResult.userId;
-    } catch (authError) {
+    } catch (_authError) {
       // In E2E test mode, auth() might fail, return 401
       const errorResponse = createErrorResponse(
         'Unauthorized access',
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
     });
 
     return response;
-  } catch (error) {
+  } catch (_error) {
     const errorResponse = createErrorResponse(
       'Failed to fetch courses',
       ErrorCodes.INTERNAL_ERROR,

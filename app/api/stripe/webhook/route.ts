@@ -1,9 +1,9 @@
-import { updateBookingPaymentStatus } from '@/lib/api/bookings';
-import { STRIPE_API_VERSION } from '@/lib/stripe/config';
 import { PaymentStatus } from '@prisma/client';
 import { headers } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { updateBookingPaymentStatus } from '@/lib/api/bookings';
+import { STRIPE_API_VERSION } from '@/lib/stripe/config';
 
 // Skip Stripe initialization during build process
 const isBuildTime =
@@ -38,7 +38,7 @@ const getWebhookSecret = () => {
  * In production, use Redis or a database
  */
 const processedEvents = new Set<string>();
-const EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
+const _EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 
 interface ProcessedEvent {
   id: string;
@@ -48,8 +48,8 @@ interface ProcessedEvent {
 // Clean up old events periodically
 setInterval(
   () => {
-    const now = Date.now();
-    processedEvents.forEach(eventId => {
+    const _now = Date.now();
+    processedEvents.forEach(_eventId => {
       // In real implementation, we'd check timestamp from storage
       // For now, just clear after some time
     });

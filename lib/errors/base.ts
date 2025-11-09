@@ -6,8 +6,8 @@
 import {
   createErrorContext,
   ErrorSeverity,
-  reportError,
   type ErrorSeverityType,
+  reportError,
 } from '../monitoring/rollbar-official';
 
 export abstract class BaseError extends Error {
@@ -69,7 +69,7 @@ export abstract class BaseError extends Error {
       }
 
       reportError(this, errorContext, severity);
-    } catch (rollbarError) {
+    } catch (_rollbarError) {
       // Silently fail rollbar reporting to avoid recursive errors
     }
   }

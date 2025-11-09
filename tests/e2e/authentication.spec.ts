@@ -1,6 +1,6 @@
-import { expect, Page, test } from '@playwright/test';
-import { gotoStable } from './helpers/nav';
+import { expect, type Page, test } from '@playwright/test';
 import { AuthHelper, TEST_USERS } from './auth-helper';
+import { gotoStable } from './helpers/nav';
 
 /**
  * Authentication Flow Validation
@@ -130,10 +130,10 @@ test.describe('Authentication Flow', () => {
     // Test sign-out by clearing session cookies (simulates logout)
     await page.evaluate(() => {
       // Clear all cookies and storage to simulate sign-out
-      document.cookie.split(';').forEach(function (c) {
+      document.cookie.split(';').forEach(c => {
         document.cookie = c
           .replace(/^ +/, '')
-          .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+          .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
       });
       localStorage.clear();
       sessionStorage.clear();

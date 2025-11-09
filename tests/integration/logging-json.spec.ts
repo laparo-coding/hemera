@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 // We will capture Rollbar.info payloads via the serverInstance mock (no-op in tests)
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { createApiLogger } from '@/lib/utils/api-logger';
-import { type RequestContext } from '@/lib/utils/request-id';
+import type { RequestContext } from '@/lib/utils/request-id';
 
 describe('Integration: Structured JSON logging with requestId', () => {
   const calls: Array<{ message: string; payload: any }> = [];

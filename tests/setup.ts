@@ -1,8 +1,9 @@
 // Test setup for Jest
-import { afterAll, beforeAll } from '@jest/globals';
+
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { afterAll, beforeAll } from '@jest/globals';
 import dotenv from 'dotenv';
 
 // Load env files eagerly so that DATABASE_URL is available before test files import PrismaClient
@@ -78,7 +79,7 @@ beforeAll(async () => {
         stdio: 'inherit',
         env: { ...process.env, DATABASE_URL: connectionUri },
       });
-    } catch (err) {
+    } catch (_err) {
       // If npm script fails, fallback to direct prisma seed
       execSync('npx prisma db seed', {
         stdio: 'inherit',

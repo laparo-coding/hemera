@@ -3,6 +3,8 @@
  * Provides comprehensive user operations with error handling
  */
 
+import { type User as ClerkUser, currentUser } from '@clerk/nextjs/server';
+import type { User } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import {
   DatabaseConnectionError,
@@ -11,8 +13,6 @@ import {
   UserValidationError,
 } from '@/lib/errors';
 import { safePrismaOperation } from '@/lib/errors/prisma-mapping';
-import { User as ClerkUser, currentUser } from '@clerk/nextjs/server';
-import { User } from '@prisma/client';
 
 export type { User } from '@prisma/client';
 

@@ -1,4 +1,4 @@
-import { expect, Page, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { AuthHelper } from './auth-helper';
 import { gotoStable } from './helpers/nav';
 
@@ -250,7 +250,7 @@ async function signInWithRole(page: Page, role: string) {
   );
 }
 
-async function updateUserRole(page: any, newRole: string) {
+async function updateUserRole(_page: any, newRole: string) {
   // This would typically involve an API call to update user role
   // For testing purposes, this might be simulated through:
   // 1. Admin interface interaction

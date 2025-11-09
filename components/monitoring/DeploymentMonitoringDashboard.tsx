@@ -5,34 +5,34 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  LinearProgress,
-  Alert,
-  Button,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-} from '@mui/material';
-import Grid from '@mui/material/GridLegacy';
-import {
-  ExpandMore as ExpandMoreIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon,
+  CloudDone as CloudDoneIcon,
   Error as ErrorIcon,
+  ExpandMore as ExpandMoreIcon,
   Refresh as RefreshIcon,
   Timeline as TimelineIcon,
-  CloudDone as CloudDoneIcon,
+  Warning as WarningIcon,
 } from '@mui/icons-material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  LinearProgress,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
+import { useEffect, useState } from 'react';
 
 interface HealthCheck {
   name: string;
@@ -125,7 +125,7 @@ export default function DeploymentMonitoringDashboard() {
     // Auto-refresh alle 30 Sekunden
     const interval = setInterval(fetchHealthStatus, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchHealthStatus]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

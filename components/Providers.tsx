@@ -1,13 +1,13 @@
 'use client';
 
-import ErrorBoundary from '@/components/ErrorBoundary';
-import ThemeRegistry from '@/components/ThemeRegistry';
+import type * as React from 'react';
 import ClerkProviderWrapper from '@/components/auth/ClerkProviderWrapper';
-import StripeProvider from '@/components/payment/StripeProvider';
-import ConditionalPublicNavigation from '@/components/navigation/ConditionalPublicNavigation';
-import { RollbarProviderWrapper } from '@/lib/monitoring/rollbar-react-official';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import MonitoringInit from '@/components/MonitoringInit';
-import * as React from 'react';
+import ConditionalPublicNavigation from '@/components/navigation/ConditionalPublicNavigation';
+import StripeProvider from '@/components/payment/StripeProvider';
+import ThemeRegistry from '@/components/ThemeRegistry';
+import { RollbarProviderWrapper } from '@/lib/monitoring/rollbar-react-official';
 
 type ProvidersProps = {
   children: React.ReactNode;

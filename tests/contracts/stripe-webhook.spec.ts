@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 describe('POST /api/stripe/webhook - Contract Tests', () => {
-  const WEBHOOK_ENDPOINT = '/api/stripe/webhook';
+  const _WEBHOOK_ENDPOINT = '/api/stripe/webhook';
 
   describe('Request Schema Validation', () => {
     it('should define Stripe webhook event structure', () => {
@@ -359,7 +359,7 @@ describe('POST /api/stripe/webhook - Contract Tests', () => {
 
     it('should handle webhook timeout scenarios', () => {
       const timeoutDuration = 30000; // 30 seconds
-      const processingStart = Date.now();
+      const _processingStart = Date.now();
 
       // Simulate processing time check
       const processingTime = 1000; // 1 second

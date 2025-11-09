@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 // Skip Stripe initialization during build process
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
-    } catch (err) {
+    } catch (_err) {
       // Webhook signature verification failed
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }

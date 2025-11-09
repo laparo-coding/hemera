@@ -3,13 +3,13 @@
  * Returns available authentication providers for the application
  */
 
+import type { NextRequest } from 'next/server';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import { createSuccessResponse } from '@/lib/utils/api-response';
 import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);

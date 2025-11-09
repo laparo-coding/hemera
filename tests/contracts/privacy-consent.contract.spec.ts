@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 describe('Contract: Privacy/Consent default OFF (no PII)', () => {
   const ORIGINAL_ENV = process.env;

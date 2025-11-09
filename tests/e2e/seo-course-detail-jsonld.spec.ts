@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { gotoStable, clickAndWait } from './helpers/nav';
+import { clickAndWait, gotoStable } from './helpers/nav';
 
 const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 

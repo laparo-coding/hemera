@@ -1,17 +1,18 @@
 import { requireAuthenticatedUser } from '@/lib/auth/helpers';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+
 import {
   Box,
+  Button,
   Card,
   CardContent,
-  Typography,
-  Button,
   Chip,
   LinearProgress,
+  Typography,
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Courses - Hemera Academy',
@@ -48,7 +49,7 @@ const mockCourses = [
 ];
 
 export default async function CoursesPage() {
-  const user = await requireAuthenticatedUser();
+  const _user = await requireAuthenticatedUser();
 
   return (
     <Box data-testid='courses-page'>

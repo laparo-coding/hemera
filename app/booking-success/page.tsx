@@ -1,9 +1,9 @@
+import { auth } from '@clerk/nextjs/server';
+import { notFound, redirect } from 'next/navigation';
 import BookingSuccessContent, {
   type BookingSuccessViewModel,
 } from '@/components/booking/BookingSuccessContent';
 import { getBookingById } from '@/lib/services/booking';
-import { auth } from '@clerk/nextjs/server';
-import { notFound, redirect } from 'next/navigation';
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {
   PENDING: 'Ausstehend',
@@ -21,7 +21,7 @@ function formatCurrency(amount: number, currency: string) {
       currency,
       minimumFractionDigits: 2,
     }).format(amount / 100);
-  } catch (error) {
+  } catch (_error) {
     return `${(amount / 100).toFixed(2)} ${currency}`;
   }
 }

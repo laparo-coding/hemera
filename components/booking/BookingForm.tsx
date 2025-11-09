@@ -1,6 +1,5 @@
 'use client';
 
-import type { CourseWithSEO } from '@/lib/api/courses';
 import { AttachMoneyOutlined, SchoolOutlined } from '@mui/icons-material';
 import {
   Alert,
@@ -19,6 +18,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import type { CourseWithSEO } from '@/lib/api/courses';
 
 interface BookingFormProps {
   courses: CourseWithSEO[];

@@ -1,6 +1,6 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
+import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import type { NextRequest, NextFetchEvent } from 'next/server';
 
 // In E2E test mode, bypass Clerk middleware entirely
 const isE2EMode =

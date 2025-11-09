@@ -5,8 +5,8 @@
  * with consistent styling and behavior across the app
  */
 
-import { Button, ButtonProps, SvgIcon } from '@mui/material';
-import { ReactNode } from 'react';
+import { Button, type ButtonProps, SvgIcon } from '@mui/material';
+import type { ReactNode } from 'react';
 
 // Icons for social providers (in production, use proper icon libraries)
 const GoogleIcon = () => (

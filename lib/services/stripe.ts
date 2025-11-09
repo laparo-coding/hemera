@@ -1,10 +1,10 @@
+import Stripe from 'stripe';
 import {
+  logError,
   PaymentProcessingError,
   StripeConfigurationError,
-  logError,
 } from '@/lib/errors';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import Stripe from 'stripe';
 import { STRIPE_API_VERSION } from '../stripe/config';
 import { PaymentStatus } from './course';
 
@@ -514,7 +514,7 @@ export class StripeService {
       );
 
       return true;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
