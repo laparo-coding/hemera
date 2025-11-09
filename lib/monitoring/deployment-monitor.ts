@@ -20,7 +20,7 @@ interface HealthCheck {
   name: string;
   status: 'pass' | 'fail' | 'warn';
   responseTime: number;
-  details?: any;
+  details?: unknown;
   lastChecked: string;
 }
 

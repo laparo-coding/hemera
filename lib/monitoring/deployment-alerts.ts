@@ -24,7 +24,7 @@ export interface AlertCondition {
 
 export interface NotificationChannel {
   type: 'rollbar' | 'webhook' | 'email';
-  config: Record<string, any>;
+  config: Record<string, unknown>;
 }
 
 export interface DeploymentAlert {
@@ -33,7 +33,7 @@ export interface DeploymentAlert {
   timestamp: string;
   severity: string;
   message: string;
-  details: any;
+  details: unknown;
   resolved: boolean;
 }
 
