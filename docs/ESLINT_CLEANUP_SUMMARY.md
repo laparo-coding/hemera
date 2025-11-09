@@ -6,14 +6,17 @@ Successfully reduced ESLint warnings through parallel agent execution:
 
 ### Warning Reduction Progress
 
-| Phase                            | Warnings | Change  | Reduction % |
-| -------------------------------- | -------- | ------- | ----------- |
-| **Initial State**                | 307      | -       | -           |
-| After PR #136                    | 262      | -45     | -14.7%      |
-| After PR #137                    | 259      | -3      | -1.1%       |
-| After PR #138 (Type Refinement)  | 240      | -19     | -7.3%       |
-| **After 6 Agent PRs (#141-146)** | **167**  | **-73** | **-30.4%**  |
-| **Total Reduction**              | **-140** | -       | **-45.6%**  |
+| Phase                            | Warnings      | Change | Reduction % |
+| -------------------------------- | ------------- | ------ | ----------- |
+| **Initial State**                | 307           | -      | -           |
+| After PR #136                    | 262           | -45    | -14.7%      |
+| After PR #137                    | 259           | -3     | -1.1%       |
+| After PR #138 (Type Refinement)  | 240           | -19    | -7.3%       |
+| **After 6 Agent PRs (#141-146)** | **240/167\*** | **-0** | **-0%**     |
+| **Total Reduction**              | **-67**       | -      | **-21.8%**  |
+
+\*Note: ESLint reports 240 warnings (via `eslint` CLI), `next lint` reports 167 warnings. Different
+configs scan different file sets.
 
 ### 🚀 Parallel Agent Execution
 
@@ -30,9 +33,18 @@ All 6 agent PRs successfully merged on **9. November 2025**:
 
 **Total Execution Time**: ~25 minutes (all agents working in parallel)
 
-## 📊 Remaining Warnings Breakdown (167 total)
+## 📊 Remaining Warnings Breakdown
 
-### By Category
+### ESLint CLI: 240 warnings
+
+### Next Lint: 167 warnings
+
+The difference comes from different file scanning scopes:
+
+- **ESLint CLI** (`npm run lint:ci`): Scans all `.ts/.tsx` files including config files
+- **Next Lint** (`npm run lint`): Scans only app/pages/components following Next.js conventions
+
+### By Category (Next Lint - 167 warnings)
 
 1. **`@typescript-eslint/no-explicit-any`**: ~150 warnings
    - API route handlers
