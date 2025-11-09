@@ -228,7 +228,9 @@ export class AuthHelper {
         await submitButton.click();
         buttonClicked = true;
       }
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     // Click sign in button (improved logic with multiple selectors)
     buttonClicked = false;
@@ -322,7 +324,9 @@ export class AuthHelper {
         );
         buttonClicked = true;
         console.log('🔘 Clicked primary form button');
-      } catch {}
+      } catch {
+        // Ignore E2E test errors
+      }
     }
 
     if (!buttonClicked) {
@@ -708,7 +712,9 @@ export class AuthHelper {
     try {
       await this.page.click('[data-testid="sign-out-button"]');
       signOutClicked = true;
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     if (!signOutClicked) {
       try {
@@ -721,7 +727,9 @@ export class AuthHelper {
           .first();
         await signOutButton.click();
         signOutClicked = true;
-      } catch {}
+      } catch {
+        // Ignore E2E test errors
+      }
     }
 
     if (!signOutClicked) {
@@ -747,7 +755,9 @@ export class AuthHelper {
         timeout: 2000,
       });
       return true;
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     // 2. Check URL
     const currentUrl = this.page.url();
@@ -764,7 +774,9 @@ export class AuthHelper {
         timeout: 2000,
       });
       return true;
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     // 4. Check for Clerk UserButton
     try {
@@ -772,7 +784,9 @@ export class AuthHelper {
         timeout: 2000,
       });
       return true;
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     return false;
   }

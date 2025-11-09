@@ -28,7 +28,7 @@ interface BookingFormProps {
 
 export default function BookingForm({
   courses,
-  userId,
+  userId: _userId,
   selectedCourseId,
 }: BookingFormProps) {
   const router = useRouter();
