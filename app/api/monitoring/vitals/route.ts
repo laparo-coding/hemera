@@ -55,8 +55,8 @@ function sanitizePayload(payload: IncomingWebVitalPayload) {
 }
 
 export async function POST(request: NextRequest) {
-  const requestId = getOrCreateRequestId(request);
-  const context = createRequestContextFromNextRequest(request, requestId);
+  const _requestId = getOrCreateRequestId(request);
+  const context = createRequestContextFromNextRequest(request, _requestId);
   const logger = createApiLogger(context);
 
   if (!request.headers.get('content-type')?.includes('application/json')) {
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     return createErrorResponse(
       'Unsupported Media Type. Expected application/json payload.',
       ErrorCodes.INVALID_INPUT,
-      requestId,
+      _requestId,
       415
     );
   }
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     return createErrorResponse(
       'Invalid JSON payload.',
       ErrorCodes.INVALID_INPUT,
-      requestId,
+      _requestId,
       400
     );
   }
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     return createErrorResponse(
       'Metric name and value are required.',
       ErrorCodes.INVALID_INPUT,
-      requestId,
+      _requestId,
       400
     );
   }

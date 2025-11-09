@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { clickAndWait, gotoStable } from './helpers/nav';
 
-const isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
+const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
 test.describe('Courses routing', () => {
   test('List → Detail → Sign-in redirect on booking', async ({ page }) => {

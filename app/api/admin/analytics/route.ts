@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
         };
         break;
 
-      case 'trace':
+      case 'trace': {
         const traceRequestId = searchParams.get('requestId');
         if (!traceRequestId) {
           const errorResponse = createErrorResponse(
@@ -151,8 +151,9 @@ export async function GET(request: NextRequest) {
           trace: analytics.getRequestTrace(traceRequestId),
         };
         break;
+      }
 
-      default:
+      default: {
         const errorResponse = createErrorResponse(
           'Invalid report type',
           ErrorCodes.INVALID_INPUT,
@@ -166,6 +167,7 @@ export async function GET(request: NextRequest) {
         });
 
         return errorResponse;
+      }
     }
 
     logger.info('Analytics report generated successfully', {

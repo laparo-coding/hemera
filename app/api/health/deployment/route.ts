@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     logger.info('Deployment action requested', { action });
 
     switch (action) {
-      case 'start_monitoring':
+      case 'start_monitoring': {
         const intervalMinutes = body.intervalMinutes || 5;
         deploymentMonitor.startContinuousMonitoring(intervalMinutes);
 
@@ -110,8 +110,9 @@ export async function POST(request: NextRequest) {
           interval: `${intervalMinutes} minutes`,
           requestId: context.id,
         });
+      }
 
-      case 'force_check':
+      case 'force_check': {
         const healthStatus = await deploymentMonitor.performHealthChecks();
         const deploymentStatus = deploymentMonitor.getDeploymentStatus();
 
@@ -121,6 +122,7 @@ export async function POST(request: NextRequest) {
           services: healthStatus,
           requestId: context.id,
         });
+      }
 
       default:
         logger.warn('Invalid deployment action', { action });

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { gotoStable } from './helpers/nav';
 
-const isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
+const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
 // Validiert die Darstellung und Deaktivierung für ausgebuchte Kurse, falls vorhanden.
 // Falls in der Zielumgebung aktuell kein ausgebuchter Kurs existiert, wird dies im Testbericht vermerkt

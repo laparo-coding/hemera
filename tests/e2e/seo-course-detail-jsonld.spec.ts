@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { gotoStable, clickAndWait } from './helpers/nav';
 
-const isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
+const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
 test.describe('Course detail JSON-LD', () => {
   test('enthält strukturierte Daten (application/ld+json)', async ({
