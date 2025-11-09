@@ -113,7 +113,7 @@ export interface ErrorContext {
   userAgent?: string;
   ip?: string;
   timestamp?: Date;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
 }
 
 export function createErrorContext(
@@ -154,7 +154,7 @@ export function reportError(
       Math.random() < Math.max(0, Math.min(1, rate)) && Math.random() < rateAll;
 
     const includePII = isTelemetryConsentGranted();
-    const rollbarContext = {
+    const rollbarContext: Record<string, unknown> = {
       person:
         includePII && context?.userId
           ? { id: context.userId, email: context.userEmail }
@@ -170,7 +170,7 @@ export function reportError(
         timestamp: context?.timestamp?.toISOString(),
         ...context?.additionalData,
       },
-    } as any;
+    };
 
     switch (severity) {
       case ErrorSeverity.CRITICAL:
