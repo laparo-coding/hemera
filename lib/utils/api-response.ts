@@ -2,13 +2,13 @@
  * Standardized API response utilities
  */
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: Record<string, unknown>;
   };
   meta?: {
     requestId: string;
@@ -25,7 +25,7 @@ export function createErrorResponse(
   code: string,
   requestId?: string,
   httpStatus?: number,
-  details?: any
+  details?: Record<string, unknown>
 ): Response {
   const errorResponse: ApiResponse<never> = {
     success: false,

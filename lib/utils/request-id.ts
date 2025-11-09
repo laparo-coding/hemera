@@ -3,6 +3,13 @@
  */
 import { NextRequest } from 'next/server';
 
+interface GlobalWithCrypto {
+  crypto?: {
+    randomUUID?: () => string;
+    getRandomValues?: <T extends ArrayBufferView>(array: T) => T;
+  };
+}
+
 /**
  * Generate a unique request ID (RFC4122 v4 UUID preferred)
  */
@@ -10,10 +17,10 @@ export function generateRequestId(): string {
   try {
     if (
       typeof globalThis !== 'undefined' &&
-      (globalThis as any).crypto &&
-      typeof (globalThis as any).crypto.randomUUID === 'function'
+      (globalThis as GlobalWithCrypto).crypto &&
+      typeof (globalThis as GlobalWithCrypto).crypto?.randomUUID === 'function'
     ) {
-      return (globalThis as any).crypto.randomUUID();
+      return (globalThis as GlobalWithCrypto).crypto!.randomUUID!();
     }
   } catch (_) {
     // fall through to fallback
@@ -22,11 +29,12 @@ export function generateRequestId(): string {
   const getBytes = (): Uint8Array => {
     if (
       typeof globalThis !== 'undefined' &&
-      (globalThis as any).crypto &&
-      typeof (globalThis as any).crypto.getRandomValues === 'function'
+      (globalThis as GlobalWithCrypto).crypto &&
+      typeof (globalThis as GlobalWithCrypto).crypto?.getRandomValues ===
+        'function'
     ) {
       const buf = new Uint8Array(16);
-      (globalThis as any).crypto.getRandomValues(buf);
+      (globalThis as GlobalWithCrypto).crypto!.getRandomValues!(buf);
       return buf;
     }
     const buf = new Uint8Array(16);

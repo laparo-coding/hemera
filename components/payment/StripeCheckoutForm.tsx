@@ -22,7 +22,7 @@ interface StripeCheckoutFormProps {
   amount: number;
   currency: string;
   courseName: string;
-  onSuccess: (paymentIntent: any) => void;
+  onSuccess: (paymentIntent: { id: string; status: string }) => void;
   onError: (error: string) => void;
 }
 
