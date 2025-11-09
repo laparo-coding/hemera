@@ -92,15 +92,17 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
 
   let responseData;
   switch (action) {
-    case 'metrics':
+    case 'metrics': {
       const metrics = errorAnalytics.getErrorMetrics(timeRange);
       responseData = NextResponse.json(metrics);
       break;
+    }
 
-    case 'logs':
+    case 'logs': {
       const logs = errorAnalytics.getRecentErrors(page, limit);
       responseData = NextResponse.json(logs);
       break;
+    }
 
     default:
       responseData = NextResponse.json(
@@ -181,7 +183,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   let responseData;
   switch (action) {
-    case 'resolve':
+    case 'resolve': {
       const { errorId } = await request.json();
       const resolved = errorAnalytics.resolveError(errorId);
 
@@ -190,8 +192,9 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         message: resolved ? 'Error marked as resolved' : 'Error not found',
       });
       break;
+    }
 
-    case 'clear':
+    case 'clear': {
       // Only allow in development
       if (process.env.NODE_ENV === 'development') {
         errorAnalytics.clearLogs();
@@ -203,6 +206,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         );
       }
       break;
+    }
 
     default:
       responseData = NextResponse.json(

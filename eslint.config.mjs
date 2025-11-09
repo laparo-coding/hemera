@@ -15,6 +15,7 @@ export default tseslint.config(
       '**/playwright-report/**',
       '**/playwright-report-external/**',
       '**/test-results/**',
+      '**/coverage/**',
     ],
   },
 
@@ -24,6 +25,8 @@ export default tseslint.config(
       globals: {
         ...globals.node,
         ...globals.browser,
+        React: 'readonly',
+        NodeJS: 'readonly',
       },
     },
     rules: {

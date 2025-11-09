@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * Get course details by ID
  */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
