@@ -173,7 +173,7 @@ export async function getBookingById(
 export async function getBookings(
   params?: BookingSearchParams
 ): Promise<BookingWithCourse[]> {
-  const where: any = {};
+  const where: Prisma.BookingWhereInput = {};
 
   if (params?.userId) {
     where.userId = params.userId;
@@ -239,7 +239,7 @@ export async function updateBookingStatus(params: {
 }): Promise<Booking> {
   const { id, status, stripePaymentIntentId, stripeSessionId } = params;
 
-  const updateData: any = { paymentStatus: status };
+  const updateData: Prisma.BookingUpdateInput = { paymentStatus: status };
 
   if (stripePaymentIntentId) {
     updateData.stripePaymentIntentId = stripePaymentIntentId;
