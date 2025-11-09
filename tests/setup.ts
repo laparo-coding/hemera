@@ -24,7 +24,16 @@ import dotenv from 'dotenv';
 })();
 
 // We lazy import testcontainers to avoid requiring Docker when DATABASE_URL is already provided
-let container: any | undefined;
+interface PostgresContainer {
+  getHost: () => string;
+  getPort: () => number;
+  getUsername: () => string;
+  getPassword: () => string;
+  getDatabase: () => string;
+  stop: () => Promise<unknown>;
+}
+
+let container: PostgresContainer | undefined;
 
 beforeAll(async () => {
   // If DATABASE_URL is now provided (e.g., via env files or CI secrets), use it as-is.
@@ -39,6 +48,10 @@ beforeAll(async () => {
 
     const pg = new PostgreSqlContainer('postgres:16');
     container = await pg.start();
+
+    if (!container) {
+      throw new Error('Failed to start container');
+    }
 
     const host = container.getHost();
     const port = container.getPort();
