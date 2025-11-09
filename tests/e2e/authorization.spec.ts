@@ -250,7 +250,7 @@ async function signInWithRole(page: Page, role: string) {
   );
 }
 
-async function updateUserRole(_page: any, newRole: string) {
+async function updateUserRole(_page: Page, newRole: string) {
   // This would typically involve an API call to update user role
   // For testing purposes, this might be simulated through:
   // 1. Admin interface interaction
