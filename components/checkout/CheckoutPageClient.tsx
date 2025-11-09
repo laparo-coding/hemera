@@ -132,7 +132,7 @@ function CheckoutContent() {
     fetchCourseAndCreatePaymentIntent();
   }, [isLoaded, user, courseRef, stripeEnabled]);
 
-  const handlePaymentSuccess = async (paymentIntentResult: any) => {
+  const handlePaymentSuccess = async (paymentIntentResult: { id: string }) => {
     try {
       const response = await fetch('/api/payment/confirm', {
         method: 'POST',

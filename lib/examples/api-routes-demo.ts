@@ -41,8 +41,9 @@ export const POST = withAuthProtection(async context => {
 
 // Example 3: API route with request validation
 const createCourseSchema = {
-  parse: (data: any) => {
-    if (!data.title || !data.description) {
+  parse: (data: unknown) => {
+    const record = data as Record<string, unknown>;
+    if (!record.title || !record.description) {
       throw new Error('Title and description are required');
     }
     return data;

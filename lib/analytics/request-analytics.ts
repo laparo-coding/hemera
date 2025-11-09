@@ -9,7 +9,7 @@ export interface AnalyticsEvent {
   requestId: string;
   eventType: string;
   timestamp: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   context: RequestContext;
 }
 
@@ -107,7 +107,7 @@ export class RequestAnalytics {
   public trackEvent(
     requestId: string,
     eventType: string,
-    data: Record<string, any>,
+    data: Record<string, unknown>,
     context?: RequestContext
   ): void {
     const event: AnalyticsEvent = {

@@ -423,8 +423,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     variant='contained'
                     size='large'
                     startIcon={<BookOnlineOutlinedIcon />}
-                    component={bookNowHref ? (Link as any) : undefined}
-                    href={bookNowHref}
+                    {...(bookNowHref
+                      ? {
+                          component: Link as React.ElementType,
+                          href: bookNowHref,
+                        }
+                      : {})}
                     onClick={
                       typeof onBookNow === 'function'
                         ? handleBookNow

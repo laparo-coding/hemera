@@ -23,7 +23,7 @@ export abstract class BaseError extends Error {
 
   constructor(
     message: string,
-    public readonly context?: Record<string, any>,
+    public readonly context?: Record<string, unknown>,
     public readonly cause?: Error
   ) {
     super(message);

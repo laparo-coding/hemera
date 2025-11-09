@@ -18,7 +18,7 @@ export interface ApiErrorResponse {
     code: string;
     category: string;
     statusCode: number;
-    context?: Record<string, any>;
+    context?: Record<string, unknown>;
     timestamp: string;
     requestId?: string;
   };
@@ -133,14 +133,14 @@ function getStatusCodeForError(error: Error): number {
 /**
  * Error logging utility with structured format
  */
-export function logError(error: unknown, context?: Record<string, any>) {
+export function logError(error: unknown, context?: Record<string, unknown>) {
   logErrorWithContext(error, context);
 }
 
 /**
  * Middleware helper for consistent error handling in API routes
  */
-export function withErrorHandling<T extends any[], R>(
+export function withErrorHandling<T extends unknown[], R>(
   handler: (...args: T) => Promise<R>
 ) {
   return async (...args: T): Promise<R | NextResponse<ApiErrorResponse>> => {

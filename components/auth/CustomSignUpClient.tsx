@@ -37,9 +37,10 @@ export default function CustomSignUpClient() {
       await signUp.create({ emailAddress: email, password });
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       setIsVerifying(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        err?.errors?.[0]?.message || 'Sign-up failed. Please try again.';
+        error?.errors?.[0]?.message || 'Sign-up failed. Please try again.';
       setError(message);
     } finally {
       setSubmitting(false);
@@ -61,9 +62,10 @@ export default function CustomSignUpClient() {
           'Verification not complete. Please check the code and try again.'
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        err?.errors?.[0]?.message || 'Verification failed. Please try again.';
+        error?.errors?.[0]?.message || 'Verification failed. Please try again.';
       setError(message);
     } finally {
       setSubmitting(false);

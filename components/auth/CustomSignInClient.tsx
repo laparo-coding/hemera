@@ -41,9 +41,10 @@ export default function CustomSignInClient() {
           'Additional steps required. Please complete the sign-in flow.'
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        err?.errors?.[0]?.message || 'Sign-in failed. Please try again.';
+        error?.errors?.[0]?.message || 'Sign-in failed. Please try again.';
       setError(message);
     } finally {
       setSubmitting(false);

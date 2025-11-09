@@ -27,7 +27,7 @@ export interface ErrorLogEntry {
   message: string;
   statusCode: number;
   requestId: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   userAgent?: string;
   ip?: string;
   resolved: boolean;
@@ -50,7 +50,7 @@ class ErrorAnalyticsService {
       requestId?: string;
       userAgent?: string;
       ip?: string;
-      additionalContext?: Record<string, any>;
+      additionalContext?: Record<string, unknown>;
     }
   ): void {
     const entry: ErrorLogEntry = {

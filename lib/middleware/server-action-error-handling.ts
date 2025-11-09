@@ -11,13 +11,13 @@ import {
   reportError,
 } from '../monitoring/rollbar-official';
 
-export interface ServerActionResult<T = any> {
+export interface ServerActionResult<T = unknown> {
   success: boolean;
   data?: T;
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
   requestId?: string;
 }
@@ -30,7 +30,7 @@ export interface ServerActionContext {
 /**
  * Enhanced server action wrapper with comprehensive error handling
  */
-export function withServerActionErrorHandling<T = any>(
+export function withServerActionErrorHandling<T = unknown>(
   action: (context: ServerActionContext) => Promise<T>
 ) {
   return async (
@@ -97,7 +97,7 @@ export function withServerActionErrorHandling<T = any>(
 /**
  * Server action middleware for protected actions requiring authentication
  */
-export function withAuthenticatedServerAction<T = any>(
+export function withAuthenticatedServerAction<T = unknown>(
   action: (context: ServerActionContext & { userId: string }) => Promise<T>
 ) {
   return withServerActionErrorHandling(async context => {
@@ -112,7 +112,7 @@ export function withAuthenticatedServerAction<T = any>(
 /**
  * Server action middleware for admin-only actions
  */
-export function withAdminServerAction<T = any>(
+export function withAdminServerAction<T = unknown>(
   action: (
     context: ServerActionContext & { userId: string; isAdmin: boolean }
   ) => Promise<T>
@@ -132,16 +132,16 @@ export function withAdminServerAction<T = any>(
 /**
  * Server action middleware with form data validation
  */
-export function withFormValidation<TValidated = any>(
-  schema: any, // In production, this would be a Zod schema
+export function withFormValidation<TValidated = unknown>(
+  schema: { parse: (data: unknown) => TValidated }, // In production, this would be a Zod schema
   action: (
     context: ServerActionContext,
     validatedData: TValidated
-  ) => Promise<any>
+  ) => Promise<unknown>
 ) {
   return withServerActionErrorHandling(async context => {
     // Extract form data - this would be passed differently in real implementation
-    const formData = {} as any; // Placeholder
+    const formData = {} as Record<string, unknown>; // Placeholder
 
     try {
       const validatedData = schema.parse(formData);
@@ -155,7 +155,7 @@ export function withFormValidation<TValidated = any>(
 /**
  * Server action middleware for optimistic updates
  */
-export function withOptimisticUpdate<T = any>(
+export function withOptimisticUpdate<T = unknown>(
   action: (context: ServerActionContext) => Promise<T>,
   optimisticValue?: T
 ) {
@@ -226,7 +226,7 @@ export function withOptimisticUpdate<T = any>(
 /**
  * Server action middleware with retry logic
  */
-export function withRetry<T = any>(
+export function withRetry<T = unknown>(
   action: (context: ServerActionContext) => Promise<T>,
   maxRetries: number = 3,
   retryDelay: number = 1000
@@ -256,7 +256,7 @@ export function withRetry<T = any>(
 /**
  * Server action middleware for background processing
  */
-export function withBackgroundProcessing<T = any>(
+export function withBackgroundProcessing<T = unknown>(
   action: (context: ServerActionContext) => Promise<T>,
   onProgress?: (progress: { step: string; percentage: number }) => void
 ) {
@@ -278,12 +278,12 @@ export function withBackgroundProcessing<T = any>(
 /**
  * Server action middleware for transaction handling
  */
-export function withTransaction<T = any>(
-  action: (context: ServerActionContext & { tx: any }) => Promise<T>
+export function withTransaction<T = unknown>(
+  action: (context: ServerActionContext & { tx: unknown }) => Promise<T>
 ) {
   return withServerActionErrorHandling(async context => {
     // In a real implementation, this would use Prisma transactions
-    const tx = {} as any; // Placeholder for transaction context
+    const tx = {} as Record<string, unknown>; // Placeholder for transaction context
     const result = await action({ ...context, tx });
     // Commit transaction
     return result;
@@ -293,7 +293,7 @@ export function withTransaction<T = any>(
 /**
  * Utility function to create form action handlers
  */
-export function createFormAction<T = any>(
+export function createFormAction<T = unknown>(
   action: (formData: FormData, context: ServerActionContext) => Promise<T>
 ) {
   return withServerActionErrorHandling(async context => {
@@ -306,7 +306,7 @@ export function createFormAction<T = any>(
 /**
  * Utility function to handle file upload actions
  */
-export function createFileUploadAction<T = any>(
+export function createFileUploadAction<T = unknown>(
   action: (files: File[], context: ServerActionContext) => Promise<T>
 ) {
   return withServerActionErrorHandling(async context => {

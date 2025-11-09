@@ -19,7 +19,7 @@ function isMockAuthEnvironment(): boolean {
  * Provides a minimal mocked Clerk User object for E2E/test environments.
  */
 function getMockUser(role: 'user' | 'admin' = 'user'): User {
-  const mock: any = {
+  const mock: Partial<User> = {
     id: 'e2e_mock_user',
     firstName: role === 'admin' ? 'Admin' : 'E2E',
     lastName: 'User',
