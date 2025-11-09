@@ -47,7 +47,7 @@ export interface CourseSearchParams {
 export async function getCourses(
   params?: CourseSearchParams
 ): Promise<CourseWithBookings[]> {
-  const where: any = {};
+  const where: Record<string, unknown> = {};
 
   if (params?.title) {
     where.title = {

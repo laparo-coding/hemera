@@ -65,12 +65,12 @@ export async function createBooking(
   }
 
   // Check capacity if set
-  if ((course as any).capacity) {
+  if ('capacity' in course && course.capacity) {
     const paidBookingsCount = course.bookings.filter(
-      b => (b as any).paymentStatus === PaymentStatus.PAID
+      b => 'paymentStatus' in b && b.paymentStatus === PaymentStatus.PAID
     ).length;
 
-    if (paidBookingsCount >= (course as any).capacity) {
+    if (paidBookingsCount >= course.capacity) {
       throw new Error('Course is full');
     }
   }
