@@ -20,7 +20,7 @@ import {
  */
 export function mapPrismaError(
   error: unknown,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): Error {
   if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
     // Handle other Prisma errors
@@ -128,7 +128,7 @@ export function mapPrismaError(
  */
 function handleUniqueConstraintViolation(
   error: Prisma.PrismaClientKnownRequestError,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): Error {
   const constraint = error.meta?.target as string[] | string;
   const table = error.meta?.table as string;
@@ -165,7 +165,7 @@ function handleUniqueConstraintViolation(
  */
 export async function safePrismaOperation<T>(
   operation: () => Promise<T>,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): Promise<T> {
   try {
     return await operation();
@@ -179,7 +179,7 @@ export async function safePrismaOperation<T>(
  */
 export async function safePrismaTransaction<T>(
   transaction: (prisma: Prisma.TransactionClient) => Promise<T>,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): Promise<T> {
   try {
     return await basePrisma.$transaction(transaction);

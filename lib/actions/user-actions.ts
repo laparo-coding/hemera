@@ -202,7 +202,7 @@ export const checkEmailAvailabilityAction = async (
  */
 export const updateUserPreferenceAction = async (
   key: string,
-  value: any
+  value: unknown
 ): Promise<ServerActionResult> => {
   try {
     if (!key || typeof key !== 'string') {
