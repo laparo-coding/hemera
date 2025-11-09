@@ -174,25 +174,22 @@ export function reportError(
 
     switch (severity) {
       case ErrorSeverity.CRITICAL:
-        if (pick(rateCritical))
-          serverInstance.critical(error as any, rollbarContext);
+        if (pick(rateCritical)) serverInstance.critical(error, rollbarContext);
         break;
       case ErrorSeverity.ERROR:
-        if (pick(rateError)) serverInstance.error(error as any, rollbarContext);
+        if (pick(rateError)) serverInstance.error(error, rollbarContext);
         break;
       case ErrorSeverity.WARNING:
-        if (pick(rateWarn))
-          serverInstance.warning(error as any, rollbarContext);
+        if (pick(rateWarn)) serverInstance.warning(error, rollbarContext);
         break;
       case ErrorSeverity.INFO:
-        if (pick(rateInfo)) serverInstance.info(error as any, rollbarContext);
+        if (pick(rateInfo)) serverInstance.info(error, rollbarContext);
         break;
       case ErrorSeverity.DEBUG:
-        if (pick(rateInfo))
-          serverInstance.debug?.(error as any, rollbarContext);
+        if (pick(rateInfo)) serverInstance.debug?.(error, rollbarContext);
         break;
       default:
-        if (pick(rateError)) serverInstance.error(error as any, rollbarContext);
+        if (pick(rateError)) serverInstance.error(error, rollbarContext);
     }
   } catch {
     // Suppress any reporting failures
@@ -202,7 +199,7 @@ export function reportError(
 export function recordUserAction(
   action: string,
   userId?: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): void {
   if (!baseConfig.enabled) return;
   try {
