@@ -3,8 +3,8 @@
  * Automatische Benachrichtigungen bei kritischen Deployment-Problemen
  */
 
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { analytics } from '@/lib/analytics/request-analytics';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 export interface AlertRule {
   id: string;
@@ -296,7 +296,7 @@ export class DeploymentAlertSystem {
     alert: DeploymentAlert
   ): Promise<void> {
     switch (channel.type) {
-      case 'rollbar':
+      case 'rollbar': {
         const level = channel.config.level || 'error';
 
         if (level === 'critical') {
@@ -307,6 +307,7 @@ export class DeploymentAlertSystem {
           serverInstance.error(alert.message, alert.details);
         }
         break;
+      }
 
       case 'webhook':
         // Webhook-Implementation hier

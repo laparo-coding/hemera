@@ -69,7 +69,7 @@ export default function ErrorDashboard() {
       );
       const data = await response.json();
       setMetrics(data.metrics);
-    } catch (error) {}
+    } catch (_error) {}
   }, [timeRange]);
 
   const fetchLogs = useCallback(async () => {
@@ -77,7 +77,7 @@ export default function ErrorDashboard() {
       const response = await fetch('/api/admin/errors?action=logs&limit=20');
       const data = await response.json();
       setErrorLogs(data.errors);
-    } catch (error) {}
+    } catch (_error) {}
   }, []);
 
   const resolveError = async (errorId: string) => {
@@ -91,7 +91,7 @@ export default function ErrorDashboard() {
       setErrorLogs(logs =>
         logs.map(log => (log.id === errorId ? { ...log, resolved: true } : log))
       );
-    } catch (error) {}
+    } catch (_error) {}
   };
 
   const refreshData = useCallback(async () => {
@@ -102,7 +102,7 @@ export default function ErrorDashboard() {
 
   useEffect(() => {
     refreshData();
-  }, [timeRange, refreshData]);
+  }, [refreshData]);
 
   const getCategoryIcon = (category: string) => {
     switch (category) {

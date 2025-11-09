@@ -1,12 +1,12 @@
-import { updateBookingStatus } from '@/lib/services/booking';
+import { auth } from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { StripeConfigurationError } from '@/lib/errors';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { updateBookingStatus } from '@/lib/services/booking';
 import {
   isStripeConfigured,
   retrievePaymentIntent,
 } from '@/lib/services/stripe';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
 
 const STRIPE_UNAVAILABLE_ERROR =
   'Stripe payments are temporarily unavailable. Please contact support.';

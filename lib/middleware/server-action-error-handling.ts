@@ -34,7 +34,7 @@ export function withServerActionErrorHandling<T = any>(
   action: (context: ServerActionContext) => Promise<T>
 ) {
   return async (
-    formData?: FormData,
+    _formData?: FormData,
     userId?: string
   ): Promise<ServerActionResult<T>> => {
     const requestContext = await getRequestContext();
@@ -160,7 +160,7 @@ export function withOptimisticUpdate<T = any>(
   optimisticValue?: T
 ) {
   return async (
-    formData?: FormData,
+    _formData?: FormData,
     userId?: string
   ): Promise<ServerActionResult<T> & { optimisticValue?: T }> => {
     const requestContext = await getRequestContext();
@@ -284,15 +284,9 @@ export function withTransaction<T = any>(
   return withServerActionErrorHandling(async context => {
     // In a real implementation, this would use Prisma transactions
     const tx = {} as any; // Placeholder for transaction context
-
-    try {
-      const result = await action({ ...context, tx });
-      // Commit transaction
-      return result;
-    } catch (error) {
-      // Rollback transaction
-      throw error;
-    }
+    const result = await action({ ...context, tx });
+    // Commit transaction
+    return result;
   });
 }
 

@@ -3,9 +3,9 @@
  * Provides route-specific error handling and request context management
  */
 
+import { type NextRequest, NextResponse } from 'next/server';
 import { toHttpError } from '@/lib/errors/http';
 import { getRequestContext } from '@/lib/utils/request-context';
-import { NextRequest, NextResponse } from 'next/server';
 import { BaseError } from '../errors/base';
 import { mapPrismaError } from '../errors/prisma-mapping';
 import {
@@ -120,7 +120,7 @@ export function withAuthProtection(
 ) {
   return withApiErrorHandling(async context => {
     // Extract user ID from headers or session
-    const authHeader = context.request.headers.get('authorization');
+    const _authHeader = context.request.headers.get('authorization');
     const sessionCookie = context.request.cookies.get('session')?.value;
 
     // For demo purposes, we'll extract from a custom header
@@ -170,15 +170,15 @@ export function withRequestValidation<TBody = any, TQuery = any>(
   bodySchema?: any, // In production, this would be Zod schemas
   querySchema?: any
 ) {
-  return function (
+  return (
     handler: (
       context: ApiRouteContext & {
         validatedBody?: TBody;
         validatedQuery?: TQuery;
       }
     ) => Promise<NextResponse>
-  ) {
-    return withApiErrorHandling(async context => {
+  ) =>
+    withApiErrorHandling(async context => {
       let validatedBody: TBody | undefined;
       let validatedQuery: TQuery | undefined;
 
@@ -217,7 +217,6 @@ export function withRequestValidation<TBody = any, TQuery = any>(
         validatedQuery,
       });
     });
-  };
 }
 
 /**
@@ -229,10 +228,8 @@ export function withRateLimit(
 ) {
   const requests = new Map<string, number[]>();
 
-  return function (
-    handler: (context: ApiRouteContext) => Promise<NextResponse>
-  ) {
-    return withApiErrorHandling(async context => {
+  return (handler: (context: ApiRouteContext) => Promise<NextResponse>) =>
+    withApiErrorHandling(async context => {
       const ip =
         context.request.headers.get('x-forwarded-for') ||
         context.request.headers.get('x-real-ip') ||
@@ -257,7 +254,6 @@ export function withRateLimit(
 
       return handler(context);
     });
-  };
 }
 
 /**
@@ -276,10 +272,8 @@ export function withCors(options?: {
 
   const corsOptions = { ...defaultOptions, ...options };
 
-  return function (
-    handler: (context: ApiRouteContext) => Promise<NextResponse>
-  ) {
-    return withApiErrorHandling(async context => {
+  return (handler: (context: ApiRouteContext) => Promise<NextResponse>) =>
+    withApiErrorHandling(async context => {
       // Handle preflight requests
       if (context.request.method === 'OPTIONS') {
         return new NextResponse(null, {
@@ -306,7 +300,6 @@ export function withCors(options?: {
 
       return response;
     });
-  };
 }
 
 // Helper functions (would be implemented based on your auth system)

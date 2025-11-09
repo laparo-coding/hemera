@@ -3,7 +3,7 @@
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import Link from 'next/link';
-import React from 'react';
+import type React from 'react';
 
 export interface Course {
   id: string;
@@ -296,13 +296,10 @@ const CourseListing: React.FC<CourseListingProps> = ({
         ))}
 
         {/* Loading cards */}
-        {loading && (
-          <>
-            {Array.from({ length: 1 }).map((_, index) => (
-              <LoadingCard key={`loading-${index}`} />
-            ))}
-          </>
-        )}
+        {loading &&
+          Array.from({ length: 1 }).map((_, index) => (
+            <LoadingCard key={`loading-${index}`} />
+          ))}
       </div>
 
       {/* Load More Button */}

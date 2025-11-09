@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 describe('POST /api/stripe/checkout - Contract Tests', () => {
-  const CHECKOUT_ENDPOINT = '/api/stripe/checkout';
+  const _CHECKOUT_ENDPOINT = '/api/stripe/checkout';
 
   describe('Request Schema Validation', () => {
     it('should define required request body schema', () => {

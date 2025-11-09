@@ -3,13 +3,13 @@
  * Converts domain errors to standardized HTTP responses
  */
 
+import { NextResponse } from 'next/server';
 import { errorAnalytics } from '@/lib/services/error-analytics';
 import {
   getRequestContext,
   getRequestId,
   logErrorWithContext,
 } from '@/lib/utils/request-context';
-import { NextResponse } from 'next/server';
 import { BaseError } from './base';
 
 export interface ApiErrorResponse {

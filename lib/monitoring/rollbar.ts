@@ -166,7 +166,7 @@ export function reportError(
       default:
         rollbar.error(error, rollbarContext);
     }
-  } catch (rollbarError) {
+  } catch (_rollbarError) {
     // Failed to report error to Rollbar - fallback logging disabled
   }
 }
@@ -282,7 +282,7 @@ export function recordUserAction(
         ...metadata,
       },
     });
-  } catch (error) {
+  } catch (_error) {
     // Failed to record user action - error suppressed for production
   }
 }

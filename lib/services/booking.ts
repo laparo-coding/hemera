@@ -1,6 +1,6 @@
-import { prisma } from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
-import { Booking, Course, PaymentStatus } from './course';
+import { prisma } from '@/lib/db/prisma';
+import { type Booking, type Course, PaymentStatus } from './course';
 
 export interface BookingWithCourse extends Booking {
   course: Course;

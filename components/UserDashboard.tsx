@@ -22,7 +22,8 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Booking {
   id: string;
@@ -52,7 +53,7 @@ const UserDashboard: React.FC = () => {
 };
 
 const UserDashboardE2E: React.FC = () => {
-  const [e2eRole, setE2eRole] = useState<'user' | 'admin' | 'unknown'>('user');
+  const [_e2eRole, setE2eRole] = useState<'user' | 'admin' | 'unknown'>('user');
 
   // Load role initially and track changes via storage events
   useEffect(() => {

@@ -1,6 +1,6 @@
-import { prisma } from '@/lib/db/prisma';
 import { PaymentStatus } from '@prisma/client';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db/prisma';
 
 /**
  * GET /api/courses/[id]
@@ -64,7 +64,7 @@ export async function GET(
         userBookingStatus: null,
       },
     });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { success: false, error: 'Failed to fetch course' },
       { status: 500 }

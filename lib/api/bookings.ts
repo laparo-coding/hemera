@@ -1,3 +1,9 @@
+import {
+  type Booking,
+  type Course,
+  PaymentStatus,
+  type User,
+} from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import {
   BookingAlreadyExistsError,
@@ -9,12 +15,6 @@ import {
   logError,
   UserNotFoundError,
 } from '@/lib/errors';
-import {
-  PaymentStatus,
-  type Booking,
-  type Course,
-  type User,
-} from '@prisma/client';
 
 /**
  * Booking model with API utilities
@@ -248,7 +248,7 @@ export async function updateBookingPaymentStatus(
  */
 export async function cancelBooking(
   bookingId: string,
-  userId: string
+  _userId: string
 ): Promise<Booking> {
   return updateBookingPaymentStatus(bookingId, PaymentStatus.CANCELLED);
 }

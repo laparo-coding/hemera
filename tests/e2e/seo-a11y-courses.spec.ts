@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from '@playwright/test';
 import { gotoStable } from './helpers/nav';
 
 const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;

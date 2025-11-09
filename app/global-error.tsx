@@ -20,7 +20,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
     rollbar.critical(error, {
       level: 'critical',
       context: 'global-error-boundary',
-      fingerprint: 'global-error-' + error.name,
+      fingerprint: `global-error-${error.name}`,
     });
   }, [error, rollbar]);
 

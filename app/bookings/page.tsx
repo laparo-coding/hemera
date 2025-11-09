@@ -1,11 +1,4 @@
 import {
-  formatBookingStatus,
-  getBookingStatusColor,
-  getUserBookings,
-  getUserBookingStats,
-} from '@/lib/api/bookings';
-import { requireAuthenticatedUser } from '@/lib/auth/helpers';
-import {
   CalendarTodayOutlined,
   MoreVertOutlined,
   SchoolOutlined,
@@ -27,8 +20,15 @@ import {
   Typography,
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import {
+  formatBookingStatus,
+  getBookingStatusColor,
+  getUserBookingStats,
+  getUserBookings,
+} from '@/lib/api/bookings';
+import { requireAuthenticatedUser } from '@/lib/auth/helpers';
 
 export const metadata: Metadata = {
   title: 'My Bookings - Hemera Academy',

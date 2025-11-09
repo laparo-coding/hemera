@@ -18,7 +18,7 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded, signOut } = useAuth();
   const { user } = useUser();
   const router = useRouter();
-  const pathname = usePathname() || '/';
+  const _pathname = usePathname() || '/';
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
@@ -104,7 +104,7 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
 }
 
 function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname() || '/';
+  const _pathname = usePathname() || '/';
   const router = useRouter();
   const [userRole, setUserRole] = useState<'user' | 'admin'>(() => {
     try {
@@ -146,7 +146,7 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [pathname]);
+  }, []);
 
   // Safety: set role before first paint if data is present
   useLayoutEffect(() => {
@@ -168,10 +168,10 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
       localStorage.clear();
       sessionStorage.clear();
       // Basic cookie clear
-      document.cookie.split(';').forEach(function (c) {
+      document.cookie.split(';').forEach(c => {
         document.cookie = c
           .replace(/^ +/, '')
-          .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+          .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
       });
     } catch {}
     router.push('/');

@@ -1,4 +1,7 @@
-import { CourseWithBookings, getCourses } from '@/lib/services/courses';
+import { PaymentStatus } from '@prisma/client';
+import type { NextRequest } from 'next/server';
+import { z } from 'zod';
+import { type CourseWithBookings, getCourses } from '@/lib/services/courses';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import {
   createErrorResponse,
@@ -9,9 +12,6 @@ import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { PaymentStatus } from '@prisma/client';
-import { NextRequest } from 'next/server';
-import { z } from 'zod';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';

@@ -3,6 +3,8 @@
  * Metrics are accepted only as JSON POST requests to keep the surface minimal.
  */
 
+import type { NextRequest } from 'next/server';
+import { isTelemetryConsentGranted } from '@/lib/monitoring/privacy';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import {
   createErrorResponse,
@@ -13,8 +15,6 @@ import {
   createRequestContextFromNextRequest,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { isTelemetryConsentGranted } from '@/lib/monitoring/privacy';
-import { NextRequest } from 'next/server';
 
 interface IncomingWebVitalPayload {
   name?: unknown;

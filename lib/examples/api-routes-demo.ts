@@ -3,15 +3,15 @@
  * Demonstrates comprehensive error handling patterns
  */
 
+import { NextResponse } from 'next/server';
 import { getCourseById } from '@/lib/api/courses';
 import { CourseNotFoundError } from '@/lib/errors/domain';
 import {
-  ApiRouteContext,
+  type ApiRouteContext,
   withApiErrorHandling,
   withAuthProtection,
   withRequestValidation,
 } from '@/lib/middleware/api-error-handling';
-import { NextResponse } from 'next/server';
 
 // Example 1: Basic API route with error handling
 export const GET = withApiErrorHandling(async (context: ApiRouteContext) => {
@@ -65,7 +65,7 @@ export const PUT = withRequestValidation(
 });
 
 // Example 4: API route with rate limiting and CORS
-export const PATCH = withApiErrorHandling(async context => {
+export const PATCH = withApiErrorHandling(async _context => {
   // Rate limiting and CORS would be applied here
   // For demonstration purposes, simplified implementation
   return NextResponse.json({ message: 'Course patched successfully' });

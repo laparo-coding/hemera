@@ -1,11 +1,11 @@
-import { Metadata } from 'next';
-import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
+import type { Metadata } from 'next';
 import {
+  getFullUrl,
   IMAGE_CONFIG,
   SITE_CONFIG,
   SOCIAL_CONFIG,
-  getFullUrl,
 } from '@/lib/seo/constants';
+import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
 
 export const metadata: Metadata = {
   title: 'Hemera Academy – Über unsere Kurse',

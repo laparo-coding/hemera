@@ -1,7 +1,7 @@
-import { Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 // Test user credentials - must match what's created in create-test-user.js
-const TEST_CREDENTIALS = {
+const _TEST_CREDENTIALS = {
   USER_EMAIL: 'e2e.dashboard@example.com', // Real E2E Test Account
   USER_PASSWORD: 'E2ETestPassword2024!SecureForTesting',
   ADMIN_EMAIL: 'e2e.admin@example.com',
@@ -124,7 +124,7 @@ export class AuthHelper {
         timeout: 30000, // Reduced timeout for faster failure detection
       });
       console.log(`� Navigated to sign-in page: ${this.page.url()}`);
-    } catch (error) {
+    } catch (_error) {
       console.log('⚠️ First navigation attempt failed, retrying...');
       await this.page.waitForTimeout(2000);
       try {
@@ -133,7 +133,7 @@ export class AuthHelper {
           timeout: 30000, // Reduced timeout
         });
         console.log(`📍 Retry navigation successful: ${this.page.url()}`);
-      } catch (retryError) {
+      } catch (_retryError) {
         console.log(
           '❌ Navigation failed completely, proceeding with current page'
         );
@@ -171,7 +171,7 @@ export class AuthHelper {
         console.log(`✅ Sign-in form found with selector: ${selector}`);
         signInFormFound = true;
         break;
-      } catch (e) {
+      } catch (_e) {
         console.log(`⚠️ Selector ${selector} not found, trying next...`);
       }
     }
@@ -189,7 +189,7 @@ export class AuthHelper {
       });
       await this.page.fill('input[name="identifier"]', email);
       console.log(`📧 Email filled: ${email}`);
-    } catch (e) {
+    } catch (_e) {
       console.log(
         '⚠️ Standard email field not found, trying alternative selectors...'
       );
@@ -208,7 +208,7 @@ export class AuthHelper {
           console.log(`📧 Email filled with selector: ${selector}`);
           emailFilled = true;
           break;
-        } catch (e) {
+        } catch (_e) {
           console.log(`⚠️ Email selector ${selector} failed`);
         }
       }
@@ -250,7 +250,7 @@ export class AuthHelper {
           buttonClicked = true;
           break;
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue to next selector
       }
     }
@@ -309,7 +309,7 @@ export class AuthHelper {
           buttonClicked = true;
           break;
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue to next selector
       }
     }
@@ -397,7 +397,7 @@ export class AuthHelper {
 
       // If we reach here, one of the strategies succeeded
       authSuccess = true;
-    } catch (error) {
+    } catch (_error) {
       console.log(
         '⏳ Primary auth indicators not found, checking URL manually...'
       );
@@ -554,7 +554,7 @@ export class AuthHelper {
               );
             }
           }
-        } catch (e) {
+        } catch (_e) {
           console.log('❌ No Clerk elements found');
         }
       }

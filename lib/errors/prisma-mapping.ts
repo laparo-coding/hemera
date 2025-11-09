@@ -3,6 +3,7 @@
  * Converts Prisma errors to domain-specific error types
  */
 
+import { Prisma } from '@prisma/client';
 import { prisma as basePrisma } from '@/lib/db/prisma';
 import {
   BookingAlreadyExistsError,
@@ -13,7 +14,6 @@ import {
   FieldValidationError,
   UserEmailAlreadyExistsError,
 } from '@/lib/errors';
-import { Prisma } from '@prisma/client';
 
 /**
  * Convert Prisma errors to domain errors

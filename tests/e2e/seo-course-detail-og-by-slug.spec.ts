@@ -1,5 +1,5 @@
-import { expect, test, Page } from '@playwright/test';
-import { gotoStable, clickAndWait } from './helpers/nav';
+import { expect, type Page, test } from '@playwright/test';
+import { clickAndWait, gotoStable } from './helpers/nav';
 
 const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
@@ -62,7 +62,7 @@ test.describe('Course detail OG image by slug', () => {
 
     const ogImage = await getMetaContent(page, 'meta[property="og:image"]');
     expect(ogImage).toBeTruthy();
-    expect(ogImage!.startsWith('http')).toBeTruthy();
+    expect(ogImage?.startsWith('http')).toBeTruthy();
 
     if (slug) {
       // Erwarteter slug-basierter Pfad

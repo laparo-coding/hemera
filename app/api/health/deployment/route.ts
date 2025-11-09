@@ -3,10 +3,10 @@
  * Stellt Health-Check-Endpunkt und Deployment-Status bereit
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { deploymentMonitor } from '@/lib/monitoring/deployment-monitor';
-import { createRequestContextFromNextRequest } from '@/lib/utils/request-id';
 import { ApiLogger } from '@/lib/utils/api-logger';
+import { createRequestContextFromNextRequest } from '@/lib/utils/request-id';
 
 export async function GET(request: NextRequest) {
   const context = createRequestContextFromNextRequest(request);

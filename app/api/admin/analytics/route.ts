@@ -3,6 +3,8 @@
  * Stellt Analytics-Daten für Dashboard und Monitoring zur Verfügung
  */
 
+import { auth } from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { analytics } from '@/lib/analytics/request-analytics';
 import { checkUserAdminStatus } from '@/lib/auth/helpers';
 import { createApiLogger } from '@/lib/utils/api-logger';
@@ -15,8 +17,6 @@ import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
 
 // CORS headers for external app access
 const corsHeaders = {
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
       userId,
     });
 
-    let responseData;
+    let responseData: unknown;
 
     switch (reportType) {
       case 'summary':
