@@ -11,9 +11,9 @@ describe('Contract: Request-ID propagation and response headers', () => {
       headers: {
         'x-request-id': inboundId,
       },
-    } as any);
+    });
 
-    const res = await healthGet(req as any);
+    const res = await healthGet(req);
     const canonicalId = res.headers.get('X-Request-ID');
     expect(canonicalId).toBeTruthy();
     expect(canonicalId).not.toEqual(inboundId);

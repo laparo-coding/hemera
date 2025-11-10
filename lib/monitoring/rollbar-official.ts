@@ -6,6 +6,17 @@
 import Rollbar from 'rollbar';
 import { isTelemetryConsentGranted } from './privacy';
 
+interface RollbarTestInstance {
+  critical: () => void;
+  error: () => void;
+  warning: () => void;
+  warn: () => void;
+  info: () => void;
+  debug: () => void;
+  log: () => void;
+  wait: (cb?: () => void) => void;
+}
+
 // Enablement rules unify various legacy flags used across the repo/scripts
 const isE2EMode = process.env.E2E_TEST === 'true';
 const isTestMode =
@@ -42,7 +53,7 @@ export const clientConfig = {
 
 // Server-side instance (for API routes and server components)
 // In test mode, export a no-op instance to avoid network calls.
-export const serverInstance: any = isTestMode
+export const serverInstance: Rollbar | RollbarTestInstance = isTestMode
   ? {
       critical: () => {},
       error: () => {},
@@ -102,7 +113,7 @@ export interface ErrorContext {
   userAgent?: string;
   ip?: string;
   timestamp?: Date;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
 }
 
 export function createErrorContext(
@@ -143,7 +154,7 @@ export function reportError(
       Math.random() < Math.max(0, Math.min(1, rate)) && Math.random() < rateAll;
 
     const includePII = isTelemetryConsentGranted();
-    const rollbarContext = {
+    const rollbarContext: Record<string, unknown> = {
       person:
         includePII && context?.userId
           ? { id: context.userId, email: context.userEmail }
@@ -159,29 +170,26 @@ export function reportError(
         timestamp: context?.timestamp?.toISOString(),
         ...context?.additionalData,
       },
-    } as any;
+    };
 
     switch (severity) {
       case ErrorSeverity.CRITICAL:
-        if (pick(rateCritical))
-          serverInstance.critical(error as any, rollbarContext);
+        if (pick(rateCritical)) serverInstance.critical(error, rollbarContext);
         break;
       case ErrorSeverity.ERROR:
-        if (pick(rateError)) serverInstance.error(error as any, rollbarContext);
+        if (pick(rateError)) serverInstance.error(error, rollbarContext);
         break;
       case ErrorSeverity.WARNING:
-        if (pick(rateWarn))
-          serverInstance.warning(error as any, rollbarContext);
+        if (pick(rateWarn)) serverInstance.warning(error, rollbarContext);
         break;
       case ErrorSeverity.INFO:
-        if (pick(rateInfo)) serverInstance.info(error as any, rollbarContext);
+        if (pick(rateInfo)) serverInstance.info(error, rollbarContext);
         break;
       case ErrorSeverity.DEBUG:
-        if (pick(rateInfo))
-          serverInstance.debug?.(error as any, rollbarContext);
+        if (pick(rateInfo)) serverInstance.debug?.(error, rollbarContext);
         break;
       default:
-        if (pick(rateError)) serverInstance.error(error as any, rollbarContext);
+        if (pick(rateError)) serverInstance.error(error, rollbarContext);
     }
   } catch {
     // Suppress any reporting failures
@@ -191,7 +199,7 @@ export function reportError(
 export function recordUserAction(
   action: string,
   userId?: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): void {
   if (!baseConfig.enabled) return;
   try {
