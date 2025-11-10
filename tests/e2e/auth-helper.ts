@@ -31,14 +31,20 @@ export class AuthHelper {
           try {
             localStorage.clear();
             sessionStorage.clear();
-          } catch (e: any) {
-            console.warn('Could not clear storage:', e.message);
+          } catch (e: unknown) {
+            console.warn(
+              'Could not clear storage:',
+              e instanceof Error ? e.message : String(e)
+            );
           }
         });
       }
       console.log('✅ Cookies and storage cleared for clean auth state');
-    } catch (e: any) {
-      console.log('⚠️ Could not clear local/session storage:', e.message);
+    } catch (e: unknown) {
+      console.log(
+        '⚠️ Could not clear local/session storage:',
+        e instanceof Error ? e.message : String(e)
+      );
       console.log('✅ Cookies cleared successfully');
     }
   }

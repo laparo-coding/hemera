@@ -338,7 +338,7 @@ export default function DeploymentMonitoringDashboard() {
                         ).toLocaleString()}
                       />
                     </ListItem>
-                    {healthCheck.details ? (
+                    {healthCheck.details !== undefined && (
                       <ListItem>
                         <ListItemIcon>
                           <TimelineIcon />

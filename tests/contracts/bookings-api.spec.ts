@@ -234,7 +234,7 @@ describe('GET /api/bookings - Contract Tests', () => {
       userRoles.forEach(role => {
         expect(accessRules).toHaveProperty(role);
         expect(['own_bookings_only', 'all_bookings']).toContain(
-          (accessRules as any)[role]
+          (accessRules as Record<string, unknown>)[role]
         );
       });
     });

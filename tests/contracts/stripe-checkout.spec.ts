@@ -19,11 +19,7 @@ describe('POST /api/stripe/checkout - Contract Tests', () => {
     });
 
     it('should reject empty courseId', () => {
-      interface CreateCheckoutRequest {
-        courseId: string;
-      }
-
-      const invalidRequest = {
+      const invalidRequest: { courseId: string } = {
         courseId: '',
       };
 
