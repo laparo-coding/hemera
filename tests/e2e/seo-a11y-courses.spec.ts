@@ -49,12 +49,12 @@ test.describe('Courses SEO & A11y', () => {
     const results = await new AxeBuilder({ page }).analyze();
 
     const critical = (results.violations || []).filter(
-      (v: any) => v.impact === 'critical'
+      v => v.impact === 'critical'
     );
     if (critical.length) {
       console.error(
         'Critical A11y violations:',
-        critical.map((v: any) => v.id)
+        critical.map(v => v.id)
       );
     }
     expect(critical.length).toBe(0);

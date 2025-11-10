@@ -23,7 +23,7 @@ export interface LogEntry {
   level: LogLevel;
   message: string;
   context: RequestContext;
-  data?: any;
+  data?: unknown;
   error?: Error;
   timestamp: string;
 }
@@ -39,7 +39,7 @@ export class ApiLogger {
   /**
    * Log an error with structured context via Rollbar and track analytics
    */
-  error(message: string, error?: Error, data?: any): void {
+  error(message: string, error?: Error, data?: unknown): void {
     serverInstance.error(message, {
       requestId: this.requestContext.id,
       error: error?.message,
@@ -67,7 +67,7 @@ export class ApiLogger {
   /**
    * Log a warning with structured context via Rollbar and track analytics
    */
-  warn(message: string, data?: any): void {
+  warn(message: string, data?: unknown): void {
     serverInstance.warn(message, {
       requestId: this.requestContext.id,
       data,
@@ -92,7 +92,7 @@ export class ApiLogger {
   /**
    * Log info with structured context via Rollbar
    */
-  info(message: string, data?: any): void {
+  info(message: string, data?: unknown): void {
     serverInstance.info(message, {
       requestId: this.requestContext.id,
       data,
@@ -104,7 +104,7 @@ export class ApiLogger {
   /**
    * Log debug information (only in development) via Rollbar
    */
-  debug(message: string, data?: any): void {
+  debug(message: string, data?: unknown): void {
     if (process.env.NODE_ENV === 'development') {
       serverInstance.debug?.(message, {
         requestId: this.requestContext.id,
@@ -132,7 +132,7 @@ export class ApiLogger {
   /**
    * Track custom business event
    */
-  trackBusinessEvent(eventType: string, data: Record<string, any>): void {
+  trackBusinessEvent(eventType: string, data: Record<string, unknown>): void {
     analytics.trackEvent(
       this.requestContext.id,
       eventType,

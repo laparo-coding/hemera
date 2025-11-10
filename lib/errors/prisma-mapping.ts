@@ -142,18 +142,18 @@ function handleUniqueConstraintViolation(
   switch (true) {
     case constraintStr?.includes('email') || table === 'User':
       return new UserEmailAlreadyExistsError(
-        String(context?.email || 'unknown')
+        typeof context?.email === 'string' ? context.email : 'unknown'
       );
 
     case constraintStr?.includes('slug') || table === 'Course':
       return new CourseSlugAlreadyExistsError(
-        String(context?.slug || 'unknown')
+        typeof context?.slug === 'string' ? context.slug : 'unknown'
       );
 
     case constraintStr?.includes('userId_courseId') || table === 'Booking':
       return new BookingAlreadyExistsError(
-        String(context?.userId || 'unknown'),
-        String(context?.courseId || 'unknown')
+        typeof context?.userId === 'string' ? context.userId : 'unknown',
+        typeof context?.courseId === 'string' ? context.courseId : 'unknown'
       );
 
     default:

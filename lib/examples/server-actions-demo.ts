@@ -55,7 +55,7 @@ const bookingSchema = {
     if (!record.courseId || !record.userId || !record.date) {
       throw new Error('Course ID, User ID, and date are required');
     }
-    return record;
+    return data as Record<string, unknown>;
   },
 };
 

@@ -44,8 +44,54 @@ export async function initWebVitals(
   if (!isPublicPath(opts?.path)) return false;
 
   try {
-    const mod: any = await import('web-vitals');
-    const handler = (metric: any) =>
+    const mod = (await import('web-vitals')) as {
+      onCLS?: (
+        handler: (metric: {
+          name: string;
+          value: number;
+          id: string;
+          label?: string;
+        }) => void
+      ) => void;
+      onFCP?: (
+        handler: (metric: {
+          name: string;
+          value: number;
+          id: string;
+          label?: string;
+        }) => void
+      ) => void;
+      onLCP?: (
+        handler: (metric: {
+          name: string;
+          value: number;
+          id: string;
+          label?: string;
+        }) => void
+      ) => void;
+      onINP?: (
+        handler: (metric: {
+          name: string;
+          value: number;
+          id: string;
+          label?: string;
+        }) => void
+      ) => void;
+      onTTFB?: (
+        handler: (metric: {
+          name: string;
+          value: number;
+          id: string;
+          label?: string;
+        }) => void
+      ) => void;
+    };
+    const handler = (metric: {
+      name: string;
+      value: number;
+      id: string;
+      label?: string;
+    }) =>
       sender({
         name: metric.name,
         value: metric.value,
