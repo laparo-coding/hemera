@@ -32,7 +32,7 @@ import {
   Typography,
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface HealthCheck {
   name: string;
@@ -71,7 +71,7 @@ export default function DeploymentMonitoringDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
-  const fetchHealthStatus = async () => {
+  const fetchHealthStatus = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -95,7 +95,7 @@ export default function DeploymentMonitoringDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const forceHealthCheck = async () => {
     try {
