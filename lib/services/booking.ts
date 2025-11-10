@@ -303,7 +303,10 @@ export async function cancelBooking(
 
   // Can only cancel pending or paid bookings
   const currentStatus = existingBooking.paymentStatus;
-  if (![PaymentStatus.PENDING, PaymentStatus.PAID].includes(currentStatus)) {
+  if (
+    currentStatus !== PaymentStatus.PENDING &&
+    currentStatus !== PaymentStatus.PAID
+  ) {
     throw new Error(`Cannot cancel booking with status: ${currentStatus}`);
   }
 

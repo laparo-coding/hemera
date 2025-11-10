@@ -52,7 +52,7 @@ const createCourseSchema = {
 
 export const PUT = withRequestValidation(
   createCourseSchema, // body schema
-  null // query schema
+  undefined // query schema
 )(async context => {
   const { validatedBody } = context;
 
