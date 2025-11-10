@@ -167,8 +167,8 @@ export function withAdminProtection(
  * Middleware for request validation using Zod schemas
  */
 export function withRequestValidation<TBody = unknown, TQuery = unknown>(
-  bodySchema?: unknown, // In production, this would be Zod schemas
-  querySchema?: unknown
+  bodySchema?: { parse: (data: unknown) => TBody }, // In production, this would be Zod schemas
+  querySchema?: { parse: (data: unknown) => TQuery }
 ) {
   return (
     handler: (
