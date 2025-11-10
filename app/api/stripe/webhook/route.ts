@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'payment_intent.canceled': {
-        const paymentIntent = event.data.object as any;
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log(`[${requestId}] Processing payment_intent.canceled`, {
           paymentIntentId: paymentIntent.id,
         });
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'charge.dispute.created': {
-        const dispute = event.data.object as any;
+        const dispute = event.data.object as Stripe.Dispute;
         console.warn(`[${requestId}] Dispute created`, {
           disputeId: dispute.id,
           amount: dispute.amount,
@@ -250,11 +250,17 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.payment_succeeded':
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as any;
+        const invoice = event.data.object as Stripe.Invoice;
+        const invoiceData = invoice as unknown as {
+          id: string;
+          subscription?: string;
+          amount_paid?: number;
+          amount_due?: number;
+        };
         console.log(`[${requestId}] Processing ${event.type}`, {
-          invoiceId: invoice.id,
-          subscriptionId: invoice.subscription,
-          amount: invoice.amount_paid || invoice.amount_due,
+          invoiceId: invoiceData.id,
+          subscriptionId: invoiceData.subscription,
+          amount: invoiceData.amount_paid || invoiceData.amount_due,
         });
 
         // Handle subscription payments if applicable

@@ -10,7 +10,7 @@ describe('POST /api/stripe/webhook - Contract Tests', () => {
         object: 'event';
         type: string;
         data: {
-          object: any;
+          object: unknown;
         };
         created: number;
         livemode: boolean;
@@ -295,8 +295,10 @@ describe('POST /api/stripe/webhook - Contract Tests', () => {
 
       requiredMetadataFields.forEach(field => {
         expect(validMetadata).toHaveProperty(field);
-        expect((validMetadata as any)[field]).toBeDefined();
-        expect(typeof (validMetadata as any)[field]).toBe('string');
+        expect((validMetadata as Record<string, unknown>)[field]).toBeDefined();
+        expect(typeof (validMetadata as Record<string, unknown>)[field]).toBe(
+          'string'
+        );
       });
     });
 

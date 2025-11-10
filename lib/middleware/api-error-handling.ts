@@ -167,8 +167,8 @@ export function withAdminProtection(
  * Middleware for request validation using Zod schemas
  */
 export function withRequestValidation<TBody = unknown, TQuery = unknown>(
-  bodySchema?: unknown, // In production, this would be Zod schemas
-  querySchema?: unknown
+  bodySchema?: { parse: (data: unknown) => TBody },
+  querySchema?: { parse: (data: unknown) => TQuery }
 ) {
   return (
     handler: (
@@ -185,11 +185,15 @@ export function withRequestValidation<TBody = unknown, TQuery = unknown>(
       // Validate request body if schema provided
       if (
         bodySchema &&
+        typeof bodySchema === 'object' &&
+        bodySchema !== null &&
+        'parse' in bodySchema &&
+        typeof bodySchema.parse === 'function' &&
         (context.request.method === 'POST' || context.request.method === 'PUT')
       ) {
         try {
           const body = await context.request.json();
-          validatedBody = bodySchema.parse(body);
+          validatedBody = bodySchema.parse(body) as TBody;
         } catch (error) {
           return NextResponse.json(
             { error: 'Invalid request body', details: error },
@@ -199,10 +203,17 @@ export function withRequestValidation<TBody = unknown, TQuery = unknown>(
       }
 
       // Validate query parameters if schema provided
-      if (querySchema && context.searchParams) {
+      if (
+        querySchema &&
+        typeof querySchema === 'object' &&
+        querySchema !== null &&
+        'parse' in querySchema &&
+        typeof querySchema.parse === 'function' &&
+        context.searchParams
+      ) {
         try {
           const queryObject = Object.fromEntries(context.searchParams);
-          validatedQuery = querySchema.parse(queryObject);
+          validatedQuery = querySchema.parse(queryObject) as TQuery;
         } catch (error) {
           return NextResponse.json(
             { error: 'Invalid query parameters', details: error },
