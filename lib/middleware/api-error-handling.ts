@@ -189,7 +189,9 @@ export function withRequestValidation<TBody = unknown, TQuery = unknown>(
       ) {
         try {
           const body = await context.request.json();
-          validatedBody = bodySchema.parse(body);
+          validatedBody = (
+            bodySchema as { parse: (data: unknown) => TBody }
+          ).parse(body);
         } catch (error) {
           return NextResponse.json(
             { error: 'Invalid request body', details: error },
@@ -202,7 +204,9 @@ export function withRequestValidation<TBody = unknown, TQuery = unknown>(
       if (querySchema && context.searchParams) {
         try {
           const queryObject = Object.fromEntries(context.searchParams);
-          validatedQuery = querySchema.parse(queryObject);
+          validatedQuery = (
+            querySchema as { parse: (data: unknown) => TQuery }
+          ).parse(queryObject);
         } catch (error) {
           return NextResponse.json(
             { error: 'Invalid query parameters', details: error },
