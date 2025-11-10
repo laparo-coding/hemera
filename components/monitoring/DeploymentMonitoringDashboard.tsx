@@ -352,7 +352,7 @@ export default function DeploymentMonitoringDashboard() {
                           }
                         />
                       </ListItem>
-                    ) : null}
+                    )}
                   </List>
                 </AccordionDetails>
               </Accordion>
