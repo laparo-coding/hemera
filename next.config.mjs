@@ -5,6 +5,7 @@ const __filename = fileURLToPath(import.meta.url);
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  turbopack: {},
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // Optimize webpack cache for client-side builds
