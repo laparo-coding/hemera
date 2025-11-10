@@ -58,14 +58,14 @@ export async function getCourses(
 
   if (params?.minPrice !== undefined) {
     where.price = {
-      ...where.price,
+      ...(where.price as Record<string, unknown>),
       gte: params.minPrice,
     };
   }
 
   if (params?.maxPrice !== undefined) {
     where.price = {
-      ...where.price,
+      ...(where.price as Record<string, unknown>),
       lte: params.maxPrice,
     };
   }
