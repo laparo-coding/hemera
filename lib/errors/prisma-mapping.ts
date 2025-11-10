@@ -141,15 +141,19 @@ function handleUniqueConstraintViolation(
   // Map specific constraints to domain errors
   switch (true) {
     case constraintStr?.includes('email') || table === 'User':
-      return new UserEmailAlreadyExistsError(context?.email || 'unknown');
+      return new UserEmailAlreadyExistsError(
+        typeof context?.email === 'string' ? context.email : 'unknown'
+      );
 
     case constraintStr?.includes('slug') || table === 'Course':
-      return new CourseSlugAlreadyExistsError(context?.slug || 'unknown');
+      return new CourseSlugAlreadyExistsError(
+        typeof context?.slug === 'string' ? context.slug : 'unknown'
+      );
 
     case constraintStr?.includes('userId_courseId') || table === 'Booking':
       return new BookingAlreadyExistsError(
-        context?.userId || 'unknown',
-        context?.courseId || 'unknown'
+        typeof context?.userId === 'string' ? context.userId : 'unknown',
+        typeof context?.courseId === 'string' ? context.courseId : 'unknown'
       );
 
     default:

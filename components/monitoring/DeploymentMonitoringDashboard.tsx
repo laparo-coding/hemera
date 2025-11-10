@@ -338,7 +338,7 @@ export default function DeploymentMonitoringDashboard() {
                         ).toLocaleString()}
                       />
                     </ListItem>
-                    {healthCheck.details && (
+                    {healthCheck.details ? (
                       <ListItem>
                         <ListItemIcon>
                           <TimelineIcon />
@@ -352,7 +352,7 @@ export default function DeploymentMonitoringDashboard() {
                           }
                         />
                       </ListItem>
-                    )}
+                    ) : null}
                   </List>
                 </AccordionDetails>
               </Accordion>

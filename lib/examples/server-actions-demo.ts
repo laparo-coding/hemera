@@ -50,12 +50,12 @@ export const updateProfileAction = withAuthenticatedServerAction(
 
 // Example 3: Form validation server action
 const bookingSchema = {
-  parse: (data: unknown) => {
+  parse: (data: unknown): Record<string, unknown> => {
     const record = data as Record<string, unknown>;
     if (!record.courseId || !record.userId || !record.date) {
       throw new Error('Course ID, User ID, and date are required');
     }
-    return data;
+    return record;
   },
 };
 
