@@ -347,7 +347,11 @@ export default function DeploymentMonitoringDashboard() {
                           primary='Details'
                           secondary={
                             <pre style={{ fontSize: '0.75rem', margin: 0 }}>
-                              {JSON.stringify(healthCheck.details, null, 2)}
+                              {JSON.stringify(
+                                healthCheck.details as Record<string, unknown>,
+                                null,
+                                2
+                              )}
                             </pre>
                           }
                         />

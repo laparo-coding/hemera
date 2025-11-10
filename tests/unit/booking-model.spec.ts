@@ -74,21 +74,21 @@ describe('Booking Model Validations', () => {
     console.log('✅ Test course created and verified:', testCourse.id);
 
     // Create test users
-    testUser = await prisma.user.create({
+    testUser = (await prisma.user.create({
       data: {
         id: `test-user-${timestamp}-${randomSuffix}`,
         email: `test${timestamp}@example.com`,
         name: 'Test User',
       },
-    });
+    })) as { id: string; email: string };
 
-    testUser2 = await prisma.user.create({
+    testUser2 = (await prisma.user.create({
       data: {
         id: `test-user2-${timestamp}-${randomSuffix}`,
         email: `test2${timestamp}@example.com`,
         name: 'Test User 2',
       },
-    });
+    })) as { id: string; email: string };
 
     console.log('✅ Test users created:', testUser.id, testUser2.id);
   });
