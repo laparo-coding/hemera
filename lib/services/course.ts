@@ -58,14 +58,14 @@ export async function getCourses(
 
   if (params?.minPrice !== undefined) {
     where.price = {
-      ...(where.price && typeof where.price === 'object' ? where.price : {}),
+      ...where.price,
       gte: params.minPrice,
     };
   }
 
   if (params?.maxPrice !== undefined) {
     where.price = {
-      ...(where.price && typeof where.price === 'object' ? where.price : {}),
+      ...where.price,
       lte: params.maxPrice,
     };
   }
