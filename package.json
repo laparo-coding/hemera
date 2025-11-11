@@ -1,114 +1,114 @@
 {
-  "name": "hemera",
-  "private": true,
-  "version": "0.1.2",
-  "type": "module",
-  "overrides": {
-    "test-exclude": "^7.0.1"
-  },
-  "scripts": {
-    "dev": "next dev -p 3000",
-    "build": "node scripts/verify-env.mjs && next build",
-    "start": "next start -p 3000",
-    "lint": "next lint",
-    "lint:ci": "eslint --cache --max-warnings=250 .",
-    "prepare": "husky",
-    "test": "jest",
-    "test:unit": "jest tests/unit",
-    "test:contracts": "jest tests/contracts",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed",
-    "test:all": "npm run test:unit && npm run test:contracts && npm run test:e2e",
-    "test:watch": "jest --watch",
-    "test:prettier": "node tests/prettier-test-simple.js",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "format:staged": "prettier --write",
-    "db:status": "dotenv -e .env.local -- npx prisma migrate status",
-    "db:migrate": "dotenv -e .env.local -- npx prisma migrate dev",
-    "db:deploy": "dotenv -e .env.local -- npx prisma migrate deploy",
-    "db:seed": "dotenv -e .env.local -- node --loader ts-node/esm prisma/seed.ts",
-    "db:list:courses": "dotenv -e .env.local -- node scripts/debug/list-courses.mjs",
-    "e2e": "CI=1 NEXT_PUBLIC_DISABLE_CLERK=1 E2E_TEST=true NEXT_PUBLIC_ROLLBAR_ENABLED=0 npm run build && CI=1 NEXT_PUBLIC_DISABLE_CLERK=1 E2E_TEST=true NEXT_PUBLIC_ROLLBAR_ENABLED=0 PW_WEB_SERVER_COMMAND='npm run start' playwright test",
-    "e2e:dev": "CI=1 NEXT_PUBLIC_DISABLE_CLERK=1 E2E_TEST=true NEXT_PUBLIC_ROLLBAR_ENABLED=0 PW_WEB_SERVER_COMMAND='npm run dev' playwright test",
-    "e2e:install": "playwright install chromium",
-    "spellcheck": "cspell --config ./cspell.config.yaml --no-progress --no-summary --exclude 'cspell.config.*' lint 'app/**/*.{ts,tsx,js,jsx,md,mdx}' 'src/**/*.{ts,tsx,js,jsx,md,mdx}' 'docs/**/*.{md,mdx}'",
-    "spellcheck:fix": "cspell --config ./cspell.config.yaml --no-progress --no-summary --wordsOnly --unique --exclude 'cspell.config.*' lint 'app/**/*.{ts,tsx,js,jsx,md,mdx}' 'src/**/*.{ts,tsx,js,jsx,md,mdx}' 'docs/**/*.{md,mdx}'",
-    "stripe:key:check": "sh -c 'if [ -f .env.development.local ]; then dotenv -e .env.development.local -- node scripts/check-stripe-key.mjs; elif [ -f .env.local ]; then dotenv -e .env.local -- node scripts/check-stripe-key.mjs; else node scripts/check-stripe-key.mjs; fi'"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "prettier --write",
-      "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files",
-      "eslint --max-warnings=350 --cache --fix"
-    ],
-    "*.{json,yaml,yml}": [
-      "prettier --write"
-    ],
-    "*.{md,mdx}": [
-      "prettier --write",
-      "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files"
-    ]
-  },
-  "dependencies": {
-    "@clerk/localizations": "^3.26.4",
-    "@clerk/nextjs": "^6.34.1",
-    "@emotion/react": "^11.13.0",
-    "@emotion/styled": "^11.13.0",
-    "@mui/icons-material": "^7.3.4",
-    "@mui/material": "^7.3.4",
-    "@prisma/client": "^6.18.0",
-    "@rollbar/react": "^1.0.0",
-    "@stripe/react-stripe-js": "^5.3.0",
-    "@stripe/stripe-js": "^8.2.0",
-    "date-fns": "^4.1.0",
-    "next": "^15.5.4",
-    "pg": "^8.16.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "rollbar": "^2.26.4",
-    "stripe": "^19.2.0",
-    "uuid": "^13.0.0",
-    "web-vitals": "^5.1.0",
-    "zod": "^4.1.11"
-  },
-  "devDependencies": {
-    "@axe-core/playwright": "^4.10.0",
-    "@cspell/dict-de-de": "^4.1.2",
-    "@eslint/js": "^9.17.0",
-    "@jest/globals": "^30.2.0",
-    "@playwright/test": "^1.56.1",
-    "@testcontainers/postgresql": "^11.7.2",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^22.19.0",
-    "@types/react": "^18.2.74",
-    "@types/react-dom": "^18.2.24",
-    "@types/uuid": "^10.0.0",
-    "cspell": "^9.2.2",
-    "dotenv": "^17.2.3",
-    "dotenv-cli": "^11.0.0",
-    "eslint": "^9.17.0",
-    "eslint-config-next": "^15.1.0",
-    "globals": "^16.5.0",
-    "husky": "^9.0.0",
-    "jest": "^30.2.0",
-    "jest-junit": "^16.0.0",
-    "lint-staged": "^16.2.6",
-    "playwright": "^1.56.1",
-    "prettier": "^3.6.2",
-    "prisma": "^6.18.0",
-    "testcontainers": "^11.7.2",
-    "ts-jest": "^29.4.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.19.0",
-    "webpack": "^5.102.1"
-  },
-  "engines": {
-    "node": ">=22 <25"
-  },
-  "prisma": {
-    "seed": "node --loader ts-node/esm prisma/seed.ts"
-  }
+	"name": "hemera",
+	"private": true,
+	"version": "0.1.2",
+	"type": "module",
+	"overrides": {
+		"test-exclude": "^7.0.1"
+	},
+	"scripts": {
+		"dev": "next dev -p 3000",
+		"build": "node scripts/verify-env.mjs && next build",
+		"start": "next start -p 3000",
+		"lint": "next lint",
+		"lint:ci": "eslint --cache --max-warnings=250 .",
+		"prepare": "husky",
+		"test": "jest",
+		"test:unit": "jest tests/unit",
+		"test:contracts": "jest tests/contracts",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:headed": "playwright test --headed",
+		"test:all": "npm run test:unit && npm run test:contracts && npm run test:e2e",
+		"test:watch": "jest --watch",
+		"test:prettier": "node tests/prettier-test-simple.js",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"format:staged": "prettier --write",
+		"db:status": "dotenv -e .env.local -- npx prisma migrate status",
+		"db:migrate": "dotenv -e .env.local -- npx prisma migrate dev",
+		"db:deploy": "dotenv -e .env.local -- npx prisma migrate deploy",
+		"db:seed": "dotenv -e .env.local -- node --loader ts-node/esm prisma/seed.ts",
+		"db:list:courses": "dotenv -e .env.local -- node scripts/debug/list-courses.mjs",
+		"e2e": "CI=1 NEXT_PUBLIC_DISABLE_CLERK=1 E2E_TEST=true NEXT_PUBLIC_ROLLBAR_ENABLED=0 npm run build && CI=1 NEXT_PUBLIC_DISABLE_CLERK=1 E2E_TEST=true NEXT_PUBLIC_ROLLBAR_ENABLED=0 PW_WEB_SERVER_COMMAND='npm run start' playwright test",
+		"e2e:dev": "CI=1 NEXT_PUBLIC_DISABLE_CLERK=1 E2E_TEST=true NEXT_PUBLIC_ROLLBAR_ENABLED=0 PW_WEB_SERVER_COMMAND='npm run dev' playwright test",
+		"e2e:install": "playwright install chromium",
+		"spellcheck": "cspell --config ./cspell.config.yaml --no-progress --no-summary --exclude 'cspell.config.*' lint 'app/**/*.{ts,tsx,js,jsx,md,mdx}' 'src/**/*.{ts,tsx,js,jsx,md,mdx}' 'docs/**/*.{md,mdx}'",
+		"spellcheck:fix": "cspell --config ./cspell.config.yaml --no-progress --no-summary --wordsOnly --unique --exclude 'cspell.config.*' lint 'app/**/*.{ts,tsx,js,jsx,md,mdx}' 'src/**/*.{ts,tsx,js,jsx,md,mdx}' 'docs/**/*.{md,mdx}'",
+		"stripe:key:check": "sh -c 'if [ -f .env.development.local ]; then dotenv -e .env.development.local -- node scripts/check-stripe-key.mjs; elif [ -f .env.local ]; then dotenv -e .env.local -- node scripts/check-stripe-key.mjs; else node scripts/check-stripe-key.mjs; fi'"
+	},
+	"lint-staged": {
+		"*.{ts,tsx,js,jsx}": [
+			"prettier --write",
+			"cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files",
+			"eslint --max-warnings=350 --cache --fix"
+		],
+		"*.{json,yaml,yml}": [
+			"prettier --write"
+		],
+		"*.{md,mdx}": [
+			"prettier --write",
+			"cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files"
+		]
+	},
+	"dependencies": {
+		"@clerk/localizations": "^3.26.4",
+		"@clerk/nextjs": "^6.34.1",
+		"@emotion/react": "^11.13.0",
+		"@emotion/styled": "^11.13.0",
+		"@mui/icons-material": "^7.3.4",
+		"@mui/material": "^7.3.4",
+		"@prisma/client": "^6.18.0",
+		"@rollbar/react": "^1.0.0",
+		"@stripe/react-stripe-js": "^5.3.0",
+		"@stripe/stripe-js": "^8.2.0",
+		"date-fns": "^4.1.0",
+		"next": "^15.5.4",
+		"pg": "^8.16.3",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"rollbar": "^2.26.4",
+		"stripe": "^19.2.0",
+		"uuid": "^13.0.0",
+		"web-vitals": "^5.1.0",
+		"zod": "^4.1.11"
+	},
+	"devDependencies": {
+		"@axe-core/playwright": "^4.10.0",
+		"@cspell/dict-de-de": "^4.1.2",
+		"@eslint/js": "^9.17.0",
+		"@jest/globals": "^30.2.0",
+		"@playwright/test": "^1.56.1",
+		"@testcontainers/postgresql": "^11.7.2",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^22.19.0",
+		"@types/react": "^18.2.74",
+		"@types/react-dom": "^18.2.24",
+		"@types/uuid": "^10.0.0",
+		"cspell": "^9.2.2",
+		"dotenv": "^17.2.3",
+		"dotenv-cli": "^11.0.0",
+		"eslint": "^9.17.0",
+		"eslint-config-next": "^15.1.0",
+		"globals": "^16.5.0",
+		"husky": "^9.0.0",
+		"jest": "^30.2.0",
+		"jest-junit": "^16.0.0",
+		"lint-staged": "^16.2.6",
+		"playwright": "^1.56.1",
+		"prettier": "^3.6.2",
+		"prisma": "^6.18.0",
+		"testcontainers": "^11.7.2",
+		"ts-jest": "^29.4.5",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.19.0",
+		"webpack": "^5.102.1"
+	},
+	"engines": {
+		"node": ">=22 <25"
+	},
+	"prisma": {
+		"seed": "node --loader ts-node/esm prisma/seed.ts"
+	}
 }

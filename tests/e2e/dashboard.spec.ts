@@ -1,6 +1,6 @@
-import { expect, type Page, test } from '@playwright/test';
-import { AuthHelper, TEST_USERS } from './auth-helper';
-import { gotoStable } from './helpers/nav';
+import { expect, type Page, test } from "@playwright/test";
+import { AuthHelper, TEST_USERS } from "./auth-helper";
+import { gotoStable } from "./helpers/nav";
 
 /**
  * User Dashboard Management - Simplified for CI
@@ -8,81 +8,81 @@ import { gotoStable } from './helpers/nav';
  * Validates basic dashboard functionality with CI compatibility.
  */
 
-test.describe('User Dashboard E2E - Simplified', () => {
-  let page: Page;
+test.describe("User Dashboard E2E - Simplified", () => {
+	let page: Page;
 
-  test.beforeEach(async ({ page: testPage }) => {
-    page = testPage;
+	test.beforeEach(async ({ page: testPage }) => {
+		page = testPage;
 
-    // Set viewport for consistent testing
-    await page.setViewportSize({ width: 1280, height: 720 });
+		// Set viewport for consistent testing
+		await page.setViewportSize({ width: 1280, height: 720 });
 
-    if (process.env.CI) {
-      await renderDashboardFixture(page);
-    } else {
-      // Authenticate user for dashboard tests
-      const authHelper = new AuthHelper(page);
-      await authHelper.signIn(
-        TEST_USERS.DASHBOARD.email,
-        TEST_USERS.DASHBOARD.password
-      );
+		if (process.env.CI) {
+			await renderDashboardFixture(page);
+		} else {
+			// Authenticate user for dashboard tests
+			const authHelper = new AuthHelper(page);
+			await authHelper.signIn(
+				TEST_USERS.DASHBOARD.email,
+				TEST_USERS.DASHBOARD.password,
+			);
 
-      // Navigate to dashboard (stable)
-      await gotoStable(page, '/dashboard', { waitForTestId: 'user-dashboard' });
-    }
-  });
+			// Navigate to dashboard (stable)
+			await gotoStable(page, "/dashboard", { waitForTestId: "user-dashboard" });
+		}
+	});
 
-  test('should display dashboard layout and navigation correctly', async () => {
-    if (process.env.CI) {
-      await expect(
-        page.locator('[data-testid="user-dashboard"]')
-      ).toBeVisible();
-      await expect(
-        page.locator('[data-testid="dashboard-title"]')
-      ).toContainText('Dashboard Overview');
-      await expect(page.locator('[data-testid="dashboard-nav"]')).toBeVisible();
-      return;
-    } else {
-      // Local development - full test
-      await expect(
-        page.locator('[data-testid="user-dashboard"]')
-      ).toBeVisible();
-      await expect(
-        page.locator('[data-testid="dashboard-title"]')
-      ).toBeVisible();
-    }
-  });
+	test("should display dashboard layout and navigation correctly", async () => {
+		if (process.env.CI) {
+			await expect(
+				page.locator('[data-testid="user-dashboard"]'),
+			).toBeVisible();
+			await expect(
+				page.locator('[data-testid="dashboard-title"]'),
+			).toContainText("Dashboard Overview");
+			await expect(page.locator('[data-testid="dashboard-nav"]')).toBeVisible();
+			return;
+		} else {
+			// Local development - full test
+			await expect(
+				page.locator('[data-testid="user-dashboard"]'),
+			).toBeVisible();
+			await expect(
+				page.locator('[data-testid="dashboard-title"]'),
+			).toBeVisible();
+		}
+	});
 
-  // Simplified dashboard tests for CI compatibility
-  const simplifiedTests = [
-    'should display and manage booking history correctly',
-    'should display payment status and handle payment actions',
-    'should handle course access and materials',
-    'should manage user profile and account settings',
-    'should handle booking cancellation workflow',
-    'should display dashboard overview and statistics',
-  ];
+	// Simplified dashboard tests for CI compatibility
+	const simplifiedTests = [
+		"should display and manage booking history correctly",
+		"should display payment status and handle payment actions",
+		"should handle course access and materials",
+		"should manage user profile and account settings",
+		"should handle booking cancellation workflow",
+		"should display dashboard overview and statistics",
+	];
 
-  simplifiedTests.forEach(testName => {
-    test(testName, async () => {
-      if (process.env.CI) {
-        await expect(
-          page.locator('[data-testid="user-dashboard"]')
-        ).toBeVisible();
-        await expect(
-          page.locator('[data-testid="dashboard-title"]')
-        ).toContainText('Dashboard Overview');
-        await expect(
-          page.locator('[data-testid="dashboard-metrics"]')
-        ).toBeVisible();
-        return;
-      }
-    });
-  });
+	simplifiedTests.forEach((testName) => {
+		test(testName, async () => {
+			if (process.env.CI) {
+				await expect(
+					page.locator('[data-testid="user-dashboard"]'),
+				).toBeVisible();
+				await expect(
+					page.locator('[data-testid="dashboard-title"]'),
+				).toContainText("Dashboard Overview");
+				await expect(
+					page.locator('[data-testid="dashboard-metrics"]'),
+				).toBeVisible();
+				return;
+			}
+		});
+	});
 });
 
 async function renderDashboardFixture(page: Page) {
-  await page.setContent(`
+	await page.setContent(`
       <html>
         <body>
           <main data-testid="user-dashboard">
