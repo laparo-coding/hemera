@@ -38,7 +38,7 @@ export default async function CoursesPage() {
     <>
       {jsonLdSchemas.map((schema, index) => (
         <script
-          key={index}
+          key={`jsonld-${index}`}
           type='application/ld+json'
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(schema),

@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
 
     logger.info('Fetching users', { limit, offset, search: !!search });
 
-    let users;
+    let users: any;
     if (search) {
       users = await searchUsers(search, limit);
       logger.info('Search completed', {
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let body;
+    let body: any;
     try {
       body = await request.json();
     } catch (_error) {

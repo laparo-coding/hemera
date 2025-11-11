@@ -9,7 +9,7 @@ interface ErrorPageProps {
   reset: () => void;
 }
 
-export default function Error({ error, reset }: ErrorPageProps) {
+export default function ErrorPage({ error, reset }: ErrorPageProps) {
   const isRollbarDisabled =
     process.env.E2E_TEST === 'true' ||
     process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
@@ -96,7 +96,9 @@ export default function Error({ error, reset }: ErrorPageProps) {
 
           <Button
             variant='outlined'
-            onClick={() => (window.location.href = '/')}
+            onClick={() => {
+              window.location.href = '/';
+            }}
           >
             Zur Startseite
           </Button>

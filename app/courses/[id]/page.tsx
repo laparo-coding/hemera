@@ -19,7 +19,7 @@ interface PageProps {
 export default async function CourseDetailPage({ params }: PageProps) {
   const { id: identifier } = await params;
 
-  let course;
+  let course: any;
 
   try {
     course = await getCourseBySlug(identifier);

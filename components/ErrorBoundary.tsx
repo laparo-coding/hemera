@@ -115,7 +115,9 @@ class ErrorBoundary extends React.Component<
 
               <Button
                 variant='outlined'
-                onClick={() => (window.location.href = '/')}
+                onClick={() => {
+                  window.location.href = '/';
+                }}
               >
                 Zur Startseite
               </Button>

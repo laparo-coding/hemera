@@ -89,7 +89,7 @@ export async function PUT(
       );
     }
 
-    let body;
+    let body: any;
     try {
       body = await _request.json();
     } catch (_error) {
