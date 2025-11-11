@@ -35,11 +35,13 @@ Invalidierung
 Konfigurationsvalidierung
 Kundenzentriert
 Kurse
+Laparo
 Motivationsquellen
 NEXTAUTH
 Neon
 NextAuth
 OPENAI
+OpenAPIV
 Println
 Prisma
 Provisionierung

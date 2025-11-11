@@ -10,6 +10,13 @@ interface GlobalWithCrypto {
   };
 }
 
+interface GlobalWithCrypto {
+  crypto?: {
+    randomUUID?: () => string;
+    getRandomValues?: <T extends ArrayBufferView>(array: T) => T;
+  };
+}
+
 /**
  * Generate a unique request ID (RFC4122 v4 UUID preferred)
  */
