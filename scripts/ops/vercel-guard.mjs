@@ -16,9 +16,7 @@ const teamId = process.env.VERCEL_ORG_ID;
 const projectId = process.env.VERCEL_PROJECT_ID;
 
 if (!token || !teamId || !projectId) {
-  console.error(
-    '❌ vercel-guard: Missing required env (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID)'
-  );
+  console.error('❌ vercel-guard: Missing required env (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID)');
   process.exit(2);
 }
 
@@ -58,11 +56,10 @@ function pickProductionBranch(project) {
   return branch || null;
 }
 
+
 (async () => {
   try {
-    console.log(
-      '🔎 vercel-guard: Checking Vercel project and recent deployments…'
-    );
+    console.log('🔎 vercel-guard: Checking Vercel project and recent deployments…');
 
     const project = await getProject();
     const deployments = await getRecentDeployments(25);
@@ -73,20 +70,16 @@ function pickProductionBranch(project) {
     const prodBranch = pickProductionBranch(project);
     if (prodBranch && prodBranch !== 'main') {
       violations.push(
-        `Production branch is "${prodBranch}" but policy requires "main" (project: ${project.name || projectId})`
+        `Production branch is "${prodBranch}" but policy requires "main" (project: ${project.name || projectId})`,
       );
     } else if (!prodBranch) {
-      console.warn(
-        '⚠️  Could not determine production branch from project; skipping branch check.'
-      );
+      console.warn('⚠️  Could not determine production branch from project; skipping branch check.');
     } else {
       console.log(`✅ Production branch OK: ${prodBranch}`);
     }
 
     // 2) Disallow git-sourced deployments (we want CLI-only via GitHub Actions)
-    const list = Array.isArray(deployments.deployments)
-      ? deployments.deployments
-      : deployments;
+    const list = Array.isArray(deployments.deployments) ? deployments.deployments : deployments;
     const bySource = list.reduce((acc, d) => {
       const s = d.source || 'unknown';
       acc[s] = (acc[s] || 0) + 1;
@@ -95,20 +88,16 @@ function pickProductionBranch(project) {
 
     console.log('📦 Recent deployments by source:', bySource);
 
-    const gitGraceHours = Number(
-      process.env.VERCEL_GUARD_GIT_GRACE_HOURS || '24'
-    );
+    const gitGraceHours = Number(process.env.VERCEL_GUARD_GIT_GRACE_HOURS || '24');
     const gitGraceMs = gitGraceHours * 60 * 60 * 1000;
     const now = Date.now();
     const enforceAfterRaw = process.env.VERCEL_GUARD_GIT_ENFORCE_AFTER;
     const enforceAfterTs = enforceAfterRaw ? Date.parse(enforceAfterRaw) : NaN;
     if (enforceAfterRaw && !Number.isFinite(enforceAfterTs)) {
-      console.warn(
-        `⚠️  vercel-guard: could not parse VERCEL_GUARD_GIT_ENFORCE_AFTER="${enforceAfterRaw}". Falling back to grace window.`
-      );
+      console.warn(`⚠️  vercel-guard: could not parse VERCEL_GUARD_GIT_ENFORCE_AFTER="${enforceAfterRaw}". Falling back to grace window.`);
     }
-    const gitDeployments = list.filter(d => (d.source || 'unknown') === 'git');
-    const recentGitDeployments = gitDeployments.filter(d => {
+    const gitDeployments = list.filter((d) => (d.source || 'unknown') === 'git');
+    const recentGitDeployments = gitDeployments.filter((d) => {
       const createdValue =
         typeof d.createdAt === 'number'
           ? d.createdAt
@@ -137,6 +126,19 @@ function pickProductionBranch(project) {
         Number.isFinite(enforceAfterTs)
           ? `ℹ️ Detected ${gitDeployments.length} git-sourced deployment(s) prior to enforcement timestamp ${new Date(enforceAfterTs).toISOString()}. Marking as informational only.`
           : `ℹ️ Detected ${gitDeployments.length} historical git-sourced deployment(s) outside the ${gitGraceHours}h window. Marking as informational only.`
+      );
+    }
+
+    if (recentGitDeployments.length > 0) {
+      const violationMessage = Number.isFinite(enforceAfterTs)
+        ? `Found ${recentGitDeployments.length} git-sourced deployment(s) newer than enforcement timestamp ${new Date(enforceAfterTs).toISOString()}. Policy requires CLI-only deployments via GitHub Actions.`
+        : `Found ${recentGitDeployments.length} git-sourced deployment(s) within the last ${gitGraceHours}h. Policy requires CLI-only deployments via GitHub Actions.`;
+      violations.push(violationMessage);
+    } else if (gitDeployments.length > 0) {
+      console.log(
+        Number.isFinite(enforceAfterTs)
+          ? `ℹ️ Detected ${gitDeployments.length} git-sourced deployment(s) prior to enforcement timestamp ${new Date(enforceAfterTs).toISOString()}. Marking as informational only.`
+          : `ℹ️ Detected ${gitDeployments.length} historical git-sourced deployment(s) outside the ${gitGraceHours}h window. Marking as informational only.`,
       );
     }
 

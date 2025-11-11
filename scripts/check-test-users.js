@@ -78,7 +78,7 @@ async function checkTestUsers() {
             `   Email verified: ${user.email_addresses[0]?.verification?.status === 'verified'}`
           );
         } else {
-          console.log(`❌ User not found`);
+          console.log('❌ User not found');
         }
       } else {
         console.log(`❌ Error checking user: ${result.status}`);

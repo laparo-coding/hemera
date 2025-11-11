@@ -94,17 +94,17 @@ async function createAllUsers() {
       const result = await createUser(userData);
 
       if (result.status === 200 || result.status === 201) {
-        console.log(`✅ User created successfully!`);
+        console.log('✅ User created successfully!');
         console.log(
           `   Email: ${result.data.email_addresses[0]?.email_address}`
         );
         console.log(`   User ID: ${result.data.id}`);
       } else if (result.status === 422) {
         // User might already exist
-        console.log(`⚠️ User might already exist (422)`);
+        console.log('⚠️ User might already exist (422)');
         console.log(`   Response: ${JSON.stringify(result.data, null, 2)}`);
       } else {
-        console.log(`❌ Failed to create user`);
+        console.log('❌ Failed to create user');
         console.log(`   Status: ${result.status}`);
         console.log(`   Response: ${JSON.stringify(result.data, null, 2)}`);
       }

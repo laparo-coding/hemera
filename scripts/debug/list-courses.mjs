@@ -20,9 +20,7 @@ try {
   } else {
     console.log('Aktuelle Kurse im System:');
     courses.forEach((course, index) => {
-      console.log(
-        `${index + 1}. ${course.title} (ID: ${course.id}, slug: ${course.slug}, published: ${course.isPublished})`
-      );
+      console.log(`${index + 1}. ${course.title} (ID: ${course.id}, slug: ${course.slug}, published: ${course.isPublished})`);
     });
   }
 } catch (error) {

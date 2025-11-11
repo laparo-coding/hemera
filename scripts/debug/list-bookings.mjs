@@ -32,7 +32,7 @@ try {
       console.log(
         `${index + 1}. Booking ${booking.id} | Kurs: ${booking.course.title} | ` +
           `User: ${booking.user?.email ?? booking.userId} | Status: ${booking.paymentStatus} | ` +
-          `Betrag: ${(booking.amount ?? 0) / 100} ${booking.currency}`
+          `Betrag: ${(booking.amount ?? 0) / 100} ${booking.currency}`,
       );
     });
   }
