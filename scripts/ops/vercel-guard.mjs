@@ -20,7 +20,7 @@ if (!token || !teamId || !projectId) {
   process.exit(2);
 }
 
-const API = "https://api.vercel.com";
+const API = 'https://api.vercel.com';
 
 async function getJson(url) {
   const res = await fetch(url, {

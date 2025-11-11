@@ -3,7 +3,7 @@
  * - Fails the build on Vercel (preview/production) if Stripe keys are missing
  */
 
-const isVercel = process.env.VERCEL === "1";
+const isVercel = process.env.VERCEL === '1';
 const vercelEnv = process.env.VERCEL_ENV; // "development" | "preview" | "production"
 const nodeEnv = process.env.NODE_ENV;
 
