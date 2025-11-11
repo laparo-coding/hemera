@@ -71,16 +71,16 @@ export async function GET(request: NextRequest) {
 
     // Preisfilter anwenden
     if (validatedParams.minPrice !== undefined) {
+      const minPrice = validatedParams.minPrice;
       filteredCourses = filteredCourses.filter(
-        (course: CourseWithBookings) =>
-          (course.price || 0) >= validatedParams.minPrice!
+        (course: CourseWithBookings) => (course.price || 0) >= minPrice
       );
     }
 
     if (validatedParams.maxPrice !== undefined) {
+      const maxPrice = validatedParams.maxPrice;
       filteredCourses = filteredCourses.filter(
-        (course: CourseWithBookings) =>
-          (course.price || 0) <= validatedParams.maxPrice!
+        (course: CourseWithBookings) => (course.price || 0) <= maxPrice
       );
     }
 

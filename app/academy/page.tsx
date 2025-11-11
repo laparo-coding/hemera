@@ -49,7 +49,7 @@ export default function AcademyPage() {
     <>
       {jsonLdSchemas.map((schema, index) => (
         <script
-          key={index}
+          key={`jsonld-${index}`}
           type='application/ld+json'
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(schema, null, 2),
@@ -123,6 +123,7 @@ export default function AcademyPage() {
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
+                aria-hidden='true'
               >
                 <path
                   strokeLinecap='round'

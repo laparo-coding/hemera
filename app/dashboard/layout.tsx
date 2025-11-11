@@ -171,10 +171,10 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
       localStorage.clear();
       sessionStorage.clear();
       // Basic cookie clear
-      document.cookie.split(';').forEach(c => {
-        document.cookie = c
-          .replace(/^ +/, '')
-          .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+      const cookies = document.cookie.split(';');
+      cookies.forEach(c => {
+        const cookieName = c.replace(/^ +/, '').replace(/=.*/, '');
+        document.cookie = `${cookieName}=;expires=${new Date().toUTCString()};path=/`;
       });
     } catch {
       // Ignore cookie clearing errors

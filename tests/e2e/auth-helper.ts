@@ -295,7 +295,7 @@ export class AuthHelper {
     }
 
     await this.page.fill('input[name="password"]', password);
-    console.log(`🔑 Password filled`);
+    console.log('🔑 Password filled');
 
     // Click sign in button with improved selector logic
     buttonClicked = false;

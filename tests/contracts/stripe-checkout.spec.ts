@@ -168,6 +168,7 @@ describe('POST /api/stripe/checkout - Contract Tests', () => {
 
     it('should validate Clerk token format', () => {
       const validClerkTokens = [
+        // cspell:disable-next-line
         'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...',
         'Bearer sess_123abc456def',
       ];

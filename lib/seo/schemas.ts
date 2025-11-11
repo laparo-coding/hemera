@@ -224,7 +224,7 @@ export const SCHEMA_COMBINATIONS = {
   academyPage: () => [
     generateOrganizationSchema(),
     generateWebPageSchema({
-      title: `Hemera Academy – Über unsere Kurse`,
+      title: 'Hemera Academy – Über unsere Kurse',
       description:
         'Erfahre mehr über die Hemera Academy: Ziele, Lernformate und wie du mit unseren Kursen durchstartest.',
       url: `${ORGANIZATION_CONFIG.url}/academy`,

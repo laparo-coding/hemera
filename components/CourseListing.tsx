@@ -306,6 +306,7 @@ const CourseListing: React.FC<CourseListingProps> = ({
       {hasMore && onLoadMore && (
         <div className='text-center pt-8'>
           <button
+            type='button'
             onClick={onLoadMore}
             disabled={loading}
             className='inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'

@@ -43,9 +43,7 @@ async function getProject() {
 
 async function getRecentDeployments(limit = 20) {
   // v6 deployments endpoint supports projectId & teamId
-  const url = `${API}/v6/deployments?projectId=${encodeURIComponent(projectId)}&teamId=${encodeURIComponent(
-    teamId
-  )}&limit=${limit}`;
+  const url = `${API}/v6/deployments?projectId=${encodeURIComponent(projectId)}&teamId=${encodeURIComponent(teamId)}&limit=${limit}`;
   return getJson(url);
 }
 
@@ -131,17 +129,26 @@ function pickProductionBranch(project) {
 
     if (recentGitDeployments.length > 0) {
       const violationMessage = Number.isFinite(enforceAfterTs)
-        ? `Found ${recentGitDeployments.length} git-sourced deployment(s) newer than enforcement timestamp ${new Date(
-            enforceAfterTs
-          ).toISOString()}. Policy requires CLI-only deployments via GitHub Actions.`
+        ? `Found ${recentGitDeployments.length} git-sourced deployment(s) newer than enforcement timestamp ${new Date(enforceAfterTs).toISOString()}. Policy requires CLI-only deployments via GitHub Actions.`
         : `Found ${recentGitDeployments.length} git-sourced deployment(s) within the last ${gitGraceHours}h. Policy requires CLI-only deployments via GitHub Actions.`;
       violations.push(violationMessage);
     } else if (gitDeployments.length > 0) {
       console.log(
         Number.isFinite(enforceAfterTs)
-          ? `ℹ️ Detected ${gitDeployments.length} git-sourced deployment(s) prior to enforcement timestamp ${new Date(
-              enforceAfterTs
-            ).toISOString()}. Marking as informational only.`
+          ? `ℹ️ Detected ${gitDeployments.length} git-sourced deployment(s) prior to enforcement timestamp ${new Date(enforceAfterTs).toISOString()}. Marking as informational only.`
+          : `ℹ️ Detected ${gitDeployments.length} historical git-sourced deployment(s) outside the ${gitGraceHours}h window. Marking as informational only.`
+      );
+    }
+
+    if (recentGitDeployments.length > 0) {
+      const violationMessage = Number.isFinite(enforceAfterTs)
+        ? `Found ${recentGitDeployments.length} git-sourced deployment(s) newer than enforcement timestamp ${new Date(enforceAfterTs).toISOString()}. Policy requires CLI-only deployments via GitHub Actions.`
+        : `Found ${recentGitDeployments.length} git-sourced deployment(s) within the last ${gitGraceHours}h. Policy requires CLI-only deployments via GitHub Actions.`;
+      violations.push(violationMessage);
+    } else if (gitDeployments.length > 0) {
+      console.log(
+        Number.isFinite(enforceAfterTs)
+          ? `ℹ️ Detected ${gitDeployments.length} git-sourced deployment(s) prior to enforcement timestamp ${new Date(enforceAfterTs).toISOString()}. Marking as informational only.`
           : `ℹ️ Detected ${gitDeployments.length} historical git-sourced deployment(s) outside the ${gitGraceHours}h window. Marking as informational only.`
       );
     }

@@ -31,7 +31,7 @@ export default async function HomePage() {
       {/* JSON-LD Structured Data */}
       {jsonLdSchemas.map((schema, index) => (
         <script
-          key={index}
+          key={`jsonld-${index}`}
           type='application/ld+json'
           dangerouslySetInnerHTML={{
             __html: Buffer.from(JSON.stringify(schema, null, 2)).toString(

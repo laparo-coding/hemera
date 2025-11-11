@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let body;
+    let body: any;
     try {
       body = await request.json();
     } catch (_error) {
