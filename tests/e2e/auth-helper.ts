@@ -1,7 +1,7 @@
-import { Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 // Test user credentials - must match what's created in create-test-user.js
-const TEST_CREDENTIALS = {
+const _TEST_CREDENTIALS = {
   USER_EMAIL: 'e2e.dashboard@example.com', // Real E2E Test Account
   USER_PASSWORD: 'E2ETestPassword2024!SecureForTesting',
   ADMIN_EMAIL: 'e2e.admin@example.com',
@@ -31,14 +31,20 @@ export class AuthHelper {
           try {
             localStorage.clear();
             sessionStorage.clear();
-          } catch (e: any) {
-            console.warn('Could not clear storage:', e.message);
+          } catch (e: unknown) {
+            console.warn(
+              'Could not clear storage:',
+              e instanceof Error ? e.message : String(e)
+            );
           }
         });
       }
       console.log('✅ Cookies and storage cleared for clean auth state');
-    } catch (e: any) {
-      console.log('⚠️ Could not clear local/session storage:', e.message);
+    } catch (e: unknown) {
+      console.log(
+        '⚠️ Could not clear local/session storage:',
+        e instanceof Error ? e.message : String(e)
+      );
       console.log('✅ Cookies cleared successfully');
     }
   }
@@ -124,7 +130,7 @@ export class AuthHelper {
         timeout: 30000, // Reduced timeout for faster failure detection
       });
       console.log(`� Navigated to sign-in page: ${this.page.url()}`);
-    } catch (error) {
+    } catch (_error) {
       console.log('⚠️ First navigation attempt failed, retrying...');
       await this.page.waitForTimeout(2000);
       try {
@@ -133,7 +139,7 @@ export class AuthHelper {
           timeout: 30000, // Reduced timeout
         });
         console.log(`📍 Retry navigation successful: ${this.page.url()}`);
-      } catch (retryError) {
+      } catch (_retryError) {
         console.log(
           '❌ Navigation failed completely, proceeding with current page'
         );
@@ -171,7 +177,7 @@ export class AuthHelper {
         console.log(`✅ Sign-in form found with selector: ${selector}`);
         signInFormFound = true;
         break;
-      } catch (e) {
+      } catch (_e) {
         console.log(`⚠️ Selector ${selector} not found, trying next...`);
       }
     }
@@ -189,7 +195,7 @@ export class AuthHelper {
       });
       await this.page.fill('input[name="identifier"]', email);
       console.log(`📧 Email filled: ${email}`);
-    } catch (e) {
+    } catch (_e) {
       console.log(
         '⚠️ Standard email field not found, trying alternative selectors...'
       );
@@ -208,7 +214,7 @@ export class AuthHelper {
           console.log(`📧 Email filled with selector: ${selector}`);
           emailFilled = true;
           break;
-        } catch (e) {
+        } catch (_e) {
           console.log(`⚠️ Email selector ${selector} failed`);
         }
       }
@@ -228,7 +234,9 @@ export class AuthHelper {
         await submitButton.click();
         buttonClicked = true;
       }
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     // Click sign in button (improved logic with multiple selectors)
     buttonClicked = false;
@@ -250,7 +258,7 @@ export class AuthHelper {
           buttonClicked = true;
           break;
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue to next selector
       }
     }
@@ -309,7 +317,7 @@ export class AuthHelper {
           buttonClicked = true;
           break;
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue to next selector
       }
     }
@@ -322,7 +330,9 @@ export class AuthHelper {
         );
         buttonClicked = true;
         console.log('🔘 Clicked primary form button');
-      } catch {}
+      } catch {
+        // Ignore E2E test errors
+      }
     }
 
     if (!buttonClicked) {
@@ -397,7 +407,7 @@ export class AuthHelper {
 
       // If we reach here, one of the strategies succeeded
       authSuccess = true;
-    } catch (error) {
+    } catch (_error) {
       console.log(
         '⏳ Primary auth indicators not found, checking URL manually...'
       );
@@ -554,7 +564,7 @@ export class AuthHelper {
               );
             }
           }
-        } catch (e) {
+        } catch (_e) {
           console.log('❌ No Clerk elements found');
         }
       }
@@ -708,7 +718,9 @@ export class AuthHelper {
     try {
       await this.page.click('[data-testid="sign-out-button"]');
       signOutClicked = true;
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     if (!signOutClicked) {
       try {
@@ -721,7 +733,9 @@ export class AuthHelper {
           .first();
         await signOutButton.click();
         signOutClicked = true;
-      } catch {}
+      } catch {
+        // Ignore E2E test errors
+      }
     }
 
     if (!signOutClicked) {
@@ -747,7 +761,9 @@ export class AuthHelper {
         timeout: 2000,
       });
       return true;
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     // 2. Check URL
     const currentUrl = this.page.url();
@@ -764,7 +780,9 @@ export class AuthHelper {
         timeout: 2000,
       });
       return true;
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     // 4. Check for Clerk UserButton
     try {
@@ -772,7 +790,9 @@ export class AuthHelper {
         timeout: 2000,
       });
       return true;
-    } catch {}
+    } catch {
+      // Ignore E2E test errors
+    }
 
     return false;
   }

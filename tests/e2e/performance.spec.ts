@@ -1,4 +1,4 @@
-import { expect, Page, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 const isMockMode =
   !!process.env.CI ||
@@ -222,7 +222,7 @@ test.describe('Core Web Vitals Validation', () => {
               fontRules.push(rule.cssText);
             }
           });
-        } catch (e) {
+        } catch (_e) {
           // Cross-origin stylesheets may not be accessible
         }
       });
@@ -316,7 +316,7 @@ test.describe('Auth Performance Validation (T019)', () => {
 
     // Test that auth middleware responds quickly (either auth redirect or success)
     // Status 200 (authenticated) or 302/307 (redirect to signin) both acceptable
-    expect([200, 302, 307]).toContain(response!.status());
+    expect([200, 302, 307]).toContain(response?.status());
 
     // Adjust threshold based on environment - CI is much slower
     const ttfbThreshold = isMockMode ? 20000 : 2000; // More lenient in CI/mock mode

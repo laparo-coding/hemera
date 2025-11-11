@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 describe('GET /api/bookings - Contract Tests', () => {
-  const BOOKINGS_ENDPOINT = '/api/bookings';
+  const _BOOKINGS_ENDPOINT = '/api/bookings';
 
   describe('Request Schema Validation', () => {
     it('should support query parameters for filtering', () => {
@@ -234,7 +234,7 @@ describe('GET /api/bookings - Contract Tests', () => {
       userRoles.forEach(role => {
         expect(accessRules).toHaveProperty(role);
         expect(['own_bookings_only', 'all_bookings']).toContain(
-          (accessRules as any)[role]
+          (accessRules as Record<string, unknown>)[role]
         );
       });
     });

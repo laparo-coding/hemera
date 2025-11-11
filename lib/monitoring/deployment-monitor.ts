@@ -4,8 +4,8 @@
  */
 
 import { analytics } from '@/lib/analytics/request-analytics';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { deploymentAlerts } from '@/lib/monitoring/deployment-alerts';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 interface DeploymentMetrics {
   version: string;
@@ -20,7 +20,7 @@ interface HealthCheck {
   name: string;
   status: 'pass' | 'fail' | 'warn';
   responseTime: number;
-  details?: any;
+  details?: unknown;
   lastChecked: string;
 }
 
@@ -34,7 +34,6 @@ interface ServiceStatus {
 
 export class DeploymentMonitor {
   private static instance: DeploymentMonitor;
-  private checks: Map<string, HealthCheck> = new Map();
   private deploymentInfo: DeploymentMetrics;
 
   constructor() {

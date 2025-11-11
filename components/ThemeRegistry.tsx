@@ -1,6 +1,6 @@
 'use client';
-import * as React from 'react';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import type * as React from 'react';
 import theme from '@/lib/theme';
 
 export default function ThemeRegistry({

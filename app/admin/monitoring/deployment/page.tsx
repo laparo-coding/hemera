@@ -3,7 +3,7 @@
  * Zeigt Echtzeit-Health-Status und Deployment-Metriken
  */
 
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import DeploymentMonitoringDashboard from '@/components/monitoring/DeploymentMonitoringDashboard';
 
 export const metadata: Metadata = {

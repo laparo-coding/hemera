@@ -1,10 +1,9 @@
 'use client';
 
-import { format, formatDistanceToNow } from 'date-fns';
-import { de } from 'date-fns/locale';
-import Image from 'next/image';
-import Link from 'next/link';
-import React, { useMemo, useState } from 'react';
+import BookOnlineOutlinedIcon from '@mui/icons-material/BookOnlineOutlined';
+import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
+import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
+import HistoryEduRoundedIcon from '@mui/icons-material/HistoryEduRounded';
 import {
   Box,
   Button,
@@ -24,10 +23,12 @@ import {
   Typography,
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
-import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
-import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import HistoryEduRoundedIcon from '@mui/icons-material/HistoryEduRounded';
-import BookOnlineOutlinedIcon from '@mui/icons-material/BookOnlineOutlined';
+import { format, formatDistanceToNow } from 'date-fns';
+import { de } from 'date-fns/locale';
+import Image from 'next/image';
+import Link from 'next/link';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 
 interface Course {
   id: string;
@@ -422,8 +423,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     variant='contained'
                     size='large'
                     startIcon={<BookOnlineOutlinedIcon />}
-                    component={bookNowHref ? (Link as any) : undefined}
-                    href={bookNowHref}
+                    {...(bookNowHref
+                      ? {
+                          component: Link as React.ElementType,
+                          href: bookNowHref,
+                        }
+                      : {})}
                     onClick={
                       typeof onBookNow === 'function'
                         ? handleBookNow

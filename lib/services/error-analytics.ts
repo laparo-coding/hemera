@@ -27,7 +27,7 @@ export interface ErrorLogEntry {
   message: string;
   statusCode: number;
   requestId: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   userAgent?: string;
   ip?: string;
   resolved: boolean;
@@ -50,7 +50,7 @@ class ErrorAnalyticsService {
       requestId?: string;
       userAgent?: string;
       ip?: string;
-      additionalContext?: Record<string, any>;
+      additionalContext?: Record<string, unknown>;
     }
   ): void {
     const entry: ErrorLogEntry = {
@@ -87,7 +87,7 @@ class ErrorAnalyticsService {
    * Get error metrics for dashboard
    */
   getErrorMetrics(timeRange: 'hour' | 'day' | 'week' = 'day'): ErrorMetrics {
-    const now = new Date();
+    const _now = new Date();
     const timeFilter = this.getTimeFilter(timeRange);
 
     const recentErrors = this.errorLogs.filter(
@@ -218,7 +218,7 @@ class ErrorAnalyticsService {
     }
   }
 
-  private async sendToMonitoring(error: ErrorLogEntry): Promise<void> {
+  private async sendToMonitoring(_error: ErrorLogEntry): Promise<void> {
     // In production, integrate with monitoring services like:
     // - Sentry: Sentry.captureException(error)
     // - DataDog: datadogLogger.error(error)

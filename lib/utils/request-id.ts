@@ -1,7 +1,14 @@
 /**
  * Request ID utilities for tracking requests across the application
  */
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+interface GlobalWithCrypto {
+  crypto?: {
+    randomUUID?: () => string;
+    getRandomValues?: <T extends ArrayBufferView>(array: T) => T;
+  };
+}
 
 interface GlobalWithCrypto {
   crypto?: {
@@ -20,7 +27,8 @@ export function generateRequestId(): string {
       (globalThis as GlobalWithCrypto).crypto &&
       typeof (globalThis as GlobalWithCrypto).crypto?.randomUUID === 'function'
     ) {
-      return (globalThis as GlobalWithCrypto).crypto!.randomUUID!();
+      const uuid = (globalThis as GlobalWithCrypto).crypto?.randomUUID?.();
+      if (uuid) return uuid;
     }
   } catch (_) {
     // fall through to fallback
@@ -34,7 +42,7 @@ export function generateRequestId(): string {
         'function'
     ) {
       const buf = new Uint8Array(16);
-      (globalThis as GlobalWithCrypto).crypto!.getRandomValues!(buf);
+      (globalThis as GlobalWithCrypto).crypto?.getRandomValues?.(buf);
       return buf;
     }
     const buf = new Uint8Array(16);
@@ -63,7 +71,7 @@ export function generateRequestId(): string {
 /**
  * Extract request ID from NextRequest or generate a new one
  */
-export function getOrCreateRequestId(request: NextRequest): string {
+export function getOrCreateRequestId(_request: NextRequest): string {
   // Always return a canonical, freshly generated request ID.
   // Any inbound x-request-id is treated as an external correlation ID and should not be reused.
   return generateRequestId();
@@ -72,7 +80,7 @@ export function getOrCreateRequestId(request: NextRequest): string {
 /**
  * Extract request ID from headers or generate a new one
  */
-export function getOrCreateRequestIdFromHeaders(headers: Headers): string {
+export function getOrCreateRequestIdFromHeaders(_headers: Headers): string {
   // Always generate a new canonical ID for responses/logging.
   return generateRequestId();
 }

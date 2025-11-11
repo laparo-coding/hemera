@@ -1,4 +1,4 @@
-import { expect, test, Page } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { gotoStable } from './helpers/nav';
 
 const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;

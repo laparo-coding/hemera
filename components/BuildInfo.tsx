@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { getBuildInfo } from '@/lib/buildInfo';
 
 // This component renders a tiny build/version indicator.

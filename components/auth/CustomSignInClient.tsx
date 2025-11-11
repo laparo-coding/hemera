@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useMemo, useState } from 'react';
+import { type FormEvent, useMemo, useState } from 'react';
 
 export default function CustomSignInClient() {
   const { isLoaded, signIn, setActive } = useSignIn();
@@ -41,9 +41,10 @@ export default function CustomSignInClient() {
           'Additional steps required. Please complete the sign-in flow.'
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        err?.errors?.[0]?.message || 'Sign-in failed. Please try again.';
+        error?.errors?.[0]?.message || 'Sign-in failed. Please try again.';
       setError(message);
     } finally {
       setSubmitting(false);

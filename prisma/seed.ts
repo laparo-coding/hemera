@@ -452,7 +452,7 @@ async function main() {
     },
   ];
 
-  const courses = await Promise.all(
+  const _courses = await Promise.all(
     seedCourses.map(course =>
       prisma.course.upsert({
         where: { slug: course.slug },

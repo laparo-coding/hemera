@@ -5,26 +5,26 @@
 
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import {
   getCurrentUserWithSync,
   getUserStats,
-  updateUser,
   type UpdateUserData,
+  updateUser,
 } from '@/lib/api/users';
 import { UserValidationError } from '@/lib/errors';
 import {
-  withServerActionErrorHandling,
   type ServerActionContext,
   type ServerActionResult,
+  withServerActionErrorHandling,
 } from '@/lib/middleware/server-action-error-handling';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import { revalidatePath } from 'next/cache';
 
 /**
  * Get current user profile
  */
 export const getCurrentProfileAction = withServerActionErrorHandling(
-  async (context: ServerActionContext) => {
+  async (_context: ServerActionContext) => {
     return await getCurrentUserWithSync();
   }
 );
@@ -105,7 +105,7 @@ export const updateProfileAction = async (
  * Get user statistics
  */
 export const getUserStatsAction = withServerActionErrorHandling(
-  async (context: ServerActionContext) => {
+  async (_context: ServerActionContext) => {
     const currentUser = await getCurrentUserWithSync();
     const stats = await getUserStats(currentUser.id);
 
@@ -117,7 +117,7 @@ export const getUserStatsAction = withServerActionErrorHandling(
  * Sync user with Clerk (useful after external updates)
  */
 export const syncUserAction = withServerActionErrorHandling(
-  async (context: ServerActionContext) => {
+  async (_context: ServerActionContext) => {
     const user = await getCurrentUserWithSync();
 
     revalidatePath('/protected');
@@ -202,7 +202,7 @@ export const checkEmailAvailabilityAction = async (
  */
 export const updateUserPreferenceAction = async (
   key: string,
-  value: any
+  value: unknown
 ): Promise<ServerActionResult> => {
   try {
     if (!key || typeof key !== 'string') {

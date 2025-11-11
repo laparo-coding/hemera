@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/db/prisma';
 import { PaymentStatus } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 
 export { PaymentStatus } from '@prisma/client';
 
@@ -47,7 +47,7 @@ export interface CourseSearchParams {
 export async function getCourses(
   params?: CourseSearchParams
 ): Promise<CourseWithBookings[]> {
-  const where: any = {};
+  const where: Record<string, unknown> = {};
 
   if (params?.title) {
     where.title = {
@@ -58,14 +58,14 @@ export async function getCourses(
 
   if (params?.minPrice !== undefined) {
     where.price = {
-      ...where.price,
+      ...(where.price as Record<string, unknown>),
       gte: params.minPrice,
     };
   }
 
   if (params?.maxPrice !== undefined) {
     where.price = {
-      ...where.price,
+      ...(where.price as Record<string, unknown>),
       lte: params.maxPrice,
     };
   }

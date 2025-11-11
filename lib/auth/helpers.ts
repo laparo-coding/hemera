@@ -19,7 +19,7 @@ function isMockAuthEnvironment(): boolean {
  * Provides a minimal mocked Clerk User object for E2E/test environments.
  */
 function getMockUser(role: 'user' | 'admin' = 'user'): User {
-  const mock: any = {
+  const mock: Partial<User> = {
     id: 'e2e_mock_user',
     firstName: role === 'admin' ? 'Admin' : 'E2E',
     lastName: 'User',
@@ -91,7 +91,7 @@ export async function isAdmin() {
 /**
  * Check if a specific user has admin role by ID
  */
-export async function checkUserAdminStatus(userId: string): Promise<boolean> {
+export async function checkUserAdminStatus(_userId: string): Promise<boolean> {
   if (isMockAuthEnvironment()) return true;
   const user = await currentUser();
   // Check if the current authenticated user is an admin

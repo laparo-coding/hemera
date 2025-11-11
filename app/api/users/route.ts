@@ -1,8 +1,10 @@
+import { auth } from '@clerk/nextjs/server';
+import type { NextRequest } from 'next/server';
 import {
+  type CreateUserData,
   createUser,
   getAllUsers,
   searchUsers,
-  type CreateUserData,
 } from '@/lib/api/users';
 import { checkUserAdminStatus } from '@/lib/auth/helpers';
 import { createApiLogger } from '@/lib/utils/api-logger';
@@ -15,8 +17,6 @@ import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { auth } from '@clerk/nextjs/server';
-import { NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);
@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const limit = parseInt(searchParams.get('limit') || '50', 10);
+    const offset = parseInt(searchParams.get('offset') || '0', 10);
     const search = searchParams.get('search');
 
     logger.info('Fetching users', { limit, offset, search: !!search });
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     let body;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch (_error) {
       logger.warn('Invalid JSON in request body');
       return createErrorResponse(
         'Invalid JSON in request body',

@@ -8,7 +8,7 @@ describe('de-DE Intl formatting', () => {
       currency: 'EUR',
     }).format(amountCents / 100);
 
-    expect(formatted).toMatch(/\d{1,3}([\.\s]\d{3})*,\d{2}\s?€/);
+    expect(formatted).toMatch(/\d{1,3}([.\s]\d{3})*,\d{2}\s?€/);
     expect(formatted.includes(',')).toBeTruthy();
   });
 

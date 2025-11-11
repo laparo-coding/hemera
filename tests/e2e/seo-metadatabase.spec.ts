@@ -1,4 +1,4 @@
-import { expect, test, Page } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { gotoStable } from './helpers/nav';
 
 const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
@@ -18,6 +18,6 @@ test.describe('Global metadataBase Wirkung', () => {
     const ogImage = await getMetaContent(page, 'meta[property="og:image"]');
     expect(ogImage).toBeTruthy();
     // Sollte absolut sein und nicht auf localhost zeigen
-    expect(ogImage!.startsWith('http')).toBeTruthy();
+    expect(ogImage?.startsWith('http')).toBeTruthy();
   });
 });

@@ -1,8 +1,13 @@
 'use client';
 
-import React from 'react';
-import { usePathname } from 'next/navigation';
 import {
+  Dashboard as DashboardIcon,
+  Person as PersonIcon,
+  School as SchoolIcon,
+} from '@mui/icons-material';
+import {
+  Box,
+  Divider,
   Drawer,
   List,
   ListItem,
@@ -10,15 +15,9 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  Box,
-  Divider,
 } from '@mui/material';
-import {
-  Dashboard as DashboardIcon,
-  School as SchoolIcon,
-  Person as PersonIcon,
-} from '@mui/icons-material';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const drawerWidth = 260;
 

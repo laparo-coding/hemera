@@ -1,9 +1,9 @@
-import { updateBookingPaymentStatus } from '@/lib/api/bookings';
-import { STRIPE_API_VERSION } from '@/lib/stripe/config';
 import { PaymentStatus } from '@prisma/client';
 import { headers } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { updateBookingPaymentStatus } from '@/lib/api/bookings';
+import { STRIPE_API_VERSION } from '@/lib/stripe/config';
 
 // Skip Stripe initialization during build process
 const isBuildTime =
@@ -38,18 +38,13 @@ const getWebhookSecret = () => {
  * In production, use Redis or a database
  */
 const processedEvents = new Set<string>();
-const EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
-
-interface ProcessedEvent {
-  id: string;
-  timestamp: number;
-}
+const _EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 
 // Clean up old events periodically
 setInterval(
   () => {
-    const now = Date.now();
-    processedEvents.forEach(eventId => {
+    const _now = Date.now();
+    processedEvents.forEach(_eventId => {
       // In real implementation, we'd check timestamp from storage
       // For now, just clear after some time
     });
@@ -163,7 +158,7 @@ export async function POST(request: NextRequest) {
     // Handle different event types
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as any;
+        const session = event.data.object as Stripe.Checkout.Session;
         console.log(`[${requestId}] Processing checkout.session.completed`, {
           sessionId: session.id,
           customerEmail: session.customer_email,
@@ -202,7 +197,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'payment_intent.payment_failed': {
-        const paymentIntent = event.data.object as any;
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log(`[${requestId}] Processing payment_intent.payment_failed`, {
           paymentIntentId: paymentIntent.id,
           lastPaymentError: paymentIntent.last_payment_error?.message,
@@ -220,7 +215,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'payment_intent.canceled': {
-        const paymentIntent = event.data.object as any;
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log(`[${requestId}] Processing payment_intent.canceled`, {
           paymentIntentId: paymentIntent.id,
         });
@@ -239,7 +234,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'charge.dispute.created': {
-        const dispute = event.data.object as any;
+        const dispute = event.data.object as Stripe.Dispute;
         console.warn(`[${requestId}] Dispute created`, {
           disputeId: dispute.id,
           amount: dispute.amount,
@@ -255,11 +250,17 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.payment_succeeded':
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as any;
+        const invoice = event.data.object as Stripe.Invoice;
+        const invoiceData = invoice as unknown as {
+          id: string;
+          subscription?: string;
+          amount_paid?: number;
+          amount_due?: number;
+        };
         console.log(`[${requestId}] Processing ${event.type}`, {
-          invoiceId: invoice.id,
-          subscriptionId: invoice.subscription,
-          amount: invoice.amount_paid || invoice.amount_due,
+          invoiceId: invoiceData.id,
+          subscriptionId: invoiceData.subscription,
+          amount: invoiceData.amount_paid || invoiceData.amount_due,
         });
 
         // Handle subscription payments if applicable

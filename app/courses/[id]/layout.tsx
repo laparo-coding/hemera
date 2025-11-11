@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { ReactNode } from 'react';
-import { generateSEOMetadata, truncateDescription } from '@/lib/seo/metadata';
+import type { ReactNode } from 'react';
 import { SITE_CONFIG } from '@/lib/seo/constants';
+import { generateSEOMetadata, truncateDescription } from '@/lib/seo/metadata';
 
 // Note: Default layout component only needs to render children. Avoid over-typing props to satisfy Next's validator types.
 

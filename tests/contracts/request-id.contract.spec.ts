@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import { NextRequest } from 'next/server';
 import { GET as healthGet } from '@/app/api/health/route';
 
@@ -11,9 +11,9 @@ describe('Contract: Request-ID propagation and response headers', () => {
       headers: {
         'x-request-id': inboundId,
       },
-    } as any);
+    });
 
-    const res = await healthGet(req as any);
+    const res = await healthGet(req);
     const canonicalId = res.headers.get('X-Request-ID');
     expect(canonicalId).toBeTruthy();
     expect(canonicalId).not.toEqual(inboundId);

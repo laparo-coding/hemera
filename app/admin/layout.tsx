@@ -3,7 +3,7 @@
  * Layout für Admin-Bereiche
  */
 
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard | Hemera',

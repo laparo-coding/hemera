@@ -1,9 +1,9 @@
-import Providers from '@/components/Providers';
-import BuildInfo from '@/components/BuildInfo';
 import type { Metadata } from 'next';
-import { SITE_CONFIG } from '@/lib/seo/constants';
 import { Inter } from 'next/font/google';
-import * as React from 'react';
+import type * as React from 'react';
+import BuildInfo from '@/components/BuildInfo';
+import Providers from '@/components/Providers';
+import { SITE_CONFIG } from '@/lib/seo/constants';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });

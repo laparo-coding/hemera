@@ -58,7 +58,7 @@ function BookingSuccessContent() {
             'Buchung nicht gefunden. Bitte prüfe den Link oder kontaktiere den Support.'
           );
         }
-      } catch (e) {
+      } catch (_e) {
         setError('Es ist ein Fehler bei der Überprüfung aufgetreten.');
       } finally {
         setLoading(false);

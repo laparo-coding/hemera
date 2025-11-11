@@ -1,14 +1,14 @@
+import { auth } from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import {
   deleteUser,
   getUserProfile,
   getUserStats,
-  updateUser,
   type UpdateUserData,
+  updateUser,
 } from '@/lib/api/users';
 import { checkUserAdminStatus } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   _request: NextRequest,
@@ -92,7 +92,7 @@ export async function PUT(
     let body;
     try {
       body = await _request.json();
-    } catch (error) {
+    } catch (_error) {
       return NextResponse.json(
         { error: 'Invalid JSON in request body' },
         { status: 400 }

@@ -3,6 +3,7 @@
  * Converts Prisma errors to domain-specific error types
  */
 
+import { Prisma } from '@prisma/client';
 import { prisma as basePrisma } from '@/lib/db/prisma';
 import {
   BookingAlreadyExistsError,
@@ -13,14 +14,13 @@ import {
   FieldValidationError,
   UserEmailAlreadyExistsError,
 } from '@/lib/errors';
-import { Prisma } from '@prisma/client';
 
 /**
  * Convert Prisma errors to domain errors
  */
 export function mapPrismaError(
   error: unknown,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): Error {
   if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
     // Handle other Prisma errors
@@ -62,13 +62,6 @@ export function mapPrismaError(
     case 'P2025':
       return new DatabaseConnectionError(
         'Record not found for operation',
-        prismaError
-      );
-
-    // Record to delete does not exist
-    case 'P2025':
-      return new DatabaseConnectionError(
-        'Cannot delete non-existent record',
         prismaError
       );
 
@@ -135,7 +128,7 @@ export function mapPrismaError(
  */
 function handleUniqueConstraintViolation(
   error: Prisma.PrismaClientKnownRequestError,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): Error {
   const constraint = error.meta?.target as string[] | string;
   const table = error.meta?.table as string;
@@ -148,15 +141,19 @@ function handleUniqueConstraintViolation(
   // Map specific constraints to domain errors
   switch (true) {
     case constraintStr?.includes('email') || table === 'User':
-      return new UserEmailAlreadyExistsError(context?.email || 'unknown');
+      return new UserEmailAlreadyExistsError(
+        typeof context?.email === 'string' ? context.email : 'unknown'
+      );
 
     case constraintStr?.includes('slug') || table === 'Course':
-      return new CourseSlugAlreadyExistsError(context?.slug || 'unknown');
+      return new CourseSlugAlreadyExistsError(
+        typeof context?.slug === 'string' ? context.slug : 'unknown'
+      );
 
     case constraintStr?.includes('userId_courseId') || table === 'Booking':
       return new BookingAlreadyExistsError(
-        context?.userId || 'unknown',
-        context?.courseId || 'unknown'
+        typeof context?.userId === 'string' ? context.userId : 'unknown',
+        typeof context?.courseId === 'string' ? context.courseId : 'unknown'
       );
 
     default:
@@ -172,7 +169,7 @@ function handleUniqueConstraintViolation(
  */
 export async function safePrismaOperation<T>(
   operation: () => Promise<T>,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): Promise<T> {
   try {
     return await operation();
@@ -186,7 +183,7 @@ export async function safePrismaOperation<T>(
  */
 export async function safePrismaTransaction<T>(
   transaction: (prisma: Prisma.TransactionClient) => Promise<T>,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): Promise<T> {
   try {
     return await basePrisma.$transaction(transaction);
