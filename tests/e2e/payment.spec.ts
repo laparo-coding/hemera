@@ -1,5 +1,5 @@
-import { expect, type Page, test } from '@playwright/test';
-import { gotoStable } from './helpers/nav';
+import { expect, type Page, test } from "@playwright/test";
+import { gotoStable } from "./helpers/nav";
 
 /**
  * Payment Flow Integration - Simplified for CI
@@ -7,7 +7,7 @@ import { gotoStable } from './helpers/nav';
  * Validates basic payment flow with CI compatibility.
  */
 
-test.describe('Stripe React Elements Payment Flow E2E - Simplified', () => {
+test.describe("Stripe React Elements Payment Flow E2E - Simplified", () => {
   let page: Page;
 
   test.beforeEach(async ({ page: testPage }) => {
@@ -20,29 +20,29 @@ test.describe('Stripe React Elements Payment Flow E2E - Simplified', () => {
       await renderPaymentFixture(page);
     } else {
       // Navigate to home page with extended timeout (stable)
-      await gotoStable(page, '/', { timeout: 30000 });
+      await gotoStable(page, "/", { timeout: 30000 });
     }
   });
 
-  test('should complete payment flow with React Stripe Elements', async () => {
+  test("should complete payment flow with React Stripe Elements", async () => {
     if (process.env.CI) {
       await expect(page.locator('[data-testid="payment-flow"]')).toBeVisible();
       await expect(
-        page.locator('[data-testid="payment-summary"]')
-      ).toContainText('Total');
+        page.locator('[data-testid="payment-summary"]'),
+      ).toContainText("Total");
       await expect(
-        page.locator('[data-testid="payment-action"]')
-      ).toContainText('Confirm');
+        page.locator('[data-testid="payment-action"]'),
+      ).toContainText("Confirm");
       return;
     }
   });
 
-  test('should prevent duplicate bookings for same course', async () => {
+  test("should prevent duplicate bookings for same course", async () => {
     if (process.env.CI) {
       await expect(page.locator('[data-testid="payment-flow"]')).toBeVisible();
       await expect(
-        page.locator('[data-testid="duplicate-warning"]')
-      ).toContainText('Duplicate booking');
+        page.locator('[data-testid="duplicate-warning"]'),
+      ).toContainText("Duplicate booking");
       return;
     }
   });

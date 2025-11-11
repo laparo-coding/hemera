@@ -1,7 +1,7 @@
 /**
  * Request ID utilities for tracking requests across the application
  */
-import type { NextRequest } from 'next/server';
+import type { NextRequest } from "next/server";
 
 interface GlobalWithCrypto {
   crypto?: {
@@ -16,9 +16,9 @@ interface GlobalWithCrypto {
 export function generateRequestId(): string {
   try {
     if (
-      typeof globalThis !== 'undefined' &&
+      typeof globalThis !== "undefined" &&
       (globalThis as GlobalWithCrypto).crypto &&
-      typeof (globalThis as GlobalWithCrypto).crypto?.randomUUID === 'function'
+      typeof (globalThis as GlobalWithCrypto).crypto?.randomUUID === "function"
     ) {
       const uuid = (globalThis as GlobalWithCrypto).crypto?.randomUUID?.();
       if (uuid) return uuid;
@@ -29,10 +29,10 @@ export function generateRequestId(): string {
   // Fallback: RFC4122 v4-ish using crypto.getRandomValues if available, else Math.random (last resort)
   const getBytes = (): Uint8Array => {
     if (
-      typeof globalThis !== 'undefined' &&
+      typeof globalThis !== "undefined" &&
       (globalThis as GlobalWithCrypto).crypto &&
       typeof (globalThis as GlobalWithCrypto).crypto?.getRandomValues ===
-        'function'
+        "function"
     ) {
       const buf = new Uint8Array(16);
       (globalThis as GlobalWithCrypto).crypto?.getRandomValues?.(buf);
@@ -46,17 +46,17 @@ export function generateRequestId(): string {
   // Per RFC4122 section 4.4
   b[6] = (b[6] & 0x0f) | 0x40; // version 4
   b[8] = (b[8] & 0x3f) | 0x80; // variant 10xxxxxx
-  const toHex = (n: number) => n.toString(16).padStart(2, '0');
-  const hex = Array.from(b).map(toHex).join('');
+  const toHex = (n: number) => n.toString(16).padStart(2, "0");
+  const hex = Array.from(b).map(toHex).join("");
   return (
     hex.slice(0, 8) +
-    '-' +
+    "-" +
     hex.slice(8, 12) +
-    '-' +
+    "-" +
     hex.slice(12, 16) +
-    '-' +
+    "-" +
     hex.slice(16, 20) +
-    '-' +
+    "-" +
     hex.slice(20)
   );
 }
@@ -83,9 +83,9 @@ export function getOrCreateRequestIdFromHeaders(_headers: Headers): string {
  * This is for correlation only and must not be used as the canonical ID.
  */
 export function getExternalRequestIdFromHeaders(
-  headers: Headers
+  headers: Headers,
 ): string | undefined {
-  return headers.get('x-request-id') || headers.get('x-trace-id') || undefined;
+  return headers.get("x-request-id") || headers.get("x-trace-id") || undefined;
 }
 
 /**
@@ -110,13 +110,13 @@ export function createRequestContext(
   method?: string,
   url?: string,
   userAgent?: string,
-  ip?: string
+  ip?: string,
 ): RequestContext {
   return {
     id: requestId,
     timestamp: new Date().toISOString(),
-    method: method || 'UNKNOWN',
-    url: url || 'unknown',
+    method: method || "UNKNOWN",
+    url: url || "unknown",
     userAgent,
     ip,
   };
@@ -127,7 +127,7 @@ export function createRequestContext(
  */
 export function createRequestContextFromNextRequest(
   request: NextRequest,
-  requestId?: string
+  requestId?: string,
 ): RequestContext {
   const id = requestId || getOrCreateRequestId(request);
   const externalId = getExternalRequestIdFromHeaders(request.headers);
@@ -138,10 +138,10 @@ export function createRequestContextFromNextRequest(
     method: request.method,
     url: request.url,
     externalId,
-    userAgent: request.headers.get('user-agent') || undefined,
+    userAgent: request.headers.get("user-agent") || undefined,
     ip:
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
       undefined,
   };
 }

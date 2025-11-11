@@ -3,19 +3,19 @@
  * Provides error metrics and logs for monitoring dashboard
  */
 
-import { auth } from '@clerk/nextjs/server';
-import { type NextRequest, NextResponse } from 'next/server';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
-import { withErrorHandling } from '@/lib/errors';
-import { errorAnalytics } from '@/lib/services/error-analytics';
-import { createErrorResponse, ErrorCodes } from '@/lib/utils/api-response';
-import { getOrCreateRequestId } from '@/lib/utils/request-id';
+import { auth } from "@clerk/nextjs/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { checkUserAdminStatus } from "@/lib/auth/helpers";
+import { withErrorHandling } from "@/lib/errors";
+import { errorAnalytics } from "@/lib/services/error-analytics";
+import { createErrorResponse, ErrorCodes } from "@/lib/utils/api-response";
+import { getOrCreateRequestId } from "@/lib/utils/request-id";
 
 // CORS headers for external app access
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
 export async function OPTIONS() {
@@ -33,10 +33,10 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   } catch (_authError) {
     // In E2E test mode, auth() might fail, return 401
     const errorResponse = createErrorResponse(
-      'Unauthorized access',
+      "Unauthorized access",
       ErrorCodes.UNAUTHORIZED,
       requestId,
-      401
+      401,
     );
 
     // Add CORS headers to error response
@@ -49,10 +49,10 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
 
   if (!userId) {
     const errorResponse = createErrorResponse(
-      'Unauthorized access',
+      "Unauthorized access",
       ErrorCodes.UNAUTHORIZED,
       requestId,
-      401
+      401,
     );
 
     // Add CORS headers to error response
@@ -67,10 +67,10 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   const isAdmin = await checkUserAdminStatus(userId);
   if (!isAdmin) {
     const errorResponse = createErrorResponse(
-      'Admin privileges required',
+      "Admin privileges required",
       ErrorCodes.FORBIDDEN,
       requestId,
-      403
+      403,
     );
 
     // Add CORS headers to error response
@@ -82,23 +82,23 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   }
 
   const { searchParams } = new URL(request.url);
-  const action = searchParams.get('action') || 'metrics';
-  const timeRange = (searchParams.get('timeRange') || 'day') as
-    | 'hour'
-    | 'day'
-    | 'week';
-  const page = parseInt(searchParams.get('page') || '1', 10);
-  const limit = parseInt(searchParams.get('limit') || '50', 10);
+  const action = searchParams.get("action") || "metrics";
+  const timeRange = (searchParams.get("timeRange") || "day") as
+    | "hour"
+    | "day"
+    | "week";
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "50", 10);
 
   let responseData: NextResponse;
   switch (action) {
-    case 'metrics': {
+    case "metrics": {
       const metrics = errorAnalytics.getErrorMetrics(timeRange);
       responseData = NextResponse.json(metrics);
       break;
     }
 
-    case 'logs': {
+    case "logs": {
       const logs = errorAnalytics.getRecentErrors(page, limit);
       responseData = NextResponse.json(logs);
       break;
@@ -107,7 +107,7 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     default:
       responseData = NextResponse.json(
         { error: 'Invalid action. Use "metrics" or "logs".' },
-        { status: 400 }
+        { status: 400 },
       );
   }
 
@@ -130,10 +130,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   } catch (_authError) {
     // In E2E test mode, auth() might fail, return 401
     const errorResponse = createErrorResponse(
-      'Unauthorized access',
+      "Unauthorized access",
       ErrorCodes.UNAUTHORIZED,
       requestId,
-      401
+      401,
     );
 
     // Add CORS headers to error response
@@ -146,10 +146,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   if (!userId) {
     const errorResponse = createErrorResponse(
-      'Unauthorized access',
+      "Unauthorized access",
       ErrorCodes.UNAUTHORIZED,
       requestId,
-      401
+      401,
     );
 
     // Add CORS headers to error response
@@ -164,10 +164,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const isAdmin = await checkUserAdminStatus(userId);
   if (!isAdmin) {
     const errorResponse = createErrorResponse(
-      'Admin privileges required',
+      "Admin privileges required",
       ErrorCodes.FORBIDDEN,
       requestId,
-      403
+      403,
     );
 
     // Add CORS headers to error response
@@ -179,30 +179,30 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   const { searchParams } = new URL(request.url);
-  const action = searchParams.get('action');
+  const action = searchParams.get("action");
 
   let responseData: NextResponse;
   switch (action) {
-    case 'resolve': {
+    case "resolve": {
       const { errorId } = await request.json();
       const resolved = errorAnalytics.resolveError(errorId);
 
       responseData = NextResponse.json({
         success: resolved,
-        message: resolved ? 'Error marked as resolved' : 'Error not found',
+        message: resolved ? "Error marked as resolved" : "Error not found",
       });
       break;
     }
 
-    case 'clear': {
+    case "clear": {
       // Only allow in development
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         errorAnalytics.clearLogs();
-        responseData = NextResponse.json({ message: 'Error logs cleared' });
+        responseData = NextResponse.json({ message: "Error logs cleared" });
       } else {
         responseData = NextResponse.json(
-          { error: 'Action not allowed in production' },
-          { status: 403 }
+          { error: "Action not allowed in production" },
+          { status: 403 },
         );
       }
       break;
@@ -211,7 +211,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     default:
       responseData = NextResponse.json(
         { error: 'Invalid action. Use "resolve" or "clear".' },
-        { status: 400 }
+        { status: 400 },
       );
   }
 

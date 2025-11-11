@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from "@jest/globals";
 
-describe('Contract: Privacy/Consent default OFF (no PII)', () => {
+describe("Contract: Privacy/Consent default OFF (no PII)", () => {
   const ORIGINAL_ENV = process.env;
 
   beforeEach(() => {
@@ -12,8 +12,8 @@ describe('Contract: Privacy/Consent default OFF (no PII)', () => {
     // No module mocking; we reload module by dynamic import when needed
   });
 
-  it('does not include person when consent is not granted', async () => {
-    const mod = await import('@/lib/monitoring/rollbar-official');
+  it("does not include person when consent is not granted", async () => {
+    const mod = await import("@/lib/monitoring/rollbar-official");
     // Monkey patch serverInstance.error to capture payload
     const calls: any[] = [];
     const originalError = mod.serverInstance.error.bind(mod.serverInstance);
@@ -21,12 +21,12 @@ describe('Contract: Privacy/Consent default OFF (no PII)', () => {
       calls.push([msg, payload]);
     };
 
-    mod.reportError('Test Error', {
-      userId: 'user-123',
-      userEmail: 'user@example.com',
-      requestId: 'req-1',
-      route: '/test',
-      method: 'GET',
+    mod.reportError("Test Error", {
+      userId: "user-123",
+      userEmail: "user@example.com",
+      requestId: "req-1",
+      route: "/test",
+      method: "GET",
     });
 
     expect(calls.length).toBe(1);

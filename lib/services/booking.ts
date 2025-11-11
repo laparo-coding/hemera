@@ -1,6 +1,6 @@
-import { Prisma } from '@prisma/client';
-import { prisma } from '@/lib/db/prisma';
-import { type Booking, type Course, PaymentStatus } from './course';
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
+import { type Booking, type Course, PaymentStatus } from "./course";
 
 export interface BookingWithCourse extends Booking {
   course: Course;
@@ -29,13 +29,13 @@ export interface BookingSearchParams {
  * Create a new booking
  */
 export async function createBooking(
-  params: CreateBookingParams
+  params: CreateBookingParams,
 ): Promise<Booking> {
   const {
     userId,
     courseId,
     amount,
-    currency = 'USD',
+    currency = "USD",
     stripeSessionId,
     stripePaymentIntentId,
   } = params;
@@ -57,21 +57,21 @@ export async function createBooking(
   });
 
   if (!course) {
-    throw new Error('Course not found');
+    throw new Error("Course not found");
   }
 
   if (!course.isPublished) {
-    throw new Error('Course is not published');
+    throw new Error("Course is not published");
   }
 
   // Check capacity if set
-  if ('capacity' in course && course.capacity) {
+  if ("capacity" in course && course.capacity) {
     const paidBookingsCount = course.bookings.filter(
-      b => 'paymentStatus' in b && b.paymentStatus === PaymentStatus.PAID
+      (b) => "paymentStatus" in b && b.paymentStatus === PaymentStatus.PAID,
     ).length;
 
     if (paidBookingsCount >= course.capacity) {
-      throw new Error('Course is full');
+      throw new Error("Course is full");
     }
   }
 
@@ -88,7 +88,7 @@ export async function createBooking(
     updateData.stripePaymentIntentId = stripePaymentIntentId;
   }
 
-  if (typeof amount === 'number' && existingBooking?.amount !== amount) {
+  if (typeof amount === "number" && existingBooking?.amount !== amount) {
     updateData.amount = amount;
   }
 
@@ -124,7 +124,7 @@ export async function createBooking(
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
+      error.code === "P2002"
     ) {
       const existing = await prisma.booking.findUnique({
         where: {
@@ -157,7 +157,7 @@ export async function createBooking(
  * Get booking by ID
  */
 export async function getBookingById(
-  id: string
+  id: string,
 ): Promise<BookingWithCourse | null> {
   return (await prisma.booking.findUnique({
     where: { id },
@@ -171,7 +171,7 @@ export async function getBookingById(
  * Get bookings with optional filtering
  */
 export async function getBookings(
-  params?: BookingSearchParams
+  params?: BookingSearchParams,
 ): Promise<BookingWithCourse[]> {
   const where: Prisma.BookingWhereInput = {};
 
@@ -203,7 +203,7 @@ export async function getBookings(
       course: true,
     },
     orderBy: {
-      createdAt: 'desc',
+      createdAt: "desc",
     },
     take: params?.limit,
     skip: params?.offset,
@@ -214,7 +214,7 @@ export async function getBookings(
  * Get user's bookings
  */
 export async function getUserBookings(
-  userId: string
+  userId: string,
 ): Promise<BookingWithCourse[]> {
   return getBookings({ userId });
 }
@@ -223,7 +223,7 @@ export async function getUserBookings(
  * Get course bookings
  */
 export async function getCourseBookings(
-  courseId: string
+  courseId: string,
 ): Promise<BookingWithCourse[]> {
   return getBookings({ courseId });
 }
@@ -263,7 +263,7 @@ export async function updateBookingStatus(params: {
 export async function updateBookingPaymentStatus(
   bookingId: string,
   paymentStatus: PaymentStatus,
-  stripePaymentIntentId?: string
+  stripePaymentIntentId?: string,
 ): Promise<Booking> {
   const updateData: Prisma.BookingUpdateInput = { paymentStatus };
 
@@ -284,7 +284,7 @@ export async function updateBookingPaymentStatus(
  */
 export async function cancelBooking(
   bookingId: string,
-  userId?: string
+  userId?: string,
 ): Promise<Booking> {
   const where: Prisma.BookingWhereUniqueInput = { id: bookingId };
 
@@ -298,7 +298,7 @@ export async function cancelBooking(
   });
 
   if (!existingBooking) {
-    throw new Error('Booking not found or does not belong to user');
+    throw new Error("Booking not found or does not belong to user");
   }
 
   // Can only cancel pending or paid bookings
@@ -317,7 +317,7 @@ export async function cancelBooking(
  * Get booking by Stripe session ID
  */
 export async function getBookingByStripeSessionId(
-  sessionId: string
+  sessionId: string,
 ): Promise<Booking | null> {
   return (await prisma.booking.findFirst({
     where: {
@@ -330,7 +330,7 @@ export async function getBookingByStripeSessionId(
  * Get booking by Stripe payment intent ID
  */
 export async function getBookingByStripePaymentIntentId(
-  paymentIntentId: string
+  paymentIntentId: string,
 ): Promise<Booking | null> {
   return (await prisma.booking.findFirst({
     where: {
@@ -374,17 +374,18 @@ export async function getBookingStats(params?: {
 
   return {
     total: bookings.length,
-    pending: bookings.filter(b => b.paymentStatus === PaymentStatus.PENDING)
+    pending: bookings.filter((b) => b.paymentStatus === PaymentStatus.PENDING)
       .length,
-    paid: bookings.filter(b => b.paymentStatus === PaymentStatus.PAID).length,
-    failed: bookings.filter(b => b.paymentStatus === PaymentStatus.FAILED)
+    paid: bookings.filter((b) => b.paymentStatus === PaymentStatus.PAID).length,
+    failed: bookings.filter((b) => b.paymentStatus === PaymentStatus.FAILED)
       .length,
-    cancelled: bookings.filter(b => b.paymentStatus === PaymentStatus.CANCELLED)
-      .length,
-    refunded: bookings.filter(b => b.paymentStatus === PaymentStatus.REFUNDED)
+    cancelled: bookings.filter(
+      (b) => b.paymentStatus === PaymentStatus.CANCELLED,
+    ).length,
+    refunded: bookings.filter((b) => b.paymentStatus === PaymentStatus.REFUNDED)
       .length,
     totalRevenue: bookings
-      .filter(b => b.paymentStatus === PaymentStatus.PAID)
+      .filter((b) => b.paymentStatus === PaymentStatus.PAID)
       .reduce((sum, b) => sum + b.amount, 0),
   };
 }
@@ -394,7 +395,7 @@ export async function getBookingStats(params?: {
  */
 export async function canUserBookCourse(
   userId: string,
-  courseId: string
+  courseId: string,
 ): Promise<{
   canBook: boolean;
   reason?: string;
@@ -406,11 +407,11 @@ export async function canUserBookCourse(
   });
 
   if (!course) {
-    return { canBook: false, reason: 'Course not found' };
+    return { canBook: false, reason: "Course not found" };
   }
 
   if (!course.isPublished) {
-    return { canBook: false, reason: 'Course is not published' };
+    return { canBook: false, reason: "Course is not published" };
   }
 
   // Check if user already has a booking
@@ -426,7 +427,7 @@ export async function canUserBookCourse(
   if (existingBooking) {
     return {
       canBook: false,
-      reason: 'User already has a booking for this course',
+      reason: "User already has a booking for this course",
     };
   }
 
@@ -434,11 +435,11 @@ export async function canUserBookCourse(
   const capacity = (course as { capacity?: number }).capacity;
   if (capacity) {
     const paidBookingsCount = course.bookings.filter(
-      b => b.paymentStatus === PaymentStatus.PAID
+      (b) => b.paymentStatus === PaymentStatus.PAID,
     ).length;
 
     if (paidBookingsCount >= capacity) {
-      return { canBook: false, reason: 'Course is full' };
+      return { canBook: false, reason: "Course is full" };
     }
   }
 

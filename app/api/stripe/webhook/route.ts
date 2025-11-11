@@ -1,13 +1,13 @@
-import { PaymentStatus } from '@prisma/client';
-import { headers } from 'next/headers';
-import { type NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { updateBookingPaymentStatus } from '@/lib/api/bookings';
-import { STRIPE_API_VERSION } from '@/lib/stripe/config';
+import { PaymentStatus } from "@prisma/client";
+import { headers } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+import { updateBookingPaymentStatus } from "@/lib/api/bookings";
+import { STRIPE_API_VERSION } from "@/lib/stripe/config";
 
 // Skip Stripe initialization during build process
 const isBuildTime =
-  process.env.NODE_ENV === 'production' && !process.env.STRIPE_SECRET_KEY;
+  process.env.NODE_ENV === "production" && !process.env.STRIPE_SECRET_KEY;
 
 // Create stripe instance only at runtime
 const createStripeInstance = () => {
@@ -19,7 +19,7 @@ const createStripeInstance = () => {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) {
     throw new Error(
-      'STRIPE_SECRET_KEY is not configured for webhook processing'
+      "STRIPE_SECRET_KEY is not configured for webhook processing",
     );
   }
 
@@ -29,8 +29,8 @@ const createStripeInstance = () => {
 };
 
 const getWebhookSecret = () => {
-  if (isBuildTime) return '';
-  return process.env.STRIPE_WEBHOOK_SECRET || '';
+  if (isBuildTime) return "";
+  return process.env.STRIPE_WEBHOOK_SECRET || "";
 };
 
 /**
@@ -44,12 +44,12 @@ const _EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 setInterval(
   () => {
     const _now = Date.now();
-    processedEvents.forEach(_eventId => {
+    processedEvents.forEach((_eventId) => {
       // In real implementation, we'd check timestamp from storage
       // For now, just clear after some time
     });
   },
-  60 * 60 * 1000
+  60 * 60 * 1000,
 ); // Clean every hour
 
 /**
@@ -75,9 +75,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Webhook service temporarily unavailable during deployment',
+          error: "Webhook service temporarily unavailable during deployment",
         },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -86,28 +86,28 @@ export async function POST(request: NextRequest) {
 
     if (!stripe) {
       return NextResponse.json(
-        { success: false, error: 'Stripe service unavailable' },
-        { status: 503 }
+        { success: false, error: "Stripe service unavailable" },
+        { status: 503 },
       );
     }
 
     if (!webhookSecret) {
-      throw new Error('STRIPE_WEBHOOK_SECRET is required');
+      throw new Error("STRIPE_WEBHOOK_SECRET is required");
     }
 
     // Get Stripe signature from headers
     const headersList = await headers();
-    const signature = headersList.get('stripe-signature');
+    const signature = headersList.get("stripe-signature");
 
     if (!signature) {
       console.warn(`[${requestId}] Missing Stripe signature`);
       return NextResponse.json(
         {
           success: false,
-          error: 'Missing Stripe signature',
-          code: 'MISSING_SIGNATURE',
+          error: "Missing Stripe signature",
+          code: "MISSING_SIGNATURE",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -119,21 +119,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Empty request body',
-          code: 'EMPTY_BODY',
+          error: "Empty request body",
+          code: "EMPTY_BODY",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.log(
-      `[${requestId}] Processing webhook with signature verification`
+      `[${requestId}] Processing webhook with signature verification`,
     );
 
     const event = stripe.webhooks.constructEvent(
       rawBody,
       signature,
-      webhookSecret
+      webhookSecret,
     );
 
     console.log(`[${requestId}] Webhook event verified`, {
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       console.info(`[${requestId}] Event already processed: ${event.id}`);
       return NextResponse.json({
         success: true,
-        message: 'Event already processed',
+        message: "Event already processed",
         eventId: event.id,
       });
     }
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
 
     // Handle different event types
     switch (event.type) {
-      case 'checkout.session.completed': {
+      case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         console.log(`[${requestId}] Processing checkout.session.completed`, {
           sessionId: session.id,
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      case 'payment_intent.payment_failed': {
+      case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log(`[${requestId}] Processing payment_intent.payment_failed`, {
           paymentIntentId: paymentIntent.id,
@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      case 'payment_intent.canceled': {
+      case "payment_intent.canceled": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log(`[${requestId}] Processing payment_intent.canceled`, {
           paymentIntentId: paymentIntent.id,
@@ -226,14 +226,14 @@ export async function POST(request: NextRequest) {
         if (bookingId) {
           await updateBookingPaymentStatus(bookingId, PaymentStatus.CANCELLED);
           console.log(
-            `[${requestId}] Booking ${bookingId} marked as CANCELLED`
+            `[${requestId}] Booking ${bookingId} marked as CANCELLED`,
           );
         }
 
         break;
       }
 
-      case 'charge.dispute.created': {
+      case "charge.dispute.created": {
         const dispute = event.data.object as Stripe.Dispute;
         console.warn(`[${requestId}] Dispute created`, {
           disputeId: dispute.id,
@@ -248,8 +248,8 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      case 'invoice.payment_succeeded':
-      case 'invoice.payment_failed': {
+      case "invoice.payment_succeeded":
+      case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
         const invoiceData = invoice as unknown as {
           id: string;
@@ -281,7 +281,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Webhook processed successfully',
+      message: "Webhook processed successfully",
       eventId: event.id,
       eventType: event.type,
     });
@@ -293,25 +293,25 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof Error) {
       // Handle specific Stripe errors
-      if (error.message.includes('Invalid signature')) {
+      if (error.message.includes("Invalid signature")) {
         return NextResponse.json(
           {
             success: false,
-            error: 'Invalid webhook signature',
-            code: 'INVALID_SIGNATURE',
+            error: "Invalid webhook signature",
+            code: "INVALID_SIGNATURE",
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
 
-      if (error.message.includes('Webhook endpoint')) {
+      if (error.message.includes("Webhook endpoint")) {
         return NextResponse.json(
           {
             success: false,
-            error: 'Webhook configuration error',
-            code: 'WEBHOOK_CONFIG_ERROR',
+            error: "Webhook configuration error",
+            code: "WEBHOOK_CONFIG_ERROR",
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -320,11 +320,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Webhook processing failed',
-        code: 'WEBHOOK_ERROR',
+        error: "Webhook processing failed",
+        code: "WEBHOOK_ERROR",
         requestId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -336,8 +336,8 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     success: true,
-    message: 'Stripe webhook endpoint is operational',
+    message: "Stripe webhook endpoint is operational",
     timestamp: new Date().toISOString(),
-    version: '1.0.0',
+    version: "1.0.0",
   });
 }

@@ -1,5 +1,5 @@
-import type { MetadataRoute } from 'next';
-import { SITEMAP_CONFIG } from '@/lib/seo/constants';
+import type { MetadataRoute } from "next";
+import { SITEMAP_CONFIG } from "@/lib/seo/constants";
 
 /**
  * Robots.txt configuration
@@ -17,13 +17,13 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: '*',
-        allow: '/',
+        userAgent: "*",
+        allow: "/",
         disallow: [...SITEMAP_CONFIG.exclude],
       },
       {
-        userAgent: 'Googlebot',
-        allow: '/',
+        userAgent: "Googlebot",
+        allow: "/",
         disallow: [...SITEMAP_CONFIG.exclude],
       },
     ],

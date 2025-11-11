@@ -3,8 +3,8 @@
  * https://docs.rollbar.com/docs/nextjs
  */
 
-import Rollbar from 'rollbar';
-import { isTelemetryConsentGranted } from './privacy';
+import Rollbar from "rollbar";
+import { isTelemetryConsentGranted } from "./privacy";
 
 interface RollbarTestInstance {
   critical: () => void;
@@ -18,15 +18,15 @@ interface RollbarTestInstance {
 }
 
 // Enablement rules unify various legacy flags used across the repo/scripts
-const isE2EMode = process.env.E2E_TEST === 'true';
+const isE2EMode = process.env.E2E_TEST === "true";
 const isTestMode =
-  process.env.NODE_ENV === 'test' ||
+  process.env.NODE_ENV === "test" ||
   // Jest sets JEST_WORKER_ID for each worker process
-  typeof process.env.JEST_WORKER_ID !== 'undefined';
+  typeof process.env.JEST_WORKER_ID !== "undefined";
 const isExplicitlyDisabled =
-  process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
-  process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0' ||
-  process.env.ROLLBAR_ENABLED === '0';
+  process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === "1" ||
+  process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === "0" ||
+  process.env.ROLLBAR_ENABLED === "0";
 
 function readNumberEnv(name: string, fallback: number): number {
   const v = process.env[name];
@@ -63,13 +63,13 @@ export const serverInstance: Rollbar | RollbarTestInstance = isTestMode
       debug: () => {},
       log: () => {},
       wait: (cb?: () => void) => {
-        if (typeof cb === 'function') cb();
+        if (typeof cb === "function") cb();
       },
     }
   : new Rollbar({
       // In E2E mode, use a dummy token to prevent initialization errors
       accessToken: isE2EMode
-        ? 'dummy-token-for-e2e'
+        ? "dummy-token-for-e2e"
         : process.env.ROLLBAR_SERVER_TOKEN,
       ...baseConfig,
     });
@@ -94,11 +94,11 @@ export const clientRollbarConfig = {
 // ---- Compatibility helpers (legacy API surfaced via official instance) ----
 
 export const ErrorSeverity = {
-  CRITICAL: 'critical',
-  ERROR: 'error',
-  WARNING: 'warning',
-  INFO: 'info',
-  DEBUG: 'debug',
+  CRITICAL: "critical",
+  ERROR: "error",
+  WARNING: "warning",
+  INFO: "info",
+  DEBUG: "debug",
 } as const;
 
 export type ErrorSeverityType =
@@ -119,17 +119,17 @@ export interface ErrorContext {
 export function createErrorContext(
   request?: Request,
   userId?: string,
-  requestId?: string
+  requestId?: string,
 ): ErrorContext {
   return {
     userId,
     requestId,
     route: request ? new URL(request.url).pathname : undefined,
     method: request?.method,
-    userAgent: request?.headers.get('user-agent') || undefined,
+    userAgent: request?.headers.get("user-agent") || undefined,
     ip:
-      request?.headers.get('x-forwarded-for') ||
-      request?.headers.get('x-real-ip') ||
+      request?.headers.get("x-forwarded-for") ||
+      request?.headers.get("x-real-ip") ||
       undefined,
     timestamp: new Date(),
   };
@@ -138,17 +138,17 @@ export function createErrorContext(
 export function reportError(
   error: Error | string,
   context?: ErrorContext,
-  severity: ErrorSeverityType = ErrorSeverity.ERROR
+  severity: ErrorSeverityType = ErrorSeverity.ERROR,
 ): void {
   if (!baseConfig.enabled) return;
 
   try {
     // Simple sampling: allow configuring rate per severity (0..1)
-    const rateAll = readNumberEnv('ROLLBAR_SAMPLE_RATE_ALL', 1);
-    const rateInfo = readNumberEnv('ROLLBAR_SAMPLE_RATE_INFO', 0.05);
-    const rateWarn = readNumberEnv('ROLLBAR_SAMPLE_RATE_WARN', 0.05);
-    const rateError = readNumberEnv('ROLLBAR_SAMPLE_RATE_ERROR', 1);
-    const rateCritical = readNumberEnv('ROLLBAR_SAMPLE_RATE_CRITICAL', 1);
+    const rateAll = readNumberEnv("ROLLBAR_SAMPLE_RATE_ALL", 1);
+    const rateInfo = readNumberEnv("ROLLBAR_SAMPLE_RATE_INFO", 0.05);
+    const rateWarn = readNumberEnv("ROLLBAR_SAMPLE_RATE_WARN", 0.05);
+    const rateError = readNumberEnv("ROLLBAR_SAMPLE_RATE_ERROR", 1);
+    const rateCritical = readNumberEnv("ROLLBAR_SAMPLE_RATE_CRITICAL", 1);
 
     const pick = (rate: number) =>
       Math.random() < Math.max(0, Math.min(1, rate)) && Math.random() < rateAll;
@@ -164,7 +164,7 @@ export function reportError(
         url: context?.route,
         method: context?.method,
         user_ip: context?.ip,
-        headers: { 'User-Agent': context?.userAgent },
+        headers: { "User-Agent": context?.userAgent },
       },
       custom: {
         timestamp: context?.timestamp?.toISOString(),
@@ -199,7 +199,7 @@ export function reportError(
 export function recordUserAction(
   action: string,
   userId?: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): void {
   if (!baseConfig.enabled) return;
   try {
@@ -219,7 +219,7 @@ export function recordUserAction(
 }
 
 export function flushRollbar(): Promise<void> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (!baseConfig.enabled) return resolve();
     try {
       serverInstance.wait(() => resolve());

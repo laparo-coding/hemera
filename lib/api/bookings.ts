@@ -3,8 +3,8 @@ import {
   type Course,
   PaymentStatus,
   type User,
-} from '@prisma/client';
-import { prisma } from '@/lib/db/prisma';
+} from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
 import {
   BookingAlreadyExistsError,
   BookingNotFoundError,
@@ -14,7 +14,7 @@ import {
   InvalidBookingStatusError,
   logError,
   UserNotFoundError,
-} from '@/lib/errors';
+} from "@/lib/errors";
 
 /**
  * Booking model with API utilities
@@ -26,7 +26,7 @@ import {
  * - Payment status management
  */
 
-export type { Booking } from '@prisma/client';
+export type { Booking } from "@prisma/client";
 
 export interface BookingWithDetails extends Booking {
   course: Course;
@@ -106,8 +106,8 @@ export async function createBooking(data: CreateBookingData): Promise<Booking> {
       throw error; // Re-throw our custom errors
     }
 
-    logError(error, { operation: 'createBooking', data });
-    throw new DatabaseConnectionError('creating booking', error as Error);
+    logError(error, { operation: "createBooking", data });
+    throw new DatabaseConnectionError("creating booking", error as Error);
   }
 }
 
@@ -115,7 +115,7 @@ export async function createBooking(data: CreateBookingData): Promise<Booking> {
  * Get all bookings for a specific user
  */
 export async function getUserBookings(
-  userId: string
+  userId: string,
 ): Promise<BookingWithDetails[]> {
   try {
     // Verify user exists
@@ -136,7 +136,7 @@ export async function getUserBookings(
         user: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
   } catch (error) {
@@ -144,8 +144,8 @@ export async function getUserBookings(
       throw error;
     }
 
-    logError(error, { operation: 'getUserBookings', userId });
-    throw new DatabaseConnectionError('fetching user bookings', error as Error);
+    logError(error, { operation: "getUserBookings", userId });
+    throw new DatabaseConnectionError("fetching user bookings", error as Error);
   }
 }
 
@@ -154,7 +154,7 @@ export async function getUserBookings(
  */
 export async function getBookingById(
   bookingId: string,
-  userId: string
+  userId: string,
 ): Promise<BookingWithDetails> {
   try {
     const booking = await prisma.booking.findFirst({
@@ -178,8 +178,8 @@ export async function getBookingById(
       throw error;
     }
 
-    logError(error, { operation: 'getBookingById', bookingId, userId });
-    throw new DatabaseConnectionError('fetching booking by ID', error as Error);
+    logError(error, { operation: "getBookingById", bookingId, userId });
+    throw new DatabaseConnectionError("fetching booking by ID", error as Error);
   }
 }
 
@@ -188,12 +188,12 @@ export async function getBookingById(
  */
 export async function updateBookingPaymentStatus(
   bookingId: string,
-  paymentStatus: PaymentStatus
+  paymentStatus: PaymentStatus,
 ): Promise<Booking> {
   try {
     // Validate the payment status
     if (!isValidBookingStatus(paymentStatus)) {
-      throw new InvalidBookingStatusError('UNKNOWN', paymentStatus);
+      throw new InvalidBookingStatusError("UNKNOWN", paymentStatus);
     }
 
     // Check if booking exists
@@ -211,7 +211,7 @@ export async function updateBookingPaymentStatus(
     ) {
       throw new InvalidBookingStatusError(
         existingBooking.paymentStatus,
-        paymentStatus
+        paymentStatus,
       );
     }
 
@@ -232,13 +232,13 @@ export async function updateBookingPaymentStatus(
     }
 
     logError(error, {
-      operation: 'updateBookingPaymentStatus',
+      operation: "updateBookingPaymentStatus",
       bookingId,
       paymentStatus,
     });
     throw new DatabaseConnectionError(
-      'updating booking payment status',
-      error as Error
+      "updating booking payment status",
+      error as Error,
     );
   }
 }
@@ -248,7 +248,7 @@ export async function updateBookingPaymentStatus(
  */
 export async function cancelBooking(
   bookingId: string,
-  _userId: string
+  _userId: string,
 ): Promise<Booking> {
   return updateBookingPaymentStatus(bookingId, PaymentStatus.CANCELLED);
 }
@@ -265,12 +265,13 @@ export async function getUserBookingStats(userId: string) {
 
   return {
     total: bookings.length,
-    pending: bookings.filter(b => b.paymentStatus === PaymentStatus.PENDING)
+    pending: bookings.filter((b) => b.paymentStatus === PaymentStatus.PENDING)
       .length,
-    confirmed: bookings.filter(b => b.paymentStatus === PaymentStatus.PAID)
+    confirmed: bookings.filter((b) => b.paymentStatus === PaymentStatus.PAID)
       .length,
-    cancelled: bookings.filter(b => b.paymentStatus === PaymentStatus.CANCELLED)
-      .length,
+    cancelled: bookings.filter(
+      (b) => b.paymentStatus === PaymentStatus.CANCELLED,
+    ).length,
   };
 }
 
@@ -279,7 +280,7 @@ export async function getUserBookingStats(userId: string) {
  */
 export async function hasUserBookedCourse(
   userId: string,
-  courseId: string
+  courseId: string,
 ): Promise<boolean> {
   const booking = await prisma.booking.findUnique({
     where: {
@@ -298,7 +299,7 @@ export async function hasUserBookedCourse(
  */
 export async function getAllBookings(
   limit: number = 50,
-  offset: number = 0
+  offset: number = 0,
 ): Promise<BookingListResponse> {
   const [bookings, total] = await Promise.all([
     prisma.booking.findMany({
@@ -307,7 +308,7 @@ export async function getAllBookings(
         user: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: limit,
       skip: offset,
@@ -334,7 +335,7 @@ export function isValidBookingStatus(status: string): boolean {
  */
 export function isValidStatusTransition(
   currentStatus: PaymentStatus,
-  newStatus: PaymentStatus
+  newStatus: PaymentStatus,
 ): boolean {
   // Define valid status transitions
   const validTransitions: Record<PaymentStatus, PaymentStatus[]> = {
@@ -366,19 +367,19 @@ export function isValidStatusTransition(
 export function formatBookingStatus(status: PaymentStatus): string {
   switch (status) {
     case PaymentStatus.PENDING:
-      return 'Pending Payment';
+      return "Pending Payment";
     case PaymentStatus.PAID:
-      return 'Paid';
+      return "Paid";
     case PaymentStatus.CONFIRMED:
-      return 'Confirmed';
+      return "Confirmed";
     case PaymentStatus.FAILED:
-      return 'Payment Failed';
+      return "Payment Failed";
     case PaymentStatus.CANCELLED:
-      return 'Cancelled';
+      return "Cancelled";
     case PaymentStatus.REFUNDED:
-      return 'Refunded';
+      return "Refunded";
     default:
-      return 'Unknown';
+      return "Unknown";
   }
 }
 
@@ -386,27 +387,27 @@ export function formatBookingStatus(status: PaymentStatus): string {
  * Get booking status color for UI
  */
 export function getBookingStatusColor(
-  status: PaymentStatus
+  status: PaymentStatus,
 ):
-  | 'default'
-  | 'primary'
-  | 'secondary'
-  | 'error'
-  | 'info'
-  | 'success'
-  | 'warning' {
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "info"
+  | "success"
+  | "warning" {
   switch (status) {
     case PaymentStatus.PENDING:
-      return 'warning';
+      return "warning";
     case PaymentStatus.PAID:
-      return 'success';
+      return "success";
     case PaymentStatus.FAILED:
-      return 'error';
+      return "error";
     case PaymentStatus.CANCELLED:
-      return 'error';
+      return "error";
     case PaymentStatus.REFUNDED:
-      return 'info';
+      return "info";
     default:
-      return 'default';
+      return "default";
   }
 }

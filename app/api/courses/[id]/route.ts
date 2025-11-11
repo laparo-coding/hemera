@@ -1,6 +1,6 @@
-import { PaymentStatus } from '@prisma/client';
-import { type NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
+import { PaymentStatus } from "@prisma/client";
+import { type NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db/prisma";
 
 /**
  * GET /api/courses/[id]
@@ -8,7 +8,7 @@ import { prisma } from '@/lib/db/prisma';
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -29,8 +29,8 @@ export async function GET(
 
     if (!courseRecord) {
       return NextResponse.json(
-        { success: false, error: 'Course not found' },
-        { status: 404 }
+        { success: false, error: "Course not found" },
+        { status: 404 },
       );
     }
 
@@ -66,8 +66,8 @@ export async function GET(
     });
   } catch (_error) {
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch course' },
-      { status: 500 }
+      { success: false, error: "Failed to fetch course" },
+      { status: 500 },
     );
   }
 }

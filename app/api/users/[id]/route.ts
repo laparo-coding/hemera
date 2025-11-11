@@ -1,43 +1,43 @@
-import { auth } from '@clerk/nextjs/server';
-import { type NextRequest, NextResponse } from 'next/server';
+import { auth } from "@clerk/nextjs/server";
+import { type NextRequest, NextResponse } from "next/server";
 import {
   deleteUser,
   getUserProfile,
   getUserStats,
   type UpdateUserData,
   updateUser,
-} from '@/lib/api/users';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
+} from "@/lib/api/users";
+import { checkUserAdminStatus } from "@/lib/auth/helpers";
+import { serverInstance } from "@/lib/monitoring/rollbar-official";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { userId: currentUserId } = await auth();
     if (!currentUserId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const isAdmin = await checkUserAdminStatus(currentUserId);
     if (!isAdmin) {
       return NextResponse.json(
-        { error: 'Admin privileges required' },
-        { status: 403 }
+        { error: "Admin privileges required" },
+        { status: 403 },
       );
     }
 
     const { id: userId } = await params;
     if (!userId) {
       return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
+        { error: "User ID is required" },
+        { status: 400 },
       );
     }
 
     const { searchParams } = new URL(_request.url);
-    const includeStats = searchParams.get('includeStats') === 'true';
+    const includeStats = searchParams.get("includeStats") === "true";
 
     const [profile, stats] = await Promise.all([
       getUserProfile(userId),
@@ -52,40 +52,40 @@ export async function GET(
       },
     });
   } catch (error) {
-    serverInstance.error('Error in GET /api/users/[id]', {
+    serverInstance.error("Error in GET /api/users/[id]", {
       error: error instanceof Error ? error.message : String(error),
       timestamp: new Date().toISOString(),
     });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { userId: currentUserId } = await auth();
     if (!currentUserId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const isAdmin = await checkUserAdminStatus(currentUserId);
     if (!isAdmin) {
       return NextResponse.json(
-        { error: 'Admin privileges required' },
-        { status: 403 }
+        { error: "Admin privileges required" },
+        { status: 403 },
       );
     }
 
     const { id: userId } = await params;
     if (!userId) {
       return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
+        { error: "User ID is required" },
+        { status: 400 },
       );
     }
 
@@ -94,38 +94,38 @@ export async function PUT(
       body = await _request.json();
     } catch (_error) {
       return NextResponse.json(
-        { error: 'Invalid JSON in request body' },
-        { status: 400 }
+        { error: "Invalid JSON in request body" },
+        { status: 400 },
       );
     }
 
     const updateData: UpdateUserData = {};
 
     if (body.name !== undefined) {
-      if (typeof body.name !== 'string' && body.name !== null) {
+      if (typeof body.name !== "string" && body.name !== null) {
         return NextResponse.json(
-          { error: 'Name must be a string or null' },
-          { status: 400 }
+          { error: "Name must be a string or null" },
+          { status: 400 },
         );
       }
       updateData.name = body.name;
     }
 
     if (body.email !== undefined) {
-      if (typeof body.email !== 'string' || !body.email.trim()) {
+      if (typeof body.email !== "string" || !body.email.trim()) {
         return NextResponse.json(
-          { error: 'Email must be a non-empty string' },
-          { status: 400 }
+          { error: "Email must be a non-empty string" },
+          { status: 400 },
         );
       }
       updateData.email = body.email.trim();
     }
 
     if (body.image !== undefined) {
-      if (typeof body.image !== 'string' && body.image !== null) {
+      if (typeof body.image !== "string" && body.image !== null) {
         return NextResponse.json(
-          { error: 'Image must be a string URL or null' },
-          { status: 400 }
+          { error: "Image must be a string URL or null" },
+          { status: 400 },
         );
       }
       updateData.image = body.image;
@@ -138,47 +138,47 @@ export async function PUT(
       data: updatedUser,
     });
   } catch (error) {
-    serverInstance.error('Error in PUT /api/users/[id]', {
+    serverInstance.error("Error in PUT /api/users/[id]", {
       error: error instanceof Error ? error.message : String(error),
       timestamp: new Date().toISOString(),
     });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { userId: currentUserId } = await auth();
     if (!currentUserId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const isAdmin = await checkUserAdminStatus(currentUserId);
     if (!isAdmin) {
       return NextResponse.json(
-        { error: 'Admin privileges required' },
-        { status: 403 }
+        { error: "Admin privileges required" },
+        { status: 403 },
       );
     }
 
     const { id: userId } = await params;
     if (!userId) {
       return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
+        { error: "User ID is required" },
+        { status: 400 },
       );
     }
 
     if (userId === currentUserId) {
       return NextResponse.json(
-        { error: 'Cannot delete your own account' },
-        { status: 400 }
+        { error: "Cannot delete your own account" },
+        { status: 400 },
       );
     }
 
@@ -186,16 +186,16 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'User deleted successfully',
+      message: "User deleted successfully",
     });
   } catch (error) {
-    serverInstance.error('Error in DELETE /api/users/[id]', {
+    serverInstance.error("Error in DELETE /api/users/[id]", {
       error: error instanceof Error ? error.message : String(error),
       timestamp: new Date().toISOString(),
     });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

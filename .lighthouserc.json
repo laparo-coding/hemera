@@ -10,7 +10,10 @@
       "assertions": {
         "categories:performance": ["error", { "minScore": 0.8 }],
         "categories:accessibility": ["warn", { "minScore": 0.9 }],
-        "metrics/largest-contentful-paint": ["error", { "maxNumericValue": 3000 }],
+        "metrics/largest-contentful-paint": [
+          "error",
+          { "maxNumericValue": 3000 }
+        ],
         "metrics/cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }]
       }
     }

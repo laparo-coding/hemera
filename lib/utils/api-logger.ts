@@ -2,18 +2,18 @@
  * Enhanced logging utilities for API routes with request context using Rollbar
  */
 
-import { analytics } from '@/lib/analytics/request-analytics';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import type { RequestContext } from '@/lib/utils/request-id';
+import { analytics } from "@/lib/analytics/request-analytics";
+import { serverInstance } from "@/lib/monitoring/rollbar-official";
+import type { RequestContext } from "@/lib/utils/request-id";
 
 /**
  * Log levels
  */
 export enum LogLevel {
-  ERROR = 'error',
-  WARN = 'warn',
-  INFO = 'info',
-  DEBUG = 'debug',
+  ERROR = "error",
+  WARN = "warn",
+  INFO = "info",
+  DEBUG = "debug",
 }
 
 /**
@@ -52,7 +52,7 @@ export class ApiLogger {
     // Track error event in analytics
     analytics.trackEvent(
       this.requestContext.id,
-      'api_error',
+      "api_error",
       {
         message,
         errorType: error?.name,
@@ -60,7 +60,7 @@ export class ApiLogger {
         method: this.requestContext.method,
         data,
       },
-      this.requestContext
+      this.requestContext,
     );
   }
 
@@ -78,14 +78,14 @@ export class ApiLogger {
     // Track warning event in analytics
     analytics.trackEvent(
       this.requestContext.id,
-      'api_warning',
+      "api_warning",
       {
         message,
         route: this.requestContext.url,
         method: this.requestContext.method,
         data,
       },
-      this.requestContext
+      this.requestContext,
     );
   }
 
@@ -105,7 +105,7 @@ export class ApiLogger {
    * Log debug information (only in development) via Rollbar
    */
   debug(message: string, data?: unknown): void {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       serverInstance.debug?.(message, {
         requestId: this.requestContext.id,
         data,
@@ -125,7 +125,7 @@ export class ApiLogger {
       this.requestContext.method,
       this.startTime,
       statusCode,
-      this.requestContext
+      this.requestContext,
     );
   }
 
@@ -137,7 +137,7 @@ export class ApiLogger {
       this.requestContext.id,
       eventType,
       data,
-      this.requestContext
+      this.requestContext,
     );
   }
 }
