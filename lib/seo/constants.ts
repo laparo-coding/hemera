@@ -10,72 +10,72 @@
  */
 
 export const SITE_CONFIG = {
-  name: "Hemera Academy",
+  name: 'Hemera Academy',
   description:
-    "Transform your career with expert-led courses in technology, business, and creative skills.",
-  tagline: "Transform Your Career with Expert-Led Courses",
-  url: "https://hemera.academy",
-  domain: "hemera.academy",
+    'Transform your career with expert-led courses in technology, business, and creative skills.',
+  tagline: 'Transform Your Career with Expert-Led Courses',
+  url: 'https://hemera.academy',
+  domain: 'hemera.academy',
 } as const;
 
 export const SEO_DEFAULTS = {
   title: {
-    template: "%s | Hemera Academy",
-    default: "Hemera Academy - Transform Your Career with Expert-Led Courses",
+    template: '%s | Hemera Academy',
+    default: 'Hemera Academy - Transform Your Career with Expert-Led Courses',
     maxLength: 60,
   },
   description: {
     default:
-      "Transform your career with expert-led courses in technology, business, and creative skills. Join thousands of students advancing their careers with Hemera Academy.",
+      'Transform your career with expert-led courses in technology, business, and creative skills. Join thousands of students advancing their careers with Hemera Academy.',
     maxLength: 160,
   },
   keywords: [
-    "online courses",
-    "career development",
-    "technology training",
-    "professional development",
-    "skill building",
-    "expert instruction",
-    "online learning",
-    "certification",
+    'online courses',
+    'career development',
+    'technology training',
+    'professional development',
+    'skill building',
+    'expert instruction',
+    'online learning',
+    'certification',
   ],
 } as const;
 
 export const SOCIAL_CONFIG = {
   twitter: {
-    handle: "@hemeraacademy",
-    creator: "@hemeraacademy",
-    site: "@hemeraacademy",
+    handle: '@hemeraacademy',
+    creator: '@hemeraacademy',
+    site: '@hemeraacademy',
   },
   linkedin: {
-    company: "hemera-academy",
-    url: "https://linkedin.com/company/hemera-academy",
+    company: 'hemera-academy',
+    url: 'https://linkedin.com/company/hemera-academy',
   },
   facebook: {
-    page: "HemeraAcademy",
-    url: "https://facebook.com/HemeraAcademy",
+    page: 'HemeraAcademy',
+    url: 'https://facebook.com/HemeraAcademy',
   },
 } as const;
 
 export const IMAGE_CONFIG = {
   og: {
-    default: "/images/og-default.jpg",
+    default: '/images/og-default.jpg',
     width: 1200,
     height: 630,
-    alt: "Hemera Academy - Expert-Led Online Courses",
+    alt: 'Hemera Academy - Expert-Led Online Courses',
   },
   logo: {
-    default: "/images/logo.png",
+    default: '/images/logo.png',
     width: 200,
     height: 60,
-    alt: "Hemera Academy Logo",
+    alt: 'Hemera Academy Logo',
   },
   favicon: {
-    ico: "/favicon.ico",
-    svg: "/favicon.svg",
-    png192: "/images/icon-192.png",
-    png512: "/images/icon-512.png",
-    apple: "/images/apple-touch-icon.png",
+    ico: '/favicon.ico',
+    svg: '/favicon.svg',
+    png192: '/images/icon-192.png',
+    png512: '/images/icon-512.png',
+    apple: '/images/apple-touch-icon.png',
   },
 } as const;
 
@@ -84,12 +84,12 @@ export const ORGANIZATION_INFO = {
   description: SITE_CONFIG.description,
   url: SITE_CONFIG.url,
   logo: `${SITE_CONFIG.url}${IMAGE_CONFIG.logo.default}`,
-  email: "contact@hemera.academy",
-  foundingDate: "2024",
-  areaServed: "Worldwide",
-  knowsLanguage: ["en-US"],
+  email: 'contact@hemera.academy',
+  foundingDate: '2024',
+  areaServed: 'Worldwide',
+  knowsLanguage: ['en-US'],
   sameAs: [
-    SOCIAL_CONFIG.twitter.handle.replace("@", "https://twitter.com/"),
+    SOCIAL_CONFIG.twitter.handle.replace('@', 'https://twitter.com/'),
     SOCIAL_CONFIG.linkedin.url,
     SOCIAL_CONFIG.facebook.url,
   ],
@@ -105,29 +105,29 @@ export const ROBOTS_CONFIG = {
   googleBot: {
     index: true,
     follow: true,
-    "max-video-preview": -1,
-    "max-image-preview": "large",
-    "max-snippet": -1,
+    'max-video-preview': -1,
+    'max-image-preview': 'large',
+    'max-snippet': -1,
   },
 } as const;
 
 export const SITEMAP_CONFIG = {
   baseUrl: SITE_CONFIG.url,
   exclude: [
-    "/auth/*",
-    "/dashboard/*",
-    "/admin/*",
-    "/my-courses/*",
-    "/bookings/*",
-    "/api/*",
-    "/_next/*",
-    "/404",
-    "/500",
+    '/auth/*',
+    '/dashboard/*',
+    '/admin/*',
+    '/my-courses/*',
+    '/bookings/*',
+    '/api/*',
+    '/_next/*',
+    '/404',
+    '/500',
   ],
   changeFrequency: {
-    homepage: "weekly",
-    courses: "daily",
-    static: "monthly",
+    homepage: 'weekly',
+    courses: 'daily',
+    static: 'monthly',
   },
   priority: {
     homepage: 1.0,
@@ -139,33 +139,33 @@ export const SITEMAP_CONFIG = {
 
 export const STRUCTURED_DATA_CONFIG = {
   organization: {
-    type: "Organization" as const,
-    context: "https://schema.org",
+    type: 'Organization' as const,
+    context: 'https://schema.org',
   },
   website: {
-    type: "WebSite" as const,
-    context: "https://schema.org",
+    type: 'WebSite' as const,
+    context: 'https://schema.org',
   },
   course: {
-    type: "Course" as const,
-    context: "https://schema.org",
-    inLanguage: "en-US",
-    currency: "USD",
+    type: 'Course' as const,
+    context: 'https://schema.org',
+    inLanguage: 'en-US',
+    currency: 'USD',
   },
   breadcrumb: {
-    type: "BreadcrumbList" as const,
-    context: "https://schema.org",
+    type: 'BreadcrumbList' as const,
+    context: 'https://schema.org',
   },
 } as const;
 
 export const ANALYTICS_CONFIG = {
   googleAnalytics: {
-    id: process.env.NEXT_PUBLIC_GA_ID || "",
-    enabled: process.env.NODE_ENV === "production",
+    id: process.env.NEXT_PUBLIC_GA_ID || '',
+    enabled: process.env.NODE_ENV === 'production',
   },
   gtm: {
-    id: process.env.NEXT_PUBLIC_GTM_ID || "",
-    enabled: process.env.NODE_ENV === "production",
+    id: process.env.NEXT_PUBLIC_GTM_ID || '',
+    enabled: process.env.NODE_ENV === 'production',
   },
 } as const;
 
@@ -193,17 +193,17 @@ export const COURSE_CONFIG = {
     maxLimit: 50,
   },
   sorting: {
-    default: "createdAt",
-    options: ["createdAt", "title", "price", "duration"],
+    default: 'createdAt',
+    options: ['createdAt', 'title', 'price', 'duration'],
   },
   filters: {
-    levels: ["BEGINNER", "INTERMEDIATE", "ADVANCED"],
+    levels: ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'],
     priceRanges: [
-      { min: 0, max: 0, label: "Free" },
-      { min: 1, max: 50, label: "$1 - $50" },
-      { min: 51, max: 100, label: "$51 - $100" },
-      { min: 101, max: 200, label: "$101 - $200" },
-      { min: 201, max: 999999, label: "$200+" },
+      { min: 0, max: 0, label: 'Free' },
+      { min: 1, max: 50, label: '$1 - $50' },
+      { min: 51, max: 100, label: '$51 - $100' },
+      { min: 101, max: 200, label: '$101 - $200' },
+      { min: 201, max: 999999, label: '$200+' },
     ],
   },
 } as const;
@@ -231,7 +231,7 @@ export const VALIDATION_RULES = {
  * Get full URL for a path
  */
 export function getFullUrl(path: string): string {
-  return `${SITE_CONFIG.url}${path.startsWith("/") ? path : `/${path}`}`;
+  return `${SITE_CONFIG.url}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
 /**

@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
-import { SITE_CONFIG } from "@/lib/seo/constants";
-import { generateSEOMetadata, truncateDescription } from "@/lib/seo/metadata";
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+import { SITE_CONFIG } from '@/lib/seo/constants';
+import { generateSEOMetadata, truncateDescription } from '@/lib/seo/metadata';
 
 // Note: Default layout component only needs to render children. Avoid over-typing props to satisfy Next's validator types.
 
@@ -22,8 +22,8 @@ export async function generateMetadata({
     if (!res.ok) {
       // Fallback metadata when course is not found
       return generateSEOMetadata({
-        title: "Kurs",
-        description: "Kursdetails und Informationen.",
+        title: 'Kurs',
+        description: 'Kursdetails und Informationen.',
         canonicalUrl: `${SITE_CONFIG.url}/courses/${identifier}`,
       });
     }
@@ -38,12 +38,12 @@ export async function generateMetadata({
         }
       | undefined;
 
-    const title = course?.title ?? "Kurs";
+    const title = course?.title ?? 'Kurs';
     const canonicalSlug = course?.slug ?? identifier;
     const description = truncateDescription(
       course?.description ??
-        "Kursdetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.",
-      160,
+        'Kursdetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.',
+      160
     );
     // Kurs-spezifisches OG-Bild per Konvention (Fallback auf Default in SEO util)
     const ogImage = course?.slug
@@ -59,8 +59,8 @@ export async function generateMetadata({
   } catch (_) {
     // Network or parsing error – provide minimal but valid metadata
     return generateSEOMetadata({
-      title: "Kurs",
-      description: "Kursdetails und Informationen.",
+      title: 'Kurs',
+      description: 'Kursdetails und Informationen.',
       canonicalUrl: `${SITE_CONFIG.url}/courses/${identifier}`,
     });
   }

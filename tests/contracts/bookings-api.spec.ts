@@ -1,79 +1,79 @@
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it } from '@jest/globals';
 
-describe("GET /api/bookings - Contract Tests", () => {
-  const _BOOKINGS_ENDPOINT = "/api/bookings";
+describe('GET /api/bookings - Contract Tests', () => {
+  const _BOOKINGS_ENDPOINT = '/api/bookings';
 
-  describe("Request Schema Validation", () => {
-    it("should support query parameters for filtering", () => {
+  describe('Request Schema Validation', () => {
+    it('should support query parameters for filtering', () => {
       interface BookingsQueryParams {
         status?:
-          | "PENDING"
-          | "CONFIRMED"
-          | "CANCELLED"
-          | "REFUNDED"
-          | "COMPLETED";
+          | 'PENDING'
+          | 'CONFIRMED'
+          | 'CANCELLED'
+          | 'REFUNDED'
+          | 'COMPLETED';
         courseId?: string;
         limit?: number;
         offset?: number;
-        sort?: "createdAt" | "updatedAt" | "courseName";
-        order?: "asc" | "desc";
+        sort?: 'createdAt' | 'updatedAt' | 'courseName';
+        order?: 'asc' | 'desc';
       }
 
       const validQuery: BookingsQueryParams = {
-        status: "CONFIRMED",
+        status: 'CONFIRMED',
         limit: 10,
         offset: 0,
-        sort: "createdAt",
-        order: "desc",
+        sort: 'createdAt',
+        order: 'desc',
       };
 
       expect([
-        "PENDING",
-        "CONFIRMED",
-        "CANCELLED",
-        "REFUNDED",
-        "COMPLETED",
+        'PENDING',
+        'CONFIRMED',
+        'CANCELLED',
+        'REFUNDED',
+        'COMPLETED',
       ]).toContain(validQuery.status);
       expect(validQuery.limit).toBeGreaterThan(0);
       expect(validQuery.offset).toBeGreaterThanOrEqual(0);
-      expect(["createdAt", "updatedAt", "courseName"]).toContain(
-        validQuery.sort,
+      expect(['createdAt', 'updatedAt', 'courseName']).toContain(
+        validQuery.sort
       );
-      expect(["asc", "desc"]).toContain(validQuery.order);
+      expect(['asc', 'desc']).toContain(validQuery.order);
     });
 
-    it("should validate limit parameter constraints", () => {
+    it('should validate limit parameter constraints', () => {
       const validLimits = [1, 10, 25, 50, 100];
       const invalidLimits = [0, -1, 101, 1000];
       const maxLimit = 100;
       const minLimit = 1;
 
-      validLimits.forEach((limit) => {
+      validLimits.forEach(limit => {
         expect(limit).toBeGreaterThanOrEqual(minLimit);
         expect(limit).toBeLessThanOrEqual(maxLimit);
       });
 
-      invalidLimits.forEach((limit) => {
+      invalidLimits.forEach(limit => {
         expect(limit < minLimit || limit > maxLimit).toBe(true);
       });
     });
 
-    it("should validate offset parameter constraints", () => {
+    it('should validate offset parameter constraints', () => {
       const validOffsets = [0, 10, 50, 100];
       const invalidOffsets = [-1, -10];
 
-      validOffsets.forEach((offset) => {
+      validOffsets.forEach(offset => {
         expect(offset).toBeGreaterThanOrEqual(0);
       });
 
-      invalidOffsets.forEach((offset) => {
+      invalidOffsets.forEach(offset => {
         expect(offset).toBeLessThan(0);
       });
     });
   });
 
-  describe("Response Schema Validation", () => {
-    it("should define booking list response schema", () => {
+  describe('Response Schema Validation', () => {
+    it('should define booking list response schema', () => {
       interface BookingListResponse {
         bookings: BookingItem[];
         pagination: {
@@ -95,11 +95,11 @@ describe("GET /api/bookings - Contract Tests", () => {
         courseName: string;
         coursePrice: number;
         paymentStatus:
-          | "PENDING"
-          | "CONFIRMED"
-          | "CANCELLED"
-          | "REFUNDED"
-          | "COMPLETED";
+          | 'PENDING'
+          | 'CONFIRMED'
+          | 'CANCELLED'
+          | 'REFUNDED'
+          | 'COMPLETED';
         stripeSessionId: string | null;
         stripePaymentIntentId: string | null;
         createdAt: string;
@@ -109,16 +109,16 @@ describe("GET /api/bookings - Contract Tests", () => {
       const validResponse: BookingListResponse = {
         bookings: [
           {
-            id: "booking_123",
-            userId: "user_456",
-            courseId: "course_789",
-            courseName: "Advanced TypeScript",
+            id: 'booking_123',
+            userId: 'user_456',
+            courseId: 'course_789',
+            courseName: 'Advanced TypeScript',
             coursePrice: 9900,
-            paymentStatus: "CONFIRMED",
-            stripeSessionId: "cs_test_session_123",
-            stripePaymentIntentId: "pi_test_payment_456",
-            createdAt: "2024-01-01T12:00:00Z",
-            updatedAt: "2024-01-01T12:05:00Z",
+            paymentStatus: 'CONFIRMED',
+            stripeSessionId: 'cs_test_session_123',
+            stripePaymentIntentId: 'pi_test_payment_456',
+            createdAt: '2024-01-01T12:00:00Z',
+            updatedAt: '2024-01-01T12:05:00Z',
           },
         ],
         pagination: {
@@ -144,134 +144,134 @@ describe("GET /api/bookings - Contract Tests", () => {
       expect(validResponse.meta).toBeDefined();
       expect(validResponse.pagination.total).toBeGreaterThanOrEqual(0);
       expect(validResponse.pagination.hasMore).toBeDefined();
-      expect(typeof validResponse.pagination.hasMore).toBe("boolean");
+      expect(typeof validResponse.pagination.hasMore).toBe('boolean');
       expect(validResponse.meta.totalRevenue).toBeGreaterThanOrEqual(0);
     });
 
-    it("should define error response schema", () => {
+    it('should define error response schema', () => {
       interface BookingsError {
         error: string;
-        code: "UNAUTHORIZED" | "INVALID_QUERY" | "SERVER_ERROR";
+        code: 'UNAUTHORIZED' | 'INVALID_QUERY' | 'SERVER_ERROR';
         message: string;
         details?: Record<string, string>;
       }
 
       const errorResponses: BookingsError[] = [
         {
-          error: "Unauthorized",
-          code: "UNAUTHORIZED",
-          message: "Authentication required to access bookings",
+          error: 'Unauthorized',
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required to access bookings',
         },
         {
-          error: "Invalid query",
-          code: "INVALID_QUERY",
-          message: "Invalid query parameters provided",
+          error: 'Invalid query',
+          code: 'INVALID_QUERY',
+          message: 'Invalid query parameters provided',
           details: {
-            limit: "Must be between 1 and 100",
-            status: "Must be a valid payment status",
+            limit: 'Must be between 1 and 100',
+            status: 'Must be a valid payment status',
           },
         },
         {
-          error: "Server error",
-          code: "SERVER_ERROR",
-          message: "Failed to retrieve bookings",
+          error: 'Server error',
+          code: 'SERVER_ERROR',
+          message: 'Failed to retrieve bookings',
         },
       ];
 
-      errorResponses.forEach((error) => {
+      errorResponses.forEach(error => {
         expect(error.error).toBeDefined();
         expect(error.code).toBeDefined();
         expect(error.message).toBeDefined();
-        expect(["UNAUTHORIZED", "INVALID_QUERY", "SERVER_ERROR"]).toContain(
-          error.code,
+        expect(['UNAUTHORIZED', 'INVALID_QUERY', 'SERVER_ERROR']).toContain(
+          error.code
         );
       });
     });
   });
 
-  describe("HTTP Status Codes", () => {
-    it("should return 200 for successful booking retrieval", () => {
+  describe('HTTP Status Codes', () => {
+    it('should return 200 for successful booking retrieval', () => {
       const successStatusCode = 200;
       expect(successStatusCode).toBe(200);
     });
 
-    it("should return 400 for invalid query parameters", () => {
+    it('should return 400 for invalid query parameters', () => {
       const badRequestStatusCode = 400;
       expect(badRequestStatusCode).toBe(400);
     });
 
-    it("should return 401 for unauthenticated requests", () => {
+    it('should return 401 for unauthenticated requests', () => {
       const unauthorizedStatusCode = 401;
       expect(unauthorizedStatusCode).toBe(401);
     });
 
-    it("should return 500 for server errors", () => {
+    it('should return 500 for server errors', () => {
       const serverErrorStatusCode = 500;
       expect(serverErrorStatusCode).toBe(500);
     });
   });
 
-  describe("Authentication Requirements", () => {
-    it("should require Clerk authentication", () => {
+  describe('Authentication Requirements', () => {
+    it('should require Clerk authentication', () => {
       const requiredHeaders = {
-        Authorization: "Bearer <clerk_token>",
-        Accept: "application/json",
+        Authorization: 'Bearer <clerk_token>',
+        Accept: 'application/json',
       };
 
       expect(requiredHeaders.Authorization).toBeDefined();
-      expect(requiredHeaders.Accept).toBe("application/json");
+      expect(requiredHeaders.Accept).toBe('application/json');
       expect(requiredHeaders.Authorization).toMatch(/^Bearer /);
     });
 
-    it("should validate user access to bookings", () => {
+    it('should validate user access to bookings', () => {
       // Users should only see their own bookings unless admin
-      const userRoles = ["user", "admin"];
+      const userRoles = ['user', 'admin'];
       const accessRules = {
-        user: "own_bookings_only",
-        admin: "all_bookings",
+        user: 'own_bookings_only',
+        admin: 'all_bookings',
       };
 
-      userRoles.forEach((role) => {
+      userRoles.forEach(role => {
         expect(accessRules).toHaveProperty(role);
-        expect(["own_bookings_only", "all_bookings"]).toContain(
-          (accessRules as Record<string, unknown>)[role],
+        expect(['own_bookings_only', 'all_bookings']).toContain(
+          (accessRules as Record<string, unknown>)[role]
         );
       });
     });
   });
 
-  describe("Query Parameter Validation", () => {
-    it("should validate status parameter values", () => {
+  describe('Query Parameter Validation', () => {
+    it('should validate status parameter values', () => {
       const validStatuses = [
-        "PENDING",
-        "CONFIRMED",
-        "CANCELLED",
-        "REFUNDED",
-        "COMPLETED",
+        'PENDING',
+        'CONFIRMED',
+        'CANCELLED',
+        'REFUNDED',
+        'COMPLETED',
       ];
-      const invalidStatuses = ["INVALID", "pending", "confirmed", ""];
+      const invalidStatuses = ['INVALID', 'pending', 'confirmed', ''];
 
-      validStatuses.forEach((status) => {
+      validStatuses.forEach(status => {
         expect(validStatuses).toContain(status);
         expect(status).toMatch(/^[A-Z_]+$/);
       });
 
-      invalidStatuses.forEach((status) => {
+      invalidStatuses.forEach(status => {
         expect(validStatuses).not.toContain(status);
       });
     });
 
-    it("should validate courseId parameter format", () => {
-      const validCourseIds = ["course_123", "clm1abc2def3", "valid-course-id"];
-      const invalidCourseIds = ["", " ", "invalid id", "course@123"];
+    it('should validate courseId parameter format', () => {
+      const validCourseIds = ['course_123', 'clm1abc2def3', 'valid-course-id'];
+      const invalidCourseIds = ['', ' ', 'invalid id', 'course@123'];
       const courseIdPattern = /^[a-zA-Z0-9\-_]+$/;
 
-      validCourseIds.forEach((courseId) => {
+      validCourseIds.forEach(courseId => {
         expect(courseId).toMatch(courseIdPattern);
         expect(courseId.length).toBeGreaterThan(0);
       });
 
-      invalidCourseIds.forEach((courseId) => {
+      invalidCourseIds.forEach(courseId => {
         if (courseId.length > 0) {
           expect(courseId).not.toMatch(courseIdPattern);
         } else {
@@ -280,36 +280,36 @@ describe("GET /api/bookings - Contract Tests", () => {
       });
     });
 
-    it("should validate sort parameter values", () => {
-      const validSortFields = ["createdAt", "updatedAt", "courseName"];
-      const invalidSortFields = ["invalid", "price", "status"];
+    it('should validate sort parameter values', () => {
+      const validSortFields = ['createdAt', 'updatedAt', 'courseName'];
+      const invalidSortFields = ['invalid', 'price', 'status'];
 
-      validSortFields.forEach((field) => {
+      validSortFields.forEach(field => {
         expect(validSortFields).toContain(field);
       });
 
-      invalidSortFields.forEach((field) => {
+      invalidSortFields.forEach(field => {
         expect(validSortFields).not.toContain(field);
       });
     });
 
-    it("should validate order parameter values", () => {
-      const validOrders = ["asc", "desc"];
-      const invalidOrders = ["ascending", "descending", "ASC", "DESC", ""];
+    it('should validate order parameter values', () => {
+      const validOrders = ['asc', 'desc'];
+      const invalidOrders = ['ascending', 'descending', 'ASC', 'DESC', ''];
 
-      validOrders.forEach((order) => {
+      validOrders.forEach(order => {
         expect(validOrders).toContain(order);
         expect(order).toMatch(/^(asc|desc)$/);
       });
 
-      invalidOrders.forEach((order) => {
+      invalidOrders.forEach(order => {
         expect(validOrders).not.toContain(order);
       });
     });
   });
 
-  describe("Pagination Contract", () => {
-    it("should implement consistent pagination", () => {
+  describe('Pagination Contract', () => {
+    it('should implement consistent pagination', () => {
       interface PaginationInfo {
         total: number;
         limit: number;
@@ -329,18 +329,18 @@ describe("GET /api/bookings - Contract Tests", () => {
       };
 
       expect(paginationExample.currentPage).toBe(
-        Math.floor(paginationExample.offset / paginationExample.limit) + 1,
+        Math.floor(paginationExample.offset / paginationExample.limit) + 1
       );
       expect(paginationExample.totalPages).toBe(
-        Math.ceil(paginationExample.total / paginationExample.limit),
+        Math.ceil(paginationExample.total / paginationExample.limit)
       );
       expect(paginationExample.hasMore).toBe(
         paginationExample.offset + paginationExample.limit <
-          paginationExample.total,
+          paginationExample.total
       );
     });
 
-    it("should validate pagination math", () => {
+    it('should validate pagination math', () => {
       const testCases = [
         {
           total: 10,
@@ -372,7 +372,7 @@ describe("GET /api/bookings - Contract Tests", () => {
         },
       ];
 
-      testCases.forEach((testCase) => {
+      testCases.forEach(testCase => {
         const totalPages = Math.ceil(testCase.total / testCase.limit);
         const hasMore = testCase.offset + testCase.limit < testCase.total;
 
@@ -382,8 +382,8 @@ describe("GET /api/bookings - Contract Tests", () => {
     });
   });
 
-  describe("Response Data Validation", () => {
-    it("should validate booking item structure", () => {
+  describe('Response Data Validation', () => {
+    it('should validate booking item structure', () => {
       interface BookingItem {
         id: string;
         userId: string;
@@ -398,16 +398,16 @@ describe("GET /api/bookings - Contract Tests", () => {
       }
 
       const validBooking: BookingItem = {
-        id: "booking_123",
-        userId: "user_456",
-        courseId: "course_789",
-        courseName: "TypeScript Fundamentals",
+        id: 'booking_123',
+        userId: 'user_456',
+        courseId: 'course_789',
+        courseName: 'TypeScript Fundamentals',
         coursePrice: 4999,
-        paymentStatus: "CONFIRMED",
-        stripeSessionId: "cs_test_session_123",
-        stripePaymentIntentId: "pi_test_payment_456",
-        createdAt: "2024-01-01T12:00:00Z",
-        updatedAt: "2024-01-01T12:05:00Z",
+        paymentStatus: 'CONFIRMED',
+        stripeSessionId: 'cs_test_session_123',
+        stripePaymentIntentId: 'pi_test_payment_456',
+        createdAt: '2024-01-01T12:00:00Z',
+        updatedAt: '2024-01-01T12:05:00Z',
       };
 
       expect(validBooking.id).toMatch(/^booking_/);
@@ -416,14 +416,14 @@ describe("GET /api/bookings - Contract Tests", () => {
       expect(validBooking.courseName.length).toBeGreaterThan(0);
       expect(validBooking.coursePrice).toBeGreaterThan(0);
       expect(validBooking.createdAt).toMatch(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/,
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/
       );
       expect(validBooking.updatedAt).toMatch(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/,
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/
       );
     });
 
-    it("should validate metadata structure", () => {
+    it('should validate metadata structure', () => {
       interface BookingMetadata {
         totalRevenue: number;
         statusCounts: Record<string, number>;
@@ -449,22 +449,22 @@ describe("GET /api/bookings - Contract Tests", () => {
       expect(validMetadata.averagePrice).toBeGreaterThanOrEqual(0);
       expect(validMetadata.recentBookings).toBeGreaterThanOrEqual(0);
 
-      Object.values(validMetadata.statusCounts).forEach((count) => {
+      Object.values(validMetadata.statusCounts).forEach(count => {
         expect(count).toBeGreaterThanOrEqual(0);
         expect(Number.isInteger(count)).toBe(true);
       });
     });
   });
 
-  describe("Content-Type Requirements", () => {
-    it("should return application/json content type", () => {
-      const responseContentType = "application/json";
-      expect(responseContentType).toBe("application/json");
+  describe('Content-Type Requirements', () => {
+    it('should return application/json content type', () => {
+      const responseContentType = 'application/json';
+      expect(responseContentType).toBe('application/json');
     });
 
-    it("should accept application/json for requests with body", () => {
-      const acceptedContentType = "application/json";
-      expect(acceptedContentType).toBe("application/json");
+    it('should accept application/json for requests with body', () => {
+      const acceptedContentType = 'application/json';
+      expect(acceptedContentType).toBe('application/json');
     });
   });
 });

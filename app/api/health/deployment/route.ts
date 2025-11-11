@@ -3,17 +3,17 @@
  * Stellt Health-Check-Endpunkt und Deployment-Status bereit
  */
 
-import { type NextRequest, NextResponse } from "next/server";
-import { deploymentMonitor } from "@/lib/monitoring/deployment-monitor";
-import { ApiLogger } from "@/lib/utils/api-logger";
-import { createRequestContextFromNextRequest } from "@/lib/utils/request-id";
+import { type NextRequest, NextResponse } from 'next/server';
+import { deploymentMonitor } from '@/lib/monitoring/deployment-monitor';
+import { ApiLogger } from '@/lib/utils/api-logger';
+import { createRequestContextFromNextRequest } from '@/lib/utils/request-id';
 
 export async function GET(request: NextRequest) {
   const context = createRequestContextFromNextRequest(request);
   const logger = new ApiLogger(context);
 
   try {
-    logger.info("Deployment health check initiated");
+    logger.info('Deployment health check initiated');
 
     // Health-Checks durchführen
     const healthStatus = await deploymentMonitor.performHealthChecks();
@@ -29,63 +29,63 @@ export async function GET(request: NextRequest) {
         overallStatus: deploymentStatus.status,
         totalChecks: Object.keys(healthStatus).length,
         passedChecks: Object.values(healthStatus).filter(
-          (check) => check.status === "pass",
+          check => check.status === 'pass'
         ).length,
         failedChecks: Object.values(healthStatus).filter(
-          (check) => check.status === "fail",
+          check => check.status === 'fail'
         ).length,
         warningChecks: Object.values(healthStatus).filter(
-          (check) => check.status === "warn",
+          check => check.status === 'warn'
         ).length,
       },
     };
 
-    logger.info("Health check completed", {
+    logger.info('Health check completed', {
       status: deploymentStatus.status,
       summary: response.summary,
     });
 
     // HTTP-Status basierend auf Health-Status
     const httpStatus =
-      deploymentStatus.status === "healthy"
+      deploymentStatus.status === 'healthy'
         ? 200
-        : deploymentStatus.status === "degraded"
+        : deploymentStatus.status === 'degraded'
           ? 206
           : 503;
 
     return NextResponse.json(response, {
       status: httpStatus,
       headers: {
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "X-Request-ID": context.id,
-        "X-Deployment-Status": deploymentStatus.status,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'X-Request-ID': context.id,
+        'X-Deployment-Status': deploymentStatus.status,
       },
     });
   } catch (error) {
     logger.error(
-      "Health check failed",
-      error instanceof Error ? error : new Error("Unknown error"),
+      'Health check failed',
+      error instanceof Error ? error : new Error('Unknown error')
     );
 
     return NextResponse.json(
       {
         timestamp: new Date().toISOString(),
         requestId: context.id,
-        error: "Health check failed",
-        details: error instanceof Error ? error.message : "Unknown error",
+        error: 'Health check failed',
+        details: error instanceof Error ? error.message : 'Unknown error',
         deployment: {
-          status: "unhealthy",
-          version: process.env.npm_package_version || "1.0.0",
-          region: process.env.VERCEL_REGION || "local",
+          status: 'unhealthy',
+          version: process.env.npm_package_version || '1.0.0',
+          region: process.env.VERCEL_REGION || 'local',
         },
       },
       {
         status: 503,
         headers: {
-          "X-Request-ID": context.id,
-          "X-Deployment-Status": "unhealthy",
+          'X-Request-ID': context.id,
+          'X-Deployment-Status': 'unhealthy',
         },
-      },
+      }
     );
   }
 }
@@ -98,26 +98,26 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { action } = body;
 
-    logger.info("Deployment action requested", { action });
+    logger.info('Deployment action requested', { action });
 
     switch (action) {
-      case "start_monitoring": {
+      case 'start_monitoring': {
         const intervalMinutes = body.intervalMinutes || 5;
         deploymentMonitor.startContinuousMonitoring(intervalMinutes);
 
         return NextResponse.json({
-          message: "Continuous monitoring started",
+          message: 'Continuous monitoring started',
           interval: `${intervalMinutes} minutes`,
           requestId: context.id,
         });
       }
 
-      case "force_check": {
+      case 'force_check': {
         const healthStatus = await deploymentMonitor.performHealthChecks();
         const deploymentStatus = deploymentMonitor.getDeploymentStatus();
 
         return NextResponse.json({
-          message: "Health check forced",
+          message: 'Health check forced',
           deployment: deploymentStatus,
           services: healthStatus,
           requestId: context.id,
@@ -125,25 +125,25 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        logger.warn("Invalid deployment action", { action });
+        logger.warn('Invalid deployment action', { action });
         return NextResponse.json(
-          { error: "Invalid action", requestId: context.id },
-          { status: 400 },
+          { error: 'Invalid action', requestId: context.id },
+          { status: 400 }
         );
     }
   } catch (error) {
     logger.error(
-      "Deployment action failed",
-      error instanceof Error ? error : new Error("Unknown error"),
+      'Deployment action failed',
+      error instanceof Error ? error : new Error('Unknown error')
     );
 
     return NextResponse.json(
       {
-        error: "Deployment action failed",
-        details: error instanceof Error ? error.message : "Unknown error",
+        error: 'Deployment action failed',
+        details: error instanceof Error ? error.message : 'Unknown error',
         requestId: context.id,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

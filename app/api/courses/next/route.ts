@@ -1,6 +1,6 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { getNextUpcomingCourse } from "@/lib/api/courses";
-import { serverInstance } from "@/lib/monitoring/rollbar-official";
+import { type NextRequest, NextResponse } from 'next/server';
+import { getNextUpcomingCourse } from '@/lib/api/courses';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 /**
  * GET /api/courses/next
@@ -13,7 +13,7 @@ export async function GET(_request: NextRequest) {
   try {
     const course = await getNextUpcomingCourse();
     const duration = Date.now() - startTime;
-    serverInstance.info("GET /api/courses/next completed", {
+    serverInstance.info('GET /api/courses/next completed', {
       requestId,
       durationMs: duration,
       found: Boolean(course),
@@ -23,10 +23,10 @@ export async function GET(_request: NextRequest) {
     if (!course) {
       // Return a mock course for testing
       const mockCourse = {
-        id: "mock-course-1",
-        title: "Grundlagen der Persönlichkeitsentwicklung",
-        date: "2025-11-15T10:00:00.000Z",
-        slug: "grundlagen-persoenlichkeitsentwicklung",
+        id: 'mock-course-1',
+        title: 'Grundlagen der Persönlichkeitsentwicklung',
+        date: '2025-11-15T10:00:00.000Z',
+        slug: 'grundlagen-persoenlichkeitsentwicklung',
       };
       return NextResponse.json(mockCourse);
     }
@@ -41,14 +41,14 @@ export async function GET(_request: NextRequest) {
 
     return NextResponse.json(formattedCourse);
   } catch (error) {
-    serverInstance.error("Error fetching next course", {
+    serverInstance.error('Error fetching next course', {
       requestId,
       error: error instanceof Error ? error.message : String(error),
       timestamp: new Date().toISOString(),
     });
     return NextResponse.json(
-      { error: "Failed to fetch next course" },
-      { status: 500 },
+      { error: 'Failed to fetch next course' },
+      { status: 500 }
     );
   }
 }

@@ -1,11 +1,11 @@
-declare module "web-vitals" {
+declare module 'web-vitals' {
   export interface Metric {
-    name: "CLS" | "FCP" | "LCP" | "INP" | "TTFB" | "FID";
+    name: 'CLS' | 'FCP' | 'LCP' | 'INP' | 'TTFB' | 'FID';
     value: number;
     id: string;
     delta: number;
     entries: PerformanceEntry[];
-    navigationType: "navigate" | "reload" | "back-forward" | "prerender";
+    navigationType: 'navigate' | 'reload' | 'back-forward' | 'prerender';
   }
 
   export function onCLS(cb: (metric: Metric) => void): void;

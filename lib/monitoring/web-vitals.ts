@@ -13,9 +13,9 @@ export type WebVitalMetric = {
 };
 
 export function isWebVitalsEnabled(): boolean {
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = process.env.NODE_ENV === 'production';
   const flag = process.env.NEXT_PUBLIC_ENABLE_WEB_VITALS;
-  const enabled = flag === "1" || flag === "true";
+  const enabled = flag === '1' || flag === 'true';
   return isProd && enabled;
 }
 
@@ -23,13 +23,13 @@ export function isPublicPath(pathname: string | undefined): boolean {
   if (!pathname) return true;
   // Heuristic: treat these prefixes as private areas
   const privatePrefixes = [
-    "/auth",
-    "/protected",
-    "/admin",
-    "/sign-in",
-    "/sign-up",
+    '/auth',
+    '/protected',
+    '/admin',
+    '/sign-in',
+    '/sign-up',
   ];
-  return !privatePrefixes.some((prefix) => pathname.startsWith(prefix));
+  return !privatePrefixes.some(prefix => pathname.startsWith(prefix));
 }
 
 /**
@@ -38,20 +38,20 @@ export function isPublicPath(pathname: string | undefined): boolean {
  */
 export async function initWebVitals(
   sender: (metric: WebVitalMetric) => void,
-  opts?: { path?: string },
+  opts?: { path?: string }
 ): Promise<boolean> {
   if (!isWebVitalsEnabled()) return false;
   if (!isPublicPath(opts?.path)) return false;
 
   try {
-    const mod = (await import("web-vitals")) as {
+    const mod = (await import('web-vitals')) as {
       onCLS?: (
         handler: (metric: {
           name: string;
           value: number;
           id: string;
           label?: string;
-        }) => void,
+        }) => void
       ) => void;
       onFCP?: (
         handler: (metric: {
@@ -59,7 +59,7 @@ export async function initWebVitals(
           value: number;
           id: string;
           label?: string;
-        }) => void,
+        }) => void
       ) => void;
       onLCP?: (
         handler: (metric: {
@@ -67,7 +67,7 @@ export async function initWebVitals(
           value: number;
           id: string;
           label?: string;
-        }) => void,
+        }) => void
       ) => void;
       onINP?: (
         handler: (metric: {
@@ -75,7 +75,7 @@ export async function initWebVitals(
           value: number;
           id: string;
           label?: string;
-        }) => void,
+        }) => void
       ) => void;
       onTTFB?: (
         handler: (metric: {
@@ -83,7 +83,7 @@ export async function initWebVitals(
           value: number;
           id: string;
           label?: string;
-        }) => void,
+        }) => void
       ) => void;
     };
     const handler = (metric: {

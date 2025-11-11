@@ -3,26 +3,26 @@
  * Stellt Analytics-Daten für Dashboard und Monitoring zur Verfügung
  */
 
-import { auth } from "@clerk/nextjs/server";
-import { type NextRequest, NextResponse } from "next/server";
-import { analytics } from "@/lib/analytics/request-analytics";
-import { checkUserAdminStatus } from "@/lib/auth/helpers";
-import { createApiLogger } from "@/lib/utils/api-logger";
+import { auth } from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { analytics } from '@/lib/analytics/request-analytics';
+import { checkUserAdminStatus } from '@/lib/auth/helpers';
+import { createApiLogger } from '@/lib/utils/api-logger';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
-} from "@/lib/utils/api-response";
+} from '@/lib/utils/api-response';
 import {
   createRequestContext,
   getOrCreateRequestId,
-} from "@/lib/utils/request-id";
+} from '@/lib/utils/request-id';
 
 // CORS headers for external app access
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 export async function OPTIONS() {
@@ -33,13 +33,13 @@ export async function GET(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);
   const context = createRequestContext(
     requestId,
-    "GET",
-    "/api/admin/analytics",
+    'GET',
+    '/api/admin/analytics'
   );
   const logger = createApiLogger(context);
 
   try {
-    logger.info("Analytics data request started");
+    logger.info('Analytics data request started');
 
     // Authentication check
     let userId: string | null = null;
@@ -48,12 +48,12 @@ export async function GET(request: NextRequest) {
       userId = authResult.userId;
     } catch (authError) {
       // In E2E test mode, auth() might fail, return 401
-      logger.warn("Auth failed", authError);
+      logger.warn('Auth failed', authError);
       const errorResponse = createErrorResponse(
-        "Unauthorized access",
+        'Unauthorized access',
         ErrorCodes.UNAUTHORIZED,
         requestId,
-        401,
+        401
       );
 
       // Add CORS headers to error response
@@ -65,12 +65,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (!userId) {
-      logger.warn("Unauthorized analytics access attempt");
+      logger.warn('Unauthorized analytics access attempt');
       const errorResponse = createErrorResponse(
-        "Unauthorized access",
+        'Unauthorized access',
         ErrorCodes.UNAUTHORIZED,
         requestId,
-        401,
+        401
       );
 
       // Add CORS headers to error response
@@ -83,12 +83,12 @@ export async function GET(request: NextRequest) {
 
     const isAdmin = await checkUserAdminStatus(userId);
     if (!isAdmin) {
-      logger.warn("Non-admin user attempted to access analytics", { userId });
+      logger.warn('Non-admin user attempted to access analytics', { userId });
       const errorResponse = createErrorResponse(
-        "Admin privileges required",
+        'Admin privileges required',
         ErrorCodes.FORBIDDEN,
         requestId,
-        403,
+        403
       );
 
       // Add CORS headers to error response
@@ -100,10 +100,10 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const timeframe = searchParams.get("timeframe") || "24h";
-    const reportType = searchParams.get("type") || "summary";
+    const timeframe = searchParams.get('timeframe') || '24h';
+    const reportType = searchParams.get('type') || 'summary';
 
-    logger.info("Generating analytics report", {
+    logger.info('Generating analytics report', {
       timeframe,
       reportType,
       userId,
@@ -112,32 +112,32 @@ export async function GET(request: NextRequest) {
     let responseData: unknown;
 
     switch (reportType) {
-      case "summary":
+      case 'summary':
         responseData = analytics.generateReport(timeframe);
         break;
 
-      case "usage":
+      case 'usage':
         responseData = {
           usageStats: Array.from(
-            analytics.generateUsageStats(timeframe).values(),
+            analytics.generateUsageStats(timeframe).values()
           ),
         };
         break;
 
-      case "anomalies":
+      case 'anomalies':
         responseData = {
           anomalies: analytics.detectAnomalies(),
         };
         break;
 
-      case "trace": {
-        const traceRequestId = searchParams.get("requestId");
+      case 'trace': {
+        const traceRequestId = searchParams.get('requestId');
         if (!traceRequestId) {
           const errorResponse = createErrorResponse(
-            "Request ID required for trace report",
+            'Request ID required for trace report',
             ErrorCodes.INVALID_INPUT,
             requestId,
-            400,
+            400
           );
 
           // Add CORS headers to error response
@@ -155,10 +155,10 @@ export async function GET(request: NextRequest) {
 
       default: {
         const errorResponse = createErrorResponse(
-          "Invalid report type",
+          'Invalid report type',
           ErrorCodes.INVALID_INPUT,
           requestId,
-          400,
+          400
         );
 
         // Add CORS headers to error response
@@ -170,14 +170,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    logger.info("Analytics report generated successfully", {
+    logger.info('Analytics report generated successfully', {
       reportType,
       timeframe,
       dataSize: JSON.stringify(responseData).length,
     });
 
     // Track business event
-    logger.trackBusinessEvent("analytics_report_generated", {
+    logger.trackBusinessEvent('analytics_report_generated', {
       reportType,
       timeframe,
       userId,
@@ -196,7 +196,7 @@ export async function GET(request: NextRequest) {
           requestId,
         },
       },
-      requestId,
+      requestId
     );
 
     // Add CORS headers to response
@@ -206,14 +206,14 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
-    logger.error("Error generating analytics report", error as Error);
+    logger.error('Error generating analytics report', error as Error);
     logger.trackRequestCompletion(500);
 
     const errorResponse = createErrorResponse(
-      "Failed to generate analytics report",
+      'Failed to generate analytics report',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
-      500,
+      500
     );
 
     // Add CORS headers to error response

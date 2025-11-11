@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -20,24 +20,24 @@ try {
       },
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: 'desc',
     },
   });
 
   if (!bookings.length) {
-    console.log("Keine Buchungen gefunden.");
+    console.log('Keine Buchungen gefunden.');
   } else {
     console.log(`Gefundene Buchungen: ${bookings.length}`);
     bookings.forEach((booking, index) => {
       console.log(
         `${index + 1}. Booking ${booking.id} | Kurs: ${booking.course.title} | ` +
           `User: ${booking.user?.email ?? booking.userId} | Status: ${booking.paymentStatus} | ` +
-          `Betrag: ${(booking.amount ?? 0) / 100} ${booking.currency}`,
+          `Betrag: ${(booking.amount ?? 0) / 100} ${booking.currency}`
       );
     });
   }
 } catch (error) {
-  console.error("Fehler beim Abrufen der Buchungen:", error);
+  console.error('Fehler beim Abrufen der Buchungen:', error);
 } finally {
   await prisma.$disconnect();
 }

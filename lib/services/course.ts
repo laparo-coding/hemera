@@ -1,7 +1,7 @@
-import { PaymentStatus } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
+import { PaymentStatus } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 
-export { PaymentStatus } from "@prisma/client";
+export { PaymentStatus } from '@prisma/client';
 
 export interface Course {
   id: string;
@@ -45,14 +45,14 @@ export interface CourseSearchParams {
  * Get all courses with optional filtering
  */
 export async function getCourses(
-  params?: CourseSearchParams,
+  params?: CourseSearchParams
 ): Promise<CourseWithBookings[]> {
   const where: Record<string, unknown> = {};
 
   if (params?.title) {
     where.title = {
       contains: params.title,
-      mode: "insensitive",
+      mode: 'insensitive',
     };
   }
 
@@ -76,13 +76,13 @@ export async function getCourses(
       bookings: true,
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: 'desc',
     },
   })) as unknown as CourseWithBookings[];
 
   // Filter out courses that are full if availableOnly is true
   if (params?.availableOnly) {
-    return courses.filter((course) => isCourseAvailable(course));
+    return courses.filter(course => isCourseAvailable(course));
   }
 
   return courses;
@@ -92,7 +92,7 @@ export async function getCourses(
  * Get course by ID
  */
 export async function getCourseById(
-  id: string,
+  id: string
 ): Promise<CourseWithBookings | null> {
   return (await prisma.course.findUnique({
     where: { id },
@@ -107,7 +107,7 @@ export async function getCourseById(
  * Convenience helper to resolve a course reference that may be a UUID (id) or a human-friendly slug.
  */
 export async function getCourseByIdOrSlug(
-  idOrSlug: string,
+  idOrSlug: string
 ): Promise<CourseWithBookings | null> {
   return (await prisma.course.findFirst({
     where: {
@@ -125,7 +125,7 @@ export async function getCourseByIdOrSlug(
 export function isCourseAvailable(course: CourseWithBookings): boolean {
   if (course.capacity && course.capacity > 0) {
     const paidBookings = course.bookings.filter(
-      (booking) => booking.paymentStatus === PaymentStatus.PAID,
+      booking => booking.paymentStatus === PaymentStatus.PAID
     );
     return paidBookings.length < course.capacity;
   }
@@ -142,7 +142,7 @@ export function getAvailableSpots(course: CourseWithBookings): number | null {
   }
 
   const paidBookings = course.bookings.filter(
-    (booking) => booking.paymentStatus === PaymentStatus.PAID,
+    booking => booking.paymentStatus === PaymentStatus.PAID
   );
 
   return Math.max(0, course.capacity - paidBookings.length);
@@ -153,7 +153,7 @@ export function getAvailableSpots(course: CourseWithBookings): number | null {
  */
 export async function hasUserBookedCourse(
   userId: string,
-  courseId: string,
+  courseId: string
 ): Promise<boolean> {
   const booking = await prisma.booking.findUnique({
     where: {
@@ -172,7 +172,7 @@ export async function hasUserBookedCourse(
  */
 export async function getUserBooking(
   userId: string,
-  courseId: string,
+  courseId: string
 ): Promise<Booking | null> {
   return (await prisma.booking.findUnique({
     where: {
@@ -188,7 +188,7 @@ export async function getUserBooking(
  * Search courses by title/description
  */
 export async function searchCourses(
-  query: string,
+  query: string
 ): Promise<CourseWithBookings[]> {
   return (await prisma.course.findMany({
     where: {
@@ -196,13 +196,13 @@ export async function searchCourses(
         {
           title: {
             contains: query,
-            mode: "insensitive",
+            mode: 'insensitive',
           },
         },
         {
           description: {
             contains: query,
-            mode: "insensitive",
+            mode: 'insensitive',
           },
         },
       ],
@@ -211,7 +211,7 @@ export async function searchCourses(
       bookings: true,
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: 'desc',
     },
   })) as unknown as CourseWithBookings[];
 }

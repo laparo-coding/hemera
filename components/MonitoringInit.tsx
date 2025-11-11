@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { usePathname } from "next/navigation";
-import * as React from "react";
+import { usePathname } from 'next/navigation';
+import * as React from 'react';
 import {
   initWebVitals,
   type WebVitalMetric,
-} from "@/lib/monitoring/web-vitals";
+} from '@/lib/monitoring/web-vitals';
 
 function sendMetric(metric: WebVitalMetric & { path?: string }) {
   const payload = JSON.stringify({
@@ -19,21 +19,21 @@ function sendMetric(metric: WebVitalMetric & { path?: string }) {
 
   try {
     if (
-      typeof navigator !== "undefined" &&
-      typeof navigator.sendBeacon === "function"
+      typeof navigator !== 'undefined' &&
+      typeof navigator.sendBeacon === 'function'
     ) {
-      const blob = new Blob([payload], { type: "application/json" });
-      navigator.sendBeacon("/api/monitoring/vitals", blob);
+      const blob = new Blob([payload], { type: 'application/json' });
+      navigator.sendBeacon('/api/monitoring/vitals', blob);
       return;
     }
   } catch {
     // navigator.sendBeacon failed, fall back to fetch keepalive below
   }
 
-  void fetch("/api/monitoring/vitals", {
-    method: "POST",
+  void fetch('/api/monitoring/vitals', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: payload,
     keepalive: true,
@@ -55,11 +55,11 @@ export default function MonitoringInit() {
 
     const setup = async () => {
       const initialized = await initWebVitals(
-        (metric) => {
+        metric => {
           if (!subscribed) return;
           sendMetric({ ...metric, path: pathname });
         },
-        { path: pathname },
+        { path: pathname }
       );
 
       if (initialized) {

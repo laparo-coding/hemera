@@ -8,23 +8,23 @@ import {
   ErrorSeverity,
   type ErrorSeverityType,
   reportError,
-} from "../monitoring/rollbar-official";
+} from '../monitoring/rollbar-official';
 
 export abstract class BaseError extends Error {
   abstract readonly statusCode: number;
   abstract readonly errorCode: string;
   abstract readonly category:
-    | "business"
-    | "infrastructure"
-    | "validation"
-    | "auth";
+    | 'business'
+    | 'infrastructure'
+    | 'validation'
+    | 'auth';
 
   public readonly timestamp: Date;
 
   constructor(
     message: string,
     public readonly context?: Record<string, unknown>,
-    public readonly cause?: Error,
+    public readonly cause?: Error
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -61,7 +61,7 @@ export abstract class BaseError extends Error {
         severity = ErrorSeverity.CRITICAL;
       } else if (this.statusCode >= 400 && this.statusCode < 500) {
         severity =
-          this.category === "auth"
+          this.category === 'auth'
             ? ErrorSeverity.CRITICAL
             : ErrorSeverity.WARNING;
       } else if (this.statusCode < 400) {
@@ -93,7 +93,7 @@ export abstract class BaseError extends Error {
  * For domain-specific validation and business rule violations
  */
 export abstract class BusinessError extends BaseError {
-  readonly category = "business" as const;
+  readonly category = 'business' as const;
   readonly statusCode = 400;
 }
 
@@ -102,7 +102,7 @@ export abstract class BusinessError extends BaseError {
  * For database, external APIs, and system-level failures
  */
 export abstract class InfrastructureError extends BaseError {
-  readonly category = "infrastructure" as const;
+  readonly category = 'infrastructure' as const;
   readonly statusCode = 503;
 }
 
@@ -111,7 +111,7 @@ export abstract class InfrastructureError extends BaseError {
  * For input validation and data format issues
  */
 export abstract class ValidationError extends BaseError {
-  readonly category = "validation" as const;
+  readonly category = 'validation' as const;
   readonly statusCode = 422;
 }
 
@@ -120,6 +120,6 @@ export abstract class ValidationError extends BaseError {
  * For security and access control issues
  */
 export abstract class AuthError extends BaseError {
-  readonly category = "auth" as const;
+  readonly category = 'auth' as const;
   readonly statusCode = 401;
 }

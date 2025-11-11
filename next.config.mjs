@@ -1,4 +1,4 @@
-import { fileURLToPath } from "node:url";
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -9,7 +9,7 @@ const nextConfig = {
     if (!isServer) {
       // Optimize webpack cache for client-side builds
       config.cache = {
-        type: "filesystem",
+        type: 'filesystem',
         buildDependencies: {
           config: [__filename],
         },
@@ -22,8 +22,8 @@ const nextConfig = {
     // All legacy /protected/* paths should land on the client-guarded dashboard
     return [
       {
-        source: "/protected/:path*",
-        destination: "/dashboard",
+        source: '/protected/:path*',
+        destination: '/dashboard',
         permanent: true,
       },
     ];

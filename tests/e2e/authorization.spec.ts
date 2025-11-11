@@ -1,6 +1,6 @@
-import { expect, type Page, test } from "@playwright/test";
-import { AuthHelper } from "./auth-helper";
-import { gotoStable } from "./helpers/nav";
+import { expect, type Page, test } from '@playwright/test';
+import { AuthHelper } from './auth-helper';
+import { gotoStable } from './helpers/nav';
 
 /**
  * Role-Based Authorization E2E
@@ -9,12 +9,12 @@ import { gotoStable } from "./helpers/nav";
  * Tests role enforcement, navigation visibility, and access restrictions.
  */
 
-test.describe("Role-Based Navigation Contract", () => {
+test.describe('Role-Based Navigation Contract', () => {
   const isMockMode =
     !!process.env.CI ||
-    process.env.E2E_TEST === "true" ||
-    process.env.NEXT_PUBLIC_DISABLE_CLERK === "1";
-  test("user role should see limited navigation sections", async ({ page }) => {
+    process.env.E2E_TEST === 'true' ||
+    process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
+  test('user role should see limited navigation sections', async ({ page }) => {
     // This test will fail until role-based navigation is implemented
 
     // Sign in as regular user
@@ -27,20 +27,20 @@ test.describe("Role-Based Navigation Contract", () => {
       return;
     } else {
       // Should redirect to protected dashboard
-      await expect(page).toHaveURL("/dashboard");
+      await expect(page).toHaveURL('/dashboard');
 
       // Verify user navigation is visible
-      await expect(page.locator("[data-testid=nav-dashboard]")).toBeVisible();
-      await expect(page.locator("[data-testid=nav-courses]")).toBeVisible();
+      await expect(page.locator('[data-testid=nav-dashboard]')).toBeVisible();
+      await expect(page.locator('[data-testid=nav-courses]')).toBeVisible();
 
       // Admin navigation should NOT be visible for regular users
-      await expect(page.locator("[data-testid=nav-admin]")).not.toBeVisible();
+      await expect(page.locator('[data-testid=nav-admin]')).not.toBeVisible();
     }
   });
 
-  test("admin role should see all navigation sections", async ({ page }) => {
+  test('admin role should see all navigation sections', async ({ page }) => {
     if (isMockMode) {
-      await renderMockNavigation(page, "admin");
+      await renderMockNavigation(page, 'admin');
       await expect(page.locator('[data-testid="nav-dashboard"]')).toBeVisible();
       await expect(page.locator('[data-testid="nav-courses"]')).toBeVisible();
       await expect(page.locator('[data-testid="nav-admin"]')).toBeVisible();
@@ -53,21 +53,21 @@ test.describe("Role-Based Navigation Contract", () => {
     await signInAsAdmin(page);
 
     // Should redirect to protected dashboard
-    await expect(page).toHaveURL("/dashboard");
+    await expect(page).toHaveURL('/dashboard');
 
     // Verify all navigation sections are visible for admin
-    await expect(page.locator("[data-testid=nav-dashboard]")).toBeVisible();
-    await expect(page.locator("[data-testid=nav-courses]")).toBeVisible();
-    await expect(page.locator("[data-testid=nav-admin]")).toBeVisible();
+    await expect(page.locator('[data-testid=nav-dashboard]')).toBeVisible();
+    await expect(page.locator('[data-testid=nav-courses]')).toBeVisible();
+    await expect(page.locator('[data-testid=nav-admin]')).toBeVisible();
   });
 
-  test("should enforce role-based access to admin section", async ({
+  test('should enforce role-based access to admin section', async ({
     page,
   }) => {
     if (isMockMode) {
       await renderMockAccessDenied(page);
       await expect(page.locator('[data-testid="access-denied"]')).toContainText(
-        "Access denied",
+        'Access denied'
       );
       return;
     }
@@ -78,31 +78,31 @@ test.describe("Role-Based Navigation Contract", () => {
     await signInAsUser(page);
 
     // Attempt to navigate directly to admin section
-    await gotoStable(page, "/admin");
+    await gotoStable(page, '/admin');
 
     // Should be denied access or redirected
     // This could manifest as:
     // 1. Redirect to dashboard with error message
     // 2. 403 Forbidden page
     // 3. Admin section showing "Access Denied" message
-    const isOnDashboard = page.url().includes("/dashboard");
+    const isOnDashboard = page.url().includes('/dashboard');
     const hasAccessDenied = await page
-      .locator("[data-testid=access-denied]")
+      .locator('[data-testid=access-denied]')
       .isVisible();
     const hasForbiddenStatus =
-      page.url().includes("/403") || page.url().includes("/forbidden");
+      page.url().includes('/403') || page.url().includes('/forbidden');
 
     expect(isOnDashboard || hasAccessDenied || hasForbiddenStatus).toBeTruthy();
   });
 
-  test("should handle unknown/invalid roles gracefully", async ({ page }) => {
+  test('should handle unknown/invalid roles gracefully', async ({ page }) => {
     if (isMockMode) {
-      await renderMockNavigation(page, "unknown");
+      await renderMockNavigation(page, 'unknown');
       await expect(page.locator('[data-testid="nav-dashboard"]')).toBeVisible();
       await expect(page.locator('[data-testid="nav-courses"]')).toBeVisible();
       await expect(page.locator('[data-testid="nav-admin"]')).not.toBeVisible();
       await expect(page.locator('[data-testid="user-role"]')).toHaveText(
-        "user",
+        'user'
       );
       return;
     }
@@ -110,26 +110,26 @@ test.describe("Role-Based Navigation Contract", () => {
     // This test will fail until role fallback logic is implemented
 
     // Sign in with a user that has an unknown role
-    await signInWithRole(page, "unknown_role");
+    await signInWithRole(page, 'unknown_role');
 
     // Should fallback to default user permissions
-    await expect(page.locator("[data-testid=nav-dashboard]")).toBeVisible();
-    await expect(page.locator("[data-testid=nav-courses]")).toBeVisible();
-    await expect(page.locator("[data-testid=nav-admin]")).not.toBeVisible();
+    await expect(page.locator('[data-testid=nav-dashboard]')).toBeVisible();
+    await expect(page.locator('[data-testid=nav-courses]')).toBeVisible();
+    await expect(page.locator('[data-testid=nav-admin]')).not.toBeVisible();
 
     // Should show user role as default or display appropriate fallback
     const userRole = await page
-      .locator("[data-testid=user-role]")
+      .locator('[data-testid=user-role]')
       .textContent();
-    expect(userRole).toBe("user"); // Should fallback to 'user' role
+    expect(userRole).toBe('user'); // Should fallback to 'user' role
   });
 
-  test("should update navigation when role changes", async ({ page }) => {
+  test('should update navigation when role changes', async ({ page }) => {
     if (isMockMode) {
-      await renderMockNavigation(page, "user");
+      await renderMockNavigation(page, 'user');
       await expect(page.locator('[data-testid="nav-admin"]')).not.toBeVisible();
 
-      await renderMockNavigation(page, "admin");
+      await renderMockNavigation(page, 'admin');
       await expect(page.locator('[data-testid="nav-admin"]')).toBeVisible();
       return;
     }
@@ -138,31 +138,31 @@ test.describe("Role-Based Navigation Contract", () => {
 
     // Start as regular user
     await signInAsUser(page);
-    await expect(page.locator("[data-testid=nav-admin]")).not.toBeVisible();
+    await expect(page.locator('[data-testid=nav-admin]')).not.toBeVisible();
 
     // Simulate role promotion to admin (this would typically happen via admin interface)
     // For testing, we might need to simulate this through API or refresh with new role
-    await updateUserRole(page, "admin");
+    await updateUserRole(page, 'admin');
 
     // Refresh or navigate to trigger role check
     await page.reload();
 
     // Should now see admin navigation
-    await expect(page.locator("[data-testid=nav-admin]")).toBeVisible();
+    await expect(page.locator('[data-testid=nav-admin]')).toBeVisible();
   });
 
-  test("should show correct user information based on role", async ({
+  test('should show correct user information based on role', async ({
     page,
   }) => {
     if (isMockMode) {
-      await renderMockProfile(page, "user");
+      await renderMockProfile(page, 'user');
       await expect(page.locator('[data-testid="user-role"]')).toHaveText(
-        "user",
+        'user'
       );
 
-      await renderMockProfile(page, "admin");
+      await renderMockProfile(page, 'admin');
       await expect(page.locator('[data-testid="user-role"]')).toHaveText(
-        "admin",
+        'admin'
       );
       return;
     }
@@ -171,19 +171,19 @@ test.describe("Role-Based Navigation Contract", () => {
 
     // Test with user role
     await signInAsUser(page);
-    await expect(page.locator("[data-testid=user-role]")).toHaveText("user");
+    await expect(page.locator('[data-testid=user-role]')).toHaveText('user');
 
     // Sign out and test with admin role
-    await page.click("[data-testid=sign-out-button]");
+    await page.click('[data-testid=sign-out-button]');
     await signInAsAdmin(page);
-    await expect(page.locator("[data-testid=user-role]")).toHaveText("admin");
+    await expect(page.locator('[data-testid=user-role]')).toHaveText('admin');
   });
 
-  test("should maintain role consistency across navigation", async ({
+  test('should maintain role consistency across navigation', async ({
     page,
   }) => {
     if (isMockMode) {
-      await renderMockNavigation(page, "user");
+      await renderMockNavigation(page, 'user');
       await expect(page.locator('[data-testid="nav-courses"]')).toBeVisible();
       await expect(page.locator('[data-testid="nav-admin"]')).not.toBeVisible();
       return;
@@ -194,50 +194,50 @@ test.describe("Role-Based Navigation Contract", () => {
     await signInAsUser(page);
 
     // Navigate through all accessible sections
-    await page.click("[data-testid=nav-courses]");
-    await expect(page).toHaveURL("/courses");
-    await expect(page.locator("[data-testid=nav-admin]")).not.toBeVisible();
+    await page.click('[data-testid=nav-courses]');
+    await expect(page).toHaveURL('/courses');
+    await expect(page.locator('[data-testid=nav-admin]')).not.toBeVisible();
 
-    await page.click("[data-testid=nav-dashboard]");
-    await expect(page).toHaveURL("/dashboard");
-    await expect(page.locator("[data-testid=nav-admin]")).not.toBeVisible();
+    await page.click('[data-testid=nav-dashboard]');
+    await expect(page).toHaveURL('/dashboard');
+    await expect(page.locator('[data-testid=nav-admin]')).not.toBeVisible();
   });
 });
 
 // Helper functions for Clerk authentication
 async function signInAsUser(page: Page) {
   if (process.env.CI) {
-    await renderMockNavigation(page, "user");
+    await renderMockNavigation(page, 'user');
     return;
   }
 
   const authHelper = new AuthHelper(page);
   await authHelper.signIn(
-    "e2e.dashboard@example.com",
-    "E2ETestPassword2024!SecureForTesting",
+    'e2e.dashboard@example.com',
+    'E2ETestPassword2024!SecureForTesting'
   );
 }
 
 async function signInAsAdmin(page: Page) {
   if (process.env.CI) {
-    await renderMockNavigation(page, "admin");
+    await renderMockNavigation(page, 'admin');
     return;
   }
 
   const authHelper = new AuthHelper(page);
   await authHelper.signIn(
-    "e2e.admin@example.com",
-    "E2ETestPassword2024!SecureForTesting",
+    'e2e.admin@example.com',
+    'E2ETestPassword2024!SecureForTesting'
   );
 }
 
 async function signInWithRole(page: Page, role: string) {
   if (process.env.CI) {
     const normalizedRole =
-      role === "admin" ? "admin" : role === "user" ? "user" : "unknown";
+      role === 'admin' ? 'admin' : role === 'user' ? 'user' : 'unknown';
     await renderMockNavigation(
       page,
-      normalizedRole as "user" | "admin" | "unknown",
+      normalizedRole as 'user' | 'admin' | 'unknown'
     );
     return;
   }
@@ -245,8 +245,8 @@ async function signInWithRole(page: Page, role: string) {
   const authHelper = new AuthHelper(page);
   // Use default test user for role testing
   await authHelper.signIn(
-    "e2e.dashboard@example.com",
-    "E2ETestPassword2024!SecureForTesting",
+    'e2e.dashboard@example.com',
+    'E2ETestPassword2024!SecureForTesting'
   );
 }
 
@@ -257,16 +257,16 @@ async function updateUserRole(_page: Page, newRole: string) {
   // 2. Direct API call to update user metadata
   // 3. Database manipulation for test data
   console.warn(
-    `updateUserRole('${newRole}') not implemented - requires admin interface`,
+    `updateUserRole('${newRole}') not implemented - requires admin interface`
   );
 }
 
 async function renderMockNavigation(
   page: Page,
-  role: "user" | "admin" | "unknown",
+  role: 'user' | 'admin' | 'unknown'
 ) {
-  const isAdmin = role === "admin";
-  const displayRole = role === "unknown" ? "user" : role;
+  const isAdmin = role === 'admin';
+  const displayRole = role === 'unknown' ? 'user' : role;
 
   await page.setContent(`
     <html>
@@ -275,7 +275,7 @@ async function renderMockNavigation(
           <a data-testid="nav-dashboard">Dashboard</a>
           <a data-testid="nav-courses">Courses</a>
           <a data-testid="nav-admin" style="display: ${
-            isAdmin ? "block" : "none"
+            isAdmin ? 'block' : 'none'
           }">Admin</a>
         </nav>
         <main>
@@ -296,7 +296,7 @@ async function renderMockAccessDenied(page: Page) {
   `);
 }
 
-async function renderMockProfile(page: Page, role: "user" | "admin") {
+async function renderMockProfile(page: Page, role: 'user' | 'admin') {
   await page.setContent(`
     <html>
       <body>

@@ -1,8 +1,8 @@
-"use client";
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+'use client';
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from '@clerk/nextjs';
 import {
   AppBar,
   Box,
@@ -10,19 +10,19 @@ import {
   Container,
   Toolbar,
   Typography,
-} from "@mui/material";
-import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+} from '@mui/material';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 
 function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded, signOut } = useAuth();
   const { user } = useUser();
   const router = useRouter();
-  const _pathname = usePathname() || "/";
+  const _pathname = usePathname() || '/';
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
-      router.push("/sign-in");
+      router.push('/sign-in');
     }
   }, [isLoaded, isSignedIn, router]);
 
@@ -30,10 +30,10 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
     return (
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
         }}
       >
         <Typography>Loading...</Typography>
@@ -47,21 +47,21 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
 
   return (
     <Box
-      data-testid="dashboard-layout"
-      sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      data-testid='dashboard-layout'
+      sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
     >
-      <AppBar position="fixed" elevation={1} sx={{ zIndex: 1100 }}>
+      <AppBar position='fixed' elevation={1} sx={{ zIndex: 1100 }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
             Hemera Academy
           </Typography>
-          <span style={{ display: "none" }} data-testid="user-role">
-            {(user?.publicMetadata?.role as string) || "user"}
+          <span style={{ display: 'none' }} data-testid='user-role'>
+            {(user?.publicMetadata?.role as string) || 'user'}
           </span>
           <Button
-            color="inherit"
-            data-testid="sign-out-button"
-            onClick={() => signOut?.({ redirectUrl: "/" })}
+            color='inherit'
+            data-testid='sign-out-button'
+            onClick={() => signOut?.({ redirectUrl: '/' })}
           >
             Sign out
           </Button>
@@ -69,32 +69,32 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
       </AppBar>
 
       <Container
-        component="main"
-        maxWidth="lg"
+        component='main'
+        maxWidth='lg'
         sx={{
           flexGrow: 1,
           py: 3,
-          display: "flex",
-          flexDirection: "column",
-          marginTop: { xs: "104px", sm: "112px" },
+          display: 'flex',
+          flexDirection: 'column',
+          marginTop: { xs: '104px', sm: '112px' },
         }}
       >
         {children}
       </Container>
 
       <Box
-        component="footer"
+        component='footer'
         sx={{
-          mt: "auto",
+          mt: 'auto',
           py: 2,
           px: 3,
-          backgroundColor: "background.paper",
+          backgroundColor: 'background.paper',
           borderTop: 1,
-          borderColor: "divider",
+          borderColor: 'divider',
         }}
       >
-        <Container maxWidth="lg">
-          <Typography variant="body2" color="text.secondary" align="center">
+        <Container maxWidth='lg'>
+          <Typography variant='body2' color='text.secondary' align='center'>
             © 2024 Hemera Academy. All rights reserved.
           </Typography>
         </Container>
@@ -104,60 +104,60 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
 }
 
 function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
-  const _pathname = usePathname() || "/";
+  const _pathname = usePathname() || '/';
   const router = useRouter();
-  const [userRole, setUserRole] = useState<"user" | "admin">(() => {
+  const [userRole, setUserRole] = useState<'user' | 'admin'>(() => {
     try {
       const raw =
-        typeof window !== "undefined" &&
-        window.localStorage.getItem("clerk-session");
+        typeof window !== 'undefined' &&
+        window.localStorage.getItem('clerk-session');
       if (raw) {
         const parsed = JSON.parse(raw as string);
-        const role = (parsed?.user?.role as string) || "user";
-        return role === "admin" ? "admin" : "user";
+        const role = (parsed?.user?.role as string) || 'user';
+        return role === 'admin' ? 'admin' : 'user';
       }
     } catch {
       // Ignore parsing errors, return default
     }
-    return "user";
+    return 'user';
   }); // Read role from localStorage and react to changes
   useEffect(() => {
     const readRole = () => {
       try {
         const raw =
-          typeof window !== "undefined" &&
-          window.localStorage.getItem("clerk-session");
+          typeof window !== 'undefined' &&
+          window.localStorage.getItem('clerk-session');
         if (raw) {
           const parsed = JSON.parse(raw as string);
-          const role = (parsed?.user?.role as string) || "user";
-          setUserRole(role === "admin" ? "admin" : "user");
+          const role = (parsed?.user?.role as string) || 'user';
+          setUserRole(role === 'admin' ? 'admin' : 'user');
           return;
         }
       } catch {
         // Ignore parsing errors
       }
-      setUserRole("user");
+      setUserRole('user');
     };
     // Initial read before first paint
     // (in SSR window is undefined; in this effect we are on the client)
     readRole();
     const onStorage = (e: StorageEvent) => {
-      if (e.key === "clerk-session") {
+      if (e.key === 'clerk-session') {
         readRole();
       }
     };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   // Safety: set role before first paint if data is present
   useLayoutEffect(() => {
     try {
-      const raw = window.localStorage.getItem("clerk-session");
+      const raw = window.localStorage.getItem('clerk-session');
       if (raw) {
         const parsed = JSON.parse(raw as string);
-        const role = (parsed?.user?.role as string) || "user";
-        setUserRole(role === "admin" ? "admin" : "user");
+        const role = (parsed?.user?.role as string) || 'user';
+        setUserRole(role === 'admin' ? 'admin' : 'user');
       }
     } catch {
       // Ignore parsing errors
@@ -166,37 +166,37 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
   const handleSignOut = useCallback(() => {
     try {
       // Clear local mock session
-      window.localStorage.removeItem("clerk-session");
+      window.localStorage.removeItem('clerk-session');
       // Clear other storage
       localStorage.clear();
       sessionStorage.clear();
       // Basic cookie clear
-      const cookies = document.cookie.split(";");
-      cookies.forEach((c) => {
-        const cookieName = c.replace(/^ +/, "").replace(/=.*/, "");
+      const cookies = document.cookie.split(';');
+      cookies.forEach(c => {
+        const cookieName = c.replace(/^ +/, '').replace(/=.*/, '');
         document.cookie = `${cookieName}=;expires=${new Date().toUTCString()};path=/`;
       });
     } catch {
       // Ignore cookie clearing errors
     }
-    router.push("/");
+    router.push('/');
   }, [router]);
   return (
     <Box
-      data-testid="dashboard-layout"
-      sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      data-testid='dashboard-layout'
+      sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
     >
-      <AppBar position="fixed" elevation={1} sx={{ zIndex: 1100 }}>
+      <AppBar position='fixed' elevation={1} sx={{ zIndex: 1100 }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
             Hemera Academy
           </Typography>
-          <span style={{ display: "none" }} data-testid="user-role">
+          <span style={{ display: 'none' }} data-testid='user-role'>
             {userRole}
           </span>
           <Button
-            color="inherit"
-            data-testid="sign-out-button"
+            color='inherit'
+            data-testid='sign-out-button'
             onClick={handleSignOut}
           >
             Sign out
@@ -206,62 +206,62 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
 
       {/* Simple E2E navigation matching protected layout */}
       <Box
-        data-testid="protected-navigation"
+        data-testid='protected-navigation'
         sx={{
-          position: "fixed",
+          position: 'fixed',
           top: 64,
           left: 0,
           right: 0,
           zIndex: 1100,
           borderBottom: 1,
-          borderColor: "divider",
-          bgcolor: "background.paper",
-          display: "flex",
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
           gap: 2,
           px: 2,
           py: 1,
         }}
       >
-        <a href="/dashboard" data-testid="nav-dashboard">
+        <a href='/dashboard' data-testid='nav-dashboard'>
           Dashboard
         </a>
-        <a href="/courses" data-testid="nav-courses">
+        <a href='/courses' data-testid='nav-courses'>
           Courses
         </a>
-        {userRole === "admin" && (
-          <a href="/admin" data-testid="nav-admin">
+        {userRole === 'admin' && (
+          <a href='/admin' data-testid='nav-admin'>
             Admin
           </a>
         )}
       </Box>
 
       <Container
-        component="main"
-        maxWidth="lg"
+        component='main'
+        maxWidth='lg'
         sx={{
           flexGrow: 1,
           py: 3,
-          display: "flex",
-          flexDirection: "column",
-          marginTop: { xs: "112px", sm: "120px" },
+          display: 'flex',
+          flexDirection: 'column',
+          marginTop: { xs: '112px', sm: '120px' },
         }}
       >
         {children}
       </Container>
 
       <Box
-        component="footer"
+        component='footer'
         sx={{
-          mt: "auto",
+          mt: 'auto',
           py: 2,
           px: 3,
-          backgroundColor: "background.paper",
+          backgroundColor: 'background.paper',
           borderTop: 1,
-          borderColor: "divider",
+          borderColor: 'divider',
         }}
       >
-        <Container maxWidth="lg">
-          <Typography variant="body2" color="text.secondary" align="center">
+        <Container maxWidth='lg'>
+          <Typography variant='body2' color='text.secondary' align='center'>
             © 2024 Hemera Academy. All rights reserved.
           </Typography>
         </Container>
@@ -281,10 +281,10 @@ export default function DashboardLayout({
   let isE2E = false;
   try {
     // Public env flag available on client
-    if (process.env.NEXT_PUBLIC_DISABLE_CLERK === "1") {
+    if (process.env.NEXT_PUBLIC_DISABLE_CLERK === '1') {
       isE2E = true;
-    } else if (typeof window !== "undefined") {
-      const raw = window.localStorage?.getItem("clerk-session");
+    } else if (typeof window !== 'undefined') {
+      const raw = window.localStorage?.getItem('clerk-session');
       if (raw) isE2E = true;
     }
   } catch {

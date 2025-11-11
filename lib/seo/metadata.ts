@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 import {
   getFullUrl,
   IMAGE_CONFIG,
   SITE_CONFIG,
   SOCIAL_CONFIG,
-} from "@/lib/seo/constants";
+} from '@/lib/seo/constants';
 
 /**
  * SEO metadata utilities for public pages
@@ -34,24 +34,24 @@ export interface SEOMetadata {
  * Generate Next.js Metadata for landing page
  */
 export function generateLandingPageMetadata(): Metadata {
-  const title = "Transform Your Career";
+  const title = 'Transform Your Career';
   const description =
-    "Transform your career with expert-led courses in technology, business, and creative skills. Join thousands advancing their careers.";
+    'Transform your career with expert-led courses in technology, business, and creative skills. Join thousands advancing their careers.';
 
   return {
     title,
     description,
     keywords: [
-      "online courses",
-      "career development",
-      "technology training",
-      "professional development",
-      "skill building",
-      "expert instruction",
+      'online courses',
+      'career development',
+      'technology training',
+      'professional development',
+      'skill building',
+      'expert instruction',
     ],
-    authors: [{ name: "Hemera Academy" }],
-    creator: "Hemera Academy",
-    publisher: "Hemera Academy",
+    authors: [{ name: 'Hemera Academy' }],
+    creator: 'Hemera Academy',
+    publisher: 'Hemera Academy',
     formatDetection: {
       email: false,
       address: false,
@@ -59,12 +59,12 @@ export function generateLandingPageMetadata(): Metadata {
     },
     metadataBase: new URL(SITE_CONFIG.url),
     alternates: {
-      canonical: "https://hemera.academy/",
+      canonical: 'https://hemera.academy/',
     },
     openGraph: {
-      type: "website",
-      locale: "en_US",
-      url: "/",
+      type: 'website',
+      locale: 'en_US',
+      url: '/',
       title,
       description,
       siteName: SITE_CONFIG.name,
@@ -78,7 +78,7 @@ export function generateLandingPageMetadata(): Metadata {
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description,
       site: SOCIAL_CONFIG.twitter.site,
@@ -91,9 +91,9 @@ export function generateLandingPageMetadata(): Metadata {
       googleBot: {
         index: true,
         follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
       },
     },
   };
@@ -103,31 +103,31 @@ export function generateLandingPageMetadata(): Metadata {
  * Generate Next.js Metadata for course list page
  */
 export function generateCourseListMetadata(): Metadata {
-  const title = "Courses";
+  const title = 'Courses';
   const description =
-    "Explore our complete catalog of expert-led courses. Find the perfect course to advance your career in technology, business, and creative skills.";
+    'Explore our complete catalog of expert-led courses. Find the perfect course to advance your career in technology, business, and creative skills.';
 
   return {
     title,
     description,
     keywords: [
-      "course catalog",
-      "online learning",
-      "professional courses",
-      "skill development",
-      "career advancement",
+      'course catalog',
+      'online learning',
+      'professional courses',
+      'skill development',
+      'career advancement',
     ],
-    authors: [{ name: "Hemera Academy" }],
-    creator: "Hemera Academy",
-    publisher: "Hemera Academy",
+    authors: [{ name: 'Hemera Academy' }],
+    creator: 'Hemera Academy',
+    publisher: 'Hemera Academy',
     metadataBase: new URL(SITE_CONFIG.url),
     alternates: {
-      canonical: "https://hemera.academy/courses",
+      canonical: 'https://hemera.academy/courses',
     },
     openGraph: {
-      type: "website",
-      locale: "en_US",
-      url: "/courses",
+      type: 'website',
+      locale: 'en_US',
+      url: '/courses',
       title,
       description,
       siteName: SITE_CONFIG.name,
@@ -141,7 +141,7 @@ export function generateCourseListMetadata(): Metadata {
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description,
       site: SOCIAL_CONFIG.twitter.site,
@@ -154,9 +154,9 @@ export function generateCourseListMetadata(): Metadata {
       googleBot: {
         index: true,
         follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
       },
     },
   };
@@ -181,16 +181,16 @@ export function generateSEOMetadata(config: SEOMetadata): Metadata {
         }
       : undefined,
     openGraph: {
-      type: "website",
-      locale: "en_US",
-      url: config.canonicalUrl || "/",
+      type: 'website',
+      locale: 'en_US',
+      url: config.canonicalUrl || '/',
       title: fullTitle,
       description: config.description,
       siteName: SITE_CONFIG.name,
       images: [
         {
           url: config.ogImage
-            ? config.ogImage.startsWith("http")
+            ? config.ogImage.startsWith('http')
               ? config.ogImage
               : getFullUrl(config.ogImage)
             : getFullUrl(IMAGE_CONFIG.og.default),
@@ -201,14 +201,14 @@ export function generateSEOMetadata(config: SEOMetadata): Metadata {
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title: fullTitle,
       description: config.description,
       site: SOCIAL_CONFIG.twitter.site,
       creator: SOCIAL_CONFIG.twitter.creator,
       images: [
         config.ogImage
-          ? config.ogImage.startsWith("http")
+          ? config.ogImage.startsWith('http')
             ? config.ogImage
             : getFullUrl(config.ogImage)
           : getFullUrl(IMAGE_CONFIG.og.default),
@@ -225,9 +225,9 @@ export function generateSEOMetadata(config: SEOMetadata): Metadata {
           googleBot: {
             index: true,
             follow: true,
-            "max-video-preview": -1,
-            "max-image-preview": "large",
-            "max-snippet": -1,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
           },
         },
   };
@@ -238,14 +238,14 @@ export function generateSEOMetadata(config: SEOMetadata): Metadata {
  */
 export function truncateDescription(
   text: string,
-  maxLength: number = 160,
+  maxLength: number = 160
 ): string {
   if (text.length <= maxLength) {
     return text;
   }
 
   const truncated = text.substring(0, maxLength - 3);
-  const lastSpace = truncated.lastIndexOf(" ");
+  const lastSpace = truncated.lastIndexOf(' ');
 
   return lastSpace > 0
     ? `${truncated.substring(0, lastSpace)}...`
@@ -256,13 +256,13 @@ export function truncateDescription(
  * Generate breadcrumb schema for SEO
  */
 export function generateBreadcrumbSchema(
-  items: Array<{ name: string; url: string }>,
+  items: Array<{ name: string; url: string }>
 ) {
   return {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
     itemListElement: items.map((item, index) => ({
-      "@type": "ListItem",
+      '@type': 'ListItem',
       position: index + 1,
       name: item.name,
       item: `${SITE_CONFIG.url}${item.url}`,

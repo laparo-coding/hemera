@@ -1,8 +1,8 @@
-import type { Page, Response } from "@playwright/test";
+import type { Page, Response } from '@playwright/test';
 
 type GotoStableOptions = {
   waitForTestId?: string;
-  waitUntil?: "domcontentloaded" | "load" | "networkidle" | "commit";
+  waitUntil?: 'domcontentloaded' | 'load' | 'networkidle' | 'commit';
   timeout?: number;
 };
 
@@ -13,16 +13,16 @@ type GotoStableOptions = {
 export async function gotoStable(
   page: Page,
   path: string,
-  opts: GotoStableOptions = {},
+  opts: GotoStableOptions = {}
 ): Promise<Response | null> {
-  const { waitForTestId, waitUntil = "domcontentloaded", timeout } = opts;
+  const { waitForTestId, waitUntil = 'domcontentloaded', timeout } = opts;
   const response = await page.goto(path, { waitUntil, timeout });
 
   if (waitForTestId) {
     await page
       .getByTestId(waitForTestId)
       .first()
-      .waitFor({ state: "visible", timeout: 30_000 });
+      .waitFor({ state: 'visible', timeout: 30_000 });
   }
   return response;
 }
@@ -33,12 +33,12 @@ export async function gotoStable(
  */
 export async function clickAndWait(
   page: Page,
-  clickSelector: () => ReturnType<Page["locator"]>,
+  clickSelector: () => ReturnType<Page['locator']>,
   options: {
     expectUrl?: RegExp | string;
     waitForTestId?: string;
     timeout?: number;
-  } = {},
+  } = {}
 ): Promise<void> {
   const { expectUrl, waitForTestId, timeout } = options;
 
@@ -53,6 +53,6 @@ export async function clickAndWait(
     await page
       .getByTestId(waitForTestId)
       .first()
-      .waitFor({ state: "visible", timeout: 30_000 });
+      .waitFor({ state: 'visible', timeout: 30_000 });
   }
 }
