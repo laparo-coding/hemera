@@ -57,6 +57,8 @@ export default tseslint.config(
       '@typescript-eslint/triple-slash-reference': 'warn',
       'no-undef': 'warn',
       quotes: ['warn', 'single', { avoidEscape: true }],
+      // Prefer single quotes in JSX attributes as well
+      'jsx-quotes': ['warn', 'prefer-single'],
     },
   },
 
