@@ -1,14 +1,14 @@
-import { notFound } from "next/navigation";
-import CourseDetail from "@/components/CourseDetail";
-import { getCourseById, getCourseBySlug } from "@/lib/api/courses";
-import { CourseNotFoundError, CourseNotPublishedError } from "@/lib/errors";
-import { SITE_CONFIG } from "@/lib/seo/constants";
+import { notFound } from 'next/navigation';
+import CourseDetail from '@/components/CourseDetail';
+import { getCourseById, getCourseBySlug } from '@/lib/api/courses';
+import { CourseNotFoundError, CourseNotPublishedError } from '@/lib/errors';
+import { SITE_CONFIG } from '@/lib/seo/constants';
 import {
   generateBreadcrumbSchema as genBreadcrumb,
   generateOrganizationSchema as genOrgSchema,
   generateWebPageSchema as genWebPageSchema,
-} from "@/lib/seo/schemas";
-import { generateMetadata as genMetadata } from "./layout";
+} from '@/lib/seo/schemas';
+import { generateMetadata as genMetadata } from './layout';
 
 export { genMetadata as generateMetadata };
 
@@ -63,18 +63,18 @@ export default async function CourseDetailPage({ params }: PageProps) {
       : (course.availableSpots ?? 0) > 0;
 
   const offer = {
-    "@type": "Offer",
+    '@type': 'Offer',
     price:
       (course.price ?? 0) > 0
         ? String(((course.price ?? 0) / 100).toFixed(2))
-        : "0",
-    priceCurrency: "EUR",
-    availability: `https://schema.org/${inStock ? "InStock" : "OutOfStock"}`,
+        : '0',
+    priceCurrency: 'EUR',
+    availability: `https://schema.org/${inStock ? 'InStock' : 'OutOfStock'}`,
     url,
     ...(course.availableSpots !== null && course.availableSpots !== undefined
       ? {
           inventoryLevel: {
-            "@type": "QuantitativeValue",
+            '@type': 'QuantitativeValue',
             value: course.availableSpots,
           },
         }
@@ -82,30 +82,30 @@ export default async function CourseDetailPage({ params }: PageProps) {
   } as const;
 
   const courseSchema = {
-    "@context": "https://schema.org",
-    "@type": "Course",
+    '@context': 'https://schema.org',
+    '@type': 'Course',
     name: course.title,
     description:
       course.description ||
-      "Kursdetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.",
+      'Kursdetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.',
     provider: {
-      "@type": "EducationalOrganization",
-      name: "Hemera Academy",
+      '@type': 'EducationalOrganization',
+      name: 'Hemera Academy',
       url: SITE_CONFIG.url,
     },
     hasCourseInstance: {
-      "@type": "CourseInstance",
-      courseMode: "online",
+      '@type': 'CourseInstance',
+      courseMode: 'online',
       ...(startDateISO ? { startDate: startDateISO } : {}),
       ...(endDateISO ? { endDate: endDateISO } : {}),
       location: {
-        "@type": "VirtualLocation",
+        '@type': 'VirtualLocation',
         url,
       },
     },
     offers: offer,
     url,
-    inLanguage: "de-DE",
+    inLanguage: 'de-DE',
   } as const;
 
   const schemas = [
@@ -114,13 +114,13 @@ export default async function CourseDetailPage({ params }: PageProps) {
       title: course.title,
       description:
         course.description ||
-        "Kursdetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.",
+        'Kursdetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.',
       url,
-      type: "Course",
+      type: 'Course',
     }),
     genBreadcrumb([
-      { name: "Start", url: SITE_CONFIG.url },
-      { name: "Kurse", url: `${SITE_CONFIG.url}/courses` },
+      { name: 'Start', url: SITE_CONFIG.url },
+      { name: 'Kurse', url: `${SITE_CONFIG.url}/courses` },
       { name: course.title, url },
     ]),
     courseSchema,
@@ -131,7 +131,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
       {schemas.map((schema, index) => (
         <script
           key={`jsonld-${index}`}
-          type="application/ld+json"
+          type='application/ld+json'
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       ))}

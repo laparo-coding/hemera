@@ -3,27 +3,27 @@
  * Automatische Benachrichtigungen bei kritischen Deployment-Problemen
  */
 
-import { analytics } from "@/lib/analytics/request-analytics";
-import { serverInstance } from "@/lib/monitoring/rollbar-official";
+import { analytics } from '@/lib/analytics/request-analytics';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 export interface AlertRule {
   id: string;
   name: string;
   condition: AlertCondition;
-  severity: "critical" | "warning" | "info";
+  severity: 'critical' | 'warning' | 'info';
   channels: NotificationChannel[];
   enabled: boolean;
 }
 
 export interface AlertCondition {
   metric: string;
-  operator: "gt" | "lt" | "eq" | "ne" | "gte" | "lte";
+  operator: 'gt' | 'lt' | 'eq' | 'ne' | 'gte' | 'lte';
   threshold: number;
   timeWindow: number; // in seconds
 }
 
 export interface NotificationChannel {
-  type: "rollbar" | "webhook" | "email";
+  type: 'rollbar' | 'webhook' | 'email';
   config: Record<string, unknown>;
 }
 
@@ -59,73 +59,73 @@ export class DeploymentAlertSystem {
   private initializeDefaultRules(): void {
     const defaultRules: AlertRule[] = [
       {
-        id: "database_connection_failure",
-        name: "Database Connection Failure",
+        id: 'database_connection_failure',
+        name: 'Database Connection Failure',
         condition: {
-          metric: "database_health",
-          operator: "eq",
+          metric: 'database_health',
+          operator: 'eq',
           threshold: 0, // 0 = failed
           timeWindow: 60,
         },
-        severity: "critical",
-        channels: [{ type: "rollbar", config: { level: "critical" } }],
+        severity: 'critical',
+        channels: [{ type: 'rollbar', config: { level: 'critical' } }],
         enabled: true,
       },
       {
-        id: "authentication_service_down",
-        name: "Authentication Service Down",
+        id: 'authentication_service_down',
+        name: 'Authentication Service Down',
         condition: {
-          metric: "auth_health",
-          operator: "eq",
+          metric: 'auth_health',
+          operator: 'eq',
           threshold: 0,
           timeWindow: 60,
         },
-        severity: "critical",
-        channels: [{ type: "rollbar", config: { level: "critical" } }],
+        severity: 'critical',
+        channels: [{ type: 'rollbar', config: { level: 'critical' } }],
         enabled: true,
       },
       {
-        id: "payment_service_degraded",
-        name: "Payment Service Degraded",
+        id: 'payment_service_degraded',
+        name: 'Payment Service Degraded',
         condition: {
-          metric: "stripe_health",
-          operator: "eq",
+          metric: 'stripe_health',
+          operator: 'eq',
           threshold: 0,
           timeWindow: 300,
         },
-        severity: "warning",
-        channels: [{ type: "rollbar", config: { level: "warning" } }],
+        severity: 'warning',
+        channels: [{ type: 'rollbar', config: { level: 'warning' } }],
         enabled: true,
       },
       {
-        id: "high_response_time",
-        name: "High Average Response Time",
+        id: 'high_response_time',
+        name: 'High Average Response Time',
         condition: {
-          metric: "avg_response_time",
-          operator: "gt",
+          metric: 'avg_response_time',
+          operator: 'gt',
           threshold: 2000, // 2 seconds
           timeWindow: 300,
         },
-        severity: "warning",
-        channels: [{ type: "rollbar", config: { level: "warning" } }],
+        severity: 'warning',
+        channels: [{ type: 'rollbar', config: { level: 'warning' } }],
         enabled: true,
       },
       {
-        id: "error_rate_spike",
-        name: "Error Rate Spike",
+        id: 'error_rate_spike',
+        name: 'Error Rate Spike',
         condition: {
-          metric: "error_rate",
-          operator: "gt",
+          metric: 'error_rate',
+          operator: 'gt',
           threshold: 5, // 5%
           timeWindow: 300,
         },
-        severity: "critical",
-        channels: [{ type: "rollbar", config: { level: "critical" } }],
+        severity: 'critical',
+        channels: [{ type: 'rollbar', config: { level: 'critical' } }],
         enabled: true,
       },
     ];
 
-    defaultRules.forEach((rule) => {
+    defaultRules.forEach(rule => {
       this.alertRules.set(rule.id, rule);
     });
   }
@@ -161,17 +161,17 @@ export class DeploymentAlertSystem {
     // Service Health zu numerischen Werten konvertieren
     if (
       healthData &&
-      typeof healthData === "object" &&
-      "services" in healthData
+      typeof healthData === 'object' &&
+      'services' in healthData
     ) {
       const services = (healthData as { services?: unknown }).services;
-      if (services && typeof services === "object") {
+      if (services && typeof services === 'object') {
         Object.entries(services).forEach(([service, check]) => {
-          if (check && typeof check === "object") {
+          if (check && typeof check === 'object') {
             const status = (check as { status?: string }).status;
             const responseTime = (check as { responseTime?: number })
               .responseTime;
-            metrics[`${service}_health`] = status === "pass" ? 1 : 0;
+            metrics[`${service}_health`] = status === 'pass' ? 1 : 0;
             metrics[`${service}_response_time`] = responseTime || 0;
           }
         });
@@ -180,8 +180,8 @@ export class DeploymentAlertSystem {
 
     // Durchschnittliche Response Time
     const responseTimes = Object.keys(metrics)
-      .filter((key) => key.endsWith("_response_time"))
-      .map((key) => metrics[key]);
+      .filter(key => key.endsWith('_response_time'))
+      .map(key => metrics[key]);
 
     if (responseTimes.length > 0) {
       metrics.avg_response_time =
@@ -190,10 +190,10 @@ export class DeploymentAlertSystem {
 
     // Error Rate (vereinfacht)
     const failedServices = Object.keys(metrics).filter(
-      (key) => key.endsWith("_health") && metrics[key] === 0,
+      key => key.endsWith('_health') && metrics[key] === 0
     ).length;
-    const totalServices = Object.keys(metrics).filter((key) =>
-      key.endsWith("_health"),
+    const totalServices = Object.keys(metrics).filter(key =>
+      key.endsWith('_health')
     ).length;
 
     if (totalServices > 0) {
@@ -208,23 +208,23 @@ export class DeploymentAlertSystem {
    */
   private evaluateCondition(
     condition: AlertCondition,
-    metrics: Record<string, number>,
+    metrics: Record<string, number>
   ): boolean {
     const value = metrics[condition.metric];
     if (value === undefined) return false;
 
     switch (condition.operator) {
-      case "gt":
+      case 'gt':
         return value > condition.threshold;
-      case "lt":
+      case 'lt':
         return value < condition.threshold;
-      case "eq":
+      case 'eq':
         return value === condition.threshold;
-      case "ne":
+      case 'ne':
         return value !== condition.threshold;
-      case "gte":
+      case 'gte':
         return value >= condition.threshold;
-      case "lte":
+      case 'lte':
         return value <= condition.threshold;
       default:
         return false;
@@ -236,7 +236,7 @@ export class DeploymentAlertSystem {
    */
   private async triggerAlert(
     rule: AlertRule,
-    metrics: Record<string, number>,
+    metrics: Record<string, number>
   ): Promise<void> {
     const alertId = `${rule.id}_${Date.now()}`;
     const alert: DeploymentAlert = {
@@ -263,7 +263,7 @@ export class DeploymentAlertSystem {
     }
 
     // Analytics tracken
-    analytics.trackEvent(alertId, "deployment_alert_triggered", {
+    analytics.trackEvent(alertId, 'deployment_alert_triggered', {
       ruleId: rule.id,
       severity: rule.severity,
       metric: rule.condition.metric,
@@ -283,7 +283,7 @@ export class DeploymentAlertSystem {
     this.activeAlerts.delete(ruleId);
 
     // Auflösung an Rollbar melden
-    serverInstance.info("Deployment Alert Resolved", {
+    serverInstance.info('Deployment Alert Resolved', {
       alertId: alert.id,
       ruleId: alert.ruleId,
       resolvedAt: new Date().toISOString(),
@@ -291,7 +291,7 @@ export class DeploymentAlertSystem {
     });
 
     // Analytics tracken
-    analytics.trackEvent(`${alert.id}_resolved`, "deployment_alert_resolved", {
+    analytics.trackEvent(`${alert.id}_resolved`, 'deployment_alert_resolved', {
       ruleId: alert.ruleId,
       severity: alert.severity,
       duration: Date.now() - new Date(alert.timestamp).getTime(),
@@ -303,36 +303,36 @@ export class DeploymentAlertSystem {
    */
   private async sendNotification(
     channel: NotificationChannel,
-    alert: DeploymentAlert,
+    alert: DeploymentAlert
   ): Promise<void> {
     switch (channel.type) {
-      case "rollbar": {
-        const level = channel.config.level || "error";
+      case 'rollbar': {
+        const level = channel.config.level || 'error';
 
-        if (level === "critical") {
+        if (level === 'critical') {
           serverInstance.critical(
             alert.message,
-            alert.details as Record<string, unknown>,
+            alert.details as Record<string, unknown>
           );
-        } else if (level === "warning") {
+        } else if (level === 'warning') {
           serverInstance.warning(
             alert.message,
-            alert.details as Record<string, unknown>,
+            alert.details as Record<string, unknown>
           );
         } else {
           serverInstance.error(
             alert.message,
-            alert.details as Record<string, unknown>,
+            alert.details as Record<string, unknown>
           );
         }
         break;
       }
 
-      case "webhook":
+      case 'webhook':
         // Webhook-Implementation hier
         break;
 
-      case "email":
+      case 'email':
         // E-Mail-Implementation hier
         break;
     }

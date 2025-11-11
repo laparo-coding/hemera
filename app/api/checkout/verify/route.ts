@@ -1,16 +1,16 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { PaymentStatus, Prisma } from "@prisma/client";
-import { type NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-import { prisma } from "@/lib/db/prisma";
-import { STRIPE_API_VERSION } from "@/lib/stripe/config";
+import { currentUser } from '@clerk/nextjs/server';
+import { PaymentStatus, Prisma } from '@prisma/client';
+import { type NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { prisma } from '@/lib/db/prisma';
+import { STRIPE_API_VERSION } from '@/lib/stripe/config';
 
 // Force dynamic rendering
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 // Skip Stripe initialization during build process
 const isBuildTime =
-  process.env.NODE_ENV === "production" && !process.env.STRIPE_SECRET_KEY;
+  process.env.NODE_ENV === 'production' && !process.env.STRIPE_SECRET_KEY;
 
 // Create stripe instance only at runtime
 const createStripeInstance = () => {
@@ -22,7 +22,7 @@ const createStripeInstance = () => {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) {
     throw new Error(
-      "STRIPE_SECRET_KEY is not configured for checkout verification",
+      'STRIPE_SECRET_KEY is not configured for checkout verification'
     );
   }
 
@@ -39,35 +39,35 @@ export async function GET(request: NextRequest) {
         {
           success: false,
           error:
-            "Verification service temporarily unavailable during deployment",
+            'Verification service temporarily unavailable during deployment',
         },
-        { status: 503 },
+        { status: 503 }
       );
     }
 
     const stripe = createStripeInstance();
     if (!stripe) {
       return NextResponse.json(
-        { success: false, error: "Payment verification service unavailable" },
-        { status: 503 },
+        { success: false, error: 'Payment verification service unavailable' },
+        { status: 503 }
       );
     }
 
     const user = await currentUser();
     if (!user?.id) {
       return NextResponse.json(
-        { success: false, error: "Authentication required" },
-        { status: 401 },
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
       );
     }
 
     const { searchParams } = new URL(request.url);
-    const sessionId = searchParams.get("session_id");
+    const sessionId = searchParams.get('session_id');
 
     if (!sessionId) {
       return NextResponse.json(
-        { success: false, error: "Session ID is required" },
-        { status: 400 },
+        { success: false, error: 'Session ID is required' },
+        { status: 400 }
       );
     }
 
@@ -89,15 +89,15 @@ export async function GET(request: NextRequest) {
 
     if (booking && booking.userId !== user.id) {
       return NextResponse.json(
-        { success: false, error: "This payment is linked to another account" },
-        { status: 403 },
+        { success: false, error: 'This payment is linked to another account' },
+        { status: 403 }
       );
     }
 
     let session: Stripe.Checkout.Session | null = null;
     try {
       session = await stripe.checkout.sessions.retrieve(sessionId, {
-        expand: ["payment_intent"],
+        expand: ['payment_intent'],
       });
     } catch (stripeError) {
       // If Stripe no longer has the session but we already recorded a paid booking, trust our DB
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
         booking &&
         booking.paymentStatus === PaymentStatus.PAID &&
         stripeError instanceof Stripe.errors.StripeError &&
-        stripeError.code === "resource_missing"
+        stripeError.code === 'resource_missing'
       ) {
         return NextResponse.json({
           success: true,
@@ -125,8 +125,8 @@ export async function GET(request: NextRequest) {
 
     if (!session) {
       return NextResponse.json(
-        { success: false, error: "Invalid session" },
-        { status: 404 },
+        { success: false, error: 'Invalid session' },
+        { status: 404 }
       );
     }
 
@@ -152,15 +152,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if payment was successful
-    if (session.payment_status !== "paid") {
+    if (session.payment_status !== 'paid') {
       return NextResponse.json(
-        { success: false, error: "Payment not completed" },
-        { status: 400 },
+        { success: false, error: 'Payment not completed' },
+        { status: 400 }
       );
     }
 
     const paymentIntentId =
-      typeof session.payment_intent === "string"
+      typeof session.payment_intent === 'string'
         ? session.payment_intent
         : (session.payment_intent?.id ?? null);
 
@@ -172,9 +172,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Unable to determine course for this payment",
+          error: 'Unable to determine course for this payment',
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -182,9 +182,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Payment metadata does not match the current user",
+          error: 'Payment metadata does not match the current user',
         },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -232,8 +232,8 @@ export async function GET(request: NextRequest) {
 
     if (!booking && !course) {
       return NextResponse.json(
-        { success: false, error: "Course not found" },
-        { status: 404 },
+        { success: false, error: 'Course not found' },
+        { status: 404 }
       );
     }
 
@@ -243,7 +243,7 @@ export async function GET(request: NextRequest) {
       session.currency?.toUpperCase() ??
       booking?.currency ??
       course?.currency ??
-      "USD";
+      'USD';
 
     const bookingUpdateData = {
       paymentStatus: PaymentStatus.PAID,
@@ -296,7 +296,7 @@ export async function GET(request: NextRequest) {
     } catch (bookingError: unknown) {
       if (
         bookingError instanceof Prisma.PrismaClientKnownRequestError &&
-        bookingError.code === "P2002"
+        bookingError.code === 'P2002'
       ) {
         const existingBooking = await prisma.booking.findUnique({
           where: {
@@ -339,7 +339,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!booking) {
-      throw new Error("Failed to finalize booking after payment.");
+      throw new Error('Failed to finalize booking after payment.');
     }
 
     return NextResponse.json({
@@ -357,15 +357,15 @@ export async function GET(request: NextRequest) {
     if (error instanceof Stripe.errors.StripeError) {
       return NextResponse.json(
         { success: false, error: error.message, code: error.code },
-        { status: error.statusCode ?? 502 },
+        { status: error.statusCode ?? 502 }
       );
     }
 
     const message =
-      error instanceof Error ? error.message : "Failed to verify payment";
+      error instanceof Error ? error.message : 'Failed to verify payment';
     return NextResponse.json(
       { success: false, error: message },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

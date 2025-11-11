@@ -1,10 +1,10 @@
-import { headers } from "next/headers";
-import { type NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
+import { headers } from 'next/headers';
+import { type NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
 
 // Skip Stripe initialization during build process
 const isBuildTime =
-  process.env.NODE_ENV === "production" && !process.env.STRIPE_SECRET_KEY;
+  process.env.NODE_ENV === 'production' && !process.env.STRIPE_SECRET_KEY;
 
 // Create stripe instance only at runtime
 const createStripeInstance = () => {
@@ -16,24 +16,24 @@ const createStripeInstance = () => {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) {
     throw new Error(
-      "STRIPE_SECRET_KEY is not configured for webhook processing",
+      'STRIPE_SECRET_KEY is not configured for webhook processing'
     );
   }
 
   // Safety check for localhost development
-  const isLocalhost = process.env.NEXT_PUBLIC_APP_URL?.includes("localhost");
-  if (isLocalhost && !stripeKey.startsWith("sk_test_")) {
+  const isLocalhost = process.env.NEXT_PUBLIC_APP_URL?.includes('localhost');
+  if (isLocalhost && !stripeKey.startsWith('sk_test_')) {
     // WARNING: Using live Stripe key on localhost! This should be a test key.
   }
 
   return new Stripe(stripeKey, {
-    apiVersion: "2025-10-29.clover",
+    apiVersion: '2025-10-29.clover',
   });
 };
 
 const getEndpointSecret = () => {
-  if (isBuildTime) return "";
-  return process.env.STRIPE_WEBHOOK_SECRET || "";
+  if (isBuildTime) return '';
+  return process.env.STRIPE_WEBHOOK_SECRET || '';
 };
 
 /**
@@ -47,9 +47,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Webhook service temporarily unavailable during deployment",
+          error: 'Webhook service temporarily unavailable during deployment',
         },
-        { status: 503 },
+        { status: 503 }
       );
     }
 
@@ -58,24 +58,24 @@ export async function POST(request: NextRequest) {
 
     if (!stripe) {
       return NextResponse.json(
-        { success: false, error: "Stripe service unavailable" },
-        { status: 503 },
+        { success: false, error: 'Stripe service unavailable' },
+        { status: 503 }
       );
     }
 
     if (!endpointSecret) {
       return NextResponse.json(
-        { success: false, error: "Webhook secret not configured" },
-        { status: 500 },
+        { success: false, error: 'Webhook secret not configured' },
+        { status: 500 }
       );
     }
 
     const body = await request.text();
-    const signature = (await headers()).get("stripe-signature");
+    const signature = (await headers()).get('stripe-signature');
 
     if (!signature) {
       // Missing Stripe signature
-      return NextResponse.json({ error: "Missing signature" }, { status: 400 });
+      return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
     }
 
     let event: Stripe.Event;
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
     } catch (_err) {
       // Webhook signature verification failed
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
     // Processing Stripe webhook event: ${event.type}
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     const result = { success: true, processed: false };
 
     switch (event.type) {
-      case "checkout.session.completed": {
+      case 'checkout.session.completed': {
         const _session = event.data.object as Stripe.Checkout.Session;
         // Checkout session completed: ${session.id}
 
@@ -103,14 +103,14 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      case "payment_intent.succeeded": {
+      case 'payment_intent.succeeded': {
         const _paymentIntent = event.data.object as Stripe.PaymentIntent;
         // Payment intent succeeded: ${paymentIntent.id}
         result.processed = true;
         break;
       }
 
-      case "payment_intent.payment_failed": {
+      case 'payment_intent.payment_failed': {
         const _failedPaymentIntent = event.data.object as Stripe.PaymentIntent;
         // Payment intent failed: ${failedPaymentIntent.id}
         result.processed = true;
@@ -128,18 +128,18 @@ export async function POST(request: NextRequest) {
     } else {
       // Webhook processing failed
       return NextResponse.json(
-        { error: "Webhook processing failed" },
-        { status: 400 },
+        { error: 'Webhook processing failed' },
+        { status: 400 }
       );
     }
   } catch (error) {
     // Stripe webhook error
     return NextResponse.json(
       {
-        error: "Webhook processing failed",
-        details: error instanceof Error ? error.message : "Unknown error",
+        error: 'Webhook processing failed',
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

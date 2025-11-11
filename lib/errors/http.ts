@@ -3,14 +3,14 @@
  * Converts domain errors to standardized HTTP responses
  */
 
-import { NextResponse } from "next/server";
-import { errorAnalytics } from "@/lib/services/error-analytics";
+import { NextResponse } from 'next/server';
+import { errorAnalytics } from '@/lib/services/error-analytics';
 import {
   getRequestContext,
   getRequestId,
   logErrorWithContext,
-} from "@/lib/utils/request-context";
-import { BaseError } from "./base";
+} from '@/lib/utils/request-context';
+import { BaseError } from './base';
 
 export interface ApiErrorResponse {
   error: {
@@ -29,7 +29,7 @@ export interface ApiErrorResponse {
  */
 export async function toHttpError(
   error: unknown,
-  requestId?: string,
+  requestId?: string
 ): Promise<NextResponse<ApiErrorResponse>> {
   const reqId = requestId || (await getRequestId());
   const requestContext = await getRequestContext();
@@ -62,45 +62,45 @@ export async function toHttpError(
           requestId: reqId,
         },
       },
-      { status: error.statusCode },
+      { status: error.statusCode }
     );
   }
 
   // Handle specific known errors
   if (error instanceof Error) {
     const statusCode = getStatusCodeForError(error);
-    await logErrorWithContext(error, { errorType: "standard", statusCode });
+    await logErrorWithContext(error, { errorType: 'standard', statusCode });
 
     return NextResponse.json(
       {
         error: {
           message: error.message,
-          code: "UNKNOWN_ERROR",
-          category: "infrastructure",
+          code: 'UNKNOWN_ERROR',
+          category: 'infrastructure',
           statusCode,
           timestamp: new Date().toISOString(),
           requestId: reqId,
         },
       },
-      { status: statusCode },
+      { status: statusCode }
     );
   }
 
   // Handle unknown errors
-  await logErrorWithContext(error, { errorType: "unknown" });
+  await logErrorWithContext(error, { errorType: 'unknown' });
 
   return NextResponse.json(
     {
       error: {
-        message: "An unexpected error occurred",
-        code: "INTERNAL_SERVER_ERROR",
-        category: "infrastructure",
+        message: 'An unexpected error occurred',
+        code: 'INTERNAL_SERVER_ERROR',
+        category: 'infrastructure',
         statusCode: 500,
         timestamp: new Date().toISOString(),
         requestId: reqId,
       },
     },
-    { status: 500 },
+    { status: 500 }
   );
 }
 
@@ -111,19 +111,19 @@ function getStatusCodeForError(error: Error): number {
   const errorName = error.constructor.name;
 
   switch (errorName) {
-    case "PrismaClientKnownRequestError":
+    case 'PrismaClientKnownRequestError':
       return 400;
-    case "PrismaClientUnknownRequestError":
+    case 'PrismaClientUnknownRequestError':
       return 500;
-    case "PrismaClientValidationError":
+    case 'PrismaClientValidationError':
       return 422;
-    case "NotFoundError":
+    case 'NotFoundError':
       return 404;
-    case "ValidationError":
+    case 'ValidationError':
       return 422;
-    case "UnauthorizedError":
+    case 'UnauthorizedError':
       return 401;
-    case "ForbiddenError":
+    case 'ForbiddenError':
       return 403;
     default:
       return 500;
@@ -141,7 +141,7 @@ export function logError(error: unknown, context?: Record<string, unknown>) {
  * Middleware helper for consistent error handling in API routes
  */
 export function withErrorHandling<T extends unknown[], R>(
-  handler: (...args: T) => Promise<R>,
+  handler: (...args: T) => Promise<R>
 ) {
   return async (...args: T): Promise<R | NextResponse<ApiErrorResponse>> => {
     try {

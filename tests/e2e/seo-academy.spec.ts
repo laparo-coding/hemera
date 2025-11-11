@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test";
-import { gotoStable } from "./helpers/nav";
+import { expect, test } from '@playwright/test';
+import { gotoStable } from './helpers/nav';
 
 const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
@@ -11,13 +11,13 @@ function decodeJsonLd(content: string): unknown {
   }
 }
 
-test.describe("Academy SEO & A11y", () => {
-  test("JSON-LD vorhanden und valide", async ({ page }) => {
-    await gotoStable(page, "/academy");
+test.describe('Academy SEO & A11y', () => {
+  test('JSON-LD vorhanden und valide', async ({ page }) => {
+    await gotoStable(page, '/academy');
 
     // Warte darauf, dass mindestens ein JSON-LD Script geladen ist
     await page.waitForSelector('script[type="application/ld+json"]', {
-      state: "attached",
+      state: 'attached',
       timeout: 10000,
     });
 
@@ -35,14 +35,14 @@ test.describe("Academy SEO & A11y", () => {
     }
 
     // Es sollten mindestens Organization + WebPage/Breadcrumb vorhanden sein
-    const types = jsons.map((j) =>
-      j && typeof j === "object" && "@type" in j
-        ? (j as Record<string, unknown>)["@type"]
-        : undefined,
+    const types = jsons.map(j =>
+      j && typeof j === 'object' && '@type' in j
+        ? (j as Record<string, unknown>)['@type']
+        : undefined
     );
-    expect(types).toContain("Organization");
+    expect(types).toContain('Organization');
     expect(
-      types.some((t) => t === "WebPage" || t === "BreadcrumbList"),
+      types.some(t => t === 'WebPage' || t === 'BreadcrumbList')
     ).toBeTruthy();
   });
 });

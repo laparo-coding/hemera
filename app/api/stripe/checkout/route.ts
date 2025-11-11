@@ -1,16 +1,16 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { type NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-import { serverInstance } from "@/lib/monitoring/rollbar-official";
-import { canUserBookCourse, createBooking } from "@/lib/services/booking";
-import { getCourseById } from "@/lib/services/course";
-import { createCheckoutSession } from "@/lib/services/stripe";
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { canUserBookCourse, createBooking } from '@/lib/services/booking';
+import { getCourseById } from '@/lib/services/course';
+import { createCheckoutSession } from '@/lib/services/stripe';
 
 /**
  * Request validation schema for Stripe checkout
  */
 const createCheckoutSchema = z.object({
-  courseId: z.string().min(1, "Course ID is required"),
+  courseId: z.string().min(1, 'Course ID is required'),
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
 });
@@ -68,26 +68,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Authentication required",
-          code: "UNAUTHORIZED",
+          error: 'Authentication required',
+          code: 'UNAUTHORIZED',
         },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
     // 2. Rate limiting check
     if (!checkRateLimit(userId)) {
-      serverInstance.warn("Rate limit exceeded for checkout", {
+      serverInstance.warn('Rate limit exceeded for checkout', {
         userId,
         requestId,
       });
       return NextResponse.json(
         {
           success: false,
-          error: "Too many requests. Please try again later.",
-          code: "RATE_LIMITED",
+          error: 'Too many requests. Please try again later.',
+          code: 'RATE_LIMITED',
         },
-        { status: 429 },
+        { status: 429 }
       );
     }
 
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     const clerk = await clerkClient();
     const user = await clerk.users.getUser(userId);
     const userEmail =
-      user.emailAddresses[0]?.emailAddress || "noreply@example.com";
+      user.emailAddresses[0]?.emailAddress || 'noreply@example.com';
 
     // Verify course exists and is available
     const course = await getCourseById(validatedData.courseId);
@@ -107,10 +107,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Course not found",
-          code: "COURSE_NOT_FOUND",
+          error: 'Course not found',
+          code: 'COURSE_NOT_FOUND',
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -118,10 +118,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Course is not available for booking",
-          code: "COURSE_NOT_PUBLISHED",
+          error: 'Course is not available for booking',
+          code: 'COURSE_NOT_PUBLISHED',
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -132,13 +132,13 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           error: eligibility.reason,
-          code: "BOOKING_NOT_ALLOWED",
+          code: 'BOOKING_NOT_ALLOWED',
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    serverInstance.info("Creating booking for checkout", {
+    serverInstance.info('Creating booking for checkout', {
       requestId,
       userId,
       courseId: course.id,
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Generate URLs
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const courseSlug = course.slug || course.id;
     const successUrl =
       validatedData.successUrl ||
@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     serverInstance.error(`Checkout creation failed [${requestId}]`, {
       error: error instanceof Error ? error.message : String(error),
-      userId: userId || "unknown",
+      userId: userId || 'unknown',
       requestId,
       timestamp: new Date().toISOString(),
     });
@@ -196,38 +196,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid request data",
-          code: "VALIDATION_ERROR",
-          details: error.issues.map((issue) => ({
-            field: issue.path.join("."),
+          error: 'Invalid request data',
+          code: 'VALIDATION_ERROR',
+          details: error.issues.map(issue => ({
+            field: issue.path.join('.'),
             message: issue.message,
           })),
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (error instanceof Error) {
       // Handle known error patterns
-      if (error.message.includes("insufficient_funds")) {
+      if (error.message.includes('insufficient_funds')) {
         return NextResponse.json(
           {
             success: false,
-            error: "Payment method has insufficient funds",
-            code: "INSUFFICIENT_FUNDS",
+            error: 'Payment method has insufficient funds',
+            code: 'INSUFFICIENT_FUNDS',
           },
-          { status: 400 },
+          { status: 400 }
         );
       }
 
-      if (error.message.includes("stripe")) {
+      if (error.message.includes('stripe')) {
         return NextResponse.json(
           {
             success: false,
-            error: "Payment system error. Please try again.",
-            code: "PAYMENT_SYSTEM_ERROR",
+            error: 'Payment system error. Please try again.',
+            code: 'PAYMENT_SYSTEM_ERROR',
           },
-          { status: 502 },
+          { status: 502 }
         );
       }
     }
@@ -236,11 +236,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to create checkout session",
-        code: "INTERNAL_ERROR",
+        error: 'Failed to create checkout session',
+        code: 'INTERNAL_ERROR',
         requestId, // Include request ID for support
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -252,7 +252,7 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     success: true,
-    message: "Stripe checkout endpoint is operational",
+    message: 'Stripe checkout endpoint is operational',
     timestamp: new Date().toISOString(),
   });
 }

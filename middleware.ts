@@ -1,11 +1,11 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
-import type { NextFetchEvent, NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { clerkMiddleware } from '@clerk/nextjs/server';
+import type { NextFetchEvent, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // In E2E test mode, bypass Clerk middleware entirely
 const isE2EMode =
-  process.env.E2E_TEST === "true" ||
-  process.env.NEXT_PUBLIC_DISABLE_CLERK === "1";
+  process.env.E2E_TEST === 'true' ||
+  process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
 
 // Prepare a Clerk middleware instance for non-E2E mode
 const clerkMw = clerkMiddleware();
@@ -13,13 +13,13 @@ const clerkMw = clerkMiddleware();
 // Custom middleware to enforce legacy redirects and then delegate to Clerk (when enabled)
 export default function middleware(
   request: NextRequest,
-  event: NextFetchEvent,
+  event: NextFetchEvent
 ) {
   const { pathname } = request.nextUrl;
 
   // Legacy redirect: consolidate all /protected/* to /dashboard (before any auth handling)
   if (/^\/protected(\/|$)/.test(pathname)) {
-    return NextResponse.redirect(new URL("/dashboard", request.url), 308);
+    return NextResponse.redirect(new URL('/dashboard', request.url), 308);
   }
 
   // In E2E mode bypass Clerk to reduce flakiness
@@ -34,8 +34,8 @@ export default function middleware(
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
     // Always run for API routes
-    "/(api|trpc)(.*)",
+    '/(api|trpc)(.*)',
   ],
 };

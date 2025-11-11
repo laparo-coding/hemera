@@ -1,9 +1,9 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Page, test } from '@playwright/test';
 
 const isMockMode =
   !!process.env.CI ||
-  process.env.E2E_TEST === "true" ||
-  process.env.NEXT_PUBLIC_DISABLE_CLERK === "1";
+  process.env.E2E_TEST === 'true' ||
+  process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
 
 /**
  * Performance Metrics Validation
@@ -11,13 +11,13 @@ const isMockMode =
  * Validates Core Web Vitals and application performance thresholds.
  */
 
-test.describe("Core Web Vitals Validation", () => {
-  test("landing page should meet Core Web Vitals thresholds", async ({
+test.describe('Core Web Vitals Validation', () => {
+  test('landing page should meet Core Web Vitals thresholds', async ({
     page,
   }) => {
     if (process.env.CI) {
       await renderPerformancePage(page, {
-        path: "/",
+        path: '/',
         body: `
           <main data-testid="hero-section">
             <section>
@@ -31,10 +31,10 @@ test.describe("Core Web Vitals Validation", () => {
       const navigationTime = 500;
       expect(navigationTime).toBeLessThan(30000);
 
-      const hero = page.locator("main");
+      const hero = page.locator('main');
       await expect(hero).toBeVisible();
 
-      const ctaButton = page.locator("button").first();
+      const ctaButton = page.locator('button').first();
       await expect(ctaButton).toBeVisible();
 
       const fidThreshold = 2000;
@@ -45,7 +45,7 @@ test.describe("Core Web Vitals Validation", () => {
 
     // Navigate to page and wait for load
     const startTime = Date.now();
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     const navigationTime = Date.now() - startTime;
 
     // LCP (Largest Contentful Paint) - adjust threshold based on environment
@@ -56,7 +56,7 @@ test.describe("Core Web Vitals Validation", () => {
     let hero;
     if (process.env.CI) {
       // In CI, just check if any main content is visible
-      hero = page.locator("body, main, div").first();
+      hero = page.locator('body, main, div').first();
     } else {
       // Local development uses specific test-id
       hero = page.locator('[data-testid="hero-section"]');
@@ -67,7 +67,7 @@ test.describe("Core Web Vitals Validation", () => {
     // Check for layout stability by ensuring no elements shift unexpectedly
     await page.waitForTimeout(500); // Wait for any dynamic content
 
-    const mainContent = page.locator("main");
+    const mainContent = page.locator('main');
     const initialBox = await mainContent.boundingBox();
 
     await page.waitForTimeout(1000); // Wait for potential shifts
@@ -82,7 +82,7 @@ test.describe("Core Web Vitals Validation", () => {
 
     // FID (First Input Delay) - adjust threshold based on environment
     // Test by clicking an interactive element and measuring response time
-    const ctaButton = page.locator("button, a").first();
+    const ctaButton = page.locator('button, a').first();
     await expect(ctaButton).toBeVisible();
 
     // Kurze Pause, um Hydration/Effects abschließen zu lassen (reduziert lokale FID-Flakes)
@@ -98,12 +98,12 @@ test.describe("Core Web Vitals Validation", () => {
     expect(clickTime).toBeLessThan(fidThreshold);
   });
 
-  test("course list page should meet Core Web Vitals thresholds", async ({
+  test('course list page should meet Core Web Vitals thresholds', async ({
     page,
   }) => {
     if (process.env.CI) {
       await renderPerformancePage(page, {
-        path: "/courses",
+        path: '/courses',
         body: `
           <main data-testid="course-overview">
             <article>Course One</article>
@@ -116,13 +116,13 @@ test.describe("Core Web Vitals Validation", () => {
       expect(navigationTime).toBeLessThan(30000);
 
       await expect(
-        page.locator('[data-testid="course-overview"]'),
+        page.locator('[data-testid="course-overview"]')
       ).toBeVisible();
       return;
     }
 
     const startTime = Date.now();
-    await page.goto("/courses", { waitUntil: "domcontentloaded" });
+    await page.goto('/courses', { waitUntil: 'domcontentloaded' });
     const navigationTime = Date.now() - startTime;
 
     // LCP - adjust threshold based on environment
@@ -133,7 +133,7 @@ test.describe("Core Web Vitals Validation", () => {
     let courseContent;
     if (process.env.CI) {
       // In CI, just check if any main content is visible
-      courseContent = page.locator("body, main, div").first();
+      courseContent = page.locator('body, main, div').first();
     } else {
       // Local development uses specific test-id
       courseContent = page.locator('[data-testid="course-overview"]');
@@ -142,7 +142,7 @@ test.describe("Core Web Vitals Validation", () => {
 
     // Layout stability test
     await page.waitForTimeout(500);
-    const contentContainer = page.locator("main");
+    const contentContainer = page.locator('main');
     const initialBox = await contentContainer.boundingBox();
 
     await page.waitForTimeout(1000);
@@ -154,10 +154,10 @@ test.describe("Core Web Vitals Validation", () => {
     }
   });
 
-  test("images should be optimized for performance", async ({ page }) => {
+  test('images should be optimized for performance', async ({ page }) => {
     if (process.env.CI) {
       await renderPerformancePage(page, {
-        path: "/",
+        path: '/',
         body: `
           <main>
             <img src="/_next/image?url=/img/example.webp" width="400" height="300" />
@@ -166,34 +166,34 @@ test.describe("Core Web Vitals Validation", () => {
         `,
       });
     } else {
-      await page.goto("/");
+      await page.goto('/');
     }
 
     // Check image optimization
-    const images = await page.locator("img").all();
+    const images = await page.locator('img').all();
 
     for (const img of images) {
       // Should have proper sizing attributes
-      const width = await img.getAttribute("width");
-      const height = await img.getAttribute("height");
+      const width = await img.getAttribute('width');
+      const height = await img.getAttribute('height');
 
       // Modern format or proper sizing
-      const src = await img.getAttribute("src");
+      const src = await img.getAttribute('src');
       if (src) {
         // Check for Next.js Image optimization or proper formats
         const isOptimized =
-          src.includes("/_next/image") ||
-          src.includes(".webp") ||
+          src.includes('/_next/image') ||
+          src.includes('.webp') ||
           (width && height);
         expect(isOptimized).toBe(true);
       }
     }
   });
 
-  test("fonts should load efficiently", async ({ page }) => {
+  test('fonts should load efficiently', async ({ page }) => {
     if (process.env.CI) {
       await renderPerformancePage(page, {
-        path: "/",
+        path: '/',
         body: `
           <style>
             @font-face {
@@ -206,7 +206,7 @@ test.describe("Core Web Vitals Validation", () => {
         `,
       });
     } else {
-      await page.goto("/");
+      await page.goto('/');
     }
 
     // Check for font-display optimization
@@ -214,11 +214,11 @@ test.describe("Core Web Vitals Validation", () => {
       const styleSheets = Array.from(document.styleSheets);
       const fontRules: string[] = [];
 
-      styleSheets.forEach((sheet) => {
+      styleSheets.forEach(sheet => {
         try {
           const rules = Array.from(sheet.cssRules || []);
-          rules.forEach((rule) => {
-            if (rule.cssText.includes("@font-face")) {
+          rules.forEach(rule => {
+            if (rule.cssText.includes('@font-face')) {
               fontRules.push(rule.cssText);
             }
           });
@@ -233,10 +233,10 @@ test.describe("Core Web Vitals Validation", () => {
     // Should use font-display: swap or similar for performance
     if (styles.length > 0) {
       const hasDisplayOptimization = styles.some(
-        (rule) =>
-          rule.includes("font-display: swap") ||
-          rule.includes("font-display: fallback") ||
-          rule.includes("font-display: optional"),
+        rule =>
+          rule.includes('font-display: swap') ||
+          rule.includes('font-display: fallback') ||
+          rule.includes('font-display: optional')
       );
 
       // If custom fonts are used, they should be optimized
@@ -244,10 +244,10 @@ test.describe("Core Web Vitals Validation", () => {
     }
   });
 
-  test("critical resources should load quickly", async ({ page, request }) => {
+  test('critical resources should load quickly', async ({ page, request }) => {
     if (process.env.CI) {
       await renderPerformancePage(page, {
-        path: "/",
+        path: '/',
         body: `
           <style>.critical { color: #222; }</style>
           <link rel="stylesheet" href="/styles/base.css" />
@@ -258,27 +258,27 @@ test.describe("Core Web Vitals Validation", () => {
       const domLoadTime = 400;
       expect(domLoadTime).toBeLessThan(5000);
 
-      const criticalCSS = await page.locator("style").count();
+      const criticalCSS = await page.locator('style').count();
       const externalCSS = await page.locator('link[rel="stylesheet"]').count();
       expect(criticalCSS > 0 || externalCSS < 3).toBe(true);
       return;
     }
 
     // Warm-up the page to avoid first-hit overhead in mock/E2E
-    const warmupResp = await request.get("http://localhost:3000/");
+    const warmupResp = await request.get('http://localhost:3000/');
     expect([200, 302, 307]).toContain(warmupResp.status());
 
     const startTime = Date.now();
 
     // Measure time to first paint
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     const domLoadTime = Date.now() - startTime;
 
     // DOM should load quickly
     expect(domLoadTime).toBeLessThan(isMockMode ? 20000 : 5000);
 
     // Check for critical CSS
-    const criticalCSS = await page.locator("style").count();
+    const criticalCSS = await page.locator('style').count();
     const externalCSS = await page.locator('link[rel="stylesheet"]').count();
 
     // Should have some critical CSS or very fast external CSS
@@ -286,8 +286,8 @@ test.describe("Core Web Vitals Validation", () => {
   });
 });
 
-test.describe("Auth Performance Validation (T019)", () => {
-  test("protected routes should have TTFB under 500ms", async ({
+test.describe('Auth Performance Validation (T019)', () => {
+  test('protected routes should have TTFB under 500ms', async ({
     page,
     request,
   }) => {
@@ -300,15 +300,15 @@ test.describe("Auth Performance Validation (T019)", () => {
     }
 
     // Warm-up server and route to reduce first-hit overhead in mock/E2E mode
-    const warmup = await request.get("http://localhost:3000/protected");
+    const warmup = await request.get('http://localhost:3000/protected');
     expect([200, 302, 307]).toContain(warmup.status());
 
     // Start timing before navigation
     const startTime = Date.now();
 
     // Navigate to protected route and wait until DOM is ready (faster/more stable than full 'load')
-    const response = await page.goto("http://localhost:3000/protected", {
-      waitUntil: "domcontentloaded",
+    const response = await page.goto('http://localhost:3000/protected', {
+      waitUntil: 'domcontentloaded',
     });
     const endTime = Date.now();
 
@@ -323,7 +323,7 @@ test.describe("Auth Performance Validation (T019)", () => {
     expect(ttfb).toBeLessThan(ttfbThreshold);
   });
 
-  test("auth helper performance should be under 300ms", async ({
+  test('auth helper performance should be under 300ms', async ({
     page,
     request,
   }) => {
@@ -335,21 +335,21 @@ test.describe("Auth Performance Validation (T019)", () => {
     }
 
     // Simulate auth helper operations by navigating authenticated routes
-    await page.goto("http://localhost:3000/dashboard", {
-      waitUntil: "domcontentloaded",
+    await page.goto('http://localhost:3000/dashboard', {
+      waitUntil: 'domcontentloaded',
     });
 
     // Warm up subsequent route to avoid first-hit overhead in mock/E2E
-    const warmupDash = await request.get("http://localhost:3000/dashboard");
+    const warmupDash = await request.get('http://localhost:3000/dashboard');
     expect([200, 302, 307]).toContain(warmupDash.status());
-    const warmupNext = await request.get("http://localhost:3000/my-courses");
+    const warmupNext = await request.get('http://localhost:3000/my-courses');
     expect([200, 302, 307]).toContain(warmupNext.status());
 
     const startTime = Date.now();
 
     // Test navigation between protected routes (uses auth helpers)
-    await page.goto("http://localhost:3000/my-courses", {
-      waitUntil: "domcontentloaded",
+    await page.goto('http://localhost:3000/my-courses', {
+      waitUntil: 'domcontentloaded',
     });
     const endTime = Date.now();
 
@@ -363,7 +363,7 @@ test.describe("Auth Performance Validation (T019)", () => {
 
 async function renderPerformancePage(
   page: Page,
-  options: { path: string; body: string },
+  options: { path: string; body: string }
 ) {
   await page.setContent(`
     <html>

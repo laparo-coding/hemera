@@ -1,12 +1,12 @@
-import Stripe from "stripe";
+import Stripe from 'stripe';
 import {
   logError,
   PaymentProcessingError,
   StripeConfigurationError,
-} from "@/lib/errors";
-import { serverInstance } from "@/lib/monitoring/rollbar-official";
-import { STRIPE_API_VERSION } from "../stripe/config";
-import { PaymentStatus } from "./course";
+} from '@/lib/errors';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { STRIPE_API_VERSION } from '../stripe/config';
+import { PaymentStatus } from './course';
 
 /**
  * Stripe Service
@@ -25,7 +25,7 @@ export class StripeService {
   constructor() {
     // Skip Stripe initialization during build time
     const isBuildTime =
-      process.env.NODE_ENV === "production" && !process.env.STRIPE_SECRET_KEY;
+      process.env.NODE_ENV === 'production' && !process.env.STRIPE_SECRET_KEY;
 
     if (isBuildTime) {
       // Build time detected - skipping Stripe initialization
@@ -35,16 +35,16 @@ export class StripeService {
     const stripeKey = process.env.STRIPE_SECRET_KEY;
 
     if (!stripeKey) {
-      if (process.env.NODE_ENV === "production") {
-        throw new StripeConfigurationError("STRIPE_SECRET_KEY");
+      if (process.env.NODE_ENV === 'production') {
+        throw new StripeConfigurationError('STRIPE_SECRET_KEY');
       }
 
       serverInstance.warn(
-        "Stripe secret key not configured, disabling StripeService",
+        'Stripe secret key not configured, disabling StripeService',
         {
-          service: "StripeService",
+          service: 'StripeService',
           env: process.env.NODE_ENV,
-        },
+        }
       );
       return;
     }
@@ -58,7 +58,7 @@ export class StripeService {
 
   private ensureStripe(): Stripe {
     if (!this.stripe) {
-      throw new StripeConfigurationError("STRIPE_SECRET_KEY");
+      throw new StripeConfigurationError('STRIPE_SECRET_KEY');
     }
     return this.stripe;
   }
@@ -101,11 +101,11 @@ export class StripeService {
       }
 
       const session = await this.ensureStripe().checkout.sessions.create({
-        payment_method_types: ["card"],
+        payment_method_types: ['card'],
         line_items: [
           {
             price_data: {
-              currency: "usd",
+              currency: 'usd',
               product_data: {
                 name: courseName,
                 description: `Course booking for ${courseName}`,
@@ -115,14 +115,14 @@ export class StripeService {
             quantity: 1,
           },
         ],
-        mode: "payment",
+        mode: 'payment',
         success_url: successUrl,
         cancel_url: cancelUrl,
         customer_email: userEmail,
         metadata: {
           courseId,
           userId,
-          bookingType: "course",
+          bookingType: 'course',
           ...(bookingId && { bookingId }),
         },
         payment_intent_data: {
@@ -137,7 +137,7 @@ export class StripeService {
 
       if (!session.id || !session.url) {
         throw new PaymentProcessingError(
-          "Stripe session creation returned incomplete data",
+          'Stripe session creation returned incomplete data'
         );
       }
 
@@ -153,11 +153,11 @@ export class StripeService {
         throw error; // Re-throw our custom errors
       }
 
-      logError(error, { operation: "createCheckoutSession", params });
+      logError(error, { operation: 'createCheckoutSession', params });
       throw new PaymentProcessingError(
         error instanceof Error
           ? error.message
-          : "Unknown error during checkout session creation",
+          : 'Unknown error during checkout session creation'
       );
     }
   }
@@ -166,21 +166,21 @@ export class StripeService {
    * Retrieve checkout session details
    */
   async getCheckoutSession(
-    sessionId: string,
+    sessionId: string
   ): Promise<Stripe.Checkout.Session> {
     try {
       const session = await this.ensureStripe().checkout.sessions.retrieve(
         sessionId,
         {
-          expand: ["payment_intent"],
-        },
+          expand: ['payment_intent'],
+        }
       );
 
       return session;
     } catch (error) {
-      logError(error, { operation: "getCheckoutSession", sessionId });
+      logError(error, { operation: 'getCheckoutSession', sessionId });
       throw new PaymentProcessingError(
-        `Failed to retrieve session: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Failed to retrieve session: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }
@@ -190,7 +190,7 @@ export class StripeService {
    */
   async processWebhookEvent(
     payload: string,
-    signature: string,
+    signature: string
   ): Promise<{
     eventId: string;
     eventType: string;
@@ -199,14 +199,14 @@ export class StripeService {
   }> {
     try {
       if (!process.env.STRIPE_WEBHOOK_SECRET) {
-        throw new StripeConfigurationError("STRIPE_WEBHOOK_SECRET");
+        throw new StripeConfigurationError('STRIPE_WEBHOOK_SECRET');
       }
 
       // Verify webhook signature
       const event = this.ensureStripe().webhooks.constructEvent(
         payload,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET,
+        process.env.STRIPE_WEBHOOK_SECRET
       );
 
       // Process webhook event: ${event.type} (${event.id})
@@ -219,30 +219,30 @@ export class StripeService {
       };
 
       switch (event.type) {
-        case "checkout.session.completed":
+        case 'checkout.session.completed':
           result.data = await this.handleCheckoutSessionCompleted(
-            event.data.object as Stripe.Checkout.Session,
+            event.data.object as Stripe.Checkout.Session
           );
           result.processed = true;
           break;
 
-        case "checkout.session.expired":
+        case 'checkout.session.expired':
           result.data = await this.handleCheckoutSessionExpired(
-            event.data.object as Stripe.Checkout.Session,
+            event.data.object as Stripe.Checkout.Session
           );
           result.processed = true;
           break;
 
-        case "payment_intent.succeeded":
+        case 'payment_intent.succeeded':
           result.data = await this.handlePaymentIntentSucceeded(
-            event.data.object as Stripe.PaymentIntent,
+            event.data.object as Stripe.PaymentIntent
           );
           result.processed = true;
           break;
 
-        case "payment_intent.payment_failed":
+        case 'payment_intent.payment_failed':
           result.data = await this.handlePaymentIntentFailed(
-            event.data.object as Stripe.PaymentIntent,
+            event.data.object as Stripe.PaymentIntent
           );
           result.processed = true;
           break;
@@ -254,17 +254,17 @@ export class StripeService {
 
       return result;
     } catch (error) {
-      serverInstance.error("Webhook processing failed", {
+      serverInstance.error('Webhook processing failed', {
         error: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString(),
       });
 
       if (error instanceof Stripe.errors.StripeSignatureVerificationError) {
-        throw new Error("Invalid webhook signature");
+        throw new Error('Invalid webhook signature');
       }
 
       throw new Error(
-        `Webhook processing failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Webhook processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }
@@ -273,7 +273,7 @@ export class StripeService {
    * Handle successful checkout session
    */
   private async handleCheckoutSessionCompleted(
-    session: Stripe.Checkout.Session,
+    session: Stripe.Checkout.Session
   ): Promise<{
     sessionId: string;
     courseId: string;
@@ -284,7 +284,7 @@ export class StripeService {
     const { courseId, userId } = session.metadata || {};
 
     if (!courseId || !userId) {
-      throw new Error("Missing required metadata in checkout session");
+      throw new Error('Missing required metadata in checkout session');
     }
 
     return {
@@ -293,7 +293,7 @@ export class StripeService {
       userId,
       paymentStatus: PaymentStatus.PAID,
       paymentIntentId:
-        typeof session.payment_intent === "string"
+        typeof session.payment_intent === 'string'
           ? session.payment_intent
           : session.payment_intent?.id,
     };
@@ -303,7 +303,7 @@ export class StripeService {
    * Handle expired checkout session
    */
   private async handleCheckoutSessionExpired(
-    session: Stripe.Checkout.Session,
+    session: Stripe.Checkout.Session
   ): Promise<{
     sessionId: string;
     courseId: string;
@@ -313,7 +313,7 @@ export class StripeService {
     const { courseId, userId } = session.metadata || {};
 
     if (!courseId || !userId) {
-      throw new Error("Missing required metadata in expired checkout session");
+      throw new Error('Missing required metadata in expired checkout session');
     }
 
     return {
@@ -328,7 +328,7 @@ export class StripeService {
    * Handle successful payment intent
    */
   private async handlePaymentIntentSucceeded(
-    paymentIntent: Stripe.PaymentIntent,
+    paymentIntent: Stripe.PaymentIntent
   ): Promise<{
     paymentIntentId: string;
     courseId: string;
@@ -339,7 +339,7 @@ export class StripeService {
     const { courseId, userId } = paymentIntent.metadata || {};
 
     if (!courseId || !userId) {
-      throw new Error("Missing required metadata in payment intent");
+      throw new Error('Missing required metadata in payment intent');
     }
 
     return {
@@ -355,7 +355,7 @@ export class StripeService {
    * Handle failed payment intent
    */
   private async handlePaymentIntentFailed(
-    paymentIntent: Stripe.PaymentIntent,
+    paymentIntent: Stripe.PaymentIntent
   ): Promise<{
     paymentIntentId: string;
     courseId: string;
@@ -366,7 +366,7 @@ export class StripeService {
     const { courseId, userId } = paymentIntent.metadata || {};
 
     if (!courseId || !userId) {
-      throw new Error("Missing required metadata in failed payment intent");
+      throw new Error('Missing required metadata in failed payment intent');
     }
 
     return {
@@ -384,7 +384,7 @@ export class StripeService {
   async createRefund(params: {
     paymentIntentId: string;
     amount?: number;
-    reason?: "requested_by_customer" | "duplicate" | "fraudulent";
+    reason?: 'requested_by_customer' | 'duplicate' | 'fraudulent';
     metadata?: Record<string, string>;
   }): Promise<{
     refundId: string;
@@ -394,7 +394,7 @@ export class StripeService {
     const {
       paymentIntentId,
       amount,
-      reason = "requested_by_customer",
+      reason = 'requested_by_customer',
       metadata,
     } = params;
 
@@ -409,17 +409,17 @@ export class StripeService {
       return {
         refundId: refund.id,
         amount: refund.amount,
-        status: refund.status || "unknown",
+        status: refund.status || 'unknown',
       };
     } catch (error) {
-      serverInstance.error("Refund creation failed", {
+      serverInstance.error('Refund creation failed', {
         error: error instanceof Error ? error.message : String(error),
         paymentIntentId,
         amount,
         timestamp: new Date().toISOString(),
       });
       throw new Error(
-        `Failed to create refund: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Failed to create refund: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }
@@ -448,13 +448,13 @@ export class StripeService {
         metadata: paymentIntent.metadata,
       };
     } catch (error) {
-      serverInstance.error("Failed to retrieve payment details", {
+      serverInstance.error('Failed to retrieve payment details', {
         error: error instanceof Error ? error.message : String(error),
         paymentIntentId,
         timestamp: new Date().toISOString(),
       });
       throw new Error(
-        `Failed to get payment details: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Failed to get payment details: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }
@@ -486,14 +486,14 @@ export class StripeService {
         email: customer.email || email,
       };
     } catch (error) {
-      serverInstance.error("Customer creation failed", {
+      serverInstance.error('Customer creation failed', {
         error: error instanceof Error ? error.message : String(error),
         email: params.email,
         userId: params.userId,
         timestamp: new Date().toISOString(),
       });
       throw new Error(
-        `Failed to create customer: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Failed to create customer: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }
@@ -510,7 +510,7 @@ export class StripeService {
       this.ensureStripe().webhooks.constructEvent(
         payload,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET,
+        process.env.STRIPE_WEBHOOK_SECRET
       );
 
       return true;
@@ -549,12 +549,12 @@ export class StripeService {
         throw error;
       }
       logError(
-        "Payment intent creation failed",
-        error as Record<string, unknown>,
+        'Payment intent creation failed',
+        error as Record<string, unknown>
       );
       throw new PaymentProcessingError(
-        "Failed to create payment intent",
-        error as string,
+        'Failed to create payment intent',
+        error as string
       );
     }
   }
@@ -563,7 +563,7 @@ export class StripeService {
    * Retrieve a payment intent by ID
    */
   async retrievePaymentIntent(
-    paymentIntentId: string,
+    paymentIntentId: string
   ): Promise<Stripe.PaymentIntent> {
     try {
       const paymentIntent =
@@ -575,12 +575,12 @@ export class StripeService {
         throw error;
       }
       logError(
-        "Payment intent retrieval failed",
-        error as Record<string, unknown>,
+        'Payment intent retrieval failed',
+        error as Record<string, unknown>
       );
       throw new PaymentProcessingError(
-        "Failed to retrieve payment intent",
-        error as string,
+        'Failed to retrieve payment intent',
+        error as string
       );
     }
   }
@@ -590,7 +590,7 @@ export class StripeService {
    */
   getPublishableKey(): string {
     if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-      throw new Error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is required");
+      throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is required');
     }
 
     return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -602,7 +602,7 @@ export const stripeService = new StripeService();
 
 // Export convenience functions
 export const createCheckoutSession = (
-  params: Parameters<StripeService["createCheckoutSession"]>[0],
+  params: Parameters<StripeService['createCheckoutSession']>[0]
 ) => stripeService.createCheckoutSession(params);
 
 export const processWebhookEvent = (payload: string, signature: string) =>
@@ -612,14 +612,14 @@ export const getCheckoutSession = (sessionId: string) =>
   stripeService.getCheckoutSession(sessionId);
 
 export const createRefund = (
-  params: Parameters<StripeService["createRefund"]>[0],
+  params: Parameters<StripeService['createRefund']>[0]
 ) => stripeService.createRefund(params);
 
 export const getPaymentDetails = (paymentIntentId: string) =>
   stripeService.getPaymentDetails(paymentIntentId);
 
 export const createPaymentIntent = (
-  params: Parameters<StripeService["createPaymentIntent"]>[0],
+  params: Parameters<StripeService['createPaymentIntent']>[0]
 ) => stripeService.createPaymentIntent(params);
 
 export const retrievePaymentIntent = (paymentIntentId: string) =>

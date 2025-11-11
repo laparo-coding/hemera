@@ -3,7 +3,7 @@
  * Tracks and analyzes error patterns for debugging and monitoring
  */
 
-import { BaseError } from "@/lib/errors/base";
+import { BaseError } from '@/lib/errors/base';
 
 export interface ErrorMetrics {
   errorCount: number;
@@ -51,16 +51,16 @@ class ErrorAnalyticsService {
       userAgent?: string;
       ip?: string;
       additionalContext?: Record<string, unknown>;
-    },
+    }
   ): void {
     const entry: ErrorLogEntry = {
       id: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
-      errorCode: error instanceof BaseError ? error.errorCode : "UNKNOWN_ERROR",
-      category: error instanceof BaseError ? error.category : "infrastructure",
+      errorCode: error instanceof BaseError ? error.errorCode : 'UNKNOWN_ERROR',
+      category: error instanceof BaseError ? error.category : 'infrastructure',
       message: error.message,
       statusCode: error instanceof BaseError ? error.statusCode : 500,
-      requestId: context?.requestId || "unknown",
+      requestId: context?.requestId || 'unknown',
       context: {
         ...(error instanceof BaseError ? error.context : {}),
         ...context?.additionalContext,
@@ -78,7 +78,7 @@ class ErrorAnalyticsService {
     }
 
     // In production, this would send to monitoring service
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === 'production') {
       this.sendToMonitoring(entry);
     }
   }
@@ -86,12 +86,12 @@ class ErrorAnalyticsService {
   /**
    * Get error metrics for dashboard
    */
-  getErrorMetrics(timeRange: "hour" | "day" | "week" = "day"): ErrorMetrics {
+  getErrorMetrics(timeRange: 'hour' | 'day' | 'week' = 'day'): ErrorMetrics {
     const _now = new Date();
     const timeFilter = this.getTimeFilter(timeRange);
 
     const recentErrors = this.errorLogs.filter(
-      (log) => new Date(log.timestamp) >= timeFilter,
+      log => new Date(log.timestamp) >= timeFilter
     );
 
     const errorsByCategory = recentErrors.reduce(
@@ -99,7 +99,7 @@ class ErrorAnalyticsService {
         acc[log.category] = (acc[log.category] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     const errorsByCode = recentErrors.reduce(
@@ -107,7 +107,7 @@ class ErrorAnalyticsService {
         acc[log.errorCode] = (acc[log.errorCode] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     const errorsByHour = recentErrors.reduce(
@@ -115,28 +115,28 @@ class ErrorAnalyticsService {
         const hour = new Date(log.timestamp)
           .getHours()
           .toString()
-          .padStart(2, "0");
+          .padStart(2, '0');
         acc[hour] = (acc[hour] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     // Get top 10 most frequent errors
     const topErrors = Object.entries(errorsByCode)
       .map(([code, count]) => {
         const lastError = recentErrors
-          .filter((log) => log.errorCode === code)
+          .filter(log => log.errorCode === code)
           .sort(
             (a, b) =>
-              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
           )[0];
 
         return {
           code,
-          message: lastError?.message || "Unknown error",
+          message: lastError?.message || 'Unknown error',
           count,
-          lastOccurrence: lastError?.timestamp || "Unknown",
+          lastOccurrence: lastError?.timestamp || 'Unknown',
         };
       })
       .sort((a, b) => b.count - a.count)
@@ -156,7 +156,7 @@ class ErrorAnalyticsService {
    */
   getRecentErrors(
     page = 1,
-    limit = 50,
+    limit = 50
   ): {
     errors: ErrorLogEntry[];
     total: number;
@@ -172,7 +172,7 @@ class ErrorAnalyticsService {
     const errors = this.errorLogs
       .sort(
         (a, b) =>
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       )
       .slice(startIndex, endIndex);
 
@@ -189,7 +189,7 @@ class ErrorAnalyticsService {
    * Mark error as resolved
    */
   resolveError(errorId: string): boolean {
-    const error = this.errorLogs.find((log) => log.id === errorId);
+    const error = this.errorLogs.find(log => log.id === errorId);
     if (error) {
       error.resolved = true;
       return true;
@@ -204,14 +204,14 @@ class ErrorAnalyticsService {
     this.errorLogs = [];
   }
 
-  private getTimeFilter(timeRange: "hour" | "day" | "week"): Date {
+  private getTimeFilter(timeRange: 'hour' | 'day' | 'week'): Date {
     const now = new Date();
     switch (timeRange) {
-      case "hour":
+      case 'hour':
         return new Date(now.getTime() - 60 * 60 * 1000);
-      case "day":
+      case 'day':
         return new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      case "week":
+      case 'week':
         return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       default:
         return new Date(now.getTime() - 24 * 60 * 60 * 1000);

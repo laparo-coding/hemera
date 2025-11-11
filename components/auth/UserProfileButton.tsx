@@ -5,15 +5,15 @@
  * Includes sign-out functionality and profile management
  */
 
-"use client";
+'use client';
 
-import { SignOutButton, useUser } from "@clerk/nextjs";
+import { SignOutButton, useUser } from '@clerk/nextjs';
 import {
   AccountCircle,
   Dashboard,
   ExitToApp,
   Settings,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -25,16 +25,16 @@ import {
   Menu,
   MenuItem,
   Typography,
-} from "@mui/material";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+} from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export interface UserProfileButtonProps {
-  variant?: "icon" | "button";
+  variant?: 'icon' | 'button';
 }
 
 export function UserProfileButton({
-  variant = "icon",
+  variant = 'icon',
 }: UserProfileButtonProps) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
@@ -59,39 +59,39 @@ export function UserProfileButton({
   }
 
   const displayName =
-    user.fullName || user.primaryEmailAddress?.emailAddress || "User";
+    user.fullName || user.primaryEmailAddress?.emailAddress || 'User';
   const avatarSrc = user.imageUrl;
 
   const menuItems = [
     {
-      label: "Dashboard",
-      icon: <Dashboard fontSize="small" />,
-      path: "/dashboard",
+      label: 'Dashboard',
+      icon: <Dashboard fontSize='small' />,
+      path: '/dashboard',
     },
     {
-      label: "My Courses",
-      icon: <Settings fontSize="small" />,
-      path: "/my-courses",
+      label: 'My Courses',
+      icon: <Settings fontSize='small' />,
+      path: '/my-courses',
     },
   ];
 
-  if (variant === "icon") {
+  if (variant === 'icon') {
     return (
       <>
         <IconButton
           onClick={handleClick}
-          data-testid="user-profile-button"
+          data-testid='user-profile-button'
           sx={{
             p: 0,
-            "&:hover": {
-              transform: "scale(1.05)",
+            '&:hover': {
+              transform: 'scale(1.05)',
             },
-            transition: "transform 0.2s ease-in-out",
+            transition: 'transform 0.2s ease-in-out',
           }}
-          aria-label="User menu"
-          aria-controls={open ? "user-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
+          aria-label='User menu'
+          aria-controls={open ? 'user-menu' : undefined}
+          aria-haspopup='true'
+          aria-expanded={open ? 'true' : undefined}
         >
           <Avatar
             src={avatarSrc}
@@ -99,8 +99,8 @@ export function UserProfileButton({
             sx={{
               width: 32,
               height: 32,
-              bgcolor: "primary.main",
-              fontSize: "14px",
+              bgcolor: 'primary.main',
+              fontSize: '14px',
               fontWeight: 500,
             }}
           >
@@ -109,7 +109,7 @@ export function UserProfileButton({
         </IconButton>
 
         <Menu
-          id="user-menu"
+          id='user-menu'
           anchorEl={anchorEl}
           open={open}
           onClose={handleClose}
@@ -117,53 +117,53 @@ export function UserProfileButton({
           PaperProps={{
             elevation: 3,
             sx: {
-              overflow: "visible",
-              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+              overflow: 'visible',
+              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
               mt: 1.5,
               minWidth: 200,
-              "&:before": {
+              '&:before': {
                 content: '""',
-                display: "block",
-                position: "absolute",
+                display: 'block',
+                position: 'absolute',
                 top: 0,
                 right: 14,
                 width: 10,
                 height: 10,
-                bgcolor: "background.paper",
-                transform: "translateY(-50%) rotate(45deg)",
+                bgcolor: 'background.paper',
+                transform: 'translateY(-50%) rotate(45deg)',
                 zIndex: 0,
               },
             },
           }}
-          transformOrigin={{ horizontal: "right", vertical: "top" }}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
           {/* User Info Header */}
           <Box
             sx={{
               px: 2,
               py: 1.5,
-              borderBottom: "1px solid",
-              borderColor: "divider",
+              borderBottom: '1px solid',
+              borderColor: 'divider',
             }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+            <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
               {displayName}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant='caption' color='text.secondary'>
               {user.primaryEmailAddress?.emailAddress}
             </Typography>
           </Box>
 
           {/* Navigation Items */}
-          {menuItems.map((item) => (
+          {menuItems.map(item => (
             <MenuItem
               key={item.path}
               onClick={() => handleNavigate(item.path)}
               sx={{
                 py: 1,
-                "&:hover": {
-                  backgroundColor: "action.hover",
+                '&:hover': {
+                  backgroundColor: 'action.hover',
                 },
               }}
             >
@@ -179,16 +179,16 @@ export function UserProfileButton({
             <MenuItem
               sx={{
                 py: 1,
-                color: "error.main",
-                "&:hover": {
-                  backgroundColor: "error.lighter",
+                color: 'error.main',
+                '&:hover': {
+                  backgroundColor: 'error.lighter',
                 },
               }}
             >
-              <ListItemIcon sx={{ minWidth: 36, color: "error.main" }}>
-                <ExitToApp fontSize="small" />
+              <ListItemIcon sx={{ minWidth: 36, color: 'error.main' }}>
+                <ExitToApp fontSize='small' />
               </ListItemIcon>
-              <ListItemText primary="Sign Out" />
+              <ListItemText primary='Sign Out' />
             </MenuItem>
           </SignOutButton>
         </Menu>
@@ -200,7 +200,7 @@ export function UserProfileButton({
     <>
       <Button
         onClick={handleClick}
-        data-testid="user-profile-button"
+        data-testid='user-profile-button'
         startIcon={
           <Avatar
             src={avatarSrc}
@@ -208,8 +208,8 @@ export function UserProfileButton({
             sx={{
               width: 24,
               height: 24,
-              bgcolor: "primary.main",
-              fontSize: "12px",
+              bgcolor: 'primary.main',
+              fontSize: '12px',
             }}
           >
             {displayName.charAt(0).toUpperCase()}
@@ -217,27 +217,27 @@ export function UserProfileButton({
         }
         endIcon={<AccountCircle />}
         sx={{
-          textTransform: "none",
-          borderRadius: "8px",
+          textTransform: 'none',
+          borderRadius: '8px',
           px: 2,
           py: 1,
-          color: "text.primary",
-          "&:hover": {
-            backgroundColor: "action.hover",
+          color: 'text.primary',
+          '&:hover': {
+            backgroundColor: 'action.hover',
           },
         }}
-        aria-label="User menu"
-        aria-controls={open ? "user-menu" : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
+        aria-label='User menu'
+        aria-controls={open ? 'user-menu' : undefined}
+        aria-haspopup='true'
+        aria-expanded={open ? 'true' : undefined}
       >
         <Typography
-          variant="body2"
+          variant='body2'
           sx={{
             maxWidth: 120,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
           {displayName}
@@ -245,7 +245,7 @@ export function UserProfileButton({
       </Button>
 
       <Menu
-        id="user-menu"
+        id='user-menu'
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
@@ -253,41 +253,41 @@ export function UserProfileButton({
         PaperProps={{
           elevation: 3,
           sx: {
-            overflow: "visible",
-            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+            overflow: 'visible',
+            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
             mt: 1.5,
             minWidth: 200,
           },
         }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         {/* User Info Header */}
         <Box
           sx={{
             px: 2,
             py: 1.5,
-            borderBottom: "1px solid",
-            borderColor: "divider",
+            borderBottom: '1px solid',
+            borderColor: 'divider',
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
             {displayName}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant='caption' color='text.secondary'>
             {user.primaryEmailAddress?.emailAddress}
           </Typography>
         </Box>
 
         {/* Navigation Items */}
-        {menuItems.map((item) => (
+        {menuItems.map(item => (
           <MenuItem
             key={item.path}
             onClick={() => handleNavigate(item.path)}
             sx={{
               py: 1,
-              "&:hover": {
-                backgroundColor: "action.hover",
+              '&:hover': {
+                backgroundColor: 'action.hover',
               },
             }}
           >
@@ -303,16 +303,16 @@ export function UserProfileButton({
           <MenuItem
             sx={{
               py: 1,
-              color: "error.main",
-              "&:hover": {
-                backgroundColor: "error.lighter",
+              color: 'error.main',
+              '&:hover': {
+                backgroundColor: 'error.lighter',
               },
             }}
           >
-            <ListItemIcon sx={{ minWidth: 36, color: "error.main" }}>
-              <ExitToApp fontSize="small" />
+            <ListItemIcon sx={{ minWidth: 36, color: 'error.main' }}>
+              <ExitToApp fontSize='small' />
             </ListItemIcon>
-            <ListItemText primary="Sign Out" />
+            <ListItemText primary='Sign Out' />
           </MenuItem>
         </SignOutButton>
       </Menu>

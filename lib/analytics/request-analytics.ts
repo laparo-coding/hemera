@@ -2,8 +2,8 @@
  * Request ID-basierte Analytics für Performance-Monitoring
  */
 
-import { serverInstance } from "@/lib/monitoring/rollbar-official";
-import type { RequestContext } from "@/lib/utils/request-id";
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import type { RequestContext } from '@/lib/utils/request-id';
 
 export interface AnalyticsEvent {
   requestId: string;
@@ -56,7 +56,7 @@ export class RequestAnalytics {
     method: string,
     startTime: number,
     statusCode: number,
-    context?: RequestContext,
+    context?: RequestContext
   ): void {
     const responseTime = Date.now() - startTime;
 
@@ -74,14 +74,14 @@ export class RequestAnalytics {
     this.metrics.set(requestId, metrics);
 
     // An Rollbar senden
-    serverInstance.info("API Performance Metric", {
+    serverInstance.info('API Performance Metric', {
       requestId,
       route,
       method,
       responseTime,
       statusCode,
       context,
-      category: "performance",
+      category: 'performance',
       timestamp: metrics.timestamp,
     });
 
@@ -89,14 +89,14 @@ export class RequestAnalytics {
     if (responseTime > 2000) {
       this.trackEvent(
         requestId,
-        "slow_request",
+        'slow_request',
         {
           route,
           method,
           responseTime,
           threshold: 2000,
         },
-        context,
+        context
       );
     }
   }
@@ -108,7 +108,7 @@ export class RequestAnalytics {
     requestId: string,
     eventType: string,
     data: Record<string, unknown>,
-    context?: RequestContext,
+    context?: RequestContext
   ): void {
     const event: AnalyticsEvent = {
       requestId,
@@ -118,8 +118,8 @@ export class RequestAnalytics {
       context: context || {
         id: requestId,
         timestamp: new Date().toISOString(),
-        method: "UNKNOWN",
-        url: "unknown",
+        method: 'UNKNOWN',
+        url: 'unknown',
       },
     };
 
@@ -131,7 +131,7 @@ export class RequestAnalytics {
       eventType,
       data,
       context,
-      category: "analytics",
+      category: 'analytics',
       timestamp: event.timestamp,
     });
   }
@@ -140,7 +140,7 @@ export class RequestAnalytics {
    * Generiere API-Usage-Statistiken
    */
   public generateUsageStats(
-    timeframe: string = "24h",
+    timeframe: string = '24h'
   ): Map<string, ApiUsageStats> {
     const stats = new Map<string, ApiUsageStats>();
     const now = Date.now();
@@ -148,13 +148,13 @@ export class RequestAnalytics {
 
     // Filtere Metriken nach Zeitraum
     const relevantMetrics = Array.from(this.metrics.values()).filter(
-      (metric) => now - new Date(metric.timestamp).getTime() <= timeframeMs,
+      metric => now - new Date(metric.timestamp).getTime() <= timeframeMs
     );
 
     // Gruppiere nach Route und Method
     const grouped = new Map<string, PerformanceMetrics[]>();
 
-    relevantMetrics.forEach((metric) => {
+    relevantMetrics.forEach(metric => {
       const key = `${metric.method}:${metric.route}`;
       if (!grouped.has(key)) {
         grouped.set(key, []);
@@ -164,11 +164,9 @@ export class RequestAnalytics {
 
     // Berechne Statistiken für jede Gruppe
     grouped.forEach((metrics, key) => {
-      const [method, route] = key.split(":");
+      const [method, route] = key.split(':');
       const totalRequests = metrics.length;
-      const successfulRequests = metrics.filter(
-        (m) => m.statusCode < 400,
-      ).length;
+      const successfulRequests = metrics.filter(m => m.statusCode < 400).length;
       const failedRequests = totalRequests - successfulRequests;
       const averageResponseTime =
         metrics.reduce((sum, m) => sum + m.responseTime, 0) / totalRequests;
@@ -198,7 +196,7 @@ export class RequestAnalytics {
   } {
     return {
       metrics: this.metrics.get(requestId),
-      events: this.events.filter((event) => event.requestId === requestId),
+      events: this.events.filter(event => event.requestId === requestId),
     };
   }
 
@@ -210,21 +208,21 @@ export class RequestAnalytics {
     highErrorRates: ApiUsageStats[];
     unusualPatterns: AnalyticsEvent[];
   } {
-    const stats = this.generateUsageStats("1h");
+    const stats = this.generateUsageStats('1h');
 
     const slowRequests = Array.from(this.metrics.values())
-      .filter((metric) => metric.responseTime > 3000)
+      .filter(metric => metric.responseTime > 3000)
       .slice(-10); // Letzten 10 langsamen Requests
 
     const highErrorRates = Array.from(stats.values()).filter(
-      (stat) => stat.errorRate > 10 && stat.totalRequests > 5,
+      stat => stat.errorRate > 10 && stat.totalRequests > 5
     );
 
     const unusualPatterns = this.events
       .filter(
-        (event) =>
-          event.eventType === "slow_request" ||
-          event.eventType === "error_spike",
+        event =>
+          event.eventType === 'slow_request' ||
+          event.eventType === 'error_spike'
       )
       .slice(-20); // Letzten 20 ungewöhnlichen Events
 
@@ -238,7 +236,7 @@ export class RequestAnalytics {
   /**
    * Generiere Analytics-Report
    */
-  public generateReport(timeframe: string = "24h"): {
+  public generateReport(timeframe: string = '24h'): {
     summary: {
       totalRequests: number;
       averageResponseTime: number;
@@ -257,15 +255,15 @@ export class RequestAnalytics {
 
     const totalRequests = apiStats.reduce(
       (sum, stat) => sum + stat.totalRequests,
-      0,
+      0
     );
     const totalFailedRequests = apiStats.reduce(
       (sum, stat) => sum + stat.failedRequests,
-      0,
+      0
     );
     const weightedResponseTime = apiStats.reduce(
       (sum, stat) => sum + stat.averageResponseTime * stat.totalRequests,
-      0,
+      0
     );
 
     const averageResponseTime =
@@ -278,7 +276,7 @@ export class RequestAnalytics {
     const topRoutes = apiStats
       .sort((a, b) => b.totalRequests - a.totalRequests)
       .slice(0, 10)
-      .map((stat) => ({
+      .map(stat => ({
         route: `${stat.method} ${stat.route}`,
         count: stat.totalRequests,
       }));
@@ -310,7 +308,7 @@ export class RequestAnalytics {
 
     // Entferne alte Events
     this.events = this.events.filter(
-      (event) => new Date(event.timestamp).getTime() >= cutoffTime,
+      event => new Date(event.timestamp).getTime() >= cutoffTime
     );
   }
 
@@ -319,11 +317,11 @@ export class RequestAnalytics {
     const value = parseInt(timeframe.slice(0, -1), 10);
 
     switch (unit) {
-      case "h":
+      case 'h':
         return value * 60 * 60 * 1000;
-      case "d":
+      case 'd':
         return value * 24 * 60 * 60 * 1000;
-      case "m":
+      case 'm':
         return value * 60 * 1000;
       default:
         return 24 * 60 * 60 * 1000; // Default 24h
@@ -336,18 +334,18 @@ export const analytics = RequestAnalytics.getInstance();
 
 // Auto-Cleanup alle 6 Stunden (nicht in Tests/E2E)
 const isTestEnv =
-  process.env.NODE_ENV === "test" ||
-  typeof process.env.JEST_WORKER_ID !== "undefined" ||
-  process.env.E2E_TEST === "true";
+  process.env.NODE_ENV === 'test' ||
+  typeof process.env.JEST_WORKER_ID !== 'undefined' ||
+  process.env.E2E_TEST === 'true';
 
 let cleanupTimer: ReturnType<typeof setInterval> | undefined;
 
-if (!isTestEnv && typeof setInterval !== "undefined") {
+if (!isTestEnv && typeof setInterval !== 'undefined') {
   cleanupTimer = setInterval(
     () => {
       analytics.cleanup(24);
     },
-    6 * 60 * 60 * 1000,
+    6 * 60 * 60 * 1000
   );
 }
 

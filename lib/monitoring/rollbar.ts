@@ -3,16 +3,16 @@
  * Provides comprehensive error tracking, user context, and performance monitoring
  */
 
-import Rollbar from "rollbar";
+import Rollbar from 'rollbar';
 
 // Environment-specific configuration
-const isProduction = process.env.NODE_ENV === "production";
-const isDevelopment = process.env.NODE_ENV === "development";
+const isProduction = process.env.NODE_ENV === 'production';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Rollbar configuration
 export const rollbarConfig: Rollbar.Configuration = {
   accessToken: process.env.ROLLBAR_SERVER_ACCESS_TOKEN,
-  environment: process.env.NODE_ENV || "development",
+  environment: process.env.NODE_ENV || 'development',
 
   // Capture uncaught exceptions and unhandled rejections
   captureUncaught: isProduction,
@@ -44,13 +44,13 @@ export const rollbarConfig: Rollbar.Configuration = {
       ...(payload.custom || {}),
       buildId: process.env.NEXT_BUILD_ID,
       region: process.env.VERCEL_REGION,
-      runtime: "nextjs",
+      runtime: 'nextjs',
     };
   },
 
   // Item filtering
   // filterTelemetry: isDevelopment, // Disable telemetry in dev
-  enabled: isProduction || process.env.ROLLBAR_ENABLED === "true",
+  enabled: isProduction || process.env.ROLLBAR_ENABLED === 'true',
 
   // Rate limiting
   maxItems: 1000, // Max items per minute
@@ -58,10 +58,10 @@ export const rollbarConfig: Rollbar.Configuration = {
 
   // Ignore certain errors
   ignoredMessages: [
-    "Script error.",
-    "Network request failed",
-    "Load failed",
-    "Non-Error promise rejection captured",
+    'Script error.',
+    'Network request failed',
+    'Load failed',
+    'Non-Error promise rejection captured',
   ],
 
   // Custom fingerprinting for better error grouping (commented out - not in Configuration)
@@ -75,7 +75,7 @@ export const rollbarConfig: Rollbar.Configuration = {
 
   // Verbose logging in development
   verbose: isDevelopment,
-  reportLevel: isDevelopment ? "debug" : "warning",
+  reportLevel: isDevelopment ? 'debug' : 'warning',
 };
 
 // Initialize Rollbar instance
@@ -83,11 +83,11 @@ export const rollbar = new Rollbar(rollbarConfig);
 
 // Error severity levels
 export const ErrorSeverity = {
-  CRITICAL: "critical",
-  ERROR: "error",
-  WARNING: "warning",
-  INFO: "info",
-  DEBUG: "debug",
+  CRITICAL: 'critical',
+  ERROR: 'error',
+  WARNING: 'warning',
+  INFO: 'info',
+  DEBUG: 'debug',
 } as const;
 
 export type ErrorSeverityType =
@@ -114,7 +114,7 @@ export interface ErrorContext {
 export function reportError(
   error: Error | string,
   context?: ErrorContext,
-  severity: ErrorSeverityType = ErrorSeverity.ERROR,
+  severity: ErrorSeverityType = ErrorSeverity.ERROR
 ): void {
   if (!rollbarConfig.enabled) {
     // Rollbar Error (disabled)
@@ -136,7 +136,7 @@ export function reportError(
         method: context?.method,
         user_ip: context?.ip,
         headers: {
-          "User-Agent": context?.userAgent,
+          'User-Agent': context?.userAgent,
         },
       },
 
@@ -178,7 +178,7 @@ export function reportPerformanceIssue(
   operation: string,
   duration: number,
   threshold: number = 1000,
-  context?: ErrorContext,
+  context?: ErrorContext
 ): void {
   if (duration > threshold) {
     reportError(
@@ -192,7 +192,7 @@ export function reportPerformanceIssue(
           performanceIssue: true,
         },
       },
-      ErrorSeverity.WARNING,
+      ErrorSeverity.WARNING
     );
   }
 }
@@ -203,7 +203,7 @@ export function reportPerformanceIssue(
 export function reportBusinessError(
   errorCode: string,
   message: string,
-  context?: ErrorContext,
+  context?: ErrorContext
 ): void {
   reportError(
     `Business Error [${errorCode}]: ${message}`,
@@ -215,7 +215,7 @@ export function reportBusinessError(
         ...context?.additionalData,
       },
     },
-    ErrorSeverity.WARNING,
+    ErrorSeverity.WARNING
   );
 }
 
@@ -224,7 +224,7 @@ export function reportBusinessError(
  */
 export function reportSecurityIncident(
   incident: string,
-  context?: ErrorContext,
+  context?: ErrorContext
 ): void {
   reportError(
     `Security Incident: ${incident}`,
@@ -236,7 +236,7 @@ export function reportSecurityIncident(
         ...context?.additionalData,
       },
     },
-    ErrorSeverity.CRITICAL,
+    ErrorSeverity.CRITICAL
   );
 }
 
@@ -246,17 +246,17 @@ export function reportSecurityIncident(
 export function createErrorContext(
   request?: Request,
   userId?: string,
-  requestId?: string,
+  requestId?: string
 ): ErrorContext {
   return {
     userId,
     requestId,
     route: request ? new URL(request.url).pathname : undefined,
     method: request?.method,
-    userAgent: request?.headers.get("user-agent") || undefined,
+    userAgent: request?.headers.get('user-agent') || undefined,
     ip:
-      request?.headers.get("x-forwarded-for") ||
-      request?.headers.get("x-real-ip") ||
+      request?.headers.get('x-forwarded-for') ||
+      request?.headers.get('x-real-ip') ||
       undefined,
     timestamp: new Date(),
   };
@@ -268,7 +268,7 @@ export function createErrorContext(
 export function recordUserAction(
   action: string,
   userId?: string,
-  metadata?: Record<string, unknown>,
+  metadata?: Record<string, unknown>
 ): void {
   if (!rollbarConfig.enabled) return;
 
@@ -291,7 +291,7 @@ export function recordUserAction(
  * Flush Rollbar queue (useful for serverless)
  */
 export function flushRollbar(): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     if (!rollbarConfig.enabled) {
       resolve();
       return;
