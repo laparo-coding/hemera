@@ -126,5 +126,5 @@ export default tseslint.config(
         BASE_URL: 'readonly',
       },
     },
-  },
+  }
 );
