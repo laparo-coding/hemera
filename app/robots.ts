@@ -1,5 +1,5 @@
-import type { MetadataRoute } from "next";
-import { SITEMAP_CONFIG } from "@/lib/seo/constants";
+import type { MetadataRoute } from 'next';
+import { SITEMAP_CONFIG } from '@/lib/seo/constants';
 
 /**
  * Robots.txt configuration
@@ -12,22 +12,22 @@ import { SITEMAP_CONFIG } from "@/lib/seo/constants";
  */
 
 export default function robots(): MetadataRoute.Robots {
-	const baseUrl = SITEMAP_CONFIG.baseUrl;
+  const baseUrl = SITEMAP_CONFIG.baseUrl;
 
-	return {
-		rules: [
-			{
-				userAgent: "*",
-				allow: "/",
-				disallow: [...SITEMAP_CONFIG.exclude],
-			},
-			{
-				userAgent: "Googlebot",
-				allow: "/",
-				disallow: [...SITEMAP_CONFIG.exclude],
-			},
-		],
-		sitemap: `${baseUrl}/sitemap.xml`,
-		host: baseUrl,
-	};
+  return {
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [...SITEMAP_CONFIG.exclude],
+      },
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: [...SITEMAP_CONFIG.exclude],
+      },
+    ],
+    sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
+  };
 }

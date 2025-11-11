@@ -1,447 +1,446 @@
-import { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/db/prisma";
-import { type Booking, type Course, PaymentStatus } from "./course";
+import { Prisma } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
+import { type Booking, type Course, PaymentStatus } from './course';
 
 export interface BookingWithCourse extends Booking {
-	course: Course;
+  course: Course;
 }
 
 export interface CreateBookingParams {
-	userId: string;
-	courseId: string;
-	amount: number;
-	currency?: string;
-	stripeSessionId?: string;
-	stripePaymentIntentId?: string;
+  userId: string;
+  courseId: string;
+  amount: number;
+  currency?: string;
+  stripeSessionId?: string;
+  stripePaymentIntentId?: string;
 }
 
 export interface BookingSearchParams {
-	userId?: string;
-	courseId?: string;
-	paymentStatus?: PaymentStatus;
-	limit?: number;
-	offset?: number;
-	startDate?: Date;
-	endDate?: Date;
+  userId?: string;
+  courseId?: string;
+  paymentStatus?: PaymentStatus;
+  limit?: number;
+  offset?: number;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 /**
  * Create a new booking
  */
 export async function createBooking(
-	params: CreateBookingParams,
+  params: CreateBookingParams
 ): Promise<Booking> {
-	const {
-		userId,
-		courseId,
-		amount,
-		currency = "USD",
-		stripeSessionId,
-		stripePaymentIntentId,
-	} = params;
+  const {
+    userId,
+    courseId,
+    amount,
+    currency = 'USD',
+    stripeSessionId,
+    stripePaymentIntentId,
+  } = params;
 
-	// Check if user already has a booking for this course
-	const existingBooking = await prisma.booking.findUnique({
-		where: {
-			userId_courseId: {
-				userId,
-				courseId,
-			},
-		},
-	});
+  // Check if user already has a booking for this course
+  const existingBooking = await prisma.booking.findUnique({
+    where: {
+      userId_courseId: {
+        userId,
+        courseId,
+      },
+    },
+  });
 
-	// Check if course exists and is published
-	const course = await prisma.course.findUnique({
-		where: { id: courseId },
-		include: { bookings: true },
-	});
+  // Check if course exists and is published
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    include: { bookings: true },
+  });
 
-	if (!course) {
-		throw new Error("Course not found");
-	}
+  if (!course) {
+    throw new Error('Course not found');
+  }
 
-	if (!course.isPublished) {
-		throw new Error("Course is not published");
-	}
+  if (!course.isPublished) {
+    throw new Error('Course is not published');
+  }
 
-	// Check capacity if set
-	if ("capacity" in course && course.capacity) {
-		const paidBookingsCount = course.bookings.filter(
-			(b) => "paymentStatus" in b && b.paymentStatus === PaymentStatus.PAID,
-		).length;
+  // Check capacity if set
+  if ('capacity' in course && course.capacity) {
+    const paidBookingsCount = course.bookings.filter(
+      b => 'paymentStatus' in b && b.paymentStatus === PaymentStatus.PAID
+    ).length;
 
-		if (paidBookingsCount >= course.capacity) {
-			throw new Error("Course is full");
-		}
-	}
+    if (paidBookingsCount >= course.capacity) {
+      throw new Error('Course is full');
+    }
+  }
 
-	const updateData: Prisma.BookingUpdateInput = {};
+  const updateData: Prisma.BookingUpdateInput = {};
 
-	if (stripeSessionId && existingBooking?.stripeSessionId !== stripeSessionId) {
-		updateData.stripeSessionId = stripeSessionId;
-	}
+  if (stripeSessionId && existingBooking?.stripeSessionId !== stripeSessionId) {
+    updateData.stripeSessionId = stripeSessionId;
+  }
 
-	if (
-		stripePaymentIntentId &&
-		existingBooking?.stripePaymentIntentId !== stripePaymentIntentId
-	) {
-		updateData.stripePaymentIntentId = stripePaymentIntentId;
-	}
+  if (
+    stripePaymentIntentId &&
+    existingBooking?.stripePaymentIntentId !== stripePaymentIntentId
+  ) {
+    updateData.stripePaymentIntentId = stripePaymentIntentId;
+  }
 
-	if (typeof amount === "number" && existingBooking?.amount !== amount) {
-		updateData.amount = amount;
-	}
+  if (typeof amount === 'number' && existingBooking?.amount !== amount) {
+    updateData.amount = amount;
+  }
 
-	if (currency && existingBooking?.currency !== currency) {
-		updateData.currency = currency;
-	}
+  if (currency && existingBooking?.currency !== currency) {
+    updateData.currency = currency;
+  }
 
-	if (existingBooking?.paymentStatus === PaymentStatus.CANCELLED) {
-		updateData.paymentStatus = PaymentStatus.PENDING;
-	}
+  if (existingBooking?.paymentStatus === PaymentStatus.CANCELLED) {
+    updateData.paymentStatus = PaymentStatus.PENDING;
+  }
 
-	try {
-		const booking = await prisma.booking.upsert({
-			where: {
-				userId_courseId: {
-					userId,
-					courseId,
-				},
-			},
-			create: {
-				userId,
-				courseId,
-				amount,
-				currency,
-				paymentStatus: PaymentStatus.PENDING,
-				...(stripeSessionId && { stripeSessionId }),
-				...(stripePaymentIntentId && { stripePaymentIntentId }),
-			},
-			update: updateData,
-		});
+  try {
+    const booking = await prisma.booking.upsert({
+      where: {
+        userId_courseId: {
+          userId,
+          courseId,
+        },
+      },
+      create: {
+        userId,
+        courseId,
+        amount,
+        currency,
+        paymentStatus: PaymentStatus.PENDING,
+        ...(stripeSessionId && { stripeSessionId }),
+        ...(stripePaymentIntentId && { stripePaymentIntentId }),
+      },
+      update: updateData,
+    });
 
-		return booking as unknown as Booking;
-	} catch (error) {
-		if (
-			error instanceof Prisma.PrismaClientKnownRequestError &&
-			error.code === "P2002"
-		) {
-			const existing = await prisma.booking.findUnique({
-				where: {
-					userId_courseId: {
-						userId,
-						courseId,
-					},
-				},
-			});
+    return booking as unknown as Booking;
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      const existing = await prisma.booking.findUnique({
+        where: {
+          userId_courseId: {
+            userId,
+            courseId,
+          },
+        },
+      });
 
-			if (existing) {
-				if (Object.keys(updateData).length > 0) {
-					const updated = await prisma.booking.update({
-						where: { id: existing.id },
-						data: updateData,
-					});
+      if (existing) {
+        if (Object.keys(updateData).length > 0) {
+          const updated = await prisma.booking.update({
+            where: { id: existing.id },
+            data: updateData,
+          });
 
-					return updated as unknown as Booking;
-				}
+          return updated as unknown as Booking;
+        }
 
-				return existing as unknown as Booking;
-			}
-		}
+        return existing as unknown as Booking;
+      }
+    }
 
-		throw error;
-	}
+    throw error;
+  }
 }
 
 /**
  * Get booking by ID
  */
 export async function getBookingById(
-	id: string,
+  id: string
 ): Promise<BookingWithCourse | null> {
-	return (await prisma.booking.findUnique({
-		where: { id },
-		include: {
-			course: true,
-		},
-	})) as unknown as BookingWithCourse | null;
+  return (await prisma.booking.findUnique({
+    where: { id },
+    include: {
+      course: true,
+    },
+  })) as unknown as BookingWithCourse | null;
 }
 
 /**
  * Get bookings with optional filtering
  */
 export async function getBookings(
-	params?: BookingSearchParams,
+  params?: BookingSearchParams
 ): Promise<BookingWithCourse[]> {
-	const where: Prisma.BookingWhereInput = {};
+  const where: Prisma.BookingWhereInput = {};
 
-	if (params?.userId) {
-		where.userId = params.userId;
-	}
+  if (params?.userId) {
+    where.userId = params.userId;
+  }
 
-	if (params?.courseId) {
-		where.courseId = params.courseId;
-	}
+  if (params?.courseId) {
+    where.courseId = params.courseId;
+  }
 
-	if (params?.paymentStatus) {
-		where.paymentStatus = params.paymentStatus;
-	}
+  if (params?.paymentStatus) {
+    where.paymentStatus = params.paymentStatus;
+  }
 
-	if (params?.startDate || params?.endDate) {
-		where.createdAt = {};
-		if (params.startDate) {
-			where.createdAt.gte = params.startDate;
-		}
-		if (params.endDate) {
-			where.createdAt.lte = params.endDate;
-		}
-	}
+  if (params?.startDate || params?.endDate) {
+    where.createdAt = {};
+    if (params.startDate) {
+      where.createdAt.gte = params.startDate;
+    }
+    if (params.endDate) {
+      where.createdAt.lte = params.endDate;
+    }
+  }
 
-	return (await prisma.booking.findMany({
-		where,
-		include: {
-			course: true,
-		},
-		orderBy: {
-			createdAt: "desc",
-		},
-		take: params?.limit,
-		skip: params?.offset,
-	})) as unknown as BookingWithCourse[];
+  return (await prisma.booking.findMany({
+    where,
+    include: {
+      course: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: params?.limit,
+    skip: params?.offset,
+  })) as unknown as BookingWithCourse[];
 }
 
 /**
  * Get user's bookings
  */
 export async function getUserBookings(
-	userId: string,
+  userId: string
 ): Promise<BookingWithCourse[]> {
-	return getBookings({ userId });
+  return getBookings({ userId });
 }
 
 /**
  * Get course bookings
  */
 export async function getCourseBookings(
-	courseId: string,
+  courseId: string
 ): Promise<BookingWithCourse[]> {
-	return getBookings({ courseId });
+  return getBookings({ courseId });
 }
 
 /**
  * Update booking status with additional payment information
  */
 export async function updateBookingStatus(params: {
-	id: string;
-	status: PaymentStatus;
-	stripePaymentIntentId?: string;
-	stripeSessionId?: string;
+  id: string;
+  status: PaymentStatus;
+  stripePaymentIntentId?: string;
+  stripeSessionId?: string;
 }): Promise<Booking> {
-	const { id, status, stripePaymentIntentId, stripeSessionId } = params;
+  const { id, status, stripePaymentIntentId, stripeSessionId } = params;
 
-	const updateData: Prisma.BookingUpdateInput = { paymentStatus: status };
+  const updateData: Prisma.BookingUpdateInput = { paymentStatus: status };
 
-	if (stripePaymentIntentId) {
-		updateData.stripePaymentIntentId = stripePaymentIntentId;
-	}
+  if (stripePaymentIntentId) {
+    updateData.stripePaymentIntentId = stripePaymentIntentId;
+  }
 
-	if (stripeSessionId) {
-		updateData.stripeSessionId = stripeSessionId;
-	}
+  if (stripeSessionId) {
+    updateData.stripeSessionId = stripeSessionId;
+  }
 
-	const booking = await prisma.booking.update({
-		where: { id },
-		data: updateData,
-	});
+  const booking = await prisma.booking.update({
+    where: { id },
+    data: updateData,
+  });
 
-	return booking as unknown as Booking;
+  return booking as unknown as Booking;
 }
 
 /**
  * Update booking payment status
  */
 export async function updateBookingPaymentStatus(
-	bookingId: string,
-	paymentStatus: PaymentStatus,
-	stripePaymentIntentId?: string,
+  bookingId: string,
+  paymentStatus: PaymentStatus,
+  stripePaymentIntentId?: string
 ): Promise<Booking> {
-	const updateData: Prisma.BookingUpdateInput = { paymentStatus };
+  const updateData: Prisma.BookingUpdateInput = { paymentStatus };
 
-	if (stripePaymentIntentId) {
-		updateData.stripePaymentIntentId = stripePaymentIntentId;
-	}
+  if (stripePaymentIntentId) {
+    updateData.stripePaymentIntentId = stripePaymentIntentId;
+  }
 
-	const booking = await prisma.booking.update({
-		where: { id: bookingId },
-		data: updateData,
-	});
+  const booking = await prisma.booking.update({
+    where: { id: bookingId },
+    data: updateData,
+  });
 
-	return booking as unknown as Booking;
+  return booking as unknown as Booking;
 }
 
 /**
  * Cancel a booking
  */
 export async function cancelBooking(
-	bookingId: string,
-	userId?: string,
+  bookingId: string,
+  userId?: string
 ): Promise<Booking> {
-	const where: Prisma.BookingWhereUniqueInput = { id: bookingId };
+  const where: Prisma.BookingWhereUniqueInput = { id: bookingId };
 
-	if (userId) {
-		where.userId = userId;
-	}
+  if (userId) {
+    where.userId = userId;
+  }
 
-	// Check if booking exists and belongs to user (if userId provided)
-	const existingBooking = await prisma.booking.findUnique({
-		where,
-	});
+  // Check if booking exists and belongs to user (if userId provided)
+  const existingBooking = await prisma.booking.findUnique({
+    where,
+  });
 
-	if (!existingBooking) {
-		throw new Error("Booking not found or does not belong to user");
-	}
+  if (!existingBooking) {
+    throw new Error('Booking not found or does not belong to user');
+  }
 
-	// Can only cancel pending or paid bookings
-	const currentStatus = existingBooking.paymentStatus;
-	if (
-		currentStatus !== PaymentStatus.PENDING &&
-		currentStatus !== PaymentStatus.PAID
-	) {
-		throw new Error(`Cannot cancel booking with status: ${currentStatus}`);
-	}
+  // Can only cancel pending or paid bookings
+  const currentStatus = existingBooking.paymentStatus;
+  if (
+    currentStatus !== PaymentStatus.PENDING &&
+    currentStatus !== PaymentStatus.PAID
+  ) {
+    throw new Error(`Cannot cancel booking with status: ${currentStatus}`);
+  }
 
-	return updateBookingPaymentStatus(bookingId, PaymentStatus.CANCELLED);
+  return updateBookingPaymentStatus(bookingId, PaymentStatus.CANCELLED);
 }
 
 /**
  * Get booking by Stripe session ID
  */
 export async function getBookingByStripeSessionId(
-	sessionId: string,
+  sessionId: string
 ): Promise<Booking | null> {
-	return (await prisma.booking.findFirst({
-		where: {
-			...(sessionId && { stripeSessionId: sessionId }),
-		},
-	})) as unknown as Booking | null;
+  return (await prisma.booking.findFirst({
+    where: {
+      ...(sessionId && { stripeSessionId: sessionId }),
+    },
+  })) as unknown as Booking | null;
 }
 
 /**
  * Get booking by Stripe payment intent ID
  */
 export async function getBookingByStripePaymentIntentId(
-	paymentIntentId: string,
+  paymentIntentId: string
 ): Promise<Booking | null> {
-	return (await prisma.booking.findFirst({
-		where: {
-			...(paymentIntentId && { stripePaymentIntentId: paymentIntentId }),
-		},
-	})) as unknown as Booking | null;
+  return (await prisma.booking.findFirst({
+    where: {
+      ...(paymentIntentId && { stripePaymentIntentId: paymentIntentId }),
+    },
+  })) as unknown as Booking | null;
 }
 
 /**
  * Get booking statistics
  */
 export async function getBookingStats(params?: {
-	userId?: string;
-	courseId?: string;
-	startDate?: Date;
-	endDate?: Date;
+  userId?: string;
+  courseId?: string;
+  startDate?: Date;
+  endDate?: Date;
 }) {
-	const where: Prisma.BookingWhereInput = {};
+  const where: Prisma.BookingWhereInput = {};
 
-	if (params?.userId) {
-		where.userId = params.userId;
-	}
+  if (params?.userId) {
+    where.userId = params.userId;
+  }
 
-	if (params?.courseId) {
-		where.courseId = params.courseId;
-	}
+  if (params?.courseId) {
+    where.courseId = params.courseId;
+  }
 
-	if (params?.startDate || params?.endDate) {
-		where.createdAt = {};
-		if (params.startDate) {
-			where.createdAt.gte = params.startDate;
-		}
-		if (params.endDate) {
-			where.createdAt.lte = params.endDate;
-		}
-	}
+  if (params?.startDate || params?.endDate) {
+    where.createdAt = {};
+    if (params.startDate) {
+      where.createdAt.gte = params.startDate;
+    }
+    if (params.endDate) {
+      where.createdAt.lte = params.endDate;
+    }
+  }
 
-	const bookings = await prisma.booking.findMany({
-		where,
-	});
+  const bookings = await prisma.booking.findMany({
+    where,
+  });
 
-	return {
-		total: bookings.length,
-		pending: bookings.filter((b) => b.paymentStatus === PaymentStatus.PENDING)
-			.length,
-		paid: bookings.filter((b) => b.paymentStatus === PaymentStatus.PAID).length,
-		failed: bookings.filter((b) => b.paymentStatus === PaymentStatus.FAILED)
-			.length,
-		cancelled: bookings.filter(
-			(b) => b.paymentStatus === PaymentStatus.CANCELLED,
-		).length,
-		refunded: bookings.filter((b) => b.paymentStatus === PaymentStatus.REFUNDED)
-			.length,
-		totalRevenue: bookings
-			.filter((b) => b.paymentStatus === PaymentStatus.PAID)
-			.reduce((sum, b) => sum + b.amount, 0),
-	};
+  return {
+    total: bookings.length,
+    pending: bookings.filter(b => b.paymentStatus === PaymentStatus.PENDING)
+      .length,
+    paid: bookings.filter(b => b.paymentStatus === PaymentStatus.PAID).length,
+    failed: bookings.filter(b => b.paymentStatus === PaymentStatus.FAILED)
+      .length,
+    cancelled: bookings.filter(b => b.paymentStatus === PaymentStatus.CANCELLED)
+      .length,
+    refunded: bookings.filter(b => b.paymentStatus === PaymentStatus.REFUNDED)
+      .length,
+    totalRevenue: bookings
+      .filter(b => b.paymentStatus === PaymentStatus.PAID)
+      .reduce((sum, b) => sum + b.amount, 0),
+  };
 }
 
 /**
  * Check if user can book a course
  */
 export async function canUserBookCourse(
-	userId: string,
-	courseId: string,
+  userId: string,
+  courseId: string
 ): Promise<{
-	canBook: boolean;
-	reason?: string;
+  canBook: boolean;
+  reason?: string;
 }> {
-	// Check if course exists
-	const course = await prisma.course.findUnique({
-		where: { id: courseId },
-		include: { bookings: true },
-	});
+  // Check if course exists
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    include: { bookings: true },
+  });
 
-	if (!course) {
-		return { canBook: false, reason: "Course not found" };
-	}
+  if (!course) {
+    return { canBook: false, reason: 'Course not found' };
+  }
 
-	if (!course.isPublished) {
-		return { canBook: false, reason: "Course is not published" };
-	}
+  if (!course.isPublished) {
+    return { canBook: false, reason: 'Course is not published' };
+  }
 
-	// Check if user already has a booking
-	const existingBooking = await prisma.booking.findUnique({
-		where: {
-			userId_courseId: {
-				userId,
-				courseId,
-			},
-		},
-	});
+  // Check if user already has a booking
+  const existingBooking = await prisma.booking.findUnique({
+    where: {
+      userId_courseId: {
+        userId,
+        courseId,
+      },
+    },
+  });
 
-	if (existingBooking) {
-		return {
-			canBook: false,
-			reason: "User already has a booking for this course",
-		};
-	}
+  if (existingBooking) {
+    return {
+      canBook: false,
+      reason: 'User already has a booking for this course',
+    };
+  }
 
-	// Check capacity
-	const capacity = (course as { capacity?: number }).capacity;
-	if (capacity) {
-		const paidBookingsCount = course.bookings.filter(
-			(b) => b.paymentStatus === PaymentStatus.PAID,
-		).length;
+  // Check capacity
+  const capacity = (course as { capacity?: number }).capacity;
+  if (capacity) {
+    const paidBookingsCount = course.bookings.filter(
+      b => b.paymentStatus === PaymentStatus.PAID
+    ).length;
 
-		if (paidBookingsCount >= capacity) {
-			return { canBook: false, reason: "Course is full" };
-		}
-	}
+    if (paidBookingsCount >= capacity) {
+      return { canBook: false, reason: 'Course is full' };
+    }
+  }
 
-	return { canBook: true };
+  return { canBook: true };
 }

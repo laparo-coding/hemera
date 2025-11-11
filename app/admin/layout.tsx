@@ -3,17 +3,17 @@
  * Layout für Admin-Bereiche
  */
 
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: "Admin Dashboard | Hemera",
-	description: "Administrative functions and monitoring",
+  title: 'Admin Dashboard | Hemera',
+  description: 'Administrative functions and monitoring',
 };
 
 export default function AdminLayout({
-	children,
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	return <>{children}</>;
+  return <>{children}</>;
 }

@@ -8,9 +8,9 @@
  * Currently environment-driven; future: derive from a persisted consent state (e.g., cookie/local storage).
  */
 export function isTelemetryConsentGranted(): boolean {
-	return (
-		process.env.NEXT_PUBLIC_TELEMETRY_CONSENT === "1" ||
-		process.env.TELEMETRY_CONSENT === "1" ||
-		process.env.ROLLBAR_ALLOW_PII === "1"
-	);
+  return (
+    process.env.NEXT_PUBLIC_TELEMETRY_CONSENT === '1' ||
+    process.env.TELEMETRY_CONSENT === '1' ||
+    process.env.ROLLBAR_ALLOW_PII === '1'
+  );
 }
