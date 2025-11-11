@@ -1,7 +1,7 @@
-import { expect, test, Page } from '@playwright/test';
-import { gotoStable, clickAndWait } from './helpers/nav';
+import { expect, type Page, test } from '@playwright/test';
+import { clickAndWait, gotoStable } from './helpers/nav';
 
-const isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
+const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
 async function getMetaContent(page: Page, selector: string) {
   const el = page.locator(selector).first();
@@ -15,7 +15,7 @@ test.describe('Courses OG metadata', () => {
 
     const ogImage = await getMetaContent(page, 'meta[property="og:image"]');
     expect(ogImage).toBeTruthy();
-    expect(ogImage!.startsWith('http')).toBeTruthy();
+    expect(ogImage?.startsWith('http')).toBeTruthy();
   });
 
   test('Course detail: og:image ist, wenn vorhanden, absolut', async ({

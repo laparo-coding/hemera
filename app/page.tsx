@@ -1,13 +1,10 @@
-import CourseListing from '@/components/CourseListing';
+import { Box, Button, Container, Typography } from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 import { getFeaturedCourses } from '@/lib/api/courses';
 import { generateLandingPageMetadata } from '@/lib/seo/metadata';
 import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
-import { formatDistanceToNow } from 'date-fns';
-import { de } from 'date-fns/locale';
-import { Box, Button, Container, Typography } from '@mui/material';
-import Grid from '@mui/material/GridLegacy';
-import { Metadata } from 'next';
-import Link from 'next/link';
 
 /**
  * Landing page with SSG and SEO optimization
@@ -24,7 +21,7 @@ export const metadata: Metadata = generateLandingPageMetadata();
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const featuredCourses = await getFeaturedCourses(3);
+  const _featuredCourses = await getFeaturedCourses(3);
 
   // For now, use homepage schema instead of landingPage
   const jsonLdSchemas = SCHEMA_COMBINATIONS.homepage();

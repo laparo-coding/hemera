@@ -2,8 +2,7 @@
 // Tries environment variables first (for Vercel/GitHub), then falls back to package.json.
 
 // Importing JSON works with TypeScript's resolveJsonModule and Next.js bundling
-// @ts-ignore - allow JSON import
-const pkgJson = require('../package.json');
+import pkgJson from '../package.json';
 
 export type BuildInfo = {
   version: string;

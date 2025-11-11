@@ -22,7 +22,7 @@ interface StripeCheckoutFormProps {
   amount: number;
   currency: string;
   courseName: string;
-  onSuccess: (paymentIntent: any) => void;
+  onSuccess: (paymentIntent: { id: string; status: string }) => void;
   onError: (error: string) => void;
 }
 
@@ -129,7 +129,7 @@ export default function StripeCheckoutForm({
         setMessage('Zahlung wird verarbeitet ...');
         setMessageType('info');
       }
-    } catch (err) {
+    } catch (_err) {
       setMessage('Ein unerwarteter Fehler ist aufgetreten.');
       setMessageType('error');
       onError('Unerwarteter Fehler');

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 const ORIGINAL_ENV = process.env;
 
@@ -30,8 +30,8 @@ describe('Contract: Web Vitals gating', () => {
     expect(isPublicPath('/sign-in')).toBe(false);
 
     // init should succeed for public path, and do nothing for private
-    const sent: any[] = [];
-    const sender = (m: any) => sent.push(m);
+    const sent: unknown[] = [];
+    const sender = (m: unknown) => sent.push(m);
 
     const okPublic = await initWebVitals(sender, { path: '/' });
     const okPrivate = await initWebVitals(sender, { path: '/sign-in' });

@@ -1,17 +1,17 @@
+import { auth } from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import {
   deleteUser,
   getUserProfile,
   getUserStats,
-  updateUser,
   type UpdateUserData,
+  updateUser,
 } from '@/lib/api/users';
 import { checkUserAdminStatus } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -36,7 +36,7 @@ export async function GET(
       );
     }
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(_request.url);
     const includeStats = searchParams.get('includeStats') === 'true';
 
     const [profile, stats] = await Promise.all([
@@ -64,7 +64,7 @@ export async function GET(
 }
 
 export async function PUT(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -91,8 +91,8 @@ export async function PUT(
 
     let body;
     try {
-      body = await request.json();
-    } catch (error) {
+      body = await _request.json();
+    } catch (_error) {
       return NextResponse.json(
         { error: 'Invalid JSON in request body' },
         { status: 400 }
@@ -150,7 +150,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

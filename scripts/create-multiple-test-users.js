@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
+import https from 'node:https';
 import dotenv from 'dotenv';
-import https from 'https';
 
 // Load environment variables
 dotenv.config({ path: '.env.local' });

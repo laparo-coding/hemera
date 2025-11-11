@@ -69,7 +69,7 @@ function pickProductionBranch(project) {
     const project = await getProject();
     const deployments = await getRecentDeployments(25);
 
-    let violations = [];
+    const violations = [];
 
     // 1) Production branch policy
     const prodBranch = pickProductionBranch(project);
@@ -148,7 +148,7 @@ function pickProductionBranch(project) {
 
     if (violations.length > 0) {
       console.error('\n❌ Vercel guard violations:');
-      for (const v of violations) console.error(' - ' + v);
+      for (const v of violations) console.error(` - ${v}`);
       process.exit(1);
     } else {
       console.log('\n✅ vercel-guard passed: No policy violations detected.');

@@ -1,4 +1,7 @@
-import { CourseWithBookings, getCourses } from '@/lib/services/courses';
+import { PaymentStatus } from '@prisma/client';
+import type { NextRequest } from 'next/server';
+import { z } from 'zod';
+import { type CourseWithBookings, getCourses } from '@/lib/services/courses';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import {
   createErrorResponse,
@@ -9,9 +12,6 @@ import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { PaymentStatus } from '@prisma/client';
-import { NextRequest } from 'next/server';
-import { z } from 'zod';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -101,7 +101,8 @@ export async function GET(request: NextRequest) {
     // Sortierung anwenden
     if (validatedParams.sortBy) {
       filteredCourses.sort((a: CourseWithBookings, b: CourseWithBookings) => {
-        let aValue: any, bValue: any;
+        let aValue: string | number | Date;
+        let bValue: string | number | Date;
 
         switch (validatedParams.sortBy) {
           case 'title':
@@ -113,8 +114,8 @@ export async function GET(request: NextRequest) {
             bValue = b.price || 0;
             break;
           case 'date':
-            aValue = a.date;
-            bValue = b.date;
+            aValue = a.date || new Date(0);
+            bValue = b.date || new Date(0);
             break;
           default:
             aValue = a.title;

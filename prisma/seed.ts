@@ -452,7 +452,7 @@ async function main() {
     },
   ];
 
-  const courses = await Promise.all(
+  const _courses = await Promise.all(
     seedCourses.map(course =>
       prisma.course.upsert({
         where: { slug: course.slug },
@@ -476,11 +476,9 @@ async function main() {
 
 main()
   .then(() => {
-    // eslint-disable-next-line no-console
     console.log('✅ Seed completed successfully');
   })
   .catch(e => {
-    // eslint-disable-next-line no-console
     console.error('❌ Seed failed:', e);
     process.exit(1);
   })

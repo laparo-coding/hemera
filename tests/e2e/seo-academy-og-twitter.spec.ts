@@ -1,7 +1,7 @@
-import { expect, test, Page } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { gotoStable } from './helpers/nav';
 
-const isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
+const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
 async function getMetaContent(page: Page, selector: string) {
   const el = page.locator(selector).first();

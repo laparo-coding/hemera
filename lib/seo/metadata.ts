@@ -1,9 +1,9 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import {
+  getFullUrl,
   IMAGE_CONFIG,
   SITE_CONFIG,
   SOCIAL_CONFIG,
-  getFullUrl,
 } from '@/lib/seo/constants';
 
 /**

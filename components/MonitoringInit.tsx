@@ -1,11 +1,11 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
+import * as React from 'react';
 import {
   initWebVitals,
   type WebVitalMetric,
 } from '@/lib/monitoring/web-vitals';
-import { usePathname } from 'next/navigation';
-import * as React from 'react';
 
 function sendMetric(metric: WebVitalMetric & { path?: string }) {
   const payload = JSON.stringify({

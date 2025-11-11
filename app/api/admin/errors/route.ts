@@ -3,13 +3,13 @@
  * Provides error metrics and logs for monitoring dashboard
  */
 
+import { auth } from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { checkUserAdminStatus } from '@/lib/auth/helpers';
 import { withErrorHandling } from '@/lib/errors';
 import { errorAnalytics } from '@/lib/services/error-analytics';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
 import { createErrorResponse, ErrorCodes } from '@/lib/utils/api-response';
 import { getOrCreateRequestId } from '@/lib/utils/request-id';
-import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
 
 // CORS headers for external app access
 const corsHeaders = {
@@ -30,7 +30,7 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   try {
     const authResult = await auth();
     userId = authResult.userId;
-  } catch (authError) {
+  } catch (_authError) {
     // In E2E test mode, auth() might fail, return 401
     const errorResponse = createErrorResponse(
       'Unauthorized access',
@@ -87,20 +87,22 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     | 'hour'
     | 'day'
     | 'week';
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '50');
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = parseInt(searchParams.get('limit') || '50', 10);
 
-  let responseData;
+  let responseData: NextResponse;
   switch (action) {
-    case 'metrics':
+    case 'metrics': {
       const metrics = errorAnalytics.getErrorMetrics(timeRange);
       responseData = NextResponse.json(metrics);
       break;
+    }
 
-    case 'logs':
+    case 'logs': {
       const logs = errorAnalytics.getRecentErrors(page, limit);
       responseData = NextResponse.json(logs);
       break;
+    }
 
     default:
       responseData = NextResponse.json(
@@ -125,7 +127,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   try {
     const authResult = await auth();
     userId = authResult.userId;
-  } catch (authError) {
+  } catch (_authError) {
     // In E2E test mode, auth() might fail, return 401
     const errorResponse = createErrorResponse(
       'Unauthorized access',
@@ -179,9 +181,9 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action');
 
-  let responseData;
+  let responseData: NextResponse;
   switch (action) {
-    case 'resolve':
+    case 'resolve': {
       const { errorId } = await request.json();
       const resolved = errorAnalytics.resolveError(errorId);
 
@@ -190,8 +192,9 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         message: resolved ? 'Error marked as resolved' : 'Error not found',
       });
       break;
+    }
 
-    case 'clear':
+    case 'clear': {
       // Only allow in development
       if (process.env.NODE_ENV === 'development') {
         errorAnalytics.clearLogs();
@@ -203,6 +206,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         );
       }
       break;
+    }
 
     default:
       responseData = NextResponse.json(

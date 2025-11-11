@@ -3,15 +3,15 @@
  * Demonstrates comprehensive error handling patterns
  */
 
+import { NextResponse } from 'next/server';
 import { getCourseById } from '@/lib/api/courses';
 import { CourseNotFoundError } from '@/lib/errors/domain';
 import {
-  ApiRouteContext,
+  type ApiRouteContext,
   withApiErrorHandling,
   withAuthProtection,
   withRequestValidation,
 } from '@/lib/middleware/api-error-handling';
-import { NextResponse } from 'next/server';
 
 // Example 1: Basic API route with error handling
 export const GET = withApiErrorHandling(async (context: ApiRouteContext) => {
@@ -41,8 +41,9 @@ export const POST = withAuthProtection(async context => {
 
 // Example 3: API route with request validation
 const createCourseSchema = {
-  parse: (data: any) => {
-    if (!data.title || !data.description) {
+  parse: (data: unknown) => {
+    const record = data as Record<string, unknown>;
+    if (!record.title || !record.description) {
       throw new Error('Title and description are required');
     }
     return data;
@@ -51,7 +52,7 @@ const createCourseSchema = {
 
 export const PUT = withRequestValidation(
   createCourseSchema, // body schema
-  null // query schema
+  undefined // query schema
 )(async context => {
   const { validatedBody } = context;
 
@@ -65,7 +66,7 @@ export const PUT = withRequestValidation(
 });
 
 // Example 4: API route with rate limiting and CORS
-export const PATCH = withApiErrorHandling(async context => {
+export const PATCH = withApiErrorHandling(async _context => {
   // Rate limiting and CORS would be applied here
   // For demonstration purposes, simplified implementation
   return NextResponse.json({ message: 'Course patched successfully' });

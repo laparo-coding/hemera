@@ -1,8 +1,8 @@
-import { prisma } from '@/lib/db/prisma';
 import { currentUser } from '@clerk/nextjs/server';
 import { PaymentStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { prisma } from '@/lib/db/prisma';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -15,7 +15,7 @@ const CreateBookingSchema = z.object({
 });
 
 export async function GET(request: Request) {
-  const requestId = crypto.randomUUID();
+  const _requestId = crypto.randomUUID();
 
   try {
     const { searchParams } = new URL(request.url);

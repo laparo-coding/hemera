@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { gotoStable } from './helpers/nav';
 
 // Verifies that legacy /protected/* paths are permanently redirected to /dashboard

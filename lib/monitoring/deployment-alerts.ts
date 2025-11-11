@@ -3,8 +3,8 @@
  * Automatische Benachrichtigungen bei kritischen Deployment-Problemen
  */
 
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { analytics } from '@/lib/analytics/request-analytics';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 export interface AlertRule {
   id: string;
@@ -24,7 +24,7 @@ export interface AlertCondition {
 
 export interface NotificationChannel {
   type: 'rollbar' | 'webhook' | 'email';
-  config: Record<string, any>;
+  config: Record<string, unknown>;
 }
 
 export interface DeploymentAlert {
@@ -33,7 +33,7 @@ export interface DeploymentAlert {
   timestamp: string;
   severity: string;
   message: string;
-  details: any;
+  details: unknown;
   resolved: boolean;
 }
 
@@ -133,7 +133,7 @@ export class DeploymentAlertSystem {
   /**
    * Health-Check-Ergebnisse evaluieren und Alerts triggern
    */
-  public async evaluateHealthChecks(healthData: any): Promise<void> {
+  public async evaluateHealthChecks(healthData: unknown): Promise<void> {
     const metrics = this.extractMetrics(healthData);
 
     for (const [ruleId, rule] of this.alertRules) {
@@ -155,17 +155,27 @@ export class DeploymentAlertSystem {
   /**
    * Metriken aus Health-Check-Daten extrahieren
    */
-  private extractMetrics(healthData: any): Record<string, number> {
+  private extractMetrics(healthData: unknown): Record<string, number> {
     const metrics: Record<string, number> = {};
 
     // Service Health zu numerischen Werten konvertieren
-    if (healthData.services) {
-      Object.entries(healthData.services).forEach(
-        ([service, check]: [string, any]) => {
-          metrics[`${service}_health`] = check.status === 'pass' ? 1 : 0;
-          metrics[`${service}_response_time`] = check.responseTime || 0;
-        }
-      );
+    if (
+      healthData &&
+      typeof healthData === 'object' &&
+      'services' in healthData
+    ) {
+      const services = (healthData as { services?: unknown }).services;
+      if (services && typeof services === 'object') {
+        Object.entries(services).forEach(([service, check]) => {
+          if (check && typeof check === 'object') {
+            const status = (check as { status?: string }).status;
+            const responseTime = (check as { responseTime?: number })
+              .responseTime;
+            metrics[`${service}_health`] = status === 'pass' ? 1 : 0;
+            metrics[`${service}_response_time`] = responseTime || 0;
+          }
+        });
+      }
     }
 
     // Durchschnittliche Response Time
@@ -296,17 +306,27 @@ export class DeploymentAlertSystem {
     alert: DeploymentAlert
   ): Promise<void> {
     switch (channel.type) {
-      case 'rollbar':
+      case 'rollbar': {
         const level = channel.config.level || 'error';
 
         if (level === 'critical') {
-          serverInstance.critical(alert.message, alert.details);
+          serverInstance.critical(
+            alert.message,
+            alert.details as Record<string, unknown>
+          );
         } else if (level === 'warning') {
-          serverInstance.warning(alert.message, alert.details);
+          serverInstance.warning(
+            alert.message,
+            alert.details as Record<string, unknown>
+          );
         } else {
-          serverInstance.error(alert.message, alert.details);
+          serverInstance.error(
+            alert.message,
+            alert.details as Record<string, unknown>
+          );
         }
         break;
+      }
 
       case 'webhook':
         // Webhook-Implementation hier

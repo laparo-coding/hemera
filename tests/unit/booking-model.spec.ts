@@ -21,9 +21,9 @@ afterAll(async () => {
 });
 
 describe('Booking Model Validations', () => {
-  let testCourse: any;
-  let testUser: any;
-  let testUser2: any;
+  let testCourse: { id: string; title: string; price: number };
+  let testUser: { id: string; email: string | null };
+  let testUser2: { id: string; email: string | null };
 
   beforeEach(async () => {
     // Clean up any existing test data first

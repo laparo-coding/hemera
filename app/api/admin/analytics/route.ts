@@ -3,6 +3,8 @@
  * Stellt Analytics-Daten für Dashboard und Monitoring zur Verfügung
  */
 
+import { auth } from '@clerk/nextjs/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { analytics } from '@/lib/analytics/request-analytics';
 import { checkUserAdminStatus } from '@/lib/auth/helpers';
 import { createApiLogger } from '@/lib/utils/api-logger';
@@ -15,8 +17,6 @@ import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
 
 // CORS headers for external app access
 const corsHeaders = {
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
       userId,
     });
 
-    let responseData;
+    let responseData: unknown;
 
     switch (reportType) {
       case 'summary':
@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
         };
         break;
 
-      case 'trace':
+      case 'trace': {
         const traceRequestId = searchParams.get('requestId');
         if (!traceRequestId) {
           const errorResponse = createErrorResponse(
@@ -151,8 +151,9 @@ export async function GET(request: NextRequest) {
           trace: analytics.getRequestTrace(traceRequestId),
         };
         break;
+      }
 
-      default:
+      default: {
         const errorResponse = createErrorResponse(
           'Invalid report type',
           ErrorCodes.INVALID_INPUT,
@@ -166,6 +167,7 @@ export async function GET(request: NextRequest) {
         });
 
         return errorResponse;
+      }
     }
 
     logger.info('Analytics report generated successfully', {

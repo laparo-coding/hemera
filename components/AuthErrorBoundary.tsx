@@ -38,7 +38,7 @@ export class AuthErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(_error: Error, _errorInfo: React.ErrorInfo) {
     // Log error to monitoring service in production
     // Auth Error Boundary caught an error
 

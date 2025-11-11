@@ -1,10 +1,10 @@
+import Stripe from 'stripe';
 import {
+  logError,
   PaymentProcessingError,
   StripeConfigurationError,
-  logError,
 } from '@/lib/errors';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import Stripe from 'stripe';
 import { STRIPE_API_VERSION } from '../stripe/config';
 import { PaymentStatus } from './course';
 
@@ -195,7 +195,7 @@ export class StripeService {
     eventId: string;
     eventType: string;
     processed: boolean;
-    data?: any;
+    data?: unknown;
   }> {
     try {
       if (!process.env.STRIPE_WEBHOOK_SECRET) {
@@ -215,7 +215,7 @@ export class StripeService {
         eventId: event.id,
         eventType: event.type,
         processed: false,
-        data: undefined as any,
+        data: undefined as unknown,
       };
 
       switch (event.type) {
@@ -514,7 +514,7 @@ export class StripeService {
       );
 
       return true;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -548,7 +548,10 @@ export class StripeService {
       if (error instanceof StripeConfigurationError) {
         throw error;
       }
-      logError('Payment intent creation failed', error as Record<string, any>);
+      logError(
+        'Payment intent creation failed',
+        error as Record<string, unknown>
+      );
       throw new PaymentProcessingError(
         'Failed to create payment intent',
         error as string
@@ -571,7 +574,10 @@ export class StripeService {
       if (error instanceof StripeConfigurationError) {
         throw error;
       }
-      logError('Payment intent retrieval failed', error as Record<string, any>);
+      logError(
+        'Payment intent retrieval failed',
+        error as Record<string, unknown>
+      );
       throw new PaymentProcessingError(
         'Failed to retrieve payment intent',
         error as string

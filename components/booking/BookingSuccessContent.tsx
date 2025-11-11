@@ -6,6 +6,7 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import SchoolIcon from '@mui/icons-material/School';
 import {
   Alert,
+  type AlertColor,
   Box,
   Button,
   Chip,
@@ -15,7 +16,6 @@ import {
   Stack,
   Tooltip,
   Typography,
-  type AlertColor,
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
 import Link from 'next/link';
@@ -48,7 +48,7 @@ function formatDate(dateIso: string | null) {
     return new Intl.DateTimeFormat('de-DE', {
       dateStyle: 'full',
     }).format(date);
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }
@@ -66,7 +66,7 @@ function formatTimeRange(startIso: string | null, endIso: string | null) {
     }
     const end = new Date(endIso);
     return `${startLabel} – ${formatter.format(end)}`;
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }

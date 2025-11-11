@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { gotoStable } from './helpers/nav';
 
 // This test relies on E2E_TEST=true and NEXT_PUBLIC_ROLLBAR_ENABLED=0.

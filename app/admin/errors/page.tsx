@@ -51,7 +51,7 @@ interface ErrorLogEntry {
   message: string;
   statusCode: number;
   requestId: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   resolved: boolean;
 }
 
@@ -69,17 +69,19 @@ export default function ErrorDashboard() {
       );
       const data = await response.json();
       setMetrics(data.metrics);
-    } catch (error) {}
+    } catch (_error) {
+      console.warn('Failed to fetch error metrics:', _error);
+    }
   }, [timeRange]);
-
   const fetchLogs = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/errors?action=logs&limit=20');
       const data = await response.json();
       setErrorLogs(data.errors);
-    } catch (error) {}
+    } catch (_error) {
+      console.warn('Failed to fetch error logs:', _error);
+    }
   }, []);
-
   const resolveError = async (errorId: string) => {
     try {
       await fetch('/api/admin/errors?action=resolve', {
@@ -91,9 +93,10 @@ export default function ErrorDashboard() {
       setErrorLogs(logs =>
         logs.map(log => (log.id === errorId ? { ...log, resolved: true } : log))
       );
-    } catch (error) {}
+    } catch (_error) {
+      console.warn('Failed to resolve error:', _error);
+    }
   };
-
   const refreshData = useCallback(async () => {
     setLoading(true);
     await Promise.all([fetchMetrics(), fetchLogs()]);
@@ -102,7 +105,7 @@ export default function ErrorDashboard() {
 
   useEffect(() => {
     refreshData();
-  }, [timeRange, refreshData]);
+  }, [refreshData]);
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -119,7 +122,9 @@ export default function ErrorDashboard() {
     }
   };
 
-  const getCategoryColor = (category: string) => {
+  const getCategoryColor = (
+    category: string
+  ): 'warning' | 'info' | 'error' | 'default' => {
     switch (category) {
       case 'business':
         return 'warning';
@@ -238,7 +243,7 @@ export default function ErrorDashboard() {
                         key={category}
                         icon={getCategoryIcon(category)}
                         label={`${category}: ${count}`}
-                        color={getCategoryColor(category) as any}
+                        color={getCategoryColor(category)}
                         variant='outlined'
                       />
                     )
@@ -322,7 +327,7 @@ export default function ErrorDashboard() {
                           icon={getCategoryIcon(log.category)}
                           label={log.category}
                           size='small'
-                          color={getCategoryColor(log.category) as any}
+                          color={getCategoryColor(log.category)}
                         />
                       </TableCell>
                       <TableCell

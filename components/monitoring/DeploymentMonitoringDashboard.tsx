@@ -5,40 +5,40 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  LinearProgress,
-  Alert,
-  Button,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-} from '@mui/material';
-import Grid from '@mui/material/GridLegacy';
-import {
-  ExpandMore as ExpandMoreIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon,
+  CloudDone as CloudDoneIcon,
   Error as ErrorIcon,
+  ExpandMore as ExpandMoreIcon,
   Refresh as RefreshIcon,
   Timeline as TimelineIcon,
-  CloudDone as CloudDoneIcon,
+  Warning as WarningIcon,
 } from '@mui/icons-material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  LinearProgress,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from '@mui/material';
+import Grid from '@mui/material/GridLegacy';
+import { useCallback, useEffect, useState } from 'react';
 
 interface HealthCheck {
   name: string;
   status: 'pass' | 'fail' | 'warn';
   responseTime: number;
-  details?: any;
+  details?: unknown;
   lastChecked: string;
 }
 
@@ -71,7 +71,7 @@ export default function DeploymentMonitoringDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
-  const fetchHealthStatus = async () => {
+  const fetchHealthStatus = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -95,7 +95,7 @@ export default function DeploymentMonitoringDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const forceHealthCheck = async () => {
     try {
@@ -125,9 +125,11 @@ export default function DeploymentMonitoringDashboard() {
     // Auto-refresh alle 30 Sekunden
     const interval = setInterval(fetchHealthStatus, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchHealthStatus]);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (
+    status: string
+  ): 'success' | 'warning' | 'error' | 'default' => {
     switch (status) {
       case 'healthy':
       case 'pass':
@@ -236,7 +238,7 @@ export default function DeploymentMonitoringDashboard() {
                 {getStatusIcon(healthData.deployment.status)}
                 <Chip
                   label={healthData.deployment.status.toUpperCase()}
-                  color={getStatusColor(healthData.deployment.status) as any}
+                  color={getStatusColor(healthData.deployment.status)}
                   variant='filled'
                 />
               </Box>
@@ -302,7 +304,7 @@ export default function DeploymentMonitoringDashboard() {
                     </Typography>
                     <Chip
                       label={healthCheck.status.toUpperCase()}
-                      color={getStatusColor(healthCheck.status) as any}
+                      color={getStatusColor(healthCheck.status)}
                       size='small'
                     />
                     <Typography
@@ -336,7 +338,7 @@ export default function DeploymentMonitoringDashboard() {
                         ).toLocaleString()}
                       />
                     </ListItem>
-                    {healthCheck.details && (
+                    {healthCheck.details !== undefined && (
                       <ListItem>
                         <ListItemIcon>
                           <TimelineIcon />

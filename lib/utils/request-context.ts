@@ -52,11 +52,11 @@ export async function getRequestContext(): Promise<RequestContext> {
  */
 export async function logErrorWithContext(
   error: unknown,
-  additionalContext?: Record<string, any>
+  additionalContext?: Record<string, unknown>
 ) {
   const requestContext = await getRequestContext();
 
-  const logData = {
+  const _logData = {
     requestId: requestContext.id,
     timestamp: requestContext.timestamp,
     userAgent: requestContext.userAgent,
@@ -75,7 +75,7 @@ export async function logErrorWithContext(
 /**
  * Middleware helper for request ID injection
  */
-export function withRequestContext<T extends any[], R>(
+export function withRequestContext<T extends unknown[], R>(
   handler: (requestContext: RequestContext, ...args: T) => Promise<R>
 ) {
   return async (...args: T): Promise<R> => {

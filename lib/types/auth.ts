@@ -1,6 +1,6 @@
 // Auth-related TypeScript types for Clerk integration
 
-import { User } from '@clerk/nextjs/server';
+import type { User } from '@clerk/nextjs/server';
 
 export interface ClerkUser {
   id: string;

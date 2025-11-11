@@ -9,7 +9,7 @@ export interface AnalyticsEvent {
   requestId: string;
   eventType: string;
   timestamp: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   context: RequestContext;
 }
 
@@ -107,7 +107,7 @@ export class RequestAnalytics {
   public trackEvent(
     requestId: string,
     eventType: string,
-    data: Record<string, any>,
+    data: Record<string, unknown>,
     context?: RequestContext
   ): void {
     const event: AnalyticsEvent = {
@@ -159,7 +159,7 @@ export class RequestAnalytics {
       if (!grouped.has(key)) {
         grouped.set(key, []);
       }
-      grouped.get(key)!.push(metric);
+      grouped.get(key)?.push(metric);
     });
 
     // Berechne Statistiken für jede Gruppe
@@ -314,7 +314,7 @@ export class RequestAnalytics {
 
   private parseTimeframe(timeframe: string): number {
     const unit = timeframe.slice(-1);
-    const value = parseInt(timeframe.slice(0, -1));
+    const value = parseInt(timeframe.slice(0, -1), 10);
 
     switch (unit) {
       case 'h':

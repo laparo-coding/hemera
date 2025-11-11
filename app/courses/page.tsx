@@ -1,11 +1,5 @@
-import { getPublishedCourses } from '@/lib/api/courses';
-import { PERFORMANCE_CONFIG } from '@/lib/seo/constants';
-import { generateCourseListMetadata } from '@/lib/seo/metadata';
-import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
-import { BookOnlineOutlined } from '@mui/icons-material';
 import {
   Box,
-  Button,
   Card,
   CardActionArea,
   CardContent,
@@ -13,8 +7,11 @@ import {
   Typography,
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getPublishedCourses } from '@/lib/api/courses';
+import { generateCourseListMetadata } from '@/lib/seo/metadata';
+import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
 
 export const metadata: Metadata = generateCourseListMetadata();
 // Force dynamic rendering to ensure freshly seeded courses are visible immediately
@@ -237,7 +234,7 @@ export default async function CoursesPage() {
                               >
                                 {course.description &&
                                 course.description.length > 100
-                                  ? course.description.substring(0, 100) + '...'
+                                  ? `${course.description.substring(0, 100)}...`
                                   : course.description ||
                                     'Keine Beschreibung verfügbar'}
                               </Typography>

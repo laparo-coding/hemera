@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 // Skip Stripe initialization during build process
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
-    } catch (err) {
+    } catch (_err) {
       // Webhook signature verification failed
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
@@ -90,29 +90,32 @@ export async function POST(request: NextRequest) {
     // Processing Stripe webhook event: ${event.type}
 
     // Process the webhook event based on type
-    let result = { success: true, processed: false };
+    const result = { success: true, processed: false };
 
     switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object as Stripe.Checkout.Session;
+      case 'checkout.session.completed': {
+        const _session = event.data.object as Stripe.Checkout.Session;
         // Checkout session completed: ${session.id}
 
         // Update booking status to PAID
         // TODO: Implement booking status update logic
         result.processed = true;
         break;
+      }
 
-      case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      case 'payment_intent.succeeded': {
+        const _paymentIntent = event.data.object as Stripe.PaymentIntent;
         // Payment intent succeeded: ${paymentIntent.id}
         result.processed = true;
         break;
+      }
 
-      case 'payment_intent.payment_failed':
-        const failedPaymentIntent = event.data.object as Stripe.PaymentIntent;
+      case 'payment_intent.payment_failed': {
+        const _failedPaymentIntent = event.data.object as Stripe.PaymentIntent;
         // Payment intent failed: ${failedPaymentIntent.id}
         result.processed = true;
         break;
+      }
 
       default:
         // Unhandled event type: ${event.type}

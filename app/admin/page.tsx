@@ -1,4 +1,3 @@
-import { requireAdmin } from '@/lib/auth/helpers';
 import {
   Alert,
   Box,
@@ -9,7 +8,8 @@ import {
   Typography,
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { requireAdmin } from '@/lib/auth/helpers';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard - Hemera Academy',

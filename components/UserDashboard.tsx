@@ -22,7 +22,8 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Booking {
   id: string;
@@ -52,7 +53,7 @@ const UserDashboard: React.FC = () => {
 };
 
 const UserDashboardE2E: React.FC = () => {
-  const [e2eRole, setE2eRole] = useState<'user' | 'admin' | 'unknown'>('user');
+  const [_e2eRole, setE2eRole] = useState<'user' | 'admin' | 'unknown'>('user');
 
   // Load role initially and track changes via storage events
   useEffect(() => {
@@ -203,18 +204,21 @@ const UserDashboardClerk: React.FC = () => {
   }, [userLoaded, user, fetchBookings]);
 
   // Memoized helper functions for better performance
-  const getStatusColor = useCallback((status: string) => {
-    switch (status) {
-      case 'PAID':
-        return 'success';
-      case 'PENDING':
-        return 'warning';
-      case 'FAILED':
-        return 'error';
-      default:
-        return 'default';
-    }
-  }, []);
+  const getStatusColor = useCallback(
+    (status: string): 'success' | 'warning' | 'error' | 'default' => {
+      switch (status) {
+        case 'PAID':
+          return 'success';
+        case 'PENDING':
+          return 'warning';
+        case 'FAILED':
+          return 'error';
+        default:
+          return 'default';
+      }
+    },
+    []
+  );
 
   const getStatusIcon = useCallback((status: string) => {
     switch (status) {
@@ -381,7 +385,7 @@ const UserDashboardClerk: React.FC = () => {
                                 ? 'Bezahlt'
                                 : 'Ausstehend'
                             }
-                            color={getStatusColor(booking.paymentStatus) as any}
+                            color={getStatusColor(booking.paymentStatus)}
                             size='small'
                           />
                         </Stack>

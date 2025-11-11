@@ -1,8 +1,8 @@
-import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from '@playwright/test';
 import { gotoStable } from './helpers/nav';
 
-const isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
+const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
 test.describe('Courses SEO & A11y', () => {
   test('JSON-LD vorhanden und A11y ohne kritische Verstöße', async ({
@@ -49,12 +49,12 @@ test.describe('Courses SEO & A11y', () => {
     const results = await new AxeBuilder({ page }).analyze();
 
     const critical = (results.violations || []).filter(
-      (v: any) => v.impact === 'critical'
+      v => v.impact === 'critical'
     );
     if (critical.length) {
       console.error(
         'Critical A11y violations:',
-        critical.map((v: any) => v.id)
+        critical.map(v => v.id)
       );
     }
     expect(critical.length).toBe(0);

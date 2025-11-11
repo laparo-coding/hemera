@@ -35,8 +35,8 @@ export {
 
 // HTTP utilities
 export {
+  type ApiErrorResponse,
   logError,
   toHttpError,
   withErrorHandling,
-  type ApiErrorResponse,
 } from './http';

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
 const ORIGINAL_ENV = process.env;
 
@@ -28,10 +28,19 @@ describe('Unit: Rollbar sampling logic', () => {
 
     const mod = await import('@/lib/monitoring/rollbar-official');
 
-    const calls: any[] = [];
-    (mod.serverInstance as any).info = (msg: any, payload: any) =>
+    type LogCall = [string, string, Record<string, unknown>];
+    const calls: LogCall[] = [];
+    (
+      mod.serverInstance as unknown as {
+        info: (msg: string, payload: Record<string, unknown>) => void;
+      }
+    ).info = (msg: string, payload: Record<string, unknown>) =>
       calls.push(['info', msg, payload]);
-    (mod.serverInstance as any).error = (msg: any, payload: any) =>
+    (
+      mod.serverInstance as unknown as {
+        error: (msg: string, payload: Record<string, unknown>) => void;
+      }
+    ).error = (msg: string, payload: Record<string, unknown>) =>
       calls.push(['error', msg, payload]);
 
     // INFO: First pick should pass (0.01), second should drop (0.9)
@@ -65,12 +74,25 @@ describe('Unit: Rollbar sampling logic', () => {
 
     const mod = await import('@/lib/monitoring/rollbar-official');
 
-    const calls: any[] = [];
-    (mod.serverInstance as any).info = (msg: any, payload: any) =>
+    type LogCall = [string, string, Record<string, unknown>];
+    const calls: LogCall[] = [];
+    (
+      mod.serverInstance as unknown as {
+        info: (msg: string, payload: Record<string, unknown>) => void;
+      }
+    ).info = (msg: string, payload: Record<string, unknown>) =>
       calls.push(['info', msg, payload]);
-    (mod.serverInstance as any).error = (msg: any, payload: any) =>
+    (
+      mod.serverInstance as unknown as {
+        error: (msg: string, payload: Record<string, unknown>) => void;
+      }
+    ).error = (msg: string, payload: Record<string, unknown>) =>
       calls.push(['error', msg, payload]);
-    (mod.serverInstance as any).critical = (msg: any, payload: any) =>
+    (
+      mod.serverInstance as unknown as {
+        critical: (msg: string, payload: Record<string, unknown>) => void;
+      }
+    ).critical = (msg: string, payload: Record<string, unknown>) =>
       calls.push(['critical', msg, payload]);
 
     mod.reportError('I', { requestId: 'r' }, mod.ErrorSeverity.INFO); // dropped
