@@ -22,7 +22,9 @@ try {
   } else {
     console.log(`Benutzeranzahl: ${users.length}`);
     users.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.id} | ${user.email ?? 'ohne E-Mail'} | ${user.name ?? 'ohne Namen'}`);
+      console.log(
+        `${index + 1}. ${user.id} | ${user.email ?? 'ohne E-Mail'} | ${user.name ?? 'ohne Namen'}`
+      );
     });
   }
 } catch (error) {
