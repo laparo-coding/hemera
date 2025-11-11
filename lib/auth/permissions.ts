@@ -1,7 +1,7 @@
 // Clerk-based permissions helpers
-import { currentUser } from '@clerk/nextjs/server';
+import { currentUser } from "@clerk/nextjs/server";
 
-export type UserRole = 'user' | 'admin' | 'moderator';
+export type UserRole = "user" | "admin" | "moderator";
 
 export interface NavigationItem {
   label: string;
@@ -14,7 +14,7 @@ export interface NavigationItem {
  */
 export async function getUserRole(): Promise<UserRole> {
   const user = await currentUser();
-  return (user?.publicMetadata?.role as UserRole) || 'user';
+  return (user?.publicMetadata?.role as UserRole) || "user";
 }
 
 /**
@@ -27,24 +27,24 @@ export async function hasPermission(permission: string): Promise<boolean> {
   if (!user) return false;
 
   // Admin has all permissions
-  if (userRole === 'admin') return true;
+  if (userRole === "admin") return true;
 
   // Define role-based permissions
   const rolePermissions: Record<UserRole, string[]> = {
-    admin: ['*'], // All permissions
-    moderator: ['read:courses', 'manage:courses'],
-    user: ['read:courses'],
+    admin: ["*"], // All permissions
+    moderator: ["read:courses", "manage:courses"],
+    user: ["read:courses"],
   };
 
   const permissions = rolePermissions[userRole] || [];
-  return permissions.includes('*') || permissions.includes(permission);
+  return permissions.includes("*") || permissions.includes(permission);
 }
 
 /**
  * Check if user can manage courses
  */
 export async function canManageCourses(): Promise<boolean> {
-  return await hasPermission('manage:courses');
+  return await hasPermission("manage:courses");
 }
 
 /**
@@ -52,18 +52,18 @@ export async function canManageCourses(): Promise<boolean> {
  */
 export async function isAdmin(): Promise<boolean> {
   const role = await getUserRole();
-  return role === 'admin';
+  return role === "admin";
 }
 
 /**
  * Filter navigation items by user role
  */
 export async function filterNavigationByRole(
-  items: NavigationItem[]
+  items: NavigationItem[],
 ): Promise<NavigationItem[]> {
   const userRole = await getUserRole();
 
-  return items.filter(item => {
+  return items.filter((item) => {
     if (!item.roles || item.roles.length === 0) {
       return true; // No role restriction
     }

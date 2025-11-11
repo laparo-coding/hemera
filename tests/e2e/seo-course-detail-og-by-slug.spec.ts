@@ -1,34 +1,34 @@
-import { expect, type Page, test } from '@playwright/test';
-import { clickAndWait, gotoStable } from './helpers/nav';
+import { expect, type Page, test } from "@playwright/test";
+import { clickAndWait, gotoStable } from "./helpers/nav";
 
 const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
 async function getMetaContent(page: Page, selector: string) {
   const el = page.locator(selector).first();
   if ((await el.count()) === 0) return null;
-  return await el.getAttribute('content');
+  return await el.getAttribute("content");
 }
 
-test.describe('Course detail OG image by slug', () => {
-  test('og:image nutzt slug-basierten Pfad, wenn slug vorhanden', async ({
+test.describe("Course detail OG image by slug", () => {
+  test("og:image nutzt slug-basierten Pfad, wenn slug vorhanden", async ({
     page,
     request,
   }) => {
-    await gotoStable(page, '/courses', { waitForTestId: 'course-overview' });
+    await gotoStable(page, "/courses", { waitForTestId: "course-overview" });
 
-    const overview = page.getByTestId('course-overview');
+    const overview = page.getByTestId("course-overview");
     let detailLink = overview
-      .getByRole('button', { name: /zum kurs/i })
+      .getByRole("button", { name: /zum kurs/i })
       .first();
     if ((await detailLink.count()) === 0) {
-      detailLink = overview.getByRole('link', { name: /zum kurs/i }).first();
+      detailLink = overview.getByRole("link", { name: /zum kurs/i }).first();
     }
 
     if ((await detailLink.count()) === 0) {
       test.info().annotations.push({
-        type: 'note',
+        type: "note",
         description:
-          'Keine „Zum Kurs“-CTA gefunden (evtl. alle Kurse ausgebucht). Test informativ übersprungen.',
+          "Keine „Zum Kurs“-CTA gefunden (evtl. alle Kurse ausgebucht). Test informativ übersprungen.",
       });
       return;
     }
@@ -41,8 +41,8 @@ test.describe('Course detail OG image by slug', () => {
     const idMatch = url.match(/\/courses\/([\w-]+)/);
     if (!idMatch) {
       test.info().annotations.push({
-        type: 'note',
-        description: 'Kurs-ID konnte nicht aus URL extrahiert werden.',
+        type: "note",
+        description: "Kurs-ID konnte nicht aus URL extrahiert werden.",
       });
       return;
     }
@@ -52,8 +52,8 @@ test.describe('Course detail OG image by slug', () => {
     const res = await request.get(`/api/courses/${id}`);
     if (!res.ok()) {
       test.info().annotations.push({
-        type: 'note',
-        description: 'API-Response nicht OK, Test informativ übersprungen.',
+        type: "note",
+        description: "API-Response nicht OK, Test informativ übersprungen.",
       });
       return;
     }
@@ -62,7 +62,7 @@ test.describe('Course detail OG image by slug', () => {
 
     const ogImage = await getMetaContent(page, 'meta[property="og:image"]');
     expect(ogImage).toBeTruthy();
-    expect(ogImage?.startsWith('http')).toBeTruthy();
+    expect(ogImage?.startsWith("http")).toBeTruthy();
 
     if (slug) {
       // Erwarteter slug-basierter Pfad
@@ -70,8 +70,8 @@ test.describe('Course detail OG image by slug', () => {
       expect(ogImage).toContain(expected);
     } else {
       test.info().annotations.push({
-        type: 'note',
-        description: 'Kein Slug vorhanden – Fallback-Bild ist OK.',
+        type: "note",
+        description: "Kein Slug vorhanden – Fallback-Bild ist OK.",
       });
     }
   });

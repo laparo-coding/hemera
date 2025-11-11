@@ -1,16 +1,16 @@
-import type { UserResource } from '@clerk/types';
-import { Box, Tab, Tabs } from '@mui/material';
-import Link from 'next/link';
+import type { UserResource } from "@clerk/types";
+import { Box, Tab, Tabs } from "@mui/material";
+import Link from "next/link";
 
 interface ProtectedNavigationProps {
-  'data-testid'?: string;
+  "data-testid"?: string;
   user: UserResource;
 }
 
 const baseNavigation = [
-  { label: 'Dashboard', route: '/dashboard', testId: 'nav-dashboard' },
-  { label: 'Courses', route: '/courses', testId: 'nav-courses' },
-  { label: 'Admin', route: '/admin', testId: 'nav-admin' }, // Filtered by role
+  { label: "Dashboard", route: "/dashboard", testId: "nav-dashboard" },
+  { label: "Courses", route: "/courses", testId: "nav-courses" },
+  { label: "Admin", route: "/admin", testId: "nav-admin" }, // Filtered by role
 ];
 
 /**
@@ -20,14 +20,14 @@ const baseNavigation = [
  * of the protected application area with role-based visibility.
  */
 export function ProtectedNavigation({
-  'data-testid': testId,
+  "data-testid": testId,
   user,
 }: ProtectedNavigationProps) {
-  const userRole = (user.publicMetadata?.role as string) || 'user';
+  const userRole = (user.publicMetadata?.role as string) || "user";
 
   // Filter navigation based on user role
-  const availableNavigation = baseNavigation.filter(navItem => {
-    if (navItem.route.includes('/admin') && userRole !== 'admin') {
+  const availableNavigation = baseNavigation.filter((navItem) => {
+    if (navItem.route.includes("/admin") && userRole !== "admin") {
       return false;
     }
     return true;
@@ -35,24 +35,24 @@ export function ProtectedNavigation({
 
   return (
     <Box
-      data-testid={testId || 'protected-navigation'}
+      data-testid={testId || "protected-navigation"}
       sx={{
-        position: 'fixed',
+        position: "fixed",
         top: 64, // Below the AppBar
         left: 0,
         right: 0,
         zIndex: 1100,
         borderBottom: 1,
-        borderColor: 'divider',
-        bgcolor: 'background.paper',
+        borderColor: "divider",
+        bgcolor: "background.paper",
       }}
     >
       <Tabs
         value={false} // Server component - no current path detection
-        aria-label='protected area navigation'
+        aria-label="protected area navigation"
         sx={{ minHeight: 48 }}
       >
-        {availableNavigation.map(navItem => (
+        {availableNavigation.map((navItem) => (
           <Tab
             key={navItem.route}
             label={navItem.label}

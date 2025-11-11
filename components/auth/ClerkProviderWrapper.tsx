@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { deDE } from '@clerk/localizations';
-import { ClerkProvider } from '@clerk/nextjs';
-import type { ReactNode } from 'react';
-import { clerkConfig } from '@/lib/auth/clerk-config';
+import { deDE } from "@clerk/localizations";
+import { ClerkProvider } from "@clerk/nextjs";
+import type { ReactNode } from "react";
+import { clerkConfig } from "@/lib/auth/clerk-config";
 
 interface ClerkProviderWrapperProps {
   children: ReactNode;
@@ -14,8 +14,8 @@ export default function ClerkProviderWrapper({
 }: ClerkProviderWrapperProps) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   const isE2E =
-    process.env.E2E_TEST === 'true' ||
-    process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
+    process.env.E2E_TEST === "true" ||
+    process.env.NEXT_PUBLIC_DISABLE_CLERK === "1";
 
   // Simple heuristic for Clerk key format; real validation happens inside Clerk, but we want
   // to avoid throwing during static prerender if something is clearly off.
@@ -24,7 +24,7 @@ export default function ClerkProviderWrapper({
 
   // In CI/Vercel preview builds we prefer to bypass Clerk rather than fail the build
   const isVercelPreview =
-    process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'preview';
+    process.env.VERCEL === "1" && process.env.VERCEL_ENV === "preview";
 
   // In E2E tests or when explicitly disabled, bypass Clerk to not block rendering
   if (isE2E) return <>{children}</>;
@@ -37,9 +37,9 @@ export default function ClerkProviderWrapper({
 
   if (!publishableKey) {
     // ERROR: Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       return (
-        <div style={{ padding: '20px', color: 'red' }}>
+        <div style={{ padding: "20px", color: "red" }}>
           Error: Clerk authentication is not configured. Missing publishable
           key.
         </div>

@@ -3,8 +3,8 @@
  * Provides request tracking and context management
  */
 
-import { headers } from 'next/headers';
-import { generateRequestId } from '@/lib/utils/request-id';
+import { headers } from "next/headers";
+import { generateRequestId } from "@/lib/utils/request-id";
 
 export interface RequestContext {
   id: string;
@@ -29,21 +29,21 @@ export async function getRequestId(): Promise<string> {
 export async function getRequestContext(): Promise<RequestContext> {
   const headersList = await headers();
   const providedId =
-    headersList.get('x-request-id') ||
-    headersList.get('x-trace-id') ||
+    headersList.get("x-request-id") ||
+    headersList.get("x-trace-id") ||
     undefined;
   const canonicalId = await getRequestId();
 
   return {
     id: canonicalId,
     externalId: providedId,
-    userAgent: headersList.get('user-agent') || undefined,
+    userAgent: headersList.get("user-agent") || undefined,
     ip:
-      headersList.get('x-forwarded-for') ||
-      headersList.get('x-real-ip') ||
+      headersList.get("x-forwarded-for") ||
+      headersList.get("x-real-ip") ||
       undefined,
     timestamp: new Date().toISOString(),
-    url: headersList.get('referer') || undefined,
+    url: headersList.get("referer") || undefined,
   };
 }
 
@@ -52,7 +52,7 @@ export async function getRequestContext(): Promise<RequestContext> {
  */
 export async function logErrorWithContext(
   error: unknown,
-  additionalContext?: Record<string, unknown>
+  additionalContext?: Record<string, unknown>,
 ) {
   const requestContext = await getRequestContext();
 
@@ -76,7 +76,7 @@ export async function logErrorWithContext(
  * Middleware helper for request ID injection
  */
 export function withRequestContext<T extends unknown[], R>(
-  handler: (requestContext: RequestContext, ...args: T) => Promise<R>
+  handler: (requestContext: RequestContext, ...args: T) => Promise<R>,
 ) {
   return async (...args: T): Promise<R> => {
     const requestContext = await getRequestContext();

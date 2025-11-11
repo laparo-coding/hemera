@@ -3,18 +3,18 @@
  * Provides comprehensive user operations with error handling
  */
 
-import { type User as ClerkUser, currentUser } from '@clerk/nextjs/server';
-import type { User } from '@prisma/client';
-import { prisma } from '@/lib/db/prisma';
+import { type User as ClerkUser, currentUser } from "@clerk/nextjs/server";
+import type { User } from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
 import {
   DatabaseConnectionError,
   UserEmailAlreadyExistsError,
   UserNotFoundError,
   UserValidationError,
-} from '@/lib/errors';
-import { safePrismaOperation } from '@/lib/errors/prisma-mapping';
+} from "@/lib/errors";
+import { safePrismaOperation } from "@/lib/errors/prisma-mapping";
 
-export type { User } from '@prisma/client';
+export type { User } from "@prisma/client";
 
 export interface UserProfile extends User {
   _count?: {
@@ -50,7 +50,7 @@ export async function getCurrentUserWithSync(): Promise<User> {
   const clerkUser = await currentUser();
 
   if (!clerkUser?.id) {
-    throw new UserNotFoundError('No authenticated user found');
+    throw new UserNotFoundError("No authenticated user found");
   }
 
   // Sync Clerk user with local database
@@ -59,20 +59,20 @@ export async function getCurrentUserWithSync(): Promise<User> {
       where: { id: clerkUser.id },
       update: {
         name: clerkUser.fullName || clerkUser.firstName || null,
-        email: clerkUser.primaryEmailAddress?.emailAddress || '',
+        email: clerkUser.primaryEmailAddress?.emailAddress || "",
         image: clerkUser.imageUrl || null,
       },
       create: {
         id: clerkUser.id,
         name: clerkUser.fullName || clerkUser.firstName || null,
-        email: clerkUser.primaryEmailAddress?.emailAddress || '',
+        email: clerkUser.primaryEmailAddress?.emailAddress || "",
         image: clerkUser.imageUrl || null,
       },
     });
   });
 
   if (!user) {
-    throw new DatabaseConnectionError('Failed to sync user with database');
+    throw new DatabaseConnectionError("Failed to sync user with database");
   }
 
   return user;
@@ -82,8 +82,8 @@ export async function getCurrentUserWithSync(): Promise<User> {
  * Get user by ID with error handling
  */
 export async function getUserById(userId: string): Promise<User> {
-  if (!userId || typeof userId !== 'string') {
-    throw new UserValidationError('Invalid user ID provided');
+  if (!userId || typeof userId !== "string") {
+    throw new UserValidationError("Invalid user ID provided");
   }
 
   const user = await safePrismaOperation(async () => {
@@ -103,8 +103,8 @@ export async function getUserById(userId: string): Promise<User> {
  * Get user by email with error handling
  */
 export async function getUserByEmail(email: string): Promise<User> {
-  if (!email || typeof email !== 'string' || !isValidEmail(email)) {
-    throw new UserValidationError('Invalid email address provided');
+  if (!email || typeof email !== "string" || !isValidEmail(email)) {
+    throw new UserValidationError("Invalid email address provided");
   }
 
   const user = await safePrismaOperation(async () => {
@@ -124,8 +124,8 @@ export async function getUserByEmail(email: string): Promise<User> {
  * Get user profile with additional data
  */
 export async function getUserProfile(userId: string): Promise<UserProfile> {
-  if (!userId || typeof userId !== 'string') {
-    throw new UserValidationError('Invalid user ID provided');
+  if (!userId || typeof userId !== "string") {
+    throw new UserValidationError("Invalid user ID provided");
   }
 
   const user = await safePrismaOperation(async () => {
@@ -152,11 +152,11 @@ export async function getUserProfile(userId: string): Promise<UserProfile> {
 export async function createUser(data: CreateUserData): Promise<User> {
   // Validate required fields
   if (!data.id) {
-    throw new UserValidationError('User ID is required');
+    throw new UserValidationError("User ID is required");
   }
 
   if (!data.email || !isValidEmail(data.email)) {
-    throw new UserValidationError('Valid email address is required');
+    throw new UserValidationError("Valid email address is required");
   }
 
   // Check if user already exists
@@ -168,7 +168,7 @@ export async function createUser(data: CreateUserData): Promise<User> {
 
   if (existingUser) {
     throw new UserEmailAlreadyExistsError(
-      `User with ID ${data.id} already exists`
+      `User with ID ${data.id} already exists`,
     );
   }
 
@@ -181,7 +181,7 @@ export async function createUser(data: CreateUserData): Promise<User> {
 
   if (emailExists) {
     throw new UserEmailAlreadyExistsError(
-      `Email ${data.email} is already registered`
+      `Email ${data.email} is already registered`,
     );
   }
 
@@ -198,7 +198,7 @@ export async function createUser(data: CreateUserData): Promise<User> {
   });
 
   if (!user) {
-    throw new DatabaseConnectionError('Failed to create user in database');
+    throw new DatabaseConnectionError("Failed to create user in database");
   }
 
   return user;
@@ -209,15 +209,15 @@ export async function createUser(data: CreateUserData): Promise<User> {
  */
 export async function updateUser(
   userId: string,
-  data: UpdateUserData
+  data: UpdateUserData,
 ): Promise<User> {
-  if (!userId || typeof userId !== 'string') {
-    throw new UserValidationError('Invalid user ID provided');
+  if (!userId || typeof userId !== "string") {
+    throw new UserValidationError("Invalid user ID provided");
   }
 
   // Validate email if provided
   if (data.email && !isValidEmail(data.email)) {
-    throw new UserValidationError('Invalid email address provided');
+    throw new UserValidationError("Invalid email address provided");
   }
 
   // Check if user exists
@@ -236,7 +236,7 @@ export async function updateUser(
 
     if (emailExists) {
       throw new UserEmailAlreadyExistsError(
-        `Email ${data.email} is already registered`
+        `Email ${data.email} is already registered`,
       );
     }
   }
@@ -250,7 +250,7 @@ export async function updateUser(
   });
 
   if (!user) {
-    throw new DatabaseConnectionError('Failed to update user in database');
+    throw new DatabaseConnectionError("Failed to update user in database");
   }
 
   return user;
@@ -260,8 +260,8 @@ export async function updateUser(
  * Delete user (soft delete by removing personal data)
  */
 export async function deleteUser(userId: string): Promise<User> {
-  if (!userId || typeof userId !== 'string') {
-    throw new UserValidationError('Invalid user ID provided');
+  if (!userId || typeof userId !== "string") {
+    throw new UserValidationError("Invalid user ID provided");
   }
 
   // Check if user exists
@@ -273,14 +273,14 @@ export async function deleteUser(userId: string): Promise<User> {
       where: { id: userId },
       data: {
         email: `deleted-${userId}@example.com`,
-        name: 'Deleted User',
+        name: "Deleted User",
         image: null,
       },
     });
   });
 
   if (!user) {
-    throw new DatabaseConnectionError('Failed to delete user in database');
+    throw new DatabaseConnectionError("Failed to delete user in database");
   }
 
   return user;
@@ -290,8 +290,8 @@ export async function deleteUser(userId: string): Promise<User> {
  * Get user statistics
  */
 export async function getUserStats(userId: string): Promise<UserStats> {
-  if (!userId || typeof userId !== 'string') {
-    throw new UserValidationError('Invalid user ID provided');
+  if (!userId || typeof userId !== "string") {
+    throw new UserValidationError("Invalid user ID provided");
   }
 
   // Check if user exists
@@ -305,20 +305,20 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 
     const totalBookings = bookings.length;
     const pendingBookings = bookings.filter(
-      b => b.paymentStatus === 'PENDING'
+      (b) => b.paymentStatus === "PENDING",
     ).length;
     const confirmedBookings = bookings.filter(
-      b => b.paymentStatus === 'PAID'
+      (b) => b.paymentStatus === "PAID",
     ).length;
     const cancelledBookings = bookings.filter(
-      b => b.paymentStatus === 'CANCELLED'
+      (b) => b.paymentStatus === "CANCELLED",
     ).length;
 
     const totalSpent = bookings
-      .filter(b => b.paymentStatus === 'PAID')
+      .filter((b) => b.paymentStatus === "PAID")
       .reduce(
         (sum, booking) => sum + (booking.amount || booking.course.price || 0),
-        0
+        0,
       );
 
     return {
@@ -331,7 +331,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   });
 
   if (!stats) {
-    throw new DatabaseConnectionError('Failed to retrieve user statistics');
+    throw new DatabaseConnectionError("Failed to retrieve user statistics");
   }
 
   return stats;
@@ -341,7 +341,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
  * Check if user exists
  */
 export async function userExists(userId: string): Promise<boolean> {
-  if (!userId || typeof userId !== 'string') {
+  if (!userId || typeof userId !== "string") {
     return false;
   }
 
@@ -361,7 +361,7 @@ export async function userExists(userId: string): Promise<boolean> {
  */
 export async function getAllUsers(
   limit: number = 50,
-  offset: number = 0
+  offset: number = 0,
 ): Promise<{ users: UserProfile[]; total: number }> {
   const [users, total] = await safePrismaOperation(async () => {
     return await Promise.all([
@@ -371,7 +371,7 @@ export async function getAllUsers(
             select: { bookings: true },
           },
         },
-        orderBy: { id: 'desc' },
+        orderBy: { id: "desc" },
         take: limit,
         skip: offset,
       }),
@@ -380,7 +380,7 @@ export async function getAllUsers(
   });
 
   if (!users) {
-    throw new DatabaseConnectionError('Failed to retrieve users');
+    throw new DatabaseConnectionError("Failed to retrieve users");
   }
 
   return { users, total };
@@ -391,11 +391,11 @@ export async function getAllUsers(
  */
 export async function searchUsers(
   query: string,
-  limit: number = 20
+  limit: number = 20,
 ): Promise<UserProfile[]> {
   if (!query || query.trim().length < 2) {
     throw new UserValidationError(
-      'Search query must be at least 2 characters long'
+      "Search query must be at least 2 characters long",
     );
   }
 
@@ -403,8 +403,8 @@ export async function searchUsers(
     return await prisma.user.findMany({
       where: {
         OR: [
-          { name: { contains: query.trim(), mode: 'insensitive' } },
-          { email: { contains: query.trim(), mode: 'insensitive' } },
+          { name: { contains: query.trim(), mode: "insensitive" } },
+          { email: { contains: query.trim(), mode: "insensitive" } },
         ],
       },
       include: {
@@ -413,12 +413,12 @@ export async function searchUsers(
         },
       },
       take: limit,
-      orderBy: { id: 'desc' },
+      orderBy: { id: "desc" },
     });
   });
 
   if (!users) {
-    throw new DatabaseConnectionError('Failed to search users');
+    throw new DatabaseConnectionError("Failed to search users");
   }
 
   return users;
@@ -429,12 +429,12 @@ export async function searchUsers(
  */
 export async function syncUserFromClerk(clerkUser: ClerkUser): Promise<User> {
   if (!clerkUser?.id) {
-    throw new UserValidationError('Invalid Clerk user provided');
+    throw new UserValidationError("Invalid Clerk user provided");
   }
 
   const userData: CreateUserData = {
     id: clerkUser.id,
-    email: clerkUser.primaryEmailAddress?.emailAddress || '',
+    email: clerkUser.primaryEmailAddress?.emailAddress || "",
     name: clerkUser.fullName || clerkUser.firstName || null,
     image: clerkUser.imageUrl || null,
   };
@@ -452,7 +452,7 @@ export async function syncUserFromClerk(clerkUser: ClerkUser): Promise<User> {
   });
 
   if (!user) {
-    throw new DatabaseConnectionError('Failed to sync user from Clerk');
+    throw new DatabaseConnectionError("Failed to sync user from Clerk");
   }
 
   return user;

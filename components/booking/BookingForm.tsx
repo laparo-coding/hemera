@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { AttachMoneyOutlined, SchoolOutlined } from '@mui/icons-material';
+import { AttachMoneyOutlined, SchoolOutlined } from "@mui/icons-material";
 import {
   Alert,
   Box,
@@ -15,10 +15,10 @@ import {
   RadioGroup,
   Stack,
   Typography,
-} from '@mui/material';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import type { CourseWithSEO } from '@/lib/api/courses';
+} from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import type { CourseWithSEO } from "@/lib/api/courses";
 
 interface BookingFormProps {
   courses: CourseWithSEO[];
@@ -33,7 +33,7 @@ export default function BookingForm({
 }: BookingFormProps) {
   const router = useRouter();
   const [selectedCourse, setSelectedCourse] = useState<string>(
-    selectedCourseId || ''
+    selectedCourseId || "",
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +49,7 @@ export default function BookingForm({
     event.preventDefault();
 
     if (!selectedCourse) {
-      setError('Please select a course');
+      setError("Please select a course");
       return;
     }
 
@@ -58,10 +58,10 @@ export default function BookingForm({
     setSuccess(null);
 
     try {
-      const response = await fetch('/api/bookings', {
-        method: 'POST',
+      const response = await fetch("/api/bookings", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           courseId: selectedCourse,
@@ -70,64 +70,64 @@ export default function BookingForm({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create booking');
+        throw new Error(errorData.error || "Failed to create booking");
       }
 
-      setSuccess('Booking created successfully!');
+      setSuccess("Booking created successfully!");
 
       // Redirect to bookings page after a short delay
       setTimeout(() => {
-        router.push('/bookings?message=booking-created');
+        router.push("/bookings?message=booking-created");
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const selectedCourseData = courses.find(
-    course => course.id === selectedCourse
+    (course) => course.id === selectedCourse,
   );
 
   return (
-    <Box component='form' onSubmit={handleSubmit}>
+    <Box component="form" onSubmit={handleSubmit}>
       {error && (
-        <Alert severity='error' sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
 
       {success && (
-        <Alert severity='success' sx={{ mb: 3 }}>
+        <Alert severity="success" sx={{ mb: 3 }}>
           {success}
         </Alert>
       )}
 
-      <Typography variant='h6' gutterBottom>
+      <Typography variant="h6" gutterBottom>
         Select a Course
       </Typography>
 
       <RadioGroup
         value={selectedCourse}
         onChange={handleCourseChange}
-        name='course-selection'
+        name="course-selection"
       >
         <Stack spacing={2}>
-          {courses.map(course => (
+          {courses.map((course) => (
             <Card
               key={course.id}
-              variant='outlined'
+              variant="outlined"
               sx={{
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                '&:hover': {
-                  borderColor: 'primary.main',
-                  bgcolor: 'action.hover',
+                cursor: "pointer",
+                transition: "all 0.2s",
+                "&:hover": {
+                  borderColor: "primary.main",
+                  bgcolor: "action.hover",
                 },
                 ...(selectedCourse === course.id && {
-                  borderColor: 'primary.main',
-                  bgcolor: 'primary.50',
+                  borderColor: "primary.main",
+                  bgcolor: "primary.50",
                 }),
               }}
               onClick={() => setSelectedCourse(course.id)}
@@ -137,50 +137,50 @@ export default function BookingForm({
                   value={course.id}
                   control={<Radio />}
                   label={
-                    <Box sx={{ width: '100%' }}>
+                    <Box sx={{ width: "100%" }}>
                       <Stack
-                        direction='row'
+                        direction="row"
                         spacing={2}
-                        alignItems='flex-start'
+                        alignItems="flex-start"
                       >
-                        <SchoolOutlined color='primary' />
+                        <SchoolOutlined color="primary" />
                         <Box sx={{ flex: 1 }}>
-                          <Typography variant='h6' gutterBottom>
+                          <Typography variant="h6" gutterBottom>
                             {course.title}
                           </Typography>
                           <Typography
-                            variant='body2'
-                            color='text.secondary'
+                            variant="body2"
+                            color="text.secondary"
                             paragraph
                             sx={{ mb: 2 }}
                           >
-                            {course.description || 'No description available'}
+                            {course.description || "No description available"}
                           </Typography>
 
                           <Stack
-                            direction='row'
+                            direction="row"
                             spacing={2}
-                            alignItems='center'
+                            alignItems="center"
                           >
                             {course.price && (
                               <Stack
-                                direction='row'
+                                direction="row"
                                 spacing={0.5}
-                                alignItems='center'
+                                alignItems="center"
                               >
                                 <AttachMoneyOutlined
-                                  fontSize='small'
-                                  color='primary'
+                                  fontSize="small"
+                                  color="primary"
                                 />
-                                <Typography variant='h6' color='primary'>
+                                <Typography variant="h6" color="primary">
                                   €{(Number(course.price) / 100).toFixed(2)}
                                 </Typography>
                               </Stack>
                             )}
                             <Chip
-                              label='Available'
-                              color='success'
-                              size='small'
+                              label="Available"
+                              color="success"
+                              size="small"
                             />
                           </Stack>
                         </Box>
@@ -189,9 +189,9 @@ export default function BookingForm({
                   }
                   sx={{
                     margin: 0,
-                    width: '100%',
-                    '& .MuiFormControlLabel-label': {
-                      width: '100%',
+                    width: "100%",
+                    "& .MuiFormControlLabel-label": {
+                      width: "100%",
                     },
                   }}
                 />
@@ -204,54 +204,54 @@ export default function BookingForm({
       {selectedCourseData && (
         <Card sx={{ mt: 3 }}>
           <CardContent>
-            <Typography variant='h6' gutterBottom>
+            <Typography variant="h6" gutterBottom>
               Booking Summary
             </Typography>
             <Divider sx={{ mb: 2 }} />
 
             <Stack spacing={2}>
               <Box>
-                <Typography variant='subtitle2' color='text.secondary'>
+                <Typography variant="subtitle2" color="text.secondary">
                   Course
                 </Typography>
-                <Typography variant='body1'>
+                <Typography variant="body1">
                   {selectedCourseData.title}
                 </Typography>
               </Box>
 
               {selectedCourseData.price && (
                 <Box>
-                  <Typography variant='subtitle2' color='text.secondary'>
+                  <Typography variant="subtitle2" color="text.secondary">
                     Price
                   </Typography>
-                  <Typography variant='h6' color='primary'>
+                  <Typography variant="h6" color="primary">
                     €{(Number(selectedCourseData.price) / 100).toFixed(2)}
                   </Typography>
                 </Box>
               )}
 
               <Box>
-                <Typography variant='subtitle2' color='text.secondary'>
+                <Typography variant="subtitle2" color="text.secondary">
                   Status
                 </Typography>
-                <Chip label='Pending Review' color='warning' size='small' />
+                <Chip label="Pending Review" color="warning" size="small" />
               </Box>
             </Stack>
           </CardContent>
         </Card>
       )}
 
-      <Box sx={{ mt: 4, textAlign: 'right' }}>
+      <Box sx={{ mt: 4, textAlign: "right" }}>
         <Button
-          type='submit'
-          variant='contained'
-          size='large'
+          type="submit"
+          variant="contained"
+          size="large"
           disabled={!selectedCourse || isSubmitting}
           startIcon={
             isSubmitting ? <CircularProgress size={20} /> : <SchoolOutlined />
           }
         >
-          {isSubmitting ? 'Creating Booking...' : 'Book Course'}
+          {isSubmitting ? "Creating Booking..." : "Book Course"}
         </Button>
       </Box>
     </Box>

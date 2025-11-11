@@ -3,10 +3,10 @@
  * Demonstrates comprehensive error handling patterns for Server Actions
  */
 
-'use server';
+"use server";
 
-import { createBooking } from '@/lib/api/bookings';
-import { BookingAlreadyExistsError } from '@/lib/errors/domain';
+import { createBooking } from "@/lib/api/bookings";
+import { BookingAlreadyExistsError } from "@/lib/errors/domain";
 import {
   createFormAction,
   type ServerActionContext,
@@ -16,26 +16,26 @@ import {
   withRetry,
   withServerActionErrorHandling,
   withTransaction,
-} from '@/lib/middleware/server-action-error-handling';
+} from "@/lib/middleware/server-action-error-handling";
 
 // Example 1: Basic server action with error handling
 export const createCourseAction = withServerActionErrorHandling(
   async (_context: ServerActionContext) => {
     // Simulate course creation
     const course = {
-      id: 'course-1',
-      title: 'New Course',
-      description: 'Course description',
+      id: "course-1",
+      title: "New Course",
+      description: "Course description",
       createdAt: new Date(),
     };
 
     return course;
-  }
+  },
 );
 
 // Example 2: Authenticated server action
 export const updateProfileAction = withAuthenticatedServerAction(
-  async context => {
+  async (context) => {
     const { userId } = context;
 
     // Update user profile
@@ -43,9 +43,9 @@ export const updateProfileAction = withAuthenticatedServerAction(
 
     return {
       userId,
-      message: 'Profile updated successfully',
+      message: "Profile updated successfully",
     };
-  }
+  },
 );
 
 // Example 3: Form validation server action
@@ -53,7 +53,7 @@ const bookingSchema = {
   parse: (data: unknown): Record<string, unknown> => {
     const record = data as Record<string, unknown>;
     if (!record.courseId || !record.userId || !record.date) {
-      throw new Error('Course ID, User ID, and date are required');
+      throw new Error("Course ID, User ID, and date are required");
     }
     return data as Record<string, unknown>;
   },
@@ -63,7 +63,7 @@ export const createBookingAction = withFormValidation(
   bookingSchema,
   async (
     _context: ServerActionContext,
-    validatedData: Record<string, unknown>
+    validatedData: Record<string, unknown>,
   ) => {
     const data = validatedData as {
       courseId: string;
@@ -73,25 +73,25 @@ export const createBookingAction = withFormValidation(
     const booking = await createBooking({
       courseId: data.courseId,
       userId: data.userId,
-      paymentStatus: 'PENDING',
+      paymentStatus: "PENDING",
     });
 
     return booking;
-  }
+  },
 );
 
 // Example 4: Optimistic update server action
 export const toggleBookmarkAction = withOptimisticUpdate(
   async (_context: ServerActionContext) => {
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Toggle bookmark logic
     const isBookmarked = Math.random() > 0.5;
 
     return { isBookmarked };
   },
-  { isBookmarked: true } // Optimistic value
+  { isBookmarked: true }, // Optimistic value
 );
 
 // Example 5: Server action with retry logic
@@ -99,17 +99,17 @@ export const syncExternalDataAction = withRetry(
   async (_context: ServerActionContext) => {
     // Simulate external API call that might fail
     if (Math.random() > 0.7) {
-      throw new Error('External API temporarily unavailable');
+      throw new Error("External API temporarily unavailable");
     }
 
     return { synced: true, timestamp: new Date() };
   },
   3, // Max retries
-  1000 // Retry delay in ms
+  1000, // Retry delay in ms
 );
 
 // Example 6: Transaction-based server action
-export const transferCreditsAction = withTransaction(async context => {
+export const transferCreditsAction = withTransaction(async (context) => {
   const { tx: _tx, userId } = context;
 
   // Simulate credit transfer within transaction
@@ -117,7 +117,7 @@ export const transferCreditsAction = withTransaction(async context => {
 
   return {
     fromUser: userId,
-    toUser: 'target-user-id',
+    toUser: "target-user-id",
     amount: 100,
     transactionId: context.requestId,
   };
@@ -126,10 +126,10 @@ export const transferCreditsAction = withTransaction(async context => {
 // Example 7: File upload action
 export const uploadCourseImageAction = createFormAction(
   async (formData: FormData, context: ServerActionContext) => {
-    const file = formData.get('image') as File;
+    const file = formData.get("image") as File;
 
     if (!file) {
-      throw new Error('No image file provided');
+      throw new Error("No image file provided");
     }
 
     // Simulate file upload
@@ -141,31 +141,31 @@ export const uploadCourseImageAction = createFormAction(
     };
 
     return uploadResult;
-  }
+  },
 );
 
 // Example 8: Complex server action with error boundaries
 export const enrollInCourseAction = withAuthenticatedServerAction(
-  async context => {
+  async (context) => {
     const { userId, requestId: _requestId } = context;
     // Check if user is already enrolled
     const existingEnrollment = await checkExistingEnrollment(
       userId,
-      'course-id'
+      "course-id",
     );
 
     if (existingEnrollment) {
-      throw new BookingAlreadyExistsError(userId, 'course-id');
+      throw new BookingAlreadyExistsError(userId, "course-id");
     }
 
     // Create enrollment
-    const enrollment = await createEnrollment(userId, 'course-id');
+    const enrollment = await createEnrollment(userId, "course-id");
 
     // Send welcome email (fire and forget)
-    sendWelcomeEmail(userId, 'course-id').catch(_error => {});
+    sendWelcomeEmail(userId, "course-id").catch((_error) => {});
 
     return enrollment;
-  }
+  },
 );
 
 // Helper functions (placeholders)
@@ -175,7 +175,7 @@ async function checkExistingEnrollment(_userId: string, _courseId: string) {
 
 async function createEnrollment(userId: string, courseId: string) {
   return {
-    id: 'enrollment-id',
+    id: "enrollment-id",
     userId,
     courseId,
     enrolledAt: new Date(),

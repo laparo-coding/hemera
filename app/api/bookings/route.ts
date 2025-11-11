@@ -1,8 +1,8 @@
-import { currentUser } from '@clerk/nextjs/server';
-import { PaymentStatus } from '@prisma/client';
-import { NextResponse } from 'next/server';
-import { z } from 'zod';
-import { prisma } from '@/lib/db/prisma';
+import { currentUser } from "@clerk/nextjs/server";
+import { PaymentStatus } from "@prisma/client";
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/db/prisma";
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -11,7 +11,7 @@ const BookingQuerySchema = z.object({
 });
 
 const CreateBookingSchema = z.object({
-  courseId: z.string().min(1, 'Course ID is required'),
+  courseId: z.string().min(1, "Course ID is required"),
 });
 
 export async function GET(request: Request) {
@@ -25,13 +25,13 @@ export async function GET(request: Request) {
     const user = await currentUser();
     if (!user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
+        { success: false, error: "Authentication required" },
+        { status: 401 },
       );
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    const { syncUserFromClerk } = await import('@/lib/api/users');
+    const { syncUserFromClerk } = await import("@/lib/api/users");
     await syncUserFromClerk(user);
 
     // Get user's bookings with pagination
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
           },
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
         skip: (validatedParams.page - 1) * validatedParams.limit,
         take: validatedParams.limit,
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
     const responseData = {
       success: true,
       data: {
-        bookings: bookings.map(booking => ({
+        bookings: bookings.map((booking) => ({
           id: booking.id,
           courseId: booking.courseId,
           courseTitle: booking.course.title,
@@ -88,14 +88,14 @@ export async function GET(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: 'Invalid parameters' },
-        { status: 400 }
+        { success: false, error: "Invalid parameters" },
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
-      { success: false, error: 'Internal error' },
-      { status: 500 }
+      { success: false, error: "Internal error" },
+      { status: 500 },
     );
   }
 }
@@ -105,8 +105,8 @@ export async function POST(request: Request) {
     const user = await currentUser();
     if (!user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
+        { success: false, error: "Authentication required" },
+        { status: 401 },
       );
     }
 
@@ -123,13 +123,13 @@ export async function POST(request: Request) {
 
     if (!course) {
       return NextResponse.json(
-        { success: false, error: 'Course not found or not available' },
-        { status: 404 }
+        { success: false, error: "Course not found or not available" },
+        { status: 404 },
       );
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    const { syncUserFromClerk } = await import('@/lib/api/users');
+    const { syncUserFromClerk } = await import("@/lib/api/users");
     await syncUserFromClerk(user);
 
     // Check if user already has a booking for this course
@@ -142,8 +142,8 @@ export async function POST(request: Request) {
 
     if (existingBooking) {
       return NextResponse.json(
-        { success: false, error: 'You have already booked this course' },
-        { status: 409 }
+        { success: false, error: "You have already booked this course" },
+        { status: 409 },
       );
     }
 
@@ -184,16 +184,16 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid request data',
+          error: "Invalid request data",
           details: error.issues,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
-      { success: false, error: 'Failed to create booking' },
-      { status: 500 }
+      { success: false, error: "Failed to create booking" },
+      { status: 500 },
     );
   }
 }

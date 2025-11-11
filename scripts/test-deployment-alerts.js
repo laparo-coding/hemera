@@ -6,42 +6,42 @@
  */
 
 async function testAlertSystem() {
-  console.log('🧪 Testing Deployment Alert System...\n');
+  console.log("🧪 Testing Deployment Alert System...\n");
 
   try {
     // 1. Aktuellen Health-Status abrufen
-    console.log('1️⃣ Checking current health status...');
+    console.log("1️⃣ Checking current health status...");
     const healthResponse = await fetch(
-      'http://localhost:3000/api/health/deployment'
+      "http://localhost:3000/api/health/deployment",
     );
     const healthData = await healthResponse.json();
 
     console.log(`✅ Health Check Status: ${healthData.deployment.status}`);
     console.log(
-      `📊 Services: ${healthData.summary.passedChecks}/${healthData.summary.totalChecks} passing\n`
+      `📊 Services: ${healthData.summary.passedChecks}/${healthData.summary.totalChecks} passing\n`,
     );
 
     // 2. Force Health Check triggern
-    console.log('2️⃣ Triggering force health check...');
+    console.log("2️⃣ Triggering force health check...");
     const forceResponse = await fetch(
-      'http://localhost:3000/api/health/deployment',
+      "http://localhost:3000/api/health/deployment",
       {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'force_check' }),
-      }
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "force_check" }),
+      },
     );
 
     const forceData = await forceResponse.json();
     console.log(`✅ Force check completed: ${forceData.deployment.status}\n`);
 
     // 3. Alert-Regeln testen (simuliert)
-    console.log('3️⃣ Testing alert evaluation...');
+    console.log("3️⃣ Testing alert evaluation...");
 
     // Simuliere verschiedene Metriken
     const testMetrics = [
       {
-        name: 'Normal Operation',
+        name: "Normal Operation",
         metrics: {
           database_health: 1,
           auth_health: 1,
@@ -53,7 +53,7 @@ async function testAlertSystem() {
         },
       },
       {
-        name: 'High Response Time',
+        name: "High Response Time",
         metrics: {
           database_health: 1,
           auth_health: 1,
@@ -65,7 +65,7 @@ async function testAlertSystem() {
         },
       },
       {
-        name: 'Database Failure',
+        name: "Database Failure",
         metrics: {
           database_health: 0, // Failed
           auth_health: 1,
@@ -83,18 +83,18 @@ async function testAlertSystem() {
 
       // Überprüfe Alert-Bedingungen
       if (test.metrics.database_health === 0) {
-        console.log('     🚨 CRITICAL: Database connection failure detected');
-        console.log('     📢 Alert would be sent to Rollbar');
+        console.log("     🚨 CRITICAL: Database connection failure detected");
+        console.log("     📢 Alert would be sent to Rollbar");
       }
 
       if (test.metrics.avg_response_time > 2000) {
-        console.log('     ⚠️  WARNING: High response time detected');
-        console.log('     📢 Performance alert would be triggered');
+        console.log("     ⚠️  WARNING: High response time detected");
+        console.log("     📢 Performance alert would be triggered");
       }
 
       if (test.metrics.error_rate > 10) {
-        console.log('     🚨 CRITICAL: High error rate detected');
-        console.log('     📢 Error rate alert would be triggered');
+        console.log("     🚨 CRITICAL: High error rate detected");
+        console.log("     📢 Error rate alert would be triggered");
       }
 
       if (
@@ -102,33 +102,33 @@ async function testAlertSystem() {
         test.metrics.avg_response_time <= 2000 &&
         test.metrics.error_rate === 0
       ) {
-        console.log('     ✅ All systems nominal');
+        console.log("     ✅ All systems nominal");
       }
 
-      console.log('');
+      console.log("");
     });
 
     // 4. Dashboard-Zugriff testen
-    console.log('4️⃣ Testing dashboard accessibility...');
+    console.log("4️⃣ Testing dashboard accessibility...");
     const dashboardResponse = await fetch(
-      `${BASE_URL}/admin/monitoring/deployment`
+      `${BASE_URL}/admin/monitoring/deployment`,
     );
 
     if (dashboardResponse.ok) {
-      console.log('✅ Dashboard accessible at /admin/monitoring/deployment');
+      console.log("✅ Dashboard accessible at /admin/monitoring/deployment");
     } else {
-      console.log('❌ Dashboard not accessible');
+      console.log("❌ Dashboard not accessible");
     }
 
-    console.log('\n🎉 Alert system validation completed!');
-    console.log('\n📝 Summary:');
-    console.log('   • Health API: ✅ Working');
-    console.log('   • Force checks: ✅ Working');
-    console.log('   • Alert evaluation: ✅ Logic verified');
-    console.log('   • Dashboard: ✅ Accessible');
-    console.log('   • Rollbar integration: ✅ Configured');
+    console.log("\n🎉 Alert system validation completed!");
+    console.log("\n📝 Summary:");
+    console.log("   • Health API: ✅ Working");
+    console.log("   • Force checks: ✅ Working");
+    console.log("   • Alert evaluation: ✅ Logic verified");
+    console.log("   • Dashboard: ✅ Accessible");
+    console.log("   • Rollbar integration: ✅ Configured");
   } catch (error) {
-    console.error('❌ Test failed:', error.message);
+    console.error("❌ Test failed:", error.message);
     process.exit(1);
   }
 }

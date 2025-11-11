@@ -1,23 +1,23 @@
-import { auth } from '@clerk/nextjs/server';
-import { notFound, redirect } from 'next/navigation';
+import { auth } from "@clerk/nextjs/server";
+import { notFound, redirect } from "next/navigation";
 import BookingSuccessContent, {
   type BookingSuccessViewModel,
-} from '@/components/booking/BookingSuccessContent';
-import { getBookingById } from '@/lib/services/booking';
+} from "@/components/booking/BookingSuccessContent";
+import { getBookingById } from "@/lib/services/booking";
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Ausstehend',
-  PAID: 'Bestätigt',
-  FAILED: 'Fehlgeschlagen',
-  CANCELLED: 'Storniert',
-  REFUNDED: 'Erstattet',
-  CONFIRMED: 'Bestätigt',
+  PENDING: "Ausstehend",
+  PAID: "Bestätigt",
+  FAILED: "Fehlgeschlagen",
+  CANCELLED: "Storniert",
+  REFUNDED: "Erstattet",
+  CONFIRMED: "Bestätigt",
 };
 
 function formatCurrency(amount: number, currency: string) {
   try {
-    return new Intl.NumberFormat('de-DE', {
-      style: 'currency',
+    return new Intl.NumberFormat("de-DE", {
+      style: "currency",
       currency,
       minimumFractionDigits: 2,
     }).format(amount / 100);
@@ -47,7 +47,7 @@ export default async function BookingSuccessPage({
 
   if (!userId) {
     redirect(
-      `/sign-in?redirect_url=${encodeURIComponent(`/booking-success?bookingId=${bookingId}`)}`
+      `/sign-in?redirect_url=${encodeURIComponent(`/booking-success?bookingId=${bookingId}`)}`,
     );
   }
 
@@ -59,7 +59,7 @@ export default async function BookingSuccessPage({
 
   const viewModel: BookingSuccessViewModel = {
     id: booking.id,
-    courseTitle: booking.course?.title ?? 'Dein Kurs',
+    courseTitle: booking.course?.title ?? "Dein Kurs",
     courseDescription: booking.course?.description ?? null,
     courseDate: booking.course?.date?.toISOString() ?? null,
     // Optional time fields may not exist on Course type; access defensively
@@ -75,14 +75,14 @@ export default async function BookingSuccessPage({
     bookingUpdatedAt: booking.updatedAt.toISOString(),
     paymentStatus: booking.paymentStatus,
     paymentStatusLabel:
-      PAYMENT_STATUS_LABELS[booking.paymentStatus ?? ''] ??
+      PAYMENT_STATUS_LABELS[booking.paymentStatus ?? ""] ??
       booking.paymentStatus ??
-      'Unbekannt',
+      "Unbekannt",
     amount: booking.amount ?? 0,
-    currency: booking.currency ?? 'EUR',
+    currency: booking.currency ?? "EUR",
     formattedAmount: formatCurrency(
       booking.amount ?? 0,
-      booking.currency ?? 'EUR'
+      booking.currency ?? "EUR",
     ),
     courseSlug: booking.course?.slug ?? null,
   };

@@ -3,18 +3,18 @@
  * Metrics are accepted only as JSON POST requests to keep the surface minimal.
  */
 
-import type { NextRequest } from 'next/server';
-import { isTelemetryConsentGranted } from '@/lib/monitoring/privacy';
-import { createApiLogger } from '@/lib/utils/api-logger';
+import type { NextRequest } from "next/server";
+import { isTelemetryConsentGranted } from "@/lib/monitoring/privacy";
+import { createApiLogger } from "@/lib/utils/api-logger";
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
-} from '@/lib/utils/api-response';
+} from "@/lib/utils/api-response";
 import {
   createRequestContextFromNextRequest,
   getOrCreateRequestId,
-} from '@/lib/utils/request-id';
+} from "@/lib/utils/request-id";
 
 interface IncomingWebVitalPayload {
   name?: unknown;
@@ -28,13 +28,13 @@ interface IncomingWebVitalPayload {
 
 function sanitizePayload(payload: IncomingWebVitalPayload) {
   const metricName =
-    typeof payload.name === 'string' ? payload.name : undefined;
+    typeof payload.name === "string" ? payload.name : undefined;
   const metricValue =
-    typeof payload.value === 'number' ? payload.value : undefined;
+    typeof payload.value === "number" ? payload.value : undefined;
 
   if (
     !metricName ||
-    typeof metricValue !== 'number' ||
+    typeof metricValue !== "number" ||
     !Number.isFinite(metricValue)
   ) {
     return undefined;
@@ -43,12 +43,12 @@ function sanitizePayload(payload: IncomingWebVitalPayload) {
   return {
     name: metricName,
     value: metricValue,
-    id: typeof payload.id === 'string' ? payload.id : undefined,
-    label: typeof payload.label === 'string' ? payload.label : undefined,
-    path: typeof payload.path === 'string' ? payload.path : undefined,
-    href: typeof payload.href === 'string' ? payload.href : undefined,
+    id: typeof payload.id === "string" ? payload.id : undefined,
+    label: typeof payload.label === "string" ? payload.label : undefined,
+    path: typeof payload.path === "string" ? payload.path : undefined,
+    href: typeof payload.href === "string" ? payload.href : undefined,
     navigationType:
-      typeof payload.navigationType === 'string'
+      typeof payload.navigationType === "string"
         ? payload.navigationType
         : undefined,
   } as const;
@@ -59,14 +59,14 @@ export async function POST(request: NextRequest) {
   const context = createRequestContextFromNextRequest(request, _requestId);
   const logger = createApiLogger(context);
 
-  if (!request.headers.get('content-type')?.includes('application/json')) {
-    logger.warn('Rejected web vitals payload without JSON content type');
+  if (!request.headers.get("content-type")?.includes("application/json")) {
+    logger.warn("Rejected web vitals payload without JSON content type");
     logger.trackRequestCompletion(415);
     return createErrorResponse(
-      'Unsupported Media Type. Expected application/json payload.',
+      "Unsupported Media Type. Expected application/json payload.",
       ErrorCodes.INVALID_INPUT,
       _requestId,
-      415
+      415,
     );
   }
 
@@ -75,26 +75,26 @@ export async function POST(request: NextRequest) {
   try {
     rawPayload = (await request.json()) as IncomingWebVitalPayload;
   } catch (error) {
-    logger.warn('Failed to parse web vitals payload', { error });
+    logger.warn("Failed to parse web vitals payload", { error });
     logger.trackRequestCompletion(400);
     return createErrorResponse(
-      'Invalid JSON payload.',
+      "Invalid JSON payload.",
       ErrorCodes.INVALID_INPUT,
       _requestId,
-      400
+      400,
     );
   }
 
   const metric = sanitizePayload(rawPayload);
 
   if (!metric) {
-    logger.warn('Rejected web vitals payload due to missing name/value');
+    logger.warn("Rejected web vitals payload due to missing name/value");
     logger.trackRequestCompletion(400);
     return createErrorResponse(
-      'Metric name and value are required.',
+      "Metric name and value are required.",
       ErrorCodes.INVALID_INPUT,
       _requestId,
-      400
+      400,
     );
   }
 
@@ -107,17 +107,17 @@ export async function POST(request: NextRequest) {
   const eventData = {
     ...sanitizedMetric,
     consentGranted: telemetryAllowed,
-    source: 'web-vitals',
+    source: "web-vitals",
   } as const;
 
-  logger.info('Accepted web vitals metric', {
+  logger.info("Accepted web vitals metric", {
     name: metric.name,
     value: metric.value,
     path: metric.path,
     label: metric.label,
   });
 
-  logger.trackBusinessEvent('web_vitals_metric', {
+  logger.trackBusinessEvent("web_vitals_metric", {
     metric: metric.name,
     value: metric.value,
     path: metric.path,
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
   return createSuccessResponse(
     { accepted: true, event: eventData },
     _requestId,
-    202
+    202,
   );
 }
 
@@ -138,7 +138,7 @@ export function OPTIONS() {
   return new Response(null, {
     status: 204,
     headers: {
-      Allow: 'OPTIONS, POST',
+      Allow: "OPTIONS, POST",
     },
   });
 }

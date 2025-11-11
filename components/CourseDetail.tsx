@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import BookOnlineOutlinedIcon from '@mui/icons-material/BookOnlineOutlined';
-import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
-import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import HistoryEduRoundedIcon from '@mui/icons-material/HistoryEduRounded';
+import BookOnlineOutlinedIcon from "@mui/icons-material/BookOnlineOutlined";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
+import HistoryEduRoundedIcon from "@mui/icons-material/HistoryEduRounded";
 import {
   Box,
   Button,
@@ -21,14 +21,14 @@ import {
   SvgIcon,
   type SvgIconProps,
   Typography,
-} from '@mui/material';
-import Grid from '@mui/material/GridLegacy';
-import { format, formatDistanceToNow } from 'date-fns';
-import { de } from 'date-fns/locale';
-import Image from 'next/image';
-import Link from 'next/link';
-import type React from 'react';
-import { useMemo, useState } from 'react';
+} from "@mui/material";
+import Grid from "@mui/material/GridLegacy";
+import { format, formatDistanceToNow } from "date-fns";
+import { de } from "date-fns/locale";
+import Image from "next/image";
+import Link from "next/link";
+import type React from "react";
+import { useMemo, useState } from "react";
 
 interface Course {
   id: string;
@@ -57,33 +57,33 @@ interface CourseDetailProps {
 
 const visuallyHidden = {
   border: 0,
-  clip: 'rect(0 0 0 0)',
+  clip: "rect(0 0 0 0)",
   height: 1,
   margin: -1,
-  overflow: 'hidden',
+  overflow: "hidden",
   padding: 0,
-  position: 'absolute' as const,
+  position: "absolute" as const,
   width: 1,
 };
 
-const CoinIcon: React.FC<SvgIconProps> = props => (
-  <SvgIcon viewBox='0 0 24 24' {...props}>
+const CoinIcon: React.FC<SvgIconProps> = (props) => (
+  <SvgIcon viewBox="0 0 24 24" {...props}>
     <circle
-      cx='12'
-      cy='12'
-      r='9'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='1.5'
+      cx="12"
+      cy="12"
+      r="9"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
     />
     <circle
-      cx='12'
-      cy='12'
-      r='4.5'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='1.5'
-      opacity='0.6'
+      cx="12"
+      cy="12"
+      r="4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      opacity="0.6"
     />
   </SvgIcon>
 );
@@ -105,17 +105,17 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
   const formatCurrency = (amount: number | null, currency: string) => {
     if (amount === null || amount === undefined) {
-      return 'Kostenlos';
+      return "Kostenlos";
     }
 
-    return new Intl.NumberFormat('de-DE', {
-      style: 'currency',
+    return new Intl.NumberFormat("de-DE", {
+      style: "currency",
       currency: currency.toUpperCase(),
     }).format(amount / 100);
   };
 
   const handleBookNow = async (
-    event?: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+    event?: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
   ) => {
     if (onBookNow) {
       event?.preventDefault();
@@ -130,17 +130,17 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   };
 
   const bookingButtonText = useMemo(() => {
-    if (isBooking) return 'Buchung läuft...';
-    if (course.userBookingStatus === 'PAID') return 'Bereits gebucht';
-    if (course.userBookingStatus === 'PENDING') return 'Zahlung ausstehend';
-    if (course.availableSpots === 0) return 'Ausgebucht';
-    return 'Jetzt buchen';
+    if (isBooking) return "Buchung läuft...";
+    if (course.userBookingStatus === "PAID") return "Bereits gebucht";
+    if (course.userBookingStatus === "PENDING") return "Zahlung ausstehend";
+    if (course.availableSpots === 0) return "Ausgebucht";
+    return "Jetzt buchen";
   }, [course.availableSpots, course.userBookingStatus, isBooking]);
 
   const isBookingDisabled = useMemo(() => {
     return (
       isBooking ||
-      course.userBookingStatus === 'PAID' ||
+      course.userBookingStatus === "PAID" ||
       (course.availableSpots !== null && course.availableSpots === 0) ||
       !course.isPublished ||
       isCourseInPast
@@ -155,15 +155,15 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
   const disableReason = useMemo(() => {
     if (!isBookingDisabled) return null;
-    if (course.userBookingStatus === 'PAID')
-      return 'Du hast diesen Kurs bereits gebucht.';
+    if (course.userBookingStatus === "PAID")
+      return "Du hast diesen Kurs bereits gebucht.";
     if (course.availableSpots !== null && course.availableSpots === 0)
-      return 'Dieser Kurs ist aktuell ausgebucht.';
+      return "Dieser Kurs ist aktuell ausgebucht.";
     if (!course.isPublished)
-      return 'Dieser Kurs ist noch nicht veröffentlicht.';
-    if (isCourseInPast) return 'Der Kurstermin liegt in der Vergangenheit.';
-    if (isBooking) return 'Buchung läuft...';
-    return 'Buchung derzeit nicht möglich.';
+      return "Dieser Kurs ist noch nicht veröffentlicht.";
+    if (isCourseInPast) return "Der Kurstermin liegt in der Vergangenheit.";
+    if (isBooking) return "Buchung läuft...";
+    return "Buchung derzeit nicht möglich.";
   }, [
     course.availableSpots,
     course.isPublished,
@@ -178,7 +178,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     const dateValue =
       course.date instanceof Date ? course.date : new Date(course.date);
     if (!Number.isFinite(dateValue.getTime())) return null;
-    return format(dateValue, 'PPP', { locale: de });
+    return format(dateValue, "PPP", { locale: de });
   }, [course.date]);
 
   const createdAtLabel = useMemo(() => {
@@ -192,22 +192,22 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
   if (isLoading) {
     return (
-      <Card aria-busy='true' aria-live='polite' sx={{ p: 3 }}>
+      <Card aria-busy="true" aria-live="polite" sx={{ p: 3 }}>
         <Stack spacing={3}>
           <Skeleton
-            variant='rectangular'
+            variant="rectangular"
             height={320}
             sx={{ borderRadius: 2 }}
           />
-          <Skeleton variant='text' height={48} width='60%' />
-          <Skeleton variant='text' height={24} width='40%' />
+          <Skeleton variant="text" height={48} width="60%" />
+          <Skeleton variant="text" height={24} width="40%" />
           <Skeleton
-            variant='rectangular'
+            variant="rectangular"
             height={120}
             sx={{ borderRadius: 2 }}
           />
           <Skeleton
-            variant='rectangular'
+            variant="rectangular"
             height={56}
             width={180}
             sx={{ borderRadius: 999 }}
@@ -219,17 +219,17 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
   return (
     <Box>
-      <Grid container spacing={4} alignItems='flex-start'>
+      <Grid container spacing={4} alignItems="flex-start">
         <Grid item xs={12} md={7}>
           <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
             {course.image ? (
-              <CardMedia sx={{ position: 'relative', aspectRatio: '16 / 9' }}>
+              <CardMedia sx={{ position: "relative", aspectRatio: "16 / 9" }}>
                 <Image
                   src={course.image}
                   alt={course.title}
                   fill
-                  sizes='(min-width: 1200px) 720px, 100vw'
-                  style={{ objectFit: 'cover' }}
+                  sizes="(min-width: 1200px) 720px, 100vw"
+                  style={{ objectFit: "cover" }}
                 />
               </CardMedia>
             ) : null}
@@ -237,83 +237,83 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <Stack spacing={3}>
                 <div>
                   <Typography
-                    variant='h3'
-                    component='h1'
-                    sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' } }}
+                    variant="h3"
+                    component="h1"
+                    sx={{ fontSize: { xs: "1.75rem", md: "2.25rem" } }}
                   >
                     {course.title}
                   </Typography>
                   <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
+                    direction={{ xs: "column", sm: "row" }}
                     spacing={2}
-                    sx={{ mt: 2, color: 'text.secondary' }}
+                    sx={{ mt: 2, color: "text.secondary" }}
                   >
                     {formattedDate && (
-                      <Stack direction='row' spacing={1} alignItems='center'>
-                        <CalendarMonthRoundedIcon fontSize='small' />
-                        <Typography variant='body2'>{formattedDate}</Typography>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <CalendarMonthRoundedIcon fontSize="small" />
+                        <Typography variant="body2">{formattedDate}</Typography>
                       </Stack>
                     )}
                     {course.capacity ? (
-                      <Stack direction='row' spacing={1} alignItems='center'>
-                        <GroupRoundedIcon fontSize='small' />
-                        <Typography variant='body2'>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <GroupRoundedIcon fontSize="small" />
+                        <Typography variant="body2">
                           {course.availableSpots !== null
                             ? `${course.availableSpots} von ${course.capacity} Plätzen verfügbar`
                             : `${course.capacity} Plätze`}
                         </Typography>
                       </Stack>
                     ) : null}
-                    <Stack direction='row' spacing={1} alignItems='center'>
-                      <CoinIcon fontSize='small' />
-                      <Typography variant='body2'>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <CoinIcon fontSize="small" />
+                      <Typography variant="body2">
                         {formatCurrency(course.price, course.currency)}
                       </Typography>
                     </Stack>
                   </Stack>
                 </div>
 
-                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                   {!course.isPublished ? (
                     <Chip
-                      label='Nicht veröffentlicht'
-                      color='warning'
-                      size='small'
+                      label="Nicht veröffentlicht"
+                      color="warning"
+                      size="small"
                     />
                   ) : null}
-                  {course.userBookingStatus === 'PAID' ? (
-                    <Chip label='✓ Gebucht' color='success' size='small' />
+                  {course.userBookingStatus === "PAID" ? (
+                    <Chip label="✓ Gebucht" color="success" size="small" />
                   ) : null}
-                  {course.userBookingStatus === 'PENDING' ? (
+                  {course.userBookingStatus === "PENDING" ? (
                     <Chip
-                      label='⏳ Zahlung ausstehend'
-                      color='warning'
-                      size='small'
-                      variant='outlined'
+                      label="⏳ Zahlung ausstehend"
+                      color="warning"
+                      size="small"
+                      variant="outlined"
                     />
                   ) : null}
                   {course.availableSpots === 0 ? (
                     <Chip
-                      label='Ausgebucht'
-                      color='error'
-                      size='small'
-                      data-testid='course-detail-sold-out-badge'
+                      label="Ausgebucht"
+                      color="error"
+                      size="small"
+                      data-testid="course-detail-sold-out-badge"
                     />
                   ) : null}
                   {isCourseInPast ? (
-                    <Chip label='Vergangen' color='default' size='small' />
+                    <Chip label="Vergangen" color="default" size="small" />
                   ) : null}
                 </Stack>
 
                 {course.description ? (
                   <Stack spacing={2}>
-                    <Typography variant='h5' component='h2'>
+                    <Typography variant="h5" component="h2">
                       Kursbeschreibung
                     </Typography>
                     <Typography
-                      variant='body1'
-                      color='text.primary'
-                      sx={{ whiteSpace: 'pre-wrap' }}
+                      variant="body1"
+                      color="text.primary"
+                      sx={{ whiteSpace: "pre-wrap" }}
                     >
                       {course.description}
                     </Typography>
@@ -323,29 +323,29 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                 <Divider />
 
                 <Stack spacing={2}>
-                  <Typography variant='h6' component='h3'>
+                  <Typography variant="h6" component="h3">
                     Buchungsinformationen
                   </Typography>
                   <List disablePadding>
                     <ListItem disableGutters sx={{ py: 1 }}>
                       <ListItemIcon
-                        sx={{ minWidth: 32, color: 'text.secondary' }}
+                        sx={{ minWidth: 32, color: "text.secondary" }}
                       >
-                        <CoinIcon fontSize='small' />
+                        <CoinIcon fontSize="small" />
                       </ListItemIcon>
                       <ListItemText
-                        primary='Preis'
+                        primary="Preis"
                         secondary={formatCurrency(
                           course.price,
-                          course.currency
+                          course.currency,
                         )}
                         primaryTypographyProps={{
-                          variant: 'body2',
-                          color: 'text.secondary',
+                          variant: "body2",
+                          color: "text.secondary",
                         }}
                         secondaryTypographyProps={{
-                          variant: 'subtitle1',
-                          color: 'text.primary',
+                          variant: "subtitle1",
+                          color: "text.primary",
                           fontWeight: 600,
                         }}
                       />
@@ -353,20 +353,20 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     {course.capacity ? (
                       <ListItem disableGutters sx={{ py: 1 }}>
                         <ListItemIcon
-                          sx={{ minWidth: 32, color: 'text.secondary' }}
+                          sx={{ minWidth: 32, color: "text.secondary" }}
                         >
-                          <GroupRoundedIcon fontSize='small' />
+                          <GroupRoundedIcon fontSize="small" />
                         </ListItemIcon>
                         <ListItemText
-                          primary='Verfügbare Plätze'
+                          primary="Verfügbare Plätze"
                           secondary={course.availableSpots ?? course.capacity}
                           primaryTypographyProps={{
-                            variant: 'body2',
-                            color: 'text.secondary',
+                            variant: "body2",
+                            color: "text.secondary",
                           }}
                           secondaryTypographyProps={{
-                            variant: 'subtitle1',
-                            color: 'text.primary',
+                            variant: "subtitle1",
+                            color: "text.primary",
                             fontWeight: 600,
                           }}
                         />
@@ -375,20 +375,20 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     {course.totalBookings !== undefined ? (
                       <ListItem disableGutters sx={{ py: 1 }}>
                         <ListItemIcon
-                          sx={{ minWidth: 32, color: 'text.secondary' }}
+                          sx={{ minWidth: 32, color: "text.secondary" }}
                         >
-                          <HistoryEduRoundedIcon fontSize='small' />
+                          <HistoryEduRoundedIcon fontSize="small" />
                         </ListItemIcon>
                         <ListItemText
-                          primary='Bereits gebucht'
+                          primary="Bereits gebucht"
                           secondary={course.totalBookings}
                           primaryTypographyProps={{
-                            variant: 'body2',
-                            color: 'text.secondary',
+                            variant: "body2",
+                            color: "text.secondary",
                           }}
                           secondaryTypographyProps={{
-                            variant: 'subtitle1',
-                            color: 'text.primary',
+                            variant: "subtitle1",
+                            color: "text.primary",
                             fontWeight: 600,
                           }}
                         />
@@ -398,7 +398,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                 </Stack>
 
                 {createdAtLabel ? (
-                  <Typography variant='body2' color='text.secondary'>
+                  <Typography variant="body2" color="text.secondary">
                     Erstellt {createdAtLabel}
                   </Typography>
                 ) : null}
@@ -413,15 +413,15 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <CardContent>
                 <Stack spacing={3}>
                   <Stack spacing={1}>
-                    <Typography variant='h6'>Direkt buchen</Typography>
-                    <Typography variant='body2' color='text.secondary'>
+                    <Typography variant="h6">Direkt buchen</Typography>
+                    <Typography variant="body2" color="text.secondary">
                       Sichere dir jetzt einen Platz in diesem Kurs.
                     </Typography>
                   </Stack>
 
                   <Button
-                    variant='contained'
-                    size='large'
+                    variant="contained"
+                    size="large"
                     startIcon={<BookOnlineOutlinedIcon />}
                     {...(bookNowHref
                       ? {
@@ -430,7 +430,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                         }
                       : {})}
                     onClick={
-                      typeof onBookNow === 'function'
+                      typeof onBookNow === "function"
                         ? handleBookNow
                         : undefined
                     }
@@ -438,20 +438,20 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     title={disableReason ?? undefined}
                     aria-disabled={isBookingDisabled}
                     aria-busy={isBooking || undefined}
-                    data-testid='course-detail-book-cta'
+                    data-testid="course-detail-book-cta"
                   >
                     {bookingButtonText}
                   </Button>
 
-                  <Box component='span' aria-live='polite' sx={visuallyHidden}>
-                    {isBooking ? 'Buchung läuft' : ''}
+                  <Box component="span" aria-live="polite" sx={visuallyHidden}>
+                    {isBooking ? "Buchung läuft" : ""}
                   </Box>
 
                   {isBookingDisabled && disableReason ? (
                     <Typography
-                      variant='caption'
-                      color='text.secondary'
-                      data-testid='course-detail-disable-reason'
+                      variant="caption"
+                      color="text.secondary"
+                      data-testid="course-detail-disable-reason"
                     >
                       {disableReason}
                     </Typography>

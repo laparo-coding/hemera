@@ -1,13 +1,13 @@
-import { currentUser } from '@clerk/nextjs/server';
-import { type NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { z } from 'zod';
-import { prisma } from '@/lib/db/prisma';
-import { STRIPE_API_VERSION } from '@/lib/stripe/config';
+import { currentUser } from "@clerk/nextjs/server";
+import { type NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+import { z } from "zod";
+import { prisma } from "@/lib/db/prisma";
+import { STRIPE_API_VERSION } from "@/lib/stripe/config";
 
 // Skip Stripe initialization during build process
 const isBuildTime =
-  process.env.NODE_ENV === 'production' && !process.env.STRIPE_SECRET_KEY;
+  process.env.NODE_ENV === "production" && !process.env.STRIPE_SECRET_KEY;
 
 // Create stripe instance only at runtime
 const createStripeInstance = () => {
@@ -19,15 +19,15 @@ const createStripeInstance = () => {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) {
     throw new Error(
-      'STRIPE_SECRET_KEY is not configured. Add it to your environment variables.'
+      "STRIPE_SECRET_KEY is not configured. Add it to your environment variables.",
     );
   }
 
   // Safety check: Ensure test keys for localhost
-  const isLocalhost = process.env.NEXT_PUBLIC_APP_URL?.includes('localhost');
-  if (isLocalhost && !stripeKey.startsWith('sk_test_')) {
+  const isLocalhost = process.env.NEXT_PUBLIC_APP_URL?.includes("localhost");
+  if (isLocalhost && !stripeKey.startsWith("sk_test_")) {
     throw new Error(
-      'Live Stripe keys are not allowed on localhost. Use test keys only.'
+      "Live Stripe keys are not allowed on localhost. Use test keys only.",
     );
   }
 
@@ -53,9 +53,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Service temporarily unavailable during deployment',
+          error: "Service temporarily unavailable during deployment",
         },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -63,8 +63,8 @@ export async function POST(request: NextRequest) {
 
     if (!user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
+        { success: false, error: "Authentication required" },
+        { status: 401 },
       );
     }
 
@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
 
     if (!course) {
       return NextResponse.json(
-        { success: false, error: 'Course not found' },
-        { status: 404 }
+        { success: false, error: "Course not found" },
+        { status: 404 },
       );
     }
 
@@ -112,8 +112,8 @@ export async function POST(request: NextRequest) {
 
     if (existingBooking) {
       return NextResponse.json(
-        { success: false, error: 'You have already booked this course' },
-        { status: 409 }
+        { success: false, error: "You have already booked this course" },
+        { status: 409 },
       );
     }
 
@@ -121,13 +121,13 @@ export async function POST(request: NextRequest) {
     const stripe = createStripeInstance();
     if (!stripe) {
       return NextResponse.json(
-        { success: false, error: 'Payment service unavailable' },
-        { status: 503 }
+        { success: false, error: "Payment service unavailable" },
+        { status: 503 },
       );
     }
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      mode: 'payment',
+      mode: "payment",
       success_url:
         validatedData.successUrl ||
         `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -164,10 +164,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid request data',
+          error: "Invalid request data",
           details: error.issues,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -180,21 +180,21 @@ export async function POST(request: NextRequest) {
           type: error.type,
           requestId: error.requestId,
         },
-        { status: error.statusCode ?? 502 }
+        { status: error.statusCode ?? 502 },
       );
     }
 
     const message =
       error instanceof Error
         ? error.message
-        : 'Failed to create checkout session';
+        : "Failed to create checkout session";
 
     return NextResponse.json(
       {
         success: false,
         error: message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

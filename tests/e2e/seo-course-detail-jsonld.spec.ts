@@ -1,27 +1,27 @@
-import { expect, test } from '@playwright/test';
-import { clickAndWait, gotoStable } from './helpers/nav';
+import { expect, test } from "@playwright/test";
+import { clickAndWait, gotoStable } from "./helpers/nav";
 
 const _isExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 
-test.describe('Course detail JSON-LD', () => {
-  test('enthält strukturierte Daten (application/ld+json)', async ({
+test.describe("Course detail JSON-LD", () => {
+  test("enthält strukturierte Daten (application/ld+json)", async ({
     page,
   }) => {
-    await gotoStable(page, '/courses', { waitForTestId: 'course-overview' });
+    await gotoStable(page, "/courses", { waitForTestId: "course-overview" });
 
-    const overview = page.getByTestId('course-overview');
+    const overview = page.getByTestId("course-overview");
     let detailLink = overview
-      .getByRole('button', { name: /zum kurs/i })
+      .getByRole("button", { name: /zum kurs/i })
       .first();
     if ((await detailLink.count()) === 0) {
-      detailLink = overview.getByRole('link', { name: /zum kurs/i }).first();
+      detailLink = overview.getByRole("link", { name: /zum kurs/i }).first();
     }
 
     if ((await detailLink.count()) === 0) {
       test.info().annotations.push({
-        type: 'note',
+        type: "note",
         description:
-          'Keine „Zum Kurs“-CTA gefunden (evtl. alle Kurse ausgebucht). Test informativ übersprungen.',
+          "Keine „Zum Kurs“-CTA gefunden (evtl. alle Kurse ausgebucht). Test informativ übersprungen.",
       });
       return;
     }
@@ -41,17 +41,17 @@ test.describe('Course detail JSON-LD', () => {
       if (txt) contents.push(txt);
     }
 
-    const hasCourse = contents.some(c => /"@type"\s*:\s*"Course"/.test(c));
+    const hasCourse = contents.some((c) => /"@type"\s*:\s*"Course"/.test(c));
     expect(hasCourse).toBeTruthy();
 
-    const hasOffer = contents.some(c => /"@type"\s*:\s*"Offer"/.test(c));
+    const hasOffer = contents.some((c) => /"@type"\s*:\s*"Offer"/.test(c));
     expect(hasOffer).toBeTruthy();
 
-    const hasEur = contents.some(c => /"priceCurrency"\s*:\s*"EUR"/.test(c));
+    const hasEur = contents.some((c) => /"priceCurrency"\s*:\s*"EUR"/.test(c));
     expect(hasEur).toBeTruthy();
 
-    const hasAvailability = contents.some(c =>
-      /https:\/\/schema\.org\/(InStock|OutOfStock)/.test(c)
+    const hasAvailability = contents.some((c) =>
+      /https:\/\/schema\.org\/(InStock|OutOfStock)/.test(c),
     );
     expect(hasAvailability).toBeTruthy();
   });

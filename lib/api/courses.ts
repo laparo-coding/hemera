@@ -3,14 +3,14 @@
  * Provides server-side functions for course management
  */
 
-import { PaymentStatus } from '@prisma/client';
-import { prisma } from '@/lib/db/prisma';
+import { PaymentStatus } from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
 import {
   CourseNotFoundError,
   CourseNotPublishedError,
   DatabaseConnectionError,
   logError,
-} from '@/lib/errors';
+} from "@/lib/errors";
 
 export interface Course {
   id: string;
@@ -34,7 +34,7 @@ export interface CourseWithSEO extends Course {
   metaDescription?: string;
   keywords?: string[];
   instructor?: string;
-  level?: 'beginner' | 'intermediate' | 'advanced';
+  level?: "beginner" | "intermediate" | "advanced";
   duration?: string;
 }
 
@@ -48,16 +48,16 @@ export async function getPublishedCourses(): Promise<Course[]> {
     // due to SQLite storing booleans as integers (0/1). We fetch all and filter in JS.
     const allCourses = await prisma.course.findMany({
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
     // Filter published courses in JavaScript to ensure compatibility with SQLite
     // SQLite may store boolean as 1/0, so we check for truthy values
-    const courses = allCourses.filter(course => !!course.isPublished);
+    const courses = allCourses.filter((course) => !!course.isPublished);
 
     // Compute availability (FR-011): derive from internal capacities/bookings
-    const courseIds = courses.map(c => c.id);
+    const courseIds = courses.map((c) => c.id);
     let countsMap = new Map<string, number>();
     if (courseIds.length > 0) {
       const relatedBookings = await prisma.booking.findMany({
@@ -74,7 +74,7 @@ export async function getPublishedCourses(): Promise<Course[]> {
       }, new Map<string, number>());
     }
 
-    const enriched = courses.map(course => {
+    const enriched = courses.map((course) => {
       const totalBookings = countsMap.get(course.id) || 0;
       const availableSpots =
         course.capacity !== null && course.capacity !== undefined
@@ -82,35 +82,35 @@ export async function getPublishedCourses(): Promise<Course[]> {
           : null;
       return {
         ...course,
-        currency: course.currency || 'EUR',
+        currency: course.currency || "EUR",
         availableSpots,
         totalBookings,
         userBookingStatus: null,
       } as Course;
     });
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== "production") {
       try {
-        const samplePreview = enriched.slice(0, 3).map(course => ({
+        const samplePreview = enriched.slice(0, 3).map((course) => ({
           id: course.id,
           slug: course.slug,
           published: course.isPublished,
         }));
-        console.info('[getPublishedCourses]', {
+        console.info("[getPublishedCourses]", {
           count: enriched.length,
           sample: samplePreview,
         });
       } catch (logError) {
         console.warn(
-          '[getPublishedCourses] failed to log debug info',
-          logError
+          "[getPublishedCourses] failed to log debug info",
+          logError,
         );
       }
     }
 
     return enriched;
   } catch (error) {
-    logError(error, { operation: 'getPublishedCourses' });
+    logError(error, { operation: "getPublishedCourses" });
     throw error;
   }
 }
@@ -126,7 +126,7 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
         isPublished: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: limit,
       select: {
@@ -143,19 +143,19 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
     });
 
     // Erweitere die Kurse um die fehlenden Felder für die Component-Kompatibilität
-    return courses.map(course => ({
+    return courses.map((course) => ({
       ...course,
-      currency: 'EUR',
+      currency: "EUR",
       capacity: null,
       availableSpots: null,
       totalBookings: 0,
       userBookingStatus: null,
     }));
   } catch (error) {
-    logError(error, { operation: 'getFeaturedCourses', limit });
+    logError(error, { operation: "getFeaturedCourses", limit });
     throw new DatabaseConnectionError(
-      'fetching featured courses',
-      error as Error
+      "fetching featured courses",
+      error as Error,
     );
   }
 }
@@ -200,7 +200,7 @@ export async function getCourseById(id: string): Promise<Course> {
 
     return {
       ...course,
-      currency: course.currency || 'EUR',
+      currency: course.currency || "EUR",
       availableSpots,
       totalBookings,
       userBookingStatus: null,
@@ -210,8 +210,8 @@ export async function getCourseById(id: string): Promise<Course> {
       throw error; // Re-throw our custom error
     }
 
-    logError(error, { operation: 'getCourseById', courseId: id });
-    throw new DatabaseConnectionError('fetching course by ID', error as Error);
+    logError(error, { operation: "getCourseById", courseId: id });
+    throw new DatabaseConnectionError("fetching course by ID", error as Error);
   }
 }
 
@@ -259,7 +259,7 @@ export async function getCourseBySlug(slug: string): Promise<Course> {
 
     return {
       ...course,
-      currency: course.currency || 'EUR',
+      currency: course.currency || "EUR",
       availableSpots,
       totalBookings,
       userBookingStatus: null,
@@ -272,10 +272,10 @@ export async function getCourseBySlug(slug: string): Promise<Course> {
       throw error; // Re-throw our custom errors
     }
 
-    logError(error, { operation: 'getCourseBySlug', slug });
+    logError(error, { operation: "getCourseBySlug", slug });
     throw new DatabaseConnectionError(
-      'fetching course by slug',
-      error as Error
+      "fetching course by slug",
+      error as Error,
     );
   }
 }
@@ -288,14 +288,14 @@ export async function getAllCourses(): Promise<Course[]> {
   try {
     const courses = await prisma.course.findMany({
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
     return courses;
   } catch (error) {
-    logError(error, { operation: 'getAllCourses' });
-    throw new DatabaseConnectionError('fetching all courses', error as Error);
+    logError(error, { operation: "getAllCourses" });
+    throw new DatabaseConnectionError("fetching all courses", error as Error);
   }
 }
 
@@ -314,16 +314,16 @@ export async function getNextUpcomingCourse(): Promise<Course | null> {
         },
       },
       orderBy: {
-        date: 'asc',
+        date: "asc",
       },
     });
 
     return course;
   } catch (error) {
-    logError(error, { operation: 'getNextUpcomingCourse' });
+    logError(error, { operation: "getNextUpcomingCourse" });
     throw new DatabaseConnectionError(
-      'fetching next upcoming course',
-      error as Error
+      "fetching next upcoming course",
+      error as Error,
     );
   }
 }
@@ -346,10 +346,10 @@ export async function getCourseStats() {
       unpublished,
     };
   } catch (error) {
-    logError(error, { operation: 'getCourseStats' });
+    logError(error, { operation: "getCourseStats" });
     throw new DatabaseConnectionError(
-      'fetching course statistics',
-      error as Error
+      "fetching course statistics",
+      error as Error,
     );
   }
 }
