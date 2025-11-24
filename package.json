@@ -82,7 +82,7 @@
     "@playwright/test": "^1.56.1",
     "@testcontainers/postgresql": "^11.7.2",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.19.0",
+    "@types/node": "^24.10.1",
     "@types/react": "^18.2.74",
     "@types/react-dom": "^18.2.24",
     "@types/uuid": "^10.0.0",
