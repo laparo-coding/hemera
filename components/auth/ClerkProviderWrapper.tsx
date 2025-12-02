@@ -36,16 +36,7 @@ export default function ClerkProviderWrapper({
   }
 
   if (!publishableKey) {
-    // ERROR: Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-    if (process.env.NODE_ENV === 'development') {
-      return (
-        <div style={{ padding: '20px', color: 'red' }}>
-          Error: Clerk authentication is not configured. Missing publishable
-          key.
-        </div>
-      );
-    }
-    // In non-development (e.g., production/preview) avoid blocking render
+    // In non-development or when key is missing, bypass Clerk to not block render
     return <>{children}</>;
   }
 
