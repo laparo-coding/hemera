@@ -14,7 +14,7 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: #FBF5DD;
+  background: #fbf5dd;
   font-family: 'Inter', sans-serif;
 }
 
@@ -33,10 +33,10 @@ a {
   --foreground-rgb: 22, 64, 77;
   --background-start-rgb: 251, 245, 221;
   --background-end-rgb: 251, 245, 221;
-  --hemera-cream: #FBF5DD;
-  --hemera-petrol: #16404D;
-  --hemera-gold: #DDA853;
-  --hemera-sage: #A6CDC6;
+  --hemera-cream: #fbf5dd;
+  --hemera-petrol: #16404d;
+  --hemera-gold: #dda853;
+  --hemera-sage: #a6cdc6;
 }
 
 @media (prefers-color-scheme: dark) {
