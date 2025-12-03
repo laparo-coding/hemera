@@ -5,7 +5,7 @@ Auto-generated from all feature plans. Last updated: 2025-12-03
 ## Active Technologies
 
 - TypeScript 5.x, Next.js 15.5.6, React 18+ + MUI v5+, Clerk (auth), Rollbar (monitoring), Prisma
-  (ORM) (012-performance-improvement)
+  (ORM)
 
 ## Project Structure
 
@@ -16,7 +16,7 @@ tests/
 
 ## Commands
 
-npm test [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] npm run lint
+npm test npm run lint
 
 ## Code Style
 
@@ -36,10 +36,10 @@ See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
 
-- 012-performance-improvement: Added TypeScript 5.x, Next.js 15.5.6, React 18+ + MUI v5+, Clerk
-  (auth), Rollbar (monitoring), Prisma (ORM)
 - 012-performance-improvement: Performance optimizations (deferred MonitoringInit, loading.tsx
   skeleton, webpack cache fix)
+- 011-redesign-dashboard-in: Dashboard redesign with premium feminine design
+- 010-layout-improvement: Premium feminine landing page and navigation
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
