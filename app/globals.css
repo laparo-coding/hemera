@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -12,7 +14,8 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: white;
+  background: #FBF5DD;
+  font-family: 'Inter', sans-serif;
 }
 
 a {
@@ -27,15 +30,19 @@ a {
 }
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 22, 64, 77;
+  --background-start-rgb: 251, 245, 221;
+  --background-end-rgb: 251, 245, 221;
+  --hemera-cream: #FBF5DD;
+  --hemera-petrol: #16404D;
+  --hemera-gold: #DDA853;
+  --hemera-sage: #A6CDC6;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 255, 255, 255;
-    --background-end-rgb: 255, 255, 255;
+    --foreground-rgb: 22, 64, 77;
+    --background-start-rgb: 251, 245, 221;
+    --background-end-rgb: 251, 245, 221;
   }
 }

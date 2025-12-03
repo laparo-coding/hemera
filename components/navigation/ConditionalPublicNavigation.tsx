@@ -3,8 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { PublicNavigation } from './PublicNavigation';
 
-// Route prefixes that represent protected areas
-const PROTECTED_PREFIXES = ['/dashboard', '/my-courses', '/admin', '/bookings'];
+// Route prefixes that represent protected areas (excluding dashboard which gets special handling)
+const PROTECTED_PREFIXES = ['/my-courses', '/admin', '/bookings'];
 
 export default function ConditionalPublicNavigation() {
   const pathname = usePathname() || '/';
@@ -12,20 +12,21 @@ export default function ConditionalPublicNavigation() {
     process.env.E2E_TEST === 'true' ||
     process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
 
+  const isDashboard =
+    pathname === '/dashboard' || pathname.startsWith('/dashboard/');
+
   const isProtected = PROTECTED_PREFIXES.some(
     prefix => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
 
-  // In E2E mode: do not render public navigation on protected pages
-  // to avoid duplicate [data-testid] selectors
-  if (isE2E) {
-    if (isProtected) return null;
-    return <PublicNavigation />;
+  // Dashboard always shows navigation (with UserButton when logged in)
+  if (isDashboard) {
+    return <PublicNavigation hideMyCourses />;
   }
 
-  // Show header also on dashboard, but hide the "Meine Kurse" button
-  if (pathname === '/dashboard' || pathname.startsWith('/dashboard/')) {
-    return <PublicNavigation />;
+  // In E2E mode: do not render public navigation on other protected pages
+  if (isE2E && isProtected) {
+    return null;
   }
 
   if (isProtected) return null;

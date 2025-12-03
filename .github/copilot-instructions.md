@@ -24,6 +24,8 @@ TypeScript 5+, React 18+, Next.js 14+ (App Router): Follow standard conventions
 
 ## Recent Changes
 
+- 011-redesign-dashboard-in: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+
 - 010-010-layout-improvement: Added TypeScript 5+, React 18+, Next.js 14+ (App Router) + Material-UI
   (MUI) v5+, Emotion, Next/Fon
 

@@ -12,10 +12,10 @@ import {
   Alert,
   Box,
   Button,
-  Card,
   CardContent,
   Chip,
   Divider,
+  Paper,
   Skeleton,
   Stack,
   Typography,
@@ -24,6 +24,34 @@ import Grid from '@mui/material/GridLegacy';
 import Link from 'next/link';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+
+// Design tokens from Hemera spec (matching landing page and auth pages)
+const colors = {
+  cream: '#FBF5DD',
+  petrol: '#16404D',
+  gold: '#DDA853',
+  sage: '#A6CDC6',
+  white: '#FFFFFF',
+} as const;
+
+// Status colors for booking states
+const statusColors = {
+  PAID: {
+    background: 'rgba(166, 205, 198, 0.15)',
+    border: colors.sage,
+    text: colors.petrol,
+  },
+  PENDING: {
+    background: 'rgba(221, 168, 83, 0.15)',
+    border: colors.gold,
+    text: colors.petrol,
+  },
+  FAILED: {
+    background: 'rgba(232, 180, 184, 0.15)',
+    border: '#E8B4B8',
+    text: '#8B4A50',
+  },
+} as const;
 
 interface Booking {
   id: string;
@@ -93,39 +121,112 @@ const UserDashboardE2E: React.FC = () => {
 
   return (
     <Box
-      sx={{ maxWidth: 1200, mx: 'auto', p: 3, pt: 6 }}
-      data-testid='user-dashboard'
+      sx={{
+        minHeight: '100vh',
+        bgcolor: colors.cream,
+        p: { xs: 2, sm: 3, md: 4 },
+      }}
     >
-      <Typography
-        variant='h4'
-        component='h1'
-        gutterBottom
-        data-testid='dashboard-title'
-      >
-        Dashboard Overview
-      </Typography>
-      {/* Marker for auth-service errors/disabled in E2E so tests can detect a fallback */}
-      <span style={{ display: 'none' }} data-testid='auth-service-error'>
-        Service temporarily unavailable
-      </span>
-      {/* user-role wird global im E2E-Header angezeigt; hier vermeiden wir doppelte Selektoren */}
-      {/* Minimal metrics section expected by tests */}
-      <Box
-        data-testid='dashboard-metrics'
-        sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 3 }}
-      >
-        <Card>
-          <CardContent>Metric A</CardContent>
-        </Card>
-        <Card>
-          <CardContent>Metric B</CardContent>
-        </Card>
+      <Box sx={{ maxWidth: 1200, mx: 'auto' }} data-testid='user-dashboard'>
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            component='h1'
+            data-testid='dashboard-title'
+            sx={{
+              fontFamily: '"Playfair Display", serif',
+              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
+              fontWeight: 700,
+              color: colors.petrol,
+              mb: 1,
+            }}
+          >
+            Dashboard Overview
+          </Typography>
+        </Box>
+        {/* Marker for auth-service errors/disabled in E2E so tests can detect a fallback */}
+        <span style={{ display: 'none' }} data-testid='auth-service-error'>
+          Service temporarily unavailable
+        </span>
+        {/* user-role wird global im E2E-Header angezeigt; hier vermeiden wir doppelte Selektoren */}
+        {/* Minimal metrics section expected by tests */}
+        <Box
+          data-testid='dashboard-metrics'
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+            gap: 3,
+            mb: 4,
+          }}
+        >
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: '16px',
+              border: '1px solid rgba(22, 64, 77, 0.1)',
+              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+            }}
+          >
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <Typography
+                sx={{
+                  fontFamily: '"Inter", sans-serif',
+                  fontSize: '0.875rem',
+                  color: colors.petrol,
+                  opacity: 0.7,
+                }}
+              >
+                Metric A
+              </Typography>
+            </CardContent>
+          </Paper>
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: '16px',
+              border: '1px solid rgba(22, 64, 77, 0.1)',
+              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+            }}
+          >
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <Typography
+                sx={{
+                  fontFamily: '"Inter", sans-serif',
+                  fontSize: '0.875rem',
+                  color: colors.petrol,
+                  opacity: 0.7,
+                }}
+              >
+                Metric B
+              </Typography>
+            </CardContent>
+          </Paper>
+        </Box>
+        <Paper
+          elevation={0}
+          data-testid='courses-card'
+          sx={{
+            p: { xs: 2, sm: 3 },
+            borderRadius: '16px',
+            border: '1px solid rgba(22, 64, 77, 0.1)',
+            boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+          }}
+        >
+          <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+            <Typography
+              sx={{
+                fontFamily: '"Playfair Display", serif',
+                fontSize: '1.25rem',
+                fontWeight: 600,
+                color: colors.petrol,
+              }}
+            >
+              Courses
+            </Typography>
+          </CardContent>
+        </Paper>
       </Box>
-      <Card data-testid='courses-card'>
-        <CardContent>
-          <Typography variant='h6'>Courses</Typography>
-        </CardContent>
-      </Card>
     </Box>
   );
 };
@@ -204,22 +305,6 @@ const UserDashboardClerk: React.FC = () => {
   }, [userLoaded, user, fetchBookings]);
 
   // Memoized helper functions for better performance
-  const getStatusColor = useCallback(
-    (status: string): 'success' | 'warning' | 'error' | 'default' => {
-      switch (status) {
-        case 'PAID':
-          return 'success';
-        case 'PENDING':
-          return 'warning';
-        case 'FAILED':
-          return 'error';
-        default:
-          return 'default';
-      }
-    },
-    []
-  );
-
   const getStatusIcon = useCallback((status: string) => {
     switch (status) {
       case 'PAID':
@@ -236,75 +321,157 @@ const UserDashboardClerk: React.FC = () => {
     () => (
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Stack direction='row' spacing={2} alignItems='center'>
-                <SchoolOutlined color='primary' sx={{ fontSize: 32 }} />
-                <Box>
-                  <Typography variant='body2' color='text.secondary'>
-                    Gesamte Buchungen
-                  </Typography>
-                  <Typography variant='h5' fontWeight='bold'>
-                    {stats.totalBookings}
-                  </Typography>
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: '16px',
+              border: '1px solid rgba(22, 64, 77, 0.1)',
+              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+            }}
+          >
+            <Stack direction='row' spacing={2} alignItems='center'>
+              <SchoolOutlined sx={{ fontSize: 32, color: colors.petrol }} />
+              <Box>
+                <Typography
+                  sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '0.875rem',
+                    color: colors.petrol,
+                    opacity: 0.7,
+                  }}
+                >
+                  Gesamte Buchungen
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '1.5rem',
+                    fontWeight: 700,
+                    color: colors.petrol,
+                  }}
+                >
+                  {stats.totalBookings}
+                </Typography>
+              </Box>
+            </Stack>
+          </Paper>
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Stack direction='row' spacing={2} alignItems='center'>
-                <CheckCircleOutlined color='success' sx={{ fontSize: 32 }} />
-                <Box>
-                  <Typography variant='body2' color='text.secondary'>
-                    Bestätigte Buchungen
-                  </Typography>
-                  <Typography variant='h5' fontWeight='bold'>
-                    {stats.confirmedBookings}
-                  </Typography>
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: '16px',
+              border: '1px solid rgba(22, 64, 77, 0.1)',
+              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+            }}
+          >
+            <Stack direction='row' spacing={2} alignItems='center'>
+              <CheckCircleOutlined sx={{ fontSize: 32, color: colors.sage }} />
+              <Box>
+                <Typography
+                  sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '0.875rem',
+                    color: colors.petrol,
+                    opacity: 0.7,
+                  }}
+                >
+                  Bestätigte Buchungen
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '1.5rem',
+                    fontWeight: 700,
+                    color: colors.petrol,
+                  }}
+                >
+                  {stats.confirmedBookings}
+                </Typography>
+              </Box>
+            </Stack>
+          </Paper>
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Stack direction='row' spacing={2} alignItems='center'>
-                <PendingOutlined color='warning' sx={{ fontSize: 32 }} />
-                <Box>
-                  <Typography variant='body2' color='text.secondary'>
-                    Ausstehende Zahlungen
-                  </Typography>
-                  <Typography variant='h5' fontWeight='bold'>
-                    {stats.pendingPayments}
-                  </Typography>
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: '16px',
+              border: '1px solid rgba(22, 64, 77, 0.1)',
+              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+            }}
+          >
+            <Stack direction='row' spacing={2} alignItems='center'>
+              <PendingOutlined sx={{ fontSize: 32, color: colors.gold }} />
+              <Box>
+                <Typography
+                  sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '0.875rem',
+                    color: colors.petrol,
+                    opacity: 0.7,
+                  }}
+                >
+                  Ausstehende Zahlungen
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '1.5rem',
+                    fontWeight: 700,
+                    color: colors.petrol,
+                  }}
+                >
+                  {stats.pendingPayments}
+                </Typography>
+              </Box>
+            </Stack>
+          </Paper>
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Stack direction='row' spacing={2} alignItems='center'>
-                <AttachMoneyOutlined color='primary' sx={{ fontSize: 32 }} />
-                <Box>
-                  <Typography variant='body2' color='text.secondary'>
-                    Gesamtausgaben
-                  </Typography>
-                  <Typography variant='h5' fontWeight='bold'>
-                    €{(stats.totalSpent / 100).toFixed(2)}
-                  </Typography>
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: '16px',
+              border: '1px solid rgba(22, 64, 77, 0.1)',
+              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+            }}
+          >
+            <Stack direction='row' spacing={2} alignItems='center'>
+              <AttachMoneyOutlined
+                sx={{ fontSize: 32, color: colors.petrol }}
+              />
+              <Box>
+                <Typography
+                  sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '0.875rem',
+                    color: colors.petrol,
+                    opacity: 0.7,
+                  }}
+                >
+                  Gesamtausgaben
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '1.5rem',
+                    fontWeight: 700,
+                    color: colors.petrol,
+                  }}
+                >
+                  €{(stats.totalSpent / 100).toFixed(2)}
+                </Typography>
+              </Box>
+            </Stack>
+          </Paper>
         </Grid>
       </Grid>
     ),
@@ -314,92 +481,184 @@ const UserDashboardClerk: React.FC = () => {
   // Memoized bookings list component
   const BookingsList = useMemo(
     () => (
-      <Card data-testid='courses-card'>
-        <CardContent>
-          <Typography variant='h6' gutterBottom>
-            Meine Buchungen
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
+      <Paper
+        elevation={0}
+        data-testid='courses-card'
+        sx={{
+          p: { xs: 2, sm: 3, md: 4 },
+          borderRadius: '16px',
+          border: '1px solid rgba(22, 64, 77, 0.1)',
+          boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+        }}
+      >
+        <Typography
+          sx={{
+            fontFamily: '"Playfair Display", serif',
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            color: colors.petrol,
+            mb: 2,
+          }}
+        >
+          Meine Buchungen
+        </Typography>
+        <Divider sx={{ mb: 3, borderColor: 'rgba(22, 64, 77, 0.1)' }} />
 
-          {bookings.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <SchoolOutlined
-                sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }}
-              />
-              <Typography variant='h6' color='text.secondary' gutterBottom>
-                Keine Buchungen
-              </Typography>
-              <Typography variant='body2' color='text.secondary' paragraph>
-                Sie haben noch keine Kurse gebucht. Entdecken Sie unser Angebot!
-              </Typography>
-              <Button
-                component={Link}
-                href='/courses'
-                variant='contained'
-                endIcon={<ArrowForwardOutlined />}
+        {bookings.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 6 }}>
+            <SchoolOutlined sx={{ fontSize: 64, color: colors.sage, mb: 2 }} />
+            <Typography
+              sx={{
+                fontFamily: '"Playfair Display", serif',
+                fontSize: '1.5rem',
+                fontWeight: 600,
+                color: colors.petrol,
+                mb: 1,
+              }}
+            >
+              Beginne deine Lernreise
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: '"Inter", sans-serif',
+                fontSize: '1rem',
+                color: colors.petrol,
+                opacity: 0.8,
+                mb: 3,
+                maxWidth: 400,
+                mx: 'auto',
+              }}
+            >
+              Entdecke unsere Kurse und investiere in deine berufliche Zukunft.
+            </Typography>
+            <Button
+              component={Link}
+              href='/courses'
+              endIcon={<ArrowForwardOutlined />}
+              sx={{
+                bgcolor: colors.gold,
+                color: colors.petrol,
+                fontFamily: '"Inter", sans-serif',
+                fontWeight: 600,
+                fontSize: '1rem',
+                textTransform: 'none',
+                borderRadius: '8px',
+                px: 4,
+                py: 1.5,
+                '&:hover': {
+                  bgcolor: '#C99545',
+                },
+              }}
+            >
+              Kurse entdecken
+            </Button>
+          </Box>
+        ) : (
+          <Stack spacing={2}>
+            {bookings.map(booking => (
+              <Paper
+                key={booking.id}
+                elevation={0}
+                sx={{
+                  p: { xs: 2, sm: 3 },
+                  borderRadius: '12px',
+                  border: '1px solid rgba(22, 64, 77, 0.1)',
+                }}
               >
-                Kurse entdecken
-              </Button>
-            </Box>
-          ) : (
-            <Stack spacing={2}>
-              {bookings.map(booking => (
-                <Card key={booking.id} variant='outlined'>
-                  <CardContent>
-                    <Grid container spacing={2} alignItems='center'>
-                      <Grid item xs={12} md={6}>
-                        <Stack direction='row' spacing={2} alignItems='center'>
-                          <SchoolOutlined color='primary' />
-                          <Box>
-                            <Typography variant='subtitle1' fontWeight='bold'>
-                              {booking.courseTitle}
-                            </Typography>
-                            <Typography variant='body2' color='text.secondary'>
-                              Gebucht am{' '}
-                              {new Date(booking.createdAt).toLocaleDateString(
-                                'de-DE'
-                              )}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                      </Grid>
-
-                      <Grid item xs={12} md={3}>
-                        <Typography variant='body1' fontWeight='bold'>
-                          {booking.currency}{' '}
-                          {(booking.coursePrice / 100).toFixed(2)}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={3}>
-                        <Stack
-                          direction='row'
-                          spacing={1}
-                          alignItems='center'
-                          justifyContent='flex-end'
+                <Grid container spacing={2} alignItems='center'>
+                  <Grid item xs={12} md={6}>
+                    <Stack direction='row' spacing={2} alignItems='center'>
+                      <SchoolOutlined sx={{ color: colors.petrol }} />
+                      <Box>
+                        <Typography
+                          sx={{
+                            fontFamily: '"Inter", sans-serif',
+                            fontSize: '1rem',
+                            fontWeight: 600,
+                            color: colors.petrol,
+                          }}
                         >
-                          <Chip
-                            icon={getStatusIcon(booking.paymentStatus)}
-                            label={
-                              booking.paymentStatus === 'PAID'
-                                ? 'Bezahlt'
-                                : 'Ausstehend'
-                            }
-                            color={getStatusColor(booking.paymentStatus)}
-                            size='small'
-                          />
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
-          )}
-        </CardContent>
-      </Card>
+                          {booking.courseTitle}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontFamily: '"Inter", sans-serif',
+                            fontSize: '0.875rem',
+                            color: colors.petrol,
+                            opacity: 0.7,
+                          }}
+                        >
+                          Gebucht am{' '}
+                          {new Date(booking.createdAt).toLocaleDateString(
+                            'de-DE'
+                          )}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Grid>
+
+                  <Grid item xs={12} md={3}>
+                    <Typography
+                      sx={{
+                        fontFamily: '"Inter", sans-serif',
+                        fontSize: '1rem',
+                        fontWeight: 700,
+                        color: colors.petrol,
+                      }}
+                    >
+                      {booking.currency}{' '}
+                      {(booking.coursePrice / 100).toFixed(2)}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={12} md={3}>
+                    <Stack
+                      direction='row'
+                      spacing={1}
+                      alignItems='center'
+                      justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
+                    >
+                      <Chip
+                        icon={getStatusIcon(booking.paymentStatus)}
+                        label={
+                          booking.paymentStatus === 'PAID'
+                            ? 'Bezahlt'
+                            : booking.paymentStatus === 'FAILED'
+                              ? 'Fehlgeschlagen'
+                              : 'Ausstehend'
+                        }
+                        size='small'
+                        sx={{
+                          bgcolor:
+                            statusColors[
+                              booking.paymentStatus as keyof typeof statusColors
+                            ]?.background || statusColors.PENDING.background,
+                          border: `1px solid ${
+                            statusColors[
+                              booking.paymentStatus as keyof typeof statusColors
+                            ]?.border || statusColors.PENDING.border
+                          }`,
+                          color:
+                            statusColors[
+                              booking.paymentStatus as keyof typeof statusColors
+                            ]?.text || statusColors.PENDING.text,
+                          fontFamily: '"Inter", sans-serif',
+                          fontWeight: 500,
+                          '& .MuiChip-icon': {
+                            color: 'inherit',
+                          },
+                        }}
+                      />
+                    </Stack>
+                  </Grid>
+                </Grid>
+              </Paper>
+            ))}
+          </Stack>
+        )}
+      </Paper>
     ),
-    [bookings, getStatusColor, getStatusIcon]
+    [bookings, getStatusIcon]
   );
 
   // Production path — E2E fallback handled above
@@ -407,81 +666,200 @@ const UserDashboardClerk: React.FC = () => {
   // Loading state with skeleton
   if (!userLoaded || loading) {
     return (
-      <Box sx={{ p: 3 }}>
-        {/* Title skeleton */}
-        <Skeleton variant='text' width={200} height={40} sx={{ mb: 3 }} />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          bgcolor: colors.cream,
+          p: { xs: 2, sm: 3, md: 4 },
+        }}
+      >
+        <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+          {/* Title skeleton */}
+          <Skeleton
+            variant='text'
+            width={300}
+            height={48}
+            sx={{ mb: 1, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+          />
+          <Skeleton
+            variant='text'
+            width={400}
+            height={24}
+            sx={{ mb: 4, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+          />
 
-        {/* Stats cards skeleton */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          {[1, 2, 3, 4].map(item => (
-            <Grid item xs={12} sm={6} md={3} key={item}>
-              <Card>
-                <CardContent>
-                  <Skeleton variant='text' width='60%' height={20} />
+          {/* Stats cards skeleton */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            {[1, 2, 3, 4].map(item => (
+              <Grid item xs={12} sm={6} md={3} key={item}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: { xs: 2, sm: 3 },
+                    borderRadius: '16px',
+                    border: '1px solid rgba(22, 64, 77, 0.1)',
+                    boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+                  }}
+                >
+                  <Stack direction='row' spacing={2} alignItems='center'>
+                    <Skeleton
+                      variant='circular'
+                      width={32}
+                      height={32}
+                      sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+                    />
+                    <Box sx={{ flex: 1 }}>
+                      <Skeleton
+                        variant='text'
+                        width='80%'
+                        height={20}
+                        sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+                      />
+                      <Skeleton
+                        variant='text'
+                        width='50%'
+                        height={32}
+                        sx={{ mt: 0.5, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+                      />
+                    </Box>
+                  </Stack>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* Bookings section skeleton */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 3, md: 4 },
+              borderRadius: '16px',
+              border: '1px solid rgba(22, 64, 77, 0.1)',
+              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+            }}
+          >
+            <Skeleton
+              variant='text'
+              width={180}
+              height={32}
+              sx={{ mb: 2, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+            />
+            <Divider sx={{ mb: 3, borderColor: 'rgba(22, 64, 77, 0.1)' }} />
+            {[1, 2, 3].map(row => (
+              <Paper
+                key={row}
+                elevation={0}
+                sx={{
+                  p: { xs: 2, sm: 3 },
+                  mb: 2,
+                  borderRadius: '12px',
+                  border: '1px solid rgba(22, 64, 77, 0.1)',
+                }}
+              >
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                  <Skeleton
+                    variant='circular'
+                    width={24}
+                    height={24}
+                    sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+                  />
+                  <Box sx={{ flex: 1 }}>
+                    <Skeleton
+                      variant='text'
+                      width='40%'
+                      height={20}
+                      sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+                    />
+                    <Skeleton
+                      variant='text'
+                      width='25%'
+                      height={16}
+                      sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+                    />
+                  </Box>
                   <Skeleton
                     variant='text'
-                    width='40%'
-                    height={32}
-                    sx={{ mt: 1 }}
+                    width={80}
+                    height={20}
+                    sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
                   />
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-
-        {/* Bookings table skeleton */}
-        <Card>
-          <CardContent>
-            <Skeleton variant='text' width={150} height={32} sx={{ mb: 2 }} />
-            {[1, 2, 3].map(row => (
-              <Box key={row} sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                <Skeleton variant='text' width='25%' height={20} />
-                <Skeleton variant='text' width='20%' height={20} />
-                <Skeleton variant='text' width='15%' height={20} />
-                <Skeleton variant='text' width='15%' height={20} />
-                <Skeleton variant='text' width='25%' height={20} />
-              </Box>
+                  <Skeleton
+                    variant='rounded'
+                    width={100}
+                    height={24}
+                    sx={{
+                      bgcolor: 'rgba(166, 205, 198, 0.2)',
+                      borderRadius: '12px',
+                    }}
+                  />
+                </Box>
+              </Paper>
             ))}
-          </CardContent>
-        </Card>
+          </Paper>
+        </Box>
       </Box>
     );
   }
 
   return (
     <Box
-      sx={{ maxWidth: 1200, mx: 'auto', p: 3, pt: 6 }}
-      data-testid='user-dashboard'
+      sx={{
+        minHeight: '100vh',
+        bgcolor: colors.cream,
+        p: { xs: 2, sm: 3, md: 4 },
+      }}
     >
-      <Box sx={{ mb: 4 }}>
-        <Typography
-          variant='h4'
-          component='h1'
-          gutterBottom
-          data-testid='dashboard-title'
-        >
-          Willkommen zurück, {user?.firstName || 'User'}!
-        </Typography>
-        <span style={{ display: 'none' }} data-testid='user-role'>
-          {(user?.publicMetadata?.role as string) || 'user'}
-        </span>
-        <Typography variant='body1' color='text.secondary'>
-          Hier finden Sie eine Übersicht über Ihre Buchungen und Aktivitäten.
-        </Typography>
+      <Box sx={{ maxWidth: 1200, mx: 'auto' }} data-testid='user-dashboard'>
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            component='h1'
+            data-testid='dashboard-title'
+            sx={{
+              fontFamily: '"Playfair Display", serif',
+              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
+              fontWeight: 700,
+              color: colors.petrol,
+              mb: 1,
+            }}
+          >
+            Willkommen zurück, {user?.firstName || 'User'}!
+          </Typography>
+          <span style={{ display: 'none' }} data-testid='user-role'>
+            {(user?.publicMetadata?.role as string) || 'user'}
+          </span>
+          <Typography
+            sx={{
+              fontFamily: '"Inter", sans-serif',
+              fontSize: '1rem',
+              color: colors.petrol,
+              opacity: 0.8,
+            }}
+          >
+            Hier findest du eine Übersicht über deine Buchungen und Aktivitäten.
+          </Typography>
+        </Box>
+
+        {error && (
+          <Alert
+            severity='error'
+            sx={{
+              mb: 3,
+              borderRadius: '12px',
+              '& .MuiAlert-icon': {
+                color: '#8B4A50',
+              },
+            }}
+          >
+            {error}
+          </Alert>
+        )}
+
+        {/* Optimized Dashboard Stats */}
+        {StatsCards}
+
+        {/* Optimized Bookings List */}
+        {BookingsList}
       </Box>
-
-      {error && (
-        <Alert severity='error' sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Optimized Dashboard Stats */}
-      {StatsCards}
-
-      {/* Optimized Bookings List */}
-      {BookingsList}
     </Box>
   );
 };
