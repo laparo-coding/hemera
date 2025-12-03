@@ -8,6 +8,17 @@ loaded although they are not required for loading the initial page. Optimize for
 move all components which are not essential for rendering the initial page to later loading. Improve
 the performance step-by-step to avoid breaking changes."
 
+## Clarifications
+
+### Session 2025-12-03
+
+- Q: Wie sollen die aktuellen Baseline-Performance-Werte ermittelt werden? → A: Lighthouse CI im
+  GitHub Actions Workflow vor jedem Deployment
+- Q: Welche Third-Party-Scripts sollen als "deferred" behandelt werden? → A: Nur Rollbar
+  (Monitoring) deferred laden
+- Q: Webpack cache warning für große Strings → A: Als FR-009 und NFR-005 zur Spezifikation
+  hinzugefügt
+
 ## Execution Flow (main)
 
 ```
@@ -83,13 +94,19 @@ first.
 
 - **FR-005**: System MUST maintain current functionality after optimization (no breaking changes).
 
-- **FR-006**: System MUST achieve improved Core Web Vitals scores compared to baseline [NEEDS
-  CLARIFICATION: baseline measurements required before setting specific targets].
+- **FR-006**: System MUST achieve improved Core Web Vitals scores compared to baseline. Baseline
+  measurements are captured via Lighthouse CI in GitHub Actions workflow before optimization begins
+  and tracked on each subsequent PR.
 
 - **FR-007**: System MUST provide loading states/skeleton screens for deferred components to
   maintain visual stability.
 
 - **FR-008**: System MUST prioritize text content and critical CSS over images and heavy components.
+
+- **FR-009**: System MUST resolve the webpack cache serialization warning
+  "[webpack.cache.PackFileCacheStrategy] Serializing big strings (176kiB)" by optimizing large
+  string handling in the build process to improve development build performance and cache
+  efficiency.
 
 ### Non-Functional Requirements
 
@@ -97,14 +114,17 @@ first.
 - **NFR-002**: Largest Contentful Paint (LCP) SHOULD be under 2.5 seconds.
 - **NFR-003**: Cumulative Layout Shift (CLS) SHOULD be under 0.1.
 - **NFR-004**: Time to Interactive (TTI) SHOULD be under 3.8 seconds.
+- **NFR-005**: Webpack build cache serialization SHOULD NOT produce warnings for strings larger than
+  100kiB.
 
 ### Key Entities
 
 - **Essential Components**: Navigation header, hero section, primary call-to-action buttons - these
   must load immediately and are critical for first meaningful paint.
 
-- **Deferred Components**: Analytics scripts, monitoring tools, chat widgets, below-fold content
-  sections - these can load after the initial render without affecting user experience.
+- **Deferred Components**: Rollbar monitoring scripts, below-fold content sections - these load
+  after the initial render without affecting user experience. No other third-party analytics scripts
+  are currently in use.
 
 - **Loading Priority Levels**:
   - **Critical**: Must be in initial bundle (navigation, hero, fonts)
@@ -143,7 +163,7 @@ first.
 
 ### Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain (baseline measurement pending)
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable (Core Web Vitals)
 - [x] Scope is clearly bounded
@@ -159,6 +179,6 @@ first.
 - [x] User scenarios defined
 - [x] Requirements generated
 - [x] Entities identified
-- [ ] Review checklist passed (pending baseline measurement)
+- [x] Review checklist passed
 
 ---

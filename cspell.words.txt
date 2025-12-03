@@ -171,5 +171,8 @@ wrongpassword
 zeitoptimiert
 zgkd
 zipjs
+geolocation
+lhci
+Partytown
 Überschriftenstruktur
 Überwachbarkeit

@@ -5,14 +5,28 @@ const __filename = fileURLToPath(import.meta.url);
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      // Optimize webpack cache for client-side builds
+
+  // Performance optimization: Fix webpack cache serialization warning
+  // Feature: 012-performance-improvement (FR-009, NFR-005)
+  experimental: {
+    webpackMemoryOptimizations: true,
+  },
+
+  webpack: (config, { isServer, dev }) => {
+    // Optimize webpack cache to avoid "Serializing big strings" warning (FR-009)
+    // See: https://github.com/vercel/next.js/issues/43568
+    if (dev) {
+      // Development: Use filesystem cache for faster rebuilds
       config.cache = {
         type: 'filesystem',
         buildDependencies: {
           config: [__filename],
         },
+      };
+    } else {
+      // Production: Use memory cache to avoid serialization warnings
+      config.cache = {
+        type: 'memory',
       };
     }
     return config;
