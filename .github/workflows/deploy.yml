@@ -334,6 +334,49 @@ jobs:
           echo "Deployment candidate URL: $url"
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
+      - name: Wait for Deployment Ready
+        if: ${{ steps.deploy.outputs.url != '' }}
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          deployment="$DEPLOY_URL"
+          # Extract deployment ID from URL (e.g., hemera-mozu6lfov-laparo-team.vercel.app -> hemera-mozu6lfov)
+          deploy_host="${deployment#https://}"
+          deploy_host="${deploy_host#http://}"
+
+          echo "Waiting for deployment to be ready: $deployment"
+
+          for i in {1..60}; do
+            # Check deployment state via API
+            api_resp=$(curl -fsSL -H "Authorization: Bearer $SANITIZED_VERCEL_TOKEN" \
+              "https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&limit=5&teamId=${VERCEL_ORG_ID}" 2>/dev/null) || true
+            
+            if [[ -n "${api_resp:-}" ]]; then
+              # Find our deployment by URL
+              deploy_state=$(echo "$api_resp" | jq -r --arg host "$deploy_host" '.deployments[] | select(.url == $host) | .readyState // .state' 2>/dev/null | head -n1) || true
+              
+              echo "Poll $i: deployment state = $deploy_state"
+              
+              if [[ "$deploy_state" == "READY" ]]; then
+                echo "✅ Deployment is ready!"
+                break
+              elif [[ "$deploy_state" == "ERROR" || "$deploy_state" == "CANCELED" ]]; then
+                echo "❌ Deployment failed with state: $deploy_state"
+                exit 1
+              fi
+            fi
+            
+            if [[ $i -ge 60 ]]; then
+              echo "⚠️ Timeout waiting for deployment - proceeding anyway"
+              break
+            fi
+            
+            sleep 5
+          done
+
       - name: Assign Production Alias
         if: ${{ steps.deploy.outputs.url != '' }}
         env:
