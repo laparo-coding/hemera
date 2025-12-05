@@ -23,7 +23,10 @@ import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
  */
 
 export const metadata: Metadata = generateLandingPageMetadata();
-export const dynamic = 'force-dynamic';
+
+// Allow page to be cached - courses are fetched at build/request time
+// Using revalidate instead of force-dynamic for better performance
+export const revalidate = 60; // Revalidate every 60 seconds
 
 // Content in German, informal "Du" form
 const heroContent = {
