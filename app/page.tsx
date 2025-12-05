@@ -24,9 +24,9 @@ import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
 
 export const metadata: Metadata = generateLandingPageMetadata();
 
-// Allow page to be cached - courses are fetched at build/request time
-// Using revalidate instead of force-dynamic for better performance
-export const revalidate = 60; // Revalidate every 60 seconds
+// Force dynamic rendering since we fetch courses from DB
+// This prevents static generation during build when DATABASE_URL is unavailable
+export const dynamic = 'force-dynamic';
 
 // Content in German, informal "Du" form
 const heroContent = {
