@@ -223,7 +223,7 @@ const nextConfig = {
 };
 ```
 
-2. **Configure CSS chunking**:
+1. **Configure CSS chunking**:
 
 ```javascript
 const nextConfig = {
@@ -233,7 +233,7 @@ const nextConfig = {
 };
 ```
 
-3. **Use optimizePackageImports** (already default for MUI)
+1. **Use optimizePackageImports** (already default for MUI)
 
 ---
 

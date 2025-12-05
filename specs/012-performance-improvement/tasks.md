@@ -416,24 +416,24 @@ T017 ──> T018 ──> T019-T023 (Polish) [P]
 
 ### Sprint 2: Tests First (TDD)
 
-2. T004 - Create base performance test file
-3. T005, T006, T007 [P] - Specific test cases
+1. T004 - Create base performance test file
+1. T005, T006, T007 [P] - Specific test cases
 
 ### Sprint 3: Core Implementation
 
-4. T008 - MonitoringInit (highest impact)
-5. T009 - loading.tsx
-6. T010, T011, T012, T013 [P] - Component lazy loading
-7. T014 - Verify SSR
+1. T008 - MonitoringInit (highest impact)
+1. T009 - loading.tsx
+1. T010, T011, T012, T013 [P] - Component lazy loading
+1. T014 - Verify SSR
 
 ### Sprint 4: Integration & Validation
 
-8. T015 - GitHub Actions
-9. T016, T017, T018 - Validation
+1. T015 - GitHub Actions
+1. T016, T017, T018 - Validation
 
 ### Sprint 5: Polish (Parallelizable)
 
-10. T019, T020, T021, T022, T023 [P] - Documentation
+1. T019, T020, T021, T022, T023 [P] - Documentation
 
 ---
 
