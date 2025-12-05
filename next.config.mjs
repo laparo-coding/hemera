@@ -12,7 +12,7 @@ const nextConfig = {
     webpackMemoryOptimizations: true,
   },
 
-  webpack: (config, { isServer, dev }) => {
+  webpack: (config, { _isServer, dev }) => {
     // Optimize webpack cache to avoid "Serializing big strings" warning (FR-009)
     // See: https://github.com/vercel/next.js/issues/43568
     if (dev) {
