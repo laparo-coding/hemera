@@ -411,6 +411,19 @@ jobs:
           echo "Vercel alias response:" >> "$GITHUB_STEP_SUMMARY"
           cat /tmp/vercel-alias.log | tee -a "$GITHUB_STEP_SUMMARY"
 
+          # Also assign custom domain aliases
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Assigning custom domain aliases..." | tee -a "$GITHUB_STEP_SUMMARY"
+
+          for custom_domain in "hemera.academy" "www.hemera.academy"; do
+            echo "Assigning alias ${custom_domain} to deployment ${deployment}" | tee -a "$GITHUB_STEP_SUMMARY"
+            if vercel alias set "$deployment" "$custom_domain" --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"; then
+              echo "✅ Alias ${custom_domain} assigned successfully" | tee -a "$GITHUB_STEP_SUMMARY"
+            else
+              echo "⚠️ Failed to assign alias ${custom_domain} (may already be configured)" | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
       - name: Poll Deployment Readiness (health check)
         env:
           DEPLOY_URL: ${{ steps.deploy.outputs.url }}
