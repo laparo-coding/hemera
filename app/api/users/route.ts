@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
 import {
   type CreateUserData,
+  type UserProfile,
   createUser,
   getAllUsers,
   searchUsers,
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     logger.info('Fetching users', { limit, offset, search: !!search });
 
-    let users: any;
+    let users: { users: UserProfile[]; total: number } | UserProfile[];
     if (search) {
       users = await searchUsers(search, limit);
       logger.info('Search completed', {
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let body: any;
+    let body: unknown;
     try {
       body = await request.json();
     } catch (_error) {
@@ -135,9 +136,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!body.email || typeof body.email !== 'string') {
+    // Type guard for body
+    const data = body as Record<string, unknown>;
+
+    if (!data.email || typeof data.email !== 'string') {
       logger.warn('Missing or invalid email in request', {
-        hasEmail: !!body.email,
+        hasEmail: !!data.email,
       });
       return createErrorResponse(
         'Email is required and must be a string',
@@ -147,9 +151,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!body.id || typeof body.id !== 'string') {
+    if (!data.id || typeof data.id !== 'string') {
       logger.warn('Missing or invalid user ID in request', {
-        hasId: !!body.id,
+        hasId: !!data.id,
       });
       return createErrorResponse(
         'User ID is required and must be a string',
@@ -160,10 +164,10 @@ export async function POST(request: NextRequest) {
     }
 
     const createData: CreateUserData = {
-      id: body.id.trim(),
-      email: body.email.trim(),
-      name: body.name || null,
-      image: body.image || null,
+      id: data.id.trim(),
+      email: data.email.trim(),
+      name: typeof data.name === 'string' ? data.name : null,
+      image: typeof data.image === 'string' ? data.image : null,
     };
 
     logger.info('Creating new user', { email: createData.email });
