@@ -13,9 +13,6 @@ updates:
     assignees:
       - 'Laparo'
     # reviewers: not supported in dependabot.yml
-    labels:
-      - 'dependencies'
-      - 'automerge'
     groups:
       minor-and-patch:
         applies-to: version-updates
@@ -36,6 +33,3 @@ updates:
     assignees:
       - 'Laparo'
     # reviewers: not supported in dependabot.yml
-    labels:
-      - 'dependencies'
-      - 'automerge'
