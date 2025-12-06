@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db/prisma';
+import { prisma, closeDb } from '@/lib/db/prisma';
 
 // Use shared Prisma instance
 
@@ -483,5 +483,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await closeDb();
   });

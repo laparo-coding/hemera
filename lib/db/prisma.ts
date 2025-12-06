@@ -64,11 +64,21 @@ const runtimeDbUrl = process.env.DATABASE_URL
   : undefined;
 
 const connectionString = runtimeDbUrl ?? process.env.DATABASE_URL ?? '';
-const pool = new Pool({ connectionString });
+const sslEnabled =
+  process.env.PGSSL === '1' || process.env.PGSSL === 'true' ? true : undefined;
+const pool = new Pool({
+  connectionString,
+  ssl: sslEnabled ? { rejectUnauthorized: false } : undefined,
+});
 const adapter = new PrismaPg(pool);
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+
+export async function closeDb(): Promise<void> {
+  await prisma.$disconnect();
+  await pool.end();
+}
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
