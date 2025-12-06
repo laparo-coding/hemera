@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/generated';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { type Booking, type Course, PaymentStatus } from './course';
 

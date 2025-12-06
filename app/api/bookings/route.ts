@@ -1,5 +1,5 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { PaymentStatus } from '@prisma/generated';
+import { PaymentStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';

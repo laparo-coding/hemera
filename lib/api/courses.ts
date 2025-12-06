@@ -3,7 +3,7 @@
  * Provides server-side functions for course management
  */
 
-import { PaymentStatus } from '@prisma/generated';
+import { PaymentStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import {
   CourseNotFoundError,

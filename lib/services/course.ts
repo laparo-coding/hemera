@@ -1,7 +1,7 @@
-import { PaymentStatus } from '@prisma/generated';
+import { PaymentStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 
-export { PaymentStatus } from '@prisma/generated';
+export { PaymentStatus } from '@prisma/client';
 
 export interface Course {
   id: string;

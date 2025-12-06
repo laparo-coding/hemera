@@ -3,7 +3,7 @@ import {
   type Course,
   PaymentStatus,
   type User,
-} from '@prisma/generated';
+} from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import {
   BookingAlreadyExistsError,
@@ -26,7 +26,7 @@ import {
  * - Payment status management
  */
 
-export type { Booking } from '@prisma/generated';
+export type { Booking } from '@prisma/client';
 
 export interface BookingWithDetails extends Booking {
   course: Course;

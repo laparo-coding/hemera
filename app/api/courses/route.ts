@@ -1,4 +1,4 @@
-import { PaymentStatus } from '@prisma/generated';
+import { PaymentStatus } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { type CourseWithBookings, getCourses } from '@/lib/services/courses';

@@ -1,4 +1,4 @@
-import { PaymentStatus } from '@prisma/generated';
+import { PaymentStatus } from '@prisma/client';
 import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 

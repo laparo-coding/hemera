@@ -4,7 +4,7 @@
  */
 
 import { type User as ClerkUser, currentUser } from '@clerk/nextjs/server';
-import type { User } from '@prisma/generated';
+import type { User } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import {
   DatabaseConnectionError,
@@ -14,7 +14,7 @@ import {
 } from '@/lib/errors';
 import { safePrismaOperation } from '@/lib/errors/prisma-mapping';
 
-export type { User } from '@prisma/generated';
+export type { User } from '@prisma/client';
 
 export interface UserProfile extends User {
   _count?: {
