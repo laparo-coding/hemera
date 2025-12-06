@@ -41,5 +41,11 @@ See `docs/performance/README.md` for detailed patterns.
 - 011-redesign-dashboard-in: Dashboard redesign with premium feminine design
 - 010-layout-improvement: Premium feminine landing page and navigation
 
+## PR Review Process
+
+- **QODO Code Suggestions**: Always review and consider implementing QODO PR code suggestions
+  (qodo-code-review, qodo-merge bot comments) after opening a pull request. These automated
+  suggestions often improve code quality, error handling, and test coverage.
+
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
