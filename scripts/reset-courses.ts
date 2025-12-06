@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma, closeDb } from '@/lib/db/prisma';
 
-const prisma = new PrismaClient();
+// Use shared Prisma instance
 
 async function main() {
   await prisma.booking.deleteMany();
@@ -42,4 +42,11 @@ async function main() {
   console.log('Kurse wurden zurückgesetzt und neu angelegt.');
 }
 
-main().finally(() => prisma.$disconnect());
+main()
+  .catch(e => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await closeDb();
+  });

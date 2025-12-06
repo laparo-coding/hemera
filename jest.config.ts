@@ -11,6 +11,7 @@ const config: Config = {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@/(.*)$': '<rootDir>/$1',
   },
+  transformIgnorePatterns: [],
   testMatch: [
     '<rootDir>/tests/unit/*.spec.ts',
     '<rootDir>/tests/contracts/**/*.spec.ts',
