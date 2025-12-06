@@ -295,15 +295,15 @@ jobs:
                 deploy_url=$(echo "$api_resp" | jq -r '.deployments[0].url // empty' 2>/dev/null || true)
                 deploy_state=$(echo "$api_resp" | jq -r '.deployments[0].state // empty' 2>/dev/null || true)
                 deploy_created=$(echo "$api_resp" | jq -r '.deployments[0].created // empty' 2>/dev/null || true)
-                
+
                 echo "Poll $i: state=$deploy_state, url=$deploy_url, created=$deploy_created"
-                
+
                 # Check if this is a recent deployment (within last 5 minutes)
                 if [[ -n "${deploy_url:-}" && -n "${deploy_created:-}" ]]; then
                   now=$(date +%s)
                   created_ts=$((deploy_created / 1000))
                   age=$((now - created_ts))
-                  
+
                   if [[ $age -lt 300 ]]; then
                     if [[ "$deploy_url" =~ ^https?:// ]]; then
                       url="$deploy_url"
@@ -353,13 +353,13 @@ jobs:
             # Check deployment state via API
             api_resp=$(curl -fsSL -H "Authorization: Bearer $SANITIZED_VERCEL_TOKEN" \
               "https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&limit=5&teamId=${VERCEL_ORG_ID}" 2>/dev/null) || true
-            
+
             if [[ -n "${api_resp:-}" ]]; then
               # Find our deployment by URL
               deploy_state=$(echo "$api_resp" | jq -r --arg host "$deploy_host" '.deployments[] | select(.url == $host) | .readyState // .state' 2>/dev/null | head -n1) || true
-              
+
               echo "Poll $i: deployment state = $deploy_state"
-              
+
               if [[ "$deploy_state" == "READY" ]]; then
                 echo "✅ Deployment is ready!"
                 break
@@ -368,12 +368,12 @@ jobs:
                 exit 1
               fi
             fi
-            
+
             if [[ $i -ge 60 ]]; then
               echo "⚠️ Timeout waiting for deployment - proceeding anyway"
               break
             fi
-            
+
             sleep 5
           done
 
