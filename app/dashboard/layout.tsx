@@ -3,19 +3,12 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 import { useAuth, useUser } from '@clerk/nextjs';
-import {
-  AppBar,
-  Box,
-  Button,
-  Container,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 
 function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
-  const { isSignedIn, isLoaded, signOut } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
   const router = useRouter();
   const _pathname = usePathname() || '/';
@@ -50,23 +43,10 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
       data-testid='dashboard-layout'
       sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
     >
-      <AppBar position='fixed' elevation={1} sx={{ zIndex: 1100 }}>
-        <Toolbar>
-          <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
-            Hemera Academy
-          </Typography>
-          <span style={{ display: 'none' }} data-testid='user-role'>
-            {(user?.publicMetadata?.role as string) || 'user'}
-          </span>
-          <Button
-            color='inherit'
-            data-testid='sign-out-button'
-            onClick={() => signOut?.({ redirectUrl: '/' })}
-          >
-            Sign out
-          </Button>
-        </Toolbar>
-      </AppBar>
+      {/* Hidden user role for tests */}
+      <span style={{ display: 'none' }} data-testid='user-role'>
+        {(user?.publicMetadata?.role as string) || 'user'}
+      </span>
 
       <Container
         component='main'
@@ -76,7 +56,7 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
           py: 3,
           display: 'flex',
           flexDirection: 'column',
-          marginTop: { xs: '104px', sm: '112px' },
+          marginTop: { xs: '80px', sm: '80px' },
         }}
       >
         {children}
@@ -186,54 +166,18 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
       data-testid='dashboard-layout'
       sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
     >
-      <AppBar position='fixed' elevation={1} sx={{ zIndex: 1100 }}>
-        <Toolbar>
-          <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
-            Hemera Academy
-          </Typography>
-          <span style={{ display: 'none' }} data-testid='user-role'>
-            {userRole}
-          </span>
-          <Button
-            color='inherit'
-            data-testid='sign-out-button'
-            onClick={handleSignOut}
-          >
-            Sign out
-          </Button>
-        </Toolbar>
-      </AppBar>
-
-      {/* Simple E2E navigation matching protected layout */}
-      <Box
-        data-testid='protected-navigation'
-        sx={{
-          position: 'fixed',
-          top: 64,
-          left: 0,
-          right: 0,
-          zIndex: 1100,
-          borderBottom: 1,
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-          display: 'flex',
-          gap: 2,
-          px: 2,
-          py: 1,
-        }}
+      {/* Hidden user role for tests */}
+      <span style={{ display: 'none' }} data-testid='user-role'>
+        {userRole}
+      </span>
+      {/* Hidden sign-out button for E2E tests */}
+      <button
+        style={{ display: 'none' }}
+        data-testid='sign-out-button'
+        onClick={handleSignOut}
       >
-        <a href='/dashboard' data-testid='nav-dashboard'>
-          Dashboard
-        </a>
-        <a href='/courses' data-testid='nav-courses'>
-          Courses
-        </a>
-        {userRole === 'admin' && (
-          <a href='/admin' data-testid='nav-admin'>
-            Admin
-          </a>
-        )}
-      </Box>
+        Sign out
+      </button>
 
       <Container
         component='main'
@@ -243,7 +187,7 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
           py: 3,
           display: 'flex',
           flexDirection: 'column',
-          marginTop: { xs: '112px', sm: '120px' },
+          marginTop: { xs: '80px', sm: '80px' },
         }}
       >
         {children}

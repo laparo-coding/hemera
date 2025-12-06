@@ -12,6 +12,14 @@ import {
 import Link from 'next/link';
 import { useLayoutEffect, useState } from 'react';
 
+// Hemera Design Tokens
+const colors = {
+  cream: '#FBF5DD',
+  petrol: '#16404D',
+  gold: '#DDA853',
+  sage: '#A6CDC6',
+};
+
 /**
  * Public navigation component for non-protected pages
  * Shows login/signup buttons for unauthenticated users
@@ -63,21 +71,33 @@ export function PublicNavigation({
   return (
     <AppBar
       position='fixed'
-      color='default'
-      elevation={1}
-      sx={{ zIndex: 1100 }}
+      elevation={0}
+      sx={{
+        zIndex: 1100,
+        bgcolor: colors.cream,
+        borderBottom: `1px solid ${colors.sage}`,
+      }}
     >
       <Container maxWidth='lg'>
-        <Toolbar sx={{ py: 1 }}>
+        <Toolbar
+          disableGutters
+          sx={{
+            py: 1,
+            px: { xs: 2, sm: 3 },
+            minHeight: '64px !important',
+          }}
+        >
           {/* Logo/Brand */}
           <Link href='/' style={{ textDecoration: 'none' }}>
             <Typography
-              variant='h5'
               component='div'
               sx={{
-                fontWeight: 'bold',
-                color: 'primary.main',
+                fontFamily: '"Playfair Display", serif !important',
+                fontWeight: '700 !important',
+                fontSize: { xs: '1.25rem', md: '1.5rem' },
+                color: `${colors.petrol} !important`,
                 cursor: 'pointer',
+                letterSpacing: '0.02em',
               }}
             >
               Hemera Academy
@@ -89,38 +109,23 @@ export function PublicNavigation({
 
           {/* Navigation Links */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {/* Primary nav links (always available) */}
-            <Button
-              variant='text'
-              color='inherit'
-              component={Link}
-              href='/dashboard'
-              data-testid='nav-dashboard'
-              sx={{ textTransform: 'none' }}
-            >
-              Dashboard
-            </Button>
-            {!hideMyCourses && (
-              <Button
-                variant='text'
-                color='inherit'
-                component={Link}
-                href='/courses'
-                data-testid='nav-courses'
-                sx={{ textTransform: 'none' }}
-              >
-                Kurse
-              </Button>
-            )}
+            {/* Admin link visible in E2E mode when mocked as admin */}
             {/* Admin link visible in E2E mode when mocked as admin */}
             {isE2E && e2eRole === 'admin' && (
               <Button
                 variant='text'
-                color='inherit'
                 component={Link}
                 href='/admin'
                 data-testid='nav-admin'
-                sx={{ textTransform: 'none' }}
+                sx={{
+                  textTransform: 'none',
+                  color: colors.petrol,
+                  fontFamily: '"Inter", sans-serif',
+                  fontWeight: 500,
+                  '&:hover': {
+                    bgcolor: `${colors.sage}33`,
+                  },
+                }}
               >
                 Admin
               </Button>
@@ -131,26 +136,39 @@ export function PublicNavigation({
                 <SignedOut>
                   <Button
                     variant='outlined'
-                    color='primary'
                     component={Link}
                     href='/sign-in'
                     data-testid='nav-login-button'
                     sx={{
                       textTransform: 'none',
                       px: 3,
+                      color: colors.petrol,
+                      borderColor: colors.petrol,
+                      fontFamily: '"Inter", sans-serif',
+                      fontWeight: 500,
+                      '&:hover': {
+                        borderColor: colors.petrol,
+                        bgcolor: `${colors.sage}33`,
+                      },
                     }}
                   >
                     Anmelden
                   </Button>
                   <Button
                     variant='contained'
-                    color='primary'
                     component={Link}
                     href='/sign-up'
                     data-testid='nav-signup-button'
                     sx={{
                       textTransform: 'none',
                       px: 3,
+                      bgcolor: colors.gold,
+                      color: colors.petrol,
+                      fontFamily: '"Inter", sans-serif',
+                      fontWeight: 600,
+                      '&:hover': {
+                        bgcolor: '#C99744',
+                      },
                     }}
                   >
                     Registrieren
@@ -162,28 +180,36 @@ export function PublicNavigation({
                   {!hideMyCourses && (
                     <Button
                       variant='text'
-                      color='inherit'
                       component={Link}
                       href='/dashboard'
                       sx={{
                         textTransform: 'none',
                         mr: 1,
+                        color: colors.petrol,
+                        fontFamily: '"Inter", sans-serif',
+                        fontWeight: 500,
+                        '&:hover': {
+                          bgcolor: `${colors.sage}33`,
+                        },
                       }}
                     >
                       Meine Kurse
                     </Button>
                   )}
                   <UserButton
-                    afterSignOutUrl='/'
                     appearance={{
                       elements: {
                         avatarBox: {
-                          width: '32px',
-                          height: '32px',
+                          width: '36px',
+                          height: '36px',
+                        },
+                        userButtonPopoverCard: {
+                          pointerEvents: 'initial',
                         },
                       },
                     }}
-                    showName={false}
+                    userProfileMode='navigation'
+                    userProfileUrl='/user-profile'
                     data-testid='user-profile-button'
                   />
                 </SignedIn>
@@ -193,26 +219,39 @@ export function PublicNavigation({
               <>
                 <Button
                   variant='outlined'
-                  color='primary'
                   component={Link}
                   href='/sign-in'
                   data-testid='nav-login-button'
                   sx={{
                     textTransform: 'none',
                     px: 3,
+                    color: colors.petrol,
+                    borderColor: colors.petrol,
+                    fontFamily: '"Inter", sans-serif',
+                    fontWeight: 500,
+                    '&:hover': {
+                      borderColor: colors.petrol,
+                      bgcolor: `${colors.sage}33`,
+                    },
                   }}
                 >
                   Anmelden
                 </Button>
                 <Button
                   variant='contained'
-                  color='primary'
                   component={Link}
                   href='/sign-up'
                   data-testid='nav-signup-button'
                   sx={{
                     textTransform: 'none',
                     px: 3,
+                    bgcolor: colors.gold,
+                    color: colors.petrol,
+                    fontFamily: '"Inter", sans-serif',
+                    fontWeight: 600,
+                    '&:hover': {
+                      bgcolor: '#C99744',
+                    },
                   }}
                 >
                   Registrieren

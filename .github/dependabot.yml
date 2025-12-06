@@ -8,12 +8,11 @@ updates:
       day: 'monday'
       time: '05:00'
       timezone: 'Europe/Berlin'
+    rebase-strategy: 'auto'
     open-pull-requests-limit: 10
     assignees:
       - 'Laparo'
     # reviewers: not supported in dependabot.yml
-    labels:
-      - 'dependencies'
     groups:
       minor-and-patch:
         applies-to: version-updates
@@ -29,9 +28,8 @@ updates:
       day: 'monday'
       time: '05:30'
       timezone: 'Europe/Berlin'
+    rebase-strategy: 'auto'
     open-pull-requests-limit: 10
     assignees:
       - 'Laparo'
     # reviewers: not supported in dependabot.yml
-    labels:
-      - 'dependencies'
