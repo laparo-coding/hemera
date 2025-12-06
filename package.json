@@ -79,6 +79,8 @@
     "@cspell/dict-de-de": "^4.1.2",
     "@eslint/js": "^9.17.0",
     "@jest/globals": "^30.2.0",
+    "@lhci/cli": "^0.15.1",
+    "@next/bundle-analyzer": "^16.0.7",
     "@playwright/test": "^1.56.1",
     "@testcontainers/postgresql": "^11.7.2",
     "@types/jest": "^30.0.0",
