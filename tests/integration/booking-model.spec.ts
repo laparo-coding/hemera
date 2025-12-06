@@ -8,16 +8,16 @@ import {
   it,
 } from '@jest/globals';
 import { PaymentStatus } from '@prisma/client';
-import { prisma } from '@/lib/db/prisma';
-
-afterAll(async () => {
-  await prisma.$disconnect();
-});
+import { prisma, closeDb } from '@/lib/db/prisma';
 
 describe('Booking Model Validations', () => {
   let testCourse: { id: string; title: string; price: number };
   let testUser: { id: string; email: string | null };
   let testUser2: { id: string; email: string | null };
+
+  afterAll(async () => {
+    await closeDb();
+  });
 
   beforeEach(async () => {
     // Clean up any existing test data first

@@ -7,13 +7,13 @@ import {
   expect,
   it,
 } from '@jest/globals';
-import { prisma } from '@/lib/db/prisma';
-
-afterAll(async () => {
-  await prisma.$disconnect();
-});
+import { prisma, closeDb } from '@/lib/db/prisma';
 
 describe('Course Model Validations', () => {
+  afterAll(async () => {
+    await closeDb();
+  });
+
   beforeEach(async () => {
     // Clean up test data in correct order (foreign keys first)
     await prisma.booking.deleteMany();

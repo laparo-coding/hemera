@@ -63,7 +63,12 @@ const runtimeDbUrl = process.env.DATABASE_URL
   ? withSchemaParam(process.env.DATABASE_URL, runtimeSchema)
   : undefined;
 
-const connectionString = runtimeDbUrl ?? process.env.DATABASE_URL ?? '';
+const connectionString = runtimeDbUrl ?? process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error(
+    'DATABASE_URL is not set. Please provide a database connection string.'
+  );
+}
 const sslEnabled =
   process.env.PGSSL === '1' || process.env.PGSSL === 'true' ? true : undefined;
 const pool = new Pool({
