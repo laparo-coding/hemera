@@ -63,18 +63,20 @@ const runtimeDbUrl = process.env.DATABASE_URL
   ? withSchemaParam(process.env.DATABASE_URL, runtimeSchema)
   : undefined;
 
-const connectionString = runtimeDbUrl ?? process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error(
-    'DATABASE_URL is not set. Please provide a database connection string.'
-  );
-}
+const connectionString = runtimeDbUrl ?? process.env.DATABASE_URL ?? '';
+
 const sslEnabled =
   process.env.PGSSL === '1' || process.env.PGSSL === 'true' ? true : undefined;
+
+// Create pool only if DATABASE_URL is available
+// During Next.js build, DATABASE_URL might not be set, so we use a fallback
+// that will fail gracefully at runtime if actual DB access is attempted
 const pool = new Pool({
-  connectionString,
+  connectionString:
+    connectionString || 'postgresql://localhost:5432/build_placeholder',
   ssl: sslEnabled ? { rejectUnauthorized: true } : undefined,
 });
+
 const adapter = new PrismaPg(pool);
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
