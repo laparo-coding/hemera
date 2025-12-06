@@ -11,9 +11,11 @@ jobs:
   guard:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # Skip if secrets are unavailable (e.g., dependabot PRs don't have access to secrets)
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
