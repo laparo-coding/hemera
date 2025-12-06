@@ -68,7 +68,7 @@ const sslEnabled =
   process.env.PGSSL === '1' || process.env.PGSSL === 'true' ? true : undefined;
 const pool = new Pool({
   connectionString,
-  ssl: sslEnabled ? { rejectUnauthorized: false } : undefined,
+  ssl: sslEnabled ? { rejectUnauthorized: true } : undefined,
 });
 const adapter = new PrismaPg(pool);
 
