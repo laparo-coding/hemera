@@ -4,10 +4,7 @@
 import { defineConfig } from '@prisma/config';
 
 export default defineConfig({
-  // Keep loose typing to remain compatible with prisma CLI expectations
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
+  datasource: {
+    url: process.env.DATABASE_URL,
   },
 });
