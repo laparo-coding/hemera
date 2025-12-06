@@ -266,59 +266,116 @@ jobs:
         run: |
           set -euo pipefail
           echo "Starting Vercel production deploy (prebuilt)…"
-          # Try to deploy with a bounded timeout to avoid long blocking waits
-          # If the CLI prints the URL, capture it; otherwise, fallback to API to discover latest prod deployment
+
+          # Start the deploy in background - the CLI hangs on "Completing..." for minutes
+          # We'll poll the API instead to get the deployment URL
+          vercel deploy --prebuilt --prod --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" --yes > deploy.out 2>&1 &
+          deploy_pid=$!
+
+          # Give Vercel CLI a moment to initiate the deployment
+          sleep 10
+
+          # Try to extract URL from CLI output (may have printed it already)
           url=""
-          if timeout 15m bash -c 'vercel deploy --prebuilt --prod --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" --yes | tee deploy.out'; then
-            # Try to extract a https URL from CLI output (prefer custom domain, then *.vercel.app)
-            if grep -Eo 'https?://[a-zA-Z0-9._-]+' deploy.out | head -n1 >/dev/null; then
-              url=$(grep -Eo 'https?://[a-zA-Z0-9._-]+' deploy.out | head -n1)
+          if [[ -f deploy.out ]]; then
+            cat deploy.out
+            if grep -Eo 'https://[a-zA-Z0-9._-]+\.vercel\.app' deploy.out | head -n1 >/dev/null 2>&1; then
+              url=$(grep -Eo 'https://[a-zA-Z0-9._-]+\.vercel\.app' deploy.out | head -n1)
+              echo "Found URL in CLI output: $url"
             fi
-          else
-            echo "vercel deploy timed out after 15m; will try to discover deployment via API…" >&2
           fi
 
+          # Poll for deployment via API (more reliable than waiting for CLI)
           if [[ -z "${url}" ]]; then
-            echo "Attempting to fetch latest production deployment via Vercel API v13…"
-            api_resp=$(curl -fsSL -H "Authorization: Bearer $SANITIZED_VERCEL_TOKEN" \
-              "https://api.vercel.com/v13/deployments?projectId=${VERCEL_PROJECT_ID}&target=production&limit=1") || true
-            if [[ -n "${api_resp:-}" ]]; then
-              deploy_url=$(echo "$api_resp" | jq -r '.deployments[0].url // empty' 2>/dev/null || true)
-              if [[ -n "${deploy_url:-}" ]]; then
-                # API returns host without scheme sometimes
-                if [[ "$deploy_url" =~ ^https?:// ]]; then
-                  url="$deploy_url"
-                else
-                  url="https://$deploy_url"
+            echo "Polling Vercel API for latest deployment..."
+            for i in {1..30}; do
+              api_resp=$(curl -fsSL -H "Authorization: Bearer $SANITIZED_VERCEL_TOKEN" \
+                "https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&target=production&limit=1&teamId=${VERCEL_ORG_ID}" 2>/dev/null) || true
+              if [[ -n "${api_resp:-}" ]]; then
+                deploy_url=$(echo "$api_resp" | jq -r '.deployments[0].url // empty' 2>/dev/null || true)
+                deploy_state=$(echo "$api_resp" | jq -r '.deployments[0].state // empty' 2>/dev/null || true)
+                deploy_created=$(echo "$api_resp" | jq -r '.deployments[0].created // empty' 2>/dev/null || true)
+                
+                echo "Poll $i: state=$deploy_state, url=$deploy_url, created=$deploy_created"
+                
+                # Check if this is a recent deployment (within last 5 minutes)
+                if [[ -n "${deploy_url:-}" && -n "${deploy_created:-}" ]]; then
+                  now=$(date +%s)
+                  created_ts=$((deploy_created / 1000))
+                  age=$((now - created_ts))
+                  
+                  if [[ $age -lt 300 ]]; then
+                    if [[ "$deploy_url" =~ ^https?:// ]]; then
+                      url="$deploy_url"
+                    else
+                      url="https://$deploy_url"
+                    fi
+                    echo "Found recent deployment: $url (age: ${age}s)"
+                    break
+                  fi
                 fi
               fi
-            fi
+              sleep 5
+            done
           fi
 
-          if [[ -z "${url}" ]]; then
-            echo "Attempting to fetch latest production deployment via Vercel API v6…"
-            api_resp_v6=$(curl -fsSL -H "Authorization: Bearer $SANITIZED_VERCEL_TOKEN" \
-              "https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&target=production&limit=1&teamId=${VERCEL_ORG_ID}") || true
-            if [[ -n "${api_resp_v6:-}" ]]; then
-              deploy_url=$(echo "$api_resp_v6" | jq -r '.deployments[0].url // empty' 2>/dev/null || true)
-              if [[ -n "${deploy_url:-}" ]]; then
-                if [[ "$deploy_url" =~ ^https?:// ]]; then
-                  url="$deploy_url"
-                else
-                  url="https://$deploy_url"
-                fi
-              fi
-            fi
+          # Kill the background deploy process - we don't need to wait for "Completing..."
+          if kill -0 $deploy_pid 2>/dev/null; then
+            echo "Terminating background deploy process (we have the URL)"
+            kill $deploy_pid 2>/dev/null || true
           fi
 
+          # Final fallback to production alias
           if [[ -z "${url}" ]]; then
-            # As a final fallback, assume the known production alias (kept in sync with E2E job)
             url="${PRODUCTION_ALIAS}"
             echo "Falling back to known production alias: $url"
           fi
 
           echo "Deployment candidate URL: $url"
           echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for Deployment Ready
+        if: ${{ steps.deploy.outputs.url != '' }}
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          deployment="$DEPLOY_URL"
+          # Extract deployment ID from URL (e.g., hemera-mozu6lfov-laparo-team.vercel.app -> hemera-mozu6lfov)
+          deploy_host="${deployment#https://}"
+          deploy_host="${deploy_host#http://}"
+
+          echo "Waiting for deployment to be ready: $deployment"
+
+          for i in {1..60}; do
+            # Check deployment state via API
+            api_resp=$(curl -fsSL -H "Authorization: Bearer $SANITIZED_VERCEL_TOKEN" \
+              "https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&limit=5&teamId=${VERCEL_ORG_ID}" 2>/dev/null) || true
+            
+            if [[ -n "${api_resp:-}" ]]; then
+              # Find our deployment by URL
+              deploy_state=$(echo "$api_resp" | jq -r --arg host "$deploy_host" '.deployments[] | select(.url == $host) | .readyState // .state' 2>/dev/null | head -n1) || true
+              
+              echo "Poll $i: deployment state = $deploy_state"
+              
+              if [[ "$deploy_state" == "READY" ]]; then
+                echo "✅ Deployment is ready!"
+                break
+              elif [[ "$deploy_state" == "ERROR" || "$deploy_state" == "CANCELED" ]]; then
+                echo "❌ Deployment failed with state: $deploy_state"
+                exit 1
+              fi
+            fi
+            
+            if [[ $i -ge 60 ]]; then
+              echo "⚠️ Timeout waiting for deployment - proceeding anyway"
+              break
+            fi
+            
+            sleep 5
+          done
 
       - name: Assign Production Alias
         if: ${{ steps.deploy.outputs.url != '' }}
@@ -353,6 +410,19 @@ jobs:
           vercel alias set "$deployment" "$alias_domain" --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" >/tmp/vercel-alias.log
           echo "Vercel alias response:" >> "$GITHUB_STEP_SUMMARY"
           cat /tmp/vercel-alias.log | tee -a "$GITHUB_STEP_SUMMARY"
+
+          # Also assign custom domain aliases
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Assigning custom domain aliases..." | tee -a "$GITHUB_STEP_SUMMARY"
+
+          for custom_domain in "hemera.academy" "www.hemera.academy"; do
+            echo "Assigning alias ${custom_domain} to deployment ${deployment}" | tee -a "$GITHUB_STEP_SUMMARY"
+            if vercel alias set "$deployment" "$custom_domain" --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"; then
+              echo "✅ Alias ${custom_domain} assigned successfully" | tee -a "$GITHUB_STEP_SUMMARY"
+            else
+              echo "⚠️ Failed to assign alias ${custom_domain} (may already be configured)" | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
+          done
 
       - name: Poll Deployment Readiness (health check)
         env:

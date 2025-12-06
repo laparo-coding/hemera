@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let body: any;
+    let body: unknown;
     try {
       body = await request.json();
     } catch (_error) {
@@ -50,36 +50,38 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Type guard for body
+    const data = body as Record<string, unknown>;
     const updateData: UpdateUserData = {};
 
-    if (body.name !== undefined) {
-      if (typeof body.name !== 'string' && body.name !== null) {
+    if (data.name !== undefined) {
+      if (typeof data.name !== 'string' && data.name !== null) {
         return NextResponse.json(
           { error: 'Name must be a string or null' },
           { status: 400 }
         );
       }
-      updateData.name = body.name;
+      updateData.name = data.name;
     }
 
-    if (body.email !== undefined) {
-      if (typeof body.email !== 'string' || !body.email.trim()) {
+    if (data.email !== undefined) {
+      if (typeof data.email !== 'string' || !data.email.trim()) {
         return NextResponse.json(
           { error: 'Email must be a non-empty string' },
           { status: 400 }
         );
       }
-      updateData.email = body.email.trim();
+      updateData.email = data.email.trim();
     }
 
-    if (body.image !== undefined) {
-      if (typeof body.image !== 'string' && body.image !== null) {
+    if (data.image !== undefined) {
+      if (typeof data.image !== 'string' && data.image !== null) {
         return NextResponse.json(
           { error: 'Image must be a string URL or null' },
           { status: 400 }
         );
       }
-      updateData.image = body.image;
+      updateData.image = data.image;
     }
 
     const updatedUser = await updateUser(userId, updateData);
