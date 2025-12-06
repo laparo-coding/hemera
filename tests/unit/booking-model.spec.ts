@@ -7,7 +7,7 @@ import {
   expect,
   it,
 } from '@jest/globals';
-import { PaymentStatus } from '@prisma/generated';
+import { PaymentStatus } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 
 afterAll(async () => {

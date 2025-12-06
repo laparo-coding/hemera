@@ -1,7 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  // Generate Prisma Client into the repository for ESM-first runtime
-  output   = "../lib/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {

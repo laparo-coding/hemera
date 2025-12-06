@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { PaymentStatus } from '@prisma/generated';
+import { PaymentStatus } from '@prisma/client';
 
 describe('PaymentStatus Enum Handling', () => {
   describe('Enum Values', () => {
