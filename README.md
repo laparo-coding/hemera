@@ -106,9 +106,9 @@ Failure to monitor constitutes a process violation per the constitution
 
 ## Prisma v7 Setup
 
-- Generated client is committed under `lib/generated/prisma`.
-- Import Prisma types/enums via `@prisma/generated`.
-- Always use the shared client `prisma` from `lib/db/prisma`.
+- Uses `prisma-client-js` generator (standard Prisma Client in `node_modules/@prisma/client`).
+- Import Prisma types/enums via `@prisma/client`.
+- Always use the shared client `prisma` from `lib/db/prisma` with `@prisma/adapter-pg`.
 - Close resources in scripts/tests with `closeDb()`.
 - Optional SSL: set `PGSSL=true` to enable SSL for the pg Pool.
 
