@@ -10,6 +10,7 @@ const config: Config = {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@/(.*)$': '<rootDir>/$1',
+    '^@prisma/generated$': '<rootDir>/lib/generated/prisma/client',
   },
   testMatch: [
     '<rootDir>/tests/unit/*.spec.ts',

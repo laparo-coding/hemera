@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 
-const prisma = new PrismaClient();
+// Use shared Prisma instance
 
 async function main() {
   await prisma.booking.deleteMany();

@@ -1,7 +1,7 @@
 // Mock implementation for getCourses service
 // This provides a working interface for the courses API
 
-import type { Booking } from '@prisma/client';
+import type { Booking } from '@prisma/generated';
 
 export interface CourseWithBookings {
   id: string;

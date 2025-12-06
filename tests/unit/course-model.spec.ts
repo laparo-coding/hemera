@@ -7,17 +7,10 @@ import {
   expect,
   it,
 } from '@jest/globals';
-import { PrismaClient } from '@prisma/client';
-
-let prisma: PrismaClient;
-
-beforeAll(() => {
-  // Initialisiere Prisma erst nach globalem Test-Setup, damit DATABASE_URL sicher gesetzt ist
-  prisma = new PrismaClient();
-});
+import { prisma } from '@/lib/db/prisma';
 
 afterAll(async () => {
-  await prisma?.$disconnect();
+  await prisma.$disconnect();
 });
 
 describe('Course Model Validations', () => {

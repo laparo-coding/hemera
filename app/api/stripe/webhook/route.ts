@@ -1,4 +1,4 @@
-import { PaymentStatus } from '@prisma/client';
+import { PaymentStatus } from '@prisma/generated';
 import { headers } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';

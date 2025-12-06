@@ -14,7 +14,8 @@
     "paths": {
       "@/*": ["./*"],
       "@/lib/*": ["./lib/*"],
-      "@/components/*": ["./components/*"]
+      "@/components/*": ["./components/*"],
+      "@prisma/generated": ["./lib/generated/prisma/client"]
     },
     "types": ["node"],
     "allowJs": true,

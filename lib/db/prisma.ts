@@ -1,4 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/generated';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 function withSchemaParam(urlStr: string, schema?: string): string {
   try {
@@ -61,12 +63,12 @@ const runtimeDbUrl = process.env.DATABASE_URL
   ? withSchemaParam(process.env.DATABASE_URL, runtimeSchema)
   : undefined;
 
+const connectionString = runtimeDbUrl ?? process.env.DATABASE_URL ?? '';
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient(
-    runtimeDbUrl ? { datasources: { db: { url: runtimeDbUrl } } } : undefined
-  );
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
