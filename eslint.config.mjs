@@ -4,6 +4,9 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   // Base recommended rules
+  {
+    ignores: ['lib/generated/**'],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
 
