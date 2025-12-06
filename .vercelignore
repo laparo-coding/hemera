@@ -1,0 +1,54 @@
+# Vercel Deployment Ignore
+# Exclude unnecessary files to reduce upload size and stay under 5000 file limit
+
+# Tests and test artifacts
+tests/
+test-results/
+playwright-report/
+playwright-artifact/
+playwright-report-*.zip
+playwright-report-external/
+coverage/
+*.spec.ts
+*.spec.tsx
+*.test.ts
+*.test.tsx
+**/__tests__/
+
+# Documentation and specs
+docs/
+specs/
+*.md
+!README.md
+
+# Development files
+.github/
+.vscode/
+.idea/
+scripts/
+
+# Logs and debug files
+logs/
+*.log
+debug-*.png
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD configs
+.eslintcache
+.prettierignore
+biome.json
+eslint.config.mjs
+jest.config.ts
+playwright.config.ts
+tsconfig.json
+cspell.config.yaml
+cspell.words.txt
+
+# Misc
+CONTRIBUTING.md
+*.swp
+.DS_Store
