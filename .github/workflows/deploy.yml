@@ -269,7 +269,7 @@ jobs:
 
           # Start the deploy in background - the CLI hangs on "Completing..." for minutes
           # We'll poll the API instead to get the deployment URL
-          vercel deploy --prebuilt --prod --archive=tgz --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" --yes > deploy.out 2>&1 &
+          vercel deploy --prebuilt --prod --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" --yes > deploy.out 2>&1 &
           deploy_pid=$!
 
           # Give Vercel CLI a moment to initiate the deployment
