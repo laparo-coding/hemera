@@ -102,6 +102,14 @@ Failure to monitor constitutes a process violation per the constitution
   - If you introduce global timers, ensure they are gated during tests (`NODE_ENV === 'test'` or
     `JEST_WORKER_ID`) or cleaned up in a teardown.
   - Database/containers: If you use Testcontainers, ensure proper teardown (`afterAll`) and call
-    `prisma.$disconnect()` after DB tests.
+    `closeDb()` from `lib/db/prisma` after DB tests for clean pool shutdown.
+
+## Prisma v7 Setup
+
+- Uses `prisma-client-js` generator (standard Prisma Client in `node_modules/@prisma/client`).
+- Import Prisma types/enums via `@prisma/client`.
+- Always use the shared client `prisma` from `lib/db/prisma` with `@prisma/adapter-pg`.
+- Close resources in scripts/tests with `closeDb()`.
+- Optional SSL: set `PGSSL=true` to enable SSL for the pg Pool.
 
 <!-- chore: trigger production deploy 2025-10-29T17:43:30Z -->

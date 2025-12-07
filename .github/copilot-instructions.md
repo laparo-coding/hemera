@@ -1,11 +1,11 @@
 # hemera Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2025-12-01
+Auto-generated from all feature plans. Last updated: 2025-12-07
 
 ## Active Technologies
 
-- TypeScript 5+, React 18+, Next.js 14+ (App Router) + Material-UI (MUI) v5+, Emotion, Next/Fon
-  (010-010-layout-improvement)
+- TypeScript 5.x, Next.js 15.5.6, React 18+ + MUI v5+, Clerk (auth), Rollbar (monitoring), Prisma
+  (ORM)
 
 ## Project Structure
 
@@ -16,18 +16,30 @@ tests/
 
 ## Commands
 
-npm test [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] npm run lint
+npm test npm run lint
 
 ## Code Style
 
-TypeScript 5+, React 18+, Next.js 14+ (App Router): Follow standard conventions
+TypeScript 5.x, Next.js 15.5.6, React 18+: Follow standard conventions
+
+## Performance Guidelines
+
+- **Deferred Loading**: Use `dynamic(() => import(...), { ssr: false })` for non-essential scripts
+  (Rollbar, analytics)
+- **Skeleton UI**: Provide `app/loading.tsx` for route groups to prevent CLS
+- **SSR-First**: Keep Navigation, Hero, above-fold content server-rendered
+- **Lazy Loading**: Use dynamic imports with loading states for below-fold content
+- **Bundle Analysis**: Run `ANALYZE=true npm run build` periodically
+- **Lighthouse CI**: Budgets defined in `.lighthouserc.json` (FCP < 1.8s, LCP < 2.5s, CLS < 0.1)
+
+See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
 
-- 011-redesign-dashboard-in: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
-
-- 010-010-layout-improvement: Added TypeScript 5+, React 18+, Next.js 14+ (App Router) + Material-UI
-  (MUI) v5+, Emotion, Next/Fon
+- 012-performance-improvement: Performance optimizations (deferred MonitoringInit, loading.tsx
+  skeleton, webpack cache fix)
+- 011-redesign-dashboard-in: Dashboard redesign with premium feminine design
+- 010-layout-improvement: Premium feminine landing page and navigation
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

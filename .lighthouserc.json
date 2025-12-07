@@ -1,7 +1,7 @@
 {
   "ci": {
     "collect": {
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "preset": "desktop"
       }
@@ -10,9 +10,15 @@
       "assertions": {
         "categories:performance": ["error", { "minScore": 0.8 }],
         "categories:accessibility": ["warn", { "minScore": 0.9 }],
-        "metrics/largest-contentful-paint": ["error", { "maxNumericValue": 3000 }],
-        "metrics/cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }]
+        "first-contentful-paint": ["warn", { "maxNumericValue": 1800 }],
+        "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
+        "total-blocking-time": ["warn", { "maxNumericValue": 200 }],
+        "interactive": ["warn", { "maxNumericValue": 3800 }]
       }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
     }
   }
 }

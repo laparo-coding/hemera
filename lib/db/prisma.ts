@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 function withSchemaParam(urlStr: string, schema?: string): string {
   try {
@@ -61,12 +63,29 @@ const runtimeDbUrl = process.env.DATABASE_URL
   ? withSchemaParam(process.env.DATABASE_URL, runtimeSchema)
   : undefined;
 
+const connectionString = runtimeDbUrl ?? process.env.DATABASE_URL ?? '';
+
+const sslEnabled =
+  process.env.PGSSL === '1' || process.env.PGSSL === 'true' ? true : undefined;
+
+// Create pool only if DATABASE_URL is available
+// During Next.js build, DATABASE_URL might not be set, so we use a fallback
+// that will fail gracefully at runtime if actual DB access is attempted
+const pool = new Pool({
+  connectionString:
+    connectionString || 'postgresql://localhost:5432/build_placeholder',
+  ssl: sslEnabled ? { rejectUnauthorized: true } : undefined,
+});
+
+const adapter = new PrismaPg(pool);
+
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient(
-    runtimeDbUrl ? { datasources: { db: { url: runtimeDbUrl } } } : undefined
-  );
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+
+export async function closeDb(): Promise<void> {
+  await prisma.$disconnect();
+  await pool.end();
+}
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

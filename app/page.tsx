@@ -23,6 +23,9 @@ import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
  */
 
 export const metadata: Metadata = generateLandingPageMetadata();
+
+// Force dynamic rendering since we fetch courses from DB
+// This prevents static generation during build when DATABASE_URL is unavailable
 export const dynamic = 'force-dynamic';
 
 // Content in German, informal "Du" form

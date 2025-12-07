@@ -206,9 +206,6 @@ export function PublicNavigation({
                         userButtonPopoverCard: {
                           pointerEvents: 'initial',
                         },
-                        userButtonPopoverActionButton__signOut: {
-                          display: 'none',
-                        },
                       },
                     }}
                     userProfileMode='navigation'

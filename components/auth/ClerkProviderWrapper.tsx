@@ -32,11 +32,17 @@ export default function ClerkProviderWrapper({
   // If running a Vercel preview build and the key is missing/likely invalid, bypass Clerk to prevent
   // prerender errors during build. In development we still show an explicit error to surface misconfiguration.
   if (isVercelPreview && !looksLikeClerkKey(publishableKey)) {
+    console.warn(
+      '[ClerkProviderWrapper] Clerk bypassed in Vercel preview due to missing/invalid key'
+    );
     return <>{children}</>;
   }
 
   if (!publishableKey) {
     // In non-development or when key is missing, bypass Clerk to not block render
+    console.warn(
+      '[ClerkProviderWrapper] Clerk bypassed: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is not configured'
+    );
     return <>{children}</>;
   }
 

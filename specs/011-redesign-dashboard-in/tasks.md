@@ -167,6 +167,7 @@
   - Document any deviations
 
 - [x] **T015** Run Prettier and ESLint
+
   ```bash
   npm run lint
   npm run format

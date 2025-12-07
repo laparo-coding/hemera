@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma, closeDb } from '../lib/db/prisma.js';
 
-const prisma = new PrismaClient();
+// Use shared Prisma instance
 
 async function main() {
   // Clear existing data in development
@@ -483,5 +483,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await closeDb();
   });

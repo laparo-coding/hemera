@@ -19,7 +19,7 @@ interface PageProps {
 export default async function CourseDetailPage({ params }: PageProps) {
   const { id: identifier } = await params;
 
-  let course: any;
+  let course: Awaited<ReturnType<typeof getCourseBySlug>> | null = null;
 
   try {
     course = await getCourseBySlug(identifier);
