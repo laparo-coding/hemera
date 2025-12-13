@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL,
+});
 
 async function verifySeed() {
   try {
