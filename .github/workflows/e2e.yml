@@ -202,7 +202,7 @@ jobs:
           sed -i 's/@db\.Text//g' prisma/schema.prisma
           sed -i 's/@db\.VarChar([0-9]*)//g' prisma/schema.prisma
           # Use library engine for SQLite (client engine requires adapter)
-          sed -i 's/provider = "prisma-client-js"/provider = "prisma-client-js"\n  engineType = "library"/g' prisma/schema.prisma
+          sed -i '/provider = "prisma-client-js"/a\  engineType = "library"' prisma/schema.prisma
 
           # Backup and simplify prisma.config.ts for SQLite (no adapter needed)
           cp prisma.config.ts prisma.config.ts.backup
