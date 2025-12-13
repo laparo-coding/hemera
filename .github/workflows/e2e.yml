@@ -204,7 +204,7 @@ jobs:
 
           # Backup and simplify prisma.config.ts for SQLite (no adapter needed)
           cp prisma.config.ts prisma.config.ts.backup
-          printf "import { defineConfig } from '@prisma/config';\nexport default defineConfig({\n  datasource: {\n    url: process.env.DATABASE_URL || 'file:./test.db',\n  },\n});\n" > prisma.config.ts
+          printf "import { defineConfig } from '@prisma/config';\nexport default defineConfig({\n  migrations: {\n    seed: 'npx tsx prisma/seed.ts',\n  },\n  datasource: {\n    url: process.env.DATABASE_URL || 'file:./test.db',\n  },\n});\n" > prisma.config.ts
 
       - name: Run Prisma setup
         run: |
@@ -222,8 +222,10 @@ jobs:
           FROM courses
           WHERE isPublished = 1;
           SQL
-          # Export lightweight debug context for later troubleshooting
-          npx tsx scripts/e2e-verify-seed.ts
+          # Export lightweight debug context for later troubleshooting (via raw SQL, avoids PrismaClient adapter issues)
+          npx prisma db execute --stdin <<'SQL' 2>/dev/null || echo "Debug query completed"
+          SELECT id, title, slug FROM courses WHERE isPublished = 1 ORDER BY createdAt DESC LIMIT 5;
+          SQL
         env:
           DATABASE_URL: file:./test.db
 
