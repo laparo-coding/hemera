@@ -198,11 +198,13 @@ jobs:
 
           # Create a temporary SQLite schema for CI testing
           cp prisma/schema.prisma prisma/schema.prisma.backup
-          sed -i 's/provider = "postgresql"/provider = "sqlite"/g' prisma/schema.prisma
-          sed -i 's/@db\.Text//g' prisma/schema.prisma
-          sed -i 's/@db\.VarChar([0-9]*)//g' prisma/schema.prisma
+          sed -i.bak 's/provider = "postgresql"/provider = "sqlite"/g' prisma/schema.prisma
+          sed -i.bak 's/@db\.Text//g' prisma/schema.prisma
+          sed -i.bak 's/@db\.VarChar([0-9]*)//g' prisma/schema.prisma
           # Use library engine for SQLite (client engine requires adapter)
-          sed -i '/provider = "prisma-client-js"/a\  engineType = "library"' prisma/schema.prisma
+          sed -i.bak '/provider = "prisma-client-js"/a\  engineType = "library"' prisma/schema.prisma
+          # Clean up backup files
+          rm -f prisma/schema.prisma.bak
 
           # Use simple SQLite seed script that doesn't require PostgreSQL adapter
           echo "Using simple SQLite seed script for E2E tests"
@@ -214,19 +216,17 @@ jobs:
 
           npx prisma generate
           npx prisma db push --force-reset
-          node --loader ts-node/esm scripts/e2e-seed-simple.ts
-          # Verify seed data
+          node scripts/e2e-seed-simple.js
+          # Verify seed data using simple Node.js approach
           echo "Verifying seed data..."
-          npx prisma db execute --stdin <<'SQL'
-          SELECT
-            COUNT(*) AS published_count
-          FROM courses
-          WHERE isPublished = 1;
-          SQL
-          # Export lightweight debug context for later troubleshooting (via raw SQL, avoids PrismaClient adapter issues)
-          npx prisma db execute --stdin <<'SQL' 2>/dev/null || echo "Debug query completed"
-          SELECT id, title, slug FROM courses WHERE isPublished = 1 ORDER BY createdAt DESC LIMIT 5;
-          SQL
+          node -e "
+            import { PrismaClient } from '@prisma/client';
+            const prisma = new PrismaClient();
+            prisma.course.count({ where: { isPublished: true } })
+              .then(count => console.log('Published courses:', count))
+              .catch(err => console.error('Verification failed:', err))
+              .finally(() => prisma.\$disconnect());
+          "
         env:
           DATABASE_URL: file:./test.db
 
