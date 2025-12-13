@@ -6,8 +6,11 @@
  */
 import { PrismaClient } from '@prisma/client';
 
-// Plain PrismaClient for SQLite (no adapter needed)
-const prisma = new PrismaClient();
+// For Prisma 7, pass minimal options to satisfy validation
+// SQLite uses built-in driver, no external adapter needed
+const prisma = new PrismaClient({
+  log: ['warn', 'error'],
+});
 
 async function main() {
   console.log('🌱 Starting E2E seed...');
