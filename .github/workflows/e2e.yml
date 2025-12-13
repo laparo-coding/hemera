@@ -212,7 +212,7 @@ jobs:
           npx prisma db seed
           # Verify seed data
           echo "Verifying seed data..."
-          npx prisma db execute --schema prisma/schema.prisma --stdin <<'SQL'
+          npx prisma db execute --stdin <<'SQL'
           SELECT
             COUNT(*) AS published_count
           FROM courses
