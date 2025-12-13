@@ -202,6 +202,17 @@ jobs:
           sed -i 's/@db\.Text//g' prisma/schema.prisma
           sed -i 's/@db\.VarChar([0-9]*)//g' prisma/schema.prisma
 
+          # Backup and simplify prisma.config.ts for SQLite (no adapter needed)
+          cp prisma.config.ts prisma.config.ts.backup
+          cat > prisma.config.ts << 'EOF'
+          import { defineConfig } from '@prisma/config';
+          export default defineConfig({
+            datasource: {
+              url: process.env.DATABASE_URL || 'file:./test.db',
+            },
+          });
+          EOF
+
       - name: Run Prisma setup
         run: |
           # Clear any cached Prisma clients and Next.js build artifacts
@@ -297,9 +308,12 @@ jobs:
           echo "E2E tests failed" >&2
           exit 1
 
-      - name: Restore Prisma schema
+      - name: Restore Prisma schema and config
         if: always()
         run: |
           if [ -f prisma/schema.prisma.backup ]; then
             mv prisma/schema.prisma.backup prisma/schema.prisma
+          fi
+          if [ -f prisma.config.ts.backup ]; then
+            mv prisma.config.ts.backup prisma.config.ts
           fi

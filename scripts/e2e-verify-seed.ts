@@ -1,12 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 
-// For E2E tests with SQLite, we skip the adapter (used in production with PostgreSQL)
-// Prisma will use the built-in SQLite driver from DATABASE_URL env var
-const prisma = new PrismaClient({
-  // Explicitly set to undefined to use built-in driver
-  adapter: undefined,
-});
+// For E2E tests with SQLite, Prisma will use the built-in driver from DATABASE_URL
+// We don't pass any options since the adapter is only needed for PostgreSQL in production
+const prisma = new PrismaClient();
 
 async function verifySeed() {
   try {
