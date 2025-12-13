@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL,
-});
+// For E2E tests with SQLite, we need to bypass the config validation
+// by providing an empty config object
+const prisma = new PrismaClient({} as any);
 
 async function verifySeed() {
   try {
