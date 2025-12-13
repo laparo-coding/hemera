@@ -204,14 +204,7 @@ jobs:
 
           # Backup and simplify prisma.config.ts for SQLite (no adapter needed)
           cp prisma.config.ts prisma.config.ts.backup
-          cat > prisma.config.ts << 'EOF'
-          import { defineConfig } from '@prisma/config';
-          export default defineConfig({
-            datasource: {
-              url: process.env.DATABASE_URL || 'file:./test.db',
-            },
-          });
-          EOF
+          printf "import { defineConfig } from '@prisma/config';\nexport default defineConfig({\n  datasource: {\n    url: process.env.DATABASE_URL || 'file:./test.db',\n  },\n});\n" > prisma.config.ts
 
       - name: Run Prisma setup
         run: |
