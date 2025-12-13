@@ -204,9 +204,8 @@ jobs:
           # Use library engine for SQLite (client engine requires adapter)
           sed -i '/provider = "prisma-client-js"/a\  engineType = "library"' prisma/schema.prisma
 
-          # Backup and simplify prisma.config.ts for SQLite (no adapter needed)
-          cp prisma.config.ts prisma.config.ts.backup
-          printf "import { defineConfig } from '@prisma/config';\nexport default defineConfig({\n  migrations: {\n    seed: 'npx tsx scripts/e2e-seed.ts',\n  },\n  datasource: {\n    url: process.env.DATABASE_URL || 'file:./test.db',\n  },\n});\n" > prisma.config.ts
+          # Use simple SQLite seed script that doesn't require PostgreSQL adapter
+          echo "Using simple SQLite seed script for E2E tests"
 
       - name: Run Prisma setup
         run: |
@@ -215,7 +214,7 @@ jobs:
 
           npx prisma generate
           npx prisma db push --force-reset
-          npx prisma db seed
+          node --loader ts-node/esm scripts/e2e-seed-simple.ts
           # Verify seed data
           echo "Verifying seed data..."
           npx prisma db execute --stdin <<'SQL'
@@ -311,6 +310,5 @@ jobs:
           if [ -f prisma/schema.prisma.backup ]; then
             mv prisma/schema.prisma.backup prisma/schema.prisma
           fi
-          if [ -f prisma.config.ts.backup ]; then
-            mv prisma.config.ts.backup prisma.config.ts
-          fi
+          # No prisma.config.ts to restore - using package.json configuration
+          echo "Prisma configuration handled via package.json"
