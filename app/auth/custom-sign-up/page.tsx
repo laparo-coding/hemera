@@ -3,7 +3,7 @@ export const runtime = 'nodejs';
 
 import { Box, CircularProgress } from '@mui/material';
 import { Suspense } from 'react';
-import CustomSignUpClient from '@/components/auth/CustomSignUpClient';
+import CustomSignUpClient from '../../../components/auth/CustomSignUpClient';
 
 // Design tokens from Hemera spec
 const colors = {

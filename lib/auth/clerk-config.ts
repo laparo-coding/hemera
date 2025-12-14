@@ -8,7 +8,7 @@
  * - Security settings
  */
 
-import { env } from '@/lib/env';
+import { env } from '../env';
 
 /**
  * Clerk appearance configuration for consistent theming

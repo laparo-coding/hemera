@@ -11,7 +11,7 @@ import {
   StripeConfigurationError,
   UnauthorizedError,
   withErrorHandling,
-} from '@/lib/errors';
+} from '../../../../lib/errors';
 
 export const GET = withErrorHandling(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);

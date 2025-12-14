@@ -2,8 +2,8 @@ import { auth } from '@clerk/nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 import BookingSuccessContent, {
   type BookingSuccessViewModel,
-} from '@/components/booking/BookingSuccessContent';
-import { getBookingById } from '@/lib/services/booking';
+} from '../../components/booking/BookingSuccessContent';
+import { getBookingById } from '../../lib/services/booking';
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {
   PENDING: 'Ausstehend',

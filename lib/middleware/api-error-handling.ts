@@ -4,8 +4,8 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { toHttpError } from '@/lib/errors/http';
-import { getRequestContext } from '@/lib/utils/request-context';
+import { toHttpError } from '../errors/http';
+import { getRequestContext } from '../utils/request-context';
 import { BaseError } from '../errors/base';
 import { mapPrismaError } from '../errors/prisma-mapping';
 import {

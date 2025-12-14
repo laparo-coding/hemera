@@ -1,11 +1,11 @@
 import type { NextRequest } from 'next/server';
-import { getBuildInfo } from '@/lib/buildInfo';
-import { createApiLogger } from '@/lib/utils/api-logger';
-import { createSuccessResponse } from '@/lib/utils/api-response';
+import { getBuildInfo } from '../../../lib/buildInfo';
+import { createApiLogger } from '../../../lib/utils/api-logger';
+import { createSuccessResponse } from '../../../lib/utils/api-response';
 import {
   createRequestContext,
   getOrCreateRequestId,
-} from '@/lib/utils/request-id';
+} from '../../../lib/utils/request-id';
 
 export async function GET(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);

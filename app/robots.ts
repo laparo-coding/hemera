@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { SITEMAP_CONFIG } from '@/lib/seo/constants';
+import { SITEMAP_CONFIG } from '../lib/seo/constants';
 
 /**
  * Robots.txt configuration

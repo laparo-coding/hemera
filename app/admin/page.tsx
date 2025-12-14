@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
 import type { Metadata } from 'next';
-import { requireAdmin } from '@/lib/auth/helpers';
+import { requireAdmin } from '../../lib/auth/helpers';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard - Hemera Academy',

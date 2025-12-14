@@ -5,11 +5,14 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
-import { withErrorHandling } from '@/lib/errors';
-import { errorAnalytics } from '@/lib/services/error-analytics';
-import { createErrorResponse, ErrorCodes } from '@/lib/utils/api-response';
-import { getOrCreateRequestId } from '@/lib/utils/request-id';
+import { checkUserAdminStatus } from '../../../../lib/auth/helpers';
+import { withErrorHandling } from '../../../../lib/errors';
+import { errorAnalytics } from '../../../../lib/services/error-analytics';
+import {
+  createErrorResponse,
+  ErrorCodes,
+} from '../../../../lib/utils/api-response';
+import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
 
 // CORS headers for external app access
 const corsHeaders = {

@@ -3,8 +3,8 @@ import {
   logError,
   PaymentProcessingError,
   StripeConfigurationError,
-} from '@/lib/errors';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
+} from '../errors';
+import { serverInstance } from '../monitoring/rollbar-official';
 import { STRIPE_API_VERSION } from '../stripe/config';
 import { PaymentStatus } from './course';
 

@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useLayoutEffect, useState } from 'react';
-import ClientOnly from '@/components/ClientOnly';
+import ClientOnly from '../ClientOnly';
 
 // Hemera Design Tokens
 const colors = {

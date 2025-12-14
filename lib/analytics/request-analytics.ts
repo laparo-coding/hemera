@@ -2,8 +2,8 @@
  * Request ID-basierte Analytics für Performance-Monitoring
  */
 
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import type { RequestContext } from '@/lib/utils/request-id';
+import { serverInstance } from '../monitoring/rollbar-official';
+import type { RequestContext } from '../utils/request-id';
 
 export interface AnalyticsEvent {
   requestId: string;

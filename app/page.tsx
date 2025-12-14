@@ -4,11 +4,11 @@ import {
   CourseProgressionSection,
   CTASection,
   HeroSection,
-} from '@/components/landing';
-import type { CourseCardProps } from '@/components/landing';
-import { getFeaturedCourses } from '@/lib/api/courses';
-import { generateLandingPageMetadata } from '@/lib/seo/metadata';
-import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
+} from '../components/landing';
+import type { CourseCardProps } from '../components/landing';
+import { getFeaturedCourses } from '../lib/api/courses';
+import { generateLandingPageMetadata } from '../lib/seo/metadata';
+import { SCHEMA_COMBINATIONS } from '../lib/seo/schemas';
 
 /**
  * Premium Feminine Landing Page for Hemera Academy

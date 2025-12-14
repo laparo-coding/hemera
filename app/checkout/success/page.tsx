@@ -3,7 +3,7 @@ export const runtime = 'nodejs';
 
 import { Box, CircularProgress } from '@mui/material';
 import { Suspense } from 'react';
-import CheckoutSuccessClient from '@/components/checkout/CheckoutSuccessClient';
+import CheckoutSuccessClient from '../../../components/checkout/CheckoutSuccessClient';
 
 export default function CheckoutSuccessPage() {
   return (

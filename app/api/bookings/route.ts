@@ -2,7 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { PaymentStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '../../../lib/db/prisma';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    const { syncUserFromClerk } = await import('@/lib/api/users');
+    const { syncUserFromClerk } = await import('../../../lib/api/users');
     await syncUserFromClerk(user);
 
     // Get user's bookings with pagination
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    const { syncUserFromClerk } = await import('@/lib/api/users');
+    const { syncUserFromClerk } = await import('../../../lib/api/users');
     await syncUserFromClerk(user);
 
     // Check if user already has a booking for this course

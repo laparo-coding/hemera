@@ -2,8 +2,8 @@ import { currentUser } from '@clerk/nextjs/server';
 import { PaymentStatus, Prisma } from '@prisma/client';
 import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { prisma } from '@/lib/db/prisma';
-import { STRIPE_API_VERSION } from '@/lib/stripe/config';
+import { prisma } from '../../../../lib/db/prisma';
+import { STRIPE_API_VERSION } from '../../../../lib/stripe/config';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';

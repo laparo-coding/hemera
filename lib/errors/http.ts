@@ -4,12 +4,12 @@
  */
 
 import { NextResponse } from 'next/server';
-import { errorAnalytics } from '@/lib/services/error-analytics';
+import { errorAnalytics } from '../services/error-analytics';
 import {
   getRequestContext,
   getRequestId,
   logErrorWithContext,
-} from '@/lib/utils/request-context';
+} from '../utils/request-context';
 import { BaseError } from './base';
 
 export interface ApiErrorResponse {

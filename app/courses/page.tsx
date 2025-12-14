@@ -9,9 +9,9 @@ import {
 import Grid from '@mui/material/GridLegacy';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPublishedCourses } from '@/lib/api/courses';
-import { generateCourseListMetadata } from '@/lib/seo/metadata';
-import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
+import { getPublishedCourses } from '../../lib/api/courses';
+import { generateCourseListMetadata } from '../../lib/seo/metadata';
+import { SCHEMA_COMBINATIONS } from '../../lib/seo/schemas';
 
 export const metadata: Metadata = generateCourseListMetadata();
 // Force dynamic rendering to ensure freshly seeded courses are visible immediately

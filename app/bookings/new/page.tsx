@@ -3,9 +3,9 @@ export const runtime = 'nodejs';
 
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { hasUserBookedCourse } from '@/lib/api/bookings';
-import { getCourseById } from '@/lib/api/courses';
-import { requireAuthenticatedUser } from '@/lib/auth/helpers';
+import { hasUserBookedCourse } from '../../../lib/api/bookings';
+import { getCourseById } from '../../../lib/api/courses';
+import { requireAuthenticatedUser } from '../../../lib/auth/helpers';
 
 export const metadata: Metadata = {
   title: 'Book a Course - Hemera Academy',

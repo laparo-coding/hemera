@@ -5,7 +5,7 @@ import * as React from 'react';
 import {
   initWebVitals,
   type WebVitalMetric,
-} from '@/lib/monitoring/web-vitals';
+} from '../lib/monitoring/web-vitals';
 
 function sendMetric(metric: WebVitalMetric & { path?: string }) {
   const payload = JSON.stringify({

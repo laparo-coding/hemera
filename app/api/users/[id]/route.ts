@@ -6,9 +6,9 @@ import {
   getUserStats,
   type UpdateUserData,
   updateUser,
-} from '@/lib/api/users';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
+} from '../../../../lib/api/users';
+import { checkUserAdminStatus } from '../../../../lib/auth/helpers';
+import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
 
 export async function GET(
   _request: NextRequest,

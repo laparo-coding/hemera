@@ -4,7 +4,7 @@
  */
 
 import { Prisma } from '@prisma/client';
-import { prisma as basePrisma } from '@/lib/db/prisma';
+import { prisma as basePrisma } from '../db/prisma';
 import {
   BookingAlreadyExistsError,
   CourseSlugAlreadyExistsError,
@@ -13,7 +13,7 @@ import {
   DatabaseValidationError,
   FieldValidationError,
   UserEmailAlreadyExistsError,
-} from '@/lib/errors';
+} from './';
 
 /**
  * Convert Prisma errors to domain errors

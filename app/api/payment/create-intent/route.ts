@@ -1,11 +1,14 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { getCurrentUserWithSync } from '@/lib/api/users';
-import { StripeConfigurationError } from '@/lib/errors';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import { createBooking } from '@/lib/services/booking';
-import { getCourseByIdOrSlug } from '@/lib/services/course';
-import { createPaymentIntent, isStripeConfigured } from '@/lib/services/stripe';
+import { getCurrentUserWithSync } from '../../../../lib/api/users';
+import { StripeConfigurationError } from '../../../../lib/errors';
+import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
+import { createBooking } from '../../../../lib/services/booking';
+import { getCourseByIdOrSlug } from '../../../../lib/services/course';
+import {
+  createPaymentIntent,
+  isStripeConfigured,
+} from '../../../../lib/services/stripe';
 
 const STRIPE_UNAVAILABLE_ERROR =
   'Stripe payments are temporarily unavailable. Please contact support.';

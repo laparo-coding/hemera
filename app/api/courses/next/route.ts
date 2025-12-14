@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { getNextUpcomingCourse } from '@/lib/api/courses';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { getNextUpcomingCourse } from '../../../../lib/api/courses';
+import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
 
 /**
  * GET /api/courses/next

@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { NextRequest } from 'next/server';
-import { GET as healthGet } from '@/app/api/health/route';
+import { GET as healthGet } from '../../app/api/health/route';
 
 describe('Contract: Request-ID propagation and response headers', () => {
   it('returns a canonical X-Request-ID header that is NOT the inbound x-request-id', async () => {

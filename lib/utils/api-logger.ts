@@ -2,9 +2,9 @@
  * Enhanced logging utilities for API routes with request context using Rollbar
  */
 
-import { analytics } from '@/lib/analytics/request-analytics';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import type { RequestContext } from '@/lib/utils/request-id';
+import { analytics } from '../analytics/request-analytics';
+import { serverInstance } from '../monitoring/rollbar-official';
+import type { RequestContext } from './request-id';
 
 /**
  * Log levels

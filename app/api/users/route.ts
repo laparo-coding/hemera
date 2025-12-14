@@ -6,18 +6,18 @@ import {
   createUser,
   getAllUsers,
   searchUsers,
-} from '@/lib/api/users';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
-import { createApiLogger } from '@/lib/utils/api-logger';
+} from '../../../lib/api/users';
+import { checkUserAdminStatus } from '../../../lib/auth/helpers';
+import { createApiLogger } from '../../../lib/utils/api-logger';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
-} from '@/lib/utils/api-response';
+} from '../../../lib/utils/api-response';
 import {
   createRequestContext,
   getOrCreateRequestId,
-} from '@/lib/utils/request-id';
+} from '../../../lib/utils/request-id';
 
 export async function GET(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);

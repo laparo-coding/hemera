@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import type { CourseWithSEO } from '@/lib/api/courses';
+import type { CourseWithSEO } from '../../lib/api/courses';
 
 interface BookingFormProps {
   courses: CourseWithSEO[];

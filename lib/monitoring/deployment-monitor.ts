@@ -3,9 +3,9 @@
  * Überwacht Deployment-Status, Service-Health und kritische Metriken
  */
 
-import { analytics } from '@/lib/analytics/request-analytics';
-import { deploymentAlerts } from '@/lib/monitoring/deployment-alerts';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { analytics } from '../analytics/request-analytics';
+import { deploymentAlerts } from './deployment-alerts';
+import { serverInstance } from './rollbar-official';
 
 interface DeploymentMetrics {
   version: string;

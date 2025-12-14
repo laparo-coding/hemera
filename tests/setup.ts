@@ -107,7 +107,7 @@ afterAll(async () => {
   // Defensive: Analytics-Scheduler stoppen, falls er in einem Test manuell gestartet wurde
   try {
     const { stopRequestAnalyticsScheduler } =
-      await import('@/lib/analytics/request-analytics');
+      await import('../lib/analytics/request-analytics');
     stopRequestAnalyticsScheduler();
   } catch {
     // optional best-effort
