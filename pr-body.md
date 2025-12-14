@@ -1,3 +1,5 @@
+# Remove deprecated tsconfig baseUrl
+
 ## Summary
 
 This PR removes the deprecated `baseUrl` option from `tsconfig.json` and converts all path aliases
