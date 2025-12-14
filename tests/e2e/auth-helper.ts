@@ -581,9 +581,7 @@ export class AuthHelper {
         (finalUrl.includes('/factor') || finalUrl.includes('redirect_url'));
 
       if (isLoginLoop) {
-        console.log(
-          '⚠️  Detected login loop - likely invalid test credentials'
-        );
+        console.log('⚠️  Detected login loop - likely invalid test credentials');
         console.log('🔄 Attempting fallback authentication strategy...');
 
         // For development/testing: Try to simulate successful auth by navigating directly

@@ -11,8 +11,9 @@ describe('Contract: Web Vitals gating', () => {
   });
 
   it('is disabled by default (non-prod or flag off)', async () => {
-    const { isWebVitalsEnabled } =
-      await import('../../lib/monitoring/web-vitals');
+    const { isWebVitalsEnabled } = await import(
+      '../../lib/monitoring/web-vitals'
+    );
     expect(isWebVitalsEnabled()).toBe(false);
   });
 
@@ -22,8 +23,9 @@ describe('Contract: Web Vitals gating', () => {
       NODE_ENV: 'production',
       NEXT_PUBLIC_ENABLE_WEB_VITALS: '1',
     } as NodeJS.ProcessEnv;
-    const { isWebVitalsEnabled, isPublicPath, initWebVitals } =
-      await import('../../lib/monitoring/web-vitals');
+    const { isWebVitalsEnabled, isPublicPath, initWebVitals } = await import(
+      '../../lib/monitoring/web-vitals'
+    );
 
     expect(isWebVitalsEnabled()).toBe(true);
     expect(isPublicPath('/')).toBe(true);

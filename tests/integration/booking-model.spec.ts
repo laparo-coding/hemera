@@ -7,7 +7,7 @@ import {
   it,
 } from '@jest/globals';
 import { PaymentStatus } from '@prisma/client';
-import { prisma, closeDb } from '../../lib/db/prisma';
+import { closeDb, prisma } from '../../lib/db/prisma';
 
 describe('Booking Model Validations', () => {
   let testCourse: { id: string; title: string; price: number };

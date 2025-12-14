@@ -2,12 +2,12 @@
 
 import dynamic from 'next/dynamic';
 import type * as React from 'react';
+import { RollbarProviderWrapper } from '../lib/monitoring/rollbar-react-official';
 import ClerkProviderWrapper from './auth/ClerkProviderWrapper';
 import ErrorBoundary from './ErrorBoundary';
 import ConditionalPublicNavigation from './navigation/ConditionalPublicNavigation';
 import StripeProvider from './payment/StripeProvider';
 import ThemeRegistry from './ThemeRegistry';
-import { RollbarProviderWrapper } from '../lib/monitoring/rollbar-react-official';
 
 // Defer MonitoringInit to load after initial render (FR-002, NFR-001)
 // Feature: 012-performance-improvement

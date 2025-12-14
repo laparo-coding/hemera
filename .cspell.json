@@ -2,7 +2,18 @@
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
   "version": "0.2",
   "language": "en",
-  "words": ["NextAuth", "Nextjs", "Prisma", "Vercel", "SSR", "SSG", "ISR", "AppRouter", "hemera", "humanwhocodes"],
+  "words": [
+    "NextAuth",
+    "Nextjs",
+    "Prisma",
+    "Vercel",
+    "SSR",
+    "SSG",
+    "ISR",
+    "AppRouter",
+    "hemera",
+    "humanwhocodes"
+  ],
   "ignorePaths": [
     ".git",
     ".github",
