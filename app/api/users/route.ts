@@ -2,10 +2,10 @@ import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
 import {
   type CreateUserData,
-  type UserProfile,
   createUser,
   getAllUsers,
   searchUsers,
+  type UserProfile,
 } from '../../../lib/api/users';
 import { checkUserAdminStatus } from '../../../lib/auth/helpers';
 import { createApiLogger } from '../../../lib/utils/api-logger';

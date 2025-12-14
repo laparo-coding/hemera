@@ -1,23 +1,39 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/.next",
+      "!**/playwright-report",
+      "!**/playwright-report-external",
+      "!**/test-results",
+      "!**/coverage",
+      "!**/lib/generated",
+      "!**/*.d.ts"
+    ]
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "tab"
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 80,
+    "lineEnding": "lf"
   },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "useConst": "warn",
+        "noUnusedTemplateLiteral": "off"
       },
       "suspicious": {
         "noDocumentCookie": "off",
@@ -25,7 +41,9 @@
         "noShadowRestrictedNames": "off",
         "noAssignInExpressions": "off",
         "noArrayIndexKey": "off",
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noEmptyBlockStatements": "warn",
+        "noConsole": "off"
       },
       "a11y": {
         "noSvgWithoutTitle": "off",
@@ -33,12 +51,29 @@
       },
       "security": {
         "noDangerouslySetInnerHtml": "off"
+      },
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "warn"
+      },
+      "complexity": {
+        "noUselessCatch": "warn"
       }
     }
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double"
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "single",
+      "trailingCommas": "es5",
+      "semicolons": "always",
+      "arrowParentheses": "asNeeded",
+      "bracketSpacing": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
     }
   },
   "assist": {

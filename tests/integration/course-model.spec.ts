@@ -6,7 +6,7 @@ import {
   expect,
   it,
 } from '@jest/globals';
-import { prisma, closeDb } from '../../lib/db/prisma';
+import { closeDb, prisma } from '../../lib/db/prisma';
 
 describe('Course Model Validations', () => {
   afterAll(async () => {

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
+import type { CourseCardProps } from '../components/landing';
 import {
   ConceptSection,
   CourseProgressionSection,
   CTASection,
   HeroSection,
 } from '../components/landing';
-import type { CourseCardProps } from '../components/landing';
 import { getFeaturedCourses } from '../lib/api/courses';
 import { generateLandingPageMetadata } from '../lib/seo/metadata';
 import { SCHEMA_COMBINATIONS } from '../lib/seo/schemas';
