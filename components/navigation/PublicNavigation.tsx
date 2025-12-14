@@ -6,11 +6,13 @@ import {
   Box,
   Button,
   Container,
+  Skeleton,
   Toolbar,
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
 import { useLayoutEffect, useState } from 'react';
+import ClientOnly from '@/components/ClientOnly';
 
 // Hemera Design Tokens
 const colors = {
@@ -130,9 +132,16 @@ export function PublicNavigation({
                 Admin
               </Button>
             )}
-            {/* Authentication Buttons */}
+            {/* Authentication Buttons - wrapped in ClientOnly to prevent hydration mismatch */}
             {useClerk ? (
-              <>
+              <ClientOnly
+                fallback={
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Skeleton variant='rounded' width={100} height={36} />
+                    <Skeleton variant='rounded' width={110} height={36} />
+                  </Box>
+                }
+              >
                 <SignedOut>
                   <Button
                     variant='outlined'
@@ -213,7 +222,7 @@ export function PublicNavigation({
                     data-testid='user-profile-button'
                   />
                 </SignedIn>
-              </>
+              </ClientOnly>
             ) : (
               /* Fallback buttons when Clerk is not configured or E2E */
               <>
