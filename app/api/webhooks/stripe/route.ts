@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { STRIPE_API_VERSION } from '@/lib/stripe/config';
+import { STRIPE_API_VERSION } from '../../../../lib/stripe/config';
 
 // Skip Stripe initialization during build process
 const isBuildTime =

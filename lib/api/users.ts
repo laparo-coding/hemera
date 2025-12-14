@@ -5,14 +5,14 @@
 
 import { type User as ClerkUser, currentUser } from '@clerk/nextjs/server';
 import type { User } from '@prisma/client';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '../db/prisma';
 import {
   DatabaseConnectionError,
   UserEmailAlreadyExistsError,
   UserNotFoundError,
   UserValidationError,
-} from '@/lib/errors';
-import { safePrismaOperation } from '@/lib/errors/prisma-mapping';
+} from '../errors';
+import { safePrismaOperation } from '../errors/prisma-mapping';
 
 export type { User } from '@prisma/client';
 

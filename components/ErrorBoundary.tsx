@@ -44,10 +44,12 @@ class ErrorBoundary extends React.Component<
     if (typeof window !== 'undefined') {
       // Client-side: Import Rollbar and report error
       import('rollbar').then(Rollbar => {
-        import('@/lib/monitoring/rollbar-official').then(({ clientConfig }) => {
-          const rollbar = new Rollbar.default(clientConfig);
-          rollbar.error(error, { componentStack: errorInfo.componentStack });
-        });
+        import('../lib/monitoring/rollbar-official').then(
+          ({ clientConfig }) => {
+            const rollbar = new Rollbar.default(clientConfig);
+            rollbar.error(error, { componentStack: errorInfo.componentStack });
+          }
+        );
       });
     }
   }

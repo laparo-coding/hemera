@@ -1,13 +1,16 @@
 import { notFound } from 'next/navigation';
-import CourseDetail from '@/components/CourseDetail';
-import { getCourseById, getCourseBySlug } from '@/lib/api/courses';
-import { CourseNotFoundError, CourseNotPublishedError } from '@/lib/errors';
-import { SITE_CONFIG } from '@/lib/seo/constants';
+import CourseDetail from '../../../components/CourseDetail';
+import { getCourseById, getCourseBySlug } from '../../../lib/api/courses';
+import {
+  CourseNotFoundError,
+  CourseNotPublishedError,
+} from '../../../lib/errors';
+import { SITE_CONFIG } from '../../../lib/seo/constants';
 import {
   generateBreadcrumbSchema as genBreadcrumb,
   generateOrganizationSchema as genOrgSchema,
   generateWebPageSchema as genWebPageSchema,
-} from '@/lib/seo/schemas';
+} from '../../../lib/seo/schemas';
 import { generateMetadata as genMetadata } from './layout';
 
 export { genMetadata as generateMetadata };

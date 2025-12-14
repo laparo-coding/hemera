@@ -26,7 +26,7 @@ describe('Unit: Rollbar sampling logic', () => {
     const rnd = makeDeterministicRandom([0.01, 0.5, 0.9, 0.5]);
     const spy = jest.spyOn(Math, 'random').mockImplementation(rnd);
 
-    const mod = await import('@/lib/monitoring/rollbar-official');
+    const mod = await import('../../lib/monitoring/rollbar-official');
 
     type LogCall = [string, string, Record<string, unknown>];
     const calls: LogCall[] = [];
@@ -72,7 +72,7 @@ describe('Unit: Rollbar sampling logic', () => {
 
     const rndSpy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
 
-    const mod = await import('@/lib/monitoring/rollbar-official');
+    const mod = await import('../../lib/monitoring/rollbar-official');
 
     type LogCall = [string, string, Record<string, unknown>];
     const calls: LogCall[] = [];

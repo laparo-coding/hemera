@@ -4,8 +4,8 @@ import {
   getUserProfile,
   type UpdateUserData,
   updateUser,
-} from '@/lib/api/users';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
+} from '../../../../lib/api/users';
+import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
 
 export async function GET() {
   try {

@@ -3,7 +3,7 @@
 import { deDE } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { ReactNode } from 'react';
-import { clerkConfig } from '@/lib/auth/clerk-config';
+import { clerkConfig } from '../../lib/auth/clerk-config';
 
 interface ClerkProviderWrapperProps {
   children: ReactNode;

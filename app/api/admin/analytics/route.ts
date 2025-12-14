@@ -5,18 +5,18 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { analytics } from '@/lib/analytics/request-analytics';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
-import { createApiLogger } from '@/lib/utils/api-logger';
+import { analytics } from '../../../../lib/analytics/request-analytics';
+import { checkUserAdminStatus } from '../../../../lib/auth/helpers';
+import { createApiLogger } from '../../../../lib/utils/api-logger';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
-} from '@/lib/utils/api-response';
+} from '../../../../lib/utils/api-response';
 import {
   createRequestContext,
   getOrCreateRequestId,
-} from '@/lib/utils/request-id';
+} from '../../../../lib/utils/request-id';
 
 // CORS headers for external app access
 const corsHeaders = {

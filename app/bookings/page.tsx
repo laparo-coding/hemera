@@ -27,8 +27,8 @@ import {
   getBookingStatusColor,
   getUserBookingStats,
   getUserBookings,
-} from '@/lib/api/bookings';
-import { requireAuthenticatedUser } from '@/lib/auth/helpers';
+} from '../../lib/api/bookings';
+import { requireAuthenticatedUser } from '../../lib/auth/helpers';
 
 export const metadata: Metadata = {
   title: 'My Bookings - Hemera Academy',

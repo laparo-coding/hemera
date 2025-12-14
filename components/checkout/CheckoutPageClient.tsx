@@ -13,11 +13,8 @@ import {
 import { Elements } from '@stripe/react-stripe-js';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import StripeCheckoutForm from '@/components/payment/StripeCheckoutForm';
-import {
-  stripeAppearance,
-  stripePromise,
-} from '@/components/payment/StripeProvider';
+import StripeCheckoutForm from '../payment/StripeCheckoutForm';
+import { stripeAppearance, stripePromise } from '../payment/StripeProvider';
 
 const STRIPE_ENABLED = Boolean(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 const STRIPE_UNAVAILABLE_MESSAGE =

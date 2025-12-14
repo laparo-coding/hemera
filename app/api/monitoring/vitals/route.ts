@@ -4,17 +4,17 @@
  */
 
 import type { NextRequest } from 'next/server';
-import { isTelemetryConsentGranted } from '@/lib/monitoring/privacy';
-import { createApiLogger } from '@/lib/utils/api-logger';
+import { isTelemetryConsentGranted } from '../../../../lib/monitoring/privacy';
+import { createApiLogger } from '../../../../lib/utils/api-logger';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
-} from '@/lib/utils/api-response';
+} from '../../../../lib/utils/api-response';
 import {
   createRequestContextFromNextRequest,
   getOrCreateRequestId,
-} from '@/lib/utils/request-id';
+} from '../../../../lib/utils/request-id';
 
 interface IncomingWebVitalPayload {
   name?: unknown;

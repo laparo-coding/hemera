@@ -3,7 +3,7 @@
  * Tracks and analyzes error patterns for debugging and monitoring
  */
 
-import { BaseError } from '@/lib/errors/base';
+import { BaseError } from '../errors/base';
 
 export interface ErrorMetrics {
   errorCount: number;

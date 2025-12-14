@@ -3,8 +3,8 @@
  * Provides server action-specific error handling and result management
  */
 
-import { mapPrismaError } from '@/lib/errors/prisma-mapping';
-import { getRequestContext } from '@/lib/utils/request-context';
+import { mapPrismaError } from '../errors/prisma-mapping';
+import { getRequestContext } from '../utils/request-context';
 import { BaseError } from '../errors/base';
 import {
   createErrorContext,

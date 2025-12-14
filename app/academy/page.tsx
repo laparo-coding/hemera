@@ -4,8 +4,8 @@ import {
   IMAGE_CONFIG,
   SITE_CONFIG,
   SOCIAL_CONFIG,
-} from '@/lib/seo/constants';
-import { SCHEMA_COMBINATIONS } from '@/lib/seo/schemas';
+} from '../../lib/seo/constants';
+import { SCHEMA_COMBINATIONS } from '../../lib/seo/schemas';
 
 export const metadata: Metadata = {
   title: 'Hemera Academy – Über unsere Kurse',

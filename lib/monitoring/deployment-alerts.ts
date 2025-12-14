@@ -3,8 +3,8 @@
  * Automatische Benachrichtigungen bei kritischen Deployment-Problemen
  */
 
-import { analytics } from '@/lib/analytics/request-analytics';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { analytics } from '../analytics/request-analytics';
+import { serverInstance } from './rollbar-official';
 
 export interface AlertRule {
   id: string;

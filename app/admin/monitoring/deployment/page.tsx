@@ -4,7 +4,7 @@
  */
 
 import type { Metadata } from 'next';
-import DeploymentMonitoringDashboard from '@/components/monitoring/DeploymentMonitoringDashboard';
+import DeploymentMonitoringDashboard from '../../../../components/monitoring/DeploymentMonitoringDashboard';
 
 export const metadata: Metadata = {
   title: 'Deployment Monitoring | Hemera Admin',

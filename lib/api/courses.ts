@@ -4,13 +4,13 @@
  */
 
 import { PaymentStatus } from '@prisma/client';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '../db/prisma';
 import {
   CourseNotFoundError,
   CourseNotPublishedError,
   DatabaseConnectionError,
   logError,
-} from '@/lib/errors';
+} from '../errors';
 
 export interface Course {
   id: string;

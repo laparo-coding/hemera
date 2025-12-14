@@ -3,7 +3,7 @@
  * Following official documentation: https://docs.rollbar.com/docs/nextjs
  */
 
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { serverInstance } from './lib/monitoring/rollbar-official';
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {

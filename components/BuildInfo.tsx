@@ -1,4 +1,4 @@
-import { getBuildInfo } from '@/lib/buildInfo';
+import { getBuildInfo } from '../lib/buildInfo';
 
 // This component renders a tiny build/version indicator.
 // It's intentionally minimal and hidden from assistive tech by default.

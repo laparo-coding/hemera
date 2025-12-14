@@ -4,7 +4,7 @@ import {
   IMAGE_CONFIG,
   SITE_CONFIG,
   SOCIAL_CONFIG,
-} from '@/lib/seo/constants';
+} from './constants';
 
 /**
  * SEO metadata utilities for public pages

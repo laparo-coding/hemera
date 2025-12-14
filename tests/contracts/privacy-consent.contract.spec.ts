@@ -13,7 +13,7 @@ describe('Contract: Privacy/Consent default OFF (no PII)', () => {
   });
 
   it('does not include person when consent is not granted', async () => {
-    const mod = await import('@/lib/monitoring/rollbar-official');
+    const mod = await import('../../lib/monitoring/rollbar-official');
     // Monkey patch serverInstance.error to capture payload
     const calls: any[] = [];
     const originalError = mod.serverInstance.error.bind(mod.serverInstance);

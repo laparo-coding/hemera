@@ -4,14 +4,14 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getCourseById } from '@/lib/api/courses';
-import { CourseNotFoundError } from '@/lib/errors/domain';
+import { getCourseById } from '../api/courses';
+import { CourseNotFoundError } from '../errors/domain';
 import {
   type ApiRouteContext,
   withApiErrorHandling,
   withAuthProtection,
   withRequestValidation,
-} from '@/lib/middleware/api-error-handling';
+} from '../middleware/api-error-handling';
 
 // Example 1: Basic API route with error handling
 export const GET = withApiErrorHandling(async (context: ApiRouteContext) => {

@@ -17,7 +17,7 @@ describe('Integration: Rollbar enabled/disabled behavior', () => {
       ROLLBAR_ENABLED: '0',
     } as NodeJS.ProcessEnv;
 
-    const mod = await import('@/lib/monitoring/rollbar-official');
+    const mod = await import('../../lib/monitoring/rollbar-official');
     const calls: any[] = [];
     (mod.serverInstance as any).error = (msg: any, payload: any) =>
       calls.push([msg, payload]);
@@ -27,7 +27,7 @@ describe('Integration: Rollbar enabled/disabled behavior', () => {
   });
 
   it('sends when enabled (default) and not explicitly disabled', async () => {
-    const mod = await import('@/lib/monitoring/rollbar-official');
+    const mod = await import('../../lib/monitoring/rollbar-official');
     const calls: any[] = [];
     (mod.serverInstance as any).error = (msg: any, payload: any) =>
       calls.push([msg, payload]);

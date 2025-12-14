@@ -4,7 +4,7 @@ import {
   PaymentStatus,
   type User,
 } from '@prisma/client';
-import { prisma } from '@/lib/db/prisma';
+import { prisma } from '../db/prisma';
 import {
   BookingAlreadyExistsError,
   BookingNotFoundError,
@@ -14,7 +14,7 @@ import {
   InvalidBookingStatusError,
   logError,
   UserNotFoundError,
-} from '@/lib/errors';
+} from '../errors';
 
 /**
  * Booking model with API utilities

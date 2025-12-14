@@ -1,10 +1,13 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import { canUserBookCourse, createBooking } from '@/lib/services/booking';
-import { getCourseById } from '@/lib/services/course';
-import { createCheckoutSession } from '@/lib/services/stripe';
+import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
+import {
+  canUserBookCourse,
+  createBooking,
+} from '../../../../lib/services/booking';
+import { getCourseById } from '../../../../lib/services/course';
+import { createCheckoutSession } from '../../../../lib/services/stripe';
 
 /**
  * Request validation schema for Stripe checkout

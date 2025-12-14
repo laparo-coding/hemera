@@ -5,8 +5,8 @@
 
 'use server';
 
-import { createBooking } from '@/lib/api/bookings';
-import { BookingAlreadyExistsError } from '@/lib/errors/domain';
+import { createBooking } from '../api/bookings';
+import { BookingAlreadyExistsError } from '../errors/domain';
 import {
   createFormAction,
   type ServerActionContext,
@@ -16,7 +16,7 @@ import {
   withRetry,
   withServerActionErrorHandling,
   withTransaction,
-} from '@/lib/middleware/server-action-error-handling';
+} from '../middleware/server-action-error-handling';
 
 // Example 1: Basic server action with error handling
 export const createCourseAction = withServerActionErrorHandling(

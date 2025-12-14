@@ -1,4 +1,4 @@
-import { requireAuthenticatedUser } from '@/lib/auth/helpers';
+import { requireAuthenticatedUser } from '../../lib/auth/helpers';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 

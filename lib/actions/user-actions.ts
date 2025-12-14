@@ -11,14 +11,14 @@ import {
   getUserStats,
   type UpdateUserData,
   updateUser,
-} from '@/lib/api/users';
-import { UserValidationError } from '@/lib/errors';
+} from '../api/users';
+import { UserValidationError } from '../errors';
 import {
   type ServerActionContext,
   type ServerActionResult,
   withServerActionErrorHandling,
-} from '@/lib/middleware/server-action-error-handling';
-import { serverInstance } from '@/lib/monitoring/rollbar-official';
+} from '../middleware/server-action-error-handling';
+import { serverInstance } from '../monitoring/rollbar-official';
 
 /**
  * Get current user profile
@@ -153,7 +153,7 @@ export const checkEmailAvailabilityAction = async (
 
     try {
       // Try to find user with this email
-      const { getUserByEmail } = await import('@/lib/api/users');
+      const { getUserByEmail } = await import('../api/users');
       await getUserByEmail(email);
 
       // If we found a user, email is not available

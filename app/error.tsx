@@ -22,7 +22,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
     if (!isRollbarDisabled) {
       import('rollbar')
         .then(Rollbar =>
-          import('@/lib/monitoring/rollbar-official').then(
+          import('../lib/monitoring/rollbar-official').then(
             ({ clientConfig }) => {
               try {
                 const rb = new Rollbar.default(clientConfig);

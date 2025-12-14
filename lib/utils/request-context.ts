@@ -4,7 +4,7 @@
  */
 
 import { headers } from 'next/headers';
-import { generateRequestId } from '@/lib/utils/request-id';
+import { generateRequestId } from './request-id';
 
 export interface RequestContext {
   id: string;
