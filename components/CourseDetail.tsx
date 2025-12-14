@@ -218,7 +218,13 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   }
 
   return (
-    <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, pt: { xs: 8, md: 10 }, pb: { xs: 3, md: 4 } }}>
+    <Box
+      sx={{
+        px: { xs: 2, sm: 3, md: 4 },
+        pt: { xs: 8, md: 10 },
+        pb: { xs: 3, md: 4 },
+      }}
+    >
       <Grid container spacing={4} alignItems='flex-start'>
         <Grid item xs={12} md={7}>
           <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
@@ -408,7 +414,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
         </Grid>
 
         <Grid item xs={12} md={5}>
-          {(onBookNow || bookNowHref) ? (
+          {onBookNow || bookNowHref ? (
             <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
               <CardContent>
                 <Stack spacing={3}>
