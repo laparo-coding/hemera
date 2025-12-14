@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import {
+  BRAND_MESSAGES,
   getFullUrl,
   IMAGE_CONFIG,
   SITE_CONFIG,
@@ -34,7 +35,7 @@ export interface SEOMetadata {
  * Generate Next.js Metadata for landing page
  */
 export function generateLandingPageMetadata(): Metadata {
-  const title = 'Transform Your Career';
+  const title = BRAND_MESSAGES.tagline;
   const description =
     'Transform your career with expert-led courses in technology, business, and creative skills. Join thousands advancing their careers.';
 
