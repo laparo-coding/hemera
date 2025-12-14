@@ -2,15 +2,17 @@
  * E2E Test Seed Script
  *
  * This script is used for E2E testing with SQLite.
- * It uses a plain PrismaClient without the PostgreSQL adapter.
+ * For Prisma 7, we need the better-sqlite3 adapter.
  */
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { PrismaClient } from '@prisma/client';
 
-// For Prisma 7, pass minimal options to satisfy validation
-// SQLite uses built-in driver, no external adapter needed
-const prisma = new PrismaClient({
-  log: ['warn', 'error'],
+// Prisma 7 requires an adapter for all databases
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL || 'file:./test.db',
 });
+
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Starting E2E seed...');

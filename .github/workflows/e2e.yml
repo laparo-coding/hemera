@@ -117,7 +117,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          # Install SQLite adapter for Prisma 7 E2E tests
+          npm install @prisma/adapter-better-sqlite3 better-sqlite3
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -201,13 +204,11 @@ jobs:
           sed -i.bak 's/provider = "postgresql"/provider = "sqlite"/g' prisma/schema.prisma
           sed -i.bak 's/@db\.Text//g' prisma/schema.prisma
           sed -i.bak 's/@db\.VarChar([0-9]*)//g' prisma/schema.prisma
-          # Use library engine for SQLite (client engine requires adapter)
-          sed -i.bak '/provider = "prisma-client-js"/a\  engineType = "library"' prisma/schema.prisma
           # Clean up backup files
           rm -f prisma/schema.prisma.bak
 
-          # Use simple SQLite seed script that doesn't require PostgreSQL adapter
-          echo "Using simple SQLite seed script for E2E tests"
+          # Use SQLite seed script with better-sqlite3 adapter for Prisma 7
+          echo "Using SQLite seed script with adapter for E2E tests"
 
       - name: Run Prisma setup
         run: |
@@ -216,17 +217,13 @@ jobs:
 
           npx prisma generate
           npx prisma db push --force-reset
-          node scripts/e2e-seed-simple.js
-          # Verify seed data using simple Node.js approach
+          # Run E2E seed with SQLite adapter
+          npx tsx scripts/e2e-seed.ts
+          # Verify seed data via raw SQL
           echo "Verifying seed data..."
-          node -e "
-            import { PrismaClient } from '@prisma/client';
-            const prisma = new PrismaClient();
-            prisma.course.count({ where: { isPublished: true } })
-              .then(count => console.log('Published courses:', count))
-              .catch(err => console.error('Verification failed:', err))
-              .finally(() => prisma.\$disconnect());
-          "
+          npx prisma db execute --stdin <<'SQL'
+          SELECT COUNT(*) AS published_count FROM courses WHERE isPublished = 1;
+          SQL
         env:
           DATABASE_URL: file:./test.db
 
