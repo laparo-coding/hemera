@@ -90,7 +90,7 @@
     "@testcontainers/postgresql": "^11.9.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.0.2",
     "@types/pg": "^8.11.6",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -118,7 +118,7 @@
     "webpack": "^5.103.0"
   },
   "engines": {
-    "node": ">=22 <25"
+    "node": ">=22"
   },
   "prisma": {
     "seed": "node --loader ts-node/esm prisma/seed.ts"
