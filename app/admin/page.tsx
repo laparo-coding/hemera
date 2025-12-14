@@ -99,7 +99,7 @@ export default async function AdminPage() {
               <Typography variant='body2' paragraph>
                 <strong>Role:</strong> Administrator
               </Typography>
-              <Typography variant='body2'>
+              <Typography variant='body2' suppressHydrationWarning>
                 <strong>Last Login:</strong> {new Date().toLocaleDateString()}
               </Typography>
             </CardContent>
