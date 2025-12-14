@@ -1,3 +1,5 @@
+import { SITE_CONFIG } from './constants';
+
 /**
  * Schema.org JSON-LD generators for structured data
  *
@@ -9,9 +11,8 @@
  */
 
 const ORGANIZATION_CONFIG = {
-  name: 'Hemera Academy',
-  description:
-    'Transform your career with expert-led courses in technology, business, and creative skills.',
+  name: SITE_CONFIG.name,
+  description: SITE_CONFIG.description,
   url: 'https://hemera.academy',
   logo: 'https://hemera.academy/images/logo.png',
   email: 'contact@hemera.academy',

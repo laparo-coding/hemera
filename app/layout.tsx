@@ -10,11 +10,10 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    template: '%s - Hemera Academy',
-    default: 'Hemera Academy',
+    template: `%s - ${SITE_CONFIG.name}`,
+    default: SITE_CONFIG.name,
   },
-  description:
-    'Transform your career with expert-led courses in technology, business, and creative skills.',
+  description: SITE_CONFIG.description,
   metadataBase: new URL(SITE_CONFIG.url),
 };
 

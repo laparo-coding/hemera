@@ -36,8 +36,7 @@ export interface SEOMetadata {
  */
 export function generateLandingPageMetadata(): Metadata {
   const title = BRAND_MESSAGES.tagline;
-  const description =
-    'Transform your career with expert-led courses in technology, business, and creative skills. Join thousands advancing their careers.';
+  const description = SITE_CONFIG.description;
 
   return {
     title,
