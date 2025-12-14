@@ -117,7 +117,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          # Install SQLite adapter for Prisma 7 E2E tests
+          npm install @prisma/adapter-better-sqlite3 better-sqlite3
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -198,9 +201,14 @@ jobs:
 
           # Create a temporary SQLite schema for CI testing
           cp prisma/schema.prisma prisma/schema.prisma.backup
-          sed -i 's/provider = "postgresql"/provider = "sqlite"/g' prisma/schema.prisma
-          sed -i 's/@db\.Text//g' prisma/schema.prisma
-          sed -i 's/@db\.VarChar([0-9]*)//g' prisma/schema.prisma
+          sed -i.bak 's/provider = "postgresql"/provider = "sqlite"/g' prisma/schema.prisma
+          sed -i.bak 's/@db\.Text//g' prisma/schema.prisma
+          sed -i.bak 's/@db\.VarChar([0-9]*)//g' prisma/schema.prisma
+          # Clean up backup files
+          rm -f prisma/schema.prisma.bak
+
+          # Use SQLite seed script with better-sqlite3 adapter for Prisma 7
+          echo "Using SQLite seed script with adapter for E2E tests"
 
       - name: Run Prisma setup
         run: |
@@ -209,47 +217,13 @@ jobs:
 
           npx prisma generate
           npx prisma db push --force-reset
-          npx prisma db seed
-          # Verify seed data
+          # Run E2E seed with SQLite adapter
+          npx tsx scripts/e2e-seed.ts
+          # Verify seed data via raw SQL
           echo "Verifying seed data..."
-          npx prisma db execute --schema prisma/schema.prisma --stdin <<'SQL'
-          SELECT
-            COUNT(*) AS published_count
-          FROM courses
-          WHERE isPublished = 1;
+          npx prisma db execute --stdin <<'SQL'
+          SELECT COUNT(*) AS published_count FROM courses WHERE isPublished = 1;
           SQL
-          # Export lightweight debug context for later troubleshooting
-          node <<'NODE'
-          const fs = require('fs');
-          const path = '/tmp/course-debug.json';
-          const { PrismaClient } = require('@prisma/client');
-          const prisma = new PrismaClient();
-          (async () => {
-            const [publishedCount, sampleCourses] = await Promise.all([
-              prisma.course.count({ where: { isPublished: true } }),
-              prisma.course.findMany({
-              where: { isPublished: true },
-              select: { id: true, title: true, slug: true },
-              orderBy: { createdAt: 'desc' },
-                take: 5,
-              }),
-            ]);
-            const payload = {
-              generatedAt: new Date().toISOString(),
-              publishedCount,
-              sample: sampleCourses,
-            };
-            fs.writeFileSync(path, JSON.stringify(payload, null, 2));
-            console.log('Saved course debug snapshot to', path);
-            console.log('Seed verification - published courses:', publishedCount);
-          })()
-            .catch(error => {
-              console.error('Failed to write course debug snapshot:', error);
-            })
-            .finally(async () => {
-              await prisma.$disconnect();
-            });
-          NODE
         env:
           DATABASE_URL: file:./test.db
 
@@ -327,9 +301,11 @@ jobs:
           echo "E2E tests failed" >&2
           exit 1
 
-      - name: Restore Prisma schema
+      - name: Restore Prisma schema and config
         if: always()
         run: |
           if [ -f prisma/schema.prisma.backup ]; then
             mv prisma/schema.prisma.backup prisma/schema.prisma
           fi
+          # No prisma.config.ts to restore - using package.json configuration
+          echo "Prisma configuration handled via package.json"

@@ -56,6 +56,7 @@ export default function ClerkProviderWrapper({
       signUpFallbackRedirectUrl={clerkConfig.signUpFallbackRedirectUrl}
       signInForceRedirectUrl={clerkConfig.signInForceRedirectUrl}
       signUpForceRedirectUrl={clerkConfig.signUpForceRedirectUrl}
+      clerkJSUrl='https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js'
     >
       {children}
     </ClerkProvider>

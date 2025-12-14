@@ -1,4 +1,4 @@
-import { prisma, closeDb } from '../lib/db/prisma.js';
+import { prisma, closeDb } from '../lib/db/prisma';
 
 // Use shared Prisma instance
 
