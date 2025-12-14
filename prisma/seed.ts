@@ -11,6 +11,17 @@ async function main() {
 
   const seedCourses = [
     {
+      title: 'Grundkurs Persönlichkeitsentwicklung',
+      description:
+        'Der ideale Einstieg in die Welt der Persönlichkeitsentwicklung. Lernen Sie die wichtigsten Grundlagen und Techniken, um Ihr volles Potenzial zu entfalten.',
+      slug: 'grundkurs',
+      price: 149,
+      currency: 'EUR',
+      capacity: 25,
+      date: new Date('2025-12-20T10:00:00Z'),
+      isPublished: true,
+    },
+    {
       title: 'Grundlagen der Persönlichkeitsentwicklung',
       description:
         'Entdecken Sie die Basics der persönlichen Entwicklung. Ein perfekter Einstieg für alle, die ihr Leben positiv verändern möchten.',
