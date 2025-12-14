@@ -2,7 +2,14 @@ import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
+// Check if DATABASE_URL is SQLite (file:// protocol)
+const isSqlite = process.env.DATABASE_URL?.startsWith('file:');
+
 function withSchemaParam(urlStr: string, schema?: string): string {
+  // SQLite URLs don't support schema params
+  if (urlStr.startsWith('file:')) {
+    return urlStr;
+  }
   try {
     const url = new URL(urlStr);
 
@@ -68,24 +75,46 @@ const connectionString = runtimeDbUrl ?? process.env.DATABASE_URL ?? '';
 const sslEnabled =
   process.env.PGSSL === '1' || process.env.PGSSL === 'true' ? true : undefined;
 
-// Create pool only if DATABASE_URL is available
-// During Next.js build, DATABASE_URL might not be set, so we use a fallback
-// that will fail gracefully at runtime if actual DB access is attempted
-const pool = new Pool({
-  connectionString:
-    connectionString || 'postgresql://localhost:5432/build_placeholder',
-  ssl: sslEnabled ? { rejectUnauthorized: true } : undefined,
-});
+// For SQLite (E2E tests), we use better-sqlite3 adapter
+// For PostgreSQL (production), we use pg adapter
+let prismaClient: PrismaClient;
+let closeDbFn: () => Promise<void>;
 
-const adapter = new PrismaPg(pool);
+if (isSqlite) {
+  // Dynamic import to avoid bundling sqlite3 in production
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
+  const sqliteAdapter = new PrismaBetterSqlite3({
+    url: connectionString || 'file:./test.db',
+  });
+  prismaClient = new PrismaClient({ adapter: sqliteAdapter });
+  closeDbFn = async () => {
+    await prismaClient.$disconnect();
+  };
+} else {
+  // Create pool only if DATABASE_URL is available
+  // During Next.js build, DATABASE_URL might not be set, so we use a fallback
+  // that will fail gracefully at runtime if actual DB access is attempted
+  const pool = new Pool({
+    connectionString:
+      connectionString || 'postgresql://localhost:5432/build_placeholder',
+    ssl: sslEnabled ? { rejectUnauthorized: true } : undefined,
+  });
+
+  const adapter = new PrismaPg(pool);
+  prismaClient = new PrismaClient({ adapter });
+  closeDbFn = async () => {
+    await prismaClient.$disconnect();
+    await pool.end();
+  };
+}
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+export const prisma = globalForPrisma.prisma ?? prismaClient;
 
 export async function closeDb(): Promise<void> {
-  await prisma.$disconnect();
-  await pool.end();
+  await closeDbFn();
 }
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
