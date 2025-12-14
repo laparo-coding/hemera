@@ -59,6 +59,9 @@ export abstract class BaseError extends Error {
 
       if (this.statusCode >= 500) {
         severity = ErrorSeverity.CRITICAL;
+      } else if (this.statusCode === 404) {
+        // 404 Not Found is a normal HTTP response, log as INFO not ERROR
+        severity = ErrorSeverity.INFO;
       } else if (this.statusCode >= 400 && this.statusCode < 500) {
         severity =
           this.category === 'auth'
@@ -94,7 +97,8 @@ export abstract class BaseError extends Error {
  */
 export abstract class BusinessError extends BaseError {
   readonly category = 'business' as const;
-  readonly statusCode = 400;
+  // Use number type to allow subclasses to override (e.g., 404 for NotFound errors)
+  readonly statusCode: number = 400;
 }
 
 /**

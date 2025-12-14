@@ -13,6 +13,8 @@ import {
 // ===== COURSE ERRORS =====
 export class CourseNotFoundError extends BusinessError {
   readonly errorCode = 'COURSE_NOT_FOUND';
+  // Override to 404 - "Not Found" is not a business error, it's a normal HTTP response
+  override readonly statusCode = 404;
 
   constructor(courseId: string) {
     super(`Course with ID ${courseId} not found`, { courseId });
@@ -21,6 +23,8 @@ export class CourseNotFoundError extends BusinessError {
 
 export class CourseNotPublishedError extends BusinessError {
   readonly errorCode = 'COURSE_NOT_PUBLISHED';
+  // Override to 404 - unpublished courses are effectively "not found" for users
+  override readonly statusCode = 404;
 
   constructor(courseId: string) {
     super(`Course ${courseId} is not published`, { courseId });
@@ -38,6 +42,8 @@ export class CourseSlugAlreadyExistsError extends ValidationError {
 // ===== BOOKING ERRORS =====
 export class BookingNotFoundError extends BusinessError {
   readonly errorCode = 'BOOKING_NOT_FOUND';
+  // Override to 404 - "Not Found" is a normal HTTP response
+  override readonly statusCode = 404;
 
   constructor(bookingId: string) {
     super(`Booking with ID ${bookingId} not found`, { bookingId });
@@ -72,6 +78,8 @@ export class InvalidBookingStatusError extends ValidationError {
 // ===== USER ERRORS =====
 export class UserNotFoundError extends BusinessError {
   readonly errorCode = 'USER_NOT_FOUND';
+  // Override to 404 - "Not Found" is a normal HTTP response
+  override readonly statusCode = 404;
 
   constructor(userId: string) {
     super(`User with ID ${userId} not found`, { userId });
