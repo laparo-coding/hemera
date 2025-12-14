@@ -9,11 +9,16 @@
  * - Image specifications
  */
 
+export const BRAND_MESSAGES = {
+  tagline: 'Transform Your Career',
+  taglineWithContext: 'Transform Your Career with Expert-Led Courses',
+} as const;
+
 export const SITE_CONFIG = {
   name: 'Hemera Academy',
   description:
     'Transform your career with expert-led courses in technology, business, and creative skills.',
-  tagline: 'Transform Your Career with Expert-Led Courses',
+  tagline: BRAND_MESSAGES.taglineWithContext,
   url: 'https://hemera.academy',
   domain: 'hemera.academy',
 } as const;
@@ -21,7 +26,7 @@ export const SITE_CONFIG = {
 export const SEO_DEFAULTS = {
   title: {
     template: '%s | Hemera Academy',
-    default: 'Hemera Academy - Transform Your Career with Expert-Led Courses',
+    default: `Hemera Academy - ${BRAND_MESSAGES.taglineWithContext}`,
     maxLength: 60,
   },
   description: {
