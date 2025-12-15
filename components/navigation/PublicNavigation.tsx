@@ -1,6 +1,5 @@
 'use client';
 
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import {
   AppBar,
   Box,
@@ -12,6 +11,7 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useLayoutEffect, useState } from 'react';
+import { SignedIn, SignedOut, UserButton } from '../auth/ClerkComponents';
 import ClientOnly from '../ClientOnly';
 
 // Hemera Design Tokens
