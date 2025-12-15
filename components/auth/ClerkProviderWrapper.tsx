@@ -26,6 +26,13 @@ export default function ClerkProviderWrapper({
   const isVercelPreview =
     process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'preview';
 
+  // Detect Vercel deployment URLs that may not be in Clerk's allowed domains
+  // Production Clerk keys only work on domains configured in Clerk Dashboard
+  const isVercelDeploymentUrl =
+    typeof window !== 'undefined' &&
+    (window.location.hostname.endsWith('.vercel.app') ||
+      window.location.hostname.includes('-git-'));
+
   // In E2E tests or when explicitly disabled, bypass Clerk to not block rendering
   if (isE2E) return <>{children}</>;
 
@@ -34,6 +41,20 @@ export default function ClerkProviderWrapper({
   if (isVercelPreview && !looksLikeClerkKey(publishableKey)) {
     console.warn(
       '[ClerkProviderWrapper] Clerk bypassed in Vercel preview due to missing/invalid key'
+    );
+    return <>{children}</>;
+  }
+
+  // Bypass Clerk on Vercel deployment URLs with production keys to avoid origin mismatch errors
+  // Production Clerk keys are restricted to specific domains (e.g., hemera.academy)
+  if (
+    isVercelDeploymentUrl &&
+    publishableKey?.startsWith('pk_live_') &&
+    typeof window !== 'undefined' &&
+    !window.location.hostname.includes('hemera.academy')
+  ) {
+    console.warn(
+      '[ClerkProviderWrapper] Clerk bypassed: Production key cannot be used on Vercel deployment URL'
     );
     return <>{children}</>;
   }
@@ -56,7 +77,6 @@ export default function ClerkProviderWrapper({
       signUpFallbackRedirectUrl={clerkConfig.signUpFallbackRedirectUrl}
       signInForceRedirectUrl={clerkConfig.signInForceRedirectUrl}
       signUpForceRedirectUrl={clerkConfig.signUpForceRedirectUrl}
-      clerkJSUrl='https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js'
     >
       {children}
     </ClerkProvider>
