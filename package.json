@@ -93,7 +93,6 @@
     "@types/pg": "^8.11.6",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@types/uuid": "^10.0.0",
     "better-sqlite3": "^12.5.0",
     "cspell": "^9.4.0",
     "dotenv": "^17.2.3",
