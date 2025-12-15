@@ -46,7 +46,7 @@
       "biome check --write",
       "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files --exclude 'lib/generated/**'"
     ],
-    "*.{json,yaml,yml}": [
+    "*.json": [
       "biome format --write"
     ],
     "*.{md,mdx}": [
