@@ -10,14 +10,15 @@
  */
 
 export const BRAND_MESSAGES = {
-  tagline: 'Transform Your Career',
-  taglineWithContext: 'Transform Your Career with Expert-Led Courses',
+  tagline: 'Verhandle mit deinen Stärken',
+  taglineWithContext:
+    'Kooperative Verhandlungsführung ist eine kraftvolle weibliche Stärke.',
 } as const;
 
 export const SITE_CONFIG = {
   name: 'Hemera Academy',
   description:
-    'Transform your career with expert-led courses in technology, business, and creative skills.',
+    'Gehaltsgespräche sind notwendig, um Arbeitsleitung und finanzielle Anerkennung immer wieder in Einklang zu bringen. In solchen Gesprächen erfolgreich zu sein, lässt sich trainieren. Wir üben in kleinen Gruppe mit Videoaufzeichnung und Gesprächsanlayse wie sich individuelle Stärken kooperativ aufbauen lassen.',
   tagline: BRAND_MESSAGES.taglineWithContext,
   url: 'https://hemera.academy',
   domain: 'hemera.academy',
@@ -31,18 +32,18 @@ export const SEO_DEFAULTS = {
   },
   description: {
     default:
-      'Transform your career with expert-led courses in technology, business, and creative skills. Join thousands of students advancing their careers with Hemera Academy.',
+      'Gehaltsgespräche sind notwendig, um Arbeisleistung und finazielle Anerkennung immer wieder in Einklang zu bringen',
     maxLength: 160,
   },
   keywords: [
-    'online courses',
-    'career development',
-    'technology training',
-    'professional development',
-    'skill building',
-    'expert instruction',
-    'online learning',
-    'certification',
+    'Gehalt',
+    'Gehaltsverhandlung',
+    'Finanzielle Anerkennung',
+    'Karriere entwicklen',
+    'Zweifel überwinden',
+    'Sorgenfrei leben',
+    'Aufstieg',
+    'Werte schaffen',
   ],
 } as const;
 
