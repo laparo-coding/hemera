@@ -76,3 +76,4 @@ temp-*
 # MCP configuration
 mcp.json
 
+.env*.local

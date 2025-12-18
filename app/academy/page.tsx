@@ -115,7 +115,8 @@ export default function AcademyPage() {
           <div className='mt-10'>
             <a
               href='/courses'
-              className='inline-flex items-center px-5 py-3 rounded-md bg-blue-600 text-white hover:bg-blue-700'
+              className='inline-flex items-center px-5 py-3 rounded-md text-white hover:opacity-90'
+              style={{ backgroundColor: '#16404D' }}
             >
               Kurse entdecken
               <svg

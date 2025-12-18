@@ -35,7 +35,9 @@ export async function GET(_request: NextRequest) {
     const formattedCourse = {
       id: course.id,
       title: course.title,
-      date: course.date?.toISOString() || null,
+      startDate: course.startDate?.toISOString() || null,
+      startTime: course.startTime?.toISOString() || null,
+      endTime: course.endTime?.toISOString() || null,
       slug: course.slug,
     };
 

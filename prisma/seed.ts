@@ -1,6 +1,24 @@
-import { closeDb, prisma } from '../lib/db/prisma';
+import { closeDb, prisma } from '../lib/db/prisma.js';
 
 // Use shared Prisma instance
+
+// Helper function to convert old date format to new format
+function convertDateToFields(dateStr: string) {
+  const date = new Date(dateStr);
+  const startDate = new Date(date);
+  startDate.setHours(0, 0, 0, 0); // Reset to start of day
+  
+  const startTime = new Date(date);
+  
+  const endTime = new Date(date);
+  endTime.setHours(date.getHours() + 4); // Default 4 hours duration
+  
+  return {
+    startDate,
+    startTime,
+    endTime,
+  };
+}
 
 async function main() {
   // Clear existing data in development
@@ -18,7 +36,29 @@ async function main() {
       price: 149,
       currency: 'EUR',
       capacity: 25,
-      date: new Date('2025-12-20T10:00:00Z'),
+      ...convertDateToFields('2025-12-20T10:00:00Z'),
+      isPublished: true,
+    },
+    {
+      title: 'Fortgeschrittene Verhandlungsstrategien',
+      description:
+        'Vertiefe deine Kenntnisse mit fortgeschrittenen Taktiken und lerne, auch schwierige Situationen zu meistern.',
+      slug: 'fortgeschrittene',
+      price: 29900,
+      currency: 'EUR',
+      capacity: 20,
+      ...convertDateToFields('2026-02-15T14:00:00Z'),
+      isPublished: true,
+    },
+    {
+      title: 'Masterclass: Exzellenz in Verhandlungen',
+      description:
+        'Meistere die Kunst der Verhandlung auf höchstem Niveau und erreiche deine anspruchsvollsten Ziele.',
+      slug: 'masterclass',
+      price: 49900,
+      currency: 'EUR',
+      capacity: 12,
+      ...convertDateToFields('2026-03-20T10:00:00Z'),
       isPublished: true,
     },
     {
@@ -29,7 +69,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 20,
-      date: new Date('2025-11-15T10:00:00Z'),
+      ...convertDateToFields('2025-11-15T10:00:00Z'),
       isPublished: true,
     },
     {
@@ -40,7 +80,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 25,
-      date: new Date('2025-11-20T14:00:00Z'),
+      ...convertDateToFields('2025-11-20T14:00:00Z'),
       isPublished: true,
     },
     {
@@ -51,7 +91,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 30,
-      date: new Date('2025-11-25T16:00:00Z'),
+      ...convertDateToFields('2025-11-25T16:00:00Z'),
       isPublished: true,
     },
     {
@@ -62,7 +102,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 20,
-      date: new Date('2025-12-01T09:00:00Z'),
+      ...convertDateToFields('2025-12-01T09:00:00Z'),
       isPublished: true,
     },
     {
@@ -73,7 +113,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 18,
-      date: new Date('2025-12-05T11:00:00Z'),
+      ...convertDateToFields('2025-12-05T11:00:00Z'),
       isPublished: true,
     },
     {
@@ -84,7 +124,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 25,
-      date: new Date('2025-12-08T18:00:00Z'),
+      ...convertDateToFields('2025-12-08T18:00:00Z'),
       isPublished: true,
     },
     {
@@ -95,7 +135,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 22,
-      date: new Date('2025-12-12T15:00:00Z'),
+      ...convertDateToFields('2025-12-12T15:00:00Z'),
       isPublished: true,
     },
     {
@@ -106,7 +146,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 20,
-      date: new Date('2025-12-15T13:00:00Z'),
+      ...convertDateToFields('2025-12-15T13:00:00Z'),
       isPublished: true,
     },
     {
@@ -117,7 +157,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 15,
-      date: new Date('2025-12-18T10:30:00Z'),
+      ...convertDateToFields('2025-12-18T10:30:00Z'),
       isPublished: true,
     },
     {
@@ -128,7 +168,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 24,
-      date: new Date('2025-12-22T14:00:00Z'),
+      ...convertDateToFields('2025-12-22T14:00:00Z'),
       isPublished: true,
     },
     {
@@ -139,7 +179,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 20,
-      date: new Date('2026-01-05T10:00:00Z'),
+      ...convertDateToFields('2026-01-05T10:00:00Z'),
       isPublished: true,
     },
     {
@@ -150,7 +190,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 28,
-      date: new Date('2026-01-09T08:30:00Z'),
+      ...convertDateToFields('2026-01-09T08:30:00Z'),
       isPublished: true,
     },
     {
@@ -161,7 +201,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 18,
-      date: new Date('2026-01-12T17:00:00Z'),
+      ...convertDateToFields('2026-01-12T17:00:00Z'),
       isPublished: true,
     },
     {
@@ -172,7 +212,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 26,
-      date: new Date('2026-01-16T15:00:00Z'),
+      ...convertDateToFields('2026-01-16T15:00:00Z'),
       isPublished: true,
     },
     {
@@ -183,7 +223,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 22,
-      date: new Date('2026-01-20T19:00:00Z'),
+      ...convertDateToFields('2026-01-20T19:00:00Z'),
       isPublished: true,
     },
     {
@@ -194,7 +234,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 25,
-      date: new Date('2026-01-24T09:30:00Z'),
+      ...convertDateToFields('2026-01-24T09:30:00Z'),
       isPublished: true,
     },
     {
@@ -205,7 +245,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 21,
-      date: new Date('2026-01-27T13:00:00Z'),
+      ...convertDateToFields('2026-01-27T13:00:00Z'),
       isPublished: true,
     },
     {
@@ -216,7 +256,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 23,
-      date: new Date('2026-01-30T11:00:00Z'),
+      ...convertDateToFields('2026-01-30T11:00:00Z'),
       isPublished: true,
     },
     {
@@ -227,7 +267,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 27,
-      date: new Date('2026-02-03T08:00:00Z'),
+      ...convertDateToFields('2026-02-03T08:00:00Z'),
       isPublished: true,
     },
     {
@@ -238,7 +278,7 @@ async function main() {
       price: 100,
       currency: 'EUR',
       capacity: 19,
-      date: new Date('2026-02-06T16:30:00Z'),
+      ...convertDateToFields('2026-02-06T16:30:00Z'),
       isPublished: true,
     },
     {
@@ -249,7 +289,7 @@ async function main() {
       price: 120,
       currency: 'EUR',
       capacity: 15,
-      date: new Date('2026-02-10T10:00:00Z'),
+      ...convertDateToFields('2026-02-10T10:00:00Z'),
       isPublished: true,
     },
     {
@@ -260,7 +300,7 @@ async function main() {
       price: 150,
       currency: 'EUR',
       capacity: 25,
-      date: new Date('2026-02-14T14:00:00Z'),
+      ...convertDateToFields('2026-02-14T14:00:00Z'),
       isPublished: true,
     },
     {
@@ -271,7 +311,7 @@ async function main() {
       price: 110,
       currency: 'EUR',
       capacity: 20,
-      date: new Date('2026-02-18T09:30:00Z'),
+      ...convertDateToFields('2026-02-18T09:30:00Z'),
       isPublished: true,
     },
     {
@@ -282,7 +322,7 @@ async function main() {
       price: 130,
       currency: 'EUR',
       capacity: 18,
-      date: new Date('2026-02-22T15:00:00Z'),
+      ...convertDateToFields('2026-02-22T15:00:00Z'),
       isPublished: true,
     },
     {
@@ -293,7 +333,7 @@ async function main() {
       price: 140,
       currency: 'EUR',
       capacity: 16,
-      date: new Date('2026-02-26T11:00:00Z'),
+      ...convertDateToFields('2026-02-26T11:00:00Z'),
       isPublished: true,
     },
     {
@@ -304,7 +344,7 @@ async function main() {
       price: 125,
       currency: 'EUR',
       capacity: 22,
-      date: new Date('2026-03-02T13:30:00Z'),
+      ...convertDateToFields('2026-03-02T13:30:00Z'),
       isPublished: true,
     },
     {
@@ -315,7 +355,7 @@ async function main() {
       price: 115,
       currency: 'EUR',
       capacity: 24,
-      date: new Date('2026-03-06T16:00:00Z'),
+      ...convertDateToFields('2026-03-06T16:00:00Z'),
       isPublished: true,
     },
     {
@@ -326,7 +366,7 @@ async function main() {
       price: 160,
       currency: 'EUR',
       capacity: 30,
-      date: new Date('2026-03-10T10:30:00Z'),
+      ...convertDateToFields('2026-03-10T10:30:00Z'),
       isPublished: true,
     },
     {
@@ -336,7 +376,7 @@ async function main() {
       price: 135,
       currency: 'EUR',
       capacity: 20,
-      date: new Date('2026-03-14T14:30:00Z'),
+      ...convertDateToFields('2026-03-14T14:30:00Z'),
       isPublished: true,
     },
     {
@@ -347,7 +387,7 @@ async function main() {
       price: 145,
       currency: 'EUR',
       capacity: 18,
-      date: new Date('2026-03-18T09:00:00Z'),
+      ...convertDateToFields('2026-03-18T09:00:00Z'),
       isPublished: true,
     },
     // === Additional courses added ===
@@ -359,7 +399,7 @@ async function main() {
       price: 120,
       currency: 'EUR',
       capacity: 20,
-      date: new Date('2026-03-22T10:00:00Z'),
+      ...convertDateToFields('2026-03-22T10:00:00Z'),
       isPublished: true,
     },
     {
@@ -370,7 +410,7 @@ async function main() {
       price: 150,
       currency: 'EUR',
       capacity: 24,
-      date: new Date('2026-03-25T14:00:00Z'),
+      ...convertDateToFields('2026-03-25T14:00:00Z'),
       isPublished: true,
     },
     {
@@ -381,7 +421,7 @@ async function main() {
       price: 135,
       currency: 'EUR',
       capacity: 16,
-      date: new Date('2026-03-28T16:30:00Z'),
+      ...convertDateToFields('2026-03-28T16:30:00Z'),
       isPublished: true,
     },
     {
@@ -392,7 +432,7 @@ async function main() {
       price: 110,
       currency: 'EUR',
       capacity: 22,
-      date: new Date('2026-04-02T08:30:00Z'),
+      ...convertDateToFields('2026-04-02T08:30:00Z'),
       isPublished: true,
     },
     {
@@ -403,7 +443,7 @@ async function main() {
       price: 9900,
       currency: 'EUR',
       capacity: 12,
-      date: new Date('2026-04-05T12:00:00Z'),
+      ...convertDateToFields('2026-04-05T12:00:00Z'),
       isPublished: true,
     },
     {
@@ -414,7 +454,7 @@ async function main() {
       price: 19900,
       currency: 'EUR',
       capacity: 14,
-      date: new Date('2026-04-08T09:00:00Z'),
+      ...convertDateToFields('2026-04-08T09:00:00Z'),
       isPublished: true,
     },
     {
@@ -425,7 +465,7 @@ async function main() {
       price: 14900,
       currency: 'EUR',
       capacity: 18,
-      date: new Date('2026-04-12T15:00:00Z'),
+      ...convertDateToFields('2026-04-12T15:00:00Z'),
       isPublished: true,
     },
     {
@@ -436,7 +476,7 @@ async function main() {
       price: 12900,
       currency: 'EUR',
       capacity: 20,
-      date: new Date('2026-04-16T10:00:00Z'),
+      ...convertDateToFields('2026-04-16T10:00:00Z'),
       isPublished: true,
     },
     {
@@ -447,7 +487,7 @@ async function main() {
       price: 11900,
       currency: 'EUR',
       capacity: 26,
-      date: new Date('2026-04-20T13:00:00Z'),
+      ...convertDateToFields('2026-04-20T13:00:00Z'),
       isPublished: true,
     },
     {
@@ -458,7 +498,7 @@ async function main() {
       price: 13900,
       currency: 'EUR',
       capacity: 28,
-      date: new Date('2026-04-24T17:00:00Z'),
+      ...convertDateToFields('2026-04-24T17:00:00Z'),
       isPublished: true,
     },
   ];
@@ -473,7 +513,9 @@ async function main() {
           price: course.price,
           currency: course.currency,
           capacity: course.capacity,
-          date: course.date,
+          startDate: course.startDate,
+          startTime: course.startTime,
+          endTime: course.endTime,
           isPublished: course.isPublished,
         },
         create: course,

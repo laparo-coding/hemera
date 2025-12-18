@@ -22,7 +22,9 @@ export async function POST(request: Request) {
         price: course.price,
         currency: course.currency || 'EUR',
         capacity: course.capacity,
-        date: course.date ? new Date(course.date) : null,
+        startDate: course.startDate ? new Date(course.startDate) : null,
+        startTime: course.startTime ? new Date(course.startTime) : null,
+        endTime: course.endTime ? new Date(course.endTime) : null,
         isPublished:
           course.isPublished !== undefined ? course.isPublished : true,
       })),

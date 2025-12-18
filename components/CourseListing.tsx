@@ -13,7 +13,9 @@ export interface Course {
   price: number | null;
   currency: string;
   capacity?: number | null;
-  date: Date | null;
+  startDate?: Date | null;
+  startTime?: Date | null;
+  endTime?: Date | null;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -95,7 +97,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         {/* Course details */}
         <div className='space-y-2 mb-4'>
           {/* Date */}
-          {course.date && (
+          {course.startDate && (
             <div className='flex items-center text-sm text-gray-500'>
               <svg
                 className='w-4 h-4 mr-2'
@@ -110,13 +112,24 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
                 />
               </svg>
-              {new Date(course.date).toLocaleDateString('de-DE', {
+              {new Date(course.startDate).toLocaleDateString('de-DE', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
               })}
+              {course.startTime && course.endTime && (
+                <span className='ml-2'>
+                  {new Date(course.startTime).toLocaleTimeString('de-DE', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                  {' - '}
+                  {new Date(course.endTime).toLocaleTimeString('de-DE', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
+              )}
             </div>
           )}
 

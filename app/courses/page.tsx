@@ -50,35 +50,24 @@ export default async function CoursesPage() {
         <Box
           component='section'
           sx={{
-            bgcolor: 'primary.main',
-            color: 'primary.contrastText',
+            bgcolor: '#FBF5DD',
+            color: '#16404D',
             py: { xs: 10, md: 14 },
             textAlign: 'center',
-            position: 'relative',
-            overflow: 'hidden',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background:
-                'linear-gradient(135deg, rgba(0,86,210,0.9) 0%, rgba(0,65,163,0.9) 100%)',
-              zIndex: 1,
-            },
           }}
         >
-          <Container maxWidth='lg' sx={{ position: 'relative', zIndex: 2 }}>
+          <Container maxWidth='lg'>
             <Typography
               variant='h1'
               component='h1'
               gutterBottom
               sx={{
-                fontSize: { xs: '3rem', md: '4rem' },
+                fontFamily: '"Playfair Display", serif',
+                fontSize: { xs: '2.5rem', md: '3.5rem' },
                 fontWeight: 700,
                 mb: 3,
-                lineHeight: 1.1,
+                lineHeight: 1.2,
+                color: '#16404D',
               }}
             >
               Alle Kurse
@@ -87,11 +76,13 @@ export default async function CoursesPage() {
               variant='h2'
               component='h2'
               sx={{
-                fontSize: { xs: '1.25rem', md: '1.5rem' },
+                fontFamily: '"Inter", sans-serif',
+                fontSize: { xs: '1.125rem', md: '1.375rem' },
                 fontWeight: 400,
-                opacity: 0.95,
+                opacity: 0.9,
                 maxWidth: '600px',
                 mx: 'auto',
+                color: '#16404D',
               }}
             >
               Entdecke unser komplettes Angebot an praxisnahen Kursen
@@ -102,7 +93,7 @@ export default async function CoursesPage() {
         <Box
           component='section'
           data-testid='course-overview'
-          sx={{ py: { xs: 6, md: 8 } }}
+          sx={{ py: { xs: 6, md: 8 }, bgcolor: '#FBF5DD' }}
         >
           <Container maxWidth='lg'>
             {courses.length > 0 ? (
@@ -128,13 +119,14 @@ export default async function CoursesPage() {
                             height: '100%',
                             display: 'flex',
                             flexDirection: 'column',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                            borderRadius: '8px',
+                            bgcolor: '#FFFFFF',
+                            border: '1px solid rgba(22, 64, 77, 0.1)',
+                            borderRadius: '16px',
                             overflow: 'hidden',
-                            transition: 'all 0.3s ease',
+                            transition: 'all 0.2s ease',
                             '&:hover': {
-                              transform: 'translateY(-8px)',
-                              boxShadow: '0 12px 24px rgba(0,0,0,0.15)',
+                              transform: 'translateY(-4px)',
+                              boxShadow: '0 12px 24px rgba(22, 64, 77, 0.1)',
                             },
                           }}
                         >
@@ -151,7 +143,7 @@ export default async function CoursesPage() {
                               sx={{
                                 position: 'relative',
                                 height: 160,
-                                bgcolor: 'primary.light',
+                                bgcolor: '#16404D',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -164,8 +156,8 @@ export default async function CoursesPage() {
                                     position: 'absolute',
                                     top: 8,
                                     right: 8,
-                                    bgcolor: 'error.main',
-                                    color: 'error.contrastText',
+                                    bgcolor: '#DDA853',
+                                    color: '#16404D',
                                     px: 1.5,
                                     py: 0.5,
                                     borderRadius: 1,
@@ -181,7 +173,11 @@ export default async function CoursesPage() {
                               )}
                               <Typography
                                 variant='h4'
-                                sx={{ color: 'primary.contrastText' }}
+                                sx={{
+                                  color: '#FFFFFF',
+                                  fontFamily: '"Playfair Display", serif',
+                                  fontWeight: 700,
+                                }}
                               >
                                 {course.title.charAt(0)}
                               </Typography>
@@ -193,15 +189,25 @@ export default async function CoursesPage() {
                                 component='h3'
                                 gutterBottom
                                 data-testid='course-title'
-                                sx={{ fontWeight: 600, mb: 1 }}
+                                sx={{
+                                  fontFamily: '"Playfair Display", serif',
+                                  fontSize: '1.25rem',
+                                  fontWeight: 700,
+                                  color: '#16404D',
+                                  mb: 1,
+                                }}
                               >
                                 {course.title}
                               </Typography>
 
                               <Typography
                                 variant='body2'
-                                color='text.secondary'
-                                sx={{ mb: 2, fontSize: '0.875rem' }}
+                                sx={{
+                                  mb: 2,
+                                  fontSize: '0.875rem',
+                                  color: '#16404D',
+                                  opacity: 0.7,
+                                }}
                               >
                                 Dozent: Expert:in
                               </Typography>
@@ -219,7 +225,7 @@ export default async function CoursesPage() {
                                 </Typography>
                                 <Typography
                                   variant='body2'
-                                  color='text.secondary'
+                                  sx={{ color: '#16404D', opacity: 0.7 }}
                                 >
                                   (4.8)
                                 </Typography>
@@ -227,10 +233,15 @@ export default async function CoursesPage() {
 
                               <Typography
                                 variant='body2'
-                                color='text.secondary'
                                 paragraph
                                 data-testid='course-description'
-                                sx={{ fontSize: '0.875rem', lineHeight: 1.4 }}
+                                sx={{
+                                  fontFamily: '"Inter", sans-serif',
+                                  fontSize: '0.875rem',
+                                  lineHeight: 1.6,
+                                  color: '#16404D',
+                                  opacity: 0.85,
+                                }}
                               >
                                 {course.description &&
                                 course.description.length > 100
@@ -241,12 +252,12 @@ export default async function CoursesPage() {
 
                               <Typography
                                 variant='body2'
-                                color='primary'
                                 sx={{
                                   mb: 2,
-                                  fontWeight: 'medium',
+                                  fontWeight: 600,
                                   textTransform: 'uppercase',
                                   fontSize: '0.75rem',
+                                  color: '#16404D',
                                 }}
                                 data-testid='course-level'
                               >
@@ -262,14 +273,22 @@ export default async function CoursesPage() {
                               >
                                 <Typography
                                   variant='body2'
-                                  color='text.secondary'
+                                  sx={{
+                                    fontFamily: '"Inter", sans-serif',
+                                    color: '#16404D',
+                                    opacity: 0.7,
+                                  }}
                                 >
                                   8 Stunden
                                 </Typography>
                                 <Typography
                                   variant='h6'
                                   component='span'
-                                  sx={{ fontWeight: 'bold' }}
+                                  sx={{
+                                    fontWeight: 700,
+                                    color: '#DDA853',
+                                    fontFamily: '"Inter", sans-serif',
+                                  }}
                                 >
                                   {course.price && Number(course.price) > 0
                                     ? '€' +

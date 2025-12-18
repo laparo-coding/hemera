@@ -96,19 +96,15 @@ export default function HeroSection({
             <Button
               href={ctaPrimaryHref}
               variant='contained'
+              color='primary'
               size='large'
               sx={{
-                bgcolor: colors.gold,
-                color: colors.petrol,
                 fontWeight: 600,
                 px: 4,
                 py: 1.5,
                 fontSize: '1rem',
                 textTransform: 'none',
                 borderRadius: '8px',
-                '&:hover': {
-                  bgcolor: '#C99545',
-                },
               }}
             >
               {ctaPrimaryText}
@@ -118,10 +114,9 @@ export default function HeroSection({
               <Button
                 href={ctaSecondaryHref}
                 variant='outlined'
+                color='primary'
                 size='large'
                 sx={{
-                  borderColor: colors.sage,
-                  color: colors.petrol,
                   fontWeight: 600,
                   px: 4,
                   py: 1.5,
@@ -131,8 +126,6 @@ export default function HeroSection({
                   borderWidth: 2,
                   '&:hover': {
                     borderWidth: 2,
-                    borderColor: colors.petrol,
-                    bgcolor: 'transparent',
                   },
                 }}
               >

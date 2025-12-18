@@ -132,8 +132,8 @@ export default async function AdminPage() {
               <Typography variant='body2' color='text.secondary' paragraph>
                 Create, edit, and manage course content.
               </Typography>
-              <Button variant='outlined' disabled fullWidth>
-                Manage Courses (Coming Soon)
+              <Button variant='contained' fullWidth href='/admin/courses'>
+                Manage Courses
               </Button>
             </CardContent>
           </Card>

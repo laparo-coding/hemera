@@ -11,7 +11,9 @@ export interface CourseWithBookings {
   price: number;
   currency: string;
   capacity: number | null;
-  date: Date | null;
+  startDate?: Date | null;
+  startTime?: Date | null;
+  endTime?: Date | null;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -29,7 +31,9 @@ export async function getCourses(): Promise<CourseWithBookings[]> {
       price: 9999, // €99.99 in cents
       currency: 'EUR',
       capacity: 20,
-      date: new Date('2025-12-01'),
+      startDate: new Date('2025-12-01'),
+      startTime: new Date('2025-12-01T10:00:00Z'),
+      endTime: new Date('2025-12-01T14:00:00Z'),
       isPublished: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -43,7 +47,9 @@ export async function getCourses(): Promise<CourseWithBookings[]> {
       price: 14999, // €149.99 in cents
       currency: 'EUR',
       capacity: 15,
-      date: new Date('2025-12-15'),
+      startDate: new Date('2025-12-15'),
+      startTime: new Date('2025-12-15T14:00:00Z'),
+      endTime: new Date('2025-12-15T18:00:00Z'),
       isPublished: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -57,7 +63,9 @@ export async function getCourses(): Promise<CourseWithBookings[]> {
       price: 19999, // €199.99 in cents
       currency: 'EUR',
       capacity: 25,
-      date: new Date('2026-01-10'),
+      startDate: new Date('2026-01-10'),
+      startTime: new Date('2026-01-10T09:00:00Z'),
+      endTime: new Date('2026-01-10T17:00:00Z'),
       isPublished: true,
       createdAt: new Date(),
       updatedAt: new Date(),

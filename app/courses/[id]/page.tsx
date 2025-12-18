@@ -56,10 +56,12 @@ export default async function CourseDetailPage({ params }: PageProps) {
   // Strukturierte Daten (JSON-LD)
   const courseSlug = course.slug || course.id;
   const url = `${SITE_CONFIG.url}/courses/${courseSlug}`;
-  const startDateISO = course.date
-    ? new Date(course.date).toISOString()
+  const startDateISO = course.startDate
+    ? new Date(course.startDate).toISOString()
     : undefined;
-  const endDateISO = undefined; // No endTime in Course type
+  const endDateISO = course.endTime
+    ? new Date(course.endTime).toISOString()
+    : undefined;
   const inStock =
     (course.availableSpots ?? null) === null
       ? true

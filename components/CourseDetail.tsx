@@ -38,7 +38,9 @@ interface Course {
   price: number | null;
   currency: string;
   capacity?: number | null;
-  date?: Date | null;
+  startDate?: Date | null;
+  startTime?: Date | null;
+  endTime?: Date | null;
   isPublished: boolean;
   image?: string | null;
   createdAt: Date;
@@ -97,11 +99,13 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   const [isBooking, setIsBooking] = useState(false);
 
   const isCourseInPast = useMemo(() => {
-    if (!course.date) return false;
+    if (!course.startDate) return false;
     const dateValue =
-      course.date instanceof Date ? course.date : new Date(course.date);
+      course.startDate instanceof Date
+        ? course.startDate
+        : new Date(course.startDate);
     return Number.isFinite(dateValue.getTime()) && dateValue < new Date();
-  }, [course.date]);
+  }, [course.startDate]);
 
   const formatCurrency = (amount: number | null, currency: string) => {
     if (amount === null || amount === undefined) {
@@ -174,12 +178,32 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   ]);
 
   const formattedDate = useMemo(() => {
-    if (!course.date) return null;
+    if (!course.startDate) return null;
     const dateValue =
-      course.date instanceof Date ? course.date : new Date(course.date);
+      course.startDate instanceof Date
+        ? course.startDate
+        : new Date(course.startDate);
     if (!Number.isFinite(dateValue.getTime())) return null;
     return format(dateValue, 'PPP', { locale: de });
-  }, [course.date]);
+  }, [course.startDate]);
+
+  const formattedTime = useMemo(() => {
+    if (!course.startTime || !course.endTime) return null;
+    const startTime =
+      course.startTime instanceof Date
+        ? course.startTime
+        : new Date(course.startTime);
+    const endTime =
+      course.endTime instanceof Date
+        ? course.endTime
+        : new Date(course.endTime);
+    if (
+      !Number.isFinite(startTime.getTime()) ||
+      !Number.isFinite(endTime.getTime())
+    )
+      return null;
+    return `${format(startTime, 'HH:mm')} - ${format(endTime, 'HH:mm')}`;
+  }, [course.startTime, course.endTime]);
 
   const createdAtLabel = useMemo(() => {
     const createdAtValue =
@@ -257,7 +281,10 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     {formattedDate && (
                       <Stack direction='row' spacing={1} alignItems='center'>
                         <CalendarMonthRoundedIcon fontSize='small' />
-                        <Typography variant='body2'>{formattedDate}</Typography>
+                        <Typography variant='body2'>
+                          {formattedDate}
+                          {formattedTime && ` · ${formattedTime}`}
+                        </Typography>
                       </Stack>
                     )}
                     {course.capacity ? (

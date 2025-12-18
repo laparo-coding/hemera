@@ -20,7 +20,9 @@ export interface Course {
   price: number | null;
   currency: string;
   capacity?: number | null;
-  date: Date | null;
+  startDate?: Date | null;
+  startTime?: Date | null;
+  endTime?: Date | null;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -48,7 +50,7 @@ export async function getPublishedCourses(): Promise<Course[]> {
     // due to SQLite storing booleans as integers (0/1). We fetch all and filter in JS.
     const allCourses = await prisma.course.findMany({
       orderBy: {
-        createdAt: 'desc',
+        startDate: 'asc',
       },
     });
 
@@ -126,7 +128,7 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
         isPublished: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        startDate: 'asc',
       },
       take: limit,
       select: {
@@ -135,7 +137,9 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
         description: true,
         slug: true,
         price: true,
-        date: true,
+        startDate: true,
+        startTime: true,
+        endTime: true,
         isPublished: true,
         createdAt: true,
         updatedAt: true,
@@ -288,7 +292,7 @@ export async function getAllCourses(): Promise<Course[]> {
   try {
     const courses = await prisma.course.findMany({
       orderBy: {
-        createdAt: 'desc',
+        startDate: 'asc',
       },
     });
 
@@ -309,12 +313,12 @@ export async function getNextUpcomingCourse(): Promise<Course | null> {
     const course = await prisma.course.findFirst({
       where: {
         isPublished: true,
-        date: {
+        startDate: {
           gte: now,
         },
       },
       orderBy: {
-        date: 'asc',
+        startDate: 'asc',
       },
     });
 

@@ -8,6 +8,7 @@ export type Env = {
   NEXT_PUBLIC_CLERK_SIGN_UP_URL?: string;
   NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL?: string;
   NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL?: string;
+  BLOB_READ_WRITE_TOKEN?: string;
 };
 
 function getEnv(): Env {
@@ -26,6 +27,7 @@ function getEnv(): Env {
       process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL || '/dashboard',
     NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL:
       process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || '/dashboard',
+    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
   };
 }
 

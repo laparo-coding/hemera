@@ -1,0 +1,174 @@
+/**
+ * Course List Component
+ *
+ * Displays all courses in a table sorted by start time
+ * with enrollment counts and admin actions.
+ */
+
+'use client';
+
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import {
+  Box,
+  Chip,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
+import { format } from 'date-fns';
+import Link from 'next/link';
+import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
+import PublishToggle from './PublishToggle';
+
+interface CourseListProps {
+  courses: CourseWithEnrollmentCount[];
+  onDeleteClick?: (course: CourseWithEnrollmentCount) => void;
+  onPublishToggle?: (courseId: string, publish: boolean) => Promise<void>;
+}
+
+export default function CourseList({
+  courses,
+  onDeleteClick,
+  onPublishToggle,
+}: CourseListProps) {
+  if (courses.length === 0) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <Typography variant='h6' color='text.secondary'>
+          Keine Kurse gefunden
+        </Typography>
+        <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+          Erstelle deinen ersten Kurs, um loszulegen
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Titel</TableCell>
+            <TableCell>Dozent/in</TableCell>
+            <TableCell>Niveau</TableCell>
+            <TableCell>Startzeit</TableCell>
+            <TableCell align='right'>Preis</TableCell>
+            <TableCell align='center'>Teilnehmer</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Veröffentlichen</TableCell>
+            <TableCell align='right'>Aktionen</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {courses.map(course => (
+            <TableRow key={course.id} hover>
+              <TableCell>
+                <Typography variant='body2' fontWeight='medium'>
+                  {course.title}
+                </Typography>
+              </TableCell>
+              <TableCell>{course.instructor}</TableCell>
+              <TableCell>
+                <Chip
+                  label={
+                    course.level === 'BEGINNER'
+                      ? 'Anfänger'
+                      : course.level === 'INTERMEDIATE'
+                        ? 'Fortgeschritten'
+                        : 'Experte'
+                  }
+                  size='small'
+                  color={
+                    course.level === 'BEGINNER'
+                      ? 'success'
+                      : course.level === 'INTERMEDIATE'
+                        ? 'warning'
+                        : 'error'
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <Typography variant='body2'>
+                  {course.startDate
+                    ? format(new Date(course.startDate), 'MMM d, yyyy')
+                    : 'TBD'}
+                </Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  {course.startTime && course.endTime
+                    ? `${format(new Date(course.startTime), 'HH:mm')} - ${format(new Date(course.endTime), 'HH:mm')}`
+                    : 'TBD'}
+                </Typography>
+              </TableCell>
+              <TableCell align='right'>€{course.price.toString()}</TableCell>
+              <TableCell align='center'>
+                <Chip
+                  label={`${course._count.bookings} / ${course.capacity}`}
+                  size='small'
+                  variant='outlined'
+                />
+              </TableCell>
+              <TableCell>
+                <Chip
+                  label={course.isPublished ? 'Veröffentlicht' : 'Entwurf'}
+                  size='small'
+                  color={course.isPublished ? 'success' : 'default'}
+                  variant='outlined'
+                />
+              </TableCell>
+              <TableCell>
+                {onPublishToggle && (
+                  <PublishToggle
+                    courseId={course.id}
+                    isPublished={course.isPublished}
+                    onToggle={onPublishToggle}
+                  />
+                )}
+              </TableCell>
+              <TableCell align='right'>
+                <Box
+                  sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}
+                >
+                  <IconButton
+                    size='small'
+                    component={Link}
+                    href={`/courses/${course.id}`}
+                    title='Ansehen'
+                    color='primary'
+                  >
+                    <VisibilityIcon fontSize='small' />
+                  </IconButton>
+                  <IconButton
+                    size='small'
+                    component={Link}
+                    href={`/admin/courses/${course.id}/edit`}
+                    title='Bearbeiten'
+                    color='primary'
+                  >
+                    <EditIcon fontSize='small' />
+                  </IconButton>
+                  <IconButton
+                    size='small'
+                    onClick={() => onDeleteClick?.(course)}
+                    title='Löschen'
+                    color='primary'
+                  >
+                    <DeleteIcon fontSize='small' />
+                  </IconButton>
+                </Box>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}

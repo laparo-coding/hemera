@@ -534,10 +534,10 @@ const UserDashboardClerk: React.FC = () => {
             <Button
               component={Link}
               href='/courses'
+              variant='contained'
+              color='primary'
               endIcon={<ArrowForwardOutlined />}
               sx={{
-                bgcolor: colors.gold,
-                color: colors.petrol,
                 fontFamily: '"Inter", sans-serif',
                 fontWeight: 600,
                 fontSize: '1rem',
@@ -545,9 +545,6 @@ const UserDashboardClerk: React.FC = () => {
                 borderRadius: '8px',
                 px: 4,
                 py: 1.5,
-                '&:hover': {
-                  bgcolor: '#C99545',
-                },
               }}
             >
               Kurse entdecken

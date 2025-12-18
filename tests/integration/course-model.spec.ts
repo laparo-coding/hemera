@@ -152,19 +152,18 @@ describe('Course Model Validations', () => {
   });
 
   describe('Capacity Constraints', () => {
-    it('should accept null capacity (unlimited)', async () => {
+    it('should use default capacity when not provided', async () => {
       const courseData = {
-        title: 'Unlimited Course',
-        slug: 'unlimited-course',
+        title: 'Default Capacity Course',
+        slug: 'default-capacity-course',
         price: 5000,
-        capacity: null,
       };
 
       const course = await prisma.course.create({
         data: courseData,
       });
 
-      expect(course.capacity).toBeNull();
+      expect(course.capacity).toBe(20); // Default value from migration
     });
 
     it('should accept positive capacity values', async () => {
@@ -221,14 +220,18 @@ describe('Course Model Validations', () => {
         title: 'Scheduled Course',
         slug: 'scheduled-course',
         price: 9900,
-        date: courseDate,
+        startDate: courseDate,
+        startTime: courseDate,
+        endTime: new Date(courseDate.getTime() + 4 * 60 * 60 * 1000), // 4 hours later
       };
 
       const course = await prisma.course.create({
         data: courseData,
       });
 
-      expect(course.date).toEqual(courseDate);
+      expect(course.startDate).toEqual(courseData.startDate);
+      expect(course.startTime).toEqual(courseData.startTime);
+      expect(course.endTime).toEqual(courseData.endTime);
     });
 
     it('should handle custom currency', async () => {

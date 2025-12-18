@@ -25,7 +25,7 @@ const CourseSearchSchema = z.object({
   minPrice: z.coerce.number().optional(),
   maxPrice: z.coerce.number().optional(),
   availableOnly: z.coerce.boolean().optional(),
-  sortBy: z.enum(['title', 'price', 'date']).optional(),
+  sortBy: z.enum(['title', 'price', 'startDate']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
   page: z.coerce.number().min(1).optional(),
   limit: z.coerce.number().min(1).max(100).optional(),
@@ -116,9 +116,9 @@ export async function GET(request: NextRequest) {
             aValue = a.price || 0;
             bValue = b.price || 0;
             break;
-          case 'date':
-            aValue = a.date || new Date(0);
-            bValue = b.date || new Date(0);
+          case 'startDate':
+            aValue = a.startDate || new Date(0);
+            bValue = b.startDate || new Date(0);
             break;
           default:
             aValue = a.title;
@@ -150,7 +150,9 @@ export async function GET(request: NextRequest) {
         price: course.price,
         currency: course.currency,
         capacity: course.capacity,
-        date: course.date,
+        startDate: course.startDate,
+        startTime: course.startTime,
+        endTime: course.endTime,
         isPublished: course.isPublished,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,

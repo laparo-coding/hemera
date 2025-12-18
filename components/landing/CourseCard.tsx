@@ -172,18 +172,14 @@ export default function CourseCard({
           component={Link}
           href={detailHref}
           variant='contained'
+          color='primary'
           fullWidth
           sx={{
-            bgcolor: colors.gold,
-            color: colors.petrol,
             fontWeight: 600,
             py: 1.5,
             fontSize: '1rem',
             textTransform: 'none',
             borderRadius: '8px',
-            '&:hover': {
-              bgcolor: '#C99545',
-            },
           }}
         >
           {ctaText}

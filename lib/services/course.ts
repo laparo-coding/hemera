@@ -11,7 +11,9 @@ export interface Course {
   price: number;
   currency: string;
   capacity: number | null;
-  date: Date | null;
+  startDate?: Date | null;
+  startTime?: Date | null;
+  endTime?: Date | null;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
