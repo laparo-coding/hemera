@@ -10,7 +10,7 @@
 import { useUser } from '@clerk/nextjs';
 import { Alert, Box, CircularProgress, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { z } from 'zod';
 import CourseForm from '../../../../../components/admin/CourseForm';
 import { updateCourseAction } from '../../../../../lib/actions/admin/courses';
@@ -45,36 +45,39 @@ export default function EditCoursePage({ params }: EditCoursePageProps) {
     }
   }, [isLoaded, isSignedIn, user, router]);
 
+  const fetchCourse = useCallback(
+    async (id: string) => {
+      try {
+        const response = await fetch(`/api/admin/courses/${id}`);
+
+        // Handle authentication errors
+        if (response.status === 401 || response.status === 403) {
+          router.push(
+            `/sign-in?redirect=${encodeURIComponent(`/admin/courses/${id}/edit`)}`
+          );
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Course not found');
+        }
+        const data = await response.json();
+        setCourse(data.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load course');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [router]
+  );
+
   useEffect(() => {
     params.then(resolvedParams => {
       setCourseId(resolvedParams.id);
       fetchCourse(resolvedParams.id);
     });
   }, [params, fetchCourse]);
-
-  const fetchCourse = async (id: string) => {
-    try {
-      const response = await fetch(`/api/admin/courses/${id}`);
-
-      // Handle authentication errors
-      if (response.status === 401 || response.status === 403) {
-        router.push(
-          `/sign-in?redirect=${encodeURIComponent(`/admin/courses/${id}/edit`)}`
-        );
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error('Course not found');
-      }
-      const data = await response.json();
-      setCourse(data.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load course');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (data: FormData) => {
     if (!courseId || !course) return;
