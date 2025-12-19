@@ -1,9 +1,9 @@
 /**
  * Contract Tests for Admin Course Management API
- * 
+ *
  * These tests validate the API contracts defined in:
  * specs/014-create-an-admin/contracts/api-contract.md
- * 
+ *
  * Tests cover:
  * - Authentication & Authorization (admin role required)
  * - Request/Response schema validation
@@ -11,16 +11,24 @@
  * - Edge cases (duplicate titles, concurrent edits, enrollment protection)
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from '@jest/globals';
 import { prisma } from '../../../lib/db/prisma';
 
 describe('Admin Course API - Contract Tests', () => {
   const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const API_BASE = `${BASE_URL}/api/admin/courses`;
-  
+
   // Test data
-  let testCourseId: string;
-  const testEmail = 'admin-contract-test@example.com';
+  let _testCourseId: string;
+  const _testEmail = 'admin-contract-test@example.com';
 
   /**
    * Helper to make authenticated admin requests
@@ -51,7 +59,7 @@ describe('Admin Course API - Contract Tests', () => {
         },
       },
     });
-    
+
     await prisma.course.deleteMany({
       where: {
         title: {
@@ -72,7 +80,7 @@ describe('Admin Course API - Contract Tests', () => {
         },
       },
     });
-    
+
     await prisma.course.deleteMany({
       where: {
         title: {
@@ -80,7 +88,7 @@ describe('Admin Course API - Contract Tests', () => {
         },
       },
     });
-    
+
     await prisma.$disconnect();
   });
 
@@ -141,9 +149,9 @@ describe('Admin Course API - Contract Tests', () => {
 
       const data = await response.json();
       expect(Array.isArray(data)).toBe(true);
-      
+
       // Find our test courses
-      const testCourses = data.filter((c: any) => 
+      const testCourses = data.filter((c: any) =>
         c.title.includes('[CONTRACT-TEST]')
       );
       expect(testCourses.length).toBeGreaterThanOrEqual(2);
@@ -161,8 +169,8 @@ describe('Admin Course API - Contract Tests', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const testCourse = data.find((c: any) => 
-        c.title === '[CONTRACT-TEST] Course A'
+      const testCourse = data.find(
+        (c: any) => c.title === '[CONTRACT-TEST] Course A'
       );
 
       expect(testCourse).toBeDefined();
@@ -175,19 +183,19 @@ describe('Admin Course API - Contract Tests', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const testCourses = data.filter((c: any) => 
+      const testCourses = data.filter((c: any) =>
         c.title.includes('[CONTRACT-TEST]')
       );
 
       // Should only include published test course
-      const publishedCourse = testCourses.find((c: any) => 
-        c.title === '[CONTRACT-TEST] Course A'
+      const publishedCourse = testCourses.find(
+        (c: any) => c.title === '[CONTRACT-TEST] Course A'
       );
       expect(publishedCourse).toBeDefined();
 
       // Should not include unpublished test course
-      const unpublishedCourse = testCourses.find((c: any) => 
-        c.title === '[CONTRACT-TEST] Course B'
+      const unpublishedCourse = testCourses.find(
+        (c: any) => c.title === '[CONTRACT-TEST] Course B'
       );
       expect(unpublishedCourse).toBeUndefined();
     });
@@ -272,7 +280,7 @@ describe('Admin Course API - Contract Tests', () => {
       expect(result.slug).toBeDefined();
 
       // Cleanup
-      testCourseId = result.id;
+      _testCourseId = result.id;
     });
 
     it('should return 400 with VALIDATION_FAILED for invalid data', async () => {
@@ -436,10 +444,10 @@ describe('Admin Course API - Contract Tests', () => {
 
       expect(response.status).toBe(200);
       const result = await response.json();
-      
+
       // Price should be updated
       expect(Number(result.data.price)).toBe(partialUpdate.price);
-      
+
       // Title should remain unchanged
       expect(result.data.title).toBe(originalCourse?.title);
     });
@@ -591,14 +599,14 @@ describe('Admin Course API - Contract Tests', () => {
       expect(response.status).toBe(404);
 
       const result = await response.json();
-      
+
       // Validate error response structure
       expect(result.error).toBeDefined();
       expect(result.error.code).toBeDefined();
       expect(typeof result.error.code).toBe('string');
       expect(result.error.message).toBeDefined();
       expect(typeof result.error.message).toBe('string');
-      
+
       // Optional fields
       if (result.error.details) {
         expect(typeof result.error.details).toBe('object');

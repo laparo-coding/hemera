@@ -1,6 +1,6 @@
 /**
  * E2E Test: Admin Course Creation
- * 
+ *
  * Tests the complete course creation flow including:
  * - Admin authentication
  * - Navigation to create page
@@ -10,9 +10,9 @@
  * - Success verification
  */
 
-import { test, expect } from '@playwright/test';
-import { AuthHelper } from './auth-helper';
+import { expect, test } from '@playwright/test';
 import { prisma } from '../../lib/db/prisma';
+import { AuthHelper } from './auth-helper';
 
 test.describe('Admin Course Creation E2E', () => {
   let authHelper: AuthHelper;
@@ -20,9 +20,12 @@ test.describe('Admin Course Creation E2E', () => {
   test.beforeEach(async ({ page }) => {
     authHelper = new AuthHelper(page);
     await authHelper.prepareCleanAuthState();
-    
+
     // Login as admin
-    await authHelper.signIn('e2e.admin@example.com', 'E2ETestPassword2024!SecureForTesting');
+    await authHelper.signIn(
+      'e2e.admin@example.com',
+      'E2ETestPassword2024!SecureForTesting'
+    );
   });
 
   test.afterEach(async () => {
@@ -47,7 +50,11 @@ test.describe('Admin Course Creation E2E', () => {
 
     // Fill in course details
     await page.getByLabel(/course title/i).fill('[E2E-TEST] New Test Course');
-    await page.getByLabel(/description/i).fill('This is a test course created by E2E tests with detailed description.');
+    await page
+      .getByLabel(/description/i)
+      .fill(
+        'This is a test course created by E2E tests with detailed description.'
+      );
     await page.getByLabel(/price/i).fill('99.99');
     await page.getByLabel(/capacity/i).fill('25');
 
@@ -84,8 +91,12 @@ test.describe('Admin Course Creation E2E', () => {
     await page.getByRole('button', { name: /create course/i }).click();
 
     // Should show validation errors
-    await expect(page.getByText(/title must be at least 3 characters/i)).toBeVisible();
-    await expect(page.getByText(/description must be at least 10 characters/i)).toBeVisible();
+    await expect(
+      page.getByText(/title must be at least 3 characters/i)
+    ).toBeVisible();
+    await expect(
+      page.getByText(/description must be at least 10 characters/i)
+    ).toBeVisible();
   });
 
   test('should validate future date for start time', async ({ page }) => {
@@ -93,7 +104,9 @@ test.describe('Admin Course Creation E2E', () => {
 
     // Fill form with past date
     await page.getByLabel(/course title/i).fill('[E2E-TEST] Past Date Course');
-    await page.getByLabel(/description/i).fill('Test course with past date validation.');
+    await page
+      .getByLabel(/description/i)
+      .fill('Test course with past date validation.');
     await page.getByLabel(/price/i).fill('99.99');
 
     // Set start time to yesterday
@@ -108,13 +121,15 @@ test.describe('Admin Course Creation E2E', () => {
     await page.getByRole('button', { name: /create course/i }).click();
 
     // Should show validation error
-    await expect(page.getByText(/start time must be a future date/i)).toBeVisible();
+    await expect(
+      page.getByText(/start time must be a future date/i)
+    ).toBeVisible();
   });
 
   test.skip('should upload thumbnail image', async ({ page }) => {
     // Note: File upload requires Vercel Blob setup in test environment
     // Skipped until test blob storage is configured
-    
+
     await page.goto('/admin/courses/new');
 
     // Upload thumbnail

@@ -1,8 +1,6 @@
 'use client';
 
 import {
-  ClerkLoaded,
-  ClerkLoading,
   SignedIn as ClerkSignedIn,
   SignedOut as ClerkSignedOut,
   UserButton as ClerkUserButton,

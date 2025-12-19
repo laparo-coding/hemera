@@ -58,7 +58,7 @@ export async function uploadThumbnail(file: File): Promise<UploadResult> {
       url: blob.url,
     };
   } catch (error) {
-    const errorMessage =
+    const _errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
 
     rollbar.error('Failed to upload thumbnail', error as Error, {

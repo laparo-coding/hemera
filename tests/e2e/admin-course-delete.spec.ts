@@ -1,6 +1,6 @@
 /**
  * E2E Test: Admin Course Delete with Protection
- * 
+ *
  * Tests delete protection and enrollment transfer:
  * - Delete course without enrollments (success)
  * - Block delete with enrollments (protection)
@@ -20,7 +20,10 @@ test.describe('Admin Course Delete Protection E2E', () => {
     authHelper = new AuthHelper(page);
     await authHelper.prepareCleanAuthState();
     // Login as admin
-    await authHelper.signIn('e2e.admin@example.com', 'E2ETestPassword2024!SecureForTesting');
+    await authHelper.signIn(
+      'e2e.admin@example.com',
+      'E2ETestPassword2024!SecureForTesting'
+    );
   });
 
   test.afterEach(async () => {
@@ -52,7 +55,9 @@ test.describe('Admin Course Delete Protection E2E', () => {
     });
   });
 
-  test('should successfully delete course without enrollments', async ({ page }) => {
+  test('should successfully delete course without enrollments', async ({
+    page,
+  }) => {
     // Create course without enrollments
     const course = await prisma.course.create({
       data: {
@@ -81,7 +86,9 @@ test.describe('Admin Course Delete Protection E2E', () => {
     await expect(page).toHaveURL('/admin/courses', { timeout: 10000 });
 
     // Course should no longer appear
-    await expect(page.getByText('[E2E-DELETE-TEST] Empty Course')).not.toBeVisible();
+    await expect(
+      page.getByText('[E2E-DELETE-TEST] Empty Course')
+    ).not.toBeVisible();
   });
 
   test('should block delete when course has enrollments', async ({ page }) => {
@@ -127,7 +134,9 @@ test.describe('Admin Course Delete Protection E2E', () => {
     await expect(deleteButton).toBeDisabled();
 
     // Should show transfer option
-    await expect(page.getByRole('button', { name: /transfer students/i })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /transfer students/i })
+    ).toBeVisible();
   });
 
   test('should display enrolled students list', async ({ page }) => {
@@ -160,7 +169,7 @@ test.describe('Admin Course Delete Protection E2E', () => {
 
     // Create bookings
     await Promise.all(
-      users.map((user) =>
+      users.map(user =>
         prisma.booking.create({
           data: {
             courseId: course.id,
@@ -184,7 +193,9 @@ test.describe('Admin Course Delete Protection E2E', () => {
     await expect(page.getByText('Student Two')).toBeVisible();
   });
 
-  test.skip('should allow delete after transferring enrollments', async ({ page }) => {
+  test.skip('should allow delete after transferring enrollments', async ({
+    page,
+  }) => {
     // Note: This requires implementing the transfer flow UI
     // which involves selecting a target course
     // Skipped until transfer UI is implemented
@@ -200,7 +211,7 @@ test.describe('Admin Course Delete Protection E2E', () => {
       },
     });
 
-    const targetCourse = await prisma.course.create({
+    const _targetCourse = await prisma.course.create({
       data: {
         title: '[E2E-DELETE-TEST] Target Course',
         description: 'Course to transfer to',
@@ -243,7 +254,9 @@ test.describe('Admin Course Delete Protection E2E', () => {
     await page.getByRole('button', { name: /delete course/i }).click();
 
     await expect(page).toHaveURL('/admin/courses');
-    await expect(page.getByText('[E2E-DELETE-TEST] Source Course')).not.toBeVisible();
+    await expect(
+      page.getByText('[E2E-DELETE-TEST] Source Course')
+    ).not.toBeVisible();
   });
 
   test('should cancel delete operation', async ({ page }) => {
@@ -266,6 +279,8 @@ test.describe('Admin Course Delete Protection E2E', () => {
     await page.getByRole('button', { name: /cancel/i }).click();
 
     // Should return to courses list without deleting
-    await expect(page.getByText('[E2E-DELETE-TEST] Cancel Delete')).toBeVisible();
+    await expect(
+      page.getByText('[E2E-DELETE-TEST] Cancel Delete')
+    ).toBeVisible();
   });
 });

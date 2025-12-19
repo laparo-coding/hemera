@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (_error) {
     return createErrorResponse(
       'Failed to create course',
       ErrorCodes.INTERNAL_ERROR,

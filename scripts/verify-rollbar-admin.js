@@ -2,10 +2,10 @@
 
 /**
  * Rollbar Verification Script
- * 
+ *
  * Validates that Rollbar logging is working correctly
  * for the Course Admin Interface feature.
- * 
+ *
  * Run: node scripts/verify-rollbar-admin.js
  */
 
@@ -13,7 +13,7 @@ import { config } from 'dotenv';
 
 config({ path: '.env.local' });
 
-let serverInstance;
+let _serverInstance;
 
 console.log('🔍 Verifying Rollbar Integration for Course Admin Interface...\n');
 
@@ -28,21 +28,25 @@ console.log('✅ Rollbar access token configured');
 // Test logging at different levels
 async function testRollbarLogging() {
   console.log('\n📝 Rollbar Integration Check...');
-  console.log('   ⚠️  Direct Rollbar testing requires compiled TypeScript modules\n');
-  
+  console.log(
+    '   ⚠️  Direct Rollbar testing requires compiled TypeScript modules\n'
+  );
+
   console.log('✅ Manual Verification Steps:\n');
   console.log('1. Start your development server: npm run dev');
   console.log('2. Perform admin operations:');
   console.log('   - Create a course → Check for INFO event');
   console.log('   - Edit a course → Check for INFO event');
-  console.log('   - Try to delete course with enrollments → Check for WARNING event');
+  console.log(
+    '   - Try to delete course with enrollments → Check for WARNING event'
+  );
   console.log('   - Submit invalid form data → Check for ERROR event\n');
-  
+
   console.log('3. Visit Rollbar Dashboard:');
   console.log('   https://rollbar.com/');
   console.log('   - Filter by "last 15 minutes"');
   console.log('   - Look for events with custom.feature = "course-admin"\n');
-  
+
   console.log('📋 Expected Event Structure:');
   console.log('```json');
   console.log('{');
@@ -57,10 +61,10 @@ async function testRollbarLogging() {
   console.log('  }');
   console.log('}');
   console.log('```\n');
-  
+
   console.log('✅ Rollbar configuration verified');
   console.log('   Run manual operations to generate test events\n');
-  
+
   process.exit(0);
 }
 

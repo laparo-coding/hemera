@@ -25,7 +25,7 @@ export default function CourseListWithDelete({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] =
     useState<CourseWithEnrollmentCount | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   const handleDeleteClick = (course: CourseWithEnrollmentCount) => {
     setSelectedCourse(course);

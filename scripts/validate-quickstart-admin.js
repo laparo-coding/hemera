@@ -2,17 +2,17 @@
 
 /**
  * Quickstart Validation Script
- * 
+ *
  * Automated validation of quickstart checklist items
  * for the Course Admin Interface feature.
- * 
+ *
  * Run: node scripts/validate-quickstart-admin.js
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { config } from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 config({ path: '.env.local' });
 
@@ -49,7 +49,9 @@ async function checkEnvironmentVariables() {
         console.log(`   ✅ ${envVar} configured`);
         results.passed.push(`Environment: ${envVar}`);
       } else {
-        console.log(`   ⚠️  ${envVar} defined but empty (set before deployment)`);
+        console.log(
+          `   ⚠️  ${envVar} defined but empty (set before deployment)`
+        );
         results.warnings.push(`Environment: ${envVar} empty`);
       }
     } else {
@@ -71,12 +73,12 @@ async function checkDatabaseSchema() {
   const schemaPath = path.join(process.cwd(), 'prisma', 'schema.prisma');
   if (fs.existsSync(schemaPath)) {
     const schemaContent = fs.readFileSync(schemaPath, 'utf-8');
-    
+
     // Check for Course model
     if (schemaContent.includes('model Course')) {
       console.log('   ✅ Course model exists in schema');
       results.passed.push('Schema: Course model');
-      
+
       // Check required fields
       const requiredFields = [
         'id',
@@ -90,7 +92,7 @@ async function checkDatabaseSchema() {
         'level',
         'capacity',
       ];
-      
+
       for (const field of requiredFields) {
         if (schemaContent.includes(field)) {
           console.log(`   ✅ Course.${field} in schema`);
@@ -197,7 +199,9 @@ async function checkDatabaseOperations() {
   console.log('📋 Checking Database Operations...\n');
   console.log('   ⚠️  Database operations check skipped (requires running app)');
   console.log('   Run manual tests using the quickstart guide\n');
-  results.warnings.push('Database: CRUD operations not tested (run manual quickstart)');
+  results.warnings.push(
+    'Database: CRUD operations not tested (run manual quickstart)'
+  );
 }
 
 /**
@@ -213,20 +217,22 @@ function printSummary() {
 
   if (results.failed.length > 0) {
     console.log('Failed Checks:');
-    results.failed.forEach((item) => console.log(`   - ${item}`));
+    results.failed.forEach(item => console.log(`   - ${item}`));
     console.log('\n');
   }
 
   if (results.warnings.length > 0) {
     console.log('Warnings:');
-    results.warnings.forEach((item) => console.log(`   - ${item}`));
+    results.warnings.forEach(item => console.log(`   - ${item}`));
     console.log('\n');
   }
 
   if (results.failed.length === 0) {
     console.log('✅ All validation checks passed!\n');
     console.log('You can now proceed with manual quickstart testing.');
-    console.log('Follow the steps in specs/014-create-an-admin/quickstart.md\n');
+    console.log(
+      'Follow the steps in specs/014-create-an-admin/quickstart.md\n'
+    );
     return 0;
   } else {
     console.log('❌ Some validation checks failed.\n');
@@ -250,7 +256,7 @@ async function main() {
   process.exit(exitCode);
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error('Fatal error:', error);
   process.exit(1);
 });

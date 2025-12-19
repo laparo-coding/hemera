@@ -2,19 +2,19 @@
 
 /**
  * Performance Verification Script
- * 
+ *
  * Measures performance of Course Admin Interface endpoints:
  * - LIST /api/admin/courses (target: <100ms)
  * - GET /api/admin/courses/[id] (target: <50ms)
  * - Admin page load (target: <2s)
- * 
+ *
  * Run: node scripts/verify-performance-admin.js
  */
 
-import https from 'https';
-import http from 'http';
+import http from 'node:http';
+import https from 'node:https';
+import { performance } from 'node:perf_hooks';
 import { config } from 'dotenv';
-import { performance } from 'perf_hooks';
 
 config({ path: '.env.local' });
 
@@ -32,10 +32,10 @@ function measureRequest(url) {
     const startTime = performance.now();
     const protocol = url.startsWith('https') ? https : http;
 
-    const req = protocol.get(url, (res) => {
+    const req = protocol.get(url, res => {
       let data = '';
 
-      res.on('data', (chunk) => {
+      res.on('data', chunk => {
         data += chunk;
       });
 
@@ -51,7 +51,7 @@ function measureRequest(url) {
       });
     });
 
-    req.on('error', (error) => {
+    req.on('error', error => {
       reject(error);
     });
 
@@ -76,7 +76,9 @@ async function benchmarkEndpoint(name, url, targetMs) {
     try {
       const result = await measureRequest(url);
       results.push(result.duration);
-      process.stdout.write(`   Iteration ${i + 1}/${API_ITERATIONS}: ${result.duration.toFixed(2)}ms\r`);
+      process.stdout.write(
+        `   Iteration ${i + 1}/${API_ITERATIONS}: ${result.duration.toFixed(2)}ms\r`
+      );
     } catch (error) {
       console.error(`\n   ❌ Error in iteration ${i + 1}:`, error.message);
     }
@@ -102,7 +104,9 @@ async function benchmarkEndpoint(name, url, targetMs) {
   console.log(`   - Max:     ${max.toFixed(2)}ms`);
 
   const passed = avg < targetMs;
-  console.log(`\n   ${passed ? '✅' : '❌'} ${passed ? 'PASSED' : 'FAILED'} (avg ${avg.toFixed(2)}ms vs target ${targetMs}ms)\n`);
+  console.log(
+    `\n   ${passed ? '✅' : '❌'} ${passed ? 'PASSED' : 'FAILED'} (avg ${avg.toFixed(2)}ms vs target ${targetMs}ms)\n`
+  );
 
   return passed;
 }
@@ -110,7 +114,7 @@ async function benchmarkEndpoint(name, url, targetMs) {
 /**
  * Main test execution
  */
-async function runPerformanceTests() {
+async function _runPerformanceTests() {
   const results = [];
 
   // Test 1: LIST courses endpoint
@@ -144,7 +148,9 @@ async function runPerformanceTests() {
 
     console.log(`   Initial Load: ${duration.toFixed(2)}ms`);
     const pagePassed = duration < 2000;
-    console.log(`\n   ${pagePassed ? '✅' : '❌'} ${pagePassed ? 'PASSED' : 'FAILED'} (${duration.toFixed(2)}ms vs target 2000ms)\n`);
+    console.log(
+      `\n   ${pagePassed ? '✅' : '❌'} ${pagePassed ? 'PASSED' : 'FAILED'} (${duration.toFixed(2)}ms vs target 2000ms)\n`
+    );
     results.push(pagePassed);
   } catch (error) {
     console.log(`   ❌ Page load failed: ${error.message}\n`);
@@ -155,7 +161,7 @@ async function runPerformanceTests() {
   console.log('═'.repeat(60));
   console.log('📈 Performance Test Summary\n');
 
-  const passed = results.filter((r) => r).length;
+  const passed = results.filter(r => r).length;
   const total = results.length;
 
   console.log(`   Tests Passed: ${passed}/${total}`);

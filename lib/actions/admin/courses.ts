@@ -244,7 +244,7 @@ export async function deleteCourseAction(
     }
 
     if (errorMessage.startsWith('ACTIVE_ENROLLMENTS_EXIST')) {
-      const [, count, enrollmentsJson] = errorMessage.split(':');
+      const [, count, _enrollmentsJson] = errorMessage.split(':');
       rollbar.warning('Cannot delete course with active enrollments', {
         courseId: id,
         enrollmentCount: Number.parseInt(count, 10),

@@ -1,13 +1,13 @@
 /**
  * Backfill Script for Course Admin Fields
- * 
+ *
  * This script populates default values for new required fields in existing courses:
  * - startTime: Sets to current date + 30 days if NULL
  * - capacity: Sets to 20 if NULL
  * - duration: Sets to 4 hours if NULL
  * - instructor: Sets to "TBD" if NULL
  * - level: Sets to BEGINNER if NULL
- * 
+ *
  * Run this BEFORE applying the migration that makes these fields required.
  */
 
@@ -22,7 +22,7 @@ async function main() {
 
   // Count courses needing backfill
   const coursesNeedingBackfill = await prisma.course.count();
-  
+
   if (coursesNeedingBackfill === 0) {
     console.log('✅ No courses need backfill');
     return;
@@ -44,8 +44,7 @@ async function main() {
   console.log(`   - level: BEGINNER (handled by schema default)`);
 }
 
-main()
-  .catch((error) => {
-    console.error('❌ Backfill failed:', error);
-    process.exit(1);
-  });
+main().catch(error => {
+  console.error('❌ Backfill failed:', error);
+  process.exit(1);
+});
