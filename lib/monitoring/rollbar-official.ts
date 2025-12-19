@@ -55,13 +55,27 @@ export const clientConfig = {
 // In test mode, export a no-op instance to avoid network calls.
 export const serverInstance: Rollbar | RollbarTestInstance = isTestMode
   ? {
-      critical: () => {},
-      error: () => {},
-      warning: () => {},
-      warn: () => {},
-      info: () => {},
-      debug: () => {},
-      log: () => {},
+      critical: () => {
+        /* no-op in test mode */
+      },
+      error: () => {
+        /* no-op in test mode */
+      },
+      warning: () => {
+        /* no-op in test mode */
+      },
+      warn: () => {
+        /* no-op in test mode */
+      },
+      info: () => {
+        /* no-op in test mode */
+      },
+      debug: () => {
+        /* no-op in test mode */
+      },
+      log: () => {
+        /* no-op in test mode */
+      },
       wait: (cb?: () => void) => {
         if (typeof cb === 'function') cb();
       },

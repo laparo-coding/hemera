@@ -17,7 +17,9 @@ try {
       select: { id: true, title: true, slug: true },
     });
     console.log('\nVerfügbare Kurse:');
-    allCourses.forEach(c => console.log(`  - ${c.id}: ${c.title} (${c.slug})`));
+    for (const c of allCourses) {
+      console.log(`  - ${c.id}: ${c.title} (${c.slug})`);
+    }
   }
 } catch (err) {
   console.error('❌ Fehler:', err.message);

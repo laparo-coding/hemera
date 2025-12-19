@@ -223,7 +223,9 @@ describe('Admin Course API - Contract Tests', () => {
     });
 
     afterEach(async () => {
-      await prisma.course.delete({ where: { id: courseId } }).catch(() => {});
+      await prisma.course.delete({ where: { id: courseId } }).catch(() => {
+        /* Ignore cleanup errors */
+      });
     });
 
     it('should return course details with enrollment count', async () => {
@@ -352,7 +354,9 @@ describe('Admin Course API - Contract Tests', () => {
     });
 
     afterEach(async () => {
-      await prisma.course.delete({ where: { id: courseId } }).catch(() => {});
+      await prisma.course.delete({ where: { id: courseId } }).catch(() => {
+        /* Ignore cleanup errors */
+      });
     });
 
     it('should update course with valid data and return 200', async () => {

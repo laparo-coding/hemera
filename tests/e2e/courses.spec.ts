@@ -40,10 +40,12 @@ test.describe('Courses Page', () => {
         const emptyPublic = page.getByTestId('course-fallback-message');
         // Wait for either to be visible (short timeout)
         await Promise.race([
-          emptyE2E.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}),
-          emptyPublic
-            .waitFor({ state: 'visible', timeout: 5000 })
-            .catch(() => {}),
+          emptyE2E.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {
+            /* Ignore timeout errors */
+          }),
+          emptyPublic.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {
+            /* Ignore timeout errors */
+          }),
         ]);
         // Assert at least one is present
         const visibleE2E = await emptyE2E.count().then(c => c > 0);
