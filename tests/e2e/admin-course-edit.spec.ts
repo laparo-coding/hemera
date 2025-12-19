@@ -42,9 +42,9 @@ test.describe('Admin Course Edit - Optimistic Locking E2E', () => {
   test.afterEach(async () => {
     // Cleanup
     if (testCourseId) {
-      await prisma.course
-        .delete({ where: { id: testCourseId } })
-        .catch(() => {});
+      await prisma.course.delete({ where: { id: testCourseId } }).catch(() => {
+        /* Ignore cleanup errors */
+      });
     }
   });
 

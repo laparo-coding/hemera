@@ -25,7 +25,6 @@ export function SignedIn({ children }: AuthWrapperProps) {
     // Check if ClerkProvider context is available by looking for Clerk on window
     const clerkAvailable =
       typeof window !== 'undefined' &&
-      // biome-ignore lint/suspicious/noExplicitAny: Clerk attaches to window
       (window as any).__clerk_publishable_key !== undefined;
     setIsClerkAvailable(clerkAvailable);
   }, []);
@@ -56,7 +55,6 @@ export function SignedOut({ children }: AuthWrapperProps) {
     // Check if ClerkProvider context is available
     const clerkAvailable =
       typeof window !== 'undefined' &&
-      // biome-ignore lint/suspicious/noExplicitAny: Clerk attaches to window
       (window as any).__clerk_publishable_key !== undefined;
     setIsClerkAvailable(clerkAvailable);
   }, []);
@@ -88,7 +86,6 @@ export function UserButton(
   useEffect(() => {
     const clerkAvailable =
       typeof window !== 'undefined' &&
-      // biome-ignore lint/suspicious/noExplicitAny: Clerk attaches to window
       (window as any).__clerk_publishable_key !== undefined;
     setIsClerkAvailable(clerkAvailable);
   }, []);

@@ -9,7 +9,7 @@
 
 import { Alert, Box, CircularProgress, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import DeleteConfirmation from '../../../../../components/admin/DeleteConfirmation';
 import { deleteCourseAction } from '../../../../../lib/actions/admin/courses';
 import { deleteThumbnail } from '../../../../../lib/utils/fileUpload';
@@ -25,14 +25,7 @@ export default function DeleteCoursePage({ params }: DeleteCoursePageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    params.then(resolvedParams => {
-      setCourseId(resolvedParams.id);
-      fetchCourse(resolvedParams.id);
-    });
-  }, [params, fetchCourse]);
-
-  const fetchCourse = async (id: string) => {
+  const fetchCourse = useCallback(async (id: string) => {
     try {
       const response = await fetch(`/api/admin/courses/${id}`);
       if (!response.ok) {
@@ -45,7 +38,14 @@ export default function DeleteCoursePage({ params }: DeleteCoursePageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    params.then(resolvedParams => {
+      setCourseId(resolvedParams.id);
+      fetchCourse(resolvedParams.id);
+    });
+  }, [params, fetchCourse]);
 
   const handleDelete = async () => {
     if (!courseId) return;

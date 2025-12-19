@@ -217,13 +217,17 @@ function printSummary() {
 
   if (results.failed.length > 0) {
     console.log('Failed Checks:');
-    results.failed.forEach(item => console.log(`   - ${item}`));
+    for (const item of results.failed) {
+      console.log(`   - ${item}`);
+    }
     console.log('\n');
   }
 
   if (results.warnings.length > 0) {
     console.log('Warnings:');
-    results.warnings.forEach(item => console.log(`   - ${item}`));
+    for (const item of results.warnings) {
+      console.log(`   - ${item}`);
+    }
     console.log('\n');
   }
 
