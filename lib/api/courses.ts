@@ -46,13 +46,22 @@ export interface CourseWithSEO extends Course {
  */
 export async function getPublishedCourses(): Promise<Course[]> {
   try {
-    // Note: In SQLite (used in CI), Prisma's boolean filtering may not work correctly
-    // due to SQLite storing booleans as integers (0/1). We fetch all and filter in JS.
-    const allCourses = await prisma.course.findMany({
-      orderBy: {
-        startDate: 'asc',
-      },
-    });
+    // Try new schema first, fallback to old if columns don't exist
+    let allCourses;
+    try {
+      allCourses = await prisma.course.findMany({
+        orderBy: {
+          startDate: 'asc',
+        },
+      });
+    } catch (_schemaError) {
+      // Fallback to createdAt ordering if startDate doesn't exist yet
+      allCourses = await prisma.course.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+    }
 
     // Filter published courses in JavaScript to ensure compatibility with SQLite
     // SQLite may store boolean as 1/0, so we check for truthy values
@@ -88,6 +97,10 @@ export async function getPublishedCourses(): Promise<Course[]> {
         availableSpots,
         totalBookings,
         userBookingStatus: null,
+        // Ensure new fields exist with fallback
+        startDate: course.startDate ?? null,
+        startTime: course.startTime ?? null,
+        endTime: course.endTime ?? null,
       } as Course;
     });
 
@@ -123,38 +136,75 @@ export async function getPublishedCourses(): Promise<Course[]> {
  */
 export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
   try {
-    const courses = await prisma.course.findMany({
-      where: {
-        isPublished: true,
-      },
-      orderBy: {
-        startDate: 'asc',
-      },
-      take: limit,
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        slug: true,
-        price: true,
-        startDate: true,
-        startTime: true,
-        endTime: true,
-        isPublished: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    // Try new schema first (startDate, startTime, endTime)
+    try {
+      const courses = await prisma.course.findMany({
+        where: {
+          isPublished: true,
+        },
+        orderBy: {
+          startDate: 'asc',
+        },
+        take: limit,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          slug: true,
+          price: true,
+          startDate: true,
+          startTime: true,
+          endTime: true,
+          isPublished: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
 
-    // Erweitere die Kurse um die fehlenden Felder für die Component-Kompatibilität
-    return courses.map(course => ({
-      ...course,
-      currency: 'EUR',
-      capacity: null,
-      availableSpots: null,
-      totalBookings: 0,
-      userBookingStatus: null,
-    }));
+      // Erweitere die Kurse um die fehlenden Felder für die Component-Kompatibilität
+      return courses.map(course => ({
+        ...course,
+        currency: 'EUR',
+        capacity: null,
+        availableSpots: null,
+        totalBookings: 0,
+        userBookingStatus: null,
+      }));
+    } catch (_schemaError) {
+      // Fallback to old schema if new columns don't exist yet
+      // This handles the case where migration hasn't run on production yet
+      const coursesOldSchema = await prisma.course.findMany({
+        where: {
+          isPublished: true,
+        },
+        orderBy: {
+          createdAt: 'desc', // Fallback ordering since date field might not exist
+        },
+        take: limit,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          slug: true,
+          price: true,
+          isPublished: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      return coursesOldSchema.map(course => ({
+        ...course,
+        startDate: null,
+        startTime: null,
+        endTime: null,
+        currency: 'EUR',
+        capacity: null,
+        availableSpots: null,
+        totalBookings: 0,
+        userBookingStatus: null,
+      }));
+    }
   } catch (error) {
     logError(error, { operation: 'getFeaturedCourses', limit });
     throw new DatabaseConnectionError(

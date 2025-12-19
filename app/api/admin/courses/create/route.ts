@@ -1,7 +1,11 @@
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../../lib/db/prisma';
+import { serverInstance as rollbar } from '../../../../../lib/monitoring/rollbar-official';
+import { getOrCreateRequestId } from '../../../../../lib/utils/request-id';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const requestId = getOrCreateRequestId(request);
+
   try {
     const courses = await request.json();
 
@@ -30,6 +34,12 @@ export async function POST(request: Request) {
       })),
     });
 
+    rollbar.info('Bulk courses created via API', {
+      requestId,
+      courseCount: createdCourses.count,
+      route: '/api/admin/courses/create',
+    });
+
     return NextResponse.json(
       {
         message: `${createdCourses.count} Kurse wurden erfolgreich erstellt`,
@@ -38,7 +48,12 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.warn('Fehler beim Erstellen der Kurse:', error);
+    rollbar.error('Failed to create courses via bulk API', error as Error, {
+      requestId,
+      route: '/api/admin/courses/create',
+      errorType: (error as Error).name,
+    });
+
     return NextResponse.json(
       { error: 'Ein Fehler ist beim Erstellen der Kurse aufgetreten' },
       { status: 500 }
