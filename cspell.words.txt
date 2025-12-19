@@ -98,9 +98,11 @@ Subsetting
 Supabase
 TTFB
 Teamdynamik
+Timestamptz
 Tracke
 Unauthentifizierte
 Unkey
+Unveröffentlichen
 VARCHAR
 Validierungsregeln
 Validierungstests
@@ -125,9 +127,12 @@ Workerzahl
 Zauberflocke
 Zeilenendenungen
 adminpassword
+alignable
 autoincrement
 availableSpots
 cardnumber
+clxxx
+clxxxxxxxxxxxxxxxxxx
 clxxxxxxxxxxxxxxxxxxxxxxxx
 colorhunt
 courseId
@@ -174,6 +179,7 @@ networkidle
 noarchive
 noimageindex
 opencode
+organizat
 parallelizable
 parseable
 parsebar
@@ -212,6 +218,7 @@ timeframe
 tracken
 underlinenav
 underspecified
+unpublishing
 upcomingDates
 userpassword
 uuidv
