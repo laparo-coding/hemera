@@ -34,7 +34,7 @@ export default function EditCoursePage({ params }: EditCoursePageProps) {
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push(
-        '/sign-in?redirect=' + encodeURIComponent(window.location.pathname)
+        `/sign-in?redirect=${encodeURIComponent(window.location.pathname)}`
       );
     } else if (
       isLoaded &&
@@ -50,7 +50,7 @@ export default function EditCoursePage({ params }: EditCoursePageProps) {
       setCourseId(resolvedParams.id);
       fetchCourse(resolvedParams.id);
     });
-  }, [params]);
+  }, [params, fetchCourse]);
 
   const fetchCourse = async (id: string) => {
     try {
@@ -59,7 +59,7 @@ export default function EditCoursePage({ params }: EditCoursePageProps) {
       // Handle authentication errors
       if (response.status === 401 || response.status === 403) {
         router.push(
-          '/sign-in?redirect=' + encodeURIComponent(`/admin/courses/${id}/edit`)
+          `/sign-in?redirect=${encodeURIComponent(`/admin/courses/${id}/edit`)}`
         );
         return;
       }

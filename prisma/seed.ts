@@ -7,12 +7,12 @@ function convertDateToFields(dateStr: string) {
   const date = new Date(dateStr);
   const startDate = new Date(date);
   startDate.setHours(0, 0, 0, 0); // Reset to start of day
-  
+
   const startTime = new Date(date);
-  
+
   const endTime = new Date(date);
   endTime.setHours(date.getHours() + 4); // Default 4 hours duration
-  
+
   return {
     startDate,
     startTime,

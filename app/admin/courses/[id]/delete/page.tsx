@@ -30,7 +30,7 @@ export default function DeleteCoursePage({ params }: DeleteCoursePageProps) {
       setCourseId(resolvedParams.id);
       fetchCourse(resolvedParams.id);
     });
-  }, [params]);
+  }, [params, fetchCourse]);
 
   const fetchCourse = async (id: string) => {
     try {
