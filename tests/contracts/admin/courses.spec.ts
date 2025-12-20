@@ -50,16 +50,28 @@ describe('Admin Course API - Contract Tests', () => {
 
   beforeAll(async () => {
     // Ensure test database is clean
-    await prisma.booking.deleteMany({
+    // First find all test courses
+    const testCourses = await prisma.course.findMany({
       where: {
-        course: {
-          title: {
-            contains: '[CONTRACT-TEST]',
-          },
+        title: {
+          contains: '[CONTRACT-TEST]',
         },
       },
+      select: { id: true },
     });
 
+    // Delete bookings for these courses
+    if (testCourses.length > 0) {
+      await prisma.booking.deleteMany({
+        where: {
+          courseId: {
+            in: testCourses.map(c => c.id),
+          },
+        },
+      });
+    }
+
+    // Then delete the courses
     await prisma.course.deleteMany({
       where: {
         title: {
@@ -71,16 +83,28 @@ describe('Admin Course API - Contract Tests', () => {
 
   afterAll(async () => {
     // Cleanup test data
-    await prisma.booking.deleteMany({
+    // First find all test courses
+    const testCourses = await prisma.course.findMany({
       where: {
-        course: {
-          title: {
-            contains: '[CONTRACT-TEST]',
-          },
+        title: {
+          contains: '[CONTRACT-TEST]',
         },
       },
+      select: { id: true },
     });
 
+    // Delete bookings for these courses
+    if (testCourses.length > 0) {
+      await prisma.booking.deleteMany({
+        where: {
+          courseId: {
+            in: testCourses.map(c => c.id),
+          },
+        },
+      });
+    }
+
+    // Then delete the courses
     await prisma.course.deleteMany({
       where: {
         title: {
