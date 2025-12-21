@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   description: 'Verwalte alle Kurse im System',
 };
 
+// Force dynamic rendering to skip static generation during build
+// Admin pages require database access which isn't available at build time
+export const dynamic = 'force-dynamic';
+
 export default async function AdminCoursesPage() {
   const courses = await listCourses();
 

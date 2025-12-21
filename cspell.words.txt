@@ -231,3 +231,4 @@ zgkd
 zipjs
 Überschriftenstruktur
 Überwachbarkeit
+Segoe

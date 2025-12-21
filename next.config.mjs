@@ -12,7 +12,7 @@ const nextConfig = {
     webpackMemoryOptimizations: true,
   },
 
-  webpack: (config, { _isServer, dev }) => {
+  webpack: (config, { _isServer, dev, webpack }) => {
     // Optimize webpack cache to avoid "Serializing big strings" warning (FR-009)
     // See: https://github.com/vercel/next.js/issues/43568
     if (dev) {
@@ -29,6 +29,21 @@ const nextConfig = {
         type: 'memory',
       };
     }
+
+    // CI fix: Replace Google Font imports with local fallback in CI environments
+    // to avoid build failures when external network access is restricted
+    const isCI = process.env.CI === 'true';
+    const isVercel = !!process.env.VERCEL;
+
+    if (isCI && !isVercel) {
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /lib[\\/]fonts\.google/,
+          './fonts.local.ts'
+        )
+      );
+    }
+
     return config;
   },
   async redirects() {

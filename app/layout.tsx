@@ -1,12 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import type * as React from 'react';
 import BuildInfo from '../components/BuildInfo';
 import Providers from '../components/Providers';
+import { inter } from '../lib/fonts';
 import { SITE_CONFIG } from '../lib/seo/constants';
 import './globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
