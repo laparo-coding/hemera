@@ -2,7 +2,12 @@ name: 'Bot: Dependabot Auto-Merge'
 
 on:
   pull_request_target:
-    types: [opened, synchronize, labeled, edited, ready_for_review]
+    types: [opened, synchronize, labeled, ready_for_review]
+
+# Only run for Dependabot PRs - skip all other actors immediately
+concurrency:
+  group: dependabot-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -11,9 +16,26 @@ permissions:
   statuses: read
 
 jobs:
+  # Quick check job to fail fast for non-Dependabot PRs
+  check-actor:
+    runs-on: ubuntu-latest
+    outputs:
+      is-dependabot: ${{ steps.check.outputs.is-dependabot }}
+    steps:
+      - name: Check if Dependabot PR
+        id: check
+        run: |
+          if [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
+            echo "is-dependabot=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is-dependabot=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping: Not a Dependabot PR (actor: ${{ github.actor }})"
+          fi
+
   automerge:
-    if: >-
-      github.actor == 'dependabot[bot]' &&
+    needs: check-actor
+    if: |
+      needs.check-actor.outputs.is-dependabot == 'true' &&
       contains(join(github.event.pull_request.labels.*.name, ','), 'automerge')
     runs-on: ubuntu-latest
     steps:
