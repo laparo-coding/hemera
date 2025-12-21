@@ -2,8 +2,10 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 
-// Check if DATABASE_URL is SQLite (file:// protocol)
-const isSqlite = process.env.DATABASE_URL?.startsWith('file:');
+// Lazy-initialize to allow tests to set DATABASE_URL before first use
+let _prismaClient: PrismaClient | undefined;
+let _pool: Pool | undefined;
+let _closeDbFn: (() => Promise<void>) | undefined;
 
 function withSchemaParam(urlStr: string, schema?: string): string {
   // SQLite URLs don't support schema params
@@ -52,69 +54,121 @@ function withSchemaParam(urlStr: string, schema?: string): string {
 // Resolve schema in the following order:
 // 1) Explicit env overrides: PREVIEW_SCHEMA or PR_SCHEMA
 // 2) Optional (feature-flagged) Vercel Preview auto-detection when ENABLE_PREVIEW_SCHEMA=1
-const runtimeSchemaFromEnv =
-  process.env.PREVIEW_SCHEMA || process.env.PR_SCHEMA;
-const vercelEnv = process.env.VERCEL_ENV;
-const vercelPrId = process.env.VERCEL_GIT_PULL_REQUEST_ID;
-const enablePreviewSchema = process.env.ENABLE_PREVIEW_SCHEMA === '1';
-const inferredSchema =
-  !runtimeSchemaFromEnv &&
-  enablePreviewSchema &&
-  vercelEnv === 'preview' &&
-  vercelPrId
-    ? `hemera_pr_${vercelPrId}`
+function getRuntimeSchema(): string | undefined {
+  const runtimeSchemaFromEnv =
+    process.env.PREVIEW_SCHEMA || process.env.PR_SCHEMA;
+  const vercelEnv = process.env.VERCEL_ENV;
+  const vercelPrId = process.env.VERCEL_GIT_PULL_REQUEST_ID;
+  const enablePreviewSchema = process.env.ENABLE_PREVIEW_SCHEMA === '1';
+  const inferredSchema =
+    !runtimeSchemaFromEnv &&
+    enablePreviewSchema &&
+    vercelEnv === 'preview' &&
+    vercelPrId
+      ? `hemera_pr_${vercelPrId}`
+      : undefined;
+  return runtimeSchemaFromEnv || inferredSchema;
+}
+
+function getConnectionString(): string {
+  const runtimeSchema = getRuntimeSchema();
+  const runtimeDbUrl = process.env.DATABASE_URL
+    ? withSchemaParam(process.env.DATABASE_URL, runtimeSchema)
     : undefined;
-const runtimeSchema = runtimeSchemaFromEnv || inferredSchema;
+  return runtimeDbUrl ?? process.env.DATABASE_URL ?? '';
+}
 
-const runtimeDbUrl = process.env.DATABASE_URL
-  ? withSchemaParam(process.env.DATABASE_URL, runtimeSchema)
-  : undefined;
-
-const connectionString = runtimeDbUrl ?? process.env.DATABASE_URL ?? '';
-
-const sslEnabled =
-  process.env.PGSSL === '1' || process.env.PGSSL === 'true' ? true : undefined;
+function getSslEnabled(): boolean | undefined {
+  return process.env.PGSSL === '1' || process.env.PGSSL === 'true'
+    ? true
+    : undefined;
+}
 
 // For SQLite (E2E tests), we use better-sqlite3 adapter
 // For PostgreSQL (production), we use pg adapter
-let prismaClient: PrismaClient;
-let closeDbFn: () => Promise<void>;
+function createPrismaClient(): {
+  client: PrismaClient;
+  closeFn: () => Promise<void>;
+} {
+  const connectionString = getConnectionString();
+  const isSqlite = process.env.DATABASE_URL?.startsWith('file:');
 
-if (isSqlite) {
-  // Dynamic import to avoid bundling sqlite3 in production
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
-  const sqliteAdapter = new PrismaBetterSqlite3({
-    url: connectionString || 'file:./test.db',
-  });
-  prismaClient = new PrismaClient({ adapter: sqliteAdapter });
-  closeDbFn = async () => {
-    await prismaClient.$disconnect();
-  };
-} else {
+  if (isSqlite) {
+    // Dynamic import to avoid bundling sqlite3 in production
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
+    const sqliteAdapter = new PrismaBetterSqlite3({
+      url: connectionString || 'file:./test.db',
+    });
+    const client = new PrismaClient({ adapter: sqliteAdapter });
+    return {
+      client,
+      closeFn: async () => {
+        await client.$disconnect();
+      },
+    };
+  }
+
   // Create pool only if DATABASE_URL is available
   // During Next.js build, DATABASE_URL might not be set, so we use a fallback
   // that will fail gracefully at runtime if actual DB access is attempted
+  const sslEnabled = getSslEnabled();
   const pool = new Pool({
     connectionString:
       connectionString || 'postgresql://localhost:5432/build_placeholder',
     ssl: sslEnabled ? { rejectUnauthorized: true } : undefined,
   });
 
+  _pool = pool;
   const adapter = new PrismaPg(pool);
-  prismaClient = new PrismaClient({ adapter });
-  closeDbFn = async () => {
-    await prismaClient.$disconnect();
-    await pool.end();
+  const client = new PrismaClient({ adapter });
+  return {
+    client,
+    closeFn: async () => {
+      await client.$disconnect();
+      await pool.end();
+    },
   };
 }
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const globalForPrisma = globalThis as unknown as {
+  prisma?: PrismaClient;
+  closeDbFn?: () => Promise<void>;
+};
 
-export const prisma = globalForPrisma.prisma ?? prismaClient;
-
-export async function closeDb(): Promise<void> {
-  await closeDbFn();
+// Lazy getter for prisma client - allows DATABASE_URL to be set before first access
+function getPrismaClient(): PrismaClient {
+  if (!_prismaClient) {
+    if (globalForPrisma.prisma) {
+      _prismaClient = globalForPrisma.prisma;
+      _closeDbFn = globalForPrisma.closeDbFn;
+    } else {
+      const { client, closeFn } = createPrismaClient();
+      _prismaClient = client;
+      _closeDbFn = closeFn;
+      if (process.env.NODE_ENV !== 'production') {
+        globalForPrisma.prisma = client;
+        globalForPrisma.closeDbFn = closeFn;
+      }
+    }
+  }
+  return _prismaClient;
 }
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+// Export a proxy that lazily initializes the client on first property access
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const client = getPrismaClient();
+    const value = client[prop as keyof PrismaClient];
+    if (typeof value === 'function') {
+      return value.bind(client);
+    }
+    return value;
+  },
+});
+
+export async function closeDb(): Promise<void> {
+  if (_closeDbFn) {
+    await _closeDbFn();
+  }
+}
