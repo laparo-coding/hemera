@@ -1,4 +1,4 @@
-name: Lighthouse CI
+name: 'CI: Lighthouse'
 
 on:
   # Manual trigger with URL input (preferred)

@@ -1,4 +1,4 @@
-name: Preview DB per PR
+name: 'Deploy: Preview Database'
 
 on:
   pull_request:
