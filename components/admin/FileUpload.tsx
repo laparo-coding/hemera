@@ -16,6 +16,7 @@ import {
   CircularProgress,
   Typography,
 } from '@mui/material';
+import Image from 'next/image';
 import { useState } from 'react';
 
 interface FileUploadProps {
@@ -132,12 +133,11 @@ export default function FileUpload({
             backgroundColor: 'grey.100',
           }}
         >
-          <img
+          <Image
             src={preview}
             alt='Thumbnail preview'
+            fill
             style={{
-              width: '100%',
-              height: '100%',
               objectFit: 'cover',
             }}
           />

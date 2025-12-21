@@ -136,81 +136,40 @@ export async function getPublishedCourses(): Promise<Course[]> {
  */
 export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
   try {
-    // Try new schema first (startDate, startTime, endTime)
-    try {
-      const courses = await prisma.course.findMany({
-        where: {
-          isPublished: true,
-        },
-        orderBy: {
-          startDate: 'asc',
-        },
-        take: limit,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          slug: true,
-          price: true,
-          startDate: true,
-          startTime: true,
-          endTime: true,
-          isPublished: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
+    // Try fetching without select to avoid column mismatch issues
+    // This is more resilient to schema differences between environments
+    const courses = await prisma.course.findMany({
+      where: {
+        isPublished: true,
+      },
+      orderBy: [{ startDate: 'asc' }, { createdAt: 'desc' }],
+      take: limit,
+    });
 
-      // Erweitere die Kurse um die fehlenden Felder für die Component-Kompatibilität
-      return courses.map(course => ({
-        ...course,
-        currency: 'EUR',
-        capacity: null,
-        availableSpots: null,
-        totalBookings: 0,
-        userBookingStatus: null,
-      }));
-    } catch (_schemaError) {
-      // Fallback to old schema if new columns don't exist yet
-      // This handles the case where migration hasn't run on production yet
-      const coursesOldSchema = await prisma.course.findMany({
-        where: {
-          isPublished: true,
-        },
-        orderBy: {
-          createdAt: 'desc', // Fallback ordering since date field might not exist
-        },
-        take: limit,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          slug: true,
-          price: true,
-          isPublished: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
-
-      return coursesOldSchema.map(course => ({
-        ...course,
-        startDate: null,
-        startTime: null,
-        endTime: null,
-        currency: 'EUR',
-        capacity: null,
-        availableSpots: null,
-        totalBookings: 0,
-        userBookingStatus: null,
-      }));
-    }
+    // Map to consistent Course interface
+    return courses.map(course => ({
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      slug: course.slug,
+      price: course.price,
+      currency: course.currency || 'EUR',
+      capacity: course.capacity ?? null,
+      startDate: course.startDate ?? null,
+      startTime: course.startTime ?? null,
+      endTime: course.endTime ?? null,
+      isPublished: course.isPublished,
+      createdAt: course.createdAt,
+      updatedAt: course.updatedAt,
+      availableSpots: null,
+      totalBookings: 0,
+      userBookingStatus: null,
+    }));
   } catch (error) {
     logError(error, { operation: 'getFeaturedCourses', limit });
-    throw new DatabaseConnectionError(
-      'fetching featured courses',
-      error as Error
-    );
+    // Return empty array instead of throwing to prevent page crash
+    // The page will use static fallback data
+    return [];
   }
 }
 

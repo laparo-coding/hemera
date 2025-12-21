@@ -122,8 +122,15 @@ const staticCourses: CourseCardProps[] = [
 ];
 
 export default async function HomePage() {
-  // Fetch real courses from API (fallback to static data)
-  const _featuredCourses = await getFeaturedCourses(3);
+  // Fetch real courses from API (fallback to static data on error)
+  let _featuredCourses;
+  try {
+    _featuredCourses = await getFeaturedCourses(3);
+  } catch (error) {
+    // Log error but don't crash - use static courses as fallback
+    console.error('Failed to fetch featured courses:', error);
+    _featuredCourses = [];
+  }
 
   // JSON-LD Structured Data for SEO
   const jsonLdSchemas = SCHEMA_COMBINATIONS.homepage();
