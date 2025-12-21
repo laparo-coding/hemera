@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   description: 'Verwalte alle Kurse im System',
 };
 
+// Force dynamic rendering since we fetch courses from DB
+// This prevents static generation during build when DATABASE_URL is unavailable
+export const dynamic = 'force-dynamic';
+
 export default async function AdminCoursesPage() {
   const courses = await listCourses();
 
