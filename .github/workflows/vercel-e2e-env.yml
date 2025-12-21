@@ -1,4 +1,4 @@
-name: Vercel Preview E2E Env Setup
+name: 'Vercel: E2E Environment'
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Docs - cspell
+name: 'Docs: Spellcheck'
 
 on:
   pull_request:

@@ -1,4 +1,4 @@
-name: Vercel - Set Stripe Environment Variables
+name: 'Vercel: Set Stripe Env'
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Vercel - Set Clerk Environment Variables
+name: 'Vercel: Set Clerk Env'
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: E2E External (Preview/Prod)
+name: 'E2E: External'
 
 on:
   workflow_dispatch:
