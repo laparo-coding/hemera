@@ -231,3 +231,8 @@ zgkd
 zipjs
 Überschriftenstruktur
 Überwachbarkeit
+
+cockroachlabs
+planetscale
+elephantsql
+googlecloud
