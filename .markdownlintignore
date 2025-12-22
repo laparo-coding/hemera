@@ -1,0 +1,13 @@
+# AI-generated planning documents
+specs/
+
+# Node modules
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Test artifacts
+playwright-report/
+test-results/
