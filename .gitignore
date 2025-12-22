@@ -45,6 +45,7 @@ playwright-report-*.zip
 playwright-report-external/
 test-results/
 /test-results/
+junit.xml
 
 # Debug files (should not be committed)
 debug-*.png
