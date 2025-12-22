@@ -9,7 +9,8 @@ on:
     paths:
       - '**/*.md'
   schedule:
-    - cron: '0 3 * * *'
+    # Runs daily at 06:00 UTC (07:00 CET/08:00 CEST)
+    - cron: '0 6 * * *'
 
 jobs:
   lychee:

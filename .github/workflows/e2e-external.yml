@@ -1,5 +1,9 @@
 name: 'E2E: External'
 
+# This workflow uses optional secrets:
+# - PLAYWRIGHT_BASE_URL: Optional base URL for testing (fallback logic in place)
+# - VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_ORG_ID: Optional Vercel API access
+
 on:
   workflow_dispatch:
     inputs:
@@ -28,6 +32,12 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # Job-level env for optional secrets (avoids step-level validation warnings)
+    env:
+      PLAYWRIGHT_BASE_URL_SECRET: ${{ secrets.PLAYWRIGHT_BASE_URL }}
+      VERCEL_TOKEN_SECRET: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_PROJECT_ID_SECRET: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_ORG_ID_SECRET: ${{ secrets.VERCEL_ORG_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -47,25 +57,25 @@ jobs:
       - name: Resolve Base URL
         id: resolve
         shell: bash
+        env:
+          BASE_URL_INPUT: ${{ github.event.inputs.base_url }}
+          # Uses job-level env vars for optional secrets
+          BASE_URL_SECRET: ${{ env.PLAYWRIGHT_BASE_URL_SECRET }}
         run: |
-          # Priority: workflow input > env > secrets
-          BASE_URL_INPUT='${{ github.event.inputs.base_url }}'
-          BASE_URL_ENV='${{ env.PLAYWRIGHT_BASE_URL }}'
-          BASE_URL_SEC='${{ secrets.PLAYWRIGHT_BASE_URL }}'
+          # Priority: workflow input > secrets
           if [ -n "$BASE_URL_INPUT" ]; then BASE_URL="$BASE_URL_INPUT";
-          elif [ -n "$BASE_URL_ENV" ]; then BASE_URL="$BASE_URL_ENV";
-          elif [ -n "$BASE_URL_SEC" ]; then BASE_URL="$BASE_URL_SEC";
+          elif [ -n "$BASE_URL_SECRET" ]; then BASE_URL="$BASE_URL_SECRET";
           else BASE_URL=""; fi
 
           # If still empty, try to resolve from Vercel Deployments API (preview)
           if [ -z "$BASE_URL" ]; then
-            if [ -z "${{ secrets.VERCEL_TOKEN }}" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ] || [ -z "${{ secrets.VERCEL_ORG_ID }}" ]; then
+            if [ -z "$VERCEL_TOKEN_SECRET" ] || [ -z "$VERCEL_PROJECT_ID_SECRET" ] || [ -z "$VERCEL_ORG_ID_SECRET" ]; then
               echo "No BASE_URL and missing Vercel secrets. Provide 'base_url' input or set PLAYWRIGHT_BASE_URL secret." | tee -a $GITHUB_STEP_SUMMARY
             else
               echo "Attempting to resolve preview URL from Vercel..." | tee -a $GITHUB_STEP_SUMMARY
-              export VERCEL_TOKEN='${{ secrets.VERCEL_TOKEN }}'
-              export VERCEL_PROJECT_ID='${{ secrets.VERCEL_PROJECT_ID }}'
-              export VERCEL_ORG_ID='${{ secrets.VERCEL_ORG_ID }}'
+              export VERCEL_TOKEN="$VERCEL_TOKEN_SECRET"
+              export VERCEL_PROJECT_ID="$VERCEL_PROJECT_ID_SECRET"
+              export VERCEL_ORG_ID="$VERCEL_ORG_ID_SECRET"
               export SHA='${{ github.event.pull_request.head.sha || github.sha }}'
               export PR='${{ github.event.pull_request.number || '' }}'
               curl -sSf -H "Authorization: Bearer $VERCEL_TOKEN" \
