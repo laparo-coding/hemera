@@ -1,4 +1,9 @@
 import { closeDb, prisma } from '../lib/db/prisma.js';
+import {
+  getDatabaseEnvironmentInfo,
+  guardDestructiveOperation,
+  isSafeForDestructiveOperations,
+} from '../lib/db/production-guard.js';
 
 // Use shared Prisma instance
 
@@ -21,10 +26,21 @@ function convertDateToFields(dateStr: string) {
 }
 
 async function main() {
-  // Clear existing data in development
-  if (process.env.NODE_ENV === 'development') {
+  // Log current database environment for visibility
+  console.log(`\n📍 Database Environment: ${getDatabaseEnvironmentInfo()}\n`);
+
+  // Clear existing data ONLY in safe environments (local development/test)
+  // This guard will throw if connected to a production database
+  if (isSafeForDestructiveOperations()) {
+    console.log('🧹 Clearing existing data (safe environment detected)...');
+    guardDestructiveOperation('seed.ts: deleteMany(booking)');
     await prisma.booking.deleteMany();
+    guardDestructiveOperation('seed.ts: deleteMany(course)');
     await prisma.course.deleteMany();
+    console.log('✅ Existing data cleared\n');
+  } else {
+    console.log('⚠️  Skipping data deletion - production database detected');
+    console.log('   Will only upsert courses (safe operation)\n');
   }
 
   const seedCourses = [

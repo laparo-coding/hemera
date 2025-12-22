@@ -3,19 +3,40 @@
  *
  * This script is used for E2E testing with SQLite.
  * For Prisma 7, we need the better-sqlite3 adapter.
+ *
+ * SAFETY: This script includes production database protection to prevent
+ * accidental data loss if misconfigured to point at production.
  */
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { PrismaClient } from '@prisma/client';
+import {
+  getDatabaseEnvironmentInfo,
+  guardDestructiveOperation,
+} from '../lib/db/production-guard.js';
+
+// Validate we're using SQLite (E2E tests should ALWAYS use SQLite)
+const databaseUrl = process.env.DATABASE_URL || 'file:./test.db';
+if (!databaseUrl.startsWith('file:')) {
+  console.error('🚨 SAFETY ERROR: E2E seed must use SQLite (file: URL)');
+  console.error(`   Current DATABASE_URL: ${databaseUrl.substring(0, 30)}...`);
+  console.error('   Set DATABASE_URL=file:./test.db for E2E tests');
+  process.exit(1);
+}
 
 // Prisma 7 requires an adapter for all databases
 const adapter = new PrismaBetterSqlite3({
-  url: process.env.DATABASE_URL || 'file:./test.db',
+  url: databaseUrl,
 });
 
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Starting E2E seed...');
+  console.log(`📍 Database: ${getDatabaseEnvironmentInfo()}`);
+
+  // Additional guard - will throw if somehow connected to production
+  guardDestructiveOperation('e2e-seed.ts: deleteMany(booking)');
+  guardDestructiveOperation('e2e-seed.ts: deleteMany(course)');
 
   // Clear existing data
   await prisma.booking.deleteMany();
