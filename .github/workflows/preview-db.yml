@@ -1,5 +1,8 @@
 name: 'Deploy: Preview Database'
 
+# This workflow uses optional secrets:
+# - PREVIEW_DATABASE_URL: Optional preview database URL (steps are skipped if not set)
+
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
@@ -7,6 +10,9 @@ on:
 jobs:
   preview-db:
     runs-on: ubuntu-latest
+    # Job-level env for optional secrets (avoids step-level validation warnings)
+    env:
+      PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
     permissions:
       contents: read
       pull-requests: write
@@ -29,14 +35,15 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Provision schema (on open/sync)
-        if: ${{ github.event.action != 'closed' }}
+        if: github.event.action != 'closed'
         env:
-          PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+          # PREVIEW_DATABASE_URL inherited from job-level env
           PR_NUMBER: ${{ github.event.pull_request.number }}
         id: provision
         run: |
           if [ -z "${PREVIEW_DATABASE_URL}" ]; then
-            echo "Skipping preview DB provision: PREVIEW_DATABASE_URL secret not set."; exit 0;
+            echo "::notice::Skipping preview DB provision: PREVIEW_DATABASE_URL secret not configured"
+            exit 0
           fi
           export DATABASE_URL="${PREVIEW_DATABASE_URL}"
           export PR_NUMBER="${PR_NUMBER}"
@@ -46,13 +53,14 @@ jobs:
           echo "schema=${SCHEMA_VALUE}" >> "$GITHUB_OUTPUT"
 
       - name: Teardown schema (on close)
-        if: ${{ github.event.action == 'closed' }}
+        if: github.event.action == 'closed'
         env:
-          PREVIEW_DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+          # PREVIEW_DATABASE_URL inherited from job-level env
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           if [ -z "${PREVIEW_DATABASE_URL}" ]; then
-            echo "Skipping preview DB teardown: PREVIEW_DATABASE_URL secret not set."; exit 0;
+            echo "::notice::Skipping preview DB teardown: PREVIEW_DATABASE_URL secret not configured"
+            exit 0
           fi
           export DATABASE_URL="${PREVIEW_DATABASE_URL}"
           export PR_NUMBER="${PR_NUMBER}"
