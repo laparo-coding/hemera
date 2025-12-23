@@ -78,3 +78,4 @@ temp-*
 mcp.json
 
 .env*.local
+.lighthouseci/
