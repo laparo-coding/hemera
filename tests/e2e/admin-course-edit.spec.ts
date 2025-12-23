@@ -6,13 +6,20 @@
  * - Optimistic locking conflict detection
  * - Proper error handling for stale data
  * - Successful edit after refresh
+ *
+ * NOTE: Requires Clerk authentication - skipped in CI.
  */
 
 import { expect, test } from '@playwright/test';
 import { prisma } from '../../lib/db/prisma';
 import { AuthHelper } from './auth-helper';
 
+// Skip in CI - requires Clerk authentication
+const skipInCI = !!process.env.CI || process.env.E2E_TEST === 'true';
+
 test.describe('Admin Course Edit - Optimistic Locking E2E', () => {
+  test.skip(() => skipInCI, 'Requires Clerk authentication - skipped in CI');
+
   let testCourseId: string;
   let authHelper: AuthHelper;
 

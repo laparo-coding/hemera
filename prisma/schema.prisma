@@ -6,36 +6,26 @@ datasource db {
   provider = "postgresql"
 }
 
+// =============================================================================
+// NAMING CONVENTION:
+// - Models: PascalCase (e.g., User, Course, Booking)
+// - Fields in Prisma: camelCase (e.g., userId, createdAt)
+// - Database tables: snake_case plural (e.g., users, courses, bookings)
+// - Database columns: snake_case (e.g., user_id, created_at)
+// - Use @@map for tables, @map for columns to maintain clean TypeScript types
+// =============================================================================
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique(map: "users_email_unique")
-  emailVerified DateTime?
+  emailVerified DateTime? @map("email_verified")
   image         String?
-  accounts      Account[]
   bookings      Booking[]
-}
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  provider          String
-  providerAccountId String
-  type              String?
-  access_token      String?
-  refresh_token     String?
-  expires_at        Int?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
+  @@map("users")
 }
 
 model Course {
@@ -44,17 +34,19 @@ model Course {
   description  String?
   slug         String      @unique
   price        Int
-  currency     String      @default("USD")
+  currency     String      @default("EUR")
   capacity     Int         @default(20)
-  startDate    DateTime?
-  startTime    DateTime?
-  endTime      DateTime?
-  isPublished  Boolean     @default(false)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  startDate    DateTime?   @map("start_date")
+  startTime    DateTime?   @map("start_time")
+  endTime      DateTime?   @map("end_time")
+  isPublished  Boolean     @default(false) @map("is_published")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
   instructor   String      @default("TBD")
   level        CourseLevel @default(BEGINNER)
-  thumbnailUrl String?
+  thumbnailUrl String?     @map("thumbnail_url")
+  locationId   String?     @map("location_id")
+  location     Location?   @relation(fields: [locationId], references: [id])
   bookings     Booking[]
 
   @@index([startDate])
@@ -69,15 +61,15 @@ enum CourseLevel {
 
 model Booking {
   id                    String        @id @default(cuid())
-  userId                String
-  courseId              String
-  paymentStatus         PaymentStatus @default(PENDING)
-  stripePaymentIntentId String?
-  stripeSessionId       String?
+  userId                String        @map("user_id")
+  courseId              String        @map("course_id")
+  paymentStatus         PaymentStatus @default(PENDING) @map("payment_status")
+  stripePaymentIntentId String?       @map("stripe_payment_intent_id")
+  stripeSessionId       String?       @map("stripe_session_id")
   amount                Int
-  currency              String        @default("USD")
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
+  currency              String        @default("EUR")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
   course                Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
   user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -92,4 +84,28 @@ enum PaymentStatus {
   CANCELLED
   REFUNDED
   CONFIRMED
+}
+
+model Location {
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  name         String
+  description  String?
+  address      String
+  zipCode      String?   @map("zip_code")
+  city         String
+  email        String?
+  phone        String?
+  website      String?
+  imageUrl     String?   @map("image_url")
+  roomImageUrl String?   @map("room_image_url")
+  latitude     Float?
+  longitude    Float?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  courses      Course[]
+
+  @@index([city])
+  @@index([name])
+  @@map("locations")
 }
