@@ -273,9 +273,7 @@ export async function deleteLocation(
 /**
  * Geocode an address (standalone, for form preview)
  */
-export async function geocodeLocationAddress(
-  request: GeocodeRequest
-): Promise<{
+export async function geocodeLocationAddress(request: GeocodeRequest): Promise<{
   latitude: number | null;
   longitude: number | null;
   success: boolean;

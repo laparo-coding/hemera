@@ -27,6 +27,7 @@ Eventlisten
 FOIT
 FOUC
 FOUT
+Faketown
 Fatalf
 Fcourses
 Fokuszustand
@@ -56,12 +57,14 @@ Kursdetailsseite
 Kurse
 Landingpages
 Laparo
+Mariahilfer
 Masterclass
 Motivationsquellen
 NEXTAUTH
 Navigationen
 Neon
 NextAuth
+Nominatim
 OPENAI
 OpenAPIV
 PGSSL
@@ -134,6 +137,7 @@ cardnumber
 clxxx
 clxxxxxxxxxxxxxxxxxx
 clxxxxxxxxxxxxxxxxxxxxxxxx
+cockroachlabs
 colorhunt
 courseId
 crawlable
@@ -151,6 +155,7 @@ diffstat
 domcontentloaded
 dotenv
 dotenv-cli
+elephantsql
 entwicklen
 esbenp
 failen
@@ -162,6 +167,7 @@ generationenmanagement
 geolocation
 gepoolte
 gomcp
+googlecloud
 hemeraacademy
 homeoffice
 htmlreport
@@ -178,12 +184,15 @@ martinkempdesign
 networkidle
 noarchive
 noimageindex
+nominatim
 opencode
+openstreetmap
 organizat
 parallelizable
 parseable
 parsebar
 passwordless
+planetscale
 playfair
 pooled
 pooler
@@ -231,8 +240,3 @@ zgkd
 zipjs
 Überschriftenstruktur
 Überwachbarkeit
-
-cockroachlabs
-planetscale
-elephantsql
-googlecloud
