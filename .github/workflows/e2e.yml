@@ -222,7 +222,7 @@ jobs:
           # Verify seed data via raw SQL
           echo "Verifying seed data..."
           npx prisma db execute --stdin <<'SQL'
-          SELECT COUNT(*) AS published_count FROM courses WHERE isPublished = 1;
+          SELECT COUNT(*) AS published_count FROM courses WHERE is_published = 1;
           SQL
         env:
           DATABASE_URL: file:./test.db
