@@ -29,7 +29,7 @@ paths:
                       $ref: '#/components/schemas/Location'
                   total:
                     type: integer
-    
+
     post:
       summary: Create a new location
       operationId: createLocation
@@ -64,7 +64,7 @@ paths:
         schema:
           type: string
         description: Location ID (CUID)
-    
+
     get:
       summary: Get a single location
       operationId: getLocation
@@ -79,7 +79,7 @@ paths:
                 $ref: '#/components/schemas/Location'
         '404':
           $ref: '#/components/responses/NotFound'
-    
+
     put:
       summary: Update a location
       operationId: updateLocation
@@ -107,7 +107,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-    
+
     delete:
       summary: Delete a location
       operationId: deleteLocation
@@ -196,7 +196,7 @@ paths:
         schema:
           type: string
         description: Location slug (URL-friendly identifier)
-    
+
     get:
       summary: Get a location by slug
       operationId: getLocationBySlug
