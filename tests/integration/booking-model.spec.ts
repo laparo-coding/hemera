@@ -91,7 +91,6 @@ describe('Booking Model Validations', () => {
     try {
       await prisma.booking.deleteMany();
       await prisma.course.deleteMany();
-      await prisma.account.deleteMany();
       await prisma.user.deleteMany();
     } catch (error) {
       console.warn('Cleanup warning:', error);
