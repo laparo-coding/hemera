@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check admin role
-    const userRole = sessionClaims?.metadata?.role as string | undefined;
+    const userRole = (sessionClaims?.metadata as { role?: string })?.role;
     if (userRole !== 'admin') {
       logger.warn('Non-admin user attempted to geocode', { userId });
       return createErrorResponse(
@@ -87,7 +87,10 @@ export async function POST(request: NextRequest) {
 
     return createSuccessResponse(result, requestId);
   } catch (error) {
-    logger.error('Error geocoding address', { error });
+    logger.error(
+      'Error geocoding address',
+      error instanceof Error ? error : new Error(String(error))
+    );
     return createErrorResponse(
       'Fehler beim Geocoding',
       ErrorCodes.INTERNAL_ERROR,

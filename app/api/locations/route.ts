@@ -39,7 +39,10 @@ export async function GET(request: NextRequest) {
 
     return createSuccessResponse(result, requestId);
   } catch (error) {
-    logger.error('Error fetching locations', { error });
+    logger.error(
+      'Error fetching locations',
+      error instanceof Error ? error : new Error(String(error))
+    );
     return createErrorResponse(
       'Fehler beim Laden der Locations',
       ErrorCodes.INTERNAL_ERROR,
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check admin role
-    const userRole = sessionClaims?.metadata?.role as string | undefined;
+    const userRole = (sessionClaims?.metadata as { role?: string })?.role;
     if (userRole !== 'admin') {
       logger.warn('Non-admin user attempted to create location', { userId });
       return createErrorResponse(
@@ -94,10 +97,12 @@ export async function POST(request: NextRequest) {
         ErrorCodes.INVALID_INPUT,
         requestId,
         400,
-        validation.error.issues.map(issue => ({
-          field: issue.path.join('.'),
-          message: issue.message,
-        }))
+        {
+          validationErrors: validation.error.issues.map(issue => ({
+            field: issue.path.join('.'),
+            message: issue.message,
+          })),
+        }
       );
     }
 
@@ -112,7 +117,10 @@ export async function POST(request: NextRequest) {
 
     return createSuccessResponse(location, requestId, 201);
   } catch (error) {
-    logger.error('Error creating location', { error });
+    logger.error(
+      'Error creating location',
+      error instanceof Error ? error : new Error(String(error))
+    );
     return createErrorResponse(
       'Fehler beim Erstellen der Location',
       ErrorCodes.INTERNAL_ERROR,

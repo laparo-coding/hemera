@@ -62,7 +62,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return createSuccessResponse(location, requestId);
   } catch (error) {
-    logger.error('Error fetching location', { id, error });
+    logger.error(
+      'Error fetching location',
+      error instanceof Error ? error : new Error(String(error)),
+      { id }
+    );
     return createErrorResponse(
       'Fehler beim Laden der Location',
       ErrorCodes.INTERNAL_ERROR,
@@ -100,7 +104,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check admin role
-    const userRole = sessionClaims?.metadata?.role as string | undefined;
+    const userRole = (sessionClaims?.metadata as { role?: string })?.role;
     if (userRole !== 'admin') {
       logger.warn('Non-admin user attempted to update location', {
         userId,
@@ -127,10 +131,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         ErrorCodes.INVALID_INPUT,
         requestId,
         400,
-        validation.error.issues.map(issue => ({
-          field: issue.path.join('.'),
-          message: issue.message,
-        }))
+        {
+          validationErrors: validation.error.issues.map(issue => ({
+            field: issue.path.join('.'),
+            message: issue.message,
+          })),
+        }
       );
     }
 
@@ -155,7 +161,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    logger.error('Error updating location', { id, error });
+    logger.error(
+      'Error updating location',
+      error instanceof Error ? error : new Error(String(error)),
+      { id }
+    );
     return createErrorResponse(
       'Fehler beim Aktualisieren der Location',
       ErrorCodes.INTERNAL_ERROR,
@@ -193,7 +203,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check admin role
-    const userRole = sessionClaims?.metadata?.role as string | undefined;
+    const userRole = (sessionClaims?.metadata as { role?: string })?.role;
     if (userRole !== 'admin') {
       logger.warn('Non-admin user attempted to delete location', {
         userId,
@@ -249,7 +259,11 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    logger.error('Error deleting location', { id, error });
+    logger.error(
+      'Error deleting location',
+      error instanceof Error ? error : new Error(String(error)),
+      { id }
+    );
     return createErrorResponse(
       'Fehler beim Löschen der Location',
       ErrorCodes.INTERNAL_ERROR,

@@ -25,7 +25,7 @@ export default function LocationLoading() {
 
       <Grid container spacing={4}>
         {/* Map Section */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Paper sx={{ p: 2 }}>
             <Skeleton variant='text' width={120} height={32} sx={{ mb: 1 }} />
             <Skeleton
@@ -51,7 +51,7 @@ export default function LocationLoading() {
         </Grid>
 
         {/* Sidebar Skeleton */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper sx={{ p: 3 }}>
             <Skeleton variant='text' width={160} height={32} sx={{ mb: 2 }} />
             <Skeleton variant='rectangular' height={1} sx={{ mb: 2 }} />

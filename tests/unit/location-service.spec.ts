@@ -6,16 +6,16 @@
 
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
-// Mock Prisma client
+// Mock Prisma client with proper typing
 const mockPrisma = {
   location: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    findFirst: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    count: jest.fn(),
+    findMany: jest.fn<() => Promise<unknown>>(),
+    findUnique: jest.fn<() => Promise<unknown>>(),
+    findFirst: jest.fn<() => Promise<unknown>>(),
+    create: jest.fn<() => Promise<unknown>>(),
+    update: jest.fn<() => Promise<unknown>>(),
+    delete: jest.fn<() => Promise<unknown>>(),
+    count: jest.fn<() => Promise<number>>(),
   },
 };
 

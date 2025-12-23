@@ -86,13 +86,24 @@ export async function geocodeAddress(
 }
 
 /**
- * Build Apple Maps URL for an address
+ * Build Apple Maps URL for an address or coordinates
  */
 export function buildAppleMapsUrl(
-  address: string,
-  city: string,
-  zipCode?: string | null
+  latOrAddress: number | string,
+  lngOrCity: number | string,
+  labelOrZipCode?: string | null
 ): string {
+  if (typeof latOrAddress === 'number' && typeof lngOrCity === 'number') {
+    // Coordinate-based URL
+    const lat = latOrAddress;
+    const lng = lngOrCity;
+    const label = labelOrZipCode || '';
+    return `https://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(label)}`;
+  }
+  // Address-based URL
+  const address = latOrAddress as string;
+  const city = lngOrCity as string;
+  const zipCode = labelOrZipCode;
   const fullAddress = zipCode
     ? `${address}, ${zipCode} ${city}`
     : `${address}, ${city}`;
@@ -100,13 +111,23 @@ export function buildAppleMapsUrl(
 }
 
 /**
- * Build Google Maps URL for an address
+ * Build Google Maps URL for an address or coordinates
  */
 export function buildGoogleMapsUrl(
-  address: string,
-  city: string,
-  zipCode?: string | null
+  latOrAddress: number | string,
+  lngOrCity: number | string,
+  labelOrZipCode?: string | null
 ): string {
+  if (typeof latOrAddress === 'number' && typeof lngOrCity === 'number') {
+    // Coordinate-based URL
+    const lat = latOrAddress;
+    const lng = lngOrCity;
+    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  }
+  // Address-based URL
+  const address = latOrAddress as string;
+  const city = lngOrCity as string;
+  const zipCode = labelOrZipCode;
   const fullAddress = zipCode
     ? `${address}, ${zipCode} ${city}`
     : `${address}, ${city}`;

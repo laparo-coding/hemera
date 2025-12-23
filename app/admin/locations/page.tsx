@@ -19,9 +19,9 @@ export const metadata = {
 };
 
 async function LocationsContent() {
-  const locations = await listLocations();
+  const result = await listLocations();
 
-  return <LocationsTableClient locations={locations} />;
+  return <LocationsTableClient locations={result.locations} />;
 }
 
 function LocationsSkeleton() {
@@ -41,7 +41,8 @@ export default async function AdminLocationsPage() {
   const { sessionClaims } = await auth();
 
   // Admin authorization
-  if (sessionClaims?.metadata?.role !== 'admin') {
+  const userRole = (sessionClaims?.metadata as { role?: string })?.role;
+  if (userRole !== 'admin') {
     redirect('/dashboard');
   }
 

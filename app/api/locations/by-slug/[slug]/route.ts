@@ -56,7 +56,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return createSuccessResponse(location, requestId);
   } catch (error) {
-    logger.error('Error fetching location by slug', { slug, error });
+    logger.error(
+      'Error fetching location by slug',
+      error instanceof Error ? error : new Error(String(error)),
+      { slug }
+    );
     return createErrorResponse(
       'Fehler beim Laden der Location',
       ErrorCodes.INTERNAL_ERROR,
