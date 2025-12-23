@@ -41,7 +41,7 @@ describe('Course Model Validations', () => {
       expect(course.title).toBe(courseData.title);
       expect(course.slug).toBe(courseData.slug);
       expect(course.price).toBe(courseData.price);
-      expect(course.currency).toBe('USD'); // default
+      expect(course.currency).toBe('EUR'); // default
       expect(course.isPublished).toBe(false); // default
       expect(course.createdAt).toBeInstanceOf(Date);
       expect(course.updatedAt).toBeInstanceOf(Date);

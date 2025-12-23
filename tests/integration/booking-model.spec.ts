@@ -414,7 +414,7 @@ describe('Booking Model Validations', () => {
         },
       });
 
-      expect(booking.currency).toBe('USD');
+      expect(booking.currency).toBe('EUR');
     });
 
     it('should accept zero amount for free courses', async () => {
