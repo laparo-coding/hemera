@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   description: 'Entdecke unsere Kursstandorte und Veranstaltungsorte',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function LocationsPage() {
   const result = await listLocations();
 
