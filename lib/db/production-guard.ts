@@ -38,6 +38,7 @@ const SAFE_DB_PATTERNS = [
   'localhost',
   '127.0.0.1',
   '::1',
+  'file:', // SQLite
   '.local',
   'postgres:', // Local docker container name
 ] as const;
