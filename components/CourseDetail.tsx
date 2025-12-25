@@ -5,6 +5,7 @@ import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 import HistoryEduRoundedIcon from '@mui/icons-material/HistoryEduRounded';
 import LocationOnRoundedIcon from '@mui/icons-material/LocationOnRounded';
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import {
   Box,
   Button,
@@ -51,6 +52,7 @@ interface Course {
   endTime?: Date | null;
   isPublished: boolean;
   thumbnailUrl?: string | null;
+  instructor?: string | null;
   createdAt: Date;
   updatedAt: Date;
   availableSpots?: number | null;
@@ -264,7 +266,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
         <Grid item xs={12} md={7}>
           <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
             {course.thumbnailUrl ? (
-              <CardMedia sx={{ position: 'relative', aspectRatio: '16 / 9' }}>
+              <CardMedia sx={{ position: 'relative', aspectRatio: '3 / 1' }}>
                 <Image
                   src={course.thumbnailUrl}
                   alt={course.title}
@@ -276,7 +278,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
             ) : (
               <Box
                 sx={{
-                  height: 200,
+                  height: 120,
                   bgcolor: '#16404D',
                   display: 'flex',
                   alignItems: 'center',
@@ -306,6 +308,24 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                   >
                     {course.title}
                   </Typography>
+                  {course.instructor && (
+                    <Stack
+                      direction='row'
+                      spacing={0.5}
+                      alignItems='center'
+                      sx={{ mt: 1 }}
+                    >
+                      <PersonRoundedIcon
+                        sx={{ fontSize: 20, color: 'text.primary' }}
+                      />
+                      <Typography
+                        variant='body1'
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        Dozent: {course.instructor}
+                      </Typography>
+                    </Stack>
+                  )}
                   <Stack
                     direction={{ xs: 'column', sm: 'row' }}
                     spacing={2}

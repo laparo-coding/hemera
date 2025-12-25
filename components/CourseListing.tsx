@@ -2,6 +2,7 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
+import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
 
@@ -22,6 +23,8 @@ export interface Course {
   availableSpots?: number | null;
   totalBookings?: number;
   userBookingStatus?: string | null;
+  thumbnailUrl?: string | null;
+  instructor?: string | null;
 }
 
 export interface CourseListingProps {
@@ -54,37 +57,59 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
   return (
     <div
-      className='bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200'
+      className='bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200 overflow-hidden'
       data-testid='course-card'
     >
+      {/* Thumbnail Header */}
+      <div className='relative h-40 bg-gray-800'>
+        {course.thumbnailUrl ? (
+          <Image
+            src={course.thumbnailUrl}
+            alt={course.title}
+            fill
+            className='object-cover'
+            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+          />
+        ) : (
+          <div className='absolute inset-0 flex items-center justify-center'>
+            <span className='text-4xl font-bold text-white opacity-50'>
+              {course.title.charAt(0)}
+            </span>
+          </div>
+        )}
+        {/* Availability badge overlay */}
+        <div className='absolute top-2 right-2'>
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shadow-sm ${
+              isAvailable
+                ? 'bg-green-100 text-green-800'
+                : 'bg-red-100 text-red-800'
+            }`}
+          >
+            {isAvailable ? 'Verfügbar' : 'Ausgebucht'}
+          </span>
+        </div>
+      </div>
+
       <div className='p-6'>
-        {/* Header with title and status */}
-        <div className='flex justify-between items-start mb-3'>
+        {/* Title */}
+        <div className='mb-3'>
           <h3
             className='text-xl font-semibold text-gray-900 line-clamp-2 course-name'
             data-testid='course-name'
           >
             {course.title}
           </h3>
-          <div className='flex flex-col items-end gap-1 ml-4'>
-            {/* Availability badge */}
-            <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                isAvailable
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
-              }`}
-            >
-              {isAvailable ? 'Verfügbar' : 'Ausgebucht'}
+          {/* Instructor */}
+          {course.instructor && (
+            <p className='text-sm text-gray-500 mt-1'>👤 {course.instructor}</p>
+          )}
+          {/* User booking status */}
+          {showBookingStatus && isUserBooked && (
+            <span className='inline-flex items-center mt-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800'>
+              Gebucht
             </span>
-
-            {/* User booking status */}
-            {showBookingStatus && isUserBooked && (
-              <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800'>
-                Gebucht
-              </span>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Description */}
