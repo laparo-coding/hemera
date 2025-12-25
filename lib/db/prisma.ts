@@ -15,6 +15,9 @@ const globalForPrisma = globalThis as unknown as {
   pool?: Pool;
 };
 
+// Lazy-initialized client
+let _prismaClient: PrismaClient | undefined;
+
 /**
  * Create and configure PrismaClient instance
  *
@@ -49,20 +52,44 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
-// Reuse client in development to prevent connection exhaustion
-export const prisma: PrismaClient =
-  globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
+/**
+ * Get the Prisma client instance (lazy initialization)
+ * This allows DATABASE_URL to be set after module import (e.g., by testcontainers)
+ */
+function getPrismaClient(): PrismaClient {
+  if (!_prismaClient) {
+    if (globalForPrisma.prisma) {
+      _prismaClient = globalForPrisma.prisma;
+    } else {
+      _prismaClient = createPrismaClient();
+      if (process.env.NODE_ENV !== 'production') {
+        globalForPrisma.prisma = _prismaClient;
+      }
+    }
+  }
+  return _prismaClient;
 }
+
+// Export a proxy that lazily initializes the client on first property access
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const client = getPrismaClient();
+    const value = client[prop as keyof PrismaClient];
+    if (typeof value === 'function') {
+      return value.bind(client);
+    }
+    return value;
+  },
+});
 
 /**
  * Gracefully disconnect from database
  * Used in tests and graceful shutdown
  */
 export async function closeDb(): Promise<void> {
-  await prisma.$disconnect();
+  if (_prismaClient) {
+    await _prismaClient.$disconnect();
+  }
   if (globalForPrisma.pool) {
     await globalForPrisma.pool.end();
   }
