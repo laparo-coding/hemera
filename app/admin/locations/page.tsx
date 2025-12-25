@@ -16,6 +16,8 @@ export const metadata = {
   description: 'Kursstandorte erstellen und verwalten',
 };
 
+export const dynamic = 'force-dynamic';
+
 async function LocationsContent() {
   const result = await listLocations();
 

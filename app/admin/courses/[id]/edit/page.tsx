@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   description: 'Kurs bearbeiten',
 };
 
+export const dynamic = 'force-dynamic';
+
 interface EditCoursePageProps {
   params: Promise<{ id: string }>;
 }
