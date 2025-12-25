@@ -26,6 +26,7 @@ import {
 import { format } from 'date-fns';
 import Link from 'next/link';
 import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
+import { getLevelLabel } from '../../lib/utils/course-level';
 import PublishToggle from './PublishToggle';
 
 interface CourseListProps {
@@ -79,13 +80,7 @@ export default function CourseList({
               <TableCell>{course.instructor}</TableCell>
               <TableCell>
                 <Chip
-                  label={
-                    course.level === 'BEGINNER'
-                      ? 'Anfänger'
-                      : course.level === 'INTERMEDIATE'
-                        ? 'Fortgeschritten'
-                        : 'Experte'
-                  }
+                  label={getLevelLabel(course.level)}
                   size='small'
                   color={
                     course.level === 'BEGINNER'
@@ -108,7 +103,7 @@ export default function CourseList({
                     : 'TBD'}
                 </Typography>
               </TableCell>
-              <TableCell align='right'>€{course.price.toString()}</TableCell>
+              <TableCell align='right'>{course.price.toString()} €</TableCell>
               <TableCell align='center'>
                 <Chip
                   label={`${course._count.bookings} / ${course.capacity}`}

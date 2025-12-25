@@ -1,3 +1,4 @@
+import { currentUser } from '@clerk/nextjs/server';
 import {
   Alert,
   Box,
@@ -9,16 +10,20 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
 import type { Metadata } from 'next';
-import { requireAdmin } from '../../lib/auth/helpers';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard - Hemera Academy',
   description: 'Administrative dashboard for managing the platform',
 };
 
+/**
+ * Admin Dashboard Page
+ *
+ * Note: Admin authentication is handled by the parent layout.
+ */
 export default async function AdminPage() {
-  // This will redirect non-admin users to /dashboard
-  const adminUser = await requireAdmin();
+  // Get user for display purposes (auth is handled by layout)
+  const adminUser = await currentUser();
 
   return (
     <Box data-testid='admin-page'>
@@ -94,7 +99,7 @@ export default async function AdminPage() {
               </Typography>
               <Typography variant='body2' paragraph>
                 <strong>Admin:</strong>{' '}
-                {adminUser.emailAddresses[0]?.emailAddress || 'Unknown'}
+                {adminUser?.emailAddresses[0]?.emailAddress || 'Unknown'}
               </Typography>
               <Typography variant='body2' paragraph>
                 <strong>Role:</strong> Administrator
@@ -134,6 +139,22 @@ export default async function AdminPage() {
               </Typography>
               <Button variant='contained' fullWidth href='/admin/courses'>
                 Manage Courses
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant='h6' gutterBottom>
+                Location Management
+              </Typography>
+              <Typography variant='body2' color='text.secondary' paragraph>
+                Manage course locations and venues.
+              </Typography>
+              <Button variant='contained' fullWidth href='/admin/locations'>
+                Manage Locations
               </Button>
             </CardContent>
           </Card>

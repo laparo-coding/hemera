@@ -467,7 +467,7 @@ const UserDashboardClerk: React.FC = () => {
                     color: colors.petrol,
                   }}
                 >
-                  €{(stats.totalSpent / 100).toFixed(2)}
+                  {stats.totalSpent.toLocaleString('de-DE')} €
                 </Typography>
               </Box>
             </Stack>
@@ -603,8 +603,8 @@ const UserDashboardClerk: React.FC = () => {
                         color: colors.petrol,
                       }}
                     >
-                      {booking.currency}{' '}
-                      {(booking.coursePrice / 100).toFixed(2)}
+                      {booking.coursePrice.toLocaleString('de-DE')}{' '}
+                      {booking.currency}
                     </Typography>
                   </Grid>
 

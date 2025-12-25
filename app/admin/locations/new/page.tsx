@@ -1,67 +1,23 @@
-'use client';
-
 /**
- * Admin Create New Location Page
+ * Admin Create New Location Page (Server Component)
  * Feature: 015-course-locations
  * Task: T037
+ *
+ * Note: Admin authentication is handled by the parent layout.
+ * This page follows the Server Component + Client Child pattern.
  */
 
-import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
-import {
-  Alert,
-  Box,
-  Breadcrumbs,
-  Button,
-  Container,
-  Paper,
-  Typography,
-} from '@mui/material';
+import { Box, Breadcrumbs, Container, Typography } from '@mui/material';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import LocationForm from '@/components/LocationForm';
-import type { LocationCreateInput } from '@/lib/schemas/location-schema';
+import NewLocationForm from './NewLocationForm';
+
+export const metadata: Metadata = {
+  title: 'Neue Location erstellen | Admin',
+  description: 'Neuen Kursstandort hinzufügen',
+};
 
 export default function NewLocationPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (data: LocationCreateInput) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/locations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || 'Fehler beim Erstellen der Location'
-        );
-      }
-
-      router.push('/admin/locations');
-      router.refresh();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Ein unbekannter Fehler ist aufgetreten'
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCancel = () => {
-    router.push('/admin/locations');
-  };
-
   return (
     <Container maxWidth='md' sx={{ py: 4 }}>
       <Breadcrumbs sx={{ mb: 2 }}>
@@ -80,15 +36,7 @@ export default function NewLocationPage() {
         <Typography color='text.primary'>Neu</Typography>
       </Breadcrumbs>
 
-      <Box sx={{ mb: 4 }}>
-        <Button
-          component={Link}
-          href='/admin/locations'
-          startIcon={<ArrowBackIcon />}
-          sx={{ mb: 2 }}
-        >
-          Zurück zur Übersicht
-        </Button>
+      <Box sx={{ mb: 2 }}>
         <Typography variant='h4' component='h1' gutterBottom>
           Neue Location erstellen
         </Typography>
@@ -97,19 +45,7 @@ export default function NewLocationPage() {
         </Typography>
       </Box>
 
-      {error && (
-        <Alert severity='error' sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      <Paper sx={{ p: 3 }}>
-        <LocationForm
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isLoading={loading}
-        />
-      </Paper>
+      <NewLocationForm />
     </Container>
   );
 }

@@ -4,11 +4,9 @@
  * Task: T036
  */
 
-import { auth } from '@clerk/nextjs/server';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Box, Button, Container, Skeleton, Typography } from '@mui/material';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { listLocations } from '@/lib/services/location';
 import LocationsTableClient from './LocationsTableClient';
@@ -37,15 +35,12 @@ function LocationsSkeleton() {
   );
 }
 
+/**
+ * Admin Locations Page
+ *
+ * Note: Admin authentication is handled by the parent layout.
+ */
 export default async function AdminLocationsPage() {
-  const { sessionClaims } = await auth();
-
-  // Admin authorization
-  const userRole = (sessionClaims?.metadata as { role?: string })?.role;
-  if (userRole !== 'admin') {
-    redirect('/dashboard');
-  }
-
   return (
     <Container maxWidth='lg' sx={{ py: 4 }}>
       <Box
@@ -64,14 +59,11 @@ export default async function AdminLocationsPage() {
             Verwalte Kursstandorte und Veranstaltungsorte
           </Typography>
         </Box>
-        <Button
-          component={Link}
-          href='/admin/locations/new'
-          variant='contained'
-          startIcon={<AddIcon />}
-        >
-          Neue Location
-        </Button>
+        <Link href='/admin/locations/new'>
+          <Button variant='contained' startIcon={<AddIcon />}>
+            Neue Location
+          </Button>
+        </Link>
       </Box>
 
       <Suspense fallback={<LocationsSkeleton />}>

@@ -321,13 +321,8 @@ async function LocationContent({ slug }: { slug: string }) {
 
             {/* CTA to courses */}
             {courseCount > 0 && (
-              <Link
-                href={`/courses?location=${location.slug}`}
-                passHref
-                legacyBehavior
-              >
+              <Link href={`/courses?location=${location.slug}`}>
                 <Button
-                  component='a'
                   variant='contained'
                   fullWidth
                   startIcon={<SchoolIcon />}
@@ -347,7 +342,7 @@ export default async function LocationPage({ params }: LocationPageProps) {
   const { slug } = await params;
 
   return (
-    <Container maxWidth='lg' sx={{ py: 4 }}>
+    <Container maxWidth='lg' sx={{ pt: { xs: 10, md: 12 }, pb: 4 }}>
       <Suspense
         fallback={
           <Box>

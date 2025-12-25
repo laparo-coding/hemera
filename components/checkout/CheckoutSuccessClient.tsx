@@ -175,7 +175,7 @@ export default function CheckoutSuccessClient() {
                       Amount Paid
                     </Typography>
                     <Typography variant='body1' fontWeight='bold'>
-                      {booking.currency} {(booking.price / 100).toFixed(2)}
+                      {booking.price.toLocaleString('de-DE')} {booking.currency}
                     </Typography>
                   </Stack>
 

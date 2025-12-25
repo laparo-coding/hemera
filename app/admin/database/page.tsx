@@ -149,7 +149,9 @@ export default function DatabaseAdminPage() {
                   <TableCell>
                     <code>{course.slug}</code>
                   </TableCell>
-                  <TableCell>€{(course.price / 100).toFixed(2)}</TableCell>
+                  <TableCell>
+                    {course.price.toLocaleString('de-DE')} €
+                  </TableCell>
                   <TableCell>{course.capacity || 'Unlimited'}</TableCell>
                   <TableCell>
                     <Chip

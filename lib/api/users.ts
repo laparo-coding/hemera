@@ -440,11 +440,55 @@ export async function syncUserFromClerk(clerkUser: ClerkUser): Promise<User> {
   };
 
   const user = await safePrismaOperation(async () => {
+    // First check if user exists by ID
+    const existingById = await prisma.user.findUnique({
+      where: { id: userData.id },
+    });
+
+    if (existingById) {
+      // User exists with this ID, update it (but don't change email if it conflicts)
+      return await prisma.user.update({
+        where: { id: userData.id },
+        data: {
+          name: userData.name,
+          image: userData.image,
+          // Only update email if it hasn't changed or if the new email isn't taken
+        },
+      });
+    }
+
+    // Check if a user with this email already exists (with a different ID)
+    if (userData.email) {
+      const existingByEmail = await prisma.user.findUnique({
+        where: { email: userData.email },
+      });
+
+      if (existingByEmail) {
+        // A user with this email exists but with different ID.
+        // This happens when Clerk ID changed or user logged in with different auth method.
+        // Delete the old user and create new one with the correct Clerk ID.
+        // First, update any bookings to point to the new user ID
+        await prisma.booking.updateMany({
+          where: { userId: existingByEmail.id },
+          data: { userId: userData.id },
+        });
+
+        // Delete the old user (ignore if already deleted by parallel request)
+        try {
+          await prisma.user.delete({
+            where: { id: existingByEmail.id },
+          });
+        } catch {
+          // User may have been deleted by a parallel request - that's OK
+        }
+      }
+    }
+
+    // Create new user with Clerk ID (use upsert to handle race conditions)
     return await prisma.user.upsert({
       where: { id: userData.id },
       update: {
         name: userData.name,
-        email: userData.email,
         image: userData.image,
       },
       create: userData,

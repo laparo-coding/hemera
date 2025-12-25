@@ -197,7 +197,7 @@ export default async function BookingsPage() {
                           </Stack>
                           {booking.course.price && (
                             <Typography variant='caption' color='primary'>
-                              €{(booking.course.price / 100).toFixed(2)}
+                              {booking.course.price.toLocaleString('de-DE')} €
                             </Typography>
                           )}
                         </Stack>

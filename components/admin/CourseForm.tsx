@@ -24,8 +24,15 @@ import FileUpload from './FileUpload';
 // Use input type for form (before transformation)
 type FormData = z.input<typeof courseCreateSchema>;
 
+interface LocationOption {
+  id: string;
+  name: string;
+  city: string;
+}
+
 interface CourseFormProps {
   initialData?: Partial<FormData>;
+  locations?: LocationOption[];
   onSubmit: (data: FormData) => Promise<void>;
   onCancel?: () => void;
   submitLabel?: string;
@@ -34,6 +41,7 @@ interface CourseFormProps {
 
 export default function CourseForm({
   initialData,
+  locations = [],
   onSubmit,
   onCancel,
   submitLabel = 'Save Course',
@@ -60,6 +68,7 @@ export default function CourseForm({
       thumbnailUrl: initialData?.thumbnailUrl || null,
       capacity: initialData?.capacity || 20,
       isPublished: initialData?.isPublished ?? false,
+      locationId: initialData?.locationId || null,
     },
   });
 
@@ -123,7 +132,11 @@ export default function CourseForm({
               helperText={errors.price?.message}
               inputProps={{ min: 0, step: 0.01 }}
               disabled={isLoading || isSubmitting}
-              onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+              value={field.value === 0 ? '' : field.value}
+              onChange={e => {
+                const val = e.target.value;
+                field.onChange(val === '' ? 0 : parseFloat(val));
+              }}
             />
           )}
         />
@@ -141,7 +154,11 @@ export default function CourseForm({
               helperText={errors.capacity?.message}
               inputProps={{ min: 1 }}
               disabled={isLoading || isSubmitting}
-              onChange={e => field.onChange(parseInt(e.target.value, 10) || 0)}
+              value={field.value === 0 ? '' : field.value}
+              onChange={e => {
+                const val = e.target.value;
+                field.onChange(val === '' ? 0 : parseInt(val, 10));
+              }}
             />
           )}
         />
@@ -162,10 +179,18 @@ export default function CourseForm({
             disabled={isLoading || isSubmitting}
             value={
               field.value instanceof Date
-                ? field.value.toISOString().slice(0, 10)
-                : field.value
+                ? field.value.toISOString().split('T')[0]
+                : field.value || ''
             }
-            onChange={e => field.onChange(new Date(e.target.value))}
+            onChange={e => {
+              const dateStr = e.target.value;
+              if (dateStr) {
+                // Parse as local date (not UTC)
+                const [year, month, day] = dateStr.split('-').map(Number);
+                const date = new Date(year, month - 1, day);
+                field.onChange(date);
+              }
+            }}
           />
         )}
       />
@@ -186,8 +211,8 @@ export default function CourseForm({
               disabled={isLoading || isSubmitting}
               value={
                 field.value instanceof Date
-                  ? field.value.toISOString().slice(11, 16)
-                  : field.value
+                  ? `${String(field.value.getHours()).padStart(2, '0')}:${String(field.value.getMinutes()).padStart(2, '0')}`
+                  : field.value || ''
               }
               onChange={e => {
                 const [hours, minutes] = e.target.value.split(':');
@@ -214,8 +239,8 @@ export default function CourseForm({
               disabled={isLoading || isSubmitting}
               value={
                 field.value instanceof Date
-                  ? field.value.toISOString().slice(11, 16)
-                  : field.value
+                  ? `${String(field.value.getHours()).padStart(2, '0')}:${String(field.value.getMinutes()).padStart(2, '0')}`
+                  : field.value || ''
               }
               onChange={e => {
                 const [hours, minutes] = e.target.value.split(':');
@@ -257,13 +282,41 @@ export default function CourseForm({
               helperText={errors.level?.message}
               disabled={isLoading || isSubmitting}
             >
-              <MenuItem value='BEGINNER'>Anfänger</MenuItem>
-              <MenuItem value='INTERMEDIATE'>Fortgeschritten</MenuItem>
-              <MenuItem value='ADVANCED'>Experte</MenuItem>
+              <MenuItem value='BEGINNER'>Basis</MenuItem>
+              <MenuItem value='INTERMEDIATE'>Fortgeschrittene</MenuItem>
+              <MenuItem value='ADVANCED'>Masterclass</MenuItem>
             </TextField>
           )}
         />
       </Box>
+
+      <Controller
+        name='locationId'
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            select
+            label='Veranstaltungsort'
+            error={!!errors.locationId}
+            helperText={
+              errors.locationId?.message || 'Optional - Ort des Kurses'
+            }
+            disabled={isLoading || isSubmitting}
+            value={field.value || ''}
+            onChange={e => field.onChange(e.target.value || null)}
+          >
+            <MenuItem value=''>
+              <em>Kein Ort ausgewählt</em>
+            </MenuItem>
+            {locations.map(location => (
+              <MenuItem key={location.id} value={location.id}>
+                {location.name} – {location.city}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
+      />
 
       <Box>
         <Typography variant='subtitle2' gutterBottom>

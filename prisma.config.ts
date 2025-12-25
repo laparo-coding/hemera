@@ -2,8 +2,12 @@
 // Docs: https://pris.ly/d/config-datasource
 import { defineConfig } from '@prisma/config';
 
+const databaseUrl = process.env.DATABASE_URL || '';
+
 export default defineConfig({
   datasource: {
-    url: process.env.DATABASE_URL || '',
+    // Use direct URL from environment - this works for both PostgreSQL and SQLite
+    // Note: SQLite (file:) URLs require the schema.prisma provider to be 'sqlite'
+    url: databaseUrl,
   },
 });

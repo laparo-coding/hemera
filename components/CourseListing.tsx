@@ -191,7 +191,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
               data-testid='course-price'
             >
               {course.price && Number(course.price) > 0
-                ? (Number(course.price) / 100).toLocaleString('de-DE', {
+                ? Number(course.price).toLocaleString('de-DE', {
                     style: 'currency',
                     currency: course.currency,
                   })

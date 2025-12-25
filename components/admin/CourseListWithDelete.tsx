@@ -65,18 +65,27 @@ export default function CourseListWithDelete({
 
   const handlePublishToggle = async (courseId: string, publish: boolean) => {
     try {
+      // Find the course to get its current updatedAt for optimistic locking
+      const course = courses.find(c => c.id === courseId);
+      if (!course) {
+        setError('Kurs nicht gefunden');
+        return;
+      }
+
       const response = await fetch(`/api/admin/courses/${courseId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           isPublished: publish,
-          updatedAt: new Date().toISOString(),
+          updatedAt: new Date(course.updatedAt).toISOString(),
         }),
       });
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          'Fehler beim Aktualisieren des Veröffentlichungsstatus'
+          errorData.message ||
+            'Fehler beim Aktualisieren des Veröffentlichungsstatus'
         );
       }
 

@@ -20,13 +20,13 @@ export default function LocationNotFound() {
         Die gesuchte Location existiert nicht oder wurde verschoben.
       </Typography>
       <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-        <Link href='/' passHref legacyBehavior>
-          <Button component='a' variant='contained' startIcon={<HomeIcon />}>
+        <Link href='/'>
+          <Button variant='contained' startIcon={<HomeIcon />}>
             Zur Startseite
           </Button>
         </Link>
-        <Link href='/courses' passHref legacyBehavior>
-          <Button component='a' variant='outlined' startIcon={<SearchIcon />}>
+        <Link href='/courses'>
+          <Button variant='outlined' startIcon={<SearchIcon />}>
             Kurse durchsuchen
           </Button>
         </Link>

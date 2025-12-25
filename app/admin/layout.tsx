@@ -33,31 +33,38 @@ export default async function AdminLayout({
     redirect('/dashboard');
   }
 
+  // ThemeRegistry ist ein Client Component Wrapper für MUI SSR/CSR-Styling
+  const ThemeRegistry = (await import('../../components/ThemeRegistry'))
+    .default;
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <PublicNavigation />
-
-      <Box component='main' sx={{ paddingTop: '64px', flexGrow: 1 }}>
-        <Container maxWidth='xl' sx={{ mt: 4, mb: 4 }}>
-          {children}
-        </Container>
-      </Box>
-
+    <ThemeRegistry>
       <Box
-        component='footer'
-        sx={{
-          py: 2,
-          px: 2,
-          mt: 'auto',
-          backgroundColor: 'grey.200',
-        }}
+        sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
       >
-        <Container maxWidth='xl'>
-          <Typography variant='body2' color='text.secondary' align='center'>
-            Admin-Bereich - Eingeschränkter Zugriff
-          </Typography>
-        </Container>
+        <PublicNavigation />
+
+        <Box component='main' sx={{ paddingTop: '64px', flexGrow: 1 }}>
+          <Container maxWidth='xl' sx={{ mt: 4, mb: 4 }}>
+            {children}
+          </Container>
+        </Box>
+
+        <Box
+          component='footer'
+          sx={{
+            py: 2,
+            px: 2,
+            mt: 'auto',
+            backgroundColor: 'grey.200',
+          }}
+        >
+          <Container maxWidth='xl'>
+            <Typography variant='body2' color='text.secondary' align='center'>
+              Admin-Bereich - Eingeschränkter Zugriff
+            </Typography>
+          </Container>
+        </Box>
       </Box>
-    </Box>
+    </ThemeRegistry>
   );
 }

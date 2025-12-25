@@ -1,5 +1,8 @@
 'use client';
 
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Box, Button, Chip, Paper, Typography } from '@mui/material';
 import Link from 'next/link';
 
@@ -8,8 +11,21 @@ export interface CourseDate {
   date: Date;
   /** Formatted date (e.g., "15. Januar 2025") */
   formattedDate: string;
+  /** Start time (e.g., "10:00") */
+  startTime?: string;
+  /** End time (e.g., "17:00") */
+  endTime?: string;
   /** Available spots (optional) */
   availableSpots?: number;
+}
+
+export interface CourseLocation {
+  /** Location name */
+  name: string;
+  /** Location slug for URL */
+  slug: string;
+  /** City name */
+  city: string;
 }
 
 export interface CourseCardProps {
@@ -18,7 +34,7 @@ export interface CourseCardProps {
   /** Course identifier: A, B, or C */
   level: 'A' | 'B' | 'C';
   /** Level designation */
-  levelLabel: 'Grundkurs' | 'Fortgeschrittene' | 'Masterclass';
+  levelLabel: 'Basis' | 'Fortgeschrittene' | 'Masterclass';
   /** Course title (German) */
   title: string;
   /** Brief description (German, informal "Du") */
@@ -29,6 +45,10 @@ export interface CourseCardProps {
   detailHref: string;
   /** CTA text for button */
   ctaText?: string;
+  /** Location information (optional) */
+  location?: CourseLocation | null;
+  /** Thumbnail image URL (optional) */
+  thumbnailUrl?: string | null;
 }
 
 // Design tokens from spec
@@ -53,6 +73,8 @@ export default function CourseCard({
   upcomingDates,
   detailHref,
   ctaText = 'Mehr erfahren',
+  location,
+  thumbnailUrl,
 }: CourseCardProps) {
   return (
     <Paper
@@ -73,13 +95,45 @@ export default function CourseCard({
         },
       }}
     >
-      {/* Level indicator bar */}
-      <Box
-        sx={{
-          height: '6px',
-          bgcolor: levelColors[level],
-        }}
-      />
+      {/* Thumbnail image or Level indicator bar */}
+      {thumbnailUrl ? (
+        <Box
+          sx={{
+            position: 'relative',
+            height: 160,
+            overflow: 'hidden',
+          }}
+        >
+          <Box
+            component='img'
+            src={thumbnailUrl}
+            alt={title}
+            sx={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+          {/* Level indicator overlay */}
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: '6px',
+              bgcolor: levelColors[level],
+            }}
+          />
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            height: '6px',
+            bgcolor: levelColors[level],
+          }}
+        />
+      )}
 
       <Box
         sx={{
@@ -132,38 +186,116 @@ export default function CourseCard({
           {description}
         </Typography>
 
-        {/* Upcoming dates */}
+        {/* Upcoming dates with time */}
         {upcomingDates.length > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Typography
-              sx={{
-                fontFamily: '"Inter", sans-serif',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                color: colors.petrol,
-                mb: 1,
-              }}
-            >
-              Nächste Termine:
-            </Typography>
+          <Box sx={{ mb: 2 }}>
             {upcomingDates.slice(0, 3).map((courseDate, index) => (
-              <Typography
+              <Box
                 key={index}
                 sx={{
-                  fontFamily: '"Inter", sans-serif',
-                  fontSize: '0.875rem',
-                  color: colors.petrol,
-                  opacity: 0.75,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 0.5,
+                  mb: 1,
                 }}
               >
-                {courseDate.formattedDate}
-                {courseDate.availableSpots !== undefined && (
-                  <span style={{ marginLeft: '8px', color: colors.gold }}>
-                    ({courseDate.availableSpots} Plätze frei)
-                  </span>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CalendarTodayIcon
+                    sx={{
+                      fontSize: '1rem',
+                      color: colors.petrol,
+                      opacity: 0.6,
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontFamily: '"Inter", sans-serif',
+                      fontSize: '0.875rem',
+                      color: colors.petrol,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {courseDate.formattedDate}
+                  </Typography>
+                </Box>
+                {(courseDate.startTime || courseDate.endTime) && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      ml: 0,
+                    }}
+                  >
+                    <AccessTimeIcon
+                      sx={{
+                        fontSize: '1rem',
+                        color: colors.petrol,
+                        opacity: 0.6,
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        fontFamily: '"Inter", sans-serif',
+                        fontSize: '0.875rem',
+                        color: colors.petrol,
+                        opacity: 0.75,
+                      }}
+                    >
+                      {courseDate.startTime}
+                      {courseDate.endTime && ` – ${courseDate.endTime}`} Uhr
+                    </Typography>
+                  </Box>
                 )}
-              </Typography>
+                {courseDate.availableSpots !== undefined && (
+                  <Typography
+                    sx={{
+                      fontFamily: '"Inter", sans-serif',
+                      fontSize: '0.75rem',
+                      color: colors.gold,
+                      fontWeight: 500,
+                      ml: 2.5,
+                    }}
+                  >
+                    ({courseDate.availableSpots} Plätze frei)
+                  </Typography>
+                )}
+              </Box>
             ))}
+          </Box>
+        )}
+
+        {/* Location with link */}
+        {location && (
+          <Box sx={{ mb: 3 }}>
+            <Link
+              href={`/locations/${location.slug}`}
+              style={{ textDecoration: 'none' }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  color: colors.petrol,
+                  '&:hover': {
+                    color: colors.gold,
+                  },
+                  transition: 'color 0.2s ease',
+                }}
+              >
+                <LocationOnIcon sx={{ fontSize: '1rem', opacity: 0.6 }} />
+                <Typography
+                  sx={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  {location.name}, {location.city}
+                </Typography>
+              </Box>
+            </Link>
           </Box>
         )}
 

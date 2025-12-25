@@ -30,10 +30,7 @@ export const courseCreateSchema = z.object({
     .multipleOf(0.01, 'Price must have at most 2 decimal places'),
   startDate: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val))
-    .refine(date => date > new Date(), {
-      message: 'Start date must be a future date',
-    }),
+    .transform(val => (typeof val === 'string' ? new Date(val) : val)),
   startTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val)),
@@ -59,6 +56,11 @@ export const courseCreateSchema = z.object({
     .int('Capacity must be an integer')
     .positive('Capacity must be positive'),
   isPublished: z.boolean().default(false),
+  locationId: z
+    .string()
+    .cuid('Location ID must be a valid CUID')
+    .optional()
+    .nullable(),
 });
 
 /**
@@ -115,6 +117,11 @@ export const courseUpdateSchema = z.object({
     .positive('Capacity must be positive')
     .optional(),
   isPublished: z.boolean().optional(),
+  locationId: z
+    .string()
+    .cuid('Location ID must be a valid CUID')
+    .optional()
+    .nullable(),
   updatedAt: z.coerce.date(), // Required for optimistic locking
 });
 

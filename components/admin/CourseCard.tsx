@@ -114,7 +114,7 @@ export default function CourseCard({
           </Typography>
 
           <Typography variant='body2'>
-            <strong>Price:</strong> €{course.price.toString()}
+            <strong>Price:</strong> {course.price.toString()} €
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

@@ -69,10 +69,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
   const offer = {
     '@type': 'Offer',
-    price:
-      (course.price ?? 0) > 0
-        ? String(((course.price ?? 0) / 100).toFixed(2))
-        : '0',
+    price: (course.price ?? 0) > 0 ? String(course.price ?? 0) : '0',
     priceCurrency: 'EUR',
     availability: `https://schema.org/${inStock ? 'InStock' : 'OutOfStock'}`,
     url,
