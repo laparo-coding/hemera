@@ -17,6 +17,8 @@ export interface CourseWithBookings {
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
+  thumbnailUrl?: string | null;
+  instructor?: string | null;
   bookings: Booking[];
 }
 
