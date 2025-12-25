@@ -128,10 +128,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       return 'Kostenlos';
     }
 
+    // Prices are stored in cents, convert to euros for display
     return new Intl.NumberFormat('de-DE', {
       style: 'currency',
       currency: currency.toUpperCase(),
-    }).format(amount);
+    }).format(amount / 100);
   };
 
   const handleBookNow = async (
