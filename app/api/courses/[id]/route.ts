@@ -61,6 +61,8 @@ export async function GET(
         isPublished: course.isPublished,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
+        thumbnailUrl: course.thumbnailUrl,
+        instructor: course.instructor,
         availableSpots,
         totalBookings,
         userBookingStatus: null,

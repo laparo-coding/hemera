@@ -156,6 +156,8 @@ export async function GET(request: NextRequest) {
         isPublished: course.isPublished,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
+        thumbnailUrl: course.thumbnailUrl,
+        instructor: course.instructor,
         // Berechne verfügbare Plätze
         availableSpots: course.capacity
           ? Math.max(
