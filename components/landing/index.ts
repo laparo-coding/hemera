@@ -1,6 +1,6 @@
 export type { ConceptFeature, ConceptSectionProps } from './ConceptSection';
 export { default as ConceptSection } from './ConceptSection';
-export type { CourseCardProps, CourseDate } from './CourseCard';
+export type { CourseCardProps, CourseDate, CourseLocation } from './CourseCard';
 export { default as CourseCard } from './CourseCard';
 export type { CourseProgressionSectionProps } from './CourseProgressionSection';
 export { default as CourseProgressionSection } from './CourseProgressionSection';

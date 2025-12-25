@@ -9,6 +9,7 @@ import {
 import { getFeaturedCourses } from '../lib/api/courses';
 import { generateLandingPageMetadata } from '../lib/seo/metadata';
 import { SCHEMA_COMBINATIONS } from '../lib/seo/schemas';
+import { getLevelLabel } from '../lib/utils/course-level';
 
 /**
  * Premium Feminine Landing Page for Hemera Academy
@@ -76,18 +77,38 @@ const ctaContent = {
   ctaHref: '#kurse',
 };
 
-// Static course data (will be enhanced with real data from API)
+// Map database level to UI level indicator
+function mapLevelToIndicator(
+  level: string | null | undefined,
+  index: number
+): 'A' | 'B' | 'C' {
+  if (level === 'BEGINNER') return 'A';
+  if (level === 'INTERMEDIATE') return 'B';
+  if (level === 'ADVANCED') return 'C';
+  // Fallback based on position
+  return (['A', 'B', 'C'] as const)[index] || 'A';
+}
+
+// Format time from Date object
+function formatTime(date: Date | null | undefined): string | undefined {
+  if (!date) return undefined;
+  return new Date(date).toLocaleTimeString('de-DE', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+// Static fallback course data
 const staticCourses: CourseCardProps[] = [
   {
     courseId: 'grundkurs',
     level: 'A',
-    levelLabel: 'Grundkurs',
+    levelLabel: 'Basis',
     title: 'Grundlagen der Gehaltsverhandlung',
     description:
       'Lerne die fundamentalen Strategien und Techniken für erfolgreiche Gehaltsverhandlungen. Perfekt für den Einstieg.',
     upcomingDates: [
       { date: new Date('2025-01-15'), formattedDate: '15. Januar 2025' },
-      { date: new Date('2025-02-12'), formattedDate: '12. Februar 2025' },
     ],
     detailHref: '/courses/grundkurs',
     ctaText: 'Mehr erfahren',
@@ -101,7 +122,6 @@ const staticCourses: CourseCardProps[] = [
       'Vertiefe deine Kenntnisse mit fortgeschrittenen Taktiken und lerne, auch schwierige Situationen zu meistern.',
     upcomingDates: [
       { date: new Date('2025-02-20'), formattedDate: '20. Februar 2025' },
-      { date: new Date('2025-03-15'), formattedDate: '15. März 2025' },
     ],
     detailHref: '/courses/fortgeschrittene',
     ctaText: 'Mehr erfahren',
@@ -123,13 +143,50 @@ const staticCourses: CourseCardProps[] = [
 
 export default async function HomePage() {
   // Fetch real courses from API (fallback to static data on error)
-  let _featuredCourses;
+  let featuredCourses: CourseCardProps[] = staticCourses;
+
   try {
-    _featuredCourses = await getFeaturedCourses(3);
+    const dbCourses = await getFeaturedCourses(3);
+    if (dbCourses.length > 0) {
+      // Transform database courses to CourseCardProps
+      featuredCourses = dbCourses.map((course, index) => ({
+        courseId: course.slug,
+        level: mapLevelToIndicator(course.level, index),
+        levelLabel: getLevelLabel(course.level),
+        title: course.title,
+        description: course.description || '',
+        upcomingDates: course.startDate
+          ? [
+              {
+                date: new Date(course.startDate),
+                formattedDate: new Date(course.startDate).toLocaleDateString(
+                  'de-DE',
+                  {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  }
+                ),
+                startTime: formatTime(course.startTime),
+                endTime: formatTime(course.endTime),
+              },
+            ]
+          : [],
+        detailHref: `/courses/${course.slug}`,
+        ctaText: 'Mehr erfahren',
+        location: course.location
+          ? {
+              name: course.location.name,
+              slug: course.location.slug,
+              city: course.location.city,
+            }
+          : undefined,
+        thumbnailUrl: course.thumbnailUrl,
+      }));
+    }
   } catch (error) {
     // Log error but don't crash - use static courses as fallback
     console.error('Failed to fetch featured courses:', error);
-    _featuredCourses = [];
   }
 
   // JSON-LD Structured Data for SEO
@@ -160,7 +217,7 @@ export default async function HomePage() {
           id='kurse'
           headline='Dein Weg zum Verhandlungserfolg'
           subheadline='Drei aufeinander aufbauende Kurse begleiten dich von den Grundlagen bis zur Meisterschaft.'
-          courses={staticCourses}
+          courses={featuredCourses}
           showProgression={true}
         />
 

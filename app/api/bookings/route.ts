@@ -86,6 +86,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(responseData);
   } catch (error) {
+    console.error('[API /api/bookings GET] Error:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Invalid parameters' },

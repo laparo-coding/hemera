@@ -66,10 +66,14 @@ export async function createCourse(data: {
   level: CourseLevel;
   thumbnailUrl?: string | null;
   capacity: number;
+  locationId?: string | null;
+  isPublished?: boolean;
 }): Promise<CourseWithEnrollmentCount> {
+  // Always create courses as unpublished - admin must explicitly publish later
+  const { isPublished: _ignored, ...restData } = data;
   const course = await prisma.course.create({
     data: {
-      ...data,
+      ...restData,
       slug: generateSlug(data.title),
       currency: 'EUR',
       isPublished: false,
@@ -101,6 +105,7 @@ export async function updateCourse(
     level?: CourseLevel;
     thumbnailUrl?: string | null;
     capacity?: number;
+    locationId?: string | null;
     updatedAt: Date;
   }
 ): Promise<CourseWithEnrollmentCount> {

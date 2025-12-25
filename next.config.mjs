@@ -6,6 +6,24 @@ const __filename = fileURLToPath(import.meta.url);
 const nextConfig = {
   reactStrictMode: true,
 
+  // Allow external images from configured domains
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'foto.hrsstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'fh-410499-cms.s3-eu-central-1.ionoscloud.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.ionoscloud.com',
+      },
+    ],
+  },
+
   // Performance optimization: Fix webpack cache serialization warning
   // Feature: 012-performance-improvement (FR-009, NFR-005)
   experimental: {

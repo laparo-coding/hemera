@@ -3,6 +3,7 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  CardMedia,
   Container,
   Typography,
 } from '@mui/material';
@@ -138,7 +139,7 @@ export default async function CoursesPage() {
                               alignItems: 'stretch',
                             }}
                           >
-                            {/* Course Image Placeholder */}
+                            {/* Course Image */}
                             <Box
                               sx={{
                                 position: 'relative',
@@ -147,8 +148,33 @@ export default async function CoursesPage() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                overflow: 'hidden',
                               }}
                             >
+                              {course.thumbnailUrl ? (
+                                <CardMedia
+                                  component='img'
+                                  height='160'
+                                  image={course.thumbnailUrl}
+                                  alt={course.title}
+                                  sx={{
+                                    objectFit: 'cover',
+                                    width: '100%',
+                                    height: '100%',
+                                  }}
+                                />
+                              ) : (
+                                <Typography
+                                  variant='h4'
+                                  sx={{
+                                    color: '#FFFFFF',
+                                    fontFamily: '"Playfair Display", serif',
+                                    fontWeight: 700,
+                                  }}
+                                >
+                                  {course.title.charAt(0)}
+                                </Typography>
+                              )}
                               {/* Sold out badge */}
                               {isSoldOut && (
                                 <Box
@@ -165,22 +191,13 @@ export default async function CoursesPage() {
                                     fontWeight: 700,
                                     textTransform: 'uppercase',
                                     boxShadow: 2,
+                                    zIndex: 1,
                                   }}
                                   data-testid='sold-out-badge'
                                 >
                                   Ausgebucht
                                 </Box>
                               )}
-                              <Typography
-                                variant='h4'
-                                sx={{
-                                  color: '#FFFFFF',
-                                  fontFamily: '"Playfair Display", serif',
-                                  fontWeight: 700,
-                                }}
-                              >
-                                {course.title.charAt(0)}
-                              </Typography>
                             </Box>
 
                             <CardContent sx={{ flexGrow: 1, p: 3 }}>
@@ -199,37 +216,6 @@ export default async function CoursesPage() {
                               >
                                 {course.title}
                               </Typography>
-
-                              <Typography
-                                variant='body2'
-                                sx={{
-                                  mb: 2,
-                                  fontSize: '0.875rem',
-                                  color: '#16404D',
-                                  opacity: 0.7,
-                                }}
-                              >
-                                Dozent: Expert:in
-                              </Typography>
-
-                              {/* Rating */}
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  mb: 2,
-                                }}
-                              >
-                                <Typography variant='body2' sx={{ mr: 1 }}>
-                                  ⭐⭐⭐⭐⭐
-                                </Typography>
-                                <Typography
-                                  variant='body2'
-                                  sx={{ color: '#16404D', opacity: 0.7 }}
-                                >
-                                  (4.8)
-                                </Typography>
-                              </Box>
 
                               <Typography
                                 variant='body2'
@@ -261,8 +247,50 @@ export default async function CoursesPage() {
                                 }}
                                 data-testid='course-level'
                               >
-                                Einsteiger
+                                {course.level === 'BEGINNER'
+                                  ? 'Basis'
+                                  : course.level === 'INTERMEDIATE'
+                                    ? 'Fortgeschrittene'
+                                    : 'Masterclass'}
                               </Typography>
+
+                              {/* Location */}
+                              {course.location && (
+                                <Typography
+                                  variant='body2'
+                                  sx={{
+                                    mb: 2,
+                                    fontSize: '0.875rem',
+                                    color: '#16404D',
+                                    opacity: 0.7,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  📍 {course.location.name},{' '}
+                                  {course.location.city}
+                                </Typography>
+                              )}
+
+                              {/* Instructor */}
+                              {course.instructor && (
+                                <Typography
+                                  variant='body2'
+                                  sx={{
+                                    mb: 2,
+                                    fontSize: '0.875rem',
+                                    color: '#16404D',
+                                    opacity: 0.7,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  👤 {course.instructor}
+                                </Typography>
+                              )}
+
                               <Box
                                 sx={{
                                   display: 'flex',
@@ -291,9 +319,10 @@ export default async function CoursesPage() {
                                   }}
                                 >
                                   {course.price && Number(course.price) > 0
-                                    ? '€' +
-                                      (Number(course.price) / 100).toFixed(2)
-                                    : 'Free'}
+                                    ? `${Number(course.price).toLocaleString(
+                                        'de-DE'
+                                      )} €`
+                                    : 'Kostenlos'}
                                 </Typography>
                               </Box>
                             </CardContent>

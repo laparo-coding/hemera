@@ -12,6 +12,13 @@ import {
   logError,
 } from '../errors';
 
+export interface CourseLocation {
+  id: string;
+  name: string;
+  slug: string;
+  city: string;
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -29,6 +36,10 @@ export interface Course {
   availableSpots?: number | null;
   totalBookings?: number;
   userBookingStatus?: string | null;
+  level?: string | null;
+  location?: CourseLocation | null;
+  thumbnailUrl?: string | null;
+  instructor?: string | null;
 }
 
 export interface CourseWithSEO extends Course {
@@ -43,6 +54,7 @@ export interface CourseWithSEO extends Course {
 /**
  * Get all published courses
  * Used for the public course listing page
+ * Includes location data for display
  */
 export async function getPublishedCourses(): Promise<Course[]> {
   try {
@@ -53,6 +65,16 @@ export async function getPublishedCourses(): Promise<Course[]> {
         orderBy: {
           startDate: 'asc',
         },
+        include: {
+          location: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              city: true,
+            },
+          },
+        },
       });
     } catch (_schemaError) {
       // Fallback to createdAt ordering if startDate doesn't exist yet
@@ -60,12 +82,21 @@ export async function getPublishedCourses(): Promise<Course[]> {
         orderBy: {
           createdAt: 'desc',
         },
+        include: {
+          location: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              city: true,
+            },
+          },
+        },
       });
     }
 
-    // Filter published courses in JavaScript to ensure compatibility with SQLite
-    // SQLite may store boolean as 1/0, so we check for truthy values
-    const courses = allCourses.filter(course => !!course.isPublished);
+    // Filter published courses
+    const courses = allCourses.filter(course => course.isPublished);
 
     // Compute availability (FR-011): derive from internal capacities/bookings
     const courseIds = courses.map(c => c.id);
@@ -133,20 +164,30 @@ export async function getPublishedCourses(): Promise<Course[]> {
 /**
  * Get featured courses for homepage display
  * Returns a limited number of courses for featured section
+ * Includes location data for display
  */
 export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
   try {
-    // Try fetching without select to avoid column mismatch issues
-    // This is more resilient to schema differences between environments
+    // Include location data for display on landing page
     const courses = await prisma.course.findMany({
       where: {
         isPublished: true,
+      },
+      include: {
+        location: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            city: true,
+          },
+        },
       },
       orderBy: [{ startDate: 'asc' }, { createdAt: 'desc' }],
       take: limit,
     });
 
-    // Map to consistent Course interface
+    // Map to consistent Course interface with location
     return courses.map(course => ({
       id: course.id,
       title: course.title,
@@ -164,6 +205,15 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
       availableSpots: null,
       totalBookings: 0,
       userBookingStatus: null,
+      level: course.level ?? null,
+      location: course.location
+        ? {
+            id: course.location.id,
+            name: course.location.name,
+            slug: course.location.slug,
+            city: course.location.city,
+          }
+        : null,
     }));
   } catch (error) {
     logError(error, { operation: 'getFeaturedCourses', limit });
@@ -192,6 +242,14 @@ export async function getCourseById(id: string): Promise<Course> {
           },
           select: {
             id: true,
+          },
+        },
+        location: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            city: true,
           },
         },
       },
@@ -247,6 +305,14 @@ export async function getCourseBySlug(slug: string): Promise<Course> {
           },
           select: {
             id: true,
+          },
+        },
+        location: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            city: true,
           },
         },
       },

@@ -4,6 +4,7 @@ import BookOnlineOutlinedIcon from '@mui/icons-material/BookOnlineOutlined';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 import HistoryEduRoundedIcon from '@mui/icons-material/HistoryEduRounded';
+import LocationOnRoundedIcon from '@mui/icons-material/LocationOnRounded';
 import {
   Box,
   Button,
@@ -23,12 +24,19 @@ import {
   Typography,
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+interface CourseLocation {
+  id: string;
+  name: string;
+  slug: string;
+  city: string;
+}
 
 interface Course {
   id: string;
@@ -42,12 +50,13 @@ interface Course {
   startTime?: Date | null;
   endTime?: Date | null;
   isPublished: boolean;
-  image?: string | null;
+  thumbnailUrl?: string | null;
   createdAt: Date;
   updatedAt: Date;
   availableSpots?: number | null;
   totalBookings?: number;
   userBookingStatus?: string | null;
+  location?: CourseLocation | null;
 }
 
 interface CourseDetailProps {
@@ -97,15 +106,22 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   bookNowHref,
 }) => {
   const [isBooking, setIsBooking] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Avoid hydration mismatch by only calculating time-dependent values after mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const isCourseInPast = useMemo(() => {
+    if (!isMounted) return false; // Return stable value during SSR
     if (!course.startDate) return false;
     const dateValue =
       course.startDate instanceof Date
         ? course.startDate
         : new Date(course.startDate);
     return Number.isFinite(dateValue.getTime()) && dateValue < new Date();
-  }, [course.startDate]);
+  }, [course.startDate, isMounted]);
 
   const formatCurrency = (amount: number | null, currency: string) => {
     if (amount === null || amount === undefined) {
@@ -205,15 +221,6 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     return `${format(startTime, 'HH:mm')} - ${format(endTime, 'HH:mm')}`;
   }, [course.startTime, course.endTime]);
 
-  const createdAtLabel = useMemo(() => {
-    const createdAtValue =
-      course.createdAt instanceof Date
-        ? course.createdAt
-        : new Date(course.createdAt);
-    if (!Number.isFinite(createdAtValue.getTime())) return null;
-    return formatDistanceToNow(createdAtValue, { addSuffix: true, locale: de });
-  }, [course.createdAt]);
-
   if (isLoading) {
     return (
       <Card aria-busy='true' aria-live='polite' sx={{ p: 3 }}>
@@ -252,17 +259,39 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       <Grid container spacing={4} alignItems='flex-start'>
         <Grid item xs={12} md={7}>
           <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
-            {course.image ? (
+            {course.thumbnailUrl ? (
               <CardMedia sx={{ position: 'relative', aspectRatio: '16 / 9' }}>
                 <Image
-                  src={course.image}
+                  src={course.thumbnailUrl}
                   alt={course.title}
                   fill
                   sizes='(min-width: 1200px) 720px, 100vw'
                   style={{ objectFit: 'cover' }}
                 />
               </CardMedia>
-            ) : null}
+            ) : (
+              <Box
+                sx={{
+                  height: 200,
+                  bgcolor: '#16404D',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Typography
+                  variant='h2'
+                  sx={{
+                    color: '#FFFFFF',
+                    fontFamily: '"Playfair Display", serif',
+                    fontWeight: 700,
+                    fontSize: { xs: '3rem', md: '4rem' },
+                  }}
+                >
+                  {course.title.charAt(0)}
+                </Typography>
+              </Box>
+            )}
             <CardContent>
               <Stack spacing={3}>
                 <div>
@@ -303,6 +332,26 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                         {formatCurrency(course.price, course.currency)}
                       </Typography>
                     </Stack>
+                    {course.location && (
+                      <Stack direction='row' spacing={1} alignItems='center'>
+                        <LocationOnRoundedIcon fontSize='small' />
+                        <Link
+                          href={`/locations/${course.location.slug}`}
+                          style={{ textDecoration: 'none', color: 'inherit' }}
+                        >
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              '&:hover': {
+                                textDecoration: 'underline',
+                              },
+                            }}
+                          >
+                            {course.location.name}, {course.location.city}
+                          </Typography>
+                        </Link>
+                      </Stack>
+                    )}
                   </Stack>
                 </div>
 
@@ -429,12 +478,6 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     ) : null}
                   </List>
                 </Stack>
-
-                {createdAtLabel ? (
-                  <Typography variant='body2' color='text.secondary'>
-                    Erstellt {createdAtLabel}
-                  </Typography>
-                ) : null}
               </Stack>
             </CardContent>
           </Card>

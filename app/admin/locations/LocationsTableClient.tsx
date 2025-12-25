@@ -59,6 +59,7 @@ export default function LocationsTableClient({
     try {
       const response = await fetch(`/api/locations/${locationToDelete.id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       if (!response.ok) {

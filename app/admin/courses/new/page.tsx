@@ -1,57 +1,31 @@
 /**
- * Create Course Page
+ * Create Course Page (Server Component)
  *
- * Form for creating a new course
- * with validation and server action integration.
+ * Page for creating a new course.
+ * Note: Admin authentication is handled by the parent layout.
  */
 
-'use client';
+import type { Metadata } from 'next';
+import { listLocations } from '@/lib/services/location';
+import NewCourseForm from './NewCourseForm';
 
-import { Alert, Box, Paper, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import type { z } from 'zod';
-import CourseForm from '../../../../components/admin/CourseForm';
-import { createCourseAction } from '../../../../lib/actions/admin/courses';
-import type { courseCreateSchema } from '../../../../lib/schemas/admin/course';
+export const metadata: Metadata = {
+  title: 'Neuen Kurs erstellen | Admin',
+  description: 'Neuen Kurs erstellen',
+};
 
-type FormData = z.input<typeof courseCreateSchema>;
+// Prevent static generation - this page needs DB access at runtime
+export const dynamic = 'force-dynamic';
 
-export default function NewCoursePage() {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+export default async function NewCoursePage() {
+  const { locations } = await listLocations();
 
-  const handleSubmit = async (data: FormData) => {
-    setError(null);
-    const result = await createCourseAction(data);
+  // Map to simple format for dropdown
+  const locationOptions = locations.map(loc => ({
+    id: loc.id,
+    name: loc.name,
+    city: loc.city,
+  }));
 
-    if (result.success) {
-      router.push('/admin');
-      router.refresh();
-    } else {
-      setError(result.error || 'Failed to create course');
-    }
-  };
-
-  return (
-    <Box>
-      <Typography variant='h4' component='h1' gutterBottom>
-        Create New Course
-      </Typography>
-
-      {error && (
-        <Alert severity='error' sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <CourseForm
-          onSubmit={handleSubmit}
-          onCancel={() => router.push('/admin')}
-          submitLabel='Create Course'
-        />
-      </Paper>
-    </Box>
-  );
+  return <NewCourseForm locations={locationOptions} />;
 }

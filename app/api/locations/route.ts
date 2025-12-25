@@ -4,8 +4,9 @@
  * Tasks: T025, T026
  */
 
-import { auth } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
+import { isAdmin } from '@/lib/auth/helpers';
 import { locationCreateSchema } from '@/lib/schemas/location-schema';
 import { createLocation, listLocations } from '@/lib/services/location';
 import { createApiLogger } from '@/lib/utils/api-logger';
@@ -62,9 +63,9 @@ export async function POST(request: NextRequest) {
 
   try {
     // Check authentication
-    const { userId, sessionClaims } = await auth();
+    const user = await currentUser();
 
-    if (!userId) {
+    if (!user?.id) {
       logger.warn('Unauthorized attempt to create location');
       return createErrorResponse(
         'Authentifizierung erforderlich',
@@ -75,9 +76,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check admin role
-    const userRole = (sessionClaims?.metadata as { role?: string })?.role;
-    if (userRole !== 'admin') {
-      logger.warn('Non-admin user attempted to create location', { userId });
+    const adminCheck = await isAdmin();
+    if (!adminCheck) {
+      logger.warn('Non-admin user attempted to create location', {
+        userId: user.id,
+      });
       return createErrorResponse(
         'Admin-Berechtigung erforderlich',
         ErrorCodes.FORBIDDEN,

@@ -6,6 +6,7 @@
 
 import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
+import { checkUserAdminStatus } from '@/lib/auth/helpers';
 import { locationUpdateSchema } from '@/lib/schemas/location-schema';
 import {
   deleteLocation,
@@ -91,7 +92,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
   try {
     // Check authentication
-    const { userId, sessionClaims } = await auth();
+    const { userId } = await auth();
 
     if (!userId) {
       logger.warn('Unauthorized attempt to update location');
@@ -104,8 +105,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check admin role
-    const userRole = (sessionClaims?.metadata as { role?: string })?.role;
-    if (userRole !== 'admin') {
+    const isAdmin = await checkUserAdminStatus(userId);
+    if (!isAdmin) {
       logger.warn('Non-admin user attempted to update location', {
         userId,
         locationId: id,
@@ -190,7 +191,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
   try {
     // Check authentication
-    const { userId, sessionClaims } = await auth();
+    const { userId } = await auth();
 
     if (!userId) {
       logger.warn('Unauthorized attempt to delete location');
@@ -203,8 +204,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check admin role
-    const userRole = (sessionClaims?.metadata as { role?: string })?.role;
-    if (userRole !== 'admin') {
+    const isAdmin = await checkUserAdminStatus(userId);
+    if (!isAdmin) {
       logger.warn('Non-admin user attempted to delete location', {
         userId,
         locationId: id,

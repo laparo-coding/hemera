@@ -374,7 +374,7 @@ export default function LocationForm({
               }
               disabled={isLoading}
             >
-              {isEditing ? 'Speichern' : 'Erstellen'}
+              {isEditing ? 'Aktualisieren' : 'Erstellen'}
             </Button>
           </Box>
         </Grid>

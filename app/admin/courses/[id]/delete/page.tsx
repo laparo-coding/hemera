@@ -1,106 +1,40 @@
 /**
- * Delete Course Page
+ * Delete Course Page (Server Component)
  *
- * Confirmation page for deleting a course
- * with enrollment check and transfer option.
+ * Confirmation page for deleting a course.
+ * Note: Admin authentication is handled by the parent layout.
  */
 
-'use client';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getCourseById } from '@/lib/db/admin/courses';
+import DeleteCourseForm from './DeleteCourseForm';
 
-import { Alert, Box, CircularProgress, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import DeleteConfirmation from '../../../../../components/admin/DeleteConfirmation';
-import { deleteCourseAction } from '../../../../../lib/actions/admin/courses';
-import { deleteThumbnail } from '../../../../../lib/utils/fileUpload';
+export const metadata: Metadata = {
+  title: 'Kurs löschen | Admin',
+  description: 'Kurs löschen',
+};
 
 interface DeleteCoursePageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function DeleteCoursePage({ params }: DeleteCoursePageProps) {
-  const router = useRouter();
-  const [courseId, setCourseId] = useState<string | null>(null);
-  const [course, setCourse] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default async function DeleteCoursePage({
+  params,
+}: DeleteCoursePageProps) {
+  const { id } = await params;
+  const course = await getCourseById(id);
 
-  const fetchCourse = useCallback(async (id: string) => {
-    try {
-      const response = await fetch(`/api/admin/courses/${id}`);
-      if (!response.ok) {
-        throw new Error('Course not found');
-      }
-      const data = await response.json();
-      setCourse(data.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load course');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    params.then(resolvedParams => {
-      setCourseId(resolvedParams.id);
-      fetchCourse(resolvedParams.id);
-    });
-  }, [params, fetchCourse]);
-
-  const handleDelete = async () => {
-    if (!courseId) return;
-
-    const result = await deleteCourseAction(courseId);
-
-    if (result.success) {
-      // Cleanup thumbnail if exists
-      if (course?.thumbnailUrl) {
-        await deleteThumbnail(course.thumbnailUrl);
-      }
-
-      router.push('/admin');
-      router.refresh();
-    } else {
-      setError(result.error || 'Failed to delete course');
-    }
-  };
-
-  const handleTransfer = () => {
-    if (!courseId) return;
-    // Navigate to transfer page (to be implemented)
-    router.push(`/admin/courses/${courseId}/transfer`);
-  };
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
+  if (!course) {
+    notFound();
   }
 
-  if (error && !course) {
-    return (
-      <Alert severity='error' sx={{ mt: 2 }}>
-        {error}
-      </Alert>
-    );
-  }
+  const courseData = {
+    id: course.id,
+    title: course.title,
+    thumbnailUrl: course.thumbnailUrl,
+    enrollmentCount: course._count?.bookings ?? 0,
+  };
 
-  return (
-    <Box>
-      <Typography variant='h4' component='h1' gutterBottom>
-        Kurs löschen
-      </Typography>
-
-      <DeleteConfirmation
-        open={true}
-        courseTitle={course?.title || ''}
-        enrollmentCount={course?._count?.bookings || 0}
-        onConfirm={handleDelete}
-        onCancel={() => router.push('/admin')}
-        onTransfer={handleTransfer}
-      />
-    </Box>
-  );
+  return <DeleteCourseForm course={courseData} />;
 }
