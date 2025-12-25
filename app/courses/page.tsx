@@ -319,9 +319,17 @@ export default async function CoursesPage() {
                                   }}
                                 >
                                   {course.price && Number(course.price) > 0
-                                    ? `${Number(course.price).toLocaleString(
-                                        'de-DE'
-                                      )} €`
+                                    ? (() => {
+                                        const euros =
+                                          Number(course.price) / 100;
+                                        return euros.toLocaleString('de-DE', {
+                                          style: 'currency',
+                                          currency: 'EUR',
+                                          minimumFractionDigits:
+                                            Number.isInteger(euros) ? 0 : 2,
+                                          maximumFractionDigits: 2,
+                                        });
+                                      })()
                                     : 'Kostenlos'}
                                 </Typography>
                               </Box>

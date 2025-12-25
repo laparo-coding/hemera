@@ -1,7 +1,8 @@
-// Mock implementation for getCourses service
-// This provides a working interface for the courses API
+// Course service for API routes
+// Provides database access for course management
 
 import type { Booking } from '@prisma/client';
+import { prisma } from '../db/prisma';
 
 export interface CourseWithBookings {
   id: string;
@@ -22,56 +23,39 @@ export interface CourseWithBookings {
   bookings: Booking[];
 }
 
+/**
+ * Get all published courses from the database
+ * Used by the public API route /api/courses
+ */
 export async function getCourses(): Promise<CourseWithBookings[]> {
-  // Mock data for build testing - using exact Prisma schema structure
-  return [
-    {
-      id: 'course-1',
-      title: 'TypeScript Grundlagen',
-      description: 'Lernen Sie die Grundlagen von TypeScript',
-      slug: 'typescript-grundlagen',
-      price: 9999, // €99.99 in cents
-      currency: 'EUR',
-      capacity: 20,
-      startDate: new Date('2025-12-01'),
-      startTime: new Date('2025-12-01T10:00:00Z'),
-      endTime: new Date('2025-12-01T14:00:00Z'),
+  const courses = await prisma.course.findMany({
+    where: {
       isPublished: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      bookings: [],
     },
-    {
-      id: 'course-2',
-      title: 'React Advanced Patterns',
-      description: 'Fortgeschrittene React Konzepte und Patterns',
-      slug: 'react-advanced-patterns',
-      price: 14999, // €149.99 in cents
-      currency: 'EUR',
-      capacity: 15,
-      startDate: new Date('2025-12-15'),
-      startTime: new Date('2025-12-15T14:00:00Z'),
-      endTime: new Date('2025-12-15T18:00:00Z'),
-      isPublished: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      bookings: [],
+    orderBy: {
+      startDate: 'asc',
     },
-    {
-      id: 'course-3',
-      title: 'Node.js Backend Development',
-      description: 'Erstellen Sie skalierbare Backend-Anwendungen',
-      slug: 'nodejs-backend',
-      price: 19999, // €199.99 in cents
-      currency: 'EUR',
-      capacity: 25,
-      startDate: new Date('2026-01-10'),
-      startTime: new Date('2026-01-10T09:00:00Z'),
-      endTime: new Date('2026-01-10T17:00:00Z'),
-      isPublished: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      bookings: [],
+    include: {
+      bookings: true,
     },
-  ];
+  });
+
+  return courses.map(course => ({
+    id: course.id,
+    title: course.title,
+    description: course.description,
+    slug: course.slug,
+    price: course.price ?? 0,
+    currency: course.currency || 'EUR',
+    capacity: course.capacity,
+    startDate: course.startDate,
+    startTime: course.startTime,
+    endTime: course.endTime,
+    isPublished: course.isPublished,
+    createdAt: course.createdAt,
+    updatedAt: course.updatedAt,
+    thumbnailUrl: course.thumbnailUrl,
+    instructor: course.instructor,
+    bookings: course.bookings,
+  }));
 }
