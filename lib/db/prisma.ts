@@ -38,8 +38,21 @@ function createPrismaClient(): PrismaClient {
 
   // For tests/CI without Accelerate, use PG adapter with direct connection
   const databaseUrl = process.env.DATABASE_URL;
+
+  // During Next.js build (no DB available), we need to return a mock client
+  // This allows static page generation without actual DB access
   if (!databaseUrl) {
-    throw new Error('Either PRISMA_ACCELERATE_URL or DATABASE_URL must be set');
+    // Create a "dummy" pool with placeholder URL - operations will fail at runtime
+    // but module import succeeds during build
+    const placeholderPool = new Pool({
+      connectionString: 'postgresql://placeholder:5432/placeholder',
+    });
+    globalForPrisma.pool = placeholderPool;
+    const adapter = new PrismaPg(placeholderPool);
+    return new PrismaClient({
+      adapter,
+      log: ['error'],
+    });
   }
 
   const pool = new Pool({ connectionString: databaseUrl });
