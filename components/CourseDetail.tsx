@@ -129,10 +129,13 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     }
 
     // Prices are stored in cents, convert to euros for display
+    const euros = amount / 100;
     return new Intl.NumberFormat('de-DE', {
       style: 'currency',
       currency: currency.toUpperCase(),
-    }).format(amount / 100);
+      minimumFractionDigits: Number.isInteger(euros) ? 0 : 2,
+      maximumFractionDigits: 2,
+    }).format(euros);
   };
 
   const handleBookNow = async (
