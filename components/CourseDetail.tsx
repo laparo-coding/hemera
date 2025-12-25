@@ -131,7 +131,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     return new Intl.NumberFormat('de-DE', {
       style: 'currency',
       currency: currency.toUpperCase(),
-    }).format(amount / 100);
+    }).format(amount);
   };
 
   const handleBookNow = async (
