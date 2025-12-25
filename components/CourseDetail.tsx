@@ -51,6 +51,7 @@ interface Course {
   endTime?: Date | null;
   isPublished: boolean;
   thumbnailUrl?: string | null;
+  instructor?: string | null;
   createdAt: Date;
   updatedAt: Date;
   availableSpots?: number | null;
@@ -264,7 +265,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
         <Grid item xs={12} md={7}>
           <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
             {course.thumbnailUrl ? (
-              <CardMedia sx={{ position: 'relative', aspectRatio: '16 / 9' }}>
+              <CardMedia sx={{ position: 'relative', aspectRatio: '21 / 9' }}>
                 <Image
                   src={course.thumbnailUrl}
                   alt={course.title}
@@ -276,7 +277,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
             ) : (
               <Box
                 sx={{
-                  height: 200,
+                  height: 120,
                   bgcolor: '#16404D',
                   display: 'flex',
                   alignItems: 'center',
@@ -306,6 +307,14 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                   >
                     {course.title}
                   </Typography>
+                  {course.instructor && (
+                    <Typography
+                      variant='body1'
+                      sx={{ mt: 1, color: 'text.secondary' }}
+                    >
+                      👤 Dozent: {course.instructor}
+                    </Typography>
+                  )}
                   <Stack
                     direction={{ xs: 'column', sm: 'row' }}
                     spacing={2}
