@@ -35,10 +35,27 @@ function readNumberEnv(name: string, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+/**
+ * Determine the Rollbar environment based on Vercel deployment context.
+ * - production: Vercel production deployment
+ * - preview: Vercel preview deployment (PRs, branches)
+ * - development: Local development or fallback
+ */
+function getRollbarEnvironment(): string {
+  // Server-side: VERCEL_ENV is set by Vercel
+  // Client-side: NEXT_PUBLIC_VERCEL_ENV is the public version
+  return (
+    process.env.VERCEL_ENV ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV ||
+    process.env.NODE_ENV ||
+    'development'
+  );
+}
+
 const baseConfig = {
   captureUncaught: true,
   captureUnhandledRejections: true,
-  environment: process.env.NODE_ENV,
+  environment: getRollbarEnvironment(),
   enabled: !isE2EMode && !isExplicitlyDisabled,
   // Sampling defaults: 100% errors, ~5% non-errors (overridable)
   // Rollbar's server SDK supports 'reportLevel' and custom filtering via payload handlers,
