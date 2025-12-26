@@ -47,10 +47,6 @@ const conceptContent = {
     'Du verdienst mehr – und weißt es auch. Bei Hemera lernst du, wie du deine Gehaltsverhandlung selbstbewusst und erfolgreich führst.',
     'Unsere Methode verbindet strategisches Wissen mit praktischen Übungen. Du entwickelst nicht nur Verhandlungskompetenzen, sondern auch das Selbstvertrauen, diese einzusetzen.',
   ],
-  highlight: {
-    title: 'Unsere Mission',
-    text: 'Wir unterstützen Frauen dabei, ihren wahren Marktwert zu erkennen und durchzusetzen.',
-  },
   features: [
     {
       title: 'Praxisorientiert',
@@ -218,11 +214,8 @@ export default async function HomePage() {
           headline='Dein Weg zum Verhandlungserfolg'
           subheadline='Drei aufeinander aufbauende Kurse begleiten dich von den Grundlagen bis zur Meisterschaft.'
           courses={featuredCourses}
-          showProgression={true}
+          showProgression={false}
         />
-
-        {/* CTA Section */}
-        <CTASection {...ctaContent} />
       </main>
     </>
   );
