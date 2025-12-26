@@ -181,7 +181,10 @@ export default function StripeCheckoutForm({
       </Typography>
 
       <Typography variant='h6' color='primary' gutterBottom>
-        {(amount / 100).toFixed(2)} {currency.toUpperCase()}
+        {(amount / 100).toLocaleString('de-DE', {
+          style: 'currency',
+          currency: currency.toUpperCase(),
+        })}
       </Typography>
 
       <Divider sx={{ my: 2 }} />
@@ -248,7 +251,7 @@ export default function StripeCheckoutForm({
               Verarbeitung ...
             </>
           ) : (
-            `Jetzt ${(amount / 100).toFixed(2)} ${currency.toUpperCase()} zahlen`
+            `Jetzt ${(amount / 100).toLocaleString('de-DE', { style: 'currency', currency: currency.toUpperCase() })} zahlen`
           )}
         </Button>
 
