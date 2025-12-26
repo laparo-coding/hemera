@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
     const booking = await createBooking({
       userId,
       courseId: course.id,
-      amount: course.price, // Already stored in cents (Int)
+      amount: course.price * 100, // Convert euros to cents for Stripe
       currency: course.currency,
     });
 
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
     const checkoutResult = await createCheckoutSession({
       courseId: course.id,
       courseName: course.title,
-      coursePrice: course.price, // Already in cents
+      coursePrice: course.price * 100, // Convert euros to cents for Stripe
       userId,
       userEmail,
       successUrl,
