@@ -15,6 +15,9 @@ import { generateMetadata as genMetadata } from './layout';
 
 export { genMetadata as generateMetadata };
 
+// Force dynamic rendering to ensure course data is always fresh from database
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

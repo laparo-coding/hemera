@@ -3,28 +3,22 @@
 import BookOnlineOutlinedIcon from '@mui/icons-material/BookOnlineOutlined';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import HistoryEduRoundedIcon from '@mui/icons-material/HistoryEduRounded';
 import LocationOnRoundedIcon from '@mui/icons-material/LocationOnRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   CardMedia,
   Chip,
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
+  Container,
+  Grid,
+  Paper,
   Skeleton,
   Stack,
   SvgIcon,
   type SvgIconProps,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/GridLegacy';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import Image from 'next/image';
@@ -229,7 +223,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
   if (isLoading) {
     return (
-      <Card aria-busy='true' aria-live='polite' sx={{ p: 3 }}>
+      <Paper aria-busy='true' aria-live='polite' sx={{ p: 3 }}>
         <Stack spacing={3}>
           <Skeleton
             variant='rectangular'
@@ -250,23 +244,23 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
             sx={{ borderRadius: 999 }}
           />
         </Stack>
-      </Card>
+      </Paper>
     );
   }
 
   return (
-    <Box
+    <Container
+      maxWidth='lg'
       sx={{
-        px: { xs: 2, sm: 3, md: 4 },
-        pt: { xs: 8, md: 10 },
-        pb: { xs: 3, md: 4 },
+        pt: { xs: 10, md: 12 },
+        pb: 4,
       }}
     >
       <Grid container spacing={4} alignItems='flex-start'>
-        <Grid item xs={12} md={7}>
-          <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
+          <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
             {course.thumbnailUrl ? (
-              <CardMedia sx={{ position: 'relative', aspectRatio: '3 / 1' }}>
+              <CardMedia sx={{ position: 'relative', aspectRatio: '4.5 / 1' }}>
                 <Image
                   src={course.thumbnailUrl}
                   alt={course.title}
@@ -278,7 +272,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
             ) : (
               <Box
                 sx={{
-                  height: 120,
+                  height: 70,
                   bgcolor: '#16404D',
                   display: 'flex',
                   alignItems: 'center',
@@ -298,7 +292,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                 </Typography>
               </Box>
             )}
-            <CardContent>
+            <Box sx={{ p: 3 }}>
               <Stack spacing={3}>
                 <div>
                   <Typography
@@ -326,15 +320,21 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                       </Typography>
                     </Stack>
                   )}
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    spacing={2}
-                    sx={{ mt: 2, color: 'text.secondary' }}
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                      gap: 2,
+                      mt: 2,
+                      color: 'text.secondary',
+                    }}
                   >
                     {formattedDate && (
                       <Stack direction='row' spacing={1} alignItems='center'>
-                        <CalendarMonthRoundedIcon fontSize='small' />
-                        <Typography variant='body2'>
+                        <CalendarMonthRoundedIcon
+                          sx={{ fontSize: '1.25rem' }}
+                        />
+                        <Typography sx={{ fontSize: '0.9rem' }}>
                           {formattedDate}
                           {formattedTime && ` · ${formattedTime}`}
                         </Typography>
@@ -342,8 +342,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     )}
                     {course.capacity ? (
                       <Stack direction='row' spacing={1} alignItems='center'>
-                        <GroupRoundedIcon fontSize='small' />
-                        <Typography variant='body2'>
+                        <GroupRoundedIcon sx={{ fontSize: '1.25rem' }} />
+                        <Typography sx={{ fontSize: '0.9rem' }}>
                           {course.availableSpots !== null
                             ? `${course.availableSpots} von ${course.capacity} Plätzen verfügbar`
                             : `${course.capacity} Plätze`}
@@ -351,21 +351,21 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                       </Stack>
                     ) : null}
                     <Stack direction='row' spacing={1} alignItems='center'>
-                      <CoinIcon fontSize='small' />
-                      <Typography variant='body2'>
+                      <CoinIcon sx={{ fontSize: '1.25rem' }} />
+                      <Typography sx={{ fontSize: '0.9rem' }}>
                         {formatCurrency(course.price, course.currency)}
                       </Typography>
                     </Stack>
                     {course.location && (
                       <Stack direction='row' spacing={1} alignItems='center'>
-                        <LocationOnRoundedIcon fontSize='small' />
+                        <LocationOnRoundedIcon sx={{ fontSize: '1.25rem' }} />
                         <Link
                           href={`/locations/${course.location.slug}`}
                           style={{ textDecoration: 'none', color: 'inherit' }}
                         >
                           <Typography
-                            variant='body2'
                             sx={{
+                              fontSize: '0.9rem',
                               '&:hover': {
                                 textDecoration: 'underline',
                               },
@@ -376,7 +376,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                         </Link>
                       </Stack>
                     )}
-                  </Stack>
+                  </Box>
                 </div>
 
                 <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
@@ -425,144 +425,63 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     </Typography>
                   </Stack>
                 ) : null}
-
-                <Divider />
-
-                <Stack spacing={2}>
-                  <Typography variant='h6' component='h3'>
-                    Buchungsinformationen
-                  </Typography>
-                  <List disablePadding>
-                    <ListItem disableGutters sx={{ py: 1 }}>
-                      <ListItemIcon
-                        sx={{ minWidth: 32, color: 'text.secondary' }}
-                      >
-                        <CoinIcon fontSize='small' />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary='Preis'
-                        secondary={formatCurrency(
-                          course.price,
-                          course.currency
-                        )}
-                        primaryTypographyProps={{
-                          variant: 'body2',
-                          color: 'text.secondary',
-                        }}
-                        secondaryTypographyProps={{
-                          variant: 'subtitle1',
-                          color: 'text.primary',
-                          fontWeight: 600,
-                        }}
-                      />
-                    </ListItem>
-                    {course.capacity ? (
-                      <ListItem disableGutters sx={{ py: 1 }}>
-                        <ListItemIcon
-                          sx={{ minWidth: 32, color: 'text.secondary' }}
-                        >
-                          <GroupRoundedIcon fontSize='small' />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary='Verfügbare Plätze'
-                          secondary={course.availableSpots ?? course.capacity}
-                          primaryTypographyProps={{
-                            variant: 'body2',
-                            color: 'text.secondary',
-                          }}
-                          secondaryTypographyProps={{
-                            variant: 'subtitle1',
-                            color: 'text.primary',
-                            fontWeight: 600,
-                          }}
-                        />
-                      </ListItem>
-                    ) : null}
-                    {course.totalBookings !== undefined ? (
-                      <ListItem disableGutters sx={{ py: 1 }}>
-                        <ListItemIcon
-                          sx={{ minWidth: 32, color: 'text.secondary' }}
-                        >
-                          <HistoryEduRoundedIcon fontSize='small' />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary='Bereits gebucht'
-                          secondary={course.totalBookings}
-                          primaryTypographyProps={{
-                            variant: 'body2',
-                            color: 'text.secondary',
-                          }}
-                          secondaryTypographyProps={{
-                            variant: 'subtitle1',
-                            color: 'text.primary',
-                            fontWeight: 600,
-                          }}
-                        />
-                      </ListItem>
-                    ) : null}
-                  </List>
-                </Stack>
               </Stack>
-            </CardContent>
-          </Card>
+            </Box>
+          </Paper>
         </Grid>
 
-        <Grid item xs={12} md={5}>
+        <Grid size={{ xs: 12, md: 4 }}>
           {onBookNow || bookNowHref ? (
-            <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
-              <CardContent>
-                <Stack spacing={3}>
-                  <Stack spacing={1}>
-                    <Typography variant='h6'>Direkt buchen</Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      Sichere dir jetzt einen Platz in diesem Kurs.
-                    </Typography>
-                  </Stack>
-
-                  <Button
-                    variant='contained'
-                    size='large'
-                    startIcon={<BookOnlineOutlinedIcon />}
-                    {...(bookNowHref
-                      ? {
-                          component: Link as React.ElementType,
-                          href: bookNowHref,
-                        }
-                      : {})}
-                    onClick={
-                      typeof onBookNow === 'function'
-                        ? handleBookNow
-                        : undefined
-                    }
-                    disabled={isBookingDisabled}
-                    title={disableReason ?? undefined}
-                    aria-disabled={isBookingDisabled}
-                    aria-busy={isBooking || undefined}
-                    data-testid='course-detail-book-cta'
-                  >
-                    {bookingButtonText}
-                  </Button>
-
-                  <Box component='span' aria-live='polite' sx={visuallyHidden}>
-                    {isBooking ? 'Buchung läuft' : ''}
-                  </Box>
-
-                  {isBookingDisabled && disableReason ? (
-                    <Typography
-                      variant='caption'
-                      color='text.secondary'
-                      data-testid='course-detail-disable-reason'
-                    >
-                      {disableReason}
-                    </Typography>
-                  ) : null}
+            <Paper sx={{ p: 3, borderRadius: 2, position: 'sticky', top: 16 }}>
+              <Stack spacing={3}>
+                <Stack spacing={1}>
+                  <Typography variant='h6'>Direkt buchen</Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    Sichere dir jetzt einen Platz in diesem Kurs.
+                  </Typography>
                 </Stack>
-              </CardContent>
-            </Card>
+
+                <Button
+                  variant='contained'
+                  size='large'
+                  startIcon={<BookOnlineOutlinedIcon />}
+                  {...(bookNowHref
+                    ? {
+                        component: Link as React.ElementType,
+                        href: bookNowHref,
+                      }
+                    : {})}
+                  onClick={
+                    typeof onBookNow === 'function' ? handleBookNow : undefined
+                  }
+                  disabled={isBookingDisabled}
+                  title={disableReason ?? undefined}
+                  aria-disabled={isBookingDisabled}
+                  aria-busy={isBooking || undefined}
+                  data-testid='course-detail-book-cta'
+                >
+                  {bookingButtonText}
+                </Button>
+
+                <Box component='span' aria-live='polite' sx={visuallyHidden}>
+                  {isBooking ? 'Buchung läuft' : ''}
+                </Box>
+
+                {isBookingDisabled && disableReason ? (
+                  <Typography
+                    variant='caption'
+                    color='text.secondary'
+                    data-testid='course-detail-disable-reason'
+                  >
+                    {disableReason}
+                  </Typography>
+                ) : null}
+              </Stack>
+            </Paper>
           ) : null}
         </Grid>
       </Grid>
-    </Box>
+    </Container>
   );
 };
 

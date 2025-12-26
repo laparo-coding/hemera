@@ -95,12 +95,12 @@ export default function CourseCard({
         },
       }}
     >
-      {/* Thumbnail image or Level indicator bar */}
-      {thumbnailUrl ? (
+      {/* Thumbnail image */}
+      {thumbnailUrl && (
         <Box
           sx={{
             position: 'relative',
-            height: 160,
+            height: 80,
             overflow: 'hidden',
           }}
         >
@@ -114,25 +114,7 @@ export default function CourseCard({
               objectFit: 'cover',
             }}
           />
-          {/* Level indicator overlay */}
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: '6px',
-              bgcolor: levelColors[level],
-            }}
-          />
         </Box>
-      ) : (
-        <Box
-          sx={{
-            height: '6px',
-            bgcolor: levelColors[level],
-          }}
-        />
       )}
 
       <Box

@@ -206,6 +206,7 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
       totalBookings: 0,
       userBookingStatus: null,
       level: course.level ?? null,
+      thumbnailUrl: course.thumbnailUrl ?? null,
       location: course.location
         ? {
             id: course.location.id,
