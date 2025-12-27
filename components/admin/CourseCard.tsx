@@ -20,8 +20,8 @@ import {
   Chip,
   Typography,
 } from '@mui/material';
-import { format } from 'date-fns';
 import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
+import { formatShortDate, formatTime } from '../../lib/utils/date-format';
 
 interface CourseCardProps {
   course: CourseWithEnrollmentCount;
@@ -100,17 +100,12 @@ export default function CourseCard({
           <Typography variant='body2'>
             <strong>Start:</strong>{' '}
             {course.startDate
-              ? `${format(new Date(course.startDate), 'MMM d, yyyy')} ${
-                  course.startTime
-                    ? format(new Date(course.startTime), 'HH:mm')
-                    : ''
-                }`
+              ? `${formatShortDate(course.startDate)} ${formatTime(course.startTime) ?? ''}`
               : 'TBD'}
           </Typography>
 
           <Typography variant='body2'>
-            <strong>End:</strong>{' '}
-            {course.endTime ? format(new Date(course.endTime), 'HH:mm') : 'TBD'}
+            <strong>End:</strong> {formatTime(course.endTime) ?? 'TBD'}
           </Typography>
 
           <Typography variant='body2'>

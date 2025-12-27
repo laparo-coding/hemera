@@ -23,10 +23,10 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { format } from 'date-fns';
 import Link from 'next/link';
 import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
 import { getLevelLabel } from '../../lib/utils/course-level';
+import { formatShortDate, formatTimeRange } from '../../lib/utils/date-format';
 import PublishToggle from './PublishToggle';
 
 interface CourseListProps {
@@ -93,14 +93,10 @@ export default function CourseList({
               </TableCell>
               <TableCell>
                 <Typography variant='body2'>
-                  {course.startDate
-                    ? format(new Date(course.startDate), 'MMM d, yyyy')
-                    : 'TBD'}
+                  {formatShortDate(course.startDate) ?? 'TBD'}
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>
-                  {course.startTime && course.endTime
-                    ? `${format(new Date(course.startTime), 'HH:mm')} - ${format(new Date(course.endTime), 'HH:mm')}`
-                    : 'TBD'}
+                  {formatTimeRange(course.startTime, course.endTime) ?? 'TBD'}
                 </Typography>
               </TableCell>
               <TableCell align='right'>{course.price.toString()} €</TableCell>

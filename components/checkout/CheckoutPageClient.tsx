@@ -6,7 +6,6 @@ import {
   Box,
   CircularProgress,
   Container,
-  Paper,
   Stack,
   Typography,
 } from '@mui/material';
@@ -171,25 +170,17 @@ function CheckoutContent() {
     );
   }
 
+  // User not loaded yet - redirect effect will handle this
   if (!user) {
     return (
-      <Container maxWidth='md' sx={{ py: 4 }} data-testid='checkout-page'>
-        <Paper elevation={2} sx={{ p: 4 }}>
-          <Box
-            display='flex'
-            justifyContent='center'
-            alignItems='center'
-            minHeight='300px'
-          >
-            <Stack spacing={2} alignItems='center'>
-              <CircularProgress />
-              <Typography variant='body2' color='text.secondary'>
-                Anmeldung wird überprüft ...
-              </Typography>
-            </Stack>
-          </Box>
-        </Paper>
-      </Container>
+      <Box
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+        minHeight='50vh'
+      >
+        <CircularProgress />
+      </Box>
     );
   }
 
