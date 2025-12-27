@@ -3,7 +3,6 @@ import type { CourseCardProps } from '../components/landing';
 import {
   ConceptSection,
   CourseProgressionSection,
-  CTASection,
   HeroSection,
 } from '../components/landing';
 import { getFeaturedCourses } from '../lib/api/courses';
@@ -63,14 +62,6 @@ const conceptContent = {
       description: 'Kleine Gruppen ermöglichen individuelle Betreuung.',
     },
   ],
-};
-
-const ctaContent = {
-  headline: 'Bereit für deine Transformation?',
-  subheadline:
-    'Starte jetzt und lerne, wie du deinen Wert selbstbewusst kommunizierst.',
-  ctaText: 'Jetzt Kurs buchen',
-  ctaHref: '#kurse',
 };
 
 // Map database level to UI level indicator

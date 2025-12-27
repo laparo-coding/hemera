@@ -1,25 +1,25 @@
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
+'use client';
 
 import { Box, CircularProgress } from '@mui/material';
-import { Suspense } from 'react';
-import CheckoutPageClient from '../../components/checkout/CheckoutPageClient';
+import dynamic from 'next/dynamic';
+
+const CheckoutPageClient = dynamic(
+  () => import('../../components/checkout/CheckoutPageClient'),
+  {
+    ssr: false,
+    loading: () => (
+      <Box
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+        minHeight='50vh'
+      >
+        <CircularProgress />
+      </Box>
+    ),
+  }
+);
 
 export default function CheckoutPage() {
-  return (
-    <Suspense
-      fallback={
-        <Box
-          display='flex'
-          justifyContent='center'
-          alignItems='center'
-          minHeight='50vh'
-        >
-          <CircularProgress />
-        </Box>
-      }
-    >
-      <CheckoutPageClient />
-    </Suspense>
-  );
+  return <CheckoutPageClient />;
 }
