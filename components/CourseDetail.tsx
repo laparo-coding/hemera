@@ -217,7 +217,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       !Number.isFinite(endTime.getTime())
     )
       return null;
-    return `${format(startTime, 'HH:mm')} - ${format(endTime, 'HH:mm')}`;
+    const formatOpts: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Berlin',
+    };
+    return `${startTime.toLocaleTimeString('de-DE', formatOpts)} - ${endTime.toLocaleTimeString('de-DE', formatOpts)}`;
   }, [course.startTime, course.endTime]);
 
   if (isLoading) {

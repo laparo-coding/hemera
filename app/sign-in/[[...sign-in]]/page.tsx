@@ -22,9 +22,10 @@ export default function SignInPage() {
         minHeight: '100vh',
         bgcolor: colors.cream,
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
-        py: 4,
+        pt: { xs: 12, md: 14 },
+        pb: 4,
       }}
     >
       <Container maxWidth='sm'>

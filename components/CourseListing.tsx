@@ -141,17 +141,20 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
+                timeZone: 'Europe/Berlin',
               })}
               {course.startTime && course.endTime && (
                 <span className='ml-2'>
                   {new Date(course.startTime).toLocaleTimeString('de-DE', {
                     hour: '2-digit',
                     minute: '2-digit',
+                    timeZone: 'Europe/Berlin',
                   })}
                   {' - '}
                   {new Date(course.endTime).toLocaleTimeString('de-DE', {
                     hour: '2-digit',
                     minute: '2-digit',
+                    timeZone: 'Europe/Berlin',
                   })}
                 </span>
               )}

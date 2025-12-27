@@ -82,6 +82,7 @@ function formatTime(date: Date | null | undefined): string | undefined {
   return new Date(date).toLocaleTimeString('de-DE', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Europe/Berlin',
   });
 }
 

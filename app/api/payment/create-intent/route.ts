@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     // Create payment intent
     const paymentIntent = await createPaymentIntent({
-      // Amounts are stored in cents in our DB schema
+      // Amounts are stored in whole euros in DB, Stripe service converts to cents
       amount: course.price,
       currency: course.currency.toLowerCase(),
       courseId: course.id,
