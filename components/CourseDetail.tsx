@@ -124,14 +124,13 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       return 'Kostenlos';
     }
 
-    // Prices are stored in cents, convert to euros for display
-    const euros = amount / 100;
+    // Prices are stored in euros (whole amounts like 300, 500, 700)
     return new Intl.NumberFormat('de-DE', {
       style: 'currency',
       currency: currency.toUpperCase(),
-      minimumFractionDigits: Number.isInteger(euros) ? 0 : 2,
+      minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
       maximumFractionDigits: 2,
-    }).format(euros);
+    }).format(amount);
   };
 
   const handleBookNow = async (

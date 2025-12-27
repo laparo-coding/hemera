@@ -35,10 +35,27 @@ function readNumberEnv(name: string, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+/**
+ * Determine the Rollbar environment based on Vercel deployment context.
+ * - production: Vercel production deployment
+ * - preview: Vercel preview deployment (PRs, branches)
+ * - development: Local development or fallback
+ */
+function getRollbarEnvironment(): string {
+  // Server-side: VERCEL_ENV is set by Vercel
+  // Client-side: NEXT_PUBLIC_VERCEL_ENV is the public version
+  return (
+    process.env.VERCEL_ENV ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV ||
+    process.env.NODE_ENV ||
+    'development'
+  );
+}
+
 const baseConfig = {
   captureUncaught: true,
   captureUnhandledRejections: true,
-  environment: process.env.NODE_ENV,
+  environment: getRollbarEnvironment(),
   enabled: !isE2EMode && !isExplicitlyDisabled,
   // Sampling defaults: 100% errors, ~5% non-errors (overridable)
   // Rollbar's server SDK supports 'reportLevel' and custom filtering via payload handlers,
@@ -46,8 +63,9 @@ const baseConfig = {
 };
 
 // Client-side configuration (for React components)
+// Uses Vercel-Rollbar integration token name
 export const clientConfig = {
-  accessToken: process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN,
+  accessToken: process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885,
   ...baseConfig,
 };
 
@@ -82,26 +100,30 @@ export const serverInstance: Rollbar | RollbarTestInstance = isTestMode
     }
   : new Rollbar({
       // In E2E mode, use a dummy token to prevent initialization errors
+      // Uses Vercel-Rollbar integration token name
       accessToken: isE2EMode
         ? 'dummy-token-for-e2e'
-        : process.env.ROLLBAR_SERVER_TOKEN,
+        : process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885,
       ...baseConfig,
     });
 
 // Legacy compatibility - keeping old configuration exports
+// Uses Vercel-Rollbar integration token name with fallback
 export const rollbarConfig = {
   accessToken:
-    process.env.ROLLBAR_SERVER_TOKEN || process.env.ROLLBAR_SERVER_ACCESS_TOKEN,
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 ||
+    process.env.ROLLBAR_SERVER_TOKEN,
   ...baseConfig,
 };
 
 export const rollbar = serverInstance;
 
 // Client-side configuration with legacy fallback
+// Uses Vercel-Rollbar integration token name with fallback
 export const clientRollbarConfig = {
   accessToken:
-    process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN ||
-    process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_ACCESS_TOKEN,
+    process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885 ||
+    process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN,
   ...baseConfig,
 };
 
