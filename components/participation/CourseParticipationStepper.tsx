@@ -71,8 +71,7 @@ const allSteps: StepDefinition[] = [
   {
     key: 'PREPARATION',
     label: 'Vorbereitung',
-    description:
-      'Definiere deine Ziele und lade deinen Lebenslauf hoch.',
+    description: 'Definiere deine Ziele und lade deinen Lebenslauf hoch.',
     icon: <AssignmentOutlined />,
   },
   {

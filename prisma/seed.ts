@@ -157,7 +157,9 @@ async function main() {
   // when a user starts the preparation (not on booking)
   // See: startParticipationAction in lib/actions/participation.ts
   // --------------------------------------------
-  console.log('📋 CourseParticipation: Records created on-demand when user starts preparation');
+  console.log(
+    '📋 CourseParticipation: Records created on-demand when user starts preparation'
+  );
 
   // Minimal DB connectivity check
   await prisma.$queryRaw`SELECT 1`;

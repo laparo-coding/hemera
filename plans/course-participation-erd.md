@@ -116,19 +116,23 @@ erDiagram
 ### Bestehende Entitäten
 
 #### User
+
 - Repräsentiert einen registrierten Benutzer der Plattform
 - Kann mehrere Buchungen und Kursteilnahmen haben
 
 #### Course
+
 - Repräsentiert einen Kurs mit allen Details
 - Kann an einem Location stattfinden
 - Hat mehrere Buchungen und Teilnahmen
 
 #### Location
+
 - Repräsentiert einen physischen Veranstaltungsort
 - Kann mehrere Kurse hosten
 
 #### Booking
+
 - Repräsentiert eine Kursbuchung mit Zahlungsinformationen
 - Verbindet User und Course
 - Erzeugt automatisch eine CourseParticipation
@@ -136,6 +140,7 @@ erDiagram
 ### Neue Entität
 
 #### CourseParticipation
+
 - **Zweck**: Speichert teilnehmerspezifische Daten für jede Kursphase
 - **Beziehungen**:
   - Gehört zu einem User (Teilnehmer)
@@ -153,6 +158,7 @@ erDiagram
   - `status`: Enum für den Fortschritt (z.B. NOT_STARTED, PREPARATION, IN_PROGRESS, RESULTS, DEBRIEFING, COMPLETED)
 
 #### ParticipationDocument (NEU)
+
 - **Zweck**: Speichert hochgeladene Dokumente (PDFs) für jede Kursphase
 - **Beziehungen**:
   - Gehört zu einer CourseParticipation
@@ -236,16 +242,19 @@ erDiagram
 ## Implementierungshinweise
 
 ### Dokument-Upload
+
 - Verwendung von Vercel Blob Storage (wie bei Course-Thumbnails)
 - Validierung von Dateityp und -größe
 - Automatische Generierung von sicheren URLs
 
 ### Datenmodell-Flexibilität
+
 - Text-Felder in CourseParticipation bleiben optional
 - ParticipationDocument ermöglicht mehrere Dokumente pro Phase
 - Enum `documentType` unterscheidet zwischen TEXT und PDF für zukünftige Erweiterungen
 
 ### Sicherheit
+
 - Dokumente sind nur für den Uploader und Admins sichtbar
 - Zugriffskontrolle über userId und participationId
 - Sichere URL-Generierung mit Ablaufdatum möglich

@@ -38,6 +38,7 @@ import {
   updatePreparation,
   updateResult,
 } from '../db/courseParticipation';
+import { prisma } from '../db/prisma';
 import {
   type ServerActionResult,
   withParameterizedServerAction,
@@ -49,7 +50,6 @@ import {
   type ResumeUploadResult,
   uploadResume,
 } from '../utils/resumeUpload';
-import { prisma } from '../db/prisma';
 
 // ============================================================================
 // Types
