@@ -45,7 +45,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (!location) {
       logger.warn('Location not found', { slug });
       return createErrorResponse(
-        'Location nicht gefunden',
+        'Location not found',
         ErrorCodes.NOT_FOUND,
         requestId,
         404
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       { slug }
     );
     return createErrorResponse(
-      'Fehler beim Laden der Location',
+      'Error loading location',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

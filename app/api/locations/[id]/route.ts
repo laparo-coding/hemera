@@ -52,7 +52,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (!location) {
       logger.warn('Location not found', { id });
       return createErrorResponse(
-        'Location nicht gefunden',
+        'Location not found',
         ErrorCodes.NOT_FOUND,
         requestId,
         404
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       { id }
     );
     return createErrorResponse(
-      'Fehler beim Laden der Location',
+      'Error loading location',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
@@ -97,7 +97,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (!userId) {
       logger.warn('Unauthorized attempt to update location');
       return createErrorResponse(
-        'Authentifizierung erforderlich',
+        'Authentication required',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -112,7 +112,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         locationId: id,
       });
       return createErrorResponse(
-        'Admin-Berechtigung erforderlich',
+        'Admin permission required',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -128,7 +128,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         errors: validation.error.issues,
       });
       return createErrorResponse(
-        'Ungültige Eingabedaten',
+        'Invalid input data',
         ErrorCodes.INVALID_INPUT,
         requestId,
         400,
@@ -155,7 +155,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (errorMessage === 'Location not found') {
       logger.warn('Location not found for update', { id });
       return createErrorResponse(
-        'Location nicht gefunden',
+        'Location not found',
         ErrorCodes.NOT_FOUND,
         requestId,
         404
@@ -168,7 +168,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       { id }
     );
     return createErrorResponse(
-      'Fehler beim Aktualisieren der Location',
+      'Error updating location',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
@@ -196,7 +196,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     if (!userId) {
       logger.warn('Unauthorized attempt to delete location');
       return createErrorResponse(
-        'Authentifizierung erforderlich',
+        'Authentication required',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -211,7 +211,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         locationId: id,
       });
       return createErrorResponse(
-        'Admin-Berechtigung erforderlich',
+        'Admin permission required',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -253,7 +253,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     if (errorMessage === 'Location not found') {
       logger.warn('Location not found for deletion', { id });
       return createErrorResponse(
-        'Location nicht gefunden',
+        'Location not found',
         ErrorCodes.NOT_FOUND,
         requestId,
         404
@@ -266,7 +266,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       { id }
     );
     return createErrorResponse(
-      'Fehler beim Löschen der Location',
+      'Error deleting location',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

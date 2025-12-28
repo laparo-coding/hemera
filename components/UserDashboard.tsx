@@ -467,7 +467,7 @@ const UserDashboardClerk: React.FC = () => {
                     color: colors.petrol,
                   }}
                 >
-                  {stats.totalSpent.toLocaleString('de-DE')} €
+                  {(stats.totalSpent / 100).toLocaleString('de-DE')} €
                 </Typography>
               </Box>
             </Stack>
@@ -603,8 +603,7 @@ const UserDashboardClerk: React.FC = () => {
                         color: colors.petrol,
                       }}
                     >
-                      {booking.coursePrice.toLocaleString('de-DE')}{' '}
-                      {booking.currency}
+                      {(booking.coursePrice / 100).toLocaleString('de-DE')} €
                     </Typography>
                   </Grid>
 
@@ -646,6 +645,29 @@ const UserDashboardClerk: React.FC = () => {
                           },
                         }}
                       />
+                      {(booking.paymentStatus === 'PAID' ||
+                        booking.paymentStatus === 'CONFIRMED') && (
+                        <Link href='/my-courses' passHref>
+                          <Button
+                            variant='outlined'
+                            size='small'
+                            endIcon={<ArrowForwardOutlined />}
+                            sx={{
+                              ml: 1,
+                              borderColor: colors.petrol,
+                              color: colors.petrol,
+                              fontFamily: '"Inter", sans-serif',
+                              fontWeight: 500,
+                              '&:hover': {
+                                borderColor: colors.gold,
+                                backgroundColor: 'rgba(221, 168, 83, 0.1)',
+                              },
+                            }}
+                          >
+                            Vorbereitung
+                          </Button>
+                        </Link>
+                      )}
                     </Stack>
                   </Grid>
                 </Grid>

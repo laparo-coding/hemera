@@ -1,6 +1,6 @@
 /**
  * Deployment Monitoring API
- * Stellt Health-Check-Endpunkt und Deployment-Status bereit
+ * Provides health check endpoint and deployment status
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
@@ -15,11 +15,11 @@ export async function GET(request: NextRequest) {
   try {
     logger.info('Deployment health check initiated');
 
-    // Health-Checks durchführen
+    // Perform health checks
     const healthStatus = await deploymentMonitor.performHealthChecks();
     const deploymentStatus = deploymentMonitor.getDeploymentStatus();
 
-    // Response erstellen
+    // Create response
     const response = {
       timestamp: new Date().toISOString(),
       requestId: context.id,
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       summary: response.summary,
     });
 
-    // HTTP-Status basierend auf Health-Status
+    // HTTP status based on health status
     const httpStatus =
       deploymentStatus.status === 'healthy'
         ? 200

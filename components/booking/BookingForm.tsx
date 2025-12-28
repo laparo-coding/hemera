@@ -173,7 +173,7 @@ export default function BookingForm({
                                   color='primary'
                                 />
                                 <Typography variant='h6' color='primary'>
-                                  {Number(course.price).toLocaleString('de-DE')}{' '}
+                                  {(Number(course.price) / 100).toLocaleString('de-DE')}{' '}
                                   €
                                 </Typography>
                               </Stack>

@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json(
-        { error: 'Authentifizierung erforderlich' },
+        { error: 'Authentication required' },
         { status: 401 }
       );
     }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const isAdmin = await checkUserAdminStatus(userId);
     if (!isAdmin) {
       return NextResponse.json(
-        { error: 'Admin-Berechtigung erforderlich' },
+        { error: 'Admin permission required' },
         { status: 403 }
       );
     }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Validate courses array
     if (!Array.isArray(courses)) {
       return NextResponse.json(
-        { error: 'Kurse müssen als Array übergeben werden' },
+        { error: 'Courses must be provided as an array' },
         { status: 400 }
       );
     }
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: `${createdCourses.count} Kurse wurden erfolgreich erstellt`,
+        message: `${createdCourses.count} courses successfully created`,
         courses: createdCourses,
       },
       { status: 201 }
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { error: 'Ein Fehler ist beim Erstellen der Kurse aufgetreten' },
+      { error: 'An error occurred while creating courses' },
       { status: 500 }
     );
   }

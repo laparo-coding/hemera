@@ -65,6 +65,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.4",
+    "@mux/mux-player-react": "^3.10.2",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "@rollbar/react": "^1.0.0",

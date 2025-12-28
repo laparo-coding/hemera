@@ -95,6 +95,61 @@ export function withServerActionErrorHandling<T = unknown>(
 }
 
 /**
+ * Server action wrapper for actions that accept a direct parameter (like bookingId)
+ * instead of FormData. This is useful for client-side calls.
+ */
+export function withParameterizedServerAction<TParam, TResult = unknown>(
+  action: (param: TParam, context: ServerActionContext) => Promise<TResult>
+) {
+  return async (param: TParam): Promise<ServerActionResult<TResult>> => {
+    const requestContext = await getRequestContext();
+
+    try {
+      const actionContext: ServerActionContext = {
+        requestId: requestContext.id,
+      };
+
+      const result = await action(param, actionContext);
+
+      return {
+        success: true,
+        data: result,
+        requestId: requestContext.id,
+      };
+    } catch (error) {
+      const mappedError = mapPrismaError(error);
+
+      if (!(mappedError instanceof BaseError)) {
+        const errorContext = createErrorContext(
+          undefined,
+          undefined,
+          requestContext.id
+        );
+        errorContext.additionalData = {
+          action: action.name || 'unknown-parameterized-action',
+          serverAction: true,
+        };
+        reportError(mappedError, errorContext, 'error');
+      }
+
+      return {
+        success: false,
+        error: {
+          code:
+            mappedError instanceof BaseError
+              ? mappedError.errorCode
+              : 'INTERNAL_ERROR',
+          message: mappedError.message,
+          details:
+            mappedError instanceof BaseError ? mappedError.context : undefined,
+        },
+        requestId: requestContext.id,
+      };
+    }
+  };
+}
+
+/**
  * Server action middleware for protected actions requiring authentication
  */
 export function withAuthenticatedServerAction<T = unknown>(

@@ -1,61 +1,16 @@
+---
+$schema: https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json
 version: "0.2"
-language: en,en-US,de,de-DE
+language: en,de,de_DE
 import:
   - "@cspell/dict-de-de/cspell-ext.json"
 useGitignore: true
 dictionaryDefinitions:
   - name: project-words
     path: "./cspell.words.txt"
-    description: "Project-specific terms"
-    type: S
+    addWords: true
 dictionaries:
-  - en_US
-  - node
-  - softwareTerms
   - project-words
-  - de-de
-languageSettings:
-  - languageId: "*"
-    dictionaries:
-      - en_US
-      - node
-      - softwareTerms
-      - de-de
-  - languageId: "typescriptreact"
-    locale: en,en-US,de,de-DE
-    dictionaries:
-      - en_US
-      - node
-      - softwareTerms
-      - de-de
-  - languageId: "typescript"
-    locale: en,en-US,de,de-DE
-    dictionaries:
-      - en_US
-      - node
-      - softwareTerms
-      - de-de
-  - languageId: "javascriptreact"
-    locale: en,en-US,de,de-DE
-    dictionaries:
-      - en_US
-      - node
-      - softwareTerms
-      - de-de
-  - languageId: "markdown"
-    locale: en,en-US,de,de-DE
-    dictionaries:
-      - en_US
-      - node
-      - softwareTerms
-      - de-de
-  - languageId: "mdx"
-    locale: en,en-US,de,de-DE
-    dictionaries:
-      - en_US
-      - node
-      - softwareTerms
-      - de-de
 
 ignorePaths:
   - "**/node_modules/**"
@@ -72,5 +27,4 @@ ignorePaths:
   - "**/yarn.lock"
   - "**/.turbo/**"
   - "**/.vercel/**"
-  - "**/cspell.config.*"
-  - "cspell.config.yaml"
+  - "/cspell.words.txt"

@@ -11,17 +11,17 @@ import { gotoStable } from './helpers/nav';
  * - Test Mode (CI): Uses fixtures for form validation, real auth tests in non-CI
  * - Live Mode (Production): Only validates UI elements, NO real transactions
  *
- * NOTE: Uses E2E seed course slugs:
- * - grundlagen-persoenlichkeitsentwicklung (100 EUR)
- * - selbstvertrauen-30-minuten (100 EUR)
- * - stressabbau-anfaenger (100 EUR)
+ * NOTE: Uses E2E seed course slugs (matching production):
+ * - grundkurs (149 EUR)
+ * - fortgeschrittene (299 EUR)
+ * - masterclass (499 EUR)
  */
 
 // E2E Test Course (from e2e-seed.ts)
 const E2E_TEST_COURSE = {
-  slug: 'grundlagen-persoenlichkeitsentwicklung',
-  title: 'Grundlagen der Persönlichkeitsentwicklung',
-  price: 100,
+  slug: 'grundkurs',
+  title: 'Grundlagen der Gehaltsverhandlung',
+  price: 149,
 };
 
 // Stripe Test Card Numbers (only work in Stripe Test Mode)

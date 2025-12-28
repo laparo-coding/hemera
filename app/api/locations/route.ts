@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       error instanceof Error ? error : new Error(String(error))
     );
     return createErrorResponse(
-      'Fehler beim Laden der Locations',
+      'Error loading locations',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     if (!user?.id) {
       logger.warn('Unauthorized attempt to create location');
       return createErrorResponse(
-        'Authentifizierung erforderlich',
+        'Authentication required',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
       });
       return createErrorResponse(
-        'Admin-Berechtigung erforderlich',
+        'Admin permission required',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       logger.warn('Invalid location data', { errors: validation.error.issues });
       return createErrorResponse(
-        'Ungültige Eingabedaten',
+        'Invalid input data',
         ErrorCodes.INVALID_INPUT,
         requestId,
         400,
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       error instanceof Error ? error : new Error(String(error))
     );
     return createErrorResponse(
-      'Fehler beim Erstellen der Location',
+      'Error creating location',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

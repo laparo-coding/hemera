@@ -27,7 +27,8 @@ export const courseCreateSchema = z.object({
   price: z
     .number()
     .nonnegative('Price must be non-negative')
-    .multipleOf(0.01, 'Price must have at most 2 decimal places'),
+    .multipleOf(0.01, 'Price must have at most 2 decimal places')
+    .transform(val => Math.round(val * 100)), // Convert Euro to Cents for Stripe
   startDate: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val)),
