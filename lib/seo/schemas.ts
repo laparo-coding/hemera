@@ -177,7 +177,8 @@ export function generateCourseSchema(course: {
     },
     offers: {
       '@type': 'Offer',
-      price: course.price ? course.price.toString() : '0',
+      // Prices are stored in cents, convert to euros for schema.org
+      price: course.price ? (course.price / 100).toString() : '0',
       priceCurrency: 'EUR',
       availability: 'https://schema.org/InStock',
     },
