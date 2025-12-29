@@ -121,10 +121,10 @@ jobs:
       - name: Type checking
         run: npx tsc --noEmit
 
-      - name: Prettier formatting check
+      - name: Biome formatting check
         run: npm run format:check
 
-      - name: ESLint validation
+      - name: Biome linting
         run: npm run lint:ci
 
       - name: Run unit tests (with coverage)

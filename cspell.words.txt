@@ -282,6 +282,8 @@ hosten
 hostet
 htmlreport
 humanwhocodes
+imageDetail
+imageTwitter
 inkl
 innen
 jsonld

@@ -46,6 +46,8 @@ interface Course {
   endTime?: Date | null;
   isPublished: boolean;
   thumbnailUrl?: string | null;
+  imageDetail?: string | null;
+  imageTwitter?: string | null;
   instructor?: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -264,10 +266,10 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
       <Grid container spacing={4} alignItems='flex-start'>
         <Grid size={{ xs: 12, md: 8 }}>
           <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
-            {course.thumbnailUrl ? (
+            {course.imageDetail || course.thumbnailUrl ? (
               <CardMedia sx={{ position: 'relative', aspectRatio: '4.5 / 1' }}>
                 <Image
-                  src={course.thumbnailUrl}
+                  src={course.imageDetail || course.thumbnailUrl || ''}
                   alt={course.title}
                   fill
                   sizes='(min-width: 1200px) 720px, 100vw'

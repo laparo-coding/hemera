@@ -3,6 +3,9 @@
  *
  * Handles thumbnail image uploads to Vercel Blob storage
  * with validation and error handling.
+ *
+ * Note: For image processing with multiple variants, use
+ * lib/utils/courseImageUpload.ts (server-only)
  */
 
 import { put } from '@vercel/blob';
@@ -20,6 +23,7 @@ export interface UploadResult {
 
 /**
  * Upload a thumbnail image to Vercel Blob
+ * @deprecated Use uploadCourseImage from courseImageUpload.ts for multiple image variants
  */
 export async function uploadThumbnail(file: File): Promise<UploadResult> {
   try {

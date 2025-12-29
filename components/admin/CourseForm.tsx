@@ -19,6 +19,7 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import { courseCreateSchema } from '../../lib/schemas/admin/course';
+import type { CourseImageUrls } from './FileUpload';
 import FileUpload from './FileUpload';
 
 // Use input type for form (before transformation)
@@ -66,6 +67,8 @@ export default function CourseForm({
       instructor: initialData?.instructor || '',
       level: initialData?.level || 'BEGINNER',
       thumbnailUrl: initialData?.thumbnailUrl || null,
+      imageDetail: initialData?.imageDetail || null,
+      imageTwitter: initialData?.imageTwitter || null,
       capacity: initialData?.capacity || 20,
       isPublished: initialData?.isPublished ?? false,
       locationId: initialData?.locationId || null,
@@ -73,6 +76,12 @@ export default function CourseForm({
   });
 
   const thumbnailUrl = watch('thumbnailUrl');
+
+  const handleImageUpload = (urls: CourseImageUrls) => {
+    setValue('thumbnailUrl', urls.thumbnail);
+    setValue('imageDetail', urls.detail);
+    setValue('imageTwitter', urls.twitter);
+  };
 
   const handleFormSubmit = async (data: FormData) => {
     await onSubmit(data);
@@ -324,7 +333,7 @@ export default function CourseForm({
         </Typography>
         <FileUpload
           currentUrl={thumbnailUrl}
-          onUploadComplete={url => setValue('thumbnailUrl', url)}
+          onUploadComplete={handleImageUpload}
           disabled={isLoading || isSubmitting}
         />
       </Box>
