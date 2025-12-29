@@ -2,24 +2,15 @@
  * File Upload Component for Course Images
  *
  * Client-side component for uploading course images
- * with preview of all generated variants (thumbnail, detail, twitter).
+ * with clickable thumbnail preview for upload.
  */
 
 'use client';
 
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import ImageIcon from '@mui/icons-material/Image';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Typography,
-} from '@mui/material';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import { Alert, Box, CircularProgress, Typography } from '@mui/material';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 export interface CourseImageUrls {
   thumbnail: string;
@@ -33,24 +24,27 @@ interface FileUploadProps {
   onUploadComplete: (urls: CourseImageUrls) => void;
   /** Current thumbnail URL for preview */
   currentUrl?: string | null;
-  /** Current Twitter image URL for preview */
+  /** Current Twitter image URL for preview (kept for API compatibility) */
   currentTwitterUrl?: string | null;
-  /** Disable upload button */
+  /** Disable upload */
   disabled?: boolean;
 }
 
 export default function FileUpload({
   onUploadComplete,
   currentUrl,
-  currentTwitterUrl,
   disabled = false,
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(currentUrl || null);
-  const [twitterPreview, setTwitterPreview] = useState<string | null>(
-    currentTwitterUrl || null
-  );
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleClick = () => {
+    if (!disabled && !uploading) {
+      fileInputRef.current?.click();
+    }
+  };
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -99,9 +93,8 @@ export default function FileUpload({
         throw new Error(data.error || 'Upload fehlgeschlagen');
       }
 
-      // Update previews with generated variants
+      // Update preview with generated thumbnail
       setPreview(data.urls.thumbnail);
-      setTwitterPreview(data.urls.twitter);
 
       onUploadComplete(data.urls);
     } catch (err) {
@@ -111,7 +104,6 @@ export default function FileUpload({
           : 'Upload fehlgeschlagen. Bitte versuche es erneut.'
       );
       setPreview(null);
-      setTwitterPreview(null);
     } finally {
       setUploading(false);
     }
@@ -119,24 +111,15 @@ export default function FileUpload({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Button
-        component='label'
-        variant='outlined'
-        startIcon={
-          uploading ? <CircularProgress size={20} /> : <CloudUploadIcon />
-        }
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type='file'
+        hidden
+        accept='image/jpeg,image/png,image/webp'
+        onChange={handleFileSelect}
         disabled={disabled || uploading}
-        fullWidth
-      >
-        {uploading ? 'Wird hochgeladen...' : 'Kursbild hochladen'}
-        <input
-          type='file'
-          hidden
-          accept='image/jpeg,image/png,image/webp'
-          onChange={handleFileSelect}
-          disabled={disabled || uploading}
-        />
-      </Button>
+      />
 
       {error && (
         <Alert severity='error' onClose={() => setError(null)}>
@@ -144,96 +127,69 @@ export default function FileUpload({
         </Alert>
       )}
 
-      {/* Thumbnail Preview */}
-      {preview && (
-        <Box>
-          <Typography variant='subtitle2' gutterBottom>
-            Thumbnail (Kursübersicht)
-          </Typography>
+      {/* Clickable Thumbnail Preview / Upload Area */}
+      <Box
+        onClick={handleClick}
+        sx={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: 400,
+          aspectRatio: '4.5 / 1',
+          border: preview ? '1px solid' : '2px dashed',
+          borderColor: 'divider',
+          borderRadius: 1,
+          overflow: 'hidden',
+          backgroundColor: 'grey.100',
+          cursor: disabled || uploading ? 'not-allowed' : 'pointer',
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            borderColor: disabled || uploading ? 'divider' : 'primary.main',
+            backgroundColor:
+              disabled || uploading ? 'grey.100' : 'action.hover',
+          },
+        }}
+      >
+        {uploading ? (
           <Box
             sx={{
-              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               width: '100%',
-              maxWidth: 400,
-              aspectRatio: '4.5 / 1',
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
-              overflow: 'hidden',
-              backgroundColor: 'grey.100',
+              height: '100%',
             }}
           >
-            <Image
-              src={preview}
-              alt='Thumbnail Vorschau'
-              fill
-              style={{
-                objectFit: 'cover',
-              }}
-            />
+            <CircularProgress size={32} />
           </Box>
-        </Box>
-      )}
-
-      {/* Twitter Card Preview */}
-      {twitterPreview && (
-        <Card variant='outlined' sx={{ maxWidth: 500 }}>
-          <CardContent sx={{ pb: 1 }}>
-            <Typography variant='subtitle2' gutterBottom>
-              Twitter Card Vorschau
-            </Typography>
-          </CardContent>
+        ) : preview ? (
+          <Image
+            src={preview}
+            alt='Thumbnail Vorschau'
+            fill
+            style={{
+              objectFit: 'cover',
+            }}
+          />
+        ) : (
           <Box
             sx={{
-              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               width: '100%',
-              aspectRatio: '1200 / 630',
-              backgroundColor: 'grey.100',
+              height: '100%',
+              color: 'text.secondary',
             }}
           >
-            <Image
-              src={twitterPreview}
-              alt='Twitter Card Vorschau'
-              fill
-              style={{
-                objectFit: 'cover',
-              }}
-            />
+            <AddPhotoAlternateIcon sx={{ fontSize: 32, mr: 1 }} />
+            <Typography variant='body2'>Klicken zum Hochladen</Typography>
           </Box>
-          <CardContent>
-            <Typography variant='caption' color='text.secondary'>
-              So erscheint dein Kurs in Twitter/X Shares (summary_large_image)
-            </Typography>
-          </CardContent>
-        </Card>
-      )}
-
-      {!preview && !twitterPreview && (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            maxWidth: 400,
-            aspectRatio: '16/9',
-            border: '2px dashed',
-            borderColor: 'divider',
-            borderRadius: 1,
-            backgroundColor: 'grey.50',
-          }}
-        >
-          <Box sx={{ textAlign: 'center', color: 'text.secondary' }}>
-            <ImageIcon sx={{ fontSize: 48, mb: 1 }} />
-            <Typography variant='body2'>Kein Bild hochgeladen</Typography>
-          </Box>
-        </Box>
-      )}
+        )}
+      </Box>
 
       <Typography variant='caption' color='text.secondary'>
         Akzeptierte Formate: JPEG, PNG, WebP (max 10MB). Das Bild wird
-        automatisch in drei Größen optimiert: Thumbnail (400×90), Detail
-        (900×200) und Twitter Card (1200×630).
+        automatisch optimiert.
       </Typography>
     </Box>
   );

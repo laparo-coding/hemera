@@ -76,7 +76,6 @@ export default function CourseForm({
   });
 
   const thumbnailUrl = watch('thumbnailUrl');
-  const imageTwitter = watch('imageTwitter');
 
   const handleImageUpload = (urls: CourseImageUrls) => {
     setValue('thumbnailUrl', urls.thumbnail);
@@ -334,7 +333,6 @@ export default function CourseForm({
         </Typography>
         <FileUpload
           currentUrl={thumbnailUrl}
-          currentTwitterUrl={imageTwitter}
           onUploadComplete={handleImageUpload}
           disabled={isLoading || isSubmitting}
         />
