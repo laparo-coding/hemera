@@ -22,6 +22,7 @@ import type {
   LocationInput,
   LocationResponse,
 } from '@/lib/schemas/location-schema';
+import LocationImageUpload from './admin/LocationImageUpload';
 
 interface LocationFormProps {
   initialData?: Partial<LocationResponse>;
@@ -127,16 +128,6 @@ export default function LocationForm({
     }
     if (formData.website && !/^https?:\/\/.+/.test(formData.website)) {
       newErrors.website = 'Website muss mit http:// oder https:// beginnen';
-    }
-    if (formData.imageUrl && !/^https?:\/\/.+/.test(formData.imageUrl)) {
-      newErrors.imageUrl = 'Bild-URL muss mit http:// oder https:// beginnen';
-    }
-    if (
-      formData.roomImageUrl &&
-      !/^https?:\/\/.+/.test(formData.roomImageUrl)
-    ) {
-      newErrors.roomImageUrl =
-        'Raumbild-URL muss mit http:// oder https:// beginnen';
     }
 
     setErrors(newErrors);
@@ -327,27 +318,25 @@ export default function LocationForm({
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }}>
-          <TextField
-            fullWidth
-            label='Bild-URL (Außenansicht)'
-            type='url'
-            value={formData.imageUrl ?? ''}
-            onChange={handleChange('imageUrl')}
-            error={!!errors.imageUrl}
-            helperText={errors.imageUrl}
+          <LocationImageUpload
+            label='Außenansicht'
+            imageType='exterior'
+            currentUrl={formData.imageUrl}
+            onUploadComplete={url =>
+              setFormData(prev => ({ ...prev, imageUrl: url }))
+            }
             disabled={isLoading}
           />
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }}>
-          <TextField
-            fullWidth
-            label='Raumbild-URL (Innenansicht)'
-            type='url'
-            value={formData.roomImageUrl ?? ''}
-            onChange={handleChange('roomImageUrl')}
-            error={!!errors.roomImageUrl}
-            helperText={errors.roomImageUrl}
+          <LocationImageUpload
+            label='Innenansicht / Schulungsraum'
+            imageType='room'
+            currentUrl={formData.roomImageUrl}
+            onUploadComplete={url =>
+              setFormData(prev => ({ ...prev, roomImageUrl: url }))
+            }
             disabled={isLoading}
           />
         </Grid>
