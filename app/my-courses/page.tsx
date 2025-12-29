@@ -8,8 +8,7 @@ import { MyCoursesClient } from './MyCoursesClient';
 
 export const metadata: Metadata = {
   title: 'Meine Kurse - Hemera Academy',
-  description:
-    'Verwalte deine gebuchten Kurse und verfolge deinen Fortschritt',
+  description: 'Verwalte deine gebuchten Kurse und verfolge deinen Fortschritt',
 };
 
 // Design tokens

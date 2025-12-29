@@ -3,7 +3,7 @@
  *
  * Displays the user's booked courses with participation workflow.
  * Uses CourseParticipationStepper for guided course completion.
- * 
+ *
  * Participations are created lazily when a user starts the preparation,
  * not automatically when a course is booked.
  */
@@ -34,8 +34,14 @@ import {
   ResumeUploader,
   SummaryAssetList,
 } from '../../components/participation';
-import type { CourseEnrollment, ParticipationSummary } from '../../lib/actions/participation';
-import { getMyEnrollmentsAction, startParticipationAction } from '../../lib/actions/participation';
+import type {
+  CourseEnrollment,
+  ParticipationSummary,
+} from '../../lib/actions/participation';
+import {
+  getMyEnrollmentsAction,
+  startParticipationAction,
+} from '../../lib/actions/participation';
 import type { PreparationInput } from '../../lib/db/courseParticipation';
 
 // Design tokens
@@ -122,7 +128,9 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
           // Auto-expand the newly started participation
           setExpandedId(bookingId);
         } else {
-          setError(result.error?.message || 'Fehler beim Starten der Vorbereitung');
+          setError(
+            result.error?.message || 'Fehler beim Starten der Vorbereitung'
+          );
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
@@ -228,7 +236,13 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
                   </Box>
                   <Button
                     variant='contained'
-                    startIcon={isPending ? <CircularProgress size={16} color='inherit' /> : <PlayArrowIcon />}
+                    startIcon={
+                      isPending ? (
+                        <CircularProgress size={16} color='inherit' />
+                      ) : (
+                        <PlayArrowIcon />
+                      )
+                    }
                     disabled={isPending}
                     onClick={() => handleStartPreparation(item.booking.id)}
                     sx={{
@@ -318,8 +332,9 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
                       variant='caption'
                       sx={{ color: colors.petrol, fontWeight: 500 }}
                     >
-                      {item.participation && (statusLabels[item.participation.status] ||
-                        item.participation.status)}
+                      {item.participation &&
+                        (statusLabels[item.participation.status] ||
+                          item.participation.status)}
                     </Typography>
                   </Box>
                 </Box>
