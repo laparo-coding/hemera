@@ -29,25 +29,26 @@ model User {
 }
 
 model Course {
-  id           String      @id @default(cuid())
-  title        String
-  description  String?
-  slug         String      @unique
-  price        Int
-  currency     String      @default("EUR")
-  capacity     Int         @default(20)
-  startDate    DateTime?   @map("start_date")
-  startTime    DateTime?   @map("start_time")
-  endTime      DateTime?   @map("end_time")
-  isPublished  Boolean     @default(false) @map("is_published")
-  createdAt    DateTime    @default(now()) @map("created_at")
-  updatedAt    DateTime    @updatedAt @map("updated_at")
-  instructor   String      @default("TBD")
-  level        CourseLevel @default(BEGINNER)
-  thumbnailUrl String?     @map("thumbnail_url")
-  locationId   String?     @map("location_id")
-  location     Location?   @relation(fields: [locationId], references: [id])
-  bookings     Booking[]
+  id            String              @id @default(cuid())
+  title         String
+  description   String?
+  slug          String              @unique
+  price         Int
+  currency      String              @default("EUR")
+  capacity      Int                 @default(20)
+  startDate     DateTime?           @map("start_date")
+  startTime     DateTime?           @map("start_time")
+  endTime       DateTime?           @map("end_time")
+  isPublished   Boolean             @default(false) @map("is_published")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+  instructor    String              @default("TBD")
+  level         CourseLevel         @default(BEGINNER)
+  thumbnailUrl  String?             @map("thumbnail_url")
+  locationId    String?             @map("location_id")
+  location      Location?           @relation(fields: [locationId], references: [id])
+  bookings      Booking[]
+  summaryAssets CourseSummaryAsset[]
 
   @@index([startDate])
   @@map("courses")
@@ -60,18 +61,19 @@ enum CourseLevel {
 }
 
 model Booking {
-  id                    String        @id @default(cuid())
-  userId                String        @map("user_id")
-  courseId              String        @map("course_id")
-  paymentStatus         PaymentStatus @default(PENDING) @map("payment_status")
-  stripePaymentIntentId String?       @map("stripe_payment_intent_id")
-  stripeSessionId       String?       @map("stripe_session_id")
+  id                    String               @id @default(cuid())
+  userId                String               @map("user_id")
+  courseId              String               @map("course_id")
+  paymentStatus         PaymentStatus        @default(PENDING) @map("payment_status")
+  stripePaymentIntentId String?              @map("stripe_payment_intent_id")
+  stripeSessionId       String?              @map("stripe_session_id")
   amount                Int
-  currency              String        @default("EUR")
-  createdAt             DateTime      @default(now()) @map("created_at")
-  updatedAt             DateTime      @updatedAt @map("updated_at")
-  course                Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currency              String               @default("EUR")
+  createdAt             DateTime             @default(now()) @map("created_at")
+  updatedAt             DateTime             @updatedAt @map("updated_at")
+  course                Course               @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participation         CourseParticipation?
 
   @@unique([userId, courseId])
   @@map("bookings")
@@ -108,4 +110,111 @@ model Location {
   @@index([city])
   @@index([name])
   @@map("locations")
+}
+
+// =============================================================================
+// COURSE PARTICIPATION FLOW (016-course-assignments)
+// =============================================================================
+
+enum ParticipationStatus {
+  PREPARATION
+  SUMMARY
+  DEBRIEFING
+  RESULT
+  COMPLETE
+}
+
+enum SummaryAssetSource {
+  COURSE_DEFAULT
+  BOOKING_OVERRIDE
+}
+
+model CourseParticipation {
+  id                    String                @id @default(cuid())
+  bookingId             String                @unique @map("booking_id")
+  userId                String                @map("user_id")
+  courseId              String                @map("course_id")
+  status                ParticipationStatus   @default(PREPARATION)
+  preparationIntent     String?               @map("preparation_intent") @db.VarChar(2000)
+  desiredResults        String?               @map("desired_results") @db.VarChar(2000)
+  lineManagerProfile    String?               @map("line_manager_profile") @db.VarChar(2000)
+  preparationCompletedAt DateTime?            @map("preparation_completed_at")
+  summaryPresentedAt    DateTime?             @map("summary_presented_at")
+  summaryAssetSource    SummaryAssetSource?   @map("summary_asset_source")
+  summaryCompletedAt    DateTime?             @map("summary_completed_at")
+  debriefingPlan        String?               @map("debriefing_plan") @db.VarChar(2000)
+  salaryDiscussionMonth String?               @map("salary_discussion_month") @db.VarChar(7)
+  resultOutcome         String?               @map("result_outcome") @db.VarChar(2000)
+  resultNotes           String?               @map("result_notes") @db.VarChar(2000)
+  resultCompletedAt     DateTime?             @map("result_completed_at")
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+
+  booking               Booking               @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  documents             ParticipationDocument[]
+  summaryOverrides      ParticipationSummaryOverride[]
+
+  @@index([userId, status])
+  @@map("course_participations")
+}
+
+model ParticipationDocument {
+  id                 String              @id @default(cuid())
+  participationId    String              @map("participation_id")
+  blobUrl            String              @map("blob_url")
+  blobKey            String              @map("blob_key")
+  fileName           String              @map("file_name")
+  fileSizeBytes      Int                 @map("file_size_bytes")
+  mimeType           String              @map("mime_type")
+  uploadedAt         DateTime            @default(now()) @map("uploaded_at")
+  replacesDocumentId String?             @map("replaces_document_id")
+  replacedAt         DateTime?           @map("replaced_at")
+  isActive           Boolean             @default(true) @map("is_active")
+  createdByUserId    String              @map("created_by_user_id")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  participation      CourseParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
+
+  @@index([participationId, isActive])
+  @@map("participation_documents")
+}
+
+model CourseSummaryAsset {
+  id             String    @id @default(cuid())
+  courseId       String    @map("course_id")
+  muxAssetId     String    @map("mux_asset_id")
+  muxPlaybackId  String    @map("mux_playback_id")
+  title          String
+  description    String?
+  sortOrder      Int       @default(0) @map("sort_order")
+  isActive       Boolean   @default(true) @map("is_active")
+  availableFrom  DateTime? @map("available_from")
+  availableUntil DateTime? @map("available_until")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  course         Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  overrides      ParticipationSummaryOverride[]
+
+  @@index([courseId, isActive, sortOrder])
+  @@map("course_summary_assets")
+}
+
+model ParticipationSummaryOverride {
+  id                   String              @id @default(cuid())
+  participationId      String              @map("participation_id")
+  courseSummaryAssetId String?             @map("course_summary_asset_id")
+  muxAssetId           String?             @map("mux_asset_id")
+  muxPlaybackId        String?             @map("mux_playback_id")
+  sortOrder            Int                 @default(0) @map("sort_order")
+  label                String
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+
+  participation        CourseParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
+  courseSummaryAsset   CourseSummaryAsset? @relation(fields: [courseSummaryAssetId], references: [id], onDelete: SetNull)
+
+  @@index([participationId, sortOrder])
+  @@map("participation_summary_overrides")
 }

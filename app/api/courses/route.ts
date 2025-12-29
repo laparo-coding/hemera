@@ -19,7 +19,7 @@ import {
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-// Schema für Query-Parameter
+// Schema for query parameters
 const CourseSearchSchema = z.object({
   search: z.string().optional(),
   minPrice: z.coerce.number().optional(),
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     } catch (error) {
       logger.warn('Invalid query parameters', { queryParams, error });
       return createErrorResponse(
-        'Ungültige Query-Parameter',
+        'Invalid query parameters',
         ErrorCodes.INVALID_INPUT,
         requestId,
         400
@@ -57,12 +57,12 @@ export async function GET(request: NextRequest) {
 
     logger.info('Fetching courses', { params: validatedParams });
 
-    // Kurse von der Mock-Funktion abrufen
+    // Fetch courses from mock function
     const courses = await getCourses();
 
     let filteredCourses = courses;
 
-    // Suchfilter anwenden
+    // Apply search filter
     if (validatedParams.search) {
       const searchTerm = validatedParams.search.toLowerCase();
       filteredCourses = filteredCourses.filter(
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Preisfilter anwenden
+    // Apply price filter
     if (validatedParams.minPrice !== undefined) {
       const minPrice = validatedParams.minPrice;
       filteredCourses = filteredCourses.filter(
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verfügbarkeitsfilter anwenden
+    // Apply availability filter
     if (validatedParams.availableOnly) {
       filteredCourses = filteredCourses.filter((course: CourseWithBookings) => {
         if (!course.capacity) return true; // Unlimited capacity
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Sortierung anwenden
+    // Apply sorting
     if (validatedParams.sortBy) {
       filteredCourses.sort((a: CourseWithBookings, b: CourseWithBookings) => {
         let aValue: string | number | Date;
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Paginierung anwenden
+    // Apply pagination
     const page = validatedParams.page || 1;
     const limit = validatedParams.limit || 10;
     const startIndex = (page - 1) * limit;
@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
         updatedAt: course.updatedAt,
         thumbnailUrl: course.thumbnailUrl,
         instructor: course.instructor,
-        // Berechne verfügbare Plätze
+        // Calculate available spots
         availableSpots: course.capacity
           ? Math.max(
               0,
@@ -176,8 +176,8 @@ export async function GET(request: NextRequest) {
               booking.paymentStatus === PaymentStatus.PAID ||
               booking.paymentStatus === PaymentStatus.PENDING
           ).length || 0,
-        // User-spezifische Informationen
-        userBookingStatus: null, // Mock-Implementation
+        // User-specific information
+        userBookingStatus: null, // Mock implementation
       })),
       pagination: {
         page,
@@ -198,7 +198,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logger.error('Error in GET /api/courses', error as Error);
     return createErrorResponse(
-      'Interner Serverfehler beim Abrufen der Kurse',
+      'Internal server error while fetching courses',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

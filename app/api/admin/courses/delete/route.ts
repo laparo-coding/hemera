@@ -15,7 +15,7 @@ export async function DELETE(request: NextRequest) {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json(
-        { error: 'Authentifizierung erforderlich' },
+        { error: 'Authentication required' },
         { status: 401 }
       );
     }
@@ -24,7 +24,7 @@ export async function DELETE(request: NextRequest) {
     const isAdmin = await checkUserAdminStatus(userId);
     if (!isAdmin) {
       return NextResponse.json(
-        { error: 'Admin-Berechtigung erforderlich' },
+        { error: 'Admin permission required' },
         { status: 403 }
       );
     }
@@ -32,7 +32,7 @@ export async function DELETE(request: NextRequest) {
     // Validate course ID
     if (!courseId) {
       return NextResponse.json(
-        { error: 'Kurs-ID ist erforderlich' },
+        { error: 'Course ID is required' },
         { status: 400 }
       );
     }
@@ -49,10 +49,7 @@ export async function DELETE(request: NextRequest) {
         route: '/api/admin/courses/delete',
       });
 
-      return NextResponse.json(
-        { error: 'Kurs nicht gefunden' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
     // Delete course
@@ -68,7 +65,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: `Kurs "${existingCourse.title}" wurde erfolgreich gelöscht` },
+      { message: `Course "${existingCourse.title}" successfully deleted` },
       { status: 200 }
     );
   } catch (error) {
@@ -80,7 +77,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { error: 'Ein Fehler ist beim Löschen des Kurses aufgetreten' },
+      { error: 'An error occurred while deleting the course' },
       { status: 500 }
     );
   }

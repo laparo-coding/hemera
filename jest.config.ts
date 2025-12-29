@@ -13,7 +13,7 @@ const config: Config = {
   },
   transformIgnorePatterns: [],
   testMatch: [
-    '<rootDir>/tests/unit/*.spec.ts',
+    '<rootDir>/tests/unit/**/*.spec.ts',
     '<rootDir>/tests/contracts/**/*.spec.ts',
     '<rootDir>/tests/integration/**/*.spec.ts',
   ],

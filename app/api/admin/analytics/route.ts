@@ -1,6 +1,6 @@
 /**
- * Performance-Metriken API-Endpunkt
- * Stellt Analytics-Daten für Dashboard und Monitoring zur Verfügung
+ * Performance Metrics API Endpoint
+ * Provides analytics data for dashboard and monitoring
  */
 
 import { auth } from '@clerk/nextjs/server';

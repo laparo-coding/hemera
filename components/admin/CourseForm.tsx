@@ -58,7 +58,7 @@ export default function CourseForm({
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',
-      price: initialData?.price || 0,
+      price: initialData?.price ? initialData.price / 100 : 0, // Convert Cents to Euro for display
       startDate: initialData?.startDate || new Date(),
       startTime: initialData?.startTime || new Date(),
       endTime:

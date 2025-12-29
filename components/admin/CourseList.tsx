@@ -99,7 +99,9 @@ export default function CourseList({
                   {formatTimeRange(course.startTime, course.endTime) ?? 'TBD'}
                 </Typography>
               </TableCell>
-              <TableCell align='right'>{course.price.toString()} €</TableCell>
+              <TableCell align='right'>
+                {(course.price / 100).toFixed(2)} €
+              </TableCell>
               <TableCell align='center'>
                 <Chip
                   label={`${course._count.bookings} / ${course.capacity}`}

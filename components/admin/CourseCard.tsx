@@ -109,7 +109,7 @@ export default function CourseCard({
           </Typography>
 
           <Typography variant='body2'>
-            <strong>Price:</strong> {course.price.toString()} €
+            <strong>Price:</strong> {(course.price / 100).toFixed(2)} €
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
