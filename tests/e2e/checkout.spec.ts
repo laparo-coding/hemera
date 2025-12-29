@@ -181,7 +181,7 @@ test.describe('Checkout Flow E2E', () => {
         E2E_TEST_COURSE.title
       );
       await expect(page.locator('[data-testid="course-price"]')).toContainText(
-        '100'
+        String(E2E_TEST_COURSE.price)
       );
     });
 
