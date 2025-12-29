@@ -10,7 +10,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../../../../lib/auth/admin';
-import { uploadCourseImage } from '../../../../lib/utils/fileUpload';
+import { uploadCourseImage } from '../../../../lib/utils/courseImageUpload';
 
 export async function POST(request: NextRequest) {
   try {
