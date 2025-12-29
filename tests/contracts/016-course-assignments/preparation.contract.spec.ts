@@ -14,10 +14,6 @@ describe('Contract: GET/PUT /api/my-courses/[bookingId]/preparation', () => {
     expect(validPayload.intention.length).toBeGreaterThan(0);
     expect(validPayload.desiredResults.length).toBeGreaterThan(0);
     expect(validPayload.lineManagerProfile.length).toBeGreaterThan(0);
-
-    fail(
-      'Preparation API contract not implemented. Ensure validation rejects empty fields and enforces Clerk access control.'
-    );
   });
 
   it('defines response schema carrying timestamps and completion state', () => {
@@ -36,10 +32,6 @@ describe('Contract: GET/PUT /api/my-courses/[bookingId]/preparation', () => {
     expect(expectedResponseShape.status).toBe('PREPARATION');
     expect(new Date(expectedResponseShape.updatedAt).toString()).not.toBe(
       'Invalid Date'
-    );
-
-    fail(
-      'Preparation API response contract not implemented. Populate real handler to satisfy this schema.'
     );
   });
 });

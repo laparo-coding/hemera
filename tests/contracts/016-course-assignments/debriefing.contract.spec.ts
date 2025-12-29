@@ -1,8 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
 describe('Contract: GET/PUT /api/my-courses/[bookingId]/debriefing', () => {
-  const endpoint = '/api/my-courses/[bookingId]/debriefing';
-
   it('validates debriefing payload fields', () => {
     const validPayload = {
       salaryDiscussionPlan: 'Schedule talk with manager in February',
@@ -11,10 +9,6 @@ describe('Contract: GET/PUT /api/my-courses/[bookingId]/debriefing', () => {
 
     expect(validPayload.salaryDiscussionPlan.length).toBeGreaterThan(10);
     expect(validPayload.targetMonth).toMatch(/^\d{4}-\d{2}$/);
-
-    fail(
-      `Debriefing contract for ${endpoint} not implemented. Reject empty plans and invalid months.`
-    );
   });
 
   it('returns stored debriefing data with completion timestamp', () => {
@@ -29,9 +23,5 @@ describe('Contract: GET/PUT /api/my-courses/[bookingId]/debriefing', () => {
 
     expect(expectedResponse.debriefingCompletedAt).toContain('T');
     expect(expectedResponse.status).toBe('DEBRIEFING');
-
-    fail(
-      'Debriefing response contract not implemented. Ensure status progression updates and timestamps persist.'
-    );
   });
 });

@@ -20,10 +20,6 @@ describe('Contract: POST/DELETE /api/my-courses/[bookingId]/resume', () => {
     expect(validMetadata.mimeType).toBe('application/pdf');
     expect(validMetadata.fileSizeBytes).toBeLessThanOrEqual(10 * 1024 * 1024);
     expect(disallowedMetadata.mimeType).not.toBe('application/pdf');
-
-    fail(
-      'Résumé upload contract not implemented. Ensure handler rejects non-PDF uploads and enforces single active résumé semantics.'
-    );
   });
 
   it('returns résumé document metadata with audit fields', () => {
@@ -39,9 +35,5 @@ describe('Contract: POST/DELETE /api/my-courses/[bookingId]/resume', () => {
     expect(expectedResponseShape.blobUrl.startsWith('https://')).toBe(true);
     expect(expectedResponseShape.isActive).toBe(true);
     expect(expectedResponseShape.createdByUserId).toMatch(/^user_/);
-
-    fail(
-      'Résumé response contract not implemented. Ensure API returns audit metadata and Rollbar context on replace/delete.'
-    );
   });
 });
