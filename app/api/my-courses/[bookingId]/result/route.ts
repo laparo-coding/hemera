@@ -29,10 +29,7 @@ export async function GET(
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const { bookingId } = await params;
@@ -59,10 +56,7 @@ export async function GET(
         bookingId,
         ownerId: participation.booking.userId,
       });
-      return NextResponse.json(
-        { error: 'No permission' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'No permission' }, { status: 403 });
     }
 
     return NextResponse.json({
@@ -93,10 +87,7 @@ export async function PUT(
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const { bookingId } = await params;
@@ -136,10 +127,7 @@ export async function PUT(
         bookingId,
         ownerId: participation.booking.userId,
       });
-      return NextResponse.json(
-        { error: 'No permission' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'No permission' }, { status: 403 });
     }
 
     // Update result data

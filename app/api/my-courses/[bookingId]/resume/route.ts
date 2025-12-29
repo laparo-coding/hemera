@@ -27,10 +27,7 @@ export async function GET(
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const { bookingId } = await params;
@@ -52,10 +49,7 @@ export async function GET(
 
     // Verify ownership
     if (participation.booking.userId !== userId) {
-      return NextResponse.json(
-        { error: 'No permission' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'No permission' }, { status: 403 });
     }
 
     const activeResume = await getActiveResume(participation.id);
@@ -90,10 +84,7 @@ export async function POST(
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const { bookingId } = await params;
@@ -120,10 +111,7 @@ export async function POST(
         bookingId,
         ownerId: participation.booking.userId,
       });
-      return NextResponse.json(
-        { error: 'No permission' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'No permission' }, { status: 403 });
     }
 
     // Parse multipart form data
@@ -131,10 +119,7 @@ export async function POST(
     const file = formData.get('file') as File | null;
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file uploaded' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
     // Upload to Vercel Blob
@@ -194,10 +179,7 @@ export async function DELETE(
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const { bookingId } = await params;
@@ -219,10 +201,7 @@ export async function DELETE(
 
     // Verify ownership
     if (participation.booking.userId !== userId) {
-      return NextResponse.json(
-        { error: 'No permission' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'No permission' }, { status: 403 });
     }
 
     const activeResume = await getActiveResume(participation.id);
