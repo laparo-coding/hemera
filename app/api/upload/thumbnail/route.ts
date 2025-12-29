@@ -1,13 +1,16 @@
 /**
  * Thumbnail Upload API Route
  *
- * Handles course thumbnail uploads to Vercel Blob storage
- * with validation and error handling.
+ * Handles course image uploads to Vercel Blob storage
+ * with automatic generation of multiple image variants:
+ * - thumbnail (400x90) for Landing CourseCard
+ * - detail (900x200) for Course Detail page
+ * - twitter (1200x630) for Twitter Card SEO
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../../../../lib/auth/admin';
-import { uploadThumbnail } from '../../../../lib/utils/fileUpload';
+import { uploadCourseImage } from '../../../../lib/utils/fileUpload';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +24,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    const result = await uploadThumbnail(file);
+    const result = await uploadCourseImage(file);
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 });
@@ -29,7 +32,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      url: result.url,
+      urls: result.urls,
+      // For backwards compatibility with existing code
+      url: result.urls?.thumbnail,
     });
   } catch (error) {
     console.error('Upload error:', error);

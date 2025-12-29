@@ -38,6 +38,7 @@ export async function generateMetadata({
           title: string;
           description?: string | null;
           slug?: string;
+          imageTwitter?: string | null;
         }
       | undefined;
 
@@ -48,10 +49,12 @@ export async function generateMetadata({
         'Kursdetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.',
       160
     );
-    // Kurs-spezifisches OG-Bild per Konvention (Fallback auf Default in SEO util)
-    const ogImage = course?.slug
-      ? `/images/courses/${course.slug}.jpg`
-      : undefined;
+    // Use Twitter image from database if available, otherwise fallback
+    const ogImage = course?.imageTwitter
+      ? course.imageTwitter
+      : course?.slug
+        ? `/images/courses/${course.slug}.jpg`
+        : undefined;
 
     return generateSEOMetadata({
       title,

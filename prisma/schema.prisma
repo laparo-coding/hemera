@@ -45,6 +45,8 @@ model Course {
   instructor    String              @default("TBD")
   level         CourseLevel         @default(BEGINNER)
   thumbnailUrl  String?             @map("thumbnail_url")
+  imageDetail   String?             @map("image_detail")
+  imageTwitter  String?             @map("image_twitter")
   locationId    String?             @map("location_id")
   location      Location?           @relation(fields: [locationId], references: [id])
   bookings      Booking[]

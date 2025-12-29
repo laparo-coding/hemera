@@ -52,6 +52,24 @@ export const courseCreateSchema = z.object({
     )
     .optional()
     .nullable(),
+  imageDetail: z
+    .string()
+    .url('Detail image must be a valid URL')
+    .regex(
+      /^https:\/\/.*\.vercel-storage\.com\/.*/,
+      'Detail image must be from Vercel Blob storage'
+    )
+    .optional()
+    .nullable(),
+  imageTwitter: z
+    .string()
+    .url('Twitter image must be a valid URL')
+    .regex(
+      /^https:\/\/.*\.vercel-storage\.com\/.*/,
+      'Twitter image must be from Vercel Blob storage'
+    )
+    .optional()
+    .nullable(),
   capacity: z
     .number()
     .int('Capacity must be an integer')
@@ -109,6 +127,24 @@ export const courseUpdateSchema = z.object({
     .regex(
       /^https:\/\/.*\.vercel-storage\.com\/.*/,
       'Thumbnail must be from Vercel Blob storage'
+    )
+    .optional()
+    .nullable(),
+  imageDetail: z
+    .string()
+    .url('Detail image must be a valid URL')
+    .regex(
+      /^https:\/\/.*\.vercel-storage\.com\/.*/,
+      'Detail image must be from Vercel Blob storage'
+    )
+    .optional()
+    .nullable(),
+  imageTwitter: z
+    .string()
+    .url('Twitter image must be a valid URL')
+    .regex(
+      /^https:\/\/.*\.vercel-storage\.com\/.*/,
+      'Twitter image must be from Vercel Blob storage'
     )
     .optional()
     .nullable(),
