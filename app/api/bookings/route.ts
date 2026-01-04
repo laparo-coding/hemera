@@ -76,7 +76,7 @@ export async function GET(request: Request) {
         courseId: booking.courseId,
         courseTitle: booking.course?.title ?? 'Kurs nicht mehr verfügbar',
         coursePrice: booking.amount,
-        currency: booking.currency ?? booking.course?.currency ?? 'EUR',
+        currency: booking.currency,
         paymentStatus: booking.paymentStatus,
         createdAt: booking.createdAt,
       };
