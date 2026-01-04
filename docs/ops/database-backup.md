@@ -13,6 +13,9 @@ Da Prisma Postgres (Free Plan) keine automatischen Backups enthält, nutzen wir 
 └─────────────────────┘      └──────────────────┘      └─────────────────────┘
 ```
 
+**Hinweis**: Da Prisma Postgres einen Connection Pooler verwendet (kein direkter PostgreSQL-Zugang),
+nutzen wir Prisma Client für den Export statt `pg_dump`.
+
 ## Backup
 
 ### Automatisch (täglich)
@@ -20,8 +23,20 @@ Da Prisma Postgres (Free Plan) keine automatischen Backups enthält, nutzen wir 
 Der Workflow `daily-backup.yml` läuft jeden Tag um **03:00 UTC** (04:00 MEZ).
 
 - **Aufbewahrung**: 30 Tage
-- **Format**: SQL (gzip-komprimiert)
+- **Format**: JSON-Dateien pro Tabelle (tar.gz komprimiert)
 - **Speicherort**: GitHub Actions Artifacts
+
+### Backup-Inhalt
+
+Das Backup enthält JSON-Dateien für jede Tabelle:
+- `User.json`
+- `Course.json`
+- `Booking.json`
+- `Location.json`
+- `CourseParticipation.json`
+- `ParticipationDocument.json`
+- `CourseSummaryAsset.json`
+- `metadata.json` (Datum, Grund)
 
 ### Manuell
 
@@ -43,22 +58,23 @@ Der Workflow `daily-backup.yml` läuft jeden Tag um **03:00 UTC** (04:00 MEZ).
 
 ```bash
 # Im Projektverzeichnis
-./scripts/ops/restore-db.sh hemera_backup_2026-01-04_03-00-00.sql.gz
+./scripts/ops/restore-db.sh hemera_backup_2025-01-04_03-00-00.tar.gz
 ```
 
 Das Script:
 - Lädt `DATABASE_URL` automatisch aus `.env.local` oder `.env`
 - Fragt vor dem Überschreiben um Bestätigung
-- Entpackt und führt das SQL-Backup aus
+- Löscht bestehende Daten und importiert das Backup
+- Beachtet die richtige Reihenfolge für Foreign Keys
 
 ### Manuelle Wiederherstellung
 
 ```bash
 # Backup entpacken
-gunzip hemera_backup_2026-01-04_03-00-00.sql.gz
+tar -xzf hemera_backup_2025-01-04_03-00-00.tar.gz
 
-# Wiederherstellen
-psql "$DATABASE_URL" < hemera_backup_2026-01-04_03-00-00.sql
+# Im entpackten Ordner befinden sich JSON-Dateien pro Tabelle
+# Diese können mit einem Node.js Script importiert werden
 ```
 
 ## Einrichtung
@@ -70,7 +86,7 @@ Die `DATABASE_URL` muss als GitHub Secret konfiguriert sein:
 1. Gehe zu **Settings → Secrets and variables → Actions**
 2. Klicke **New repository secret**
 3. Name: `DATABASE_URL`
-4. Value: Die vollständige PostgreSQL-Verbindungs-URL
+4. Value: Die vollständige Prisma Postgres Verbindungs-URL
 
 ### 2. Workflow aktivieren
 
@@ -83,12 +99,14 @@ Der Workflow wird automatisch aktiviert, sobald die Datei `.github/workflows/dai
 1. Prüfe, ob `DATABASE_URL` als Secret gesetzt ist
 2. Prüfe die Workflow-Logs in GitHub Actions
 3. Stelle sicher, dass die Datenbank erreichbar ist
+4. Prüfe, ob alle Prisma-Modelle korrekt sind
 
 ### Restore schlägt fehl
 
-1. Prüfe die PostgreSQL-Client-Installation: `psql --version`
-2. Prüfe die `DATABASE_URL` Umgebungsvariable
-3. Stelle sicher, dass das Backup-File nicht beschädigt ist
+1. Prüfe, ob Node.js installiert ist: `node --version`
+2. Prüfe, ob `@prisma/client` generiert ist: `npx prisma generate`
+3. Prüfe die `DATABASE_URL` Umgebungsvariable
+4. Stelle sicher, dass das Backup-Archiv nicht beschädigt ist
 
 ## Empfehlungen
 
@@ -98,8 +116,7 @@ Der Workflow wird automatisch aktiviert, sobald die Datei `.github/workflows/dai
 
 ## Technische Details
 
-- **pg_dump Optionen**:
-  - `--no-owner`: Keine Besitzerrechte (für verschiedene Umgebungen)
-  - `--no-acl`: Keine Zugriffsrechte
-  - `--clean`: DROP-Statements vor CREATE
-  - `--if-exists`: Fehler vermeiden bei nicht vorhandenen Objekten
+- **Backup-Methode**: Prisma Client `findMany()` für alle Models
+- **Export-Format**: JSON mit vollständiger Datenstruktur
+- **Foreign Keys**: Restore-Reihenfolge berücksichtigt Abhängigkeiten
+- **Komprimierung**: tar + gzip für effiziente Speicherung
