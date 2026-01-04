@@ -1,0 +1,85 @@
+name: Daily Database Backup
+
+on:
+  schedule:
+    # Täglich um 03:00 UTC (04:00 MEZ / 05:00 MESZ)
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    # Manueller Trigger für On-Demand Backups
+    inputs:
+      reason:
+        description: 'Grund für manuelles Backup'
+        required: false
+        default: 'Manuelles Backup'
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Create Database Backup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          DATE=$(date +%Y-%m-%d_%H-%M-%S)
+          BACKUP_FILE="hemera_backup_${DATE}.sql"
+          
+          echo "🔄 Starte Backup für ${DATE}..."
+          echo "📋 Backup-Grund: ${{ github.event.inputs.reason || 'Geplantes tägliches Backup' }}"
+          
+          # Backup erstellen mit pg_dump
+          pg_dump "$DATABASE_URL" \
+            --no-owner \
+            --no-acl \
+            --clean \
+            --if-exists \
+            --verbose \
+            > "$BACKUP_FILE" 2>&1 || {
+              echo "❌ Backup fehlgeschlagen!"
+              exit 1
+            }
+          
+          # Backup komprimieren
+          gzip "$BACKUP_FILE"
+          
+          # Statistiken ausgeben
+          BACKUP_SIZE=$(ls -lh "${BACKUP_FILE}.gz" | awk '{print $5}')
+          TABLE_COUNT=$(grep -c "CREATE TABLE" "$BACKUP_FILE" 2>/dev/null || echo "N/A")
+          
+          echo "✅ Backup erfolgreich erstellt!"
+          echo "📦 Datei: ${BACKUP_FILE}.gz"
+          echo "📊 Größe: ${BACKUP_SIZE}"
+          echo "📋 Trigger: ${{ github.event_name }}"
+
+      - name: Upload Backup as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_number }}-${{ github.run_id }}
+          path: hemera_backup_*.sql.gz
+          retention-days: 30
+          compression-level: 0  # Bereits komprimiert
+
+      - name: Backup Summary
+        run: |
+          echo "## 🗄️ Datenbank Backup Zusammenfassung" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Eigenschaft | Wert |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 📅 Datum | $(date '+%d.%m.%Y %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔢 Run | #${{ github.run_number }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📋 Trigger | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⏰ Aufbewahrung | 30 Tage |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Download" >> $GITHUB_STEP_SUMMARY
+          echo "Das Backup kann über den **Artifacts**-Bereich heruntergeladen werden." >> $GITHUB_STEP_SUMMARY
