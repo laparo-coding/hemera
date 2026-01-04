@@ -78,9 +78,10 @@ jobs:
               console.log('\\n✅ Backup completed!' + (hasErrors ? ' (with warnings)' : ''));
             } catch (error) {
               console.error('❌ Backup failed: ' + (error.message || 'Unknown error'));
+              await prisma.$disconnect();
               process.exit(1);
             } finally {
-              await prisma.\$disconnect();
+              // Prisma client already disconnected
             }
           }
 
