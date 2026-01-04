@@ -76,5 +76,30 @@ See `docs/performance/README.md` for detailed patterns.
   (qodo-code-review, qodo-merge bot comments) after opening a pull request. These automated
   suggestions often improve code quality, error handling, and test coverage.
 
+### Constitutional Requirement: Qodo Error Review
+
+**After every PR is opened, you MUST:**
+
+1. **Wait for Qodo bot comments** - Look for comments from `qodo-code-review[bot]` and 
+   `qodo-free-for-open-source-projects[bot]`
+2. **Read PR Compliance Guide** - Check for 🔴 (red) security/compliance issues
+3. **Read PR Code Suggestions** - Review improvement suggestions
+4. **Fix all 🔴 issues** - Red compliance issues must be fixed before merge
+5. **Implement high-impact suggestions** - Especially security and error handling improvements
+
+**Qodo issues to always fix:**
+- 🔴 Security Compliance issues (injection, data exposure, etc.)
+- 🔴 Error Handling issues (generic errors, sensitive logging)
+- 🔴 Data validation issues (missing input validation)
+
+**How to check Qodo review:**
+```bash
+# Get PR comments with Qodo reviews
+gh pr view <PR_NUMBER> --comments
+
+# Or use the GitHub MCP tool:
+mcp_github_github_pull_request_read with method="get_comments"
+```
+
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
