@@ -63,18 +63,29 @@ export async function GET(request: Request) {
 
     const totalPages = Math.ceil(total / validatedParams.limit);
 
+    const normalizedBookings = bookings.map(booking => {
+      if (!booking.course) {
+        console.warn(
+          '[API /api/bookings GET] Missing course relation for booking',
+          { requestId: _requestId }
+        );
+      }
+
+      return {
+        id: booking.id,
+        courseId: booking.courseId,
+        courseTitle: booking.course?.title ?? 'Kurs nicht mehr verfügbar',
+        coursePrice: booking.amount,
+        currency: booking.currency,
+        paymentStatus: booking.paymentStatus,
+        createdAt: booking.createdAt,
+      };
+    });
+
     const responseData = {
       success: true,
       data: {
-        bookings: bookings.map(booking => ({
-          id: booking.id,
-          courseId: booking.courseId,
-          courseTitle: booking.course.title,
-          coursePrice: booking.course.price,
-          currency: booking.course.currency,
-          paymentStatus: booking.paymentStatus,
-          createdAt: booking.createdAt,
-        })),
+        bookings: normalizedBookings,
         pagination: {
           page: validatedParams.page,
           limit: validatedParams.limit,
