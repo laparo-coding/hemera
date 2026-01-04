@@ -4,12 +4,12 @@
 # Stellt ein Backup aus GitHub Actions Artifacts wieder her
 #
 # Verwendung:
-#   ./scripts/ops/restore-db.sh <backup-file.sql.gz>
-#   ./scripts/ops/restore-db.sh hemera_backup_2026-01-04_03-00-00.sql.gz
+#   ./scripts/ops/restore-db.sh <backup-archive.tar.gz>
+#   ./scripts/ops/restore-db.sh hemera_backup_2025-01-04_03-00-00.tar.gz
 #
-# Voraussetzungen:
-#   - PostgreSQL Client (psql) installiert
-#   - DATABASE_URL Umgebungsvariable gesetzt ODER .env.local vorhanden
+# Hinweis: 
+#   Dieses Script importiert JSON-Daten, die mit dem Prisma-basierten
+#   Backup erstellt wurden. Es überschreibt bestehende Daten.
 #
 
 set -e
@@ -34,10 +34,10 @@ if [ -z "$1" ]; then
     echo "=============================="
     echo ""
     echo "Verwendung:"
-    echo "  $0 <backup-file.sql.gz>"
+    echo "  $0 <backup-archive.tar.gz>"
     echo ""
     echo "Beispiel:"
-    echo "  $0 hemera_backup_2026-01-04_03-00-00.sql.gz"
+    echo "  $0 hemera_backup_2025-01-04_03-00-00.tar.gz"
     echo ""
     echo "So erhältst du ein Backup:"
     echo "  1. Gehe zu https://github.com/Laparo/hemera/actions"
@@ -53,6 +53,12 @@ BACKUP_FILE="$1"
 # Prüfe ob Datei existiert
 if [ ! -f "$BACKUP_FILE" ]; then
     log_error "Backup-Datei nicht gefunden: $BACKUP_FILE"
+    exit 1
+fi
+
+# Prüfe ob .tar.gz
+if [[ ! "$BACKUP_FILE" =~ \.tar\.gz$ ]]; then
+    log_error "Backup-Datei muss eine .tar.gz Datei sein"
     exit 1
 fi
 
@@ -88,38 +94,110 @@ if [ "$CONFIRM" != "ja" ]; then
     exit 0
 fi
 
-# Temporäre Datei für entpacktes SQL
-SQL_FILE="${BACKUP_FILE%.gz}"
-TEMP_SQL=""
+# Temporäres Verzeichnis erstellen
+log_info "Entpacke Backup..."
+TEMP_DIR=$(mktemp -d)
+trap "rm -rf $TEMP_DIR" EXIT
 
-# Entpacken falls .gz
-if [[ "$BACKUP_FILE" == *.gz ]]; then
-    log_info "Entpacke Backup..."
-    TEMP_SQL=$(mktemp)
-    gunzip -c "$BACKUP_FILE" > "$TEMP_SQL"
-    SQL_FILE="$TEMP_SQL"
-fi
+tar -xzf "$BACKUP_FILE" -C "$TEMP_DIR"
 
-# Restore durchführen
-log_info "Stelle Datenbank wieder her..."
-echo ""
+# Finde das Backup-Verzeichnis
+BACKUP_DIR=$(find "$TEMP_DIR" -type d -name "backup_*" | head -1)
 
-if psql "$DATABASE_URL" < "$SQL_FILE"; then
-    log_success "Datenbank erfolgreich wiederhergestellt!"
-else
-    log_error "Restore fehlgeschlagen!"
-    # Aufräumen
-    [ -n "$TEMP_SQL" ] && rm -f "$TEMP_SQL"
+if [ -z "$BACKUP_DIR" ]; then
+    log_error "Kein gültiges Backup-Verzeichnis im Archiv gefunden"
     exit 1
 fi
 
-# Aufräumen
-[ -n "$TEMP_SQL" ] && rm -f "$TEMP_SQL"
+log_info "Backup-Verzeichnis: $BACKUP_DIR"
+log_info "Starte Restore..."
+
+# Node.js Script für Restore
+node -e "
+const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
+const path = require('path');
+
+async function restore() {
+  const prisma = new PrismaClient();
+  const backupDir = '$BACKUP_DIR';
+  
+  // Reihenfolge ist wichtig wegen Foreign Keys (abhängige Tabellen zuerst löschen)
+  const deleteOrder = [
+    'courseSummaryAsset',
+    'participationDocument',
+    'courseParticipation',
+    'booking',
+    'course',
+    'location',
+    'user'
+  ];
+  
+  const createOrder = deleteOrder.slice().reverse();
+  
+  try {
+    // Erst alle Daten löschen
+    console.log('\\n🗑️  Lösche bestehende Daten...');
+    for (const model of deleteOrder) {
+      try {
+        const result = await prisma[model].deleteMany();
+        console.log('   ✅ ' + model + ': ' + result.count + ' gelöscht');
+      } catch (e) {
+        console.log('   ⚠️ ' + model + ': übersprungen');
+      }
+    }
+    
+    // Dann neue Daten importieren
+    console.log('\\n📥 Importiere Backup-Daten...');
+    for (const model of createOrder) {
+      const modelCapitalized = model.charAt(0).toUpperCase() + model.slice(1);
+      const filePath = path.join(backupDir, modelCapitalized + '.json');
+      
+      if (fs.existsSync(filePath)) {
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        if (data.length > 0) {
+          // Konvertiere DateTime Strings zurück zu Date Objekten
+          const convertDates = (item) => {
+            const dateFields = ['createdAt', 'updatedAt', 'startDate', 'endDate', 'dateCompleted', 'uploadedAt'];
+            const converted = { ...item };
+            for (const field of dateFields) {
+              if (converted[field]) {
+                converted[field] = new Date(converted[field]);
+              }
+            }
+            return converted;
+          };
+          
+          const convertedData = data.map(convertDates);
+          
+          const result = await prisma[model].createMany({ 
+            data: convertedData,
+            skipDuplicates: true
+          });
+          console.log('   ✅ ' + modelCapitalized + ': ' + result.count + ' importiert');
+        } else {
+          console.log('   ⚠️ ' + modelCapitalized + ': keine Daten');
+        }
+      } else {
+        console.log('   ⚠️ ' + modelCapitalized + ': keine Backup-Datei');
+      }
+    }
+    
+    await prisma.\$disconnect();
+    console.log('\\n✅ Restore abgeschlossen!');
+  } catch (error) {
+    console.error('\\n❌ Restore fehlgeschlagen:', error.message);
+    await prisma.\$disconnect();
+    process.exit(1);
+  }
+}
+
+restore();
+"
 
 echo ""
-log_success "Restore abgeschlossen!"
+log_success "Datenbank erfolgreich wiederhergestellt!"
 echo ""
 echo "Nächste Schritte:"
-echo "  1. Starte den Dev-Server neu: npm run dev"
-echo "  2. Prüfe die Daten unter http://localhost:3000"
-echo ""
+echo "  1. Überprüfe die Daten in der Anwendung"
+echo "  2. Starte ggf. den Entwicklungsserver neu"

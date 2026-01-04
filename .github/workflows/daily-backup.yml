@@ -23,50 +23,89 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install PostgreSQL Client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Create Database Backup
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Create Database Backup with Prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PRISMA_ACCELERATE_URL: ${{ secrets.PRISMA_ACCELERATE_URL }}
         run: |
           DATE=$(date +%Y-%m-%d_%H-%M-%S)
-          BACKUP_FILE="hemera_backup_${DATE}.sql"
+          BACKUP_DIR="backup_${DATE}"
           
           echo "🔄 Starte Backup für ${DATE}..."
           echo "📋 Backup-Grund: ${{ github.event.inputs.reason || 'Geplantes tägliches Backup' }}"
           
-          # Backup erstellen mit pg_dump
-          pg_dump "$DATABASE_URL" \
-            --no-owner \
-            --no-acl \
-            --clean \
-            --if-exists \
-            --verbose \
-            > "$BACKUP_FILE" 2>&1 || {
-              echo "❌ Backup fehlgeschlagen!"
-              exit 1
-            }
+          mkdir -p "$BACKUP_DIR"
           
-          # Backup komprimieren
-          gzip "$BACKUP_FILE"
+          # Export all data using Prisma query
+          node -e "
+          const { PrismaClient } = require('@prisma/client');
+          const fs = require('fs');
+          const path = require('path');
+          
+          async function backup() {
+            const prisma = new PrismaClient();
+            const backupDir = '$BACKUP_DIR';
+            
+            try {
+              // Get all model names from Prisma
+              const models = ['User', 'Course', 'Booking', 'Location', 'CourseParticipation', 'ParticipationDocument', 'CourseSummaryAsset'];
+              
+              for (const model of models) {
+                try {
+                  const modelName = model.charAt(0).toLowerCase() + model.slice(1);
+                  const data = await prisma[modelName].findMany();
+                  fs.writeFileSync(
+                    path.join(backupDir, model + '.json'),
+                    JSON.stringify(data, null, 2)
+                  );
+                  console.log('✅ ' + model + ': ' + data.length + ' records');
+                } catch (e) {
+                  console.log('⚠️ ' + model + ': skipped (not found or error)');
+                }
+              }
+              
+              await prisma.\$disconnect();
+              console.log('\\n✅ Backup completed!');
+            } catch (error) {
+              console.error('❌ Backup failed:', error);
+              process.exit(1);
+            }
+          }
+          
+          backup();
+          "
+          
+          # Create summary file
+          echo "{\"date\": \"${DATE}\", \"reason\": \"${{ github.event.inputs.reason || 'Scheduled daily backup' }}\"}" > "$BACKUP_DIR/metadata.json"
+          
+          # Compress backup
+          tar -czf "hemera_backup_${DATE}.tar.gz" "$BACKUP_DIR"
           
           # Statistiken ausgeben
-          BACKUP_SIZE=$(ls -lh "${BACKUP_FILE}.gz" | awk '{print $5}')
-          TABLE_COUNT=$(grep -c "CREATE TABLE" "$BACKUP_FILE" 2>/dev/null || echo "N/A")
+          BACKUP_SIZE=$(ls -lh "hemera_backup_${DATE}.tar.gz" | awk '{print $5}')
+          FILE_COUNT=$(ls -1 "$BACKUP_DIR"/*.json 2>/dev/null | wc -l)
           
+          echo ""
           echo "✅ Backup erfolgreich erstellt!"
-          echo "📦 Datei: ${BACKUP_FILE}.gz"
+          echo "📦 Datei: hemera_backup_${DATE}.tar.gz"
           echo "📊 Größe: ${BACKUP_SIZE}"
+          echo "📁 Tabellen: ${FILE_COUNT}"
           echo "📋 Trigger: ${{ github.event_name }}"
 
       - name: Upload Backup as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: db-backup-${{ github.run_number }}-${{ github.run_id }}
-          path: hemera_backup_*.sql.gz
+          path: hemera_backup_*.tar.gz
           retention-days: 30
           compression-level: 0  # Bereits komprimiert
 
