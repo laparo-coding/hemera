@@ -99,14 +99,14 @@ Create a consolidated OpenAPI 3.1.0 specification and Postman documentation for 
    }
    ```
 
-4. **Create Import Guide** (`specs/postman/README.md`):
+1. **Create Import Guide** (`specs/postman/README.md`):
    - Step-by-step guide for Postman import
    - Explanation of environment variables
    - Instructions for obtaining Clerk JWT Token
    - Examples for common API calls
    - Troubleshooting tips
 
-5. **Generate Postman Collection:**
+2. **Generate Postman Collection:**
    - Use `openapi2postmanv2` or Postman's own converter
    - Save as `specs/postman/hemera-collection.json`
    - Add pre-request scripts for auth
