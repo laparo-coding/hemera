@@ -35,7 +35,6 @@ jobs:
       - name: Create Database Backup with Prisma
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRISMA_ACCELERATE_URL: ${{ secrets.PRISMA_ACCELERATE_URL }}
         run: |
           DATE=$(date +%Y-%m-%d_%H-%M-%S)
           BACKUP_DIR="backup_${DATE}"
@@ -47,17 +46,19 @@ jobs:
 
           # Export all data using Prisma query
           node -e "
-          const { PrismaClient } = require('@prisma/client');
+          const { PrismaClient, Prisma } = require('@prisma/client');
           const fs = require('fs');
           const path = require('path');
 
           async function backup() {
             const prisma = new PrismaClient();
             const backupDir = '$BACKUP_DIR';
+            let hasErrors = false;
 
             try {
-              // Get all model names from Prisma
-              const models = ['User', 'Course', 'Booking', 'Location', 'CourseParticipation', 'ParticipationDocument', 'CourseSummaryAsset'];
+              // Get all model names dynamically from Prisma
+              const models = Object.values(Prisma.ModelName);
+              console.log('📋 Models to backup: ' + models.join(', '));
 
               for (const model of models) {
                 try {
@@ -69,15 +70,17 @@ jobs:
                   );
                   console.log('✅ ' + model + ': ' + data.length + ' records');
                 } catch (e) {
-                  console.log('⚠️ ' + model + ': skipped (not found or error)');
+                  hasErrors = true;
+                  console.log('⚠️ ' + model + ': skipped (' + e.code + ': ' + (e.message || 'unknown error').substring(0, 50) + ')');
                 }
               }
 
-              await prisma.\$disconnect();
-              console.log('\\n✅ Backup completed!');
+              console.log('\\n✅ Backup completed!' + (hasErrors ? ' (with warnings)' : ''));
             } catch (error) {
-              console.error('❌ Backup failed:', error);
+              console.error('❌ Backup failed: ' + (error.message || 'Unknown error'));
               process.exit(1);
+            } finally {
+              await prisma.\$disconnect();
             }
           }
 

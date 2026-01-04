@@ -112,83 +112,134 @@ fi
 log_info "Backup-Verzeichnis: $BACKUP_DIR"
 log_info "Starte Restore..."
 
+# Übergebe Backup-Verzeichnis sicher als Umgebungsvariable (verhindert Script-Injection)
+export HEMERA_BACKUP_DIR="$BACKUP_DIR"
+
 # Node.js Script für Restore
 node -e "
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, Prisma } = require('@prisma/client');
 const fs = require('fs');
 const path = require('path');
 
 async function restore() {
   const prisma = new PrismaClient();
-  const backupDir = '$BACKUP_DIR';
-  
-  // Reihenfolge ist wichtig wegen Foreign Keys (abhängige Tabellen zuerst löschen)
-  const deleteOrder = [
-    'courseSummaryAsset',
-    'participationDocument',
-    'courseParticipation',
-    'booking',
-    'course',
-    'location',
-    'user'
-  ];
-  
-  const createOrder = deleteOrder.slice().reverse();
-  
-  try {
-    // Erst alle Daten löschen
-    console.log('\\n🗑️  Lösche bestehende Daten...');
-    for (const model of deleteOrder) {
-      try {
-        const result = await prisma[model].deleteMany();
-        console.log('   ✅ ' + model + ': ' + result.count + ' gelöscht');
-      } catch (e) {
-        console.log('   ⚠️ ' + model + ': übersprungen');
-      }
-    }
-    
-    // Dann neue Daten importieren
-    console.log('\\n📥 Importiere Backup-Daten...');
-    for (const model of createOrder) {
-      const modelCapitalized = model.charAt(0).toUpperCase() + model.slice(1);
-      const filePath = path.join(backupDir, modelCapitalized + '.json');
-      
-      if (fs.existsSync(filePath)) {
-        const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-        if (data.length > 0) {
-          // Konvertiere DateTime Strings zurück zu Date Objekten
-          const convertDates = (item) => {
-            const dateFields = ['createdAt', 'updatedAt', 'startDate', 'endDate', 'dateCompleted', 'uploadedAt'];
-            const converted = { ...item };
-            for (const field of dateFields) {
-              if (converted[field]) {
-                converted[field] = new Date(converted[field]);
-              }
-            }
-            return converted;
-          };
-          
-          const convertedData = data.map(convertDates);
-          
-          const result = await prisma[model].createMany({ 
-            data: convertedData,
-            skipDuplicates: true
-          });
-          console.log('   ✅ ' + modelCapitalized + ': ' + result.count + ' importiert');
-        } else {
-          console.log('   ⚠️ ' + modelCapitalized + ': keine Daten');
+  // Backup-Dir aus Umgebungsvariable (sicher gegen Script-Injection)
+  const backupDir = process.env.HEMERA_BACKUP_DIR;
+
+  if (!backupDir) {
+    console.error('❌ HEMERA_BACKUP_DIR nicht gesetzt');
+    process.exit(1);
+  }
+
+  // Dynamische Model-Reihenfolge basierend auf Prisma DMMF
+  const models = Prisma.dmmf.datamodel.models;
+  const modelMap = new Map(models.map(m => [m.name, { name: m.name, dependencies: new Set() }]));
+
+  // Baue Abhängigkeitsgraph
+  for (const model of models) {
+    for (const field of model.fields) {
+      if (field.relationFromFields && field.relationFromFields.length > 0) {
+        const dependency = modelMap.get(field.type);
+        if (dependency) {
+          modelMap.get(model.name).dependencies.add(dependency.name);
         }
-      } else {
-        console.log('   ⚠️ ' + modelCapitalized + ': keine Backup-Datei');
       }
     }
-    
-    await prisma.\$disconnect();
+  }
+
+  // Topologische Sortierung
+  const sorted = [];
+  const visited = new Set();
+  function visit(modelName) {
+    if (visited.has(modelName)) return;
+    visited.add(modelName);
+    const model = modelMap.get(modelName);
+    if (model) model.dependencies.forEach(dep => visit(dep));
+    sorted.push(modelName);
+  }
+  modelMap.forEach((_, modelName) => visit(modelName));
+
+  const createOrder = sorted.map(m => m.charAt(0).toLowerCase() + m.slice(1));
+  const deleteOrder = createOrder.slice().reverse();
+
+  console.log('📋 Delete order: ' + deleteOrder.join(', '));
+  console.log('📋 Create order: ' + createOrder.join(', '));
+
+  try {
+    // Verwende Transaction für atomare Operation
+    await prisma.\$transaction(async (tx) => {
+      // Erst alle Daten löschen
+      console.log('\\n🗑️  Lösche bestehende Daten...');
+      for (const model of deleteOrder) {
+        try {
+          if (tx[model]) {
+            const result = await tx[model].deleteMany();
+            console.log('   ✅ ' + model + ': ' + result.count + ' gelöscht');
+          }
+        } catch (e) {
+          console.log('   ⚠️ ' + model + ': übersprungen (' + (e.code || 'error') + ')');
+        }
+      }
+
+      // Dann neue Daten importieren
+      console.log('\\n📥 Importiere Backup-Daten...');
+      for (const model of createOrder) {
+        const modelCapitalized = model.charAt(0).toUpperCase() + model.slice(1);
+        const filePath = path.join(backupDir, modelCapitalized + '.json');
+
+        if (fs.existsSync(filePath)) {
+          // Dynamische Date-Field Erkennung via DMMF
+          const modelInfo = Prisma.dmmf.datamodel.models.find(m => m.name === modelCapitalized);
+          const dateFields = modelInfo ? modelInfo.fields.filter(f => f.type === 'DateTime').map(f => f.name) : [];
+
+          const rawData = fs.readFileSync(filePath, 'utf-8');
+          let data;
+          try {
+            data = JSON.parse(rawData);
+          } catch (parseError) {
+            console.log('   ❌ ' + modelCapitalized + ': JSON parse error');
+            continue;
+          }
+
+          if (data.length > 0) {
+            // Konvertiere DateTime Strings zurück zu Date Objekten
+            const convertDates = (item) => {
+              const converted = { ...item };
+              for (const field of dateFields) {
+                if (converted[field]) {
+                  const date = new Date(converted[field]);
+                  if (!isNaN(date.getTime())) {
+                    converted[field] = date;
+                  }
+                }
+              }
+              return converted;
+            };
+
+            const convertedData = data.map(convertDates);
+
+            if (tx[model]) {
+              const result = await tx[model].createMany({
+                data: convertedData,
+                skipDuplicates: true
+              });
+              console.log('   ✅ ' + modelCapitalized + ': ' + result.count + ' importiert');
+            }
+          } else {
+            console.log('   ⚠️ ' + modelCapitalized + ': keine Daten');
+          }
+        } else {
+          console.log('   ⚠️ ' + modelCapitalized + ': keine Backup-Datei');
+        }
+      }
+    }, { timeout: 300000 }); // 5 Minuten Timeout für große Datenmengen
+
     console.log('\\n✅ Restore abgeschlossen!');
   } catch (error) {
-    console.error('\\n❌ Restore fehlgeschlagen:', error.message);
-    await prisma.\$disconnect();
+    console.error('\\n❌ Restore fehlgeschlagen: ' + (error.message || 'Unbekannter Fehler'));
     process.exit(1);
+  } finally {
+    await prisma.\$disconnect();
   }
 }
 
