@@ -39,26 +39,26 @@ jobs:
         run: |
           DATE=$(date +%Y-%m-%d_%H-%M-%S)
           BACKUP_DIR="backup_${DATE}"
-          
+
           echo "🔄 Starte Backup für ${DATE}..."
           echo "📋 Backup-Grund: ${{ github.event.inputs.reason || 'Geplantes tägliches Backup' }}"
-          
+
           mkdir -p "$BACKUP_DIR"
-          
+
           # Export all data using Prisma query
           node -e "
           const { PrismaClient } = require('@prisma/client');
           const fs = require('fs');
           const path = require('path');
-          
+
           async function backup() {
             const prisma = new PrismaClient();
             const backupDir = '$BACKUP_DIR';
-            
+
             try {
               // Get all model names from Prisma
               const models = ['User', 'Course', 'Booking', 'Location', 'CourseParticipation', 'ParticipationDocument', 'CourseSummaryAsset'];
-              
+
               for (const model of models) {
                 try {
                   const modelName = model.charAt(0).toLowerCase() + model.slice(1);
@@ -72,7 +72,7 @@ jobs:
                   console.log('⚠️ ' + model + ': skipped (not found or error)');
                 }
               }
-              
+
               await prisma.\$disconnect();
               console.log('\\n✅ Backup completed!');
             } catch (error) {
@@ -80,20 +80,20 @@ jobs:
               process.exit(1);
             }
           }
-          
+
           backup();
           "
-          
+
           # Create summary file
           echo "{\"date\": \"${DATE}\", \"reason\": \"${{ github.event.inputs.reason || 'Scheduled daily backup' }}\"}" > "$BACKUP_DIR/metadata.json"
-          
+
           # Compress backup
           tar -czf "hemera_backup_${DATE}.tar.gz" "$BACKUP_DIR"
-          
+
           # Statistiken ausgeben
           BACKUP_SIZE=$(ls -lh "hemera_backup_${DATE}.tar.gz" | awk '{print $5}')
           FILE_COUNT=$(ls -1 "$BACKUP_DIR"/*.json 2>/dev/null | wc -l)
-          
+
           echo ""
           echo "✅ Backup erfolgreich erstellt!"
           echo "📦 Datei: hemera_backup_${DATE}.tar.gz"
