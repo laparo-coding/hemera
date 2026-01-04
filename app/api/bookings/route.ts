@@ -67,7 +67,7 @@ export async function GET(request: Request) {
       if (!booking.course) {
         console.warn(
           '[API /api/bookings GET] Missing course relation for booking',
-          booking.id
+          { requestId: _requestId }
         );
       }
 
@@ -75,8 +75,8 @@ export async function GET(request: Request) {
         id: booking.id,
         courseId: booking.courseId,
         courseTitle: booking.course?.title ?? 'Kurs nicht mehr verfügbar',
-        coursePrice: booking.course?.price ?? booking.amount,
-        currency: booking.course?.currency ?? booking.currency ?? 'EUR',
+        coursePrice: booking.amount,
+        currency: booking.currency ?? booking.course?.currency ?? 'EUR',
         paymentStatus: booking.paymentStatus,
         createdAt: booking.createdAt,
       };
