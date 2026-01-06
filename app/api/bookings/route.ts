@@ -3,6 +3,7 @@ import { PaymentStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '../../../lib/db/prisma';
+import { logError } from '../../../lib/errors';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -13,6 +14,39 @@ const BookingQuerySchema = z.object({
 const CreateBookingSchema = z.object({
   courseId: z.string().min(1, 'Course ID is required'),
 });
+
+type BookingRecord = {
+  id: string;
+  courseId: string;
+  paymentStatus: PaymentStatus;
+  amount: number | null;
+  currency: string | null;
+  createdAt: Date;
+  course?: {
+    title: string | null;
+  } | null;
+};
+
+function normalizeBookings(bookings: BookingRecord[], requestId: string) {
+  return bookings.map(booking => {
+    if (!booking.course) {
+      console.warn(
+        '[API /api/bookings GET] Missing course relation for booking',
+        { requestId }
+      );
+    }
+
+    return {
+      id: booking.id,
+      courseId: booking.courseId,
+      courseTitle: booking.course?.title ?? 'Kurs nicht mehr verfügbar',
+      coursePrice: booking.amount,
+      currency: booking.currency,
+      paymentStatus: booking.paymentStatus,
+      createdAt: booking.createdAt,
+    };
+  });
+}
 
 export async function GET(request: Request) {
   const _requestId = crypto.randomUUID();
@@ -40,7 +74,7 @@ export async function GET(request: Request) {
       ...(validatedParams.status && { paymentStatus: validatedParams.status }),
     };
 
-    const [bookings, total] = await Promise.all([
+    const [bookingRecords, totalCount] = await Promise.all([
       prisma.booking.findMany({
         where,
         include: {
@@ -61,26 +95,11 @@ export async function GET(request: Request) {
       prisma.booking.count({ where }),
     ]);
 
+    const bookingsResult = bookingRecords as BookingRecord[];
+    const total = totalCount;
+
     const totalPages = Math.ceil(total / validatedParams.limit);
-
-    const normalizedBookings = bookings.map(booking => {
-      if (!booking.course) {
-        console.warn(
-          '[API /api/bookings GET] Missing course relation for booking',
-          { requestId: _requestId }
-        );
-      }
-
-      return {
-        id: booking.id,
-        courseId: booking.courseId,
-        courseTitle: booking.course?.title ?? 'Kurs nicht mehr verfügbar',
-        coursePrice: booking.amount,
-        currency: booking.currency,
-        paymentStatus: booking.paymentStatus,
-        createdAt: booking.createdAt,
-      };
-    });
+    const normalizedBookings = normalizeBookings(bookingsResult, _requestId);
 
     const responseData = {
       success: true,
@@ -97,6 +116,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(responseData);
   } catch (error) {
+    logError(error, {
+      operation: 'api/bookings#get',
+      requestId: _requestId,
+    });
     console.error('[API /api/bookings GET] Error:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
