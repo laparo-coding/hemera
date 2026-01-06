@@ -1,5 +1,5 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { PaymentStatus, Prisma } from '@prisma/client';
+import { PaymentStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '../../../lib/db/prisma';
@@ -27,16 +27,6 @@ type BookingRecord = {
   } | null;
 };
 
-type LegacyBookingRow = {
-  id: string;
-  courseId: string;
-  paymentStatus: PaymentStatus;
-  amount: number | bigint | null;
-  currency: string | null;
-  createdAt: Date | string;
-  courseTitle: string | null;
-};
-
 function normalizeBookings(bookings: BookingRecord[], requestId: string) {
   return bookings.map(booking => {
     if (!booking.course) {
@@ -56,90 +46,6 @@ function normalizeBookings(bookings: BookingRecord[], requestId: string) {
       createdAt: booking.createdAt,
     };
   });
-}
-
-function isSchemaMismatchError(
-  error: unknown
-): error is Prisma.PrismaClientKnownRequestError {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === 'P2022'
-  );
-}
-
-function toNullableNumber(value: number | bigint | null): number | null {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
-  if (typeof value === 'bigint') {
-    return Number(value);
-  }
-
-  return value;
-}
-
-async function fetchLegacyBookingData(
-  userId: string,
-  page: number,
-  limit: number,
-  status?: PaymentStatus
-): Promise<{ bookings: BookingRecord[]; total: number }> {
-  const offset = (page - 1) * limit;
-  const legacyStatusFilter = () =>
-    status
-      ? Prisma.sql`AND ${Prisma.raw('b."paymentStatus"')} = ${status}`
-      : Prisma.empty;
-
-  const legacyRows = await prisma.$queryRaw<LegacyBookingRow[]>(
-    Prisma.sql`
-      SELECT
-        b.id,
-        b."courseId" AS "courseId",
-        b."paymentStatus" AS "paymentStatus",
-        b.amount,
-        b.currency,
-        b."createdAt" AS "createdAt",
-        c.title AS "courseTitle"
-      FROM "bookings" AS b
-      LEFT JOIN "courses" AS c ON c.id = b."courseId"
-      WHERE b."userId" = ${userId}
-      ${legacyStatusFilter()}
-      ORDER BY b."createdAt" DESC
-      LIMIT ${limit}
-      OFFSET ${offset}
-    `
-  );
-
-  const countRows = await prisma.$queryRaw<{ count: bigint }[]>(
-    Prisma.sql`
-      SELECT COUNT(*)::bigint AS count
-      FROM "bookings" AS b
-      WHERE b."userId" = ${userId}
-      ${legacyStatusFilter()}
-    `
-  );
-
-  const totalBigint = countRows?.[0]?.count ?? 0n;
-
-  const bookings: BookingRecord[] = legacyRows.map(row => ({
-    id: row.id,
-    courseId: row.courseId,
-    paymentStatus: row.paymentStatus,
-    amount: toNullableNumber(row.amount),
-    currency: row.currency ?? 'EUR',
-    createdAt:
-      row.createdAt instanceof Date ? row.createdAt : new Date(row.createdAt),
-    course: row.courseTitle ? { title: row.courseTitle } : null,
-  }));
-
-  return {
-    bookings,
-    total:
-      typeof totalBigint === 'bigint'
-        ? Number(totalBigint)
-        : Number(totalBigint ?? 0),
-  };
 }
 
 export async function GET(request: Request) {
@@ -168,59 +74,29 @@ export async function GET(request: Request) {
       ...(validatedParams.status && { paymentStatus: validatedParams.status }),
     };
 
-    let bookingsResult: BookingRecord[] = [];
-    let total = 0;
-
-    try {
-      const [bookingRecords, totalCount] = await Promise.all([
-        prisma.booking.findMany({
-          where,
-          include: {
-            course: {
-              select: {
-                title: true,
-                price: true,
-                currency: true,
-              },
+    const [bookingRecords, totalCount] = await Promise.all([
+      prisma.booking.findMany({
+        where,
+        include: {
+          course: {
+            select: {
+              title: true,
+              price: true,
+              currency: true,
             },
           },
-          orderBy: {
-            createdAt: 'desc',
-          },
-          skip: (validatedParams.page - 1) * validatedParams.limit,
-          take: validatedParams.limit,
-        }),
-        prisma.booking.count({ where }),
-      ]);
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip: (validatedParams.page - 1) * validatedParams.limit,
+        take: validatedParams.limit,
+      }),
+      prisma.booking.count({ where }),
+    ]);
 
-      bookingsResult = bookingRecords as BookingRecord[];
-      total = totalCount;
-    } catch (dbError) {
-      if (isSchemaMismatchError(dbError)) {
-        console.warn(
-          '[API /api/bookings GET] Schema mismatch detected, using legacy fallback',
-          { requestId: _requestId }
-        );
-
-        logError(dbError, {
-          operation: 'api/bookings#get',
-          requestId: _requestId,
-          fallback: 'legacy-schema',
-        });
-
-        const legacyResult = await fetchLegacyBookingData(
-          user.id,
-          validatedParams.page,
-          validatedParams.limit,
-          validatedParams.status
-        );
-
-        bookingsResult = legacyResult.bookings;
-        total = legacyResult.total;
-      } else {
-        throw dbError;
-      }
-    }
+    const bookingsResult = bookingRecords as BookingRecord[];
+    const total = totalCount;
 
     const totalPages = Math.ceil(total / validatedParams.limit);
     const normalizedBookings = normalizeBookings(bookingsResult, _requestId);
