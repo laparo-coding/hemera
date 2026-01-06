@@ -1,8 +1,9 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { PaymentStatus } from '@prisma/client';
+import { PaymentStatus, Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '../../../lib/db/prisma';
+import { logError } from '../../../lib/errors';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -13,6 +14,133 @@ const BookingQuerySchema = z.object({
 const CreateBookingSchema = z.object({
   courseId: z.string().min(1, 'Course ID is required'),
 });
+
+type BookingRecord = {
+  id: string;
+  courseId: string;
+  paymentStatus: PaymentStatus;
+  amount: number | null;
+  currency: string | null;
+  createdAt: Date;
+  course?: {
+    title: string | null;
+  } | null;
+};
+
+type LegacyBookingRow = {
+  id: string;
+  courseId: string;
+  paymentStatus: PaymentStatus;
+  amount: number | bigint | null;
+  currency: string | null;
+  createdAt: Date | string;
+  courseTitle: string | null;
+};
+
+function normalizeBookings(bookings: BookingRecord[], requestId: string) {
+  return bookings.map(booking => {
+    if (!booking.course) {
+      console.warn(
+        '[API /api/bookings GET] Missing course relation for booking',
+        { requestId }
+      );
+    }
+
+    return {
+      id: booking.id,
+      courseId: booking.courseId,
+      courseTitle: booking.course?.title ?? 'Kurs nicht mehr verfügbar',
+      coursePrice: booking.amount,
+      currency: booking.currency,
+      paymentStatus: booking.paymentStatus,
+      createdAt: booking.createdAt,
+    };
+  });
+}
+
+function isSchemaMismatchError(
+  error: unknown
+): error is Prisma.PrismaClientKnownRequestError {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === 'P2022'
+  );
+}
+
+function toNullableNumber(value: number | bigint | null): number | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value === 'bigint') {
+    return Number(value);
+  }
+
+  return value;
+}
+
+async function fetchLegacyBookingData(
+  userId: string,
+  page: number,
+  limit: number,
+  status?: PaymentStatus
+): Promise<{ bookings: BookingRecord[]; total: number }> {
+  const offset = (page - 1) * limit;
+  const legacyStatusFilter = () =>
+    status
+      ? Prisma.sql`AND ${Prisma.raw('b."paymentStatus"')} = ${status}`
+      : Prisma.empty;
+
+  const legacyRows = await prisma.$queryRaw<LegacyBookingRow[]>(
+    Prisma.sql`
+      SELECT
+        b.id,
+        b."courseId" AS "courseId",
+        b."paymentStatus" AS "paymentStatus",
+        b.amount,
+        b.currency,
+        b."createdAt" AS "createdAt",
+        c.title AS "courseTitle"
+      FROM "bookings" AS b
+      LEFT JOIN "courses" AS c ON c.id = b."courseId"
+      WHERE b."userId" = ${userId}
+      ${legacyStatusFilter()}
+      ORDER BY b."createdAt" DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `
+  );
+
+  const countRows = await prisma.$queryRaw<{ count: bigint }[]>(
+    Prisma.sql`
+      SELECT COUNT(*)::bigint AS count
+      FROM "bookings" AS b
+      WHERE b."userId" = ${userId}
+      ${legacyStatusFilter()}
+    `
+  );
+
+  const totalBigint = countRows?.[0]?.count ?? 0n;
+
+  const bookings: BookingRecord[] = legacyRows.map(row => ({
+    id: row.id,
+    courseId: row.courseId,
+    paymentStatus: row.paymentStatus,
+    amount: toNullableNumber(row.amount),
+    currency: row.currency ?? 'EUR',
+    createdAt:
+      row.createdAt instanceof Date ? row.createdAt : new Date(row.createdAt),
+    course: row.courseTitle ? { title: row.courseTitle } : null,
+  }));
+
+  return {
+    bookings,
+    total:
+      typeof totalBigint === 'bigint'
+        ? Number(totalBigint)
+        : Number(totalBigint ?? 0),
+  };
+}
 
 export async function GET(request: Request) {
   const _requestId = crypto.randomUUID();
@@ -40,47 +168,62 @@ export async function GET(request: Request) {
       ...(validatedParams.status && { paymentStatus: validatedParams.status }),
     };
 
-    const [bookings, total] = await Promise.all([
-      prisma.booking.findMany({
-        where,
-        include: {
-          course: {
-            select: {
-              title: true,
-              price: true,
-              currency: true,
+    let bookingsResult: BookingRecord[] = [];
+    let total = 0;
+
+    try {
+      const [bookingRecords, totalCount] = await Promise.all([
+        prisma.booking.findMany({
+          where,
+          include: {
+            course: {
+              select: {
+                title: true,
+                price: true,
+                currency: true,
+              },
             },
           },
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        skip: (validatedParams.page - 1) * validatedParams.limit,
-        take: validatedParams.limit,
-      }),
-      prisma.booking.count({ where }),
-    ]);
+          orderBy: {
+            createdAt: 'desc',
+          },
+          skip: (validatedParams.page - 1) * validatedParams.limit,
+          take: validatedParams.limit,
+        }),
+        prisma.booking.count({ where }),
+      ]);
 
-    const totalPages = Math.ceil(total / validatedParams.limit);
-
-    const normalizedBookings = bookings.map(booking => {
-      if (!booking.course) {
+      bookingsResult = bookingRecords as BookingRecord[];
+      total = totalCount;
+    } catch (dbError) {
+      if (isSchemaMismatchError(dbError)) {
         console.warn(
-          '[API /api/bookings GET] Missing course relation for booking',
+          '[API /api/bookings GET] Schema mismatch detected, using legacy fallback',
           { requestId: _requestId }
         );
-      }
 
-      return {
-        id: booking.id,
-        courseId: booking.courseId,
-        courseTitle: booking.course?.title ?? 'Kurs nicht mehr verfügbar',
-        coursePrice: booking.amount,
-        currency: booking.currency,
-        paymentStatus: booking.paymentStatus,
-        createdAt: booking.createdAt,
-      };
-    });
+        logError(dbError, {
+          operation: 'api/bookings#get',
+          requestId: _requestId,
+          fallback: 'legacy-schema',
+        });
+
+        const legacyResult = await fetchLegacyBookingData(
+          user.id,
+          validatedParams.page,
+          validatedParams.limit,
+          validatedParams.status
+        );
+
+        bookingsResult = legacyResult.bookings;
+        total = legacyResult.total;
+      } else {
+        throw dbError;
+      }
+    }
+
+    const totalPages = Math.ceil(total / validatedParams.limit);
+    const normalizedBookings = normalizeBookings(bookingsResult, _requestId);
 
     const responseData = {
       success: true,
@@ -97,6 +240,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(responseData);
   } catch (error) {
+    logError(error, {
+      operation: 'api/bookings#get',
+      requestId: _requestId,
+    });
     console.error('[API /api/bookings GET] Error:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
