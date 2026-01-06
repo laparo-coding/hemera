@@ -3,7 +3,7 @@
  * Provides server-side functions for course management
  */
 
-import { PaymentStatus } from '@prisma/client';
+import { PaymentStatus, Prisma } from '@prisma/client';
 import { prisma } from '../db/prisma';
 import {
   CourseNotFoundError,
@@ -169,23 +169,60 @@ export async function getPublishedCourses(): Promise<Course[]> {
 export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
   try {
     // Include location data for display on landing page
-    const courses = await prisma.course.findMany({
-      where: {
-        isPublished: true,
-      },
-      include: {
-        location: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            city: true,
+    let courses: Awaited<ReturnType<typeof prisma.course.findMany>>;
+
+    try {
+      courses = await prisma.course.findMany({
+        where: {
+          isPublished: true,
+        },
+        include: {
+          location: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              city: true,
+            },
           },
         },
-      },
-      orderBy: [{ startDate: 'asc' }, { createdAt: 'desc' }],
-      take: limit,
-    });
+        orderBy: [{ startDate: 'asc' }, { createdAt: 'desc' }],
+        take: limit,
+      });
+    } catch (orderError) {
+      if (
+        orderError instanceof Prisma.PrismaClientKnownRequestError &&
+        orderError.code === 'P2022'
+      ) {
+        console.warn(
+          '[getFeaturedCourses] falling back to createdAt ordering',
+          {
+            code: orderError.code,
+            message: orderError.message,
+          }
+        );
+
+        courses = await prisma.course.findMany({
+          where: {
+            isPublished: true,
+          },
+          include: {
+            location: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                city: true,
+              },
+            },
+          },
+          orderBy: [{ createdAt: 'desc' }],
+          take: limit,
+        });
+      } else {
+        throw orderError;
+      }
+    }
 
     // Map to consistent Course interface with location
     return courses.map(course => ({
