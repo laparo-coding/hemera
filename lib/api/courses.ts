@@ -193,12 +193,13 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
         orderError.code === 'P2022'
       ) {
         console.warn(
-          '[getFeaturedCourses] falling back to createdAt ordering',
-          {
-            code: orderError.code,
-            message: orderError.message,
-          }
+          '[getFeaturedCourses] falling back to createdAt ordering (schema mismatch detected)'
         );
+
+        logError(orderError, {
+          operation: 'getFeaturedCourses',
+          fallback: 'createdAt-ordering',
+        });
 
         courses = await fetchCourses([{ createdAt: 'desc' }]);
       } else {
