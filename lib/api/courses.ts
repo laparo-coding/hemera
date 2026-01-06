@@ -3,7 +3,7 @@
  * Provides server-side functions for course management
  */
 
-import { PaymentStatus } from '@prisma/client';
+import { PaymentStatus, Prisma } from '@prisma/client';
 import { prisma } from '../db/prisma';
 import {
   CourseNotFoundError,
@@ -18,6 +18,13 @@ export interface CourseLocation {
   slug: string;
   city: string;
 }
+
+const courseLocationSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  city: true,
+} as const;
 
 export interface Course {
   id: string;
@@ -67,12 +74,7 @@ export async function getPublishedCourses(): Promise<Course[]> {
         },
         include: {
           location: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              city: true,
-            },
+            select: courseLocationSelect,
           },
         },
       });
@@ -84,12 +86,7 @@ export async function getPublishedCourses(): Promise<Course[]> {
         },
         include: {
           location: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              city: true,
-            },
+            select: courseLocationSelect,
           },
         },
       });
@@ -169,23 +166,46 @@ export async function getPublishedCourses(): Promise<Course[]> {
 export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
   try {
     // Include location data for display on landing page
-    const courses = await prisma.course.findMany({
-      where: {
-        isPublished: true,
-      },
-      include: {
-        location: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            city: true,
+    const fetchCourses = (orderBy: Prisma.CourseOrderByWithRelationInput[]) =>
+      prisma.course.findMany({
+        where: {
+          isPublished: true,
+        },
+        include: {
+          location: {
+            select: courseLocationSelect,
           },
         },
-      },
-      orderBy: [{ startDate: 'asc' }, { createdAt: 'desc' }],
-      take: limit,
-    });
+        orderBy,
+        take: limit,
+      });
+
+    let courses: Awaited<ReturnType<typeof fetchCourses>>;
+
+    try {
+      courses = await fetchCourses([
+        { startDate: 'asc' },
+        { createdAt: 'desc' },
+      ]);
+    } catch (orderError) {
+      if (
+        orderError instanceof Prisma.PrismaClientKnownRequestError &&
+        orderError.code === 'P2022'
+      ) {
+        console.warn(
+          '[getFeaturedCourses] falling back to createdAt ordering (schema mismatch detected)'
+        );
+
+        logError(orderError, {
+          operation: 'getFeaturedCourses',
+          fallback: 'createdAt-ordering',
+        });
+
+        courses = await fetchCourses([{ createdAt: 'desc' }]);
+      } else {
+        throw orderError;
+      }
+    }
 
     // Map to consistent Course interface with location
     return courses.map(course => ({
