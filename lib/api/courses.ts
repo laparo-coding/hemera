@@ -19,6 +19,13 @@ export interface CourseLocation {
   city: string;
 }
 
+const courseLocationSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  city: true,
+} as const;
+
 export interface Course {
   id: string;
   title: string;
@@ -67,12 +74,7 @@ export async function getPublishedCourses(): Promise<Course[]> {
         },
         include: {
           location: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              city: true,
-            },
+            select: courseLocationSelect,
           },
         },
       });
@@ -84,12 +86,7 @@ export async function getPublishedCourses(): Promise<Course[]> {
         },
         include: {
           location: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              city: true,
-            },
+            select: courseLocationSelect,
           },
         },
       });
@@ -169,26 +166,27 @@ export async function getPublishedCourses(): Promise<Course[]> {
 export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
   try {
     // Include location data for display on landing page
-    let courses: Awaited<ReturnType<typeof prisma.course.findMany>>;
-
-    try {
-      courses = await prisma.course.findMany({
+    const fetchCourses = (orderBy: Prisma.CourseOrderByWithRelationInput[]) =>
+      prisma.course.findMany({
         where: {
           isPublished: true,
         },
         include: {
           location: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              city: true,
-            },
+            select: courseLocationSelect,
           },
         },
-        orderBy: [{ startDate: 'asc' }, { createdAt: 'desc' }],
+        orderBy,
         take: limit,
       });
+
+    let courses: Awaited<ReturnType<typeof fetchCourses>>;
+
+    try {
+      courses = await fetchCourses([
+        { startDate: 'asc' },
+        { createdAt: 'desc' },
+      ]);
     } catch (orderError) {
       if (
         orderError instanceof Prisma.PrismaClientKnownRequestError &&
@@ -202,23 +200,7 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
           }
         );
 
-        courses = await prisma.course.findMany({
-          where: {
-            isPublished: true,
-          },
-          include: {
-            location: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-                city: true,
-              },
-            },
-          },
-          orderBy: [{ createdAt: 'desc' }],
-          take: limit,
-        });
+        courses = await fetchCourses([{ createdAt: 'desc' }]);
       } else {
         throw orderError;
       }
