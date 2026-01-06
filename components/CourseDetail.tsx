@@ -19,12 +19,11 @@ import {
   type SvgIconProps,
   Typography,
 } from '@mui/material';
-import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
 import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { formatDate } from '../lib/utils/date-format';
 
 interface CourseLocation {
   id: string;
@@ -197,12 +196,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
   const formattedDate = useMemo(() => {
     if (!course.startDate) return null;
-    const dateValue =
-      course.startDate instanceof Date
-        ? course.startDate
-        : new Date(course.startDate);
-    if (!Number.isFinite(dateValue.getTime())) return null;
-    return format(dateValue, 'PPP', { locale: de });
+    return formatDate(course.startDate) ?? null;
   }, [course.startDate]);
 
   const formattedTime = useMemo(() => {

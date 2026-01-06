@@ -9,6 +9,7 @@ import { getFeaturedCourses } from '../lib/api/courses';
 import { generateLandingPageMetadata } from '../lib/seo/metadata';
 import { SCHEMA_COMBINATIONS } from '../lib/seo/schemas';
 import { getLevelLabel } from '../lib/utils/course-level';
+import { formatDate, formatTime } from '../lib/utils/date-format';
 
 /**
  * Premium Feminine Landing Page for Hemera Academy
@@ -76,16 +77,6 @@ function mapLevelToIndicator(
   return (['A', 'B', 'C'] as const)[index] || 'A';
 }
 
-// Format time from Date object
-function formatTime(date: Date | null | undefined): string | undefined {
-  if (!date) return undefined;
-  return new Date(date).toLocaleTimeString('de-DE', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Berlin',
-  });
-}
-
 // Static fallback course data
 const staticCourses: CourseCardProps[] = [
   {
@@ -137,40 +128,39 @@ export default async function HomePage() {
     const dbCourses = await getFeaturedCourses(3);
     if (dbCourses.length > 0) {
       // Transform database courses to CourseCardProps
-      featuredCourses = dbCourses.map((course, index) => ({
-        courseId: course.slug,
-        level: mapLevelToIndicator(course.level, index),
-        levelLabel: getLevelLabel(course.level),
-        title: course.title,
-        description: course.description || '',
-        upcomingDates: course.startDate
-          ? [
-              {
-                date: new Date(course.startDate),
-                formattedDate: new Date(course.startDate).toLocaleDateString(
-                  'de-DE',
-                  {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  }
-                ),
-                startTime: formatTime(course.startTime),
-                endTime: formatTime(course.endTime),
-              },
-            ]
-          : [],
-        detailHref: `/courses/${course.slug}`,
-        ctaText: 'Mehr erfahren',
-        location: course.location
-          ? {
-              name: course.location.name,
-              slug: course.location.slug,
-              city: course.location.city,
-            }
-          : undefined,
-        thumbnailUrl: course.thumbnailUrl,
-      }));
+      featuredCourses = dbCourses.map((course, index) => {
+        const formattedDate = formatDate(course.startDate);
+        const upcomingDates =
+          course.startDate && formattedDate
+            ? [
+                {
+                  date: new Date(course.startDate),
+                  formattedDate,
+                  startTime: formatTime(course.startTime),
+                  endTime: formatTime(course.endTime),
+                },
+              ]
+            : [];
+
+        return {
+          courseId: course.slug,
+          level: mapLevelToIndicator(course.level, index),
+          levelLabel: getLevelLabel(course.level),
+          title: course.title,
+          description: course.description || '',
+          upcomingDates,
+          detailHref: `/courses/${course.slug}`,
+          ctaText: 'Mehr erfahren',
+          location: course.location
+            ? {
+                name: course.location.name,
+                slug: course.location.slug,
+                city: course.location.city,
+              }
+            : undefined,
+          thumbnailUrl: course.thumbnailUrl,
+        } satisfies CourseCardProps;
+      });
     }
   } catch (error) {
     // Log error but don't crash - use static courses as fallback

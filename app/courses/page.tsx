@@ -5,6 +5,7 @@ import type { CourseCardProps } from '../../components/landing';
 import CourseCard from '../../components/landing/CourseCard';
 import { getPublishedCourses } from '../../lib/api/courses';
 import { getLevelLabel } from '../../lib/utils/course-level';
+import { formatDate, formatTime } from '../../lib/utils/date-format';
 
 // Force dynamic rendering since we fetch courses from DB
 export const dynamic = 'force-dynamic';
@@ -21,16 +22,6 @@ function mapLevelToIndicator(
   return (['A', 'B', 'C'] as const)[index % 3] || 'A';
 }
 
-// Format time from Date object
-function formatTime(date: Date | null | undefined): string | undefined {
-  if (!date) return undefined;
-  return new Date(date).toLocaleTimeString('de-DE', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Berlin',
-  });
-}
-
 export default async function CoursesPage() {
   let courses: CourseCardProps[] = [];
   let fetchError: Error | null = null;
@@ -40,41 +31,40 @@ export default async function CoursesPage() {
 
     if (dbCourses.length > 0) {
       // Transform database courses to CourseCardProps
-      courses = dbCourses.map((course, index) => ({
-        courseId: course.slug,
-        level: mapLevelToIndicator(course.level, index),
-        levelLabel: getLevelLabel(course.level),
-        title: course.title,
-        description: course.description || '',
-        upcomingDates: course.startDate
-          ? [
-              {
-                date: new Date(course.startDate),
-                formattedDate: new Date(course.startDate).toLocaleDateString(
-                  'de-DE',
-                  {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  }
-                ),
-                startTime: formatTime(course.startTime),
-                endTime: formatTime(course.endTime),
-                availableSpots: course.availableSpots ?? undefined,
-              },
-            ]
-          : [],
-        detailHref: `/courses/${course.slug}`,
-        ctaText: 'Mehr erfahren',
-        location: course.location
-          ? {
-              name: course.location.name,
-              slug: course.location.slug,
-              city: course.location.city,
-            }
-          : undefined,
-        thumbnailUrl: course.thumbnailUrl,
-      }));
+      courses = dbCourses.map((course, index) => {
+        const formattedDate = formatDate(course.startDate);
+        const upcomingDates =
+          course.startDate && formattedDate
+            ? [
+                {
+                  date: new Date(course.startDate),
+                  formattedDate,
+                  startTime: formatTime(course.startTime),
+                  endTime: formatTime(course.endTime),
+                  availableSpots: course.availableSpots ?? undefined,
+                },
+              ]
+            : [];
+
+        return {
+          courseId: course.slug,
+          level: mapLevelToIndicator(course.level, index),
+          levelLabel: getLevelLabel(course.level),
+          title: course.title,
+          description: course.description || '',
+          upcomingDates,
+          detailHref: `/courses/${course.slug}`,
+          ctaText: 'Mehr erfahren',
+          location: course.location
+            ? {
+                name: course.location.name,
+                slug: course.location.slug,
+                city: course.location.city,
+              }
+            : undefined,
+          thumbnailUrl: course.thumbnailUrl,
+        } satisfies CourseCardProps;
+      });
     }
   } catch (err) {
     if (process.env.E2E_TEST === 'true') {
