@@ -68,13 +68,15 @@ export async function POST(request: NextRequest) {
       syncedUser = await getCurrentUserWithSync();
       userId = syncedUser.id;
     } catch (syncError) {
+      const errorMsg =
+        syncError instanceof Error ? syncError.message : String(syncError);
       serverInstance.error('User sync failed', {
-        error:
-          syncError instanceof Error ? syncError.message : String(syncError),
+        error: errorMsg,
+        stack: syncError instanceof Error ? syncError.stack : undefined,
         clerkUserId: userId,
       });
       return NextResponse.json(
-        { error: 'Benutzer konnte nicht synchronisiert werden' },
+        { error: `Benutzer-Sync fehlgeschlagen: ${errorMsg}` },
         { status: 500 }
       );
     }
