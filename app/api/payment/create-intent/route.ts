@@ -36,6 +36,13 @@ export async function POST(request: NextRequest) {
     const courseRef: string | undefined =
       body?.courseId || body?.courseSlug || body?.course;
     if (!courseRef) {
+      serverInstance.warn(
+        'Missing course reference in payment intent request',
+        {
+          body,
+          userId: userId || 'unknown',
+        }
+      );
       return NextResponse.json(
         { error: 'Course reference (id or slug) is required' },
         { status: 400 }
@@ -45,6 +52,10 @@ export async function POST(request: NextRequest) {
     // Get course details (resolve by id or slug)
     const course = await getCourseByIdOrSlug(courseRef);
     if (!course) {
+      serverInstance.warn('Course not found for checkout', {
+        courseRef,
+        userId: userId || 'unknown',
+      });
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 

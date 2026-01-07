@@ -87,6 +87,9 @@ function CheckoutContent() {
         setLoading(true);
         setError(null);
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
         const response = await fetch('/api/payment/create-intent', {
           method: 'POST',
           headers: {
@@ -94,12 +97,15 @@ function CheckoutContent() {
           },
           // Send as `courseId` for backward-compatibility; server resolves id or slug
           body: JSON.stringify({ courseId: courseRef }),
+          signal: controller.signal,
         });
 
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-          const errorData = await response.json();
+          const errorData = await response.json().catch(() => ({}));
           throw new Error(
-            errorData.error || 'Fehler beim Erstellen der Payment Intent'
+            errorData.error || `Fehler beim Laden: ${response.status}`
           );
         }
 
@@ -115,11 +121,19 @@ function CheckoutContent() {
 
         setPaymentIntent(data);
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Fehler beim Laden des Zahlungsformulars'
-        );
+        console.error('Payment intent creation error:', err);
+        let errorMessage = 'Fehler beim Laden des Zahlungsformulars';
+
+        if (err instanceof Error) {
+          if (err.name === 'AbortError') {
+            errorMessage =
+              'Die Anfrage hat zu lange gedauert. Bitte versuche es erneut.';
+          } else {
+            errorMessage = err.message;
+          }
+        }
+
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
