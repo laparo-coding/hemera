@@ -142,6 +142,7 @@ export default function CourseCard({
         {/* Title */}
         <Typography
           variant='h3'
+          data-testid='course-title'
           sx={{
             fontFamily: '"Playfair Display", serif',
             fontSize: '1.5rem',
