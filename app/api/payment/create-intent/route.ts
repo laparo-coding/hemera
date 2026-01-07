@@ -56,35 +56,88 @@ export async function POST(request: NextRequest) {
         courseRef,
         userId: userId || 'unknown',
       });
-      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Kurs nicht gefunden' },
+        { status: 404 }
+      );
     }
 
     // Ensure the Clerk user exists in the local database before booking creation
-    const syncedUser = await getCurrentUserWithSync();
-    userId = syncedUser.id;
+    let syncedUser;
+    try {
+      syncedUser = await getCurrentUserWithSync();
+      userId = syncedUser.id;
+    } catch (syncError) {
+      serverInstance.error('User sync failed', {
+        error:
+          syncError instanceof Error ? syncError.message : String(syncError),
+        clerkUserId: userId,
+      });
+      return NextResponse.json(
+        { error: 'Benutzer konnte nicht synchronisiert werden' },
+        { status: 500 }
+      );
+    }
 
     // Create booking with initial PENDING status
-    const booking = await createBooking({
-      userId: syncedUser.id,
-      courseId: course.id,
-      amount: course.price,
-      currency: course.currency,
-    });
+    let booking;
+    try {
+      booking = await createBooking({
+        userId: syncedUser.id,
+        courseId: course.id,
+        amount: course.price,
+        currency: course.currency,
+      });
+    } catch (bookingError) {
+      const message =
+        bookingError instanceof Error
+          ? bookingError.message
+          : String(bookingError);
+      serverInstance.error('Booking creation failed', {
+        error: message,
+        userId: syncedUser.id,
+        courseId: course.id,
+      });
+      // Pass through meaningful errors like "Course is full"
+      if (message.includes('full') || message.includes('not published')) {
+        return NextResponse.json({ error: message }, { status: 400 });
+      }
+      return NextResponse.json(
+        { error: 'Buchung konnte nicht erstellt werden' },
+        { status: 500 }
+      );
+    }
 
     // Create payment intent
-    const paymentIntent = await createPaymentIntent({
-      // Amounts are stored in whole euros in DB, Stripe service converts to cents
-      amount: course.price,
-      currency: course.currency.toLowerCase(),
-      courseId: course.id,
-      userId: syncedUser.id,
-      metadata: {
+    let paymentIntent;
+    try {
+      paymentIntent = await createPaymentIntent({
+        amount: course.price,
+        currency: course.currency.toLowerCase(),
         courseId: course.id,
         userId: syncedUser.id,
+        metadata: {
+          courseId: course.id,
+          userId: syncedUser.id,
+          bookingId: booking.id,
+          courseName: course.title,
+        },
+      });
+    } catch (stripeError) {
+      serverInstance.error('Stripe payment intent failed', {
+        error:
+          stripeError instanceof Error
+            ? stripeError.message
+            : String(stripeError),
+        userId: syncedUser.id,
+        courseId: course.id,
         bookingId: booking.id,
-        courseName: course.title,
-      },
-    });
+      });
+      return NextResponse.json(
+        { error: 'Zahlungsabwicklung fehlgeschlagen' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
@@ -96,8 +149,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
     const context = {
       error: errorMessage,
+      stack: errorStack,
       userId: userId || 'unknown',
       timestamp: new Date().toISOString(),
     };
@@ -111,8 +166,20 @@ export async function POST(request: NextRequest) {
     }
 
     serverInstance.error('Payment intent creation failed', context);
+
+    // Return more specific error messages for debugging
+    const userMessage = errorMessage.includes('Course')
+      ? errorMessage
+      : errorMessage.includes('User')
+        ? errorMessage
+        : 'Payment intent creation failed';
+
     return NextResponse.json(
-      { error: 'Payment intent creation failed' },
+      {
+        error: userMessage,
+        details:
+          process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+      },
       { status: 500 }
     );
   }
