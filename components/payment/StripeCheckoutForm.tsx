@@ -181,7 +181,7 @@ export default function StripeCheckoutForm({
       </Typography>
 
       <Typography variant='h6' color='primary' gutterBottom>
-        {amount.toLocaleString('de-DE', {
+        {(amount / 100).toLocaleString('de-DE', {
           style: 'currency',
           currency: currency.toUpperCase(),
         })}
@@ -251,7 +251,7 @@ export default function StripeCheckoutForm({
               Verarbeitung ...
             </>
           ) : (
-            `Jetzt ${amount.toLocaleString('de-DE', { style: 'currency', currency: currency.toUpperCase() })} zahlen`
+            `Jetzt ${(amount / 100).toLocaleString('de-DE', { style: 'currency', currency: currency.toUpperCase() })} zahlen`
           )}
         </Button>
 
