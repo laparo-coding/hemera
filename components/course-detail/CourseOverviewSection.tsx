@@ -22,6 +22,7 @@ import { colors, spacing, typography } from '../../lib/design-tokens';
 import { BookingCTA } from './BookingCTA';
 
 export interface CourseOverviewSectionProps {
+  title: string;
   description: string;
   learningObjectives?: string[];
   instructor: string;
@@ -30,6 +31,7 @@ export interface CourseOverviewSectionProps {
 }
 
 export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
+  title,
   description,
   learningObjectives = [],
   instructor,
@@ -61,7 +63,7 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
             textAlign: 'center',
           }}
         >
-          Über diesen Kurs
+          {title}
         </Typography>
 
         {/* Description */}

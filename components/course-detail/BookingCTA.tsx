@@ -69,9 +69,7 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
           },
         }}
       >
-        {price
-          ? `${buttonLabel} - ${formatPrice(price, currency)}`
-          : buttonLabel}
+        {buttonLabel}
       </Button>
     );
   }
@@ -107,13 +105,13 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
     );
   }
 
-  // Banner variant: Full-width gold background
+  // Banner variant: Full-width cream background
   return (
     <Box
       data-testid='booking-cta-banner'
       sx={{
         width: '100%',
-        backgroundColor: colors.gold,
+        backgroundColor: colors.cream,
         py: { xs: 4, md: 6 },
         textAlign: 'center',
       }}
@@ -154,9 +152,7 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
           },
         }}
       >
-        {price
-          ? `${buttonLabel} - ${formatPrice(price, currency)}`
-          : buttonLabel}
+        {buttonLabel}
       </Button>
     </Box>
   );

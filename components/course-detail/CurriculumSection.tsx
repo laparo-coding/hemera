@@ -47,7 +47,7 @@ const PLACEHOLDER_CURRICULUM: CurriculumModule[] = [
   {
     id: 'day-1',
     day: 1,
-    title: 'Tag 1: Grundlagen der Verhandlung',
+    title: 'Grundlagen der Verhandlung',
     topics: [
       { id: 't1', timeRange: '09:00 - 09:20', title: 'Vorstellungsrunde' },
       {
@@ -68,35 +68,6 @@ const PLACEHOLDER_CURRICULUM: CurriculumModule[] = [
         id: 't8',
         timeRange: '15:15 - 17:00',
         title: 'Reflexion und Zusammenfassung',
-      },
-    ],
-  },
-  {
-    id: 'day-2',
-    day: 2,
-    title: 'Tag 2: Fortgeschrittene Strategien',
-    topics: [
-      {
-        id: 't9',
-        timeRange: '09:00 - 10:30',
-        title: 'Schwierige Gespräche meistern',
-      },
-      { id: 't10', timeRange: '10:30 - 10:45', title: 'Pause' },
-      {
-        id: 't11',
-        timeRange: '10:45 - 12:00',
-        title: 'Körpersprache und Auftreten',
-      },
-      { id: 't12', timeRange: '12:00 - 13:00', title: 'Mittagspause' },
-      {
-        id: 't13',
-        timeRange: '13:00 - 15:00',
-        title: 'Rollenspiele und Feedback',
-      },
-      {
-        id: 't14',
-        timeRange: '15:00 - 16:00',
-        title: 'Abschluss und Zertifikate',
       },
     ],
   },

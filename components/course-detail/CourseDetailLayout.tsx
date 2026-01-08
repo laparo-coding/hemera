@@ -71,6 +71,7 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
 
       {/* 2. Overview Section - Description, objectives, instructor */}
       <CourseOverviewSection
+        title={course.title}
         description={course.description || 'Keine Beschreibung verfügbar.'}
         learningObjectives={course.learningObjectives || []}
         instructor={course.instructor || 'Hemera Academy Team'}

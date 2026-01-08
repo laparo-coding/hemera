@@ -156,7 +156,8 @@ export default async function CourseDetailPage({ params }: PageProps) {
     slug: course.slug,
     description: course.description,
     level: mapLevel(course.level),
-    heroVideoPlaybackId: course.heroVideoPlaybackId ?? null,
+    // heroVideoPlaybackId not yet in DB - will be added after migration
+    heroVideoPlaybackId: (course as { heroVideoPlaybackId?: string | null }).heroVideoPlaybackId ?? null,
     thumbnailUrl: course.thumbnailUrl ?? null,
     instructor: course.instructor ?? null,
     price: course.price,

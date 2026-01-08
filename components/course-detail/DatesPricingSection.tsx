@@ -7,8 +7,9 @@
 
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import EuroIcon from '@mui/icons-material/Euro';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { Box, Container, Grid, Paper, Typography } from '@mui/material';
+import { Box, Container, Paper, Typography } from '@mui/material';
 import type React from 'react';
 import { colors, shadows, spacing, typography } from '../../lib/design-tokens';
 import { BookingCTA } from './BookingCTA';
@@ -93,22 +94,22 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
             textAlign: 'center',
           }}
         >
-          Termine & Preise
+          Termin & Preis
         </Typography>
 
-        <Grid container spacing={4} justifyContent='center'>
-          {/* Details Card */}
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                backgroundColor: colors.white,
-                borderRadius: 3,
-                p: { xs: 3, md: 4 },
-                boxShadow: shadows.card,
-                height: '100%',
-              }}
-            >
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          {/* Details Card - Centered */}
+          <Paper
+            elevation={0}
+            sx={{
+              backgroundColor: colors.white,
+              borderRadius: 3,
+              p: { xs: 3, md: 4 },
+              boxShadow: shadows.card,
+              maxWidth: 500,
+              width: '100%',
+            }}
+          >
               {/* Date */}
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <CalendarTodayIcon
@@ -204,73 +205,51 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
                   </Typography>
                 </Box>
               </Box>
-            </Paper>
-          </Grid>
 
-          {/* Pricing Card */}
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                backgroundColor: colors.petrol,
-                borderRadius: 3,
-                p: { xs: 3, md: 4 },
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center',
-              }}
-            >
-              <Typography
-                variant='caption'
-                sx={{
-                  fontFamily: typography.body,
-                  color: colors.sage,
-                  textTransform: 'uppercase',
-                  letterSpacing: 1,
-                  mb: 1,
-                }}
-              >
-                Kursgebühr
-              </Typography>
-              <Typography
-                variant='h2'
-                sx={{
-                  fontFamily: typography.heading,
-                  fontWeight: 700,
-                  color: colors.cream,
-                  fontSize: { xs: '2.5rem', md: '3.5rem' },
-                  mb: 1,
-                }}
-              >
-                {formatPrice(price, currency)}
-              </Typography>
-              <Typography
-                variant='body2'
-                sx={{
-                  fontFamily: typography.body,
-                  color: colors.sage,
-                  mb: 4,
-                }}
-              >
-                inkl. 19% MwSt.
-              </Typography>
-              <BookingCTA
-                courseId={courseId}
-                courseSlug={courseSlug}
-                variant='primary'
-                price={price}
-                currency={currency}
-                label='Jetzt buchen'
-              />
+              {/* Price */}
+              <Box sx={{ display: 'flex', alignItems: 'center', mt: 3 }}>
+                <EuroIcon sx={{ color: colors.gold, mr: 2, fontSize: 28 }} />
+                <Box>
+                  <Typography
+                    variant='caption'
+                    sx={{
+                      fontFamily: typography.body,
+                      color: colors.sage,
+                      textTransform: 'uppercase',
+                      letterSpacing: 1,
+                    }}
+                  >
+                    Kursgebühr
+                  </Typography>
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      fontFamily: typography.body,
+                      fontWeight: 600,
+                      color: colors.petrol,
+                    }}
+                  >
+                    {formatPrice(price, currency)} inkl. MwSt.
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* CTA Button */}
+              <Box sx={{ mt: 4, textAlign: 'center' }}>
+                <BookingCTA
+                  courseId={courseId}
+                  courseSlug={courseSlug}
+                  variant='primary'
+                  price={price}
+                  currency={currency}
+                  label='Jetzt buchen'
+                />
+              </Box>
             </Paper>
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
-  );
-};
+          </Box>
+        </Container>
+      </Box>
+    );
+  };
 
 export default DatesPricingSection;
