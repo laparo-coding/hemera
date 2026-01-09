@@ -61,13 +61,14 @@ async function backup() {
     );
   } catch (error) {
     console.error('❌ Backup failed: ' + (error.message || 'Unknown error'));
-    await prisma.$disconnect();
-    await pool.end();
-    process.exit(1);
+    // Re-throw to let finally run, then exit with error code
+    throw error;
   } finally {
     await prisma.$disconnect();
     await pool.end();
   }
 }
 
-backup();
+backup().catch(() => {
+  process.exit(1);
+});
