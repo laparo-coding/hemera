@@ -2,13 +2,13 @@
  * CourseHeroSection Component
  *
  * Feature: 013-layout-improvement-course-detail-page
- * Hero section with video player placeholder.
+ * Hero section with Mux video player - only shown when heroVideoPlaybackId exists.
  */
 
 'use client';
 
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import { Box } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
+import MuxPlayer from '@mux/mux-player-react';
 import type React from 'react';
 import { colors } from '../../lib/design-tokens';
 
@@ -25,42 +25,42 @@ export interface CourseHeroSectionProps {
 
 export const CourseHeroSection: React.FC<CourseHeroSectionProps> = ({
   title,
+  heroVideoPlaybackId,
 }) => {
+  // Only render if there's a Mux video playback ID
+  if (!heroVideoPlaybackId) {
+    return null;
+  }
+
   return (
     <Box
       component='section'
       data-testid='hero-section'
-      aria-label={`Kurs: ${title}`}
+      aria-label={`Kursvideo: ${title}`}
       sx={{
         position: 'relative',
         width: '100%',
         aspectRatio: '16 / 9',
         maxHeight: '70vh',
         overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         backgroundColor: colors.petrol,
       }}
     >
-      {/* Video Player Placeholder */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-        }}
-      >
-        <PlayCircleOutlineIcon
-          sx={{
-            fontSize: { xs: 80, md: 120 },
-            color: colors.cream,
-            opacity: 0.8,
-          }}
-        />
-      </Box>
+      <MuxPlayer
+        playbackId={heroVideoPlaybackId}
+        streamType='on-demand'
+        autoPlay='muted'
+        muted
+        loop
+        playsInline
+        style={
+          {
+            width: '100%',
+            height: '100%',
+            '--controls': 'none',
+          } as React.CSSProperties
+        }
+      />
     </Box>
   );
 };

@@ -6,14 +6,12 @@ datasource db {
   provider = "postgresql"
 }
 
-// =============================================================================
 // NAMING CONVENTION:
 // - Models: PascalCase (e.g., User, Course, Booking)
 // - Fields in Prisma: camelCase (e.g., userId, createdAt)
 // - Database tables: snake_case plural (e.g., users, courses, bookings)
 // - Database columns: snake_case (e.g., user_id, created_at)
 // - Use @@map for tables, @map for columns to maintain clean TypeScript types
-// =============================================================================
 
 model User {
   id            String    @id @default(cuid())
@@ -47,8 +45,7 @@ model Course {
   thumbnailUrl  String?             @map("thumbnail_url")
   imageDetail   String?             @map("image_detail")
   imageTwitter  String?             @map("image_twitter")
-  // heroVideoPlaybackId will be added after migration is applied to production DB
-  // heroVideoPlaybackId String?       @map("hero_video_playback_id")
+  heroVideoPlaybackId String?       @map("hero_video_playback_id")
   locationId    String?             @map("location_id")
   location      Location?           @relation(fields: [locationId], references: [id])
   bookings      Booking[]
@@ -116,9 +113,7 @@ model Location {
   @@map("locations")
 }
 
-// =============================================================================
 // COURSE PARTICIPATION FLOW (016-course-assignments)
-// =============================================================================
 
 enum ParticipationStatus {
   PREPARATION
