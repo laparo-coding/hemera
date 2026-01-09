@@ -10,6 +10,11 @@ import { PrismaClient, Prisma } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 
+async function backup() {
+  const prisma = new PrismaClient();
+  const backupDir = process.env.BACKUP_DIR || './backup';
+  let hasErrors = false;
+
   try {
     // Ensure backup directory exists
     if (!fs.existsSync(backupDir)) {
