@@ -42,51 +42,8 @@ jobs:
           echo "🔄 Starte Backup für ${DATE}..."
           echo "📋 Backup-Grund: ${{ github.event.inputs.reason || 'Geplantes tägliches Backup' }}"
 
-          mkdir -p "$BACKUP_DIR"
-
-          # Export all data using Prisma query
-          node -e "
-          const { PrismaClient, Prisma } = require('@prisma/client');
-          const fs = require('fs');
-          const path = require('path');
-
-          async function backup() {
-            const prisma = new PrismaClient();
-            const backupDir = '$BACKUP_DIR';
-            let hasErrors = false;
-
-            try {
-              // Get all model names dynamically from Prisma
-              const models = Object.values(Prisma.ModelName);
-              console.log('📋 Models to backup: ' + models.join(', '));
-
-              for (const model of models) {
-                try {
-                  const modelName = model.charAt(0).toLowerCase() + model.slice(1);
-                  const data = await prisma[modelName].findMany();
-                  fs.writeFileSync(
-                    path.join(backupDir, model + '.json'),
-                    JSON.stringify(data, null, 2)
-                  );
-                  console.log('✅ ' + model + ': ' + data.length + ' records');
-                } catch (e) {
-                  hasErrors = true;
-                  console.log('⚠️ ' + model + ': skipped (' + e.code + ': ' + (e.message || 'unknown error').substring(0, 50) + ')');
-                }
-              }
-
-              console.log('\\n✅ Backup completed!' + (hasErrors ? ' (with warnings)' : ''));
-            } catch (error) {
-              console.error('❌ Backup failed: ' + (error.message || 'Unknown error'));
-              await prisma.$disconnect();
-              process.exit(1);
-            } finally {
-              // Prisma client already disconnected
-            }
-          }
-
-          backup();
-          "
+          # Run external backup script
+          BACKUP_DIR="$BACKUP_DIR" node scripts/ops/backup-db.mjs
 
           # Create summary file
           echo "{\"date\": \"${DATE}\", \"reason\": \"${{ github.event.inputs.reason || 'Scheduled daily backup' }}\"}" > "$BACKUP_DIR/metadata.json"
