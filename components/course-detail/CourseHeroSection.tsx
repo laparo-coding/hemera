@@ -7,7 +7,7 @@
 
 'use client';
 
-import { Box, Skeleton } from '@mui/material';
+import { Box } from '@mui/material';
 import MuxPlayer, { type MuxPlayerCSSProperties } from '@mux/mux-player-react';
 import type React from 'react';
 import { colors } from '../../lib/design-tokens';

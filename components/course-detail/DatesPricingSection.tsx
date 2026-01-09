@@ -110,146 +110,146 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
               width: '100%',
             }}
           >
-              {/* Date */}
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <CalendarTodayIcon
-                  sx={{ color: colors.gold, mr: 2, fontSize: 28 }}
-                />
-                <Box>
-                  <Typography
-                    variant='caption'
-                    sx={{
-                      fontFamily: typography.body,
-                      color: colors.sage,
-                      textTransform: 'uppercase',
-                      letterSpacing: 1,
-                    }}
-                  >
-                    Datum
-                  </Typography>
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      fontFamily: typography.body,
-                      fontWeight: 600,
-                      color: colors.petrol,
-                    }}
-                  >
-                    {startDate
-                      ? formatDate(startDate)
-                      : 'Termin wird bekannt gegeben'}
-                  </Typography>
-                </Box>
+            {/* Date */}
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <CalendarTodayIcon
+                sx={{ color: colors.gold, mr: 2, fontSize: 28 }}
+              />
+              <Box>
+                <Typography
+                  variant='caption'
+                  sx={{
+                    fontFamily: typography.body,
+                    color: colors.sage,
+                    textTransform: 'uppercase',
+                    letterSpacing: 1,
+                  }}
+                >
+                  Datum
+                </Typography>
+                <Typography
+                  variant='h6'
+                  sx={{
+                    fontFamily: typography.body,
+                    fontWeight: 600,
+                    color: colors.petrol,
+                  }}
+                >
+                  {startDate
+                    ? formatDate(startDate)
+                    : 'Termin wird bekannt gegeben'}
+                </Typography>
               </Box>
+            </Box>
 
-              {/* Time */}
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <AccessTimeIcon
-                  sx={{ color: colors.gold, mr: 2, fontSize: 28 }}
-                />
-                <Box>
-                  <Typography
-                    variant='caption'
-                    sx={{
-                      fontFamily: typography.body,
-                      color: colors.sage,
-                      textTransform: 'uppercase',
-                      letterSpacing: 1,
-                    }}
-                  >
-                    Uhrzeit
-                  </Typography>
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      fontFamily: typography.body,
-                      fontWeight: 600,
-                      color: colors.petrol,
-                    }}
-                  >
-                    {startTime && endTime
-                      ? `${formatTime(startTime)} - ${formatTime(endTime)} Uhr`
-                      : 'Wird bekannt gegeben'}
-                  </Typography>
-                </Box>
+            {/* Time */}
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <AccessTimeIcon
+                sx={{ color: colors.gold, mr: 2, fontSize: 28 }}
+              />
+              <Box>
+                <Typography
+                  variant='caption'
+                  sx={{
+                    fontFamily: typography.body,
+                    color: colors.sage,
+                    textTransform: 'uppercase',
+                    letterSpacing: 1,
+                  }}
+                >
+                  Uhrzeit
+                </Typography>
+                <Typography
+                  variant='h6'
+                  sx={{
+                    fontFamily: typography.body,
+                    fontWeight: 600,
+                    color: colors.petrol,
+                  }}
+                >
+                  {startTime && endTime
+                    ? `${formatTime(startTime)} - ${formatTime(endTime)} Uhr`
+                    : 'Wird bekannt gegeben'}
+                </Typography>
               </Box>
+            </Box>
 
-              {/* Location */}
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <LocationOnIcon
-                  sx={{ color: colors.gold, mr: 2, fontSize: 28 }}
-                />
-                <Box>
-                  <Typography
-                    variant='caption'
-                    sx={{
-                      fontFamily: typography.body,
-                      color: colors.sage,
-                      textTransform: 'uppercase',
-                      letterSpacing: 1,
-                    }}
-                  >
-                    Ort
-                  </Typography>
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      fontFamily: typography.body,
-                      fontWeight: 600,
-                      color: colors.petrol,
-                    }}
-                  >
-                    {location
-                      ? `${location.name}, ${location.city}`
-                      : 'Ort wird bekannt gegeben'}
-                  </Typography>
-                </Box>
+            {/* Location */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <LocationOnIcon
+                sx={{ color: colors.gold, mr: 2, fontSize: 28 }}
+              />
+              <Box>
+                <Typography
+                  variant='caption'
+                  sx={{
+                    fontFamily: typography.body,
+                    color: colors.sage,
+                    textTransform: 'uppercase',
+                    letterSpacing: 1,
+                  }}
+                >
+                  Ort
+                </Typography>
+                <Typography
+                  variant='h6'
+                  sx={{
+                    fontFamily: typography.body,
+                    fontWeight: 600,
+                    color: colors.petrol,
+                  }}
+                >
+                  {location
+                    ? `${location.name}, ${location.city}`
+                    : 'Ort wird bekannt gegeben'}
+                </Typography>
               </Box>
+            </Box>
 
-              {/* Price */}
-              <Box sx={{ display: 'flex', alignItems: 'center', mt: 3 }}>
-                <EuroIcon sx={{ color: colors.gold, mr: 2, fontSize: 28 }} />
-                <Box>
-                  <Typography
-                    variant='caption'
-                    sx={{
-                      fontFamily: typography.body,
-                      color: colors.sage,
-                      textTransform: 'uppercase',
-                      letterSpacing: 1,
-                    }}
-                  >
-                    Kursgebühr
-                  </Typography>
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      fontFamily: typography.body,
-                      fontWeight: 600,
-                      color: colors.petrol,
-                    }}
-                  >
-                    {formatPrice(price, currency)} inkl. MwSt.
-                  </Typography>
-                </Box>
+            {/* Price */}
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 3 }}>
+              <EuroIcon sx={{ color: colors.gold, mr: 2, fontSize: 28 }} />
+              <Box>
+                <Typography
+                  variant='caption'
+                  sx={{
+                    fontFamily: typography.body,
+                    color: colors.sage,
+                    textTransform: 'uppercase',
+                    letterSpacing: 1,
+                  }}
+                >
+                  Kursgebühr
+                </Typography>
+                <Typography
+                  variant='h6'
+                  sx={{
+                    fontFamily: typography.body,
+                    fontWeight: 600,
+                    color: colors.petrol,
+                  }}
+                >
+                  {formatPrice(price, currency)} inkl. MwSt.
+                </Typography>
               </Box>
+            </Box>
 
-              {/* CTA Button */}
-              <Box sx={{ mt: 4, textAlign: 'center' }}>
-                <BookingCTA
-                  courseId={courseId}
-                  courseSlug={courseSlug}
-                  variant='primary'
-                  price={price}
-                  currency={currency}
-                  label='Jetzt buchen'
-                />
-              </Box>
-            </Paper>
-          </Box>
-        </Container>
-      </Box>
-    );
-  };
+            {/* CTA Button */}
+            <Box sx={{ mt: 4, textAlign: 'center' }}>
+              <BookingCTA
+                courseId={courseId}
+                courseSlug={courseSlug}
+                variant='primary'
+                price={price}
+                currency={currency}
+                label='Jetzt buchen'
+              />
+            </Box>
+          </Paper>
+        </Box>
+      </Container>
+    </Box>
+  );
+};
 
 export default DatesPricingSection;
