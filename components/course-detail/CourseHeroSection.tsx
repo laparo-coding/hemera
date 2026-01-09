@@ -8,7 +8,7 @@
 'use client';
 
 import { Box, Skeleton } from '@mui/material';
-import MuxPlayer from '@mux/mux-player-react';
+import MuxPlayer, { type MuxPlayerCSSProperties } from '@mux/mux-player-react';
 import type React from 'react';
 import { colors } from '../../lib/design-tokens';
 
@@ -58,7 +58,7 @@ export const CourseHeroSection: React.FC<CourseHeroSectionProps> = ({
             width: '100%',
             height: '100%',
             '--controls': 'none',
-          } as React.CSSProperties
+          } satisfies MuxPlayerCSSProperties
         }
       />
     </Box>
