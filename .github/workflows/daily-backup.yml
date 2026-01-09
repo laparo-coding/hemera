@@ -43,7 +43,7 @@ jobs:
           echo "📋 Backup-Grund: ${{ github.event.inputs.reason || 'Geplantes tägliches Backup' }}"
 
           # Run external backup script
-          BACKUP_DIR="$BACKUP_DIR" node scripts/ops/backup-db.js
+          BACKUP_DIR="$BACKUP_DIR" node scripts/ops/backup-db.mjs
 
           # Create summary file
           echo "{\"date\": \"${DATE}\", \"reason\": \"${{ github.event.inputs.reason || 'Scheduled daily backup' }}\"}" > "$BACKUP_DIR/metadata.json"

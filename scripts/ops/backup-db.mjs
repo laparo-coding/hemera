@@ -3,17 +3,12 @@
  * Database Backup Script
  *
  * Exports all Prisma models to JSON files.
- * Usage: BACKUP_DIR=./backup node scripts/ops/backup-db.js
+ * Usage: BACKUP_DIR=./backup node scripts/ops/backup-db.mjs
  */
 
-const { PrismaClient, Prisma } = require('@prisma/client');
-const fs = require('fs');
-const path = require('path');
-
-async function backup() {
-  const prisma = new PrismaClient();
-  const backupDir = process.env.BACKUP_DIR || './backup';
-  let hasErrors = false;
+import { PrismaClient, Prisma } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
 
   try {
     // Ensure backup directory exists
