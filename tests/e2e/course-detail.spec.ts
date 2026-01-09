@@ -8,7 +8,8 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Course Detail Page', () => {
-  const courseUrl = '/courses/grundkurs-verhandlungstraining';
+  // Use 'grundkurs' slug which exists in e2e-seed.ts
+  const courseUrl = '/courses/grundkurs';
 
   test.beforeEach(async ({ page }) => {
     await page.goto(courseUrl);
