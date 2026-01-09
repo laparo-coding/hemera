@@ -6,12 +6,20 @@
  * Usage: BACKUP_DIR=./backup node scripts/ops/backup-db.mjs
  */
 
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, Prisma } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
+import pg from 'pg';
+
+const { Pool } = pg;
 
 async function backup() {
-  const prisma = new PrismaClient();
+  // Create PG pool and adapter for direct connection (Prisma 7 client engine)
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const adapter = new PrismaPg(pool);
+  const prisma = new PrismaClient({ adapter });
+  
   const backupDir = process.env.BACKUP_DIR || './backup';
   let hasErrors = false;
 
@@ -54,9 +62,11 @@ async function backup() {
   } catch (error) {
     console.error('❌ Backup failed: ' + (error.message || 'Unknown error'));
     await prisma.$disconnect();
+    await pool.end();
     process.exit(1);
   } finally {
     await prisma.$disconnect();
+    await pool.end();
   }
 }
 
