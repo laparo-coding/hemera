@@ -2,13 +2,23 @@
  * CourseHeroSection Component Tests
  *
  * Feature: 013-layout-improvement-course-detail-page
- * TDD: These tests must fail before implementation
+ * Tests for the minimal hero video section component.
  */
 
-import { fireEvent, render, screen } from '@testing-library/react';
-import { CourseHeroSection } from '../../../components/course-detail/CourseHeroSection';
+import { render, screen, waitFor } from '@testing-library/react';
+import { CourseHeroSection } from '../../../../components/course-detail/CourseHeroSection';
 
-// Mock MuxPlayer to avoid SSR issues in tests
+// Mock next/dynamic to return the component directly
+jest.mock(
+  'next/dynamic',
+  () => (fn: () => Promise<{ default: React.ComponentType<unknown> }>) => {
+    const Component = jest.requireActual('react').lazy(fn);
+    Component.preload = jest.fn();
+    return Component;
+  }
+);
+
+// Mock MuxPlayer
 jest.mock('@mux/mux-player-react', () => ({
   __esModule: true,
   default: ({ playbackId }: { playbackId: string }) => (
@@ -25,91 +35,49 @@ describe('CourseHeroSection', () => {
     tagline: 'Lerne die Kunst der Verhandlung',
     heroVideoPlaybackId: 'test-playback-id-123',
     fallbackImageUrl: '/images/course-fallback.jpg',
-    onBookingClick: jest.fn(),
+    courseId: 'course-123',
+    courseSlug: 'grundkurs-verhandlungstraining',
   };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  describe('Title rendering', () => {
-    it('renders title with h1 tag', () => {
-      render(<CourseHeroSection {...defaultProps} />);
-
-      const heading = screen.getByRole('heading', { level: 1 });
-      expect(heading).toBeInTheDocument();
-      expect(heading).toHaveTextContent('Grundkurs Verhandlungstraining');
-    });
-
-    it('renders tagline when provided', () => {
-      render(<CourseHeroSection {...defaultProps} />);
-
-      expect(
-        screen.getByText('Lerne die Kunst der Verhandlung')
-      ).toBeInTheDocument();
-    });
-  });
-
   describe('Video player', () => {
-    it('shows Mux player when heroVideoPlaybackId is provided', () => {
+    it('shows Mux player when heroVideoPlaybackId is provided', async () => {
       render(<CourseHeroSection {...defaultProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('mux-player')).toBeInTheDocument();
+      });
 
       const player = screen.getByTestId('mux-player');
-      expect(player).toBeInTheDocument();
       expect(player).toHaveAttribute(
         'data-playback-id',
         'test-playback-id-123'
       );
     });
 
-    it('shows fallback image when heroVideoPlaybackId is null', () => {
-      render(
+    it('returns null when heroVideoPlaybackId is null', () => {
+      const { container } = render(
         <CourseHeroSection {...defaultProps} heroVideoPlaybackId={null} />
       );
 
-      expect(screen.queryByTestId('mux-player')).not.toBeInTheDocument();
-      expect(screen.getByRole('img')).toBeInTheDocument();
+      expect(container.firstChild).toBeNull();
     });
   });
 
-  describe('Level badge', () => {
-    it('displays level badge with correct label for BEGINNER', () => {
-      render(<CourseHeroSection {...defaultProps} level='BEGINNER' />);
-
-      expect(screen.getByText('A')).toBeInTheDocument();
-    });
-
-    it('displays level badge with correct label for INTERMEDIATE', () => {
-      render(<CourseHeroSection {...defaultProps} level='INTERMEDIATE' />);
-
-      expect(screen.getByText('B')).toBeInTheDocument();
-    });
-
-    it('displays level badge with correct label for ADVANCED', () => {
-      render(<CourseHeroSection {...defaultProps} level='ADVANCED' />);
-
-      expect(screen.getByText('C')).toBeInTheDocument();
-    });
-  });
-
-  describe('Booking CTA', () => {
-    it('renders booking CTA button', () => {
+  describe('Section rendering', () => {
+    it('renders hero section with correct test id', () => {
       render(<CourseHeroSection {...defaultProps} />);
 
-      expect(
-        screen.getByRole('button', { name: /jetzt buchen/i })
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('hero-section')).toBeInTheDocument();
     });
 
-    it('calls onBookingClick when CTA is clicked', () => {
-      const onBookingClick = jest.fn();
-      render(
-        <CourseHeroSection {...defaultProps} onBookingClick={onBookingClick} />
+    it('has accessible aria-label with course title', () => {
+      render(<CourseHeroSection {...defaultProps} />);
+
+      const section = screen.getByTestId('hero-section');
+      expect(section).toHaveAttribute(
+        'aria-label',
+        'Kursvideo: Grundkurs Verhandlungstraining'
       );
-
-      fireEvent.click(screen.getByRole('button', { name: /jetzt buchen/i }));
-
-      expect(onBookingClick).toHaveBeenCalledTimes(1);
     });
   });
 });

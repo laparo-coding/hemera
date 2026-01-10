@@ -6,7 +6,7 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { CourseOverviewSection } from '../../../components/course-detail/CourseOverviewSection';
+import { CourseOverviewSection } from '../../../../components/course-detail/CourseOverviewSection';
 
 describe('CourseOverviewSection', () => {
   const defaultProps = {

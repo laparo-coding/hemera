@@ -32,10 +32,18 @@ export interface DatesPricingSectionProps {
  * Format price in German locale with EUR symbol
  */
 function formatPrice(price: number, currency: string = 'EUR'): string {
-  return new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency,
-  }).format(price / 100);
+  try {
+    return new Intl.NumberFormat('de-DE', {
+      style: 'currency',
+      currency,
+    }).format(price / 100);
+  } catch {
+    // Fallback for invalid currency codes
+    return new Intl.NumberFormat('de-DE', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(price / 100);
+  }
 }
 
 /**
@@ -229,7 +237,7 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
                     color: colors.petrol,
                   }}
                 >
-                  {formatPrice(price, currency)} inkl. MwSt.
+                  {formatPrice(price, currency)} inkl. 19% MwSt.
                 </Typography>
               </Box>
             </Box>

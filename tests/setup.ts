@@ -4,6 +4,7 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { afterAll, beforeAll } from '@jest/globals';
+import '@testing-library/jest-dom';
 import dotenv from 'dotenv';
 
 // Load env files eagerly so that DATABASE_URL is available before test files import PrismaClient

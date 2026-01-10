@@ -7,10 +7,22 @@
 
 'use client';
 
-import { Box } from '@mui/material';
-import MuxPlayer, { type MuxPlayerCSSProperties } from '@mux/mux-player-react';
+import { Box, Skeleton } from '@mui/material';
+import type { MuxPlayerCSSProperties } from '@mux/mux-player-react';
+import dynamic from 'next/dynamic';
 import type React from 'react';
 import { colors } from '../../lib/design-tokens';
+
+// Dynamic import with SSR disabled to prevent hydration issues
+const MuxPlayer = dynamic(() => import('@mux/mux-player-react'), {
+  ssr: false,
+  loading: () => (
+    <Skeleton
+      variant='rectangular'
+      sx={{ width: '100%', height: '100%', bgcolor: colors.petrol }}
+    />
+  ),
+});
 
 export interface CourseHeroSectionProps {
   title: string;

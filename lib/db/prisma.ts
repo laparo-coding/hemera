@@ -3,8 +3,10 @@
  *
  * Uses Prisma Accelerate for connection pooling and edge optimization in production.
  * Falls back to PG adapter for tests/CI when Accelerate is not available.
+ * Supports SQLite for E2E tests via better-sqlite3 adapter.
  */
 
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
@@ -19,13 +21,22 @@ const globalForPrisma = globalThis as unknown as {
 let _prismaClient: PrismaClient | undefined;
 
 /**
+ * Check if DATABASE_URL is a SQLite file URL
+ */
+function isSqliteUrl(url: string | undefined): boolean {
+  return url?.startsWith('file:') ?? false;
+}
+
+/**
  * Create and configure PrismaClient instance
  *
  * Prisma 7 with engine type "client" requires accelerateUrl for production.
  * For tests/CI (when PRISMA_ACCELERATE_URL is not set), we use PG adapter.
+ * For E2E tests, we use SQLite with better-sqlite3 adapter.
  */
 function createPrismaClient(): PrismaClient {
   const accelerateUrl = process.env.PRISMA_ACCELERATE_URL;
+  const databaseUrl = process.env.DATABASE_URL;
 
   // If accelerateUrl is available, use Prisma Accelerate (production)
   if (accelerateUrl) {
@@ -36,9 +47,17 @@ function createPrismaClient(): PrismaClient {
     });
   }
 
-  // For tests/CI without Accelerate, use PG adapter with direct connection
-  const databaseUrl = process.env.DATABASE_URL;
+  // For E2E tests with SQLite, use better-sqlite3 adapter
+  if (isSqliteUrl(databaseUrl)) {
+    const adapter = new PrismaBetterSqlite3({ url: databaseUrl! });
+    return new PrismaClient({
+      adapter,
+      log:
+        process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    });
+  }
 
+  // For tests/CI without Accelerate, use PG adapter with direct connection
   // During Next.js build (no DB available), we need to return a mock client
   // This allows static page generation without actual DB access
   if (!databaseUrl) {

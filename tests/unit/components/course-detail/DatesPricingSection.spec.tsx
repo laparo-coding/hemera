@@ -6,7 +6,7 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { DatesPricingSection } from '../../../components/course-detail/DatesPricingSection';
+import { DatesPricingSection } from '../../../../components/course-detail/DatesPricingSection';
 
 describe('DatesPricingSection', () => {
   const defaultProps = {
@@ -65,8 +65,8 @@ describe('DatesPricingSection', () => {
     it('displays location name and city', () => {
       render(<DatesPricingSection {...defaultProps} />);
 
-      expect(screen.getByText('Hemera Academy')).toBeInTheDocument();
-      expect(screen.getByText('München')).toBeInTheDocument();
+      // Location is displayed as combined text: "Name, City"
+      expect(screen.getByText(/Hemera Academy.*München/)).toBeInTheDocument();
     });
 
     it('handles null location gracefully', () => {

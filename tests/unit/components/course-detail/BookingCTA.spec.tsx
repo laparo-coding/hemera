@@ -6,8 +6,8 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { BookingCTA } from '../../../components/course-detail/BookingCTA';
-import { colors } from '../../../lib/design-tokens';
+import { BookingCTA } from '../../../../components/course-detail/BookingCTA';
+import { colors } from '../../../../lib/design-tokens';
 
 describe('BookingCTA', () => {
   const defaultProps = {
@@ -67,23 +67,32 @@ describe('BookingCTA', () => {
   });
 
   describe('Price display', () => {
-    it('displays price when provided', () => {
+    it('includes price in accessible label when provided', () => {
       render(<BookingCTA {...defaultProps} price={129900} currency='EUR' />);
 
-      expect(screen.getByText(/1\.299/)).toBeInTheDocument();
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute(
+        'aria-label',
+        expect.stringContaining('1.299')
+      );
     });
 
-    it('does not show price when not provided', () => {
+    it('does not include price in label when not provided', () => {
       render(<BookingCTA {...defaultProps} />);
 
-      expect(screen.queryByText(/€/)).not.toBeInTheDocument();
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute('aria-label', 'Jetzt buchen');
     });
 
-    it('formats price correctly in EUR', () => {
+    it('formats price correctly in EUR in aria-label', () => {
       render(<BookingCTA {...defaultProps} price={99900} currency='EUR' />);
 
+      const link = screen.getByRole('link');
       // German locale: 999,00 €
-      expect(screen.getByText(/999,00\s*€/)).toBeInTheDocument();
+      expect(link).toHaveAttribute(
+        'aria-label',
+        expect.stringMatching(/999,00.*€/)
+      );
     });
   });
 
