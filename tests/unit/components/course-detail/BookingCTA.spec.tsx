@@ -1,4 +1,7 @@
 /**
+ * @jest-environment jsdom
+ */
+/**
  * BookingCTA Component Tests
  *
  * Feature: 013-layout-improvement-course-detail-page

@@ -1,4 +1,7 @@
 /**
+ * @jest-environment jsdom
+ */
+/**
  * DatesPricingSection Component Tests
  *
  * Feature: 013-layout-improvement-course-detail-page
