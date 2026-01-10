@@ -106,12 +106,11 @@ describe('TestimonialsSection', () => {
   });
 
   describe('Empty state', () => {
-    it('shows placeholder testimonials when no testimonials provided', () => {
-      render(<TestimonialsSection testimonials={[]} />);
+    it('renders nothing when no testimonials provided', () => {
+      const { container } = render(<TestimonialsSection testimonials={[]} />);
 
-      // Component shows placeholder content when empty
-      const cards = screen.getAllByTestId('testimonial-card');
-      expect(cards.length).toBeGreaterThan(0);
+      // Component returns null when empty (no placeholders on production)
+      expect(container.firstChild).toBeNull();
     });
   });
 });

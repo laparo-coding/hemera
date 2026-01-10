@@ -30,43 +30,11 @@ export interface TestimonialsSectionProps {
   testimonials: Testimonial[];
 }
 
-// Placeholder testimonials for MVP
-const PLACEHOLDER_TESTIMONIALS: Testimonial[] = [
-  {
-    id: 'testimonial-1',
-    quote:
-      'Nach dem Kurs habe ich meine erste Gehaltsverhandlung erfolgreich geführt und 15% mehr bekommen!',
-    authorName: 'Lisa M.',
-    authorRole: 'Senior Manager',
-    successIndicator: 'Gehaltssteigerung von 15%',
-  },
-  {
-    id: 'testimonial-2',
-    quote:
-      'Die Techniken haben mir geholfen, selbstbewusster in schwierigen Gesprächen aufzutreten. Absolut empfehlenswert!',
-    authorName: 'Thomas K.',
-    authorRole: 'Projektleiter',
-    successIndicator: 'Beförderung nach 3 Monaten',
-  },
-  {
-    id: 'testimonial-3',
-    quote:
-      'Ein Kurs, der wirklich etwas verändert hat. Ich kann jetzt viel besser mit Kunden verhandeln.',
-    authorName: 'Sandra B.',
-    authorRole: 'Teamleiterin',
-    successIndicator: 'Bessere Kundengespräche',
-  },
-];
-
 export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
   testimonials,
 }) => {
-  // Use placeholder if no testimonials provided
-  const displayTestimonials =
-    testimonials.length > 0 ? testimonials : PLACEHOLDER_TESTIMONIALS;
-
-  // Don't render if no testimonials
-  if (displayTestimonials.length === 0) {
+  // Only render if real testimonials are provided (no placeholders on production)
+  if (testimonials.length === 0) {
     return null;
   }
 
@@ -100,7 +68,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
 
         {/* Testimonial Cards */}
         <Grid container spacing={4}>
-          {displayTestimonials.map(testimonial => (
+          {testimonials.map(testimonial => (
             <Grid size={{ xs: 12, md: 4 }} key={testimonial.id}>
               <Card
                 data-testid='testimonial-card'
