@@ -66,22 +66,20 @@ interface CourseHeroSectionProps {
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   tagline?: string;
   heroVideoPlaybackId: string | null;
-  fallbackImageUrl: string | null;
-  onBookingClick: () => void;
+  courseId: string;
+  courseSlug: string;
+  onBookingClick?: () => void;
 }
 ```
 
 ### Behavior
 - If `heroVideoPlaybackId` exists: Render Mux Player (autoplay, muted, loop)
-- If null: Render fallback image or gradient background
-- Display title overlay with Playfair Display font
-- Show level badge (A/B/C with color coding)
-- Primary booking CTA button
+- If null: Return null (section not rendered)
+- Display video player with 16:9 aspect ratio
 
 ### Accessibility
-- Video has `aria-hidden="true"` (decorative)
-- Title is `<h1>` for SEO
-- CTA button has clear focus state
+- Video section has `aria-label` for screen readers
+- Section is only rendered when video is available
 
 ---
 

@@ -58,13 +58,12 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
         backgroundColor: colors.cream,
       }}
     >
-      {/* 1. Hero Section - Full-width with video/image */}
+      {/* 1. Hero Section - Full-width with video (only if available) */}
       <CourseHeroSection
         title={course.title}
         level={course.level}
         tagline={course.tagline}
         heroVideoPlaybackId={course.heroVideoPlaybackId}
-        fallbackImageUrl={course.thumbnailUrl || null}
         courseId={course.id}
         courseSlug={courseSlug}
       />

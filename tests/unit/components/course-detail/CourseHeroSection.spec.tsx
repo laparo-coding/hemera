@@ -5,7 +5,7 @@
  * CourseHeroSection Component Tests
  *
  * Feature: 013-layout-improvement-course-detail-page
- * Tests for the minimal hero video section component.
+ * Tests for the hero video section component (only renders with video).
  */
 
 import { render, screen, waitFor } from '@testing-library/react';
@@ -31,22 +31,12 @@ jest.mock('@mux/mux-player-react', () => ({
   ),
 }));
 
-// Mock next/image
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: ({ src, alt, ...props }: { src: string; alt: string }) => (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} data-testid='hero-image' {...props} />
-  ),
-}));
-
 describe('CourseHeroSection', () => {
   const defaultProps = {
     title: 'Grundkurs Verhandlungstraining',
     level: 'BEGINNER' as const,
     tagline: 'Lerne die Kunst der Verhandlung',
     heroVideoPlaybackId: 'test-playback-id-123',
-    fallbackImageUrl: '/images/course-fallback.jpg',
     courseId: 'course-123',
     courseSlug: 'grundkurs-verhandlungstraining',
   };
@@ -66,28 +56,9 @@ describe('CourseHeroSection', () => {
       );
     });
 
-    it('shows fallback image when no video but image is provided', () => {
-      render(
-        <CourseHeroSection
-          {...defaultProps}
-          heroVideoPlaybackId={null}
-          fallbackImageUrl='/images/course-thumbnail.jpg'
-        />
-      );
-
-      const image = screen.getByTestId('hero-image');
-      expect(image).toBeInTheDocument();
-      expect(image).toHaveAttribute('src', '/images/course-thumbnail.jpg');
-      expect(image).toHaveAttribute('alt', 'Grundkurs Verhandlungstraining');
-    });
-
-    it('returns null when no video and no image provided', () => {
+    it('returns null when no video is provided', () => {
       const { container } = render(
-        <CourseHeroSection
-          {...defaultProps}
-          heroVideoPlaybackId={null}
-          fallbackImageUrl={null}
-        />
+        <CourseHeroSection {...defaultProps} heroVideoPlaybackId={null} />
       );
 
       expect(container.firstChild).toBeNull();
@@ -108,22 +79,6 @@ describe('CourseHeroSection', () => {
       expect(section).toHaveAttribute(
         'aria-label',
         'Kursvideo: Grundkurs Verhandlungstraining'
-      );
-    });
-
-    it('has accessible aria-label for image fallback', () => {
-      render(
-        <CourseHeroSection
-          {...defaultProps}
-          heroVideoPlaybackId={null}
-          fallbackImageUrl='/images/course-thumbnail.jpg'
-        />
-      );
-
-      const section = screen.getByTestId('hero-section');
-      expect(section).toHaveAttribute(
-        'aria-label',
-        'Kursbild: Grundkurs Verhandlungstraining'
       );
     });
   });
