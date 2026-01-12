@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * Database Backup Script
  *
@@ -6,10 +7,10 @@
  * Usage: BACKUP_DIR=./backup node scripts/ops/backup-db.mjs
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient, Prisma } from '@prisma/client';
-import fs from 'fs';
-import path from 'path';
+import { Prisma, PrismaClient } from '@prisma/client';
 import pg from 'pg';
 
 const { Pool } = pg;
@@ -19,7 +20,7 @@ async function backup() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const adapter = new PrismaPg(pool);
   const prisma = new PrismaClient({ adapter });
-  
+
   const backupDir = process.env.BACKUP_DIR || './backup';
   let hasErrors = false;
 
@@ -31,17 +32,17 @@ async function backup() {
 
     // Get all model names dynamically from Prisma
     const models = Object.values(Prisma.ModelName);
-    console.log('📋 Models to backup: ' + models.join(', '));
+    console.log(`📋 Models to backup: ${models.join(', ')}`);
 
     for (const model of models) {
       try {
         const modelName = model.charAt(0).toLowerCase() + model.slice(1);
         const data = await prisma[modelName].findMany();
         fs.writeFileSync(
-          path.join(backupDir, model + '.json'),
+          path.join(backupDir, `${model}.json`),
           JSON.stringify(data, null, 2)
         );
-        console.log('✅ ' + model + ': ' + data.length + ' records');
+        console.log(`✅ ${model}: ${data.length} records`);
       } catch (e) {
         hasErrors = true;
         console.log(
@@ -56,11 +57,9 @@ async function backup() {
       }
     }
 
-    console.log(
-      '\n✅ Backup completed!' + (hasErrors ? ' (with warnings)' : '')
-    );
+    console.log(`\n✅ Backup completed!${hasErrors ? ' (with warnings)' : ''}`);
   } catch (error) {
-    console.error('❌ Backup failed: ' + (error.message || 'Unknown error'));
+    console.error(`❌ Backup failed: ${error.message || 'Unknown error'}`);
     // Re-throw to let finally run, then exit with error code
     throw error;
   } finally {

@@ -14,6 +14,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-07
 - TypeScript 5+, Next.js 15.5.6 (App Router), React 18+ + MUI v5, Clerk (auth), Prisma (ORM), React Leaflet, Leafle (015-course-locations)
 - TypeScript 5.x with Next.js 15.5.6 (App Router) + React 18, Material-UI v5, Clerk auth, Prisma ORM, Mux video SDK/API, Rollbar monitoring (016-course-assignments)
 - PostgreSQL via Prisma models (course participation, documents, summary assets) (016-course-assignments)
+- TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Material-UI v5, @mux/mux-player-react, Prisma ORM, Clerk (auth) (013-layout-improvement-course-detail-page)
+- PostgreSQL via Prisma (Course model extension: `heroVideoPlaybackId`) (013-layout-improvement-course-detail-page)
 
 - TypeScript 5.x, Next.js 15.5.6, React 18+ + MUI v5+, Clerk (auth), Rollbar (monitoring), Prisma
   (ORM)
@@ -64,9 +66,9 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
+- 013-layout-improvement-course-detail-page: Added TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Material-UI v5, @mux/mux-player-react, Prisma ORM, Clerk (auth)
 - 016-course-assignments: Added TypeScript 5.x with Next.js 15.5.6 (App Router) + React 18, Material-UI v5, Clerk auth, Prisma ORM, Mux video SDK/API, Rollbar monitoring
 - 015-course-locations: Added TypeScript 5+, Next.js 15.5.6 (App Router), React 18+ + MUI v5, Clerk (auth), Prisma (ORM), React Leaflet, Leafle
-- 014-create-an-admin: Added TypeScript 5+ with Next.js 15.5.6 (App Router) + React 18+, Material-UI v5, Clerk (auth), Prisma (ORM), Rollbar (monitoring)
 
   skeleton, webpack cache fix)
 

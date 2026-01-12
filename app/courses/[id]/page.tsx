@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import CourseDetail from '../../../components/CourseDetail';
+import type { CourseDetailCourse } from '../../../components/course-detail';
+import { CourseDetailLayout } from '../../../components/course-detail';
 import { getCourseById, getCourseBySlug } from '../../../lib/api/courses';
 import {
   CourseNotFoundError,
@@ -20,6 +21,23 @@ export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+/**
+ * Map API level string to typed level
+ */
+function mapLevel(
+  level: string | null | undefined
+): 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' {
+  const normalizedLevel = level?.toUpperCase();
+  if (
+    normalizedLevel === 'BEGINNER' ||
+    normalizedLevel === 'INTERMEDIATE' ||
+    normalizedLevel === 'ADVANCED'
+  ) {
+    return normalizedLevel;
+  }
+  return 'BEGINNER'; // Default
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {
@@ -131,6 +149,33 @@ export default async function CourseDetailPage({ params }: PageProps) {
     courseSchema,
   ];
 
+  // Map course data to CourseDetailLayout format
+  const courseForLayout: CourseDetailCourse = {
+    id: course.id,
+    title: course.title,
+    slug: course.slug,
+    description: course.description,
+    level: mapLevel(course.level),
+    // heroVideoPlaybackId not yet in DB - will be added after migration
+    heroVideoPlaybackId:
+      (course as { heroVideoPlaybackId?: string | null }).heroVideoPlaybackId ??
+      null,
+    thumbnailUrl: course.thumbnailUrl ?? null,
+    instructor: course.instructor ?? null,
+    price: course.price,
+    currency: course.currency || 'EUR',
+    startDate: course.startDate ?? null,
+    startTime: course.startTime ?? null,
+    endTime: course.endTime ?? null,
+    location: course.location
+      ? { name: course.location.name, city: course.location.city }
+      : null,
+    // These will come from extended course data in future
+    learningObjectives: [],
+    curriculumModules: [],
+    testimonials: [],
+  };
+
   return (
     <>
       {schemas.map((schema, index) => (
@@ -140,10 +185,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       ))}
-      <CourseDetail
-        course={course}
-        bookNowHref={`/checkout?courseId=${encodeURIComponent(course.slug || course.id)}`}
-      />
+      <CourseDetailLayout course={courseForLayout} />
     </>
   );
 }

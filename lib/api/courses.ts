@@ -47,6 +47,7 @@ export interface Course {
   location?: CourseLocation | null;
   thumbnailUrl?: string | null;
   instructor?: string | null;
+  heroVideoPlaybackId?: string | null;
 }
 
 export interface CourseWithSEO extends Course {

@@ -3,9 +3,12 @@ import type { Config } from 'jest';
 const config: Config = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-  extensionsToTreatAsEsm: ['.ts'],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transform: {
-    '^.+\\.ts$': ['ts-jest', { useESM: true }],
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      { useESM: true, tsconfig: { jsx: 'react-jsx' } },
+    ],
   },
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
@@ -14,6 +17,7 @@ const config: Config = {
   transformIgnorePatterns: [],
   testMatch: [
     '<rootDir>/tests/unit/**/*.spec.ts',
+    '<rootDir>/tests/unit/**/*.spec.tsx',
     '<rootDir>/tests/contracts/**/*.spec.ts',
   ],
   testPathIgnorePatterns: [

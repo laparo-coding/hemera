@@ -67,14 +67,34 @@ strengths."**
 
 ### Scope Definition
 
+---
+
+## Clarifications
+
+### Session 2026-01-08
+
+- Q: How should the mobile booking CTA be positioned? → A: Keep current implementation (inline only, no fixed CTA)
+- Q: What rating format should testimonials use? → A: Success indicator text (e.g., "Salary increase achieved")
+- Q: How should VAT information be displayed with the price? → A: Price incl. VAT with hint "inkl. 19% MwSt."
+- Q: How should curriculum modules display time information? → A: Tabular format with time slots (e.g., "09:00 - 09:20 Introduction")
+- Q: Should prev/next course navigation be implemented? → A: No, only optimize course detail page, no additional navigation
+- Q: Should video content be included in the hero section? → A: Yes, hero section plays video content via Mux
+- Q: Should the course detail page use full width? → A: Yes, full-width layout
+- Q: Should booking CTAs be placed at multiple positions? → A: Yes, CTAs in various sections for quick booking
+
+---
+
 - ✅ **In Scope**:
   - Course detail page layout redesign
+  - Full-width page layout (edge-to-edge design)
   - Course information presentation
   - Curriculum display
   - Date and pricing presentation
-  - Booking CTA styling
+  - Multiple booking CTAs throughout the page
   - Testimonials section
   - Responsive design for all breakpoints
+  - Hero video player with autoplay (muted) via Mux
+  - Database field `heroVideoPlaybackId` for Mux Playback ID
 - ❌ **Out of Scope**:
   - Booking flow changes (already implemented)
   - Course content changes
@@ -156,7 +176,7 @@ strengths."**
 - Mobile layout is optimized for vertical scrolling
 - Key information is above the fold
 - Text is readable without zooming
-- Booking CTA is fixed or easily accessible
+- Booking CTA is inline and easily accessible (consistent with current implementation)
 - Page loads within 2s on 4G connection
 
 ---
@@ -174,14 +194,29 @@ strengths."**
 2. Show course level indicator (A/B/C) with color coding
 3. Present key value proposition or tagline
 4. Include course category (e.g., "Verhandlungstraining")
-5. Display hero image or pattern background in cream/petrol
+5. Display hero video or fallback image/pattern background in cream/petrol
+6. Video autoplays muted with play/pause controls
+7. On mobile: Show poster image, video loads on user interaction
+
+**Video Requirements**:
+- Provider: Mux (already integrated in project for Feature 016)
+- Embedding: Mux Player SDK (@mux/mux-player-react)
+- Autoplay: Yes, muted by default (browser policy compliant)
+- Controls: Play/pause overlay, mute/unmute toggle
+- Fallback: Static hero image if video unavailable or on slow connection
+- Streaming: Adaptive Bitrate (HLS) via Mux
+- Aspect Ratio: 16:9 or 21:9 (cinematic)
+- Max Duration: 15-30 seconds (loop)
+- Playback ID: From course data (new field `heroVideoPlaybackId`)
 
 **Success Criteria**:
 
 - Hero section renders with premium styling
+- Video plays smoothly without blocking page load
 - Level indicator matches course type
-- Typography hierarchy is clear
+- Typography hierarchy is clear (text overlay on video)
 - Mobile and desktop layouts optimized
+- Fallback image displays if video fails to load
 
 ### FR-002: Course Overview Section
 
@@ -209,11 +244,19 @@ strengths."**
 **Preconditions**: Curriculum data structured  
 **Main Flow**:
 
-1. Display curriculum organized by modules/sessions
-2. Show module titles with expand/collapse functionality
-3. List topics covered in each module
-4. Include time estimates per module
+1. Display curriculum as tabular schedule with time slots
+2. Format: "HH:MM - HH:MM [Thema]" (e.g., "09:00 - 09:20 Vorstellungsrunde")
+3. Show module titles with expand/collapse functionality
+4. Group topics by session/day if multiple days
 5. Apply premium Paper component styling
+
+**Example Format**:
+```
+09:00 - 09:20  Vorstellungsrunde
+09:20 - 10:00  Vorbereitungen besprechen
+10:00 - 10:15  Pause
+10:15 - 12:00  Verhandlungstechniken
+```
 
 **Success Criteria**:
 
@@ -231,7 +274,7 @@ strengths."**
 
 1. Display upcoming dates in chronological order
 2. Show format (online/in-person) and time for each date
-3. Display price prominently with VAT information
+3. Display price prominently with "inkl. 19% MwSt." hint
 4. Include booking CTA for each available date
 5. Show "Ausgebucht" (sold out) state when applicable
 
@@ -251,7 +294,7 @@ strengths."**
 
 1. Display 2-4 testimonials with names and titles
 2. Include photo placeholders with sage background
-3. Show ratings or success indicators
+3. Show success indicator text per testimonial (e.g., "Gehaltserhöhung erreicht", "Beförderung erhalten")
 4. Rotate testimonials or show selected highlights
 
 **Success Criteria**:
@@ -261,55 +304,89 @@ strengths."**
 - Layout integrates seamlessly with design system
 - Content builds trust and confidence
 
-### FR-006: Booking CTA Section
+### FR-006: Multiple Booking CTAs
 
-**Description**: Primary call-to-action for course booking  
+**Description**: Booking buttons strategically placed throughout the page for quick conversion  
 **Actors**: All visitors  
 **Preconditions**: User viewing course details  
 **Main Flow**:
 
-1. Display prominent booking button with gold background
-2. Show next available date inline with CTA
-3. Include secondary link to view all dates
-4. Maintain existing booking flow integration
+1. Display primary CTA in hero section (after video/title)
+2. Place secondary CTA after curriculum section
+3. Include CTA after testimonials section
+4. Show final CTA at page bottom with pricing summary
+5. All CTAs use consistent gold background styling
+6. Each CTA shows next available date and price
+
+**CTA Placement Strategy**:
+| Position | Trigger | CTA Style |
+|----------|---------|------------|
+| Hero (below title) | Immediate interest | Primary (large) |
+| After Curriculum | Convinced by content | Secondary (medium) |
+| After Testimonials | Social proof convinced | Secondary (medium) |
+| Page Bottom | Final decision point | Primary (large) with price summary |
 
 **Success Criteria**:
 
-- CTA is visible on all screen sizes
-- Button follows Hemera design system (gold, petrol text)
+- CTAs are visible at natural decision points
+- User can book from any section without scrolling far
+- All buttons follow Hemera design system (gold, petrol text)
 - Click initiates existing booking flow
 - Loading states provide feedback
 
-### FR-007: Navigation and Breadcrumbs
+### FR-007: Navigation (Keep Existing)
 
-**Description**: Context navigation for course detail pages  
+**Description**: Existing navigation behavior remains unchanged  
 **Actors**: All visitors  
 **Preconditions**: User on course detail page  
 **Main Flow**:
 
-1. Show breadcrumb navigation (Home → Courses → [Course Name])
-2. Include link back to landing page course section
-3. Provide next/previous course navigation
-4. Maintain premium navigation design from landing page
+1. Maintain existing browser back navigation
+2. Keep existing header navigation from landing page
+3. No new breadcrumb or prev/next course navigation
 
 **Success Criteria**:
 
-- Breadcrumbs help orientation
-- Navigation follows design system
-- Mobile navigation is optimized
-- Back navigation maintains context
+- Navigation follows existing patterns
+- No breaking changes to current navigation flow
+- Focus remains on course detail page styling only
 
-### FR-008: Responsive Layout
+### FR-008: Full-Width Responsive Layout
 
-**Description**: Optimized layouts for all device sizes  
+**Description**: Edge-to-edge layout optimized for all device sizes  
 **Actors**: All visitors  
 **Preconditions**: Course page loaded  
 **Main Flow**:
 
-1. Desktop: Two-column layout with sidebar for dates/CTA
-2. Tablet: Single column with stacked sections
-3. Mobile: Vertical stack with fixed CTA
-4. Maintain readability and hierarchy across breakpoints
+1. Hero section: Full viewport width (edge-to-edge)
+2. Content sections: Full width with max-width constraint for readability
+3. Alternating section backgrounds (cream/white) for visual separation
+4. Desktop: Wide content area, no sidebar
+5. Tablet: Full width with appropriate padding
+6. Mobile: Vertical stack with inline CTAs
+7. Maintain readability and hierarchy across breakpoints
+
+**Layout Structure**:
+```
+┌────────────────────────────────────────┐
+│          HERO (Full Width + Video)     │
+│          [Title] [Level Badge]         │
+│          [CTA: Jetzt buchen]           │
+├────────────────────────────────────────┤
+│          OVERVIEW SECTION              │
+│          (max-width: 1200px centered)  │
+├────────────────────────────────────────┤
+│          CURRICULUM SECTION            │
+│          [CTA: Jetzt buchen]           │
+├────────────────────────────────────────┤
+│          DATES & PRICING               │
+├────────────────────────────────────────┤
+│          TESTIMONIALS                  │
+│          [CTA: Jetzt buchen]           │
+├────────────────────────────────────────┤
+│          FINAL CTA + PRICE SUMMARY     │
+└────────────────────────────────────────┘
+```
 
 **Success Criteria**:
 
@@ -397,13 +474,13 @@ strengths."**
 
 ## Design System Reference
 
-### Color Palette (From 010-layout-improvement)
+### Color Palette (From lib/theme.ts)
 
 ```css
---cream: #fbf5dd; /* Background */
---petrol: #16404d; /* Primary text, headings */
---gold: #e8b65c; /* CTAs, accents */
---sage: #bec7be; /* Secondary accents, borders */
+--cream: #FBF5DD; /* Background */
+--petrol: #16404D; /* Primary text, headings */
+--gold: #DDA853; /* CTAs, accents */
+--sage: #A6CDC6; /* Secondary accents, borders */
 ```
 
 ### Typography (From 010-layout-improvement)

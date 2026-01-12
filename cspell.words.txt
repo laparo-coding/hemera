@@ -9,6 +9,7 @@ Aufgaben
 Ausgewählte
 Authentifizierung
 Authentifizierungsbasierte
+Autoplay
 Autorisierungsfehler
 Beispiele
 Benutzerkonto
@@ -208,6 +209,8 @@ anwenden
 aufgetreten
 authentifiziert
 autoincrement
+autoplay
+autoplays
 availableSpots
 basierend
 bearbeiten
@@ -374,14 +377,17 @@ superheader
 tacticlaunch
 teilnehmerspezifische
 telehphone
+termin
 testid
 theming
 timeframe
 tracken
+trainerin
 ttfb
 ubungsraum
 underlinenav
 underspecified
+unmute
 unpublishing
 unsere
 unseren

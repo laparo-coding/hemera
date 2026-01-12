@@ -25,11 +25,16 @@
     ]
   },
   "include": [
+    "video.d.ts",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "scripts/e2e-seed.ts"]
+  "exclude": [
+    "node_modules",
+    "scripts/e2e-seed.ts",
+    "tests/unit/components/**/*.spec.tsx"
+  ]
 }
