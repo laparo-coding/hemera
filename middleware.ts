@@ -10,8 +10,11 @@ const isE2EMode =
 // Prepare a Clerk middleware instance for non-E2E mode
 const clerkMw = clerkMiddleware();
 
-// Custom proxy to enforce legacy redirects and then delegate to Clerk (when enabled)
-export default function proxy(request: NextRequest, event: NextFetchEvent) {
+// Custom middleware to enforce legacy redirects and then delegate to Clerk (when enabled)
+export default function middleware(
+  request: NextRequest,
+  event: NextFetchEvent
+) {
   const { pathname } = request.nextUrl;
 
   // Legacy redirect: consolidate all /protected/* to /dashboard (before any auth handling)
