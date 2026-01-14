@@ -50,6 +50,7 @@ model Course {
   location      Location?           @relation(fields: [locationId], references: [id])
   bookings      Booking[]
   summaryAssets CourseSummaryAsset[]
+  testimonials  Testimonial[]
 
   @@index([startDate])
   @@map("courses")
@@ -74,6 +75,7 @@ model Booking {
   updatedAt             DateTime             @updatedAt @map("updated_at")
   course                Course               @relation(fields: [courseId], references: [id], onDelete: Cascade)
   user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testimonial           Testimonial?
   participation         CourseParticipation?
 
   @@unique([userId, courseId])
@@ -126,6 +128,22 @@ enum ParticipationStatus {
 enum SummaryAssetSource {
   COURSE_DEFAULT
   BOOKING_OVERRIDE
+}
+
+// TESTIMONIAL MANAGEMENT (017-testimonial-management)
+
+enum NameDisplayFormat {
+  FULL_NAME_CITY
+  FULL_NAME
+  FIRST_INITIAL
+  FIRST_NAME_ONLY
+}
+
+enum TestimonialStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  HIDDEN
 }
 
 model CourseParticipation {
@@ -216,4 +234,26 @@ model ParticipationSummaryOverride {
 
   @@index([participationId, sortOrder])
   @@map("participation_summary_overrides")
+}
+
+// TESTIMONIALS (017-testimonial-management)
+
+model Testimonial {
+  id                String            @id @default(cuid())
+  bookingId         String            @unique @map("booking_id")
+  courseId          String            @map("course_id")
+  statement         String            @db.VarChar(1000)
+  nameDisplayFormat NameDisplayFormat @map("name_display_format")
+  cachedDisplayName String            @map("cached_display_name")
+  cachedPhotoUrl    String?           @map("cached_photo_url")
+  cachedCity        String?           @map("cached_city")
+  status            TestimonialStatus @default(DRAFT)
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  booking           Booking           @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  course            Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId, status])
+  @@map("testimonials")
 }

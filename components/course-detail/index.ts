@@ -30,3 +30,5 @@ export type {
   TestimonialsSectionProps,
 } from './TestimonialsSection';
 export { TestimonialsSection } from './TestimonialsSection';
+export type { DynamicTestimonialsSectionProps } from './DynamicTestimonialsSection';
+export { DynamicTestimonialsSection } from './DynamicTestimonialsSection';

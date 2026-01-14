@@ -164,6 +164,22 @@ export default async function AdminPage() {
           <Card>
             <CardContent>
               <Typography variant='h6' gutterBottom>
+                Erfahrungsberichte
+              </Typography>
+              <Typography variant='body2' color='text.secondary' paragraph>
+                Prüfe und gib Erfahrungsberichte von Teilnehmern frei.
+              </Typography>
+              <Button variant='contained' fullWidth href='/admin/testimonials'>
+                Erfahrungsberichte verwalten
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant='h6' gutterBottom>
                 System Settings
               </Typography>
               <Typography variant='body2' color='text.secondary' paragraph>

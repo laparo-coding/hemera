@@ -14,8 +14,8 @@ import { CourseOverviewSection } from './CourseOverviewSection';
 import type { CurriculumModule } from './CurriculumSection';
 import { CurriculumSection } from './CurriculumSection';
 import { DatesPricingSection } from './DatesPricingSection';
+import { DynamicTestimonialsSection } from './DynamicTestimonialsSection';
 import type { Testimonial } from './TestimonialsSection';
-import { TestimonialsSection } from './TestimonialsSection';
 
 export interface CourseDetailCourse {
   id: string;
@@ -93,8 +93,8 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
         courseSlug={courseSlug}
       />
 
-      {/* 5. Testimonials Section - Dark background */}
-      <TestimonialsSection testimonials={course.testimonials || []} />
+      {/* 5. Testimonials Section - Dynamic from database */}
+      <DynamicTestimonialsSection courseSlug={courseSlug} />
 
       {/* 6. Final CTA Banner - Full-width gold */}
       <BookingCTA
