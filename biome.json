@@ -16,7 +16,8 @@
       "!**/test-results",
       "!**/coverage",
       "!**/lib/generated",
-      "!**/*.d.ts"
+      "!**/*.d.ts",
+      "!**/package-lock.json"
     ]
   },
   "formatter": {

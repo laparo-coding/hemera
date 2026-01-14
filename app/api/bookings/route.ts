@@ -19,8 +19,8 @@ type BookingRecord = {
   id: string;
   courseId: string;
   paymentStatus: PaymentStatus;
-  amount: number | null;
-  currency: string | null;
+  amount: number;
+  currency: string;
   createdAt: Date;
   course?: {
     title: string | null;
