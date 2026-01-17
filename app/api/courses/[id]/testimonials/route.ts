@@ -2,7 +2,7 @@
  * Public Course Testimonials API Route
  * Feature: 017-testimonial-management
  *
- * GET /api/courses/[slug]/testimonials - Get published testimonials for a course
+ * GET /api/courses/[id]/testimonials - Get published testimonials for a course
  */
 
 import type { NextRequest } from 'next/server';
@@ -20,31 +20,40 @@ import {
 } from '@/lib/utils/request-id';
 
 interface RouteParams {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }
 
 /**
- * GET /api/courses/[slug]/testimonials
+ * GET /api/courses/[id]/testimonials
  * Get published testimonials for a course (public)
+ * Accepts either course ID (cuid) or slug
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { slug } = await params;
+  const { id } = await params;
   const requestId = getOrCreateRequestId(request);
   const context = createRequestContext(
     requestId,
     'GET',
-    `/api/courses/${slug}/testimonials`
+    `/api/courses/${id}/testimonials`
   );
   const logger = createApiLogger(context);
 
   try {
-    logger.info('Fetching course testimonials', { slug });
+    logger.info('Fetching course testimonials', { courseIdOrSlug: id });
 
-    // First get the course by slug
-    const course = await prisma.course.findUnique({
-      where: { slug },
+    // Try to find course by ID first, then by slug
+    let course = await prisma.course.findUnique({
+      where: { id },
       select: { id: true },
     });
+
+    if (!course) {
+      // Try by slug
+      course = await prisma.course.findUnique({
+        where: { slug: id },
+        select: { id: true },
+      });
+    }
 
     if (!course) {
       return createErrorResponse(
@@ -68,7 +77,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     );
 
     logger.info('Successfully fetched course testimonials', {
-      slug,
+      courseId: course.id,
       count: testimonials.length,
     });
 
