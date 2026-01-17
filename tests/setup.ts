@@ -81,11 +81,18 @@ beforeAll(async () => {
       env: { ...process.env, DATABASE_URL: connectionUri },
     });
 
+    // Clear Node.js require cache for Prisma Client to pick up regenerated client
+    // This ensures the seed script uses the freshly generated client
+    Object.keys(require.cache).forEach(key => {
+      if (key.includes('@prisma/client') || key.includes('prisma/client')) {
+        delete require.cache[key];
+      }
+    });
+
     // Seed the database (ensure published courses exist for E2E)
-    // Note: We run the seed script directly instead of `npm run db:seed` to avoid
-    // dotenv overwriting the DATABASE_URL set by testcontainers
+    // Note: We run the seed script directly with tsx --no-cache to ensure fresh imports
     try {
-      execSync('npx tsx prisma/seed.ts', {
+      execSync('npx tsx --no-cache prisma/seed.ts', {
         stdio: 'inherit',
         env: { ...process.env, DATABASE_URL: connectionUri },
       });
