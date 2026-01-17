@@ -73,6 +73,14 @@ beforeAll(async () => {
       stdio: 'inherit',
       env: { ...process.env, DATABASE_URL: connectionUri },
     });
+
+    // Regenerate Prisma Client to ensure it matches the migrated schema
+    // This is necessary because the installed client may not include new columns
+    execSync('npx prisma generate', {
+      stdio: 'inherit',
+      env: { ...process.env, DATABASE_URL: connectionUri },
+    });
+
     // Seed the database (ensure published courses exist for E2E)
     // Note: We run the seed script directly instead of `npm run db:seed` to avoid
     // dotenv overwriting the DATABASE_URL set by testcontainers
