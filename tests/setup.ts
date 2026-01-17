@@ -74,14 +74,15 @@ beforeAll(async () => {
       env: { ...process.env, DATABASE_URL: connectionUri },
     });
     // Seed the database (ensure published courses exist for E2E)
+    // Note: We run the seed script directly instead of `npm run db:seed` to avoid
+    // dotenv overwriting the DATABASE_URL set by testcontainers
     try {
-      // Prefer using the project's db:seed script (which uses ts-node), fallback to prisma db seed
-      execSync('npm run db:seed', {
+      execSync('npx tsx prisma/seed.ts', {
         stdio: 'inherit',
         env: { ...process.env, DATABASE_URL: connectionUri },
       });
     } catch (_err) {
-      // If npm script fails, fallback to direct prisma seed
+      // If direct tsx fails, fallback to prisma db seed
       execSync('npx prisma db seed', {
         stdio: 'inherit',
         env: { ...process.env, DATABASE_URL: connectionUri },
