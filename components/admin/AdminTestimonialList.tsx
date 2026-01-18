@@ -64,40 +64,54 @@ export default function AdminTestimonialList() {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchTestimonials = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null); // Clear previous errors on new fetch
-      const params = new URLSearchParams({
-        limit: String(ITEMS_PER_PAGE),
-        offset: String((page - 1) * ITEMS_PER_PAGE),
-      });
-      if (statusFilter) {
-        params.set('status', statusFilter);
+  const fetchTestimonials = useCallback(
+    async (signal?: AbortSignal) => {
+      try {
+        setLoading(true);
+        setError(null); // Clear previous errors on new fetch
+        const params = new URLSearchParams({
+          limit: String(ITEMS_PER_PAGE),
+          offset: String((page - 1) * ITEMS_PER_PAGE),
+        });
+        if (statusFilter) {
+          params.set('status', statusFilter);
+        }
+
+        const response = await fetch(`/api/admin/testimonials?${params}`, {
+          signal,
+        });
+        if (!response.ok) {
+          throw new Error('Fehler beim Laden');
+        }
+
+        const data: AdminTestimonialsApiResponse = await response.json();
+        setTestimonials(data.data.testimonials);
+        setTotal(data.data.pagination.total);
+      } catch (err) {
+        // Ignore aborted requests
+        if (err instanceof Error && err.name === 'AbortError') {
+          return;
+        }
+        setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+      } finally {
+        setLoading(false);
       }
+    },
+    [page, statusFilter]
+  );
 
-      const response = await fetch(`/api/admin/testimonials?${params}`);
-      if (!response.ok) {
-        throw new Error('Fehler beim Laden');
-      }
-
-      const data: AdminTestimonialsApiResponse = await response.json();
-      setTestimonials(data.data.testimonials);
-      setTotal(data.data.pagination.total);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
-    } finally {
-      setLoading(false);
-    }
-  }, [page, statusFilter]);
-
-  // Debounced fetch effect to reduce rapid re-requests
+  // Debounced fetch effect with abort support
   useEffect(() => {
+    const controller = new AbortController();
+
     const debounceTimer = setTimeout(() => {
-      fetchTestimonials();
+      fetchTestimonials(controller.signal);
     }, 150);
 
-    return () => clearTimeout(debounceTimer);
+    return () => {
+      clearTimeout(debounceTimer);
+      controller.abort();
+    };
   }, [fetchTestimonials]);
 
   async function updateStatus(id: string, newStatus: TestimonialStatus) {
