@@ -27,7 +27,7 @@ export interface CourseDetailCourse {
   heroVideoPlaybackId: string | null;
   thumbnailUrl?: string | null;
   instructor: string | null;
-  price: number | null;
+  price: number;
   currency: string;
   startDate: Date | null;
   startTime: Date | null;
@@ -83,7 +83,7 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
 
       {/* 4. Dates & Pricing Section */}
       <DatesPricingSection
-        price={course.price || 0}
+        price={course.price}
         currency={course.currency || 'EUR'}
         startDate={course.startDate}
         startTime={course.startTime}
@@ -101,7 +101,7 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
         courseId={course.id}
         courseSlug={courseSlug}
         variant='banner'
-        price={course.price || undefined}
+        price={course.price}
         currency={course.currency}
       />
     </Box>

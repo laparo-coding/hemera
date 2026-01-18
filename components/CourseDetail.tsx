@@ -37,7 +37,7 @@ interface Course {
   title: string;
   description: string | null;
   slug: string;
-  price: number | null;
+  price: number;
   currency: string;
   capacity?: number | null;
   startDate?: Date | null;

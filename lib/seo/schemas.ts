@@ -157,7 +157,7 @@ export function generateCourseSchema(course: {
   slug?: string | null;
   title: string;
   description?: string | null;
-  price?: number | null;
+  price: number;
 }) {
   const courseSlug = course.slug ?? course.id;
   return {
@@ -178,7 +178,7 @@ export function generateCourseSchema(course: {
     offers: {
       '@type': 'Offer',
       // Prices are stored in cents, convert to euros for schema.org
-      price: course.price ? (course.price / 100).toString() : '0',
+      price: (course.price / 100).toString(),
       priceCurrency: 'EUR',
       availability: 'https://schema.org/InStock',
     },
@@ -207,7 +207,7 @@ export const SCHEMA_COMBINATIONS = {
       slug?: string | null;
       title: string;
       description?: string | null;
-      price?: number | null;
+      price: number;
     }> = []
   ) => [
     generateOrganizationSchema(),

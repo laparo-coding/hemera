@@ -11,7 +11,7 @@ export interface Course {
   title: string;
   description: string | null;
   slug: string;
-  price: number | null;
+  price: number;
   currency: string;
   capacity?: number | null;
   startDate?: Date | null;
@@ -218,8 +218,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
               className='text-2xl font-bold text-gray-900'
               data-testid='course-price'
             >
-              {course.price && Number(course.price) > 0
-                ? (Number(course.price) / 100).toLocaleString('de-DE', {
+              {course.price > 0
+                ? (course.price / 100).toLocaleString('de-DE', {
                     style: 'currency',
                     currency: course.currency,
                   })
