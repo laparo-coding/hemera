@@ -13,8 +13,8 @@
 
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
+import { getCurrentUserWithSync } from '../api/users';
 import {
   completeDebriefingStep,
   completePreparationStep,
@@ -97,11 +97,8 @@ export type {
 async function verifyParticipationOwnership(
   bookingId: string
 ): Promise<{ userId: string; participation: ParticipationWithRelations }> {
-  const { userId } = await auth();
-
-  if (!userId) {
-    throw new Error('Nicht authentifiziert');
-  }
+  const syncedUser = await getCurrentUserWithSync();
+  const userId = syncedUser.id;
 
   const participation = await getParticipationByBookingId(bookingId);
 
@@ -133,11 +130,8 @@ async function verifyParticipationOwnership(
  */
 export const getMyEnrollmentsAction = withServerActionErrorHandling(
   async (): Promise<CourseEnrollment[]> => {
-    const { userId } = await auth();
-
-    if (!userId) {
-      throw new Error('Nicht authentifiziert');
-    }
+    const syncedUser = await getCurrentUserWithSync();
+    const userId = syncedUser.id;
 
     // Get all paid/confirmed bookings for the user
     const bookings = await prisma.booking.findMany({
@@ -191,11 +185,8 @@ export const getMyEnrollmentsAction = withServerActionErrorHandling(
  */
 export const startParticipationAction = withParameterizedServerAction(
   async (bookingId: string): Promise<ParticipationSummary> => {
-    const { userId } = await auth();
-
-    if (!userId) {
-      throw new Error('Nicht authentifiziert');
-    }
+    const syncedUser = await getCurrentUserWithSync();
+    const userId = syncedUser.id;
 
     // Check if booking exists and belongs to user
     const booking = await prisma.booking.findUnique({
@@ -261,11 +252,8 @@ export const startParticipationAction = withParameterizedServerAction(
  */
 export const getMyParticipationsAction = withServerActionErrorHandling(
   async (): Promise<ParticipationSummary[]> => {
-    const { userId } = await auth();
-
-    if (!userId) {
-      throw new Error('Nicht authentifiziert');
-    }
+    const syncedUser = await getCurrentUserWithSync();
+    const userId = syncedUser.id;
 
     const participations = await getParticipationsByUserId(userId);
 

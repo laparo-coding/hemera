@@ -5,9 +5,9 @@
  * PUT - Update debriefing data (save/complete)
  */
 
-import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getCurrentUserWithSync } from '@/lib/api/users';
 import {
   completeDebriefingStep,
   getParticipationByBookingId,
@@ -30,10 +30,8 @@ export async function GET(
   { params }: { params: Promise<{ bookingId: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-    }
+    const syncedUser = await getCurrentUserWithSync();
+    const userId = syncedUser.id;
 
     const { bookingId } = await params;
     if (!bookingId) {
@@ -89,10 +87,8 @@ export async function PUT(
   { params }: { params: Promise<{ bookingId: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-    }
+    const syncedUser = await getCurrentUserWithSync();
+    const userId = syncedUser.id;
 
     const { bookingId } = await params;
     if (!bookingId) {

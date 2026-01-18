@@ -4,11 +4,10 @@
  * Tests for authorization, data normalization, and Rollbar logging paths.
  */
 
-import { auth } from '@clerk/nextjs/server';
-
-// Mock Clerk auth
-jest.mock('@clerk/nextjs/server', () => ({
-  auth: jest.fn(),
+// Mock getCurrentUserWithSync from users API
+const mockGetCurrentUserWithSync = jest.fn();
+jest.mock('@/lib/api/users', () => ({
+  getCurrentUserWithSync: () => mockGetCurrentUserWithSync(),
 }));
 
 // Mock Prisma
@@ -70,9 +69,8 @@ import {
   saveResultAction,
 } from '@/lib/actions/participation';
 import { prisma } from '@/lib/db/prisma';
+import { UserNotFoundError } from '@/lib/errors';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
-
-const mockAuth = auth as jest.MockedFunction<typeof auth>;
 
 // Mock participation data
 const mockParticipation = {
@@ -117,18 +115,24 @@ describe('Participation Server Actions', () => {
 
   describe('Authorization', () => {
     it('returns error when user is not authenticated', async () => {
-      mockAuth.mockResolvedValue({ userId: null } as any);
+      // Simulate unauthenticated user by throwing UserNotFoundError
+      mockGetCurrentUserWithSync.mockRejectedValue(
+        new UserNotFoundError('No authenticated user found')
+      );
 
       const result = await savePreparationAction('booking-123', {
         preparationIntent: 'Test intent',
       });
 
       expect(result.success).toBe(false);
-      expect(result.error?.message).toContain('authentifiziert');
+      expect(result.error?.message).toContain('authenticated');
     });
 
     it('returns error when participation is not found', async () => {
-      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue(
         null
       );
@@ -142,7 +146,10 @@ describe('Participation Server Actions', () => {
     });
 
     it('returns error when user does not own the participation', async () => {
-      mockAuth.mockResolvedValue({ userId: 'other-user-456' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'other-user-456',
+        email: 'other@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue({
         ...mockParticipation,
         booking: {
@@ -164,7 +171,10 @@ describe('Participation Server Actions', () => {
     });
 
     it('succeeds when user owns the participation', async () => {
-      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue(
         mockParticipation
       );
@@ -182,7 +192,10 @@ describe('Participation Server Actions', () => {
 
   describe('Data normalization', () => {
     it('saves preparation data correctly', async () => {
-      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue(
         mockParticipation
       );
@@ -207,7 +220,10 @@ describe('Participation Server Actions', () => {
     });
 
     it('saves debriefing data correctly', async () => {
-      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue({
         ...mockParticipation,
         status: 'DEBRIEFING',
@@ -231,7 +247,10 @@ describe('Participation Server Actions', () => {
     });
 
     it('saves result data correctly', async () => {
-      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue({
         ...mockParticipation,
         status: 'RESULT',
@@ -257,7 +276,10 @@ describe('Participation Server Actions', () => {
 
   describe('Rollbar logging', () => {
     it('logs info on successful preparation save', async () => {
-      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue(
         mockParticipation
       );
@@ -280,7 +302,10 @@ describe('Participation Server Actions', () => {
     });
 
     it('logs info on preparation step completion', async () => {
-      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue(
         mockParticipation
       );
@@ -302,7 +327,10 @@ describe('Participation Server Actions', () => {
     });
 
     it('logs error on failure', async () => {
-      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockRejectedValue(
         new Error('Database error')
       );
@@ -321,7 +349,10 @@ describe('Participation Server Actions', () => {
 
   describe('Step completion', () => {
     it('completes preparation and advances status', async () => {
-      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      mockGetCurrentUserWithSync.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+      });
       (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue(
         mockParticipation
       );
