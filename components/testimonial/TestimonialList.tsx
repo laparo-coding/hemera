@@ -7,7 +7,10 @@
 
 import { Alert, Box, Grid, Skeleton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import type { PublicTestimonialApiResponse } from '@/lib/types/testimonial';
+import type {
+  CourseTestimonialsApiResponse,
+  PublicTestimonialApiResponse,
+} from '@/lib/types/testimonial';
 import TestimonialCard from './TestimonialCard';
 
 interface TestimonialListProps {
@@ -43,7 +46,7 @@ export default function TestimonialList({
           throw new Error('Fehler beim Laden');
         }
 
-        const data = await response.json();
+        const data: CourseTestimonialsApiResponse = await response.json();
         setTestimonials(data.data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unbekannter Fehler');

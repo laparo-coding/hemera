@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import {
+  type CourseTestimonialsApiResponse,
   getAvatarInitial,
   type PublicTestimonialApiResponse,
 } from '@/lib/types/testimonial';
@@ -58,7 +59,7 @@ export const DynamicTestimonialsSection: React.FC<
           throw new Error('Fehler beim Laden');
         }
 
-        const data = await response.json();
+        const data: CourseTestimonialsApiResponse = await response.json();
         setTestimonials(data.data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
