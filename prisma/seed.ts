@@ -1,11 +1,22 @@
-import { closeDb, prisma } from '../lib/db/prisma.js';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
 import {
   getDatabaseEnvironmentInfo,
   guardDestructiveOperation,
   isSafeForDestructiveOperations,
 } from '../lib/db/production-guard.js';
 
-// Use shared Prisma instance
+// Create a fresh Prisma client for seeding
+// This ensures we use the latest generated client without ESM module caching issues
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL environment variable is required for seeding');
+}
+
+const pool = new Pool({ connectionString: databaseUrl });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 // Helper function to convert old date format to new format
 function convertDateToFields(dateStr: string) {
@@ -174,5 +185,6 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await closeDb();
+    await prisma.$disconnect();
+    await pool.end();
   });
