@@ -29,6 +29,7 @@ export default function TestimonialList({
     async function fetchTestimonials() {
       try {
         setLoading(true);
+        setError(null); // Clear previous errors
         const response = await fetch(
           `/api/courses/${courseSlug}/testimonials?limit=${limit}`
         );

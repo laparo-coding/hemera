@@ -67,6 +67,7 @@ export default function AdminTestimonialList() {
   const fetchTestimonials = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null); // Clear previous errors on new fetch
       const params = new URLSearchParams({
         limit: String(ITEMS_PER_PAGE),
         offset: String((page - 1) * ITEMS_PER_PAGE),
