@@ -5,6 +5,7 @@
  * PATCH /api/admin/testimonials/[id] - Update testimonial status
  */
 
+import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
 import { requireAdmin } from '@/lib/auth/admin';
 import { adminUpdateTestimonialSchema } from '@/lib/schemas/testimonial-schema';
@@ -40,7 +41,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const logger = createApiLogger(context);
 
   try {
-    logger.info('Admin updating testimonial status', { testimonialId: id });
+    // Get admin user ID for audit trail
+    const { userId: adminId } = await auth();
+
+    logger.info('Admin updating testimonial status', {
+      testimonialId: id,
+      adminId,
+    });
 
     // Check admin authorization - throws if not admin
     try {
@@ -78,6 +85,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     logger.info('Successfully updated testimonial status', {
       testimonialId: id,
       newStatus: parseResult.data.status,
+      adminId,
     });
 
     // Transform to typed API response with serialized dates
