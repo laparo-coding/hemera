@@ -27,10 +27,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  type AdminTestimonialsApiResponse,
-  type TestimonialStatus,
-  type TestimonialWithCourseApiResponse,
+import type {
+  AdminTestimonialsApiResponse,
+  TestimonialStatus,
+  TestimonialWithCourseApiResponse,
 } from '@/lib/types/testimonial';
 import { getAvatarInitial } from '@/lib/utils/avatar';
 

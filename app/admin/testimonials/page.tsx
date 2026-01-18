@@ -15,12 +15,12 @@ export const metadata = {
 
 export default function AdminTestimonialsPage() {
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth='lg' sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+        <Typography variant='h4' component='h1' gutterBottom fontWeight='bold'>
           Erfahrungsberichte
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant='body1' color='text.secondary'>
           Prüfe und gib Erfahrungsberichte von Kursteilnehmern frei.
         </Typography>
       </Box>

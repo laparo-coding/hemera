@@ -25,10 +25,10 @@ export type {
 export { CurriculumSection } from './CurriculumSection';
 export type { DatesPricingSectionProps } from './DatesPricingSection';
 export { DatesPricingSection } from './DatesPricingSection';
+export type { DynamicTestimonialsSectionProps } from './DynamicTestimonialsSection';
+export { DynamicTestimonialsSection } from './DynamicTestimonialsSection';
 export type {
   Testimonial,
   TestimonialsSectionProps,
 } from './TestimonialsSection';
 export { TestimonialsSection } from './TestimonialsSection';
-export type { DynamicTestimonialsSectionProps } from './DynamicTestimonialsSection';
-export { DynamicTestimonialsSection } from './DynamicTestimonialsSection';

@@ -20,9 +20,9 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import {
-  type CourseTestimonialsApiResponse,
-  type PublicTestimonialApiResponse,
+import type {
+  CourseTestimonialsApiResponse,
+  PublicTestimonialApiResponse,
 } from '@/lib/types/testimonial';
 import { getAvatarInitial } from '@/lib/utils/avatar';
 import { formatMonthYear } from '@/lib/utils/date-format';

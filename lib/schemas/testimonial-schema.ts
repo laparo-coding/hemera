@@ -54,7 +54,9 @@ export const adminUpdateTestimonialSchema = z.object({
   status: testimonialStatusSchema,
 });
 
-export type AdminUpdateTestimonialInput = z.infer<typeof adminUpdateTestimonialSchema>;
+export type AdminUpdateTestimonialInput = z.infer<
+  typeof adminUpdateTestimonialSchema
+>;
 
 // Schema for filtering testimonials (API query params)
 export const testimonialFilterSchema = z.object({
@@ -103,7 +105,9 @@ export function formatDisplayName(
 ): string {
   switch (format) {
     case 'FULL_NAME_CITY':
-      return city ? `${firstName} ${lastName}, ${city}` : `${firstName} ${lastName}`;
+      return city
+        ? `${firstName} ${lastName}, ${city}`
+        : `${firstName} ${lastName}`;
     case 'FULL_NAME':
       return `${firstName} ${lastName}`;
     case 'FIRST_INITIAL':
