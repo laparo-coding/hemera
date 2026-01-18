@@ -32,7 +32,7 @@ type CourseSchemaInput = {
   slug?: string | null;
   title: string;
   description?: string | null;
-  price?: number | null;
+  price: number;
 };
 
 export default async function CoursesPage() {
