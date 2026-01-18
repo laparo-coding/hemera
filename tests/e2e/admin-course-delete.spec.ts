@@ -112,6 +112,7 @@ test.describe('Admin Course Delete Protection E2E', () => {
 
     const user = await prisma.user.create({
       data: {
+        id: `user_e2e_delete_student_${Date.now()}`,
         email: `e2e-delete-test-student-${Date.now()}@example.com`,
         name: 'E2E Test Student',
       },
@@ -162,12 +163,14 @@ test.describe('Admin Course Delete Protection E2E', () => {
     const users = await Promise.all([
       prisma.user.create({
         data: {
+          id: `user_e2e_student1_${Date.now()}`,
           email: `e2e-delete-test-student1-${Date.now()}@example.com`,
           name: 'Student One',
         },
       }),
       prisma.user.create({
         data: {
+          id: `user_e2e_student2_${Date.now()}`,
           email: `e2e-delete-test-student2-${Date.now()}@example.com`,
           name: 'Student Two',
         },
@@ -232,6 +235,7 @@ test.describe('Admin Course Delete Protection E2E', () => {
     // Create enrollment
     const user = await prisma.user.create({
       data: {
+        id: `user_e2e_transfer_${Date.now()}`,
         email: `e2e-delete-test-transfer-${Date.now()}@example.com`,
       },
     });
