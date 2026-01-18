@@ -3,9 +3,35 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import {
+  ReadableStream,
+  TransformStream,
+  WritableStream,
+} from 'node:stream/web';
+import { TextDecoder, TextEncoder } from 'node:util';
 import { afterAll, beforeAll } from '@jest/globals';
 import '@testing-library/jest-dom';
 import dotenv from 'dotenv';
+
+// Polyfill Web APIs for jsdom environment (required by testcontainers and other libraries)
+if (typeof globalThis.TextEncoder === 'undefined') {
+  globalThis.TextEncoder = TextEncoder;
+}
+if (typeof globalThis.TextDecoder === 'undefined') {
+  globalThis.TextDecoder = TextDecoder as typeof globalThis.TextDecoder;
+}
+if (typeof globalThis.ReadableStream === 'undefined') {
+  globalThis.ReadableStream =
+    ReadableStream as typeof globalThis.ReadableStream;
+}
+if (typeof globalThis.WritableStream === 'undefined') {
+  globalThis.WritableStream =
+    WritableStream as typeof globalThis.WritableStream;
+}
+if (typeof globalThis.TransformStream === 'undefined') {
+  globalThis.TransformStream =
+    TransformStream as typeof globalThis.TransformStream;
+}
 
 // Load env files eagerly so that DATABASE_URL is available before test files import PrismaClient
 (() => {
@@ -37,7 +63,15 @@ interface PostgresContainer {
 
 let container: PostgresContainer | undefined;
 
+// Detect jsdom environment - we skip database setup for DOM-only tests
+const isJsdomEnvironment = typeof window !== 'undefined';
+
 beforeAll(async () => {
+  // Skip database setup for jsdom tests (React component tests don't need DB)
+  if (isJsdomEnvironment) {
+    return;
+  }
+
   // If DATABASE_URL is now provided (e.g., via env files or CI secrets), use it as-is.
   if (process.env.DATABASE_URL) {
     return;
