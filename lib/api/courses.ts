@@ -11,6 +11,7 @@ import {
   DatabaseConnectionError,
   logError,
 } from '../errors';
+import { normalizeCurrency } from '../utils/currency';
 
 export interface CourseLocation {
   id: string;
@@ -122,7 +123,7 @@ export async function getPublishedCourses(): Promise<Course[]> {
           : null;
       return {
         ...course,
-        currency: course.currency || 'EUR',
+        currency: normalizeCurrency(course.currency),
         availableSpots,
         totalBookings,
         userBookingStatus: null,
@@ -186,7 +187,7 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
       description: course.description,
       slug: course.slug,
       price: course.price,
-      currency: course.currency || 'EUR',
+      currency: normalizeCurrency(course.currency),
       capacity: course.capacity ?? null,
       startDate: course.startDate ?? null,
       startTime: course.startTime ?? null,
@@ -264,7 +265,7 @@ export async function getCourseById(id: string): Promise<Course> {
 
     return {
       ...course,
-      currency: course.currency || 'EUR',
+      currency: normalizeCurrency(course.currency),
       availableSpots,
       totalBookings,
       userBookingStatus: null,
@@ -331,7 +332,7 @@ export async function getCourseBySlug(slug: string): Promise<Course> {
 
     return {
       ...course,
-      currency: course.currency || 'EUR',
+      currency: normalizeCurrency(course.currency),
       availableSpots,
       totalBookings,
       userBookingStatus: null,

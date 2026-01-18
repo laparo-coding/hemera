@@ -3,6 +3,7 @@
 
 import type { Booking } from '@prisma/client';
 import { prisma } from '../db/prisma';
+import { DEFAULT_AMOUNT, normalizeCurrency } from '../utils/currency';
 
 export interface CourseWithBookings {
   id: string;
@@ -45,8 +46,8 @@ export async function getCourses(): Promise<CourseWithBookings[]> {
     title: course.title,
     description: course.description,
     slug: course.slug,
-    price: course.price ?? 0,
-    currency: course.currency || 'EUR',
+    price: course.price ?? DEFAULT_AMOUNT,
+    currency: normalizeCurrency(course.currency),
     capacity: course.capacity,
     startDate: course.startDate,
     startTime: course.startTime,

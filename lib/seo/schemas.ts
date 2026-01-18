@@ -1,3 +1,4 @@
+import { DEFAULT_CURRENCY } from '../utils/currency';
 import { SITE_CONFIG } from './constants';
 
 /**
@@ -179,7 +180,7 @@ export function generateCourseSchema(course: {
       '@type': 'Offer',
       // Prices are stored in cents, convert to euros for schema.org
       price: (course.price / 100).toString(),
-      priceCurrency: 'EUR',
+      priceCurrency: DEFAULT_CURRENCY,
       availability: 'https://schema.org/InStock',
     },
     url: `${ORGANIZATION_CONFIG.url}/courses/${courseSlug}`,

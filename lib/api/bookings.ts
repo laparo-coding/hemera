@@ -15,6 +15,7 @@ import {
   logError,
   UserNotFoundError,
 } from '../errors';
+import { DEFAULT_AMOUNT } from '../utils/currency';
 
 /**
  * Booking model with API utilities
@@ -93,7 +94,7 @@ export async function createBooking(data: CreateBookingData): Promise<Booking> {
         userId: data.userId,
         courseId: data.courseId,
         paymentStatus: data.paymentStatus || PaymentStatus.PENDING,
-        amount: course.price || 0,
+        amount: course.price ?? DEFAULT_AMOUNT,
       },
     });
   } catch (error) {
