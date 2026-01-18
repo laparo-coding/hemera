@@ -22,9 +22,9 @@ import {
 import { useEffect, useState } from 'react';
 import {
   type CourseTestimonialsApiResponse,
-  getAvatarInitial,
   type PublicTestimonialApiResponse,
 } from '@/lib/types/testimonial';
+import { getAvatarInitial } from '@/lib/utils/avatar';
 import { formatMonthYear } from '@/lib/utils/date-format';
 import { colors, spacing, typography } from '../../lib/design-tokens';
 

@@ -7,10 +7,8 @@
 
 import { FormatQuote as QuoteIcon } from '@mui/icons-material';
 import { Avatar, Box, Card, CardContent, Typography } from '@mui/material';
-import {
-  getAvatarInitial,
-  type PublicTestimonialApiResponse,
-} from '@/lib/types/testimonial';
+import { type PublicTestimonialApiResponse } from '@/lib/types/testimonial';
+import { getAvatarInitial } from '@/lib/utils/avatar';
 import { formatMonthYear } from '@/lib/utils/date-format';
 
 interface TestimonialCardProps {

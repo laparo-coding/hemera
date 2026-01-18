@@ -29,10 +29,10 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import {
   type AdminTestimonialsApiResponse,
-  getAvatarInitial,
   type TestimonialStatus,
   type TestimonialWithCourseApiResponse,
 } from '@/lib/types/testimonial';
+import { getAvatarInitial } from '@/lib/utils/avatar';
 
 const STATUS_LABELS: Record<TestimonialStatus, string> = {
   DRAFT: 'Entwurf',

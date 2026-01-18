@@ -32,7 +32,7 @@ import {
   isFormatOptionAvailable,
   type NameDisplayFormat,
 } from '@/lib/schemas/testimonial-schema';
-import { getAvatarInitial } from '@/lib/types/testimonial';
+import { getAvatarInitial } from '@/lib/utils/avatar';
 
 interface UserProfile {
   firstName: string;

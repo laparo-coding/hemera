@@ -188,6 +188,3 @@ export function toPublicTestimonialApiResponse(testimonial: {
 export type CourseTestimonialsApiResponse = ApiSuccessResponse<
   PublicTestimonialApiResponse[]
 >;
-
-// Re-export avatar utility for convenience
-export { getAvatarInitial } from '@/lib/utils/avatar';
