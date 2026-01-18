@@ -12,9 +12,10 @@ datasource db {
 // - Database tables: snake_case plural (e.g., users, courses, bookings)
 // - Database columns: snake_case (e.g., user_id, created_at)
 // - Use @@map for tables, @map for columns to maintain clean TypeScript types
+// - User.id uses Clerk ID directly (no auto-generated cuid)
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id // Clerk User ID (e.g., user_xxxxx)
   name          String?
   email         String?   @unique(map: "users_email_unique")
   emailVerified DateTime? @map("email_verified")

@@ -66,11 +66,11 @@ export async function GET(request: Request) {
 
     // Ensure the user exists in our database (upsert from Clerk)
     const { syncUserFromClerk } = await import('../../../lib/api/users');
-    await syncUserFromClerk(user);
+    const syncedUser = await syncUserFromClerk(user);
 
-    // Get user's bookings with pagination
+    // Get user's bookings with pagination (use synced DB user ID, not Clerk ID)
     const where = {
-      userId: user.id,
+      userId: syncedUser.id,
       ...(validatedParams.status && { paymentStatus: validatedParams.status }),
     };
 
