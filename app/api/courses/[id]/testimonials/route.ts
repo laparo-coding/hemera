@@ -9,7 +9,6 @@
 import { currentUser } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
 import { syncUserFromClerk } from '@/lib/api/users';
-import { prisma } from '@/lib/db/prisma';
 import {
   createTestimonial,
   getPublishedTestimonialsForCourse,
