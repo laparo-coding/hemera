@@ -11,6 +11,7 @@ import {
   getAvatarInitial,
   type PublicTestimonialApiResponse,
 } from '@/lib/types/testimonial';
+import { formatMonthYear } from '@/lib/utils/date-format';
 
 interface TestimonialCardProps {
   testimonial: PublicTestimonialApiResponse;
@@ -70,10 +71,7 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
               {testimonial.displayName}
             </Typography>
             <Typography variant='caption' color='text.secondary'>
-              {new Date(testimonial.createdAt).toLocaleDateString('de-DE', {
-                year: 'numeric',
-                month: 'long',
-              })}
+              {formatMonthYear(testimonial.createdAt) ?? ''}
             </Typography>
           </Box>
         </Box>

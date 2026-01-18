@@ -24,6 +24,7 @@ import {
   getAvatarInitial,
   type PublicTestimonialApiResponse,
 } from '@/lib/types/testimonial';
+import { formatMonthYear } from '@/lib/utils/date-format';
 import { colors, spacing, typography } from '../../lib/design-tokens';
 
 export interface DynamicTestimonialsSectionProps {
@@ -201,13 +202,7 @@ export const DynamicTestimonialsSection: React.FC<
                           color: colors.lightGray,
                         }}
                       >
-                        {new Date(testimonial.createdAt).toLocaleDateString(
-                          'de-DE',
-                          {
-                            year: 'numeric',
-                            month: 'long',
-                          }
-                        )}
+                        {formatMonthYear(testimonial.createdAt) ?? ''}
                       </Typography>
                     </Box>
                   </Box>
