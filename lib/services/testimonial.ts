@@ -9,6 +9,7 @@
 export interface Testimonial {
   id: string;
   courseId: string;
+  userId?: string; // DB user ID for entity relationships
   authorName: string;
   authorRole?: string;
   authorImage?: string;
