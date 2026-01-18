@@ -37,6 +37,21 @@ export interface TestimonialWithCourse extends Testimonial {
 }
 
 /**
+ * Booking owner info for ownership verification
+ */
+export interface BookingOwner {
+  userId: string;
+}
+
+/**
+ * Testimonial with course and booking owner for ownership checks
+ * Used in user-facing API routes to verify access
+ */
+export interface TestimonialWithCourseAndOwner extends TestimonialWithCourse {
+  booking: BookingOwner;
+}
+
+/**
  * Serialized testimonial for JSON API responses
  * Date fields are converted to ISO strings
  */

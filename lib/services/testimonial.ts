@@ -17,6 +17,7 @@ import {
 import {
   type PublicTestimonialApiResponse,
   type TestimonialWithCourse,
+  type TestimonialWithCourseAndOwner,
   toPublicTestimonialApiResponse,
 } from '@/lib/types/testimonial';
 
@@ -201,11 +202,12 @@ export async function submitTestimonialForApproval(
 }
 
 /**
- * Get a testimonial by ID
+ * Get a testimonial by ID with course and booking owner info
+ * Includes booking.userId for ownership verification
  */
 export async function getTestimonialById(
   testimonialId: string
-): Promise<TestimonialWithCourse | null> {
+): Promise<TestimonialWithCourseAndOwner | null> {
   return prisma.testimonial.findUnique({
     where: { id: testimonialId },
     include: {
@@ -214,6 +216,11 @@ export async function getTestimonialById(
           id: true,
           title: true,
           slug: true,
+        },
+      },
+      booking: {
+        select: {
+          userId: true,
         },
       },
     },

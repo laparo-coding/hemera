@@ -70,9 +70,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Users can only see their own testimonials (unless admin)
-    // This is checked via booking.userId - need to load booking
-    // For now, return the testimonial - ownership check is in update
+    // Verify ownership: user can only view their own testimonials
+    if (testimonial.booking.userId !== userId) {
+      logger.warn('Unauthorized testimonial access attempt', {
+        testimonialId: id,
+        ownerId: testimonial.booking.userId,
+        requesterId: userId,
+      });
+      return createErrorResponse(
+        'Zugriff verweigert',
+        ErrorCodes.FORBIDDEN,
+        requestId,
+        403
+      );
+    }
 
     logger.info('Successfully fetched testimonial', { testimonialId: id });
     // Transform to typed API response with serialized dates
