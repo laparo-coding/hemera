@@ -10,4 +10,7 @@ export default defineConfig({
     // Note: SQLite (file:) URLs require the schema.prisma provider to be 'sqlite'
     url: databaseUrl,
   },
+  migrations: {
+    seed: 'npx tsx prisma/seed.ts',
+  },
 });
