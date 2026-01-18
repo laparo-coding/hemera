@@ -20,19 +20,20 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import type { PublicTestimonialApiResponse } from '@/lib/types/testimonial';
 import { colors, spacing, typography } from '../../lib/design-tokens';
-import type { PublicTestimonial } from '../../lib/schemas/testimonial-schema';
 
 export interface DynamicTestimonialsSectionProps {
   courseSlug: string;
   limit?: number;
 }
 
-export const DynamicTestimonialsSection: React.FC<DynamicTestimonialsSectionProps> = ({
-  courseSlug,
-  limit = 6,
-}) => {
-  const [testimonials, setTestimonials] = useState<PublicTestimonial[]>([]);
+export const DynamicTestimonialsSection: React.FC<
+  DynamicTestimonialsSectionProps
+> = ({ courseSlug, limit = 6 }) => {
+  const [testimonials, setTestimonials] = useState<
+    PublicTestimonialApiResponse[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -124,7 +125,7 @@ export const DynamicTestimonialsSection: React.FC<DynamicTestimonialsSectionProp
 
         {/* Testimonial Cards */}
         <Grid container spacing={4}>
-          {testimonials.map((testimonial) => (
+          {testimonials.map(testimonial => (
             <Grid size={{ xs: 12, md: 4 }} key={testimonial.id}>
               <Card
                 data-testid='testimonial-card'

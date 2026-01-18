@@ -134,3 +134,42 @@ export type UserTestimonialsListApiResponse = ApiSuccessResponse<
  */
 export type UserTestimonialApiResponse =
   ApiSuccessResponse<TestimonialApiResponse>;
+
+/**
+ * Public testimonial for course detail page (only published, limited fields)
+ * Date fields are serialized as ISO strings for JSON responses
+ */
+export interface PublicTestimonialApiResponse {
+  id: string;
+  statement: string;
+  displayName: string;
+  photoUrl: string | null;
+  createdAt: string; // ISO date string
+}
+
+/**
+ * Helper to convert Prisma Testimonial to public API response format
+ */
+export function toPublicTestimonialApiResponse(testimonial: {
+  id: string;
+  statement: string;
+  cachedDisplayName: string;
+  cachedPhotoUrl: string | null;
+  createdAt: Date;
+}): PublicTestimonialApiResponse {
+  return {
+    id: testimonial.id,
+    statement: testimonial.statement,
+    displayName: testimonial.cachedDisplayName,
+    photoUrl: testimonial.cachedPhotoUrl,
+    createdAt: testimonial.createdAt.toISOString(),
+  };
+}
+
+/**
+ * Course public testimonials list API response
+ * GET /api/courses/[id]/testimonials
+ */
+export type CourseTestimonialsApiResponse = ApiSuccessResponse<
+  PublicTestimonialApiResponse[]
+>;

@@ -5,18 +5,12 @@
  * Feature: 017-testimonial-management
  */
 
-import {
-  Avatar,
-  Box,
-  Card,
-  CardContent,
-  Typography,
-} from '@mui/material';
 import { FormatQuote as QuoteIcon } from '@mui/icons-material';
-import type { PublicTestimonial } from '@/lib/schemas/testimonial-schema';
+import { Avatar, Box, Card, CardContent, Typography } from '@mui/material';
+import type { PublicTestimonialApiResponse } from '@/lib/types/testimonial';
 
 interface TestimonialCardProps {
-  testimonial: PublicTestimonial;
+  testimonial: PublicTestimonialApiResponse;
 }
 
 export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
@@ -48,7 +42,7 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
 
         {/* Statement */}
         <Typography
-          variant="body1"
+          variant='body1'
           sx={{
             fontStyle: 'italic',
             mb: 3,
@@ -69,10 +63,10 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
             {testimonial.displayName.charAt(0)}
           </Avatar>
           <Box>
-            <Typography variant="subtitle2" fontWeight="bold">
+            <Typography variant='subtitle2' fontWeight='bold'>
               {testimonial.displayName}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant='caption' color='text.secondary'>
               {new Date(testimonial.createdAt).toLocaleDateString('de-DE', {
                 year: 'numeric',
                 month: 'long',

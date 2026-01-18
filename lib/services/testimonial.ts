@@ -12,10 +12,13 @@ import { prisma } from '@/lib/db/prisma';
 import {
   type CreateTestimonialInput,
   formatDisplayName,
-  type PublicTestimonial,
   type UpdateTestimonialInput,
 } from '@/lib/schemas/testimonial-schema';
-import type { TestimonialWithCourse } from '@/lib/types/testimonial';
+import {
+  type PublicTestimonialApiResponse,
+  type TestimonialWithCourse,
+  toPublicTestimonialApiResponse,
+} from '@/lib/types/testimonial';
 
 // Re-export types from Prisma and centralized types
 export type {
@@ -261,7 +264,7 @@ export async function getTestimonialsByUserId(
 export async function getPublishedTestimonialsForCourse(
   courseId: string,
   limit = 10
-): Promise<PublicTestimonial[]> {
+): Promise<PublicTestimonialApiResponse[]> {
   const testimonials = await prisma.testimonial.findMany({
     where: {
       courseId,
@@ -273,13 +276,7 @@ export async function getPublishedTestimonialsForCourse(
     take: limit,
   });
 
-  return testimonials.map(t => ({
-    id: t.id,
-    statement: t.statement,
-    displayName: t.cachedDisplayName,
-    photoUrl: t.cachedPhotoUrl,
-    createdAt: t.createdAt,
-  }));
+  return testimonials.map(toPublicTestimonialApiResponse);
 }
 
 /**
