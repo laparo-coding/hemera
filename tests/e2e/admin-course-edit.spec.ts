@@ -141,6 +141,7 @@ test.describe('Admin Course Edit - Optimistic Locking E2E', () => {
     // Create a booking for the course
     const user = await prisma.user.create({
       data: {
+        id: `user_e2e_enrolled_${Date.now()}`,
         email: `e2e-enrolled-${Date.now()}@example.com`,
       },
     });

@@ -19,6 +19,8 @@ import {
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
 
+export const dynamic = 'force-dynamic';
+
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -41,19 +43,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     logger.info('Fetching course testimonials', { courseIdOrSlug: id });
 
-    // Try to find course by ID first, then by slug
-    let course = await prisma.course.findUnique({
-      where: { id },
+    // Find course by ID or slug in a single query
+    const course = await prisma.course.findFirst({
+      where: {
+        OR: [{ id }, { slug: id }],
+      },
       select: { id: true },
     });
-
-    if (!course) {
-      // Try by slug
-      course = await prisma.course.findUnique({
-        where: { slug: id },
-        select: { id: true },
-      });
-    }
 
     if (!course) {
       return createErrorResponse(
@@ -64,12 +60,22 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Get limit from query params
+    // Get limit from query params with validation
     const { searchParams } = new URL(request.url);
-    const limit = Math.min(
-      Number.parseInt(searchParams.get('limit') || '10', 10),
-      50
-    );
+    const limitParam = searchParams.get('limit');
+    const parsedLimit = limitParam ? Number.parseInt(limitParam, 10) : 10;
+
+    // Validate limit: must be a positive number, max 50
+    if (Number.isNaN(parsedLimit) || parsedLimit <= 0) {
+      return createErrorResponse(
+        'Ungültiger "limit" Parameter. Muss eine positive Zahl sein.',
+        ErrorCodes.INVALID_INPUT,
+        requestId,
+        400
+      );
+    }
+
+    const limit = Math.min(parsedLimit, 50);
 
     const testimonials = await getPublishedTestimonialsForCourse(
       course.id,

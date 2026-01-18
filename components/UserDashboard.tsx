@@ -13,7 +13,6 @@ import {
   Box,
   Button,
   CardContent,
-  Chip,
   Divider,
   Paper,
   Skeleton,
@@ -34,8 +33,8 @@ const colors = {
   white: '#FFFFFF',
 } as const;
 
-// Status colors for booking states
-const statusColors = {
+// Status colors for booking states (kept for potential future use)
+const _statusColors = {
   PAID: {
     background: 'rgba(166, 205, 198, 0.15)',
     border: colors.sage,
@@ -614,37 +613,6 @@ const UserDashboardClerk: React.FC = () => {
                       alignItems='center'
                       justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
                     >
-                      <Chip
-                        icon={getStatusIcon(booking.paymentStatus)}
-                        label={
-                          booking.paymentStatus === 'PAID'
-                            ? 'Bezahlt'
-                            : booking.paymentStatus === 'FAILED'
-                              ? 'Fehlgeschlagen'
-                              : 'Ausstehend'
-                        }
-                        size='small'
-                        sx={{
-                          bgcolor:
-                            statusColors[
-                              booking.paymentStatus as keyof typeof statusColors
-                            ]?.background || statusColors.PENDING.background,
-                          border: `1px solid ${
-                            statusColors[
-                              booking.paymentStatus as keyof typeof statusColors
-                            ]?.border || statusColors.PENDING.border
-                          }`,
-                          color:
-                            statusColors[
-                              booking.paymentStatus as keyof typeof statusColors
-                            ]?.text || statusColors.PENDING.text,
-                          fontFamily: '"Inter", sans-serif',
-                          fontWeight: 500,
-                          '& .MuiChip-icon': {
-                            color: 'inherit',
-                          },
-                        }}
-                      />
                       {(booking.paymentStatus === 'PAID' ||
                         booking.paymentStatus === 'CONFIRMED') && (
                         <Link href='/my-courses' passHref>
@@ -677,7 +645,7 @@ const UserDashboardClerk: React.FC = () => {
         )}
       </Paper>
     ),
-    [bookings, getStatusIcon]
+    [bookings]
   );
 
   // Production path — E2E fallback handled above

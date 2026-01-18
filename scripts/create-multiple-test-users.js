@@ -23,24 +23,6 @@ const users = [
       role: 'user',
     },
   },
-  {
-    email_address: ['e2e.duplicate@example.com'],
-    password: 'E2ETestPassword2024!SecureForTesting',
-    first_name: 'E2E',
-    last_name: 'Duplicate User',
-    public_metadata: {
-      role: 'user',
-    },
-  },
-  {
-    email_address: ['e2e.dashboard@example.com'],
-    password: 'E2ETestPassword2024!SecureForTesting',
-    first_name: 'E2E',
-    last_name: 'Dashboard User',
-    public_metadata: {
-      role: 'user',
-    },
-  },
 ];
 
 async function createUser(userData) {

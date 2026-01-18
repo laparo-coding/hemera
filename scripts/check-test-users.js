@@ -53,11 +53,7 @@ function checkUser(email) {
 }
 
 async function checkTestUsers() {
-  const emails = [
-    'e2e.test@example.com',
-    'e2e.duplicate@example.com',
-    'e2e.dashboard@example.com',
-  ];
+  const emails = ['e2e.test@example.com'];
 
   console.log('🔍 Checking test users in Clerk...\n');
 
