@@ -19,8 +19,8 @@ type BookingRecord = {
   id: string;
   courseId: string;
   paymentStatus: PaymentStatus;
-  amount: number;
-  currency: string;
+  amount: number | null;
+  currency: string | null;
   createdAt: Date;
   course?: {
     title: string | null;
@@ -40,8 +40,8 @@ function normalizeBookings(bookings: BookingRecord[], requestId: string) {
       id: booking.id,
       courseId: booking.courseId,
       courseTitle: booking.course?.title ?? 'Kurs nicht mehr verfügbar',
-      coursePrice: booking.amount,
-      currency: booking.currency,
+      coursePrice: booking.amount ?? 0,
+      currency: booking.currency ?? 'EUR',
       paymentStatus: booking.paymentStatus,
       createdAt: booking.createdAt,
     };

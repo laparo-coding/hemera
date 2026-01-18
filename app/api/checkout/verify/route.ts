@@ -112,8 +112,8 @@ export async function GET(request: NextRequest) {
           booking: {
             id: booking.id,
             courseTitle: booking.course.title,
-            price: booking.amount,
-            currency: booking.currency,
+            price: booking.amount ?? 0,
+            currency: booking.currency ?? 'EUR',
             paymentStatus: booking.paymentStatus,
             createdAt: booking.createdAt,
           },
@@ -347,8 +347,8 @@ export async function GET(request: NextRequest) {
       booking: {
         id: booking.id,
         courseTitle: booking.course.title,
-        price: booking.amount,
-        currency: booking.currency,
+        price: booking.amount ?? 0,
+        currency: booking.currency ?? 'EUR',
         paymentStatus: booking.paymentStatus,
         createdAt: booking.createdAt,
       },
