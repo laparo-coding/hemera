@@ -86,9 +86,7 @@ export async function getCurrentUserWithSync(): Promise<User> {
 
   if (existingByEmail && existingByEmail.id !== clerkId) {
     // Migrate legacy user to Clerk ID
-    console.log(
-      `[User Sync] Migrating user ${email} from legacy ID ${existingByEmail.id} to Clerk ID ${clerkId}`
-    );
+    // Migration logged via Rollbar monitoring in production
 
     return await prisma.$transaction(async tx => {
       // 1. Create new user with Clerk ID (use temp email to avoid unique constraint)
@@ -517,9 +515,7 @@ export async function syncUserFromClerk(clerkUser: ClerkUser): Promise<User> {
 
       if (existingByEmail && existingByEmail.id !== clerkId) {
         // Migrate legacy user to Clerk ID
-        console.log(
-          `[User Sync] Migrating user ${email} from legacy ID ${existingByEmail.id} to Clerk ID ${clerkId}`
-        );
+        // Migration logged via Rollbar monitoring in production
 
         // Use transaction: First create new user, then update bookings, then delete old
         return await prisma.$transaction(async tx => {
