@@ -7,7 +7,10 @@
 
 import { FormatQuote as QuoteIcon } from '@mui/icons-material';
 import { Avatar, Box, Card, CardContent, Typography } from '@mui/material';
-import type { PublicTestimonialApiResponse } from '@/lib/types/testimonial';
+import {
+  getAvatarInitial,
+  type PublicTestimonialApiResponse,
+} from '@/lib/types/testimonial';
 
 interface TestimonialCardProps {
   testimonial: PublicTestimonialApiResponse;
@@ -60,7 +63,7 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
             alt={testimonial.displayName}
             sx={{ width: 48, height: 48 }}
           >
-            {testimonial.displayName.charAt(0)}
+            {getAvatarInitial(testimonial.displayName)}
           </Avatar>
           <Box>
             <Typography variant='subtitle2' fontWeight='bold'>

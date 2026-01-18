@@ -6,6 +6,10 @@
  */
 
 import {
+  FormatQuote as QuoteIcon,
+  Send as SendIcon,
+} from '@mui/icons-material';
+import {
   Alert,
   Avatar,
   Box,
@@ -22,13 +26,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { FormatQuote as QuoteIcon, Send as SendIcon } from '@mui/icons-material';
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   formatDisplayName,
   isFormatOptionAvailable,
   type NameDisplayFormat,
 } from '@/lib/schemas/testimonial-schema';
+import { getAvatarInitial } from '@/lib/types/testimonial';
 
 interface UserProfile {
   firstName: string;
@@ -152,9 +156,12 @@ export default function TestimonialForm({
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/testimonials/${initialData.id}/submit`, {
-        method: 'POST',
-      });
+      const response = await fetch(
+        `/api/testimonials/${initialData.id}/submit`,
+        {
+          method: 'POST',
+        }
+      );
 
       if (!response.ok) {
         const data = await response.json();
@@ -172,7 +179,7 @@ export default function TestimonialForm({
 
   if (success) {
     return (
-      <Alert severity="success" sx={{ my: 2 }}>
+      <Alert severity='success' sx={{ my: 2 }}>
         {isEdit
           ? 'Dein Erfahrungsbericht wurde aktualisiert!'
           : 'Dein Erfahrungsbericht wurde gespeichert und wartet auf Freigabe.'}
@@ -181,30 +188,32 @@ export default function TestimonialForm({
   }
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
-      <Typography variant="h6" gutterBottom>
-        {isEdit ? 'Erfahrungsbericht bearbeiten' : 'Erfahrungsbericht schreiben'}
+    <Box component='form' onSubmit={handleSubmit}>
+      <Typography variant='h6' gutterBottom>
+        {isEdit
+          ? 'Erfahrungsbericht bearbeiten'
+          : 'Erfahrungsbericht schreiben'}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+      <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
         Teile deine Erfahrungen zum Kurs &ldquo;{courseName}&rdquo; mit anderen
         Interessenten.
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity='error' sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
 
       {/* Statement input */}
       <TextField
-        label="Dein Erfahrungsbericht"
+        label='Dein Erfahrungsbericht'
         multiline
         rows={5}
         fullWidth
         value={statement}
-        onChange={(e) => setStatement(e.target.value)}
-        placeholder="Was hat dir am Kurs besonders gut gefallen? Was hast du gelernt?"
+        onChange={e => setStatement(e.target.value)}
+        placeholder='Was hat dir am Kurs besonders gut gefallen? Was hast du gelernt?'
         error={isOverLimit || (statement.length > 0 && isTooShort)}
         helperText={
           isOverLimit
@@ -217,13 +226,15 @@ export default function TestimonialForm({
       />
 
       {/* Name format selection */}
-      <FormControl component="fieldset" sx={{ mb: 3 }}>
-        <FormLabel component="legend">Wie soll dein Name angezeigt werden?</FormLabel>
+      <FormControl component='fieldset' sx={{ mb: 3 }}>
+        <FormLabel component='legend'>
+          Wie soll dein Name angezeigt werden?
+        </FormLabel>
         <RadioGroup
           value={nameFormat}
-          onChange={(e) => setNameFormat(e.target.value as NameDisplayFormat)}
+          onChange={e => setNameFormat(e.target.value as NameDisplayFormat)}
         >
-          {NAME_FORMAT_OPTIONS.map((option) => {
+          {NAME_FORMAT_OPTIONS.map(option => {
             const isAvailable = isFormatOptionAvailable(option.value, hasCity);
             return (
               <FormControlLabel
@@ -232,8 +243,8 @@ export default function TestimonialForm({
                 control={<Radio />}
                 label={
                   <Box>
-                    <Typography variant="body2">{option.label}</Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant='body2'>{option.label}</Typography>
+                    <Typography variant='caption' color='text.secondary'>
                       {option.description}
                     </Typography>
                   </Box>
@@ -245,16 +256,17 @@ export default function TestimonialForm({
         </RadioGroup>
         {!hasCity && (
           <FormHelperText>
-            Tipp: Ergänze deine Stadt im Profil, um alle Anzeigeoptionen zu nutzen.
+            Tipp: Ergänze deine Stadt im Profil, um alle Anzeigeoptionen zu
+            nutzen.
           </FormHelperText>
         )}
       </FormControl>
 
       {/* Live Preview */}
-      <Typography variant="subtitle2" gutterBottom>
+      <Typography variant='subtitle2' gutterBottom>
         Vorschau
       </Typography>
-      <Card variant="outlined" sx={{ mb: 3, bgcolor: 'grey.50' }}>
+      <Card variant='outlined' sx={{ mb: 3, bgcolor: 'grey.50' }}>
         <CardContent sx={{ pt: 4, position: 'relative' }}>
           <QuoteIcon
             sx={{
@@ -267,10 +279,11 @@ export default function TestimonialForm({
             }}
           />
           <Typography
-            variant="body1"
+            variant='body1'
             sx={{ fontStyle: 'italic', mb: 2, color: 'text.secondary' }}
           >
-            &ldquo;{statement || 'Dein Erfahrungsbericht erscheint hier...'}&rdquo;
+            &ldquo;{statement || 'Dein Erfahrungsbericht erscheint hier...'}
+            &rdquo;
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Avatar
@@ -278,9 +291,9 @@ export default function TestimonialForm({
               alt={previewDisplayName}
               sx={{ width: 40, height: 40 }}
             >
-              {previewDisplayName.charAt(0)}
+              {getAvatarInitial(previewDisplayName)}
             </Avatar>
-            <Typography variant="subtitle2" fontWeight="bold">
+            <Typography variant='subtitle2' fontWeight='bold'>
               {previewDisplayName}
             </Typography>
           </Box>
@@ -290,8 +303,8 @@ export default function TestimonialForm({
       {/* Action buttons */}
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
         <Button
-          type="submit"
-          variant="contained"
+          type='submit'
+          variant='contained'
           disabled={loading || isOverLimit || isTooShort}
           startIcon={loading ? <CircularProgress size={20} /> : undefined}
         >
@@ -299,8 +312,8 @@ export default function TestimonialForm({
         </Button>
         {isEdit && initialData?.status === 'DRAFT' && (
           <Button
-            variant="outlined"
-            color="primary"
+            variant='outlined'
+            color='primary'
             disabled={loading || isOverLimit || isTooShort}
             onClick={handleSubmitForApproval}
             startIcon={<SendIcon />}
@@ -311,7 +324,11 @@ export default function TestimonialForm({
       </Box>
 
       {initialData?.status && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+        <Typography
+          variant='caption'
+          color='text.secondary'
+          sx={{ mt: 2, display: 'block' }}
+        >
           Status: {initialData.status === 'DRAFT' && 'Entwurf'}
           {initialData.status === 'PENDING' && 'Wartet auf Freigabe'}
           {initialData.status === 'PUBLISHED' && 'Veröffentlicht'}

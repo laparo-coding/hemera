@@ -20,7 +20,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import type { PublicTestimonialApiResponse } from '@/lib/types/testimonial';
+import {
+  getAvatarInitial,
+  type PublicTestimonialApiResponse,
+} from '@/lib/types/testimonial';
 import { colors, spacing, typography } from '../../lib/design-tokens';
 
 export interface DynamicTestimonialsSectionProps {
@@ -178,7 +181,7 @@ export const DynamicTestimonialsSection: React.FC<
                       alt={testimonial.displayName}
                       sx={{ width: 48, height: 48 }}
                     >
-                      {testimonial.displayName.charAt(0)}
+                      {getAvatarInitial(testimonial.displayName)}
                     </Avatar>
                     <Box>
                       <Typography

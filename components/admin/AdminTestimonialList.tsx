@@ -27,10 +27,11 @@ import {
   Typography,
 } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import type {
-  AdminTestimonialsApiResponse,
-  TestimonialStatus,
-  TestimonialWithCourseApiResponse,
+import {
+  type AdminTestimonialsApiResponse,
+  getAvatarInitial,
+  type TestimonialStatus,
+  type TestimonialWithCourseApiResponse,
 } from '@/lib/types/testimonial';
 
 const STATUS_LABELS: Record<TestimonialStatus, string> = {
@@ -170,7 +171,7 @@ export default function AdminTestimonialList() {
                     src={testimonial.cachedPhotoUrl || undefined}
                     alt={testimonial.cachedDisplayName}
                   >
-                    {testimonial.cachedDisplayName.charAt(0)}
+                    {getAvatarInitial(testimonial.cachedDisplayName)}
                   </Avatar>
                   <Box>
                     <Typography variant='subtitle2' fontWeight='bold'>
