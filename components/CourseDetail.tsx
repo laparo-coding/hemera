@@ -23,6 +23,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { getAvatarInitial } from '@/lib/utils/avatar';
 import { formatDate } from '../lib/utils/date-format';
 
 interface CourseLocation {
@@ -289,7 +290,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     fontSize: { xs: '3rem', md: '4rem' },
                   }}
                 >
-                  {course.title.charAt(0)}
+                  {getAvatarInitial(course.title)}
                 </Typography>
               </Box>
             )}

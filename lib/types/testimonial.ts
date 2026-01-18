@@ -174,17 +174,5 @@ export type CourseTestimonialsApiResponse = ApiSuccessResponse<
   PublicTestimonialApiResponse[]
 >;
 
-/**
- * Default fallback character for Avatar when displayName is empty
- */
-const AVATAR_FALLBACK_CHAR = '?';
-
-/**
- * Get safe initial character for Avatar display
- * Returns fallback if displayName is empty or undefined
- */
-export function getAvatarInitial(
-  displayName: string | undefined | null
-): string {
-  return displayName?.charAt(0) || AVATAR_FALLBACK_CHAR;
-}
+// Re-export avatar utility for convenience
+export { getAvatarInitial } from '@/lib/utils/avatar';

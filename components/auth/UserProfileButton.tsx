@@ -28,6 +28,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { getAvatarInitial } from '@/lib/utils/avatar';
 
 export interface UserProfileButtonProps {
   variant?: 'icon' | 'button';
@@ -104,7 +105,7 @@ export function UserProfileButton({
               fontWeight: 500,
             }}
           >
-            {displayName.charAt(0).toUpperCase()}
+            {getAvatarInitial(displayName)}
           </Avatar>
         </IconButton>
 
@@ -212,7 +213,7 @@ export function UserProfileButton({
               fontSize: '12px',
             }}
           >
-            {displayName.charAt(0).toUpperCase()}
+            {getAvatarInitial(displayName)}
           </Avatar>
         }
         endIcon={<AccountCircle />}
