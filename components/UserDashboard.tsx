@@ -33,25 +33,6 @@ const colors = {
   white: '#FFFFFF',
 } as const;
 
-// Status colors for booking states (kept for potential future use)
-const _statusColors = {
-  PAID: {
-    background: 'rgba(166, 205, 198, 0.15)',
-    border: colors.sage,
-    text: colors.petrol,
-  },
-  PENDING: {
-    background: 'rgba(221, 168, 83, 0.15)',
-    border: colors.gold,
-    text: colors.petrol,
-  },
-  FAILED: {
-    background: 'rgba(232, 180, 184, 0.15)',
-    border: '#E8B4B8',
-    text: '#8B4A50',
-  },
-} as const;
-
 interface Booking {
   id: string;
   courseId: string;
@@ -302,18 +283,6 @@ const UserDashboardClerk: React.FC = () => {
       setLoading(false);
     }
   }, [userLoaded, user, fetchBookings]);
-
-  // Memoized helper functions for better performance
-  const getStatusIcon = useCallback((status: string) => {
-    switch (status) {
-      case 'PAID':
-        return <CheckCircleOutlined />;
-      case 'PENDING':
-        return <PendingOutlined />;
-      default:
-        return <PendingOutlined />;
-    }
-  }, []);
 
   // Memoized stats cards component
   const StatsCards = useMemo(
