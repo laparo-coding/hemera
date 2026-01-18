@@ -9,6 +9,7 @@
 import { currentUser } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
 import { syncUserFromClerk } from '@/lib/api/users';
+import { prisma } from '@/lib/db/prisma';
 import {
   createTestimonial,
   getPublishedTestimonialsForCourse,
@@ -27,7 +28,7 @@ import {
 export const dynamic = 'force-dynamic';
 
 interface RouteParams {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 /**
@@ -36,7 +37,7 @@ interface RouteParams {
  * Accepts either course ID (cuid) or slug
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
+  const { id } = params;
   const requestId = getOrCreateRequestId(request);
   const context = createRequestContext(
     requestId,
@@ -46,12 +47,23 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const logger = createApiLogger(context);
 
   try {
+    if (!id || typeof id !== 'string' || id.trim().length === 0) {
+      return createErrorResponse(
+        'Ungültige Kurs-ID',
+        ErrorCodes.INVALID_INPUT,
+        requestId,
+        400
+      );
+    }
+
+    const normalizedId = id.trim();
+
     logger.info('Fetching course testimonials', { courseIdOrSlug: id });
 
     // Find course by ID or slug in a single query
     const course = await prisma.course.findFirst({
       where: {
-        OR: [{ id }, { slug: id }],
+        OR: [{ id: normalizedId }, { slug: normalizedId }],
       },
       select: { id: true },
     });
@@ -113,7 +125,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * Uses synced DB user ID for consistent entity relationships
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
+  const { id } = params;
   const requestId = getOrCreateRequestId(request);
   const context = createRequestContext(
     requestId,
@@ -123,6 +135,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   const logger = createApiLogger(context);
 
   try {
+    if (!id || typeof id !== 'string' || id.trim().length === 0) {
+      return createErrorResponse(
+        'Ungültige Kurs-ID',
+        ErrorCodes.INVALID_INPUT,
+        requestId,
+        400
+      );
+    }
+
+    const normalizedId = id.trim();
+
     // Authenticate user
     const clerkUser = await currentUser();
     if (!clerkUser?.id) {
@@ -141,13 +164,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     logger.info('User submitting testimonial', {
       clerkUserId: clerkUser.id,
       dbUserId: dbUser.id,
-      courseIdOrSlug: id,
+      courseIdOrSlug: normalizedId,
     });
 
     // Find course by ID or slug
     const course = await prisma.course.findFirst({
       where: {
-        OR: [{ id }, { slug: id }],
+        OR: [{ id: normalizedId }, { slug: normalizedId }],
       },
       select: { id: true, title: true },
     });
