@@ -11,6 +11,7 @@ import type {
   NameDisplayFormat,
   TestimonialStatus,
 } from '@/lib/schemas/testimonial-schema';
+import type { ApiSuccessResponse } from '@/lib/types/api';
 
 // Re-export schema types for convenience
 export type {
@@ -73,32 +74,6 @@ export interface AdminTestimonialsListResponse {
     offset: number;
   };
 }
-
-/**
- * Standard API success wrapper
- */
-export interface ApiSuccessResponse<T> {
-  success: true;
-  data: T;
-  requestId: string;
-}
-
-/**
- * Standard API error wrapper
- */
-export interface ApiErrorResponse {
-  success: false;
-  error: {
-    message: string;
-    code: string;
-  };
-  requestId: string;
-}
-
-/**
- * Union type for API responses
- */
-export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
 
 /**
  * Typed fetch helper for admin testimonials list
