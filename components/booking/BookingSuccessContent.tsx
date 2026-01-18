@@ -159,18 +159,6 @@ export default function BookingSuccessContent({
                         {booking.courseDescription}
                       </Typography>
                     ) : null}
-                    {booking.courseSlug ? (
-                      <Tooltip title='Kursdetails ansehen'>
-                        <Button
-                          component={Link}
-                          href={`/courses/${booking.courseSlug}`}
-                          size='small'
-                          variant='text'
-                        >
-                          Kursseite öffnen
-                        </Button>
-                      </Tooltip>
-                    ) : null}
                   </Stack>
                 </Grid>
 
@@ -204,9 +192,6 @@ export default function BookingSuccessContent({
                     >
                       {booking.paymentStatusLabel}
                     </Alert>
-                    <Typography variant='caption' color='text.secondary'>
-                      Systemstatus: {booking.paymentStatus}
-                    </Typography>
                   </Stack>
                 </Grid>
 
