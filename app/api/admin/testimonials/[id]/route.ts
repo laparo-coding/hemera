@@ -60,7 +60,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const parseResult = adminUpdateTestimonialSchema.safeParse(body);
     if (!parseResult.success) {
       logger.warn('Invalid status update input', {
-        issues: parseResult.error.issues,
+        validationErrors: parseResult.error.issues,
       });
       return createErrorResponse(
         parseResult.error.issues[0]?.message || 'Ungültige Eingabe',

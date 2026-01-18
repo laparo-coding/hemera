@@ -41,7 +41,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const logger = createApiLogger(context);
 
   try {
-    logger.info('Fetching course testimonials', { courseIdOrSlug: id });
+    logger.info('Fetching course testimonials', {
+      courseId: id,
+      idType: id.startsWith('c') ? 'cuid' : 'slug',
+    });
 
     // Find course by ID or slug in a single query
     const course = await prisma.course.findFirst({

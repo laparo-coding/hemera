@@ -115,7 +115,9 @@ export async function POST(request: NextRequest) {
     // Validate input
     const parseResult = createTestimonialSchema.safeParse(body);
     if (!parseResult.success) {
-      logger.warn('Invalid testimonial input', { errors: parseResult.error });
+      logger.warn('Invalid testimonial input', {
+        validationErrors: parseResult.error.issues,
+      });
       return createErrorResponse(
         parseResult.error.issues[0]?.message || 'Ungültige Eingabe',
         ErrorCodes.INVALID_INPUT,

@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     const parseResult = testimonialFilterSchema.safeParse(queryParams);
     if (!parseResult.success) {
       logger.warn('Invalid filter parameters', {
-        issues: parseResult.error.issues,
+        validationErrors: parseResult.error.issues,
       });
       return createErrorResponse(
         parseResult.error.issues[0]?.message || 'Ungültige Filter',
