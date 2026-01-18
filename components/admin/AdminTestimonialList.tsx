@@ -91,8 +91,13 @@ export default function AdminTestimonialList() {
     }
   }, [page, statusFilter]);
 
+  // Debounced fetch effect to reduce rapid re-requests
   useEffect(() => {
-    fetchTestimonials();
+    const debounceTimer = setTimeout(() => {
+      fetchTestimonials();
+    }, 150);
+
+    return () => clearTimeout(debounceTimer);
   }, [fetchTestimonials]);
 
   async function updateStatus(id: string, newStatus: TestimonialStatus) {
