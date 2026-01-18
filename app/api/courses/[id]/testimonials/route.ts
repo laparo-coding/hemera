@@ -214,10 +214,36 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       201
     );
   } catch (error) {
-    logger.error(
-      'Failed to create testimonial',
-      error instanceof Error ? error : undefined
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unbekannter Fehler';
+
+    // Log original error for diagnostics
+    logger.error('Failed to create testimonial', {
+      courseIdOrSlug: id,
+      originalError: errorMessage,
+      error: error instanceof Error ? error : undefined,
+    });
+
+    // Map internal errors to user-safe messages while preserving structured codes
+    if (errorMessage.includes('bereits eingereicht')) {
+      return createErrorResponse(
+        'Du hast bereits einen Erfahrungsbericht für diesen Kurs eingereicht',
+        ErrorCodes.CONFLICT,
+        requestId,
+        409
+      );
+    }
+
+    if (errorMessage.includes('Kurs nicht abgeschlossen')) {
+      return createErrorResponse(
+        'Erfahrungsberichte können erst nach Kursabschluss eingereicht werden',
+        ErrorCodes.FORBIDDEN,
+        requestId,
+        403
+      );
+    }
+
+    // Generic error - never expose internal details
     return createErrorResponse(
       'Fehler beim Einreichen des Erfahrungsberichts',
       ErrorCodes.INTERNAL_ERROR,

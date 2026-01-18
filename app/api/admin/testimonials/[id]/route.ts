@@ -93,20 +93,34 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    logger.error(
-      'Failed to update testimonial status',
-      error instanceof Error ? error : undefined
-    );
 
+    // Log original error for diagnostics
+    logger.error('Failed to update testimonial status', {
+      testimonialId: id,
+      originalError: errorMessage,
+      error: error instanceof Error ? error : undefined,
+    });
+
+    // Map internal errors to user-safe messages while preserving structured codes
     if (errorMessage.includes('nicht gefunden')) {
       return createErrorResponse(
-        errorMessage,
+        'Erfahrungsbericht nicht gefunden',
         ErrorCodes.NOT_FOUND,
         requestId,
         404
       );
     }
 
+    if (errorMessage.includes('ungültiger Status')) {
+      return createErrorResponse(
+        'Ungültiger Status angegeben',
+        ErrorCodes.INVALID_INPUT,
+        requestId,
+        400
+      );
+    }
+
+    // Generic error - never expose internal details
     return createErrorResponse(
       'Fehler beim Aktualisieren des Status',
       ErrorCodes.INTERNAL_ERROR,
