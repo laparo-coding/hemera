@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { closeDb, prisma } from '../lib/db/prisma.js';
 import {
   getDatabaseEnvironmentInfo,
@@ -33,10 +34,13 @@ async function main() {
   // This guard will throw if connected to a production database
   if (isSafeForDestructiveOperations()) {
     console.log('🧹 Clearing existing data (safe environment detected)...');
-    guardDestructiveOperation('seed.ts: deleteMany(booking)');
-    await prisma.booking.deleteMany();
-    guardDestructiveOperation('seed.ts: deleteMany(course)');
-    await prisma.course.deleteMany();
+    // Use raw SQL to avoid Prisma 7.2.0 @map() bug with driver adapters
+    guardDestructiveOperation('seed.ts: DELETE bookings');
+    await prisma.$executeRaw`DELETE FROM bookings`;
+    guardDestructiveOperation('seed.ts: DELETE course_summary_assets');
+    await prisma.$executeRaw`DELETE FROM course_summary_assets`;
+    guardDestructiveOperation('seed.ts: DELETE courses');
+    await prisma.$executeRaw`DELETE FROM courses`;
     console.log('✅ Existing data cleared\n');
   } else {
     console.log('⚠️  Skipping data deletion - production database detected');
@@ -79,25 +83,48 @@ async function main() {
     },
   ];
 
-  const courses = await Promise.all(
-    seedCourses.map(course =>
-      prisma.course.upsert({
-        where: { slug: course.slug },
-        update: {
-          title: course.title,
-          description: course.description,
-          price: course.price,
-          currency: course.currency,
-          capacity: course.capacity,
-          startDate: course.startDate,
-          startTime: course.startTime,
-          endTime: course.endTime,
-          isPublished: course.isPublished,
-        },
-        create: course,
-      })
-    )
-  );
+  // Use raw SQL to avoid Prisma 7.2.0 bug with @map() decorator and driver adapters
+  // (P2022 ColumnNotFound). Raw SQL bypasses the Prisma Client query compiler.
+  // See: https://github.com/prisma/prisma/issues/27357
+  for (const course of seedCourses) {
+    await prisma.$executeRaw`
+      INSERT INTO courses (id, title, description, slug, price, currency, capacity, start_date, start_time, end_time, is_published, instructor, level, created_at, updated_at)
+      VALUES (
+        gen_random_uuid()::text,
+        ${course.title},
+        ${course.description},
+        ${course.slug},
+        ${course.price},
+        ${course.currency},
+        ${course.capacity},
+        ${course.startDate},
+        ${course.startTime},
+        ${course.endTime},
+        ${course.isPublished},
+        'TBD',
+        'BEGINNER',
+        NOW(),
+        NOW()
+      )
+      ON CONFLICT (slug) DO UPDATE SET
+        title = EXCLUDED.title,
+        description = EXCLUDED.description,
+        price = EXCLUDED.price,
+        currency = EXCLUDED.currency,
+        capacity = EXCLUDED.capacity,
+        start_date = EXCLUDED.start_date,
+        start_time = EXCLUDED.start_time,
+        end_time = EXCLUDED.end_time,
+        is_published = EXCLUDED.is_published,
+        updated_at = NOW()
+    `;
+  }
+
+  // Fetch all seeded courses for subsequent operations using Prisma.join for array
+  const slugs = seedCourses.map(c => c.slug);
+  const courses = await prisma.$queryRaw<
+    Array<{ id: string; title: string; slug: string }>
+  >`SELECT id, title, slug FROM courses WHERE slug IN (${Prisma.join(slugs)})`;
 
   // --------------------------------------------
   // Seed CourseSummaryAssets (Mux videos for testing)
@@ -118,34 +145,22 @@ async function main() {
     const course = coursesWithSummaries[i];
     const playbackId = muxTestPlaybackIds[i];
     const assetId = `test-asset-${course.id}`;
+    const title = `Zusammenfassung: ${course.title}`;
 
-    // Check if asset already exists for this course
-    const existingAsset = await prisma.courseSummaryAsset.findFirst({
-      where: { courseId: course.id },
-    });
-
-    if (existingAsset) {
-      // Update existing
-      await prisma.courseSummaryAsset.update({
-        where: { id: existingAsset.id },
-        data: {
-          muxPlaybackId: playbackId,
-          muxAssetId: assetId,
-          title: `Zusammenfassung: ${course.title}`,
-        },
-      });
-    } else {
-      // Create new
-      await prisma.courseSummaryAsset.create({
-        data: {
-          courseId: course.id,
-          muxPlaybackId: playbackId,
-          muxAssetId: assetId,
-          title: `Zusammenfassung: ${course.title}`,
-          sortOrder: 0,
-        },
-      });
-    }
+    // Use raw SQL insert (we delete all data first, so no conflict handling needed)
+    await prisma.$executeRaw`
+      INSERT INTO course_summary_assets (id, course_id, mux_playback_id, mux_asset_id, title, sort_order, created_at, updated_at)
+      VALUES (
+        gen_random_uuid()::text,
+        ${course.id},
+        ${playbackId},
+        ${assetId},
+        ${title},
+        0,
+        NOW(),
+        NOW()
+      )
+    `;
   }
 
   console.log(
