@@ -68,7 +68,8 @@ export default function AdminTestimonialList() {
     async (signal?: AbortSignal) => {
       try {
         setLoading(true);
-        setError(null); // Clear previous errors on new fetch
+        // Only clear error if one exists
+        setError(prev => (prev ? null : prev));
         const params = new URLSearchParams({
           limit: String(ITEMS_PER_PAGE),
           offset: String((page - 1) * ITEMS_PER_PAGE),
@@ -85,14 +86,26 @@ export default function AdminTestimonialList() {
         }
 
         const data: AdminTestimonialsApiResponse = await response.json();
-        setTestimonials(data.data.testimonials);
-        setTotal(data.data.pagination.total);
+        const newTestimonials = data.data.testimonials;
+        const newTotal = data.data.pagination.total;
+
+        // Only update state if data changed to reduce Grid re-layouts
+        setTestimonials(prev =>
+          prev.length !== newTestimonials.length ||
+          JSON.stringify(prev) !== JSON.stringify(newTestimonials)
+            ? newTestimonials
+            : prev
+        );
+        setTotal(prev => (prev !== newTotal ? newTotal : prev));
       } catch (err) {
         // Ignore aborted requests
         if (err instanceof Error && err.name === 'AbortError') {
           return;
         }
-        setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+        const errorMsg =
+          err instanceof Error ? err.message : 'Unbekannter Fehler';
+        // Only set error if it changed
+        setError(prev => (prev !== errorMsg ? errorMsg : prev));
       } finally {
         setLoading(false);
       }
