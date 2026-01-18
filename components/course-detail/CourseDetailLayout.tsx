@@ -27,7 +27,7 @@ export interface CourseDetailCourse {
   heroVideoPlaybackId: string | null;
   thumbnailUrl?: string | null;
   instructor: string | null;
-  price: number | null;
+  price: number;
   currency: string;
   startDate: Date | null;
   startTime: Date | null;

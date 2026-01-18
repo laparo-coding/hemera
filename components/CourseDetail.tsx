@@ -38,7 +38,7 @@ interface Course {
   title: string;
   description: string | null;
   slug: string;
-  price: number | null;
+  price: number;
   currency: string;
   capacity?: number | null;
   startDate?: Date | null;
@@ -121,8 +121,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     return Number.isFinite(dateValue.getTime()) && dateValue < new Date();
   }, [course.startDate, isMounted]);
 
-  const formatCurrency = (amount: number | null, currency: string) => {
-    if (amount === null || amount === undefined) {
+  const formatCurrency = (amount: number, currency: string) => {
+    if (amount === 0) {
       return 'Kostenlos';
     }
 
