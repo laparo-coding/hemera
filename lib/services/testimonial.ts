@@ -10,22 +10,20 @@ import type {
 } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import {
-  formatDisplayName,
   type CreateTestimonialInput,
-  type UpdateTestimonialInput,
+  formatDisplayName,
   type PublicTestimonial,
+  type UpdateTestimonialInput,
 } from '@/lib/schemas/testimonial-schema';
+import type { TestimonialWithCourse } from '@/lib/types/testimonial';
 
-// Re-export types from Prisma
-export type { Testimonial, NameDisplayFormat, TestimonialStatus } from '@prisma/client';
-
-export interface TestimonialWithCourse extends Testimonial {
-  course: {
-    id: string;
-    title: string;
-    slug: string;
-  };
-}
+// Re-export types from Prisma and centralized types
+export type {
+  NameDisplayFormat,
+  Testimonial,
+  TestimonialStatus,
+} from '@prisma/client';
+export type { TestimonialWithCourse } from '@/lib/types/testimonial';
 
 export interface TestimonialCreateData {
   bookingId: string;
@@ -66,7 +64,9 @@ export async function createTestimonial(
 
   // Check if testimonial already exists for this booking
   if (booking.testimonial) {
-    throw new Error('Du hast bereits einen Erfahrungsbericht für diesen Kurs erstellt');
+    throw new Error(
+      'Du hast bereits einen Erfahrungsbericht für diesen Kurs erstellt'
+    );
   }
 
   // Format the display name based on selected format
@@ -117,7 +117,9 @@ export async function updateTestimonial(
   }
 
   if (testimonial.booking.userId !== userId) {
-    throw new Error('Du hast keine Berechtigung, diesen Erfahrungsbericht zu bearbeiten');
+    throw new Error(
+      'Du hast keine Berechtigung, diesen Erfahrungsbericht zu bearbeiten'
+    );
   }
 
   // Prepare update data
@@ -178,7 +180,9 @@ export async function submitTestimonialForApproval(
   }
 
   if (testimonial.booking.userId !== userId) {
-    throw new Error('Du hast keine Berechtigung, diesen Erfahrungsbericht einzureichen');
+    throw new Error(
+      'Du hast keine Berechtigung, diesen Erfahrungsbericht einzureichen'
+    );
   }
 
   if (testimonial.status !== 'DRAFT') {
@@ -269,7 +273,7 @@ export async function getPublishedTestimonialsForCourse(
     take: limit,
   });
 
-  return testimonials.map((t) => ({
+  return testimonials.map(t => ({
     id: t.id,
     statement: t.statement,
     displayName: t.cachedDisplayName,

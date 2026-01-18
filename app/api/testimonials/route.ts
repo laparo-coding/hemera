@@ -8,11 +8,15 @@
 
 import { auth, currentUser } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
+import { createTestimonialSchema } from '@/lib/schemas/testimonial-schema';
 import {
   createTestimonial,
   getTestimonialsByUserId,
 } from '@/lib/services/testimonial';
-import { createTestimonialSchema } from '@/lib/schemas/testimonial-schema';
+import {
+  toTestimonialApiResponse,
+  toTestimonialWithCourseApiResponse,
+} from '@/lib/types/testimonial';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import {
   createErrorResponse,
@@ -54,9 +58,16 @@ export async function GET(request: NextRequest) {
       count: testimonials.length,
     });
 
-    return createSuccessResponse(testimonials, requestId);
+    // Transform to typed API response with serialized dates
+    return createSuccessResponse(
+      testimonials.map(toTestimonialWithCourseApiResponse),
+      requestId
+    );
   } catch (error) {
-    logger.error('Failed to fetch testimonials', error instanceof Error ? error : undefined);
+    logger.error(
+      'Failed to fetch testimonials',
+      error instanceof Error ? error : undefined
+    );
     return createErrorResponse(
       'Fehler beim Laden der Erfahrungsberichte',
       ErrorCodes.INTERNAL_ERROR,
@@ -128,11 +139,19 @@ export async function POST(request: NextRequest) {
       testimonialId: testimonial.id,
     });
 
-    return createSuccessResponse(testimonial, requestId, 201);
+    // Transform to typed API response with serialized dates
+    return createSuccessResponse(
+      toTestimonialApiResponse(testimonial),
+      requestId,
+      201
+    );
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    logger.error('Failed to create testimonial', error instanceof Error ? error : undefined);
+    logger.error(
+      'Failed to create testimonial',
+      error instanceof Error ? error : undefined
+    );
 
     // Handle known business errors
     if (

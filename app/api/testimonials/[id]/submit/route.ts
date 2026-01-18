@@ -66,7 +66,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    logger.error('Failed to submit testimonial', error instanceof Error ? error : undefined);
+    logger.error(
+      'Failed to submit testimonial',
+      error instanceof Error ? error : undefined
+    );
 
     // Handle known business errors
     if (errorMessage.includes('nicht gefunden')) {

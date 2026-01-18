@@ -6,8 +6,10 @@
  */
 
 import type { NextRequest } from 'next/server';
-import { updateTestimonialStatus } from '@/lib/services/testimonial';
+import { requireAdmin } from '@/lib/auth/admin';
 import { adminUpdateTestimonialSchema } from '@/lib/schemas/testimonial-schema';
+import { updateTestimonialStatus } from '@/lib/services/testimonial';
+import { toTestimonialApiResponse } from '@/lib/types/testimonial';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import {
   createErrorResponse,
@@ -18,7 +20,6 @@ import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { requireAdmin } from '@/lib/auth/admin';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -58,7 +59,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     // Validate input
     const parseResult = adminUpdateTestimonialSchema.safeParse(body);
     if (!parseResult.success) {
-      logger.warn('Invalid status update input', { issues: parseResult.error.issues });
+      logger.warn('Invalid status update input', {
+        issues: parseResult.error.issues,
+      });
       return createErrorResponse(
         parseResult.error.issues[0]?.message || 'Ungültige Eingabe',
         ErrorCodes.INVALID_INPUT,
@@ -77,11 +80,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       newStatus: parseResult.data.status,
     });
 
-    return createSuccessResponse(testimonial, requestId);
+    // Transform to typed API response with serialized dates
+    return createSuccessResponse(
+      toTestimonialApiResponse(testimonial),
+      requestId
+    );
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    logger.error('Failed to update testimonial status', error instanceof Error ? error : undefined);
+    logger.error(
+      'Failed to update testimonial status',
+      error instanceof Error ? error : undefined
+    );
 
     if (errorMessage.includes('nicht gefunden')) {
       return createErrorResponse(

@@ -6,8 +6,13 @@
  */
 
 import type { NextRequest } from 'next/server';
-import { getTestimonialsForAdmin } from '@/lib/services/testimonial';
+import { requireAdmin } from '@/lib/auth/admin';
 import { testimonialFilterSchema } from '@/lib/schemas/testimonial-schema';
+import { getTestimonialsForAdmin } from '@/lib/services/testimonial';
+import {
+  type AdminTestimonialsListResponse,
+  toTestimonialWithCourseApiResponse,
+} from '@/lib/types/testimonial';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import {
   createErrorResponse,
@@ -18,7 +23,6 @@ import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { requireAdmin } from '@/lib/auth/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +60,9 @@ export async function GET(request: NextRequest) {
     // Validate and parse filters
     const parseResult = testimonialFilterSchema.safeParse(queryParams);
     if (!parseResult.success) {
-      logger.warn('Invalid filter parameters', { issues: parseResult.error.issues });
+      logger.warn('Invalid filter parameters', {
+        issues: parseResult.error.issues,
+      });
       return createErrorResponse(
         parseResult.error.issues[0]?.message || 'Ungültige Filter',
         ErrorCodes.INVALID_INPUT,
@@ -77,19 +83,22 @@ export async function GET(request: NextRequest) {
       total,
     });
 
-    return createSuccessResponse(
-      {
-        testimonials,
-        pagination: {
-          total,
-          limit: parseResult.data.limit,
-          offset: parseResult.data.offset,
-        },
+    // Transform to typed API response with serialized dates
+    const responseData: AdminTestimonialsListResponse = {
+      testimonials: testimonials.map(toTestimonialWithCourseApiResponse),
+      pagination: {
+        total,
+        limit: parseResult.data.limit,
+        offset: parseResult.data.offset,
       },
-      requestId
-    );
+    };
+
+    return createSuccessResponse(responseData, requestId);
   } catch (error) {
-    logger.error('Failed to fetch admin testimonials', error instanceof Error ? error : undefined);
+    logger.error(
+      'Failed to fetch admin testimonials',
+      error instanceof Error ? error : undefined
+    );
     return createErrorResponse(
       'Fehler beim Laden der Erfahrungsberichte',
       ErrorCodes.INTERNAL_ERROR,

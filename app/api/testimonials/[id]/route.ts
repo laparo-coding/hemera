@@ -8,11 +8,15 @@
 
 import { auth, currentUser } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
+import { updateTestimonialSchema } from '@/lib/schemas/testimonial-schema';
 import {
   getTestimonialById,
   updateTestimonial,
 } from '@/lib/services/testimonial';
-import { updateTestimonialSchema } from '@/lib/schemas/testimonial-schema';
+import {
+  toTestimonialApiResponse,
+  toTestimonialWithCourseApiResponse,
+} from '@/lib/types/testimonial';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import {
   createErrorResponse,
@@ -71,9 +75,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // For now, return the testimonial - ownership check is in update
 
     logger.info('Successfully fetched testimonial', { testimonialId: id });
-    return createSuccessResponse(testimonial, requestId);
+    // Transform to typed API response with serialized dates
+    return createSuccessResponse(
+      toTestimonialWithCourseApiResponse(testimonial),
+      requestId
+    );
   } catch (error) {
-    logger.error('Failed to fetch testimonial', error instanceof Error ? error : undefined);
+    logger.error(
+      'Failed to fetch testimonial',
+      error instanceof Error ? error : undefined
+    );
     return createErrorResponse(
       'Fehler beim Laden des Erfahrungsberichts',
       ErrorCodes.INTERNAL_ERROR,
@@ -153,11 +164,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     );
 
     logger.info('Successfully updated testimonial', { testimonialId: id });
-    return createSuccessResponse(testimonial, requestId);
+    // Transform to typed API response with serialized dates
+    return createSuccessResponse(
+      toTestimonialApiResponse(testimonial),
+      requestId
+    );
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    logger.error('Failed to update testimonial', error instanceof Error ? error : undefined);
+    logger.error(
+      'Failed to update testimonial',
+      error instanceof Error ? error : undefined
+    );
 
     // Handle known business errors
     if (

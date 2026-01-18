@@ -6,6 +6,10 @@
  */
 
 import {
+  CheckCircle as ApproveIcon,
+  VisibilityOff as HideIcon,
+} from '@mui/icons-material';
+import {
   Alert,
   Avatar,
   Box,
@@ -22,35 +26,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import {
-  CheckCircle as ApproveIcon,
-  VisibilityOff as HideIcon,
-} from '@mui/icons-material';
-import { useEffect, useState } from 'react';
-import type { TestimonialStatus } from '@/lib/schemas/testimonial-schema';
-
-interface TestimonialWithCourse {
-  id: string;
-  statement: string;
-  cachedDisplayName: string;
-  cachedPhotoUrl: string | null;
-  status: TestimonialStatus;
-  createdAt: string;
-  course: {
-    id: string;
-    title: string;
-    slug: string;
-  };
-}
-
-interface AdminTestimonialListResponse {
-  testimonials: TestimonialWithCourse[];
-  pagination: {
-    total: number;
-    limit: number;
-    offset: number;
-  };
-}
+import { useCallback, useEffect, useState } from 'react';
+import type {
+  AdminTestimonialsApiResponse,
+  TestimonialStatus,
+  TestimonialWithCourseApiResponse,
+} from '@/lib/types/testimonial';
 
 const STATUS_LABELS: Record<TestimonialStatus, string> = {
   DRAFT: 'Entwurf',
@@ -59,7 +40,10 @@ const STATUS_LABELS: Record<TestimonialStatus, string> = {
   HIDDEN: 'Ausgeblendet',
 };
 
-const STATUS_COLORS: Record<TestimonialStatus, 'default' | 'warning' | 'success' | 'error'> = {
+const STATUS_COLORS: Record<
+  TestimonialStatus,
+  'default' | 'warning' | 'success' | 'error'
+> = {
   DRAFT: 'default',
   PENDING: 'warning',
   PUBLISHED: 'success',
@@ -69,7 +53,9 @@ const STATUS_COLORS: Record<TestimonialStatus, 'default' | 'warning' | 'success'
 const ITEMS_PER_PAGE = 10;
 
 export default function AdminTestimonialList() {
-  const [testimonials, setTestimonials] = useState<TestimonialWithCourse[]>([]);
+  const [testimonials, setTestimonials] = useState<
+    TestimonialWithCourseApiResponse[]
+  >([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<TestimonialStatus | ''>('');
@@ -77,7 +63,7 @@ export default function AdminTestimonialList() {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  async function fetchTestimonials() {
+  const fetchTestimonials = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -93,7 +79,7 @@ export default function AdminTestimonialList() {
         throw new Error('Fehler beim Laden');
       }
 
-      const data: { data: AdminTestimonialListResponse } = await response.json();
+      const data: AdminTestimonialsApiResponse = await response.json();
       setTestimonials(data.data.testimonials);
       setTotal(data.data.pagination.total);
     } catch (err) {
@@ -101,12 +87,11 @@ export default function AdminTestimonialList() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [page, statusFilter]);
 
   useEffect(() => {
     fetchTestimonials();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, statusFilter]);
+  }, [fetchTestimonials]);
 
   async function updateStatus(id: string, newStatus: TestimonialStatus) {
     setActionLoading(id);
@@ -144,40 +129,42 @@ export default function AdminTestimonialList() {
     <Box>
       {/* Filter */}
       <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
-        <FormControl size="small" sx={{ minWidth: 200 }}>
+        <FormControl size='small' sx={{ minWidth: 200 }}>
           <InputLabel>Status filtern</InputLabel>
           <Select
             value={statusFilter}
-            label="Status filtern"
-            onChange={(e) => {
+            label='Status filtern'
+            onChange={e => {
               setStatusFilter(e.target.value as TestimonialStatus | '');
               setPage(1);
             }}
           >
-            <MenuItem value="">Alle</MenuItem>
-            <MenuItem value="PENDING">Wartet auf Freigabe</MenuItem>
-            <MenuItem value="PUBLISHED">Veröffentlicht</MenuItem>
-            <MenuItem value="HIDDEN">Ausgeblendet</MenuItem>
-            <MenuItem value="DRAFT">Entwürfe</MenuItem>
+            <MenuItem value=''>Alle</MenuItem>
+            <MenuItem value='PENDING'>Wartet auf Freigabe</MenuItem>
+            <MenuItem value='PUBLISHED'>Veröffentlicht</MenuItem>
+            <MenuItem value='HIDDEN'>Ausgeblendet</MenuItem>
+            <MenuItem value='DRAFT'>Entwürfe</MenuItem>
           </Select>
         </FormControl>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant='body2' color='text.secondary'>
           {total} Erfahrungsbericht{total !== 1 ? 'e' : ''}
         </Typography>
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+        <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
 
       {/* List */}
       <Stack spacing={2}>
-        {testimonials.map((testimonial) => (
-          <Card key={testimonial.id} variant="outlined">
+        {testimonials.map(testimonial => (
+          <Card key={testimonial.id} variant='outlined'>
             <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Box
+                sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}
+              >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Avatar
                     src={testimonial.cachedPhotoUrl || undefined}
@@ -186,10 +173,10 @@ export default function AdminTestimonialList() {
                     {testimonial.cachedDisplayName.charAt(0)}
                   </Avatar>
                   <Box>
-                    <Typography variant="subtitle2" fontWeight="bold">
+                    <Typography variant='subtitle2' fontWeight='bold'>
                       {testimonial.cachedDisplayName}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant='caption' color='text.secondary'>
                       {testimonial.course.title}
                     </Typography>
                   </Box>
@@ -197,12 +184,12 @@ export default function AdminTestimonialList() {
                 <Chip
                   label={STATUS_LABELS[testimonial.status]}
                   color={STATUS_COLORS[testimonial.status]}
-                  size="small"
+                  size='small'
                 />
               </Box>
 
               <Typography
-                variant="body2"
+                variant='body2'
                 sx={{
                   fontStyle: 'italic',
                   color: 'text.secondary',
@@ -215,16 +202,23 @@ export default function AdminTestimonialList() {
                 &ldquo;{testimonial.statement}&rdquo;
               </Typography>
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="caption" color="text.secondary">
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <Typography variant='caption' color='text.secondary'>
                   {new Date(testimonial.createdAt).toLocaleDateString('de-DE')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  {(testimonial.status === 'PENDING' || testimonial.status === 'HIDDEN') && (
+                  {(testimonial.status === 'PENDING' ||
+                    testimonial.status === 'HIDDEN') && (
                     <Button
-                      size="small"
-                      variant="contained"
-                      color="success"
+                      size='small'
+                      variant='contained'
+                      color='success'
                       startIcon={
                         actionLoading === testimonial.id ? (
                           <CircularProgress size={16} />
@@ -240,9 +234,9 @@ export default function AdminTestimonialList() {
                   )}
                   {testimonial.status === 'PUBLISHED' && (
                     <Button
-                      size="small"
-                      variant="outlined"
-                      color="error"
+                      size='small'
+                      variant='outlined'
+                      color='error'
                       startIcon={
                         actionLoading === testimonial.id ? (
                           <CircularProgress size={16} />
@@ -264,7 +258,7 @@ export default function AdminTestimonialList() {
       </Stack>
 
       {testimonials.length === 0 && !loading && (
-        <Typography color="text.secondary" textAlign="center" sx={{ py: 4 }}>
+        <Typography color='text.secondary' textAlign='center' sx={{ py: 4 }}>
           Keine Erfahrungsberichte gefunden.
         </Typography>
       )}
@@ -276,7 +270,7 @@ export default function AdminTestimonialList() {
             count={totalPages}
             page={page}
             onChange={(_, value) => setPage(value)}
-            color="primary"
+            color='primary'
           />
         </Box>
       )}
