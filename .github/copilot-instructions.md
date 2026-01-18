@@ -1,6 +1,6 @@
 # hemera Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2025-12-07
+Auto-generated from all feature plans. Last updated: 2025-01-15
 
 ## Communication Style
 
@@ -9,13 +9,13 @@ Auto-generated from all feature plans. Last updated: 2025-12-07
 - Example: "Dein Kurs", "Lade deinen Lebenslauf hoch", "Deine Buchung"
 
 ## Active Technologies
+- TypeScript 5.x with Next.js 15.5.6 (App Router) + React 18, Material-UI v5, Clerk auth, Prisma ORM, Rollbar monitoring (017-testimonial-management)
+- PostgreSQL via Prisma models (Testimonial entity with admin approval workflow) (017-testimonial-management)
 - TypeScript 5+ with Next.js 15.5.6 (App Router) + React 18+, Material-UI v5, Clerk (auth), Prisma (ORM), Rollbar (monitoring) (014-create-an-admin)
 - PostgreSQL with Prisma ORM for course data and enrollment relationships (014-create-an-admin)
 - TypeScript 5+, Next.js 15.5.6 (App Router), React 18+ + MUI v5, Clerk (auth), Prisma (ORM), React Leaflet, Leafle (015-course-locations)
 - TypeScript 5.x with Next.js 15.5.6 (App Router) + React 18, Material-UI v5, Clerk auth, Prisma ORM, Mux video SDK/API, Rollbar monitoring (016-course-assignments)
 - PostgreSQL via Prisma models (course participation, documents, summary assets) (016-course-assignments)
-- TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Material-UI v5, @mux/mux-player-react, Prisma ORM, Clerk (auth) (013-layout-improvement-course-detail-page)
-- PostgreSQL via Prisma (Course model extension: `heroVideoPlaybackId`) (013-layout-improvement-course-detail-page)
 
 - TypeScript 5.x, Next.js 15.5.6, React 18+ + MUI v5+, Clerk (auth), Rollbar (monitoring), Prisma
   (ORM)
@@ -66,11 +66,9 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
-- 013-layout-improvement-course-detail-page: Added TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Material-UI v5, @mux/mux-player-react, Prisma ORM, Clerk (auth)
+- 017-testimonial-management: Added Testimonial entity with admin approval workflow, name display format options, WYSIWYG preview
 - 016-course-assignments: Added TypeScript 5.x with Next.js 15.5.6 (App Router) + React 18, Material-UI v5, Clerk auth, Prisma ORM, Mux video SDK/API, Rollbar monitoring
-- 015-course-locations: Added TypeScript 5+, Next.js 15.5.6 (App Router), React 18+ + MUI v5, Clerk (auth), Prisma (ORM), React Leaflet, Leafle
-
-  skeleton, webpack cache fix)
+- 015-course-locations: Added TypeScript 5+, Next.js 15.5.6 (App Router), React 18+ + MUI v5, Clerk (auth), Prisma (ORM), React Leaflet, Leaflet
 
 ## PR Review Process
 

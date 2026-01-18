@@ -13,7 +13,6 @@ import {
   Box,
   Button,
   CardContent,
-  Chip,
   Divider,
   Paper,
   Skeleton,
@@ -32,25 +31,6 @@ const colors = {
   gold: '#DDA853',
   sage: '#A6CDC6',
   white: '#FFFFFF',
-} as const;
-
-// Status colors for booking states
-const statusColors = {
-  PAID: {
-    background: 'rgba(166, 205, 198, 0.15)',
-    border: colors.sage,
-    text: colors.petrol,
-  },
-  PENDING: {
-    background: 'rgba(221, 168, 83, 0.15)',
-    border: colors.gold,
-    text: colors.petrol,
-  },
-  FAILED: {
-    background: 'rgba(232, 180, 184, 0.15)',
-    border: '#E8B4B8',
-    text: '#8B4A50',
-  },
 } as const;
 
 interface Booking {
@@ -303,18 +283,6 @@ const UserDashboardClerk: React.FC = () => {
       setLoading(false);
     }
   }, [userLoaded, user, fetchBookings]);
-
-  // Memoized helper functions for better performance
-  const getStatusIcon = useCallback((status: string) => {
-    switch (status) {
-      case 'PAID':
-        return <CheckCircleOutlined />;
-      case 'PENDING':
-        return <PendingOutlined />;
-      default:
-        return <PendingOutlined />;
-    }
-  }, []);
 
   // Memoized stats cards component
   const StatsCards = useMemo(
@@ -614,37 +582,6 @@ const UserDashboardClerk: React.FC = () => {
                       alignItems='center'
                       justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
                     >
-                      <Chip
-                        icon={getStatusIcon(booking.paymentStatus)}
-                        label={
-                          booking.paymentStatus === 'PAID'
-                            ? 'Bezahlt'
-                            : booking.paymentStatus === 'FAILED'
-                              ? 'Fehlgeschlagen'
-                              : 'Ausstehend'
-                        }
-                        size='small'
-                        sx={{
-                          bgcolor:
-                            statusColors[
-                              booking.paymentStatus as keyof typeof statusColors
-                            ]?.background || statusColors.PENDING.background,
-                          border: `1px solid ${
-                            statusColors[
-                              booking.paymentStatus as keyof typeof statusColors
-                            ]?.border || statusColors.PENDING.border
-                          }`,
-                          color:
-                            statusColors[
-                              booking.paymentStatus as keyof typeof statusColors
-                            ]?.text || statusColors.PENDING.text,
-                          fontFamily: '"Inter", sans-serif',
-                          fontWeight: 500,
-                          '& .MuiChip-icon': {
-                            color: 'inherit',
-                          },
-                        }}
-                      />
                       {(booking.paymentStatus === 'PAID' ||
                         booking.paymentStatus === 'CONFIRMED') && (
                         <Link href='/my-courses' passHref>
@@ -677,7 +614,7 @@ const UserDashboardClerk: React.FC = () => {
         )}
       </Paper>
     ),
-    [bookings, getStatusIcon]
+    [bookings]
   );
 
   // Production path — E2E fallback handled above

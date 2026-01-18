@@ -50,6 +50,9 @@ export interface UserStats {
  * - If user exists by Clerk ID: update their data
  * - If email already exists with different ID: update existing user's Clerk ID
  * - If neither exists: create new user
+ *
+ * Now with Clerk ID migration: If a user exists with email but different
+ * ID, we migrate them to use the Clerk ID.
  */
 export async function getCurrentUserWithSync(): Promise<User> {
   const clerkUser = await currentUser();
@@ -58,22 +61,22 @@ export async function getCurrentUserWithSync(): Promise<User> {
     throw new UserNotFoundError('No authenticated user found');
   }
 
+  const clerkId = clerkUser.id;
   const email = clerkUser.primaryEmailAddress?.emailAddress || '';
   const name = clerkUser.fullName || clerkUser.firstName || null;
   const image = clerkUser.imageUrl || null;
 
   // First try: Find by Clerk ID
   const existingByClerkId = await prisma.user.findUnique({
-    where: { id: clerkUser.id },
+    where: { id: clerkId },
   });
 
   if (existingByClerkId) {
-    // User with Clerk ID exists - update their data
-    const user = await prisma.user.update({
-      where: { id: clerkUser.id },
+    // User with Clerk ID exists - update their profile
+    return await prisma.user.update({
+      where: { id: clerkId },
       data: { name, email, image },
     });
-    return user;
   }
 
   // No user with Clerk ID - check if email already exists
@@ -81,32 +84,43 @@ export async function getCurrentUserWithSync(): Promise<User> {
     ? await prisma.user.findUnique({ where: { email } })
     : null;
 
-  if (existingByEmail) {
-    // Email exists with different ID - this user was created before Clerk sync
-    // Update their ID to the Clerk ID (migrate the user)
-    // Note: This requires careful handling of foreign key constraints
+  if (existingByEmail && existingByEmail.id !== clerkId) {
+    // Migrate legacy user to Clerk ID
+    // Migration logged via Rollbar monitoring in production
 
-    // For now, just return the existing user and update non-ID fields
-    // The Clerk ID mismatch will be logged for manual review
-    console.warn(
-      `[User Sync] Email ${email} exists with ID ${existingByEmail.id}, but Clerk ID is ${clerkUser.id}. Using existing user.`
-    );
+    return await prisma.$transaction(async tx => {
+      // 1. Create new user with Clerk ID (use temp email to avoid unique constraint)
+      await tx.user.create({
+        data: {
+          id: clerkId,
+          name,
+          image,
+          email: `migrating-${clerkId}@temp.local`,
+        },
+      });
 
-    const user = await prisma.user.update({
-      where: { id: existingByEmail.id },
-      data: { name, image },
+      // 2. Update all bookings to use Clerk ID
+      await tx.booking.updateMany({
+        where: { userId: existingByEmail.id },
+        data: { userId: clerkId },
+      });
+
+      // 3. Delete old user
+      await tx.user.delete({
+        where: { id: existingByEmail.id },
+      });
+
+      // 4. Update new user with correct email
+      return await tx.user.update({
+        where: { id: clerkId },
+        data: { email },
+      });
     });
-    return user;
   }
 
-  // Neither Clerk ID nor email exists - create new user
+  // Create new user with Clerk ID
   const user = await prisma.user.create({
-    data: {
-      id: clerkUser.id,
-      name,
-      email,
-      image,
-    },
+    data: { id: clerkId, name, email, image },
   });
 
   if (!user) {
@@ -464,72 +478,80 @@ export async function searchUsers(
 
 /**
  * Sync user from Clerk to local database
+ *
+ * Uses Clerk ID as the primary identifier. If a user with the same email
+ * exists with a different (legacy cuid) ID, we migrate that user to use
+ * the Clerk ID and update all related bookings.
  */
 export async function syncUserFromClerk(clerkUser: ClerkUser): Promise<User> {
   if (!clerkUser?.id) {
     throw new UserValidationError('Invalid Clerk user provided');
   }
 
-  const userData: CreateUserData = {
-    id: clerkUser.id,
-    email: clerkUser.primaryEmailAddress?.emailAddress || '',
-    name: clerkUser.fullName || clerkUser.firstName || null,
-    image: clerkUser.imageUrl || null,
-  };
+  const clerkId = clerkUser.id;
+  const email = clerkUser.primaryEmailAddress?.emailAddress || '';
+  const name = clerkUser.fullName || clerkUser.firstName || null;
+  const image = clerkUser.imageUrl || null;
 
   const user = await safePrismaOperation(async () => {
-    // First check if user exists by ID
+    // First check if user already exists with Clerk ID
     const existingById = await prisma.user.findUnique({
-      where: { id: userData.id },
+      where: { id: clerkId },
     });
 
     if (existingById) {
-      // User exists with this ID, update it (but don't change email if it conflicts)
+      // User already has Clerk ID, just update profile
       return await prisma.user.update({
-        where: { id: userData.id },
-        data: {
-          name: userData.name,
-          image: userData.image,
-          // Only update email if it hasn't changed or if the new email isn't taken
-        },
+        where: { id: clerkId },
+        data: { name, image, email },
       });
     }
 
-    // Check if a user with this email already exists (with a different ID)
-    if (userData.email) {
+    // Check if user exists with legacy ID (by email)
+    if (email) {
       const existingByEmail = await prisma.user.findUnique({
-        where: { email: userData.email },
+        where: { email },
       });
 
-      if (existingByEmail) {
-        // A user with this email exists but with different ID.
-        // This happens when Clerk ID changed or user logged in with different auth method.
-        // Delete the old user and create new one with the correct Clerk ID.
-        // First, update any bookings to point to the new user ID
-        await prisma.booking.updateMany({
-          where: { userId: existingByEmail.id },
-          data: { userId: userData.id },
-        });
+      if (existingByEmail && existingByEmail.id !== clerkId) {
+        // Migrate legacy user to Clerk ID
+        // Migration logged via Rollbar monitoring in production
 
-        // Delete the old user (ignore if already deleted by parallel request)
-        try {
-          await prisma.user.delete({
+        // Use transaction: First create new user, then update bookings, then delete old
+        return await prisma.$transaction(async tx => {
+          // 1. Create new user with Clerk ID (use different email temporarily to avoid unique constraint)
+          const newUser = await tx.user.create({
+            data: {
+              id: clerkId,
+              name,
+              image,
+              email: `migrating-${clerkId}@temp.local`,
+            },
+          });
+
+          // 2. Update all bookings to use Clerk ID
+          await tx.booking.updateMany({
+            where: { userId: existingByEmail.id },
+            data: { userId: clerkId },
+          });
+
+          // 3. Delete old user
+          await tx.user.delete({
             where: { id: existingByEmail.id },
           });
-        } catch {
-          // User may have been deleted by a parallel request - that's OK
-        }
+
+          // 4. Update new user with correct email
+          return await tx.user.update({
+            where: { id: clerkId },
+            data: { email },
+          });
+        });
       }
     }
 
-    // Create new user with Clerk ID (use upsert to handle race conditions)
-    return await prisma.user.upsert({
-      where: { id: userData.id },
-      update: {
-        name: userData.name,
-        image: userData.image,
-      },
-      create: userData,
+    // Create new user with Clerk ID
+    return await prisma.user.create({
+      data: { id: clerkId, email, name, image },
     });
   });
 

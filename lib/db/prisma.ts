@@ -3,6 +3,10 @@
  *
  * Uses Prisma Accelerate for connection pooling and edge optimization in production.
  * Falls back to PG adapter for tests/CI when Accelerate is not available.
+ *
+ * Note: Prisma 7.2.0 has a known bug with @map() decorator and driver adapters
+ * when using the Query Compiler (see https://github.com/prisma/prisma/issues/27357).
+ * We work around this by regenerating the client after DATABASE_URL is set.
  */
 
 import { PrismaPg } from '@prisma/adapter-pg';

@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import BookingSuccessContent, {
   type BookingSuccessViewModel,
 } from '../../components/booking/BookingSuccessContent';
+import { getCurrentUserWithSync } from '../../lib/api/users';
 import { getBookingById } from '../../lib/services/booking';
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {
@@ -43,17 +44,19 @@ export default async function BookingSuccessPage({
     notFound();
   }
 
-  const { userId } = await auth();
+  const { userId: clerkUserId } = await auth();
 
-  if (!userId) {
+  if (!clerkUserId) {
     redirect(
       `/sign-in?redirect_url=${encodeURIComponent(`/booking-success?bookingId=${bookingId}`)}`
     );
   }
 
+  // Get synced user to match the userId stored in booking
+  const syncedUser = await getCurrentUserWithSync();
   const booking = await getBookingById(bookingId);
 
-  if (!booking || booking.userId !== userId) {
+  if (!booking || booking.userId !== syncedUser.id) {
     notFound();
   }
 

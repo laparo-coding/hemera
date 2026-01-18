@@ -431,6 +431,7 @@ describeWithServer('Admin Course API - Contract Tests', () => {
       // First create a booking
       const user = await prisma.user.create({
         data: {
+          id: `user_test_${Date.now()}`,
           email: `test-${Date.now()}@example.com`,
         },
       });
@@ -528,6 +529,7 @@ describeWithServer('Admin Course API - Contract Tests', () => {
 
       const user = await prisma.user.create({
         data: {
+          id: `user_enrolled_${Date.now()}`,
           email: `enrolled-${Date.now()}@example.com`,
         },
       });
@@ -568,6 +570,7 @@ describeWithServer('Admin Course API - Contract Tests', () => {
 
       const user = await prisma.user.create({
         data: {
+          id: `user_student_${Date.now()}`,
           email: `student-${Date.now()}@example.com`,
         },
       });

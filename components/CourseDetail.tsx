@@ -23,6 +23,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { getAvatarInitial } from '@/lib/utils/avatar';
 import { formatDate } from '../lib/utils/date-format';
 
 interface CourseLocation {
@@ -37,7 +38,7 @@ interface Course {
   title: string;
   description: string | null;
   slug: string;
-  price: number | null;
+  price: number;
   currency: string;
   capacity?: number | null;
   startDate?: Date | null;
@@ -120,8 +121,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     return Number.isFinite(dateValue.getTime()) && dateValue < new Date();
   }, [course.startDate, isMounted]);
 
-  const formatCurrency = (amount: number | null, currency: string) => {
-    if (amount === null || amount === undefined) {
+  const formatCurrency = (amount: number, currency: string) => {
+    if (amount === 0) {
       return 'Kostenlos';
     }
 
@@ -289,7 +290,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     fontSize: { xs: '3rem', md: '4rem' },
                   }}
                 >
-                  {course.title.charAt(0)}
+                  {getAvatarInitial(course.title)}
                 </Typography>
               </Box>
             )}

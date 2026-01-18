@@ -5,13 +5,14 @@ import { de } from 'date-fns/locale';
 import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
+import { getAvatarInitial } from '@/lib/utils/avatar';
 
 export interface Course {
   id: string;
   title: string;
   description: string | null;
   slug: string;
-  price: number | null;
+  price: number;
   currency: string;
   capacity?: number | null;
   startDate?: Date | null;
@@ -73,7 +74,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         ) : (
           <div className='absolute inset-0 flex items-center justify-center'>
             <span className='text-4xl font-bold text-white opacity-50'>
-              {course.title.charAt(0)}
+              {getAvatarInitial(course.title)}
             </span>
           </div>
         )}

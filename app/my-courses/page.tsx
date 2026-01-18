@@ -39,7 +39,7 @@ export default async function MyCoursesPage() {
       </Typography>
 
       <Typography variant='body1' color='text.secondary' sx={{ mb: 4 }}>
-        Verfolge deinen Fortschritt und schließe deine Kurse ab.
+        Verfolge den Fortschritt deines Kurses
       </Typography>
 
       <MyCoursesClient userId={user.id} />

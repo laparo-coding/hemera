@@ -67,3 +67,20 @@ export function formatShortDate(
     timeZone: TIMEZONE,
   });
 }
+
+/**
+ * Format a month and year for display (e.g., "Januar 2026")
+ * Useful for testimonial timestamps where day precision isn't needed.
+ */
+export function formatMonthYear(
+  date: Date | string | null | undefined
+): string | undefined {
+  if (!date) return undefined;
+  const dateObj = date instanceof Date ? date : new Date(date);
+  if (!Number.isFinite(dateObj.getTime())) return undefined;
+  return dateObj.toLocaleDateString('de-DE', {
+    year: 'numeric',
+    month: 'long',
+    timeZone: TIMEZONE,
+  });
+}

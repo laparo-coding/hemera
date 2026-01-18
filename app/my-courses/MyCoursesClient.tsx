@@ -266,13 +266,6 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
       {/* Active Courses - User is working through the steps */}
       {activeEnrollments.length > 0 && (
         <Box sx={{ mb: 4 }}>
-          <Typography
-            variant='h6'
-            sx={{ color: colors.petrol, mb: 2, fontWeight: 600 }}
-          >
-            Aktive Kurse ({activeEnrollments.length})
-          </Typography>
-
           {activeEnrollments.map(item => (
             <Accordion
               key={item.booking.id}

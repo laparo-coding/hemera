@@ -14,11 +14,7 @@ if (!CLERK_SECRET_KEY) {
 }
 
 const userData = {
-  email_address: [
-    'e2e.test@example.com',
-    'e2e.duplicate@example.com',
-    'e2e.dashboard@example.com',
-  ],
+  email_address: ['e2e.test@example.com'],
   password: 'E2ETestPassword2024!SecureForTesting',
   first_name: 'E2E',
   last_name: 'Test',
@@ -52,11 +48,9 @@ const req = https.request(options, res => {
 
   res.on('end', () => {
     if (res.statusCode === 200 || res.statusCode === 201) {
-      console.log('✅ Test users created successfully!');
-      console.log(
-        'Emails: e2e.test@example.com, e2e.duplicate@example.com, e2e.dashboard@example.com'
-      );
-      console.log('Password: TestPassword123!');
+      console.log('✅ Test user created successfully!');
+      console.log('Email: e2e.test@example.com');
+      console.log('Password: E2ETestPassword2024!SecureForTesting');
       const response = JSON.parse(data);
       console.log('User ID:', response.id);
     } else {
