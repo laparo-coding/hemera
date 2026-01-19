@@ -116,7 +116,7 @@
     "jest-junit": "^16.0.0",
     "lint-staged": "^16.2.7",
     "playwright": "^1.56.1",
-    "prisma": "^7.3.0-dev.15",
+    "prisma": "^7.3.0-integration-prisma6-fix-cloudflare-engine.3",
     "testcontainers": "^11.7.2",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
