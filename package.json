@@ -67,7 +67,7 @@
     "@mui/material": "^7.3.4",
     "@mux/mux-player-react": "^3.10.2",
     "@prisma/adapter-pg": "^7.3.0-dev.15",
-    "@prisma/client": "^7.3.0-dev.15",
+    "@prisma/client": "^7.3.0-integration-prisma6-fix-cloudflare-engine.3",
     "@rollbar/react": "^1.0.0",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.6.0",
