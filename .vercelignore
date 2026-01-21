@@ -25,7 +25,7 @@ specs/
 .github/
 .vscode/
 .idea/
-scripts/
+# scripts/ - benötigt für prebuild (verify-env.mjs)
 
 # Logs and debug files
 logs/
@@ -44,7 +44,7 @@ biome.json
 eslint.config.mjs
 jest.config.ts
 playwright.config.ts
-tsconfig.json
+# tsconfig.json - benötigt für path aliases
 cspell.config.yaml
 cspell.words.txt
 
