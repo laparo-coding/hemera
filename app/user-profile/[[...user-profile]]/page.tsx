@@ -9,7 +9,7 @@ import {
 
 export default function UserProfilePage() {
   return (
-    <div className='flex justify-center py-8'>
+    <div className='flex min-h-screen justify-center px-4 pb-8 pt-24'>
       <SignedIn>
         <UserProfile path='/user-profile' />
       </SignedIn>
