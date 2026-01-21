@@ -6,6 +6,13 @@
  * Example: npm run set-admin-role andreas@example.com
  *
  * This script sets the admin role for a Clerk user by email.
+ *
+ * Exit Codes:
+ *   0 - Success (role set or already admin)
+ *   1 - Usage error (missing email argument)
+ *   2 - Validation error (invalid email format)
+ *   3 - Not found (user does not exist in Clerk)
+ *   4 - API error (Clerk API failure)
  */
 
 import { createClerkClient } from '@clerk/backend';
@@ -27,7 +34,7 @@ async function main() {
     console.error('❌ Fehler: Bitte E-Mail-Adresse angeben');
     console.log('   Verwendung: npm run set-admin-role <email>');
     console.log('   Beispiel:   npm run set-admin-role admin@hemera.academy');
-    process.exit(1);
+    process.exit(1); // Usage error
   }
 
   if (!isValidEmail(email)) {
@@ -36,7 +43,7 @@ async function main() {
     console.log('   - Fehlende @ oder Domain');
     console.log('   - Leerzeichen oder Sonderzeichen');
     console.log('   - Tippfehler');
-    process.exit(1);
+    process.exit(2); // Validation error
   }
 
   console.log(`🔍 Suche User mit E-Mail: ${email}\n`);
@@ -58,7 +65,7 @@ async function main() {
       console.log('   - E-Mail-Adresse falsch geschrieben');
       console.log('   - User existiert nicht in Clerk');
       console.log('   - Falsches Clerk-Projekt in .env.local');
-      process.exit(1);
+      process.exit(3); // User not found
     }
 
     const user = users[0];
@@ -153,7 +160,7 @@ async function main() {
     console.error('   - Netzwerkproblem oder Clerk API nicht erreichbar');
     console.error('   - Unzureichende Berechtigungen für den API-Key');
 
-    process.exit(1);
+    process.exit(4); // API error
   }
 }
 
