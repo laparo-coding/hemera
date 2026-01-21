@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env node
 /**
  * Set Admin Role Script
  *
@@ -6,6 +6,7 @@
  * Example: npm run set-admin-role andreas@example.com
  *
  * This script sets the admin role for a Clerk user by email.
+ * Note: Run via 'npm run set-admin-role' which uses tsx for TypeScript execution.
  *
  * Exit Codes:
  *   0 - Success (role set or already admin)
