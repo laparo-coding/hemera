@@ -4,18 +4,21 @@
  * Adds isAdmin helper to existing permissions module for server actions and API routes.
  */
 
-import { auth } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
+import { syncUserFromClerk } from '../api/users';
 import { isAdmin as checkIsAdmin } from './permissions';
 
 /**
- * Check if current user has admin role and return admin ID for audit trail
- * Throws error if not authenticated or not admin
- * @returns adminId - The authenticated admin's user ID
+ * Require admin role and return the admin's DB user ID for audit trails.
+ *
+ * - Uses Clerk to verify authentication and role (via permissions.isAdmin)
+ * - Ensures a corresponding DB user exists via syncUserFromClerk
+ * - Returns the DB user's ID (not the Clerk ID)
  */
 export async function requireAdmin(): Promise<string> {
-  const { userId } = await auth();
+  const clerkUser = await currentUser();
 
-  if (!userId) {
+  if (!clerkUser?.id) {
     throw new Error('AUTH_NOT_AUTHENTICATED');
   }
 
@@ -25,7 +28,8 @@ export async function requireAdmin(): Promise<string> {
     throw new Error('AUTH_INSUFFICIENT_PERMISSIONS');
   }
 
-  return userId;
+  const dbUser = await syncUserFromClerk(clerkUser);
+  return dbUser.id;
 }
 
 /**

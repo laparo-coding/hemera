@@ -524,7 +524,7 @@ export async function syncUserFromClerk(clerkUser: ClerkUser): Promise<User> {
         // Use transaction: First create new user, then update bookings, then delete old
         return await prisma.$transaction(async tx => {
           // 1. Create new user with Clerk ID (use different email temporarily to avoid unique constraint)
-          const newUser = await tx.user.create({
+          const _newUser = await tx.user.create({
             data: {
               id: clerkId,
               name,

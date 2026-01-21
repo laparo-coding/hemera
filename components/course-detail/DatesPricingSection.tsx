@@ -15,7 +15,7 @@ import { colors, shadows, spacing, typography } from '../../lib/design-tokens';
 import { BookingCTA } from './BookingCTA';
 
 export interface DatesPricingSectionProps {
-  price: number;
+  price: number | null | undefined;
   currency: string;
   startDate: Date | null;
   startTime: Date | null;
@@ -29,9 +29,22 @@ export interface DatesPricingSectionProps {
 }
 
 /**
- * Format price in German locale with EUR symbol
+ * Format price in German locale with EUR symbol.
+ * - `null`/`undefined` werden als "Preis auf Anfrage" behandelt.
+ * - `0` wird als "Kostenlos" dargestellt.
  */
-function formatPrice(price: number, currency: string = 'EUR'): string {
+function formatPrice(
+  price: number | null | undefined,
+  currency: string = 'EUR'
+): string {
+  if (price === null || price === undefined) {
+    return 'Preis auf Anfrage';
+  }
+
+  if (price === 0) {
+    return 'Kostenlos';
+  }
+
   try {
     return new Intl.NumberFormat('de-DE', {
       style: 'currency',
@@ -237,7 +250,10 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
                     color: colors.petrol,
                   }}
                 >
-                  {formatPrice(price, currency)} inkl. 19% MwSt.
+                  {formatPrice(price, currency)}
+                  {price !== null && price !== undefined && price > 0
+                    ? ' inkl. 19% MwSt.'
+                    : ''}
                 </Typography>
               </Box>
             </Box>
@@ -248,7 +264,7 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
                 courseId={courseId}
                 courseSlug={courseSlug}
                 variant='primary'
-                price={price}
+                price={price ?? undefined}
                 currency={currency}
                 label='Jetzt buchen'
               />
