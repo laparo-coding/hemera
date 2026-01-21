@@ -371,7 +371,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     const totalSpent = bookings
       .filter(b => b.paymentStatus === 'PAID')
       .reduce(
-        (sum, booking) => sum + (booking.amount || booking.course.price || 0),
+        (sum, booking) => sum + (booking.amount ?? booking.course.price ?? 0),
         0
       );
 

@@ -16,6 +16,11 @@ const PAYMENT_STATUS_LABELS: Record<string, string> = {
 };
 
 function formatCurrency(amount: number, currency: string) {
+  // Treat zero amounts as free courses for display purposes
+  if (amount === 0) {
+    return 'Kostenlos';
+  }
+
   try {
     return new Intl.NumberFormat('de-DE', {
       style: 'currency',

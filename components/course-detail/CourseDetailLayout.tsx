@@ -11,6 +11,7 @@ import { colors } from '../../lib/design-tokens';
 import { BookingCTA } from './BookingCTA';
 import { CourseHeroSection } from './CourseHeroSection';
 import { CourseOverviewSection } from './CourseOverviewSection';
+import { CourseTestimonialsLoader } from './CourseTestimonialsLoader';
 import type { CurriculumModule } from './CurriculumSection';
 import { CurriculumSection } from './CurriculumSection';
 import { DatesPricingSection } from './DatesPricingSection';
@@ -93,8 +94,15 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
         courseSlug={courseSlug}
       />
 
-      {/* 5. Testimonials Section - Dark background */}
-      <TestimonialsSection testimonials={course.testimonials || []} />
+      {/* 5. Testimonials Section - Dark background
+          - Zeigt serverseitig gelieferte Testimonials an, falls vorhanden
+          - Fällt ansonsten auf einen Client-Fetch über die öffentliche API zurück
+      */}
+      {course.testimonials && course.testimonials.length > 0 ? (
+        <TestimonialsSection testimonials={course.testimonials} />
+      ) : (
+        <CourseTestimonialsLoader courseIdOrSlug={courseSlug} />
+      )}
 
       {/* 6. Final CTA Banner - Full-width gold */}
       <BookingCTA

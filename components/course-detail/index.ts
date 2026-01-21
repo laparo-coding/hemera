@@ -17,6 +17,7 @@ export type { CourseHeroSectionProps } from './CourseHeroSection';
 export { CourseHeroSection } from './CourseHeroSection';
 export type { CourseOverviewSectionProps } from './CourseOverviewSection';
 export { CourseOverviewSection } from './CourseOverviewSection';
+export { CourseTestimonialsLoader } from './CourseTestimonialsLoader';
 export type {
   CurriculumModule,
   CurriculumSectionProps,

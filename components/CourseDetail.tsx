@@ -121,7 +121,8 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
   }, [course.startDate, isMounted]);
 
   const formatCurrency = (amount: number | null, currency: string) => {
-    if (amount === null || amount === undefined) {
+    // Treat null/undefined and explicit zero as "Kostenlos" for UI consistency
+    if (amount === null || amount === undefined || amount === 0) {
       return 'Kostenlos';
     }
 
