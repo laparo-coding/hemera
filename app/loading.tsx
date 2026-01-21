@@ -11,7 +11,7 @@ import { Box, Container, Skeleton, Stack } from '@mui/material';
  */
 export default function Loading() {
   return (
-    <main style={{ paddingTop: '64px' }}>
+    <div style={{ paddingTop: '64px' }}>
       {/* Hero Section Skeleton */}
       <Box
         component='section'
@@ -129,6 +129,6 @@ export default function Loading() {
           </Stack>
         </Container>
       </Box>
-    </main>
+    </div>
   );
 }

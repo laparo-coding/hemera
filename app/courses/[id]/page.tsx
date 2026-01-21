@@ -20,7 +20,7 @@ export { genMetadata as generateMetadata };
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 /**
@@ -41,7 +41,7 @@ function mapLevel(
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {
-  const { id: identifier } = await params;
+  const { id: identifier } = params;
 
   let course: Awaited<ReturnType<typeof getCourseBySlug>> | null = null;
 
