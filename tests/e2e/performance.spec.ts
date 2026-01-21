@@ -67,7 +67,7 @@ test.describe('Core Web Vitals Validation', () => {
     // Check for layout stability by ensuring no elements shift unexpectedly
     await page.waitForTimeout(500); // Wait for any dynamic content
 
-    const mainContent = page.locator('main');
+    const mainContent = page.locator('main').first();
     const initialBox = await mainContent.boundingBox();
 
     await page.waitForTimeout(1000); // Wait for potential shifts
@@ -142,7 +142,7 @@ test.describe('Core Web Vitals Validation', () => {
 
     // Layout stability test
     await page.waitForTimeout(500);
-    const contentContainer = page.locator('main');
+    const contentContainer = page.locator('main').first();
     const initialBox = await contentContainer.boundingBox();
 
     await page.waitForTimeout(1000);
@@ -540,7 +540,7 @@ test.describe('Lazy Loading Validation', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     // Check for skeleton or loading state (FR-007)
-    const mainContent = page.locator('main');
+    const mainContent = page.locator('main').first();
     const initialBox = await mainContent.boundingBox();
 
     // Wait for content to fully load

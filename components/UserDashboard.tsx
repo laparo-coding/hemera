@@ -303,18 +303,6 @@ const UserDashboardClerk: React.FC = () => {
     }
   }, [userLoaded, user, fetchBookings]);
 
-  // Memoized helper functions for better performance
-  const getStatusIcon = useCallback((status: string) => {
-    switch (status) {
-      case 'PAID':
-        return <CheckCircleOutlined />;
-      case 'PENDING':
-        return <PendingOutlined />;
-      default:
-        return <PendingOutlined />;
-    }
-  }, []);
-
   // Memoized stats cards component
   const StatsCards = useMemo(
     () => (

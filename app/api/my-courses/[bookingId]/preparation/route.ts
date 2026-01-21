@@ -7,7 +7,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getCurrentUserWithSync } from '../../../../../lib/api/users';
+import { getCurrentUserWithSync } from '@/lib/api/users';
 import {
   completePreparationStep,
   getParticipationByBookingId,

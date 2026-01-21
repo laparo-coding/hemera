@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { getCurrentUserWithSync } from '../../../../lib/api/users';
+import { getCurrentUserWithSync } from '@/lib/api/users';
 import { StripeConfigurationError } from '../../../../lib/errors';
 import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
 import { updateBookingStatus } from '../../../../lib/services/booking';

@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '../../../../lib/db/prisma';
 import { STRIPE_API_VERSION } from '../../../../lib/stripe/config';
+import { normalizePrice } from '../../../../lib/utils/currency';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -107,13 +108,14 @@ export async function GET(request: NextRequest) {
         stripeError instanceof Stripe.errors.StripeError &&
         stripeError.code === 'resource_missing'
       ) {
+        const safePrice = normalizePrice(booking.amount, booking.currency);
         return NextResponse.json({
           success: true,
           booking: {
             id: booking.id,
             courseTitle: booking.course.title,
-            price: booking.amount,
-            currency: booking.currency,
+            price: safePrice.amount,
+            currency: safePrice.currency,
             paymentStatus: booking.paymentStatus,
             createdAt: booking.createdAt,
           },
@@ -342,13 +344,15 @@ export async function GET(request: NextRequest) {
       throw new Error('Failed to finalize booking after payment.');
     }
 
+    const safePrice = normalizePrice(booking.amount, booking.currency);
+
     return NextResponse.json({
       success: true,
       booking: {
         id: booking.id,
         courseTitle: booking.course.title,
-        price: booking.amount,
-        currency: booking.currency,
+        price: safePrice.amount,
+        currency: safePrice.currency,
         paymentStatus: booking.paymentStatus,
         createdAt: booking.createdAt,
       },

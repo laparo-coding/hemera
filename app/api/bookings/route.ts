@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '../../../lib/db/prisma';
 import { logError } from '../../../lib/errors';
+import { normalizePrice } from '../../../lib/utils/currency';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -36,12 +37,14 @@ function normalizeBookings(bookings: BookingRecord[], requestId: string) {
       );
     }
 
+    const priceInfo = normalizePrice(booking.amount, booking.currency);
+
     return {
       id: booking.id,
       courseId: booking.courseId,
       courseTitle: booking.course?.title ?? 'Kurs nicht mehr verfügbar',
-      coursePrice: booking.amount,
-      currency: booking.currency,
+      coursePrice: priceInfo.amount,
+      currency: priceInfo.currency,
       paymentStatus: booking.paymentStatus,
       createdAt: booking.createdAt,
     };

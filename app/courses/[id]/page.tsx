@@ -162,7 +162,9 @@ export default async function CourseDetailPage({ params }: PageProps) {
       null,
     thumbnailUrl: course.thumbnailUrl ?? null,
     instructor: course.instructor ?? null,
-    price: course.price,
+    // Normalize null prices to 0 cents; downstream components can
+    // still treat missing/"no price" via optional props where needed.
+    price: course.price ?? 0,
     currency: course.currency || 'EUR',
     startDate: course.startDate ?? null,
     startTime: course.startTime ?? null,

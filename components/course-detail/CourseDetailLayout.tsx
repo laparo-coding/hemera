@@ -101,7 +101,7 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
         courseId={course.id}
         courseSlug={courseSlug}
         variant='banner'
-        price={course.price}
+        price={course.price || undefined}
         currency={course.currency}
       />
     </Box>
