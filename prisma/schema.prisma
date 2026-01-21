@@ -15,42 +15,44 @@ datasource db {
 // - User.id uses Clerk ID directly (no auto-generated cuid)
 
 model User {
-  id            String    @id // Clerk User ID (e.g., user_xxxxx)
+  id            String        @id // Clerk User ID (e.g., user_xxxxx)
   name          String?
-  email         String?   @unique(map: "users_email_unique")
-  emailVerified DateTime? @map("email_verified")
+  email         String?       @unique(map: "users_email_unique")
+  emailVerified DateTime?     @map("email_verified")
   image         String?
   bookings      Booking[]
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  testimonials  Testimonial[]
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
   @@map("users")
 }
 
 model Course {
-  id            String              @id @default(cuid())
-  title         String
-  description   String?
-  slug          String              @unique
-  price         Int
-  currency      String              @default("EUR")
-  capacity      Int                 @default(20)
-  startDate     DateTime?           @map("start_date")
-  startTime     DateTime?           @map("start_time")
-  endTime       DateTime?           @map("end_time")
-  isPublished   Boolean             @default(false) @map("is_published")
-  createdAt     DateTime            @default(now()) @map("created_at")
-  updatedAt     DateTime            @updatedAt @map("updated_at")
-  instructor    String              @default("TBD")
-  level         CourseLevel         @default(BEGINNER)
-  thumbnailUrl  String?             @map("thumbnail_url")
-  imageDetail   String?             @map("image_detail")
-  imageTwitter  String?             @map("image_twitter")
-  heroVideoPlaybackId String?       @map("hero_video_playback_id")
-  locationId    String?             @map("location_id")
-  location      Location?           @relation(fields: [locationId], references: [id])
-  bookings      Booking[]
-  summaryAssets CourseSummaryAsset[]
+  id                  String              @id @default(cuid())
+  title               String
+  description         String?
+  slug                String              @unique
+  price               Int
+  currency            String              @default("EUR")
+  capacity            Int                 @default(20)
+  startDate           DateTime?           @map("start_date")
+  startTime           DateTime?           @map("start_time")
+  endTime             DateTime?           @map("end_time")
+  isPublished         Boolean             @default(false) @map("is_published")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+  instructor          String              @default("TBD")
+  level               CourseLevel         @default(BEGINNER)
+  thumbnailUrl        String?             @map("thumbnail_url")
+  imageDetail         String?             @map("image_detail")
+  imageTwitter        String?             @map("image_twitter")
+  heroVideoPlaybackId String?             @map("hero_video_playback_id")
+  locationId          String?             @map("location_id")
+  location            Location?           @relation(fields: [locationId], references: [id])
+  bookings            Booking[]
+  summaryAssets       CourseSummaryAsset[]
+  testimonials        Testimonial[]
 
   @@index([startDate])
   @@map("courses")
@@ -217,4 +219,28 @@ model ParticipationSummaryOverride {
 
   @@index([participationId, sortOrder])
   @@map("participation_summary_overrides")
+}
+
+// TESTIMONIAL/REVIEW MANAGEMENT (017-testimonial-management)
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  courseId    String   @map("course_id")
+  userId      String?  @map("user_id")
+  authorName  String   @map("author_name")
+  authorRole  String?  @map("author_role")
+  authorImage String?  @map("author_image")
+  content     String   @db.VarChar(2000)
+  rating      Int      @default(5)
+  isPublished Boolean  @default(false) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([courseId, userId])
+  @@index([courseId, isPublished])
+  @@index([userId])
+  @@map("testimonials")
 }

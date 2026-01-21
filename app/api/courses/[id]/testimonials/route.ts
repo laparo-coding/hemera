@@ -247,7 +247,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     // Map internal errors to user-safe messages while preserving structured codes
-    if (errorMessage.includes('bereits eingereicht')) {
+    if (
+      errorMessage.includes('bereits') &&
+      errorMessage.includes('Erfahrungsbericht')
+    ) {
       return createErrorResponse(
         'Du hast bereits einen Erfahrungsbericht für diesen Kurs eingereicht',
         ErrorCodes.CONFLICT,

@@ -3,20 +3,29 @@
  * Feature: 017-testimonial-management
  *
  * Service for managing course testimonials/reviews.
- * Note: This is a stub implementation until the Testimonial model is added to the schema.
  */
 
-export interface Testimonial {
-  id: string;
-  courseId: string;
-  userId?: string; // DB user ID for entity relationships
-  authorName: string;
-  authorRole?: string;
-  authorImage?: string;
-  content: string;
-  rating: number;
-  isPublished: boolean;
-  createdAt: Date;
+import type { Testimonial as PrismaTestimonial } from '@prisma/client';
+import { prisma } from '../db/prisma';
+import type { Testimonial, TestimonialWithCourse } from '../types/testimonial';
+
+/**
+ * Map Prisma Testimonial to service type
+ */
+function mapToTestimonial(t: PrismaTestimonial): Testimonial {
+  return {
+    id: t.id,
+    courseId: t.courseId,
+    userId: t.userId,
+    authorName: t.authorName,
+    authorRole: t.authorRole,
+    authorImage: t.authorImage,
+    content: t.content,
+    rating: t.rating,
+    isPublished: t.isPublished,
+    createdAt: t.createdAt,
+    updatedAt: t.updatedAt,
+  };
 }
 
 /**
@@ -25,30 +34,21 @@ export interface Testimonial {
  * @param courseId - The course ID to fetch testimonials for
  * @param limit - Maximum number of testimonials to return (default: 10)
  * @returns Array of published testimonials
- *
- * TODO: Replace with actual Prisma query once Testimonial model is added to schema
  */
 export async function getPublishedTestimonialsForCourse(
   courseId: string,
   limit = 10
 ): Promise<Testimonial[]> {
-  // Stub implementation - returns empty array until Testimonial model exists
-  // This prevents compilation errors while the feature is being developed
-  console.log(
-    `[Testimonial Service] Fetching testimonials for course ${courseId} (limit: ${limit})`
-  );
+  const testimonials = await prisma.testimonial.findMany({
+    where: {
+      courseId,
+      isPublished: true,
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
 
-  // TODO: Implement with Prisma once model is added:
-  // return prisma.testimonial.findMany({
-  //   where: {
-  //     courseId,
-  //     isPublished: true,
-  //   },
-  //   orderBy: { createdAt: 'desc' },
-  //   take: limit,
-  // });
-
-  return [];
+  return testimonials.map(mapToTestimonial);
 }
 
 /**
@@ -60,10 +60,85 @@ export async function getPublishedTestimonialsForCourse(
 export async function getAllTestimonialsForCourse(
   courseId: string
 ): Promise<Testimonial[]> {
-  console.log(
-    `[Testimonial Service] Fetching all testimonials for course ${courseId}`
-  );
-  return [];
+  const testimonials = await prisma.testimonial.findMany({
+    where: { courseId },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return testimonials.map(mapToTestimonial);
+}
+
+/**
+ * Admin filter options
+ */
+export interface TestimonialFilterOptions {
+  status?: boolean; // true = published, false = pending, undefined = all
+  courseId?: string;
+  limit: number;
+  offset: number;
+}
+
+/**
+ * Get testimonials for admin with filters and pagination
+ *
+ * @param options - Filter and pagination options
+ * @returns Testimonials with course info and total count
+ */
+export async function getTestimonialsForAdmin(
+  options: TestimonialFilterOptions
+): Promise<{ testimonials: TestimonialWithCourse[]; total: number }> {
+  const where: {
+    isPublished?: boolean;
+    courseId?: string;
+  } = {};
+
+  if (options.status !== undefined) {
+    where.isPublished = options.status;
+  }
+  if (options.courseId) {
+    where.courseId = options.courseId;
+  }
+
+  const [testimonials, total] = await Promise.all([
+    prisma.testimonial.findMany({
+      where,
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: options.limit,
+      skip: options.offset,
+    }),
+    prisma.testimonial.count({ where }),
+  ]);
+
+  return {
+    testimonials: testimonials.map(t => ({
+      ...mapToTestimonial(t),
+      course: t.course,
+    })),
+    total,
+  };
+}
+
+/**
+ * Create testimonial input
+ */
+export interface CreateTestimonialData {
+  courseId: string;
+  userId: string;
+  authorName: string;
+  authorRole?: string;
+  authorImage?: string;
+  content: string;
+  rating: number;
+  isPublished?: boolean;
 }
 
 /**
@@ -73,10 +148,53 @@ export async function getAllTestimonialsForCourse(
  * @returns Created testimonial
  */
 export async function createTestimonial(
-  data: Omit<Testimonial, 'id' | 'createdAt'>
+  data: CreateTestimonialData
 ): Promise<Testimonial> {
-  console.log('[Testimonial Service] Creating testimonial', data);
-  throw new Error('Testimonial creation not yet implemented');
+  // Check if user already submitted a testimonial for this course
+  const existing = await prisma.testimonial.findUnique({
+    where: {
+      courseId_userId: {
+        courseId: data.courseId,
+        userId: data.userId,
+      },
+    },
+  });
+
+  if (existing) {
+    throw new Error(
+      'Du hast bereits einen Erfahrungsbericht für diesen Kurs eingereicht'
+    );
+  }
+
+  // Optional: Check if user completed the course
+  const participation = await prisma.courseParticipation.findFirst({
+    where: {
+      courseId: data.courseId,
+      userId: data.userId,
+      status: 'COMPLETE',
+    },
+  });
+
+  if (!participation) {
+    throw new Error(
+      'Kurs nicht abgeschlossen - Erfahrungsbericht erfordert Kursabschluss'
+    );
+  }
+
+  const testimonial = await prisma.testimonial.create({
+    data: {
+      courseId: data.courseId,
+      userId: data.userId,
+      authorName: data.authorName,
+      authorRole: data.authorRole ?? null,
+      authorImage: data.authorImage ?? null,
+      content: data.content,
+      rating: data.rating,
+      isPublished: data.isPublished ?? false,
+    },
+  });
+
+  return mapToTestimonial(testimonial);
 }
 
 /**
@@ -90,8 +208,53 @@ export async function updateTestimonialStatus(
   testimonialId: string,
   isPublished: boolean
 ): Promise<Testimonial> {
-  console.log(
-    `[Testimonial Service] Updating testimonial ${testimonialId} status to ${isPublished}`
-  );
-  throw new Error('Testimonial status update not yet implemented');
+  const testimonial = await prisma.testimonial.findUnique({
+    where: { id: testimonialId },
+  });
+
+  if (!testimonial) {
+    throw new Error('Erfahrungsbericht nicht gefunden');
+  }
+
+  const updated = await prisma.testimonial.update({
+    where: { id: testimonialId },
+    data: { isPublished },
+  });
+
+  return mapToTestimonial(updated);
+}
+
+/**
+ * Delete a testimonial
+ *
+ * @param testimonialId - The testimonial ID
+ */
+export async function deleteTestimonial(testimonialId: string): Promise<void> {
+  const testimonial = await prisma.testimonial.findUnique({
+    where: { id: testimonialId },
+  });
+
+  if (!testimonial) {
+    throw new Error('Erfahrungsbericht nicht gefunden');
+  }
+
+  await prisma.testimonial.delete({
+    where: { id: testimonialId },
+  });
+}
+
+/**
+ * Get testimonial by ID
+ *
+ * @param testimonialId - The testimonial ID
+ * @returns Testimonial or null
+ */
+export async function getTestimonialById(
+  testimonialId: string
+): Promise<Testimonial | null> {
+  const testimonial = await prisma.testimonial.findUnique({
+    where: { id: testimonialId },
+  });
+
+  return testimonial ? mapToTestimonial(testimonial) : null;
 }
