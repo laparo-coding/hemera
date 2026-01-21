@@ -96,8 +96,48 @@ async function main() {
     console.log('\n🔗 Links:');
     console.log('   - Prod:  https://www.hemera.academy/admin/testimonials');
     console.log('   - Local: http://localhost:3000/admin/testimonials');
-  } catch (error) {
-    console.error('❌ Fehler:', error);
+  } catch (error: unknown) {
+    console.error('\n❌ Fehler aufgetreten:\n');
+
+    // Extract error message
+    const message =
+      error instanceof Error ? error.message : 'Unbekannter Fehler';
+    console.error(`   Nachricht: ${message}`);
+
+    // Handle Clerk API errors (ClerkAPIResponseError)
+    if (
+      error &&
+      typeof error === 'object' &&
+      'errors' in error &&
+      Array.isArray((error as { errors: unknown[] }).errors)
+    ) {
+      const clerkErrors = (
+        error as { errors: Array<{ message?: string; code?: string }> }
+      ).errors;
+      console.error('\n   Clerk API Fehler:');
+      for (const err of clerkErrors) {
+        console.error(`   - Code: ${err.code ?? 'unbekannt'}`);
+        console.error(`     Details: ${err.message ?? 'keine Details'}`);
+      }
+    }
+
+    // Handle HTTP status if available
+    if (
+      error &&
+      typeof error === 'object' &&
+      'status' in error &&
+      typeof (error as { status: unknown }).status === 'number'
+    ) {
+      console.error(
+        `\n   HTTP Status: ${(error as { status: number }).status}`
+      );
+    }
+
+    console.error('\n📝 Mögliche Ursachen:');
+    console.error('   - CLERK_SECRET_KEY ungültig oder abgelaufen');
+    console.error('   - Netzwerkproblem oder Clerk API nicht erreichbar');
+    console.error('   - Unzureichende Berechtigungen für den API-Key');
+
     process.exit(1);
   }
 }
