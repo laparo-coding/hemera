@@ -14,6 +14,12 @@ import * as dotenv from 'dotenv';
 // Load environment variables
 dotenv.config({ path: '.env.local' });
 
+// Simple RFC5322-like email validation for CLI
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 async function main() {
   const email = process.argv[2];
 
@@ -21,6 +27,15 @@ async function main() {
     console.error('❌ Fehler: Bitte E-Mail-Adresse angeben');
     console.log('   Verwendung: npm run set-admin-role <email>');
     console.log('   Beispiel:   npm run set-admin-role admin@hemera.academy');
+    process.exit(1);
+  }
+
+  if (!isValidEmail(email)) {
+    console.error(`❌ Fehler: "${email}" ist keine gültige E-Mail-Adresse`);
+    console.log('\n📝 Prüfe auf:');
+    console.log('   - Fehlende @ oder Domain');
+    console.log('   - Leerzeichen oder Sonderzeichen');
+    console.log('   - Tippfehler');
     process.exit(1);
   }
 
