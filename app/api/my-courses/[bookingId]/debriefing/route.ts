@@ -13,6 +13,7 @@ import {
   getParticipationByBookingId,
   updateDebriefing,
 } from '@/lib/db/courseParticipation';
+import { UserNotFoundError } from '@/lib/errors';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 // Zod schema for debriefing input
@@ -30,7 +31,18 @@ export async function GET(
   { params }: { params: Promise<{ bookingId: string }> }
 ) {
   try {
-    const syncedUser = await getCurrentUserWithSync();
+    let syncedUser;
+    try {
+      syncedUser = await getCurrentUserWithSync();
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+      throw error;
+    }
     const userId = syncedUser.id;
 
     const { bookingId } = await params;
@@ -87,7 +99,18 @@ export async function PUT(
   { params }: { params: Promise<{ bookingId: string }> }
 ) {
   try {
-    const syncedUser = await getCurrentUserWithSync();
+    let syncedUser;
+    try {
+      syncedUser = await getCurrentUserWithSync();
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+      throw error;
+    }
     const userId = syncedUser.id;
 
     const { bookingId } = await params;

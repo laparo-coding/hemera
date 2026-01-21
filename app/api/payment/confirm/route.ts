@@ -1,7 +1,10 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getCurrentUserWithSync } from '@/lib/api/users';
-import { StripeConfigurationError } from '../../../../lib/errors';
+import {
+  StripeConfigurationError,
+  UserNotFoundError,
+} from '../../../../lib/errors';
 import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
 import { updateBookingStatus } from '../../../../lib/services/booking';
 import {
@@ -22,8 +25,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Get synced user to match the userId stored in payment intent metadata
-    const syncedUser = await getCurrentUserWithSync();
-    userId = syncedUser.id;
+    try {
+      const syncedUser = await getCurrentUserWithSync();
+      userId = syncedUser.id;
+    } catch (syncError) {
+      if (syncError instanceof UserNotFoundError) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      throw syncError;
+    }
 
     if (!isStripeConfigured()) {
       return NextResponse.json(

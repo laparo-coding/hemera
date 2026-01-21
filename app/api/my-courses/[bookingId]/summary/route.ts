@@ -8,6 +8,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getCurrentUserWithSync } from '@/lib/api/users';
+import { UserNotFoundError } from '@/lib/errors';
 import {
   completeSummaryStep,
   getParticipationByBookingId,
@@ -27,7 +28,18 @@ export async function GET(
   { params }: { params: Promise<{ bookingId: string }> }
 ) {
   try {
-    const syncedUser = await getCurrentUserWithSync();
+    let syncedUser;
+    try {
+      syncedUser = await getCurrentUserWithSync();
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+      throw error;
+    }
     const userId = syncedUser.id;
 
     const { bookingId } = await params;
@@ -90,7 +102,18 @@ export async function PUT(
   { params }: { params: Promise<{ bookingId: string }> }
 ) {
   try {
-    const syncedUser = await getCurrentUserWithSync();
+    let syncedUser;
+    try {
+      syncedUser = await getCurrentUserWithSync();
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+      throw error;
+    }
     const userId = syncedUser.id;
 
     const { bookingId } = await params;

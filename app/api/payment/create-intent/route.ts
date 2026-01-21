@@ -1,7 +1,10 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getCurrentUserWithSync } from '@/lib/api/users';
-import { StripeConfigurationError } from '../../../../lib/errors';
+import {
+  StripeConfigurationError,
+  UserNotFoundError,
+} from '../../../../lib/errors';
 import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
 import { createBooking } from '../../../../lib/services/booking';
 import { getCourseByIdOrSlug } from '../../../../lib/services/course';
@@ -68,6 +71,13 @@ export async function POST(request: NextRequest) {
       syncedUser = await getCurrentUserWithSync();
       userId = syncedUser.id;
     } catch (syncError) {
+      if (syncError instanceof UserNotFoundError) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+
       const errorMsg =
         syncError instanceof Error ? syncError.message : String(syncError);
       serverInstance.error('User sync failed', {
