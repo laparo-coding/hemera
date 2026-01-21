@@ -47,10 +47,23 @@ async function main() {
     }
 
     const user = users[0];
+    const emails = user.emailAddresses ?? [];
+    const primaryEmail =
+      emails.find(e => e.id === user.primaryEmailAddressId)?.emailAddress ??
+      emails[0]?.emailAddress ??
+      '(keine E-Mail)';
+    const allEmails = emails.map(e => e.emailAddress).join(', ') || '(keine)';
+
     console.log('✅ User gefunden:');
     console.log(`   ID:    ${user.id}`);
-    console.log(`   E-Mail: ${user.emailAddresses[0]?.emailAddress}`);
-    console.log(`   Name:   ${user.firstName || ''} ${user.lastName || ''}`);
+    console.log(`   E-Mail: ${primaryEmail}`);
+    if (emails.length > 1) {
+      console.log(`   Alle E-Mails: ${allEmails}`);
+    }
+    console.log(
+      `   Name:   ${user.firstName || ''} ${user.lastName || ''}`.trim() ||
+        '(kein Name)'
+    );
 
     // Check current role
     const currentRole = (user.publicMetadata?.role as string) || 'user';
