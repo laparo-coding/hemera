@@ -109,6 +109,7 @@ export function DashboardNavigation() {
                   },
                 },
               }}
+              userProfileMode='modal'
               showName={false}
               data-testid='user-profile-button'
             />

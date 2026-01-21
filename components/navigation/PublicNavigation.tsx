@@ -217,8 +217,7 @@ export function PublicNavigation({
                         },
                       },
                     }}
-                    userProfileMode='navigation'
-                    userProfileUrl='/user-profile'
+                    userProfileMode='modal'
                     data-testid='user-profile-button'
                   />
                 </SignedIn>
