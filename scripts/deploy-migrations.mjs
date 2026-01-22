@@ -2,8 +2,9 @@
 /**
  * Deploy Migrations Script
  *
- * Runs Prisma migrations only in Vercel deployment environments
- * where DATABASE_URL is available.
+ * Runs Prisma migrations only in Vercel deployment environments.
+ * Uses PRISMA_DATABASE_URL (direct connection) for migrations,
+ * falling back to DATABASE_URL if not available.
  *
  * Usage: Called automatically during build via package.json
  */
@@ -11,21 +12,29 @@
 import { execSync } from 'child_process';
 
 const isVercel = process.env.VERCEL === '1';
-const hasDatabaseUrl = !!process.env.DATABASE_URL;
 const vercelEnv = process.env.VERCEL_ENV; // 'production', 'preview', or 'development'
+
+// For migrations, prefer direct database URL over Prisma Accelerate proxy
+const directDbUrl = process.env.PRISMA_DATABASE_URL || process.env.DATABASE_URL;
+const hasDatabaseUrl = !!directDbUrl;
 
 console.log('🔄 Checking migration deployment...');
 console.log(`   VERCEL: ${isVercel ? 'yes' : 'no'}`);
 console.log(`   VERCEL_ENV: ${vercelEnv || 'not set'}`);
-console.log(`   DATABASE_URL: ${hasDatabaseUrl ? 'set' : 'not set'}`);
+console.log(`   PRISMA_DATABASE_URL: ${process.env.PRISMA_DATABASE_URL ? 'set' : 'not set'}`);
+console.log(`   DATABASE_URL: ${process.env.DATABASE_URL ? 'set' : 'not set'}`);
 
 // Only run migrations on Vercel production deployments
 if (isVercel && hasDatabaseUrl && vercelEnv === 'production') {
   console.log('📦 Running prisma migrate deploy...');
   try {
+    // Use direct database URL for migrations
     execSync('npx prisma migrate deploy', {
       stdio: 'inherit',
-      env: process.env,
+      env: {
+        ...process.env,
+        DATABASE_URL: directDbUrl, // Override with direct URL
+      },
     });
     console.log('✅ Migrations applied successfully');
   } catch (error) {
@@ -38,5 +47,5 @@ if (isVercel && hasDatabaseUrl && vercelEnv === 'production') {
 } else if (vercelEnv !== 'production') {
   console.log('⏭️  Skipping migrations (not production environment)');
 } else {
-  console.log('⚠️  Skipping migrations (DATABASE_URL not set)');
+  console.log('⚠️  Skipping migrations (no database URL set)');
 }
