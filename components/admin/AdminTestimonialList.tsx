@@ -81,13 +81,17 @@ export default function AdminTestimonialList() {
         const response = await fetch(`/api/admin/testimonials?${params}`, {
           signal,
         });
+        const data = await response.json();
+
         if (!response.ok) {
-          throw new Error('Fehler beim Laden');
+          // Show the actual error message from API
+          const errorMessage = data?.error?.message || 'Fehler beim Laden';
+          throw new Error(errorMessage);
         }
 
-        const data: AdminTestimonialsApiResponse = await response.json();
-        const newTestimonials = data.data.testimonials;
-        const newTotal = data.data.pagination.total;
+        const typedData = data as AdminTestimonialsApiResponse;
+        const newTestimonials = typedData.data.testimonials;
+        const newTotal = typedData.data.pagination.total;
 
         // Only update state if data changed to reduce Grid re-layouts
         setTestimonials(prev =>

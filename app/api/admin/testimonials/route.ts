@@ -95,12 +95,17 @@ export async function GET(request: NextRequest) {
 
     return createSuccessResponse(responseData, requestId);
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
     logger.error(
       'Failed to fetch admin testimonials',
-      error instanceof Error ? error : undefined
+      error instanceof Error ? error : undefined,
+      { errorMessage, errorStack }
     );
     return createErrorResponse(
-      'Fehler beim Laden der Erfahrungsberichte',
+      `Fehler beim Laden der Erfahrungsberichte: ${errorMessage}`,
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
