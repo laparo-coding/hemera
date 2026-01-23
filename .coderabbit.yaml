@@ -18,8 +18,82 @@ reviews:
   profile: assertive
   request_changes_workflow: false
   high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
   poem: false
   collapse_walkthrough: false
+  
+  # Aktiviere alle Review-Tools (wie Qodo)
+  tools:
+    # AST-basierte Code-Analyse
+    ast-grep:
+      enabled: true
+    # Sicherheitsanalyse  
+    semgrep:
+      enabled: true
+    # Markdown/Docs Linting
+    markdownlint:
+      enabled: true
+    # Shell Script Analyse
+    shellcheck:
+      enabled: true
+    # GitHub Actions Linting
+    actionlint:
+      enabled: true
+    # YAML Linting
+    yamllint:
+      enabled: true
+    # Biome (für JS/TS)
+    biome:
+      enabled: true
+    # Ruff (Python)
+    ruff:
+      enabled: false
+    # ESLint
+    eslint:
+      enabled: true
+      config_path: "biome.json"
+    # Hadolint (Dockerfiles)
+    hadolint:
+      enabled: true
+    # Gitleaks (Secret Detection)  
+    gitleaks:
+      enabled: true
+    # Checkov (IaC Security)
+    checkov:
+      enabled: true
+    # Detekt (Kotlin) - nicht relevant
+    detekt:
+      enabled: false
+    # PHPStan - nicht relevant
+    phpstan:
+      enabled: false
+    # Golangci-lint - nicht relevant
+    golangci-lint:
+      enabled: false
+    # Buf (Protobuf) - nicht relevant
+    buf:
+      enabled: false
+    # Cppcheck - nicht relevant
+    cppcheck:
+      enabled: false
+    # Clippy (Rust) - nicht relevant
+    clippy:
+      enabled: false
+    # Oxc (JS/TS)
+    oxc:
+      enabled: true
+    # Sqlfluff (SQL)
+    sqlfluff:
+      enabled: true
+    # Rubocop - nicht relevant  
+    rubocop:
+      enabled: false
+    # Swiftlint - nicht relevant
+    swiftlint:
+      enabled: false
+    # PM2 Ecosystem - nicht relevant
+    pm2:
+      enabled: false
 
   # Pfade ignorieren
   path_filters:
@@ -87,3 +161,18 @@ chat:
 
 # Frühe Zugriffsfunktionen aktivieren
 early_access: true
+
+# Knowledge Base - Projekt-spezifisches Wissen
+knowledge_base:
+  # Lerne aus gemergten PRs
+  learnings:
+    scope: auto
+  # Nutze Issues als Kontext
+  issues:
+    scope: auto
+  # Nutze Jira (falls vorhanden)
+  jira:
+    project_keys: []
+  # Nutze Linear (falls vorhanden)
+  linear:
+    team_keys: []
