@@ -12,7 +12,8 @@ test.describe('Course Detail Page', () => {
   const courseUrl = '/courses/grundkurs';
 
   test.beforeEach(async ({ page }) => {
-    await page.goto(courseUrl);
+    // Use domcontentloaded to avoid waiting for all resources (images, fonts etc.)
+    await page.goto(courseUrl, { waitUntil: 'domcontentloaded' });
   });
 
   test.describe('Page loading', () => {
