@@ -72,33 +72,38 @@ See `docs/performance/README.md` for detailed patterns.
 
 ## PR Review Process
 
-- **QODO Code Suggestions**: Always review and consider implementing QODO PR code suggestions
-  (qodo-code-review, qodo-merge bot comments) after opening a pull request. These automated
-  suggestions often improve code quality, error handling, and test coverage.
+- **CodeRabbit Reviews**: Always review and consider implementing CodeRabbit PR suggestions
+  after opening a pull request. These automated suggestions improve code quality, error handling,
+  security, and test coverage.
 
-### Constitutional Requirement: Qodo Error Review
+### Constitutional Requirement: CodeRabbit Review
 
 **After every PR is opened, you MUST:**
 
-1. **Wait for Qodo bot comments** - Look for comments from `qodo-code-review[bot]` and 
-   `qodo-free-for-open-source-projects[bot]`
-2. **Read PR Compliance Guide** - Check for 🔴 (red) security/compliance issues
-3. **Read PR Code Suggestions** - Review improvement suggestions
-4. **Fix all 🔴 issues** - Red compliance issues must be fixed before merge
-5. **Implement high-impact suggestions** - Especially security and error handling improvements
+1. **Wait for CodeRabbit comments** - Look for comments from `coderabbitai[bot]`
+2. **Read the Walkthrough** - Understand the high-level summary of changes
+3. **Review inline suggestions** - Check code comments for improvements
+4. **Fix critical issues** - Security and error handling issues must be fixed before merge
+5. **Implement high-impact suggestions** - Especially security, performance, and TypeScript improvements
 
-**Qodo issues to always fix:**
-- 🔴 Security Compliance issues (injection, data exposure, etc.)
-- 🔴 Error Handling issues (generic errors, sensitive logging)
-- 🔴 Data validation issues (missing input validation)
+**Issues to always fix:**
+- 🔴 Security issues (injection, data exposure, auth bypasses)
+- 🔴 Error Handling issues (unhandled exceptions, missing try/catch)
+- 🔴 Type Safety issues (any types, missing validations)
 
-**How to check Qodo review:**
+**CodeRabbit commands in PR comments:**
 ```bash
-# Get PR comments with Qodo reviews
-gh pr view <PR_NUMBER> --comments
+# Trigger a new review
+@coderabbitai review
 
-# Or use the GitHub MCP tool:
-mcp_github_github_pull_request_read with method="get_comments"
+# Resolve all comments
+@coderabbitai resolve
+
+# Ask a question about the code
+@coderabbitai How does this function handle edge cases?
+
+# Show help
+@coderabbitai help
 ```
 
 <!-- MANUAL ADDITIONS START -->

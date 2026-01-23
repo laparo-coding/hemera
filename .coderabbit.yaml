@@ -1,0 +1,89 @@
+# CodeRabbit Configuration for hemera
+# Docs: https://docs.coderabbit.ai/configuration
+
+language: de-DE
+
+reviews:
+  # Automatisch bei jedem PR reviewen
+  auto_review:
+    enabled: true
+    # Nur bei ready_for_review PRs (nicht bei Drafts)
+    drafts: false
+    # Base branches die reviewed werden
+    base_branches:
+      - main
+      - develop
+
+  # Review-Einstellungen
+  profile: assertive
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  collapse_walkthrough: false
+
+  # Pfade ignorieren
+  path_filters:
+    - "!**/*.lock"
+    - "!**/package-lock.json"
+    - "!**/*.min.js"
+    - "!**/migrations/**"
+    - "!playwright-report/**"
+    - "!test-results/**"
+    - "!**/generated/**"
+
+  # Review-Anweisungen pro Pfad
+  path_instructions:
+    - path: "**/*.ts"
+      instructions: |
+        Fokussiere auf:
+        - TypeScript 5.x Best Practices
+        - Strikte Typisierung (keine `any` Types)
+        - Async/await Error Handling
+        - Prisma ORM Query-Optimierungen
+        - Rollbar Error Monitoring Integration
+
+    - path: "**/*.tsx"
+      instructions: |
+        Fokussiere auf:
+        - React 18 Patterns (Server Components vs Client Components)
+        - Next.js 15 App Router Konventionen
+        - Material-UI v5 Best Practices
+        - Accessibility (a11y)
+        - Performance (dynamic imports, lazy loading)
+
+    - path: "app/api/**"
+      instructions: |
+        Fokussiere auf:
+        - API Security (Input Validation, Auth Checks mit Clerk)
+        - Error Responses (proper HTTP status codes)
+        - Rate Limiting Überlegungen
+        - Zod Schema Validation
+
+    - path: "lib/actions/**"
+      instructions: |
+        Fokussiere auf:
+        - Server Actions Security
+        - Clerk Auth Integration
+        - Revalidation Patterns
+        - Error Handling mit Rollbar
+
+    - path: "prisma/**"
+      instructions: |
+        Fokussiere auf:
+        - Naming Convention (snake_case für DB, camelCase für Prisma)
+        - Relationen und Indizes
+        - Migration Safety
+
+    - path: "components/**"
+      instructions: |
+        Fokussiere auf:
+        - Komponenten-Wiederverwendbarkeit
+        - Props Typisierung
+        - Client vs Server Components ("use client" Direktive)
+        - MUI Theme Token Verwendung
+
+chat:
+  auto_reply: true
+
+# Frühe Zugriffsfunktionen aktivieren
+early_access: true
