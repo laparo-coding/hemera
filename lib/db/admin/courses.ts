@@ -58,6 +58,7 @@ export async function getCourseById(
 export async function createCourse(data: {
   title: string;
   description: string;
+  teaser?: string | null;
   price: number;
   startDate: Date;
   startTime: Date;
@@ -98,6 +99,7 @@ export async function updateCourse(
   data: {
     title?: string;
     description?: string;
+    teaser?: string | null;
     price?: number;
     startTime?: Date;
     duration?: number;

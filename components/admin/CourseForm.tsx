@@ -59,6 +59,7 @@ export default function CourseForm({
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',
+      teaser: initialData?.teaser || '',
       price: initialData?.price ? initialData.price / 100 : 0, // Convert Cents to Euro for display
       startDate: initialData?.startDate || new Date(),
       startTime: initialData?.startTime || new Date(),
@@ -123,6 +124,28 @@ export default function CourseForm({
             helperText={errors.description?.message}
             fullWidth
             disabled={isLoading || isSubmitting}
+          />
+        )}
+      />
+
+      <Controller
+        name='teaser'
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            value={field.value || ''}
+            label='Teaser (Kurzbeschreibung für Übersichten)'
+            multiline
+            rows={2}
+            error={!!errors.teaser}
+            helperText={
+              errors.teaser?.message ||
+              `${(field.value || '').length}/300 Zeichen`
+            }
+            fullWidth
+            disabled={isLoading || isSubmitting}
+            inputProps={{ maxLength: 300 }}
           />
         )}
       />

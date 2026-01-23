@@ -50,12 +50,13 @@ export const CourseHeroSection: React.FC<CourseHeroSectionProps> = ({
       data-testid='hero-section'
       aria-label={`Kursvideo: ${title}`}
       sx={{
-        position: 'relative',
         width: '100%',
         aspectRatio: '16 / 9',
-        maxHeight: '70vh',
+        maxHeight: '80vh',
         overflow: 'hidden',
         backgroundColor: colors.petrol,
+        borderRadius: '16px',
+        boxShadow: '0 8px 32px rgba(22, 64, 77, 0.15)',
       }}
     >
       <MuxPlayer

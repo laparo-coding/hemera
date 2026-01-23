@@ -215,6 +215,9 @@ export function PublicNavigation({
                         userButtonPopoverCard: {
                           pointerEvents: 'initial',
                         },
+                        modalBackdrop: {
+                          backgroundColor: 'transparent',
+                        },
                       },
                     }}
                     userProfileMode='modal'

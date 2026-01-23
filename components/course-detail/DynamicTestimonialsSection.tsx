@@ -14,7 +14,6 @@ import {
   Box,
   Card,
   CardContent,
-  CircularProgress,
   Container,
   Grid,
   Typography,
@@ -76,24 +75,9 @@ export const DynamicTestimonialsSection: React.FC<
     return null;
   }
 
-  // Show minimal loading state
+  // Show skeleton loading state instead of blocking spinner
   if (loading) {
-    return (
-      <Box
-        component='section'
-        data-testid='dynamic-testimonials-section'
-        sx={{
-          backgroundColor: colors.petrol,
-          py: spacing.sectionPy,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: 200,
-        }}
-      >
-        <CircularProgress sx={{ color: colors.cream }} />
-      </Box>
-    );
+    return null; // Don't block render while loading testimonials
   }
 
   // Don't render if there was an error (fail silently)

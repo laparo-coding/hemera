@@ -31,6 +31,7 @@ model Course {
   id            String              @id @default(cuid())
   title         String
   description   String?
+  teaser        String?
   slug          String              @unique
   price         Int
   currency      String              @default("EUR")

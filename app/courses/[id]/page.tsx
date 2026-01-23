@@ -16,8 +16,8 @@ import { generateMetadata as genMetadata } from './layout';
 
 export { genMetadata as generateMetadata };
 
-// Force dynamic rendering to ensure course data is always fresh from database
-export const dynamic = 'force-dynamic';
+// Revalidate every 60 seconds for fresh data while enabling caching
+export const revalidate = 60;
 
 interface PageProps {
   params: Promise<{ id: string }>;

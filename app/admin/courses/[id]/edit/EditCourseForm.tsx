@@ -21,6 +21,7 @@ interface CourseData {
   id: string;
   title: string;
   description: string | null;
+  teaser: string | null;
   price: number;
   startDate: string | Date;
   startTime: string | Date;
@@ -91,6 +92,7 @@ export default function EditCourseForm({
           initialData={{
             title: course.title,
             description: course.description ?? '',
+            teaser: course.teaser ?? '',
             price: course.price,
             startDate: course.startDate
               ? new Date(course.startDate)
