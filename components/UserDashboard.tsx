@@ -1,13 +1,7 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import {
-  ArrowForwardOutlined,
-  AttachMoneyOutlined,
-  CheckCircleOutlined,
-  PendingOutlined,
-  SchoolOutlined,
-} from '@mui/icons-material';
+import { ArrowForwardOutlined } from '@mui/icons-material';
 import {
   Alert,
   Box,
@@ -41,13 +35,6 @@ interface Booking {
   currency: string;
   paymentStatus: string;
   createdAt: string;
-}
-
-interface DashboardStats {
-  totalBookings: number;
-  confirmedBookings: number;
-  pendingPayments: number;
-  totalSpent: number;
 }
 
 // Wrapper component that decides at build time which variant to render.
@@ -219,27 +206,6 @@ const UserDashboardClerk: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Memoized stats calculation to avoid recalculation on every render
-  const stats = useMemo((): DashboardStats => {
-    const totalBookings = bookings.length;
-    const confirmedBookings = bookings.filter(
-      b => b.paymentStatus === 'PAID'
-    ).length;
-    const pendingPayments = bookings.filter(
-      b => b.paymentStatus === 'PENDING'
-    ).length;
-    const totalSpent = bookings
-      .filter(b => b.paymentStatus === 'PAID')
-      .reduce((sum, b) => sum + b.coursePrice, 0);
-
-    return {
-      totalBookings,
-      confirmedBookings,
-      pendingPayments,
-      totalSpent,
-    };
-  }, [bookings]);
-
   // Optimized fetch function with useCallback
   const fetchBookings = useCallback(async () => {
     if (!user) return;
@@ -285,168 +251,6 @@ const UserDashboardClerk: React.FC = () => {
       setLoading(false);
     }
   }, [userLoaded, user, fetchBookings]);
-
-  // Memoized stats cards component
-  const StatsCards = useMemo(
-    () => (
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2, sm: 3 },
-              borderRadius: '16px',
-              border: '1px solid rgba(22, 64, 77, 0.1)',
-              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
-            }}
-          >
-            <Stack direction='row' spacing={2} alignItems='center'>
-              <SchoolOutlined sx={{ fontSize: 32, color: colors.petrol }} />
-              <Box>
-                <Typography
-                  sx={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '0.875rem',
-                    color: colors.petrol,
-                    opacity: 0.7,
-                  }}
-                >
-                  Gesamte Buchungen
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '1.5rem',
-                    fontWeight: 700,
-                    color: colors.petrol,
-                  }}
-                >
-                  {stats.totalBookings}
-                </Typography>
-              </Box>
-            </Stack>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2, sm: 3 },
-              borderRadius: '16px',
-              border: '1px solid rgba(22, 64, 77, 0.1)',
-              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
-            }}
-          >
-            <Stack direction='row' spacing={2} alignItems='center'>
-              <CheckCircleOutlined sx={{ fontSize: 32, color: colors.sage }} />
-              <Box>
-                <Typography
-                  sx={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '0.875rem',
-                    color: colors.petrol,
-                    opacity: 0.7,
-                  }}
-                >
-                  Bestätigte Buchungen
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '1.5rem',
-                    fontWeight: 700,
-                    color: colors.petrol,
-                  }}
-                >
-                  {stats.confirmedBookings}
-                </Typography>
-              </Box>
-            </Stack>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2, sm: 3 },
-              borderRadius: '16px',
-              border: '1px solid rgba(22, 64, 77, 0.1)',
-              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
-            }}
-          >
-            <Stack direction='row' spacing={2} alignItems='center'>
-              <PendingOutlined sx={{ fontSize: 32, color: colors.gold }} />
-              <Box>
-                <Typography
-                  sx={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '0.875rem',
-                    color: colors.petrol,
-                    opacity: 0.7,
-                  }}
-                >
-                  Ausstehende Zahlungen
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '1.5rem',
-                    fontWeight: 700,
-                    color: colors.petrol,
-                  }}
-                >
-                  {stats.pendingPayments}
-                </Typography>
-              </Box>
-            </Stack>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2, sm: 3 },
-              borderRadius: '16px',
-              border: '1px solid rgba(22, 64, 77, 0.1)',
-              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
-            }}
-          >
-            <Stack direction='row' spacing={2} alignItems='center'>
-              <AttachMoneyOutlined
-                sx={{ fontSize: 32, color: colors.petrol }}
-              />
-              <Box>
-                <Typography
-                  sx={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '0.875rem',
-                    color: colors.petrol,
-                    opacity: 0.7,
-                  }}
-                >
-                  Gesamtausgaben
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '1.5rem',
-                    fontWeight: 700,
-                    color: colors.petrol,
-                  }}
-                >
-                  {(stats.totalSpent / 100).toLocaleString('de-DE')} €
-                </Typography>
-              </Box>
-            </Stack>
-          </Paper>
-        </Grid>
-      </Grid>
-    ),
-    [stats]
-  );
 
   // Memoized bookings list component
   const BookingsList = useMemo(

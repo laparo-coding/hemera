@@ -21,13 +21,13 @@ reviews:
   high_level_summary_placeholder: "@coderabbitai summary"
   poem: false
   collapse_walkthrough: false
-  
+
   # Aktiviere alle Review-Tools (wie Qodo)
   tools:
     # AST-basierte Code-Analyse
     ast-grep:
       enabled: true
-    # Sicherheitsanalyse  
+    # Sicherheitsanalyse
     semgrep:
       enabled: true
     # Markdown/Docs Linting
@@ -55,7 +55,7 @@ reviews:
     # Hadolint (Dockerfiles)
     hadolint:
       enabled: true
-    # Gitleaks (Secret Detection)  
+    # Gitleaks (Secret Detection)
     gitleaks:
       enabled: true
     # Checkov (IaC Security)
@@ -85,7 +85,7 @@ reviews:
     # Sqlfluff (SQL)
     sqlfluff:
       enabled: true
-    # Rubocop - nicht relevant  
+    # Rubocop - nicht relevant
     rubocop:
       enabled: false
     # Swiftlint - nicht relevant

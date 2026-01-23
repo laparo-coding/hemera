@@ -368,16 +368,19 @@ const bookingsWithDetails = bookings.map(booking => ({
 ## Rollout-Plan
 
 ### Phase 1: Datenbank & Backend
+
 1. Schema-Migration durchführen
 2. Webhook erweitern
 3. Stripe-Service erweitern
 4. API-Endpunkt implementieren
 
 ### Phase 2: Frontend
+
 1. Dashboard-Komponente erweitern
 2. UI-Tests durchführen
 
 ### Phase 3: Testing & Deployment
+
 1. Integration Tests
 2. E2E Tests
 3. Staging-Deployment
@@ -386,14 +389,17 @@ const bookingsWithDetails = bookings.map(booking => ({
 ## Alternativen & Erweiterungen
 
 ### Alternative 1: Eigene PDF-Generierung
+
 - **Pro**: Vollständige Kontrolle über Layout und Inhalt
 - **Contra**: Zusätzlicher Entwicklungsaufwand, Wartung
 
 ### Alternative 2: Email-Versand
+
 - **Pro**: Nutzer erhalten Rechnung automatisch per Email
 - **Contra**: Zusätzliche Email-Infrastruktur erforderlich
 
 ### Zukünftige Erweiterungen
+
 1. **Rechnungsarchiv**: Separate Seite mit allen Rechnungen
 2. **Mehrwertsteuer**: MwSt.-Berechnung und -Ausweis
 3. **Firmendaten**: Möglichkeit, Firmendaten für Rechnung anzugeben
