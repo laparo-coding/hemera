@@ -58,7 +58,8 @@
         "noUnusedImports": "warn"
       },
       "complexity": {
-        "noUselessCatch": "warn"
+        "noUselessCatch": "warn",
+        "noImportantStyles": "off"
       }
     }
   },

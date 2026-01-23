@@ -118,7 +118,7 @@ beforeAll(async () => {
         stdio: 'inherit',
         env: { ...process.env, DATABASE_URL: connectionUri },
       });
-    } catch (seedErr) {
+    } catch (_seedErr) {
       // Log warning but don't fail - unit tests can run without seed data
       // This is a known Prisma 7.2.0 issue that will be fixed in a future release
       console.warn(

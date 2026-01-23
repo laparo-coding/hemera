@@ -8,7 +8,7 @@
  * Usage: Called automatically during build via package.json
  */
 
-import { execSync } from 'child_process';
+import { execSync } from 'node:child_process';
 
 const isVercel = process.env.VERCEL === '1';
 const vercelEnv = process.env.VERCEL_ENV;

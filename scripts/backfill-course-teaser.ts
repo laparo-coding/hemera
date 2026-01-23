@@ -5,6 +5,7 @@
  */
 
 import { config } from 'dotenv';
+
 config({ path: '.env.local' });
 
 import { prisma } from '../lib/db/prisma';
@@ -18,7 +19,7 @@ function extractFirstSentence(text: string): string {
   }
   // If no sentence ending found, return first 150 chars with ellipsis
   if (text.length > 150) {
-    return text.substring(0, 147).trim() + '...';
+    return `${text.substring(0, 147).trim()}...`;
   }
   return text.trim();
 }
@@ -68,7 +69,7 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error('❌ Error:', e);
     process.exit(1);
   })
