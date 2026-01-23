@@ -15,9 +15,9 @@ Nutzer sollen in der Buchungskachel auf dem Dashboard (`/dashboard`) einen Downl
 1. **Dashboard**: [`components/UserDashboard.tsx`](../components/UserDashboard.tsx)
    - Zeigt Buchungen mit Kurs-Titel, Preis und Status
    - Hat bereits einen "Vorbereitung"-Button für bezahlte Kurse
-   - Nutzt das [`Booking`](../components/UserDashboard.tsx:36) Interface
+   - Nutzt das `Booking` Interface (definiert in UserDashboard.tsx)
 
-2. **Datenbank-Schema**: [`prisma/schema.prisma`](../prisma/schema.prisma:67)
+2. **Datenbank-Schema**: [`prisma/schema.prisma`](../prisma/schema.prisma)
    - Booking-Model hat bereits `stripePaymentIntentId` und `stripeSessionId`
    - Felder für Invoice-Daten fehlen noch
 
@@ -38,7 +38,7 @@ Stripe erstellt automatisch Invoices für erfolgreiche Checkout-Sessions. Diese 
 
 ### 1. Datenbank-Schema erweitern
 
-**Datei**: [`prisma/schema.prisma`](../prisma/schema.prisma:67)
+**Datei**: [`prisma/schema.prisma`](../prisma/schema.prisma)
 
 ```prisma
 model Booking {
@@ -56,7 +56,7 @@ npx prisma migrate dev --name add_stripe_invoice_fields
 
 ### 2. Stripe Webhook erweitern
 
-**Datei**: [`app/api/stripe/webhook/route.ts`](../app/api/stripe/webhook/route.ts:160)
+**Datei**: [`app/api/stripe/webhook/route.ts`](../app/api/stripe/webhook/route.ts)
 
 Im `checkout.session.completed` Event-Handler:
 
@@ -208,7 +208,7 @@ export async function GET(
 
 ### 5. UserDashboard-Komponente erweitern
 
-**Datei**: [`components/UserDashboard.tsx`](../components/UserDashboard.tsx:36)
+**Datei**: [`components/UserDashboard.tsx`](../components/UserDashboard.tsx)
 
 #### Interface erweitern:
 
@@ -477,7 +477,7 @@ graph LR
 
 Diese Implementierung ermöglicht es Nutzern, ihre Stripe-Rechnungen direkt vom Dashboard herunterzuladen. Der Ansatz nutzt die bestehende Stripe-Integration und erweitert sie um Invoice-Management. Die Lösung ist sicher, skalierbar und bietet eine gute Nutzererfahrung.
 
-**Geschätzter Aufwand**: 
+**Geschätzter Aufwand**:
 - Backend: 3-4 Stunden
 - Frontend: 2-3 Stunden
 - Testing: 2-3 Stunden
@@ -485,6 +485,6 @@ Diese Implementierung ermöglicht es Nutzern, ihre Stripe-Rechnungen direkt vom 
 
 **Priorität**: Mittel (Nice-to-have Feature, verbessert UX)
 
-**Risiken**: 
+**Risiken**:
 - Gering: Nutzt bestehende Stripe-Funktionalität
 - Stripe-API-Änderungen könnten Anpassungen erfordern

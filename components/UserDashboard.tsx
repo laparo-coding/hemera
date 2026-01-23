@@ -1,7 +1,7 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import { ArrowForwardOutlined } from '@mui/icons-material';
+import { ArrowForwardOutlined, SchoolOutlined } from '@mui/icons-material';
 import {
   Alert,
   Box,
