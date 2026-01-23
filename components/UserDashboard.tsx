@@ -104,7 +104,9 @@ const UserDashboardE2E: React.FC = () => {
       sx={{
         minHeight: '100vh',
         bgcolor: colors.cream,
-        p: { xs: 2, sm: 3, md: 4 },
+        pt: { xs: 12, md: 16 },
+        px: { xs: 2, sm: 3, md: 4 },
+        pb: { xs: 2, sm: 3, md: 4 },
       }}
     >
       <Box sx={{ maxWidth: 1200, mx: 'auto' }} data-testid='user-dashboard'>
@@ -626,7 +628,9 @@ const UserDashboardClerk: React.FC = () => {
         sx={{
           minHeight: '100vh',
           bgcolor: colors.cream,
-          p: { xs: 2, sm: 3, md: 4 },
+          pt: { xs: 12, md: 16 },
+          px: { xs: 2, sm: 3, md: 4 },
+          pb: { xs: 2, sm: 3, md: 4 },
         }}
       >
         <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
@@ -762,7 +766,9 @@ const UserDashboardClerk: React.FC = () => {
       sx={{
         minHeight: '100vh',
         bgcolor: colors.cream,
-        p: { xs: 2, sm: 3, md: 4 },
+        pt: { xs: 12, md: 16 },
+        px: { xs: 2, sm: 3, md: 4 },
+        pb: { xs: 2, sm: 3, md: 4 },
       }}
     >
       <Box sx={{ maxWidth: 1200, mx: 'auto' }} data-testid='user-dashboard'>
@@ -809,9 +815,6 @@ const UserDashboardClerk: React.FC = () => {
             {error}
           </Alert>
         )}
-
-        {/* Optimized Dashboard Stats */}
-        {StatsCards}
 
         {/* Optimized Bookings List */}
         {BookingsList}

@@ -61,24 +61,6 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
       >
         {children}
       </Container>
-
-      <Box
-        component='footer'
-        sx={{
-          mt: 'auto',
-          py: 2,
-          px: 3,
-          backgroundColor: 'background.paper',
-          borderTop: 1,
-          borderColor: 'divider',
-        }}
-      >
-        <Container maxWidth='lg'>
-          <Typography variant='body2' color='text.secondary' align='center'>
-            © 2024 Hemera Academy. All rights reserved.
-          </Typography>
-        </Container>
-      </Box>
     </Box>
   );
 }
@@ -192,24 +174,6 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
       >
         {children}
       </Container>
-
-      <Box
-        component='footer'
-        sx={{
-          mt: 'auto',
-          py: 2,
-          px: 3,
-          backgroundColor: 'background.paper',
-          borderTop: 1,
-          borderColor: 'divider',
-        }}
-      >
-        <Container maxWidth='lg'>
-          <Typography variant='body2' color='text.secondary' align='center'>
-            © 2024 Hemera Academy. All rights reserved.
-          </Typography>
-        </Container>
-      </Box>
     </Box>
   );
 }

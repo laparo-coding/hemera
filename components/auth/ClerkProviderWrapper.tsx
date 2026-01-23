@@ -5,6 +5,29 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { clerkConfig } from '../../lib/auth/clerk-config';
 
+// Custom German localization with overrides
+const customDeDE = {
+  ...deDE,
+  signIn: {
+    ...deDE.signIn,
+    start: {
+      ...deDE.signIn?.start,
+      title: 'Bei Hemera anmelden',
+      actionText: 'Kein Account?',
+      actionLink: 'Registrieren',
+    },
+  },
+  signUp: {
+    ...deDE.signUp,
+    start: {
+      ...deDE.signUp?.start,
+      title: 'Bei Hemera registrieren',
+      actionText: 'Bereits registriert?',
+      actionLink: 'Anmelden',
+    },
+  },
+};
+
 interface ClerkProviderWrapperProps {
   children: ReactNode;
 }
@@ -132,7 +155,7 @@ export default function ClerkProviderWrapper({
     <ClerkErrorBoundary>
       <ClerkProvider
         publishableKey={publishableKey!}
-        localization={deDE}
+        localization={customDeDE}
         signInUrl={clerkConfig.signInUrl}
         signUpUrl={clerkConfig.signUpUrl}
         signInFallbackRedirectUrl={clerkConfig.signInFallbackRedirectUrl}
