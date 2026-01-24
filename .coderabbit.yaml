@@ -13,6 +13,13 @@ reviews:
     base_branches:
       - main
       - develop
+    # Automatisch approven wenn keine kritischen Issues gefunden
+    auto_approve:
+      enabled: true
+      allowed_authors:
+        - "dependabot[bot]"
+        - "laparo-bot"
+        - "AKirchstein"
 
   # Review-Einstellungen
   profile: assertive
