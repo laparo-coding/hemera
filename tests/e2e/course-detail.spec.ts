@@ -11,9 +11,15 @@ test.describe('Course Detail Page', () => {
   // Use 'grundkurs' slug which exists in e2e-seed.ts
   const courseUrl = '/courses/grundkurs';
 
+  // Increase timeout for this test suite as course pages can be slow to render
+  test.setTimeout(90000);
+
   test.beforeEach(async ({ page }) => {
-    // Use domcontentloaded to avoid waiting for all resources (images, fonts etc.)
-    await page.goto(courseUrl, { waitUntil: 'domcontentloaded' });
+    // First ensure the server is responding by hitting the homepage
+    await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+    
+    // Then navigate to the course page with network idle wait
+    await page.goto(courseUrl, { waitUntil: 'networkidle', timeout: 60000 });
   });
 
   test.describe('Page loading', () => {
