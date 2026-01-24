@@ -17,7 +17,7 @@ test.describe('Course Detail Page', () => {
   test.beforeEach(async ({ page }) => {
     // First ensure the server is responding by hitting the homepage
     await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 30000 });
-    
+
     // Then navigate to the course page with network idle wait
     await page.goto(courseUrl, { waitUntil: 'networkidle', timeout: 60000 });
   });
