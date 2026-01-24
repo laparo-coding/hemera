@@ -47,6 +47,7 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
     id: course.id,
     title: course.title,
     description: course.description,
+    teaser: course.teaser,
     price: course.price,
     startDate: course.startDate?.toISOString() ?? new Date().toISOString(),
     startTime: course.startTime?.toISOString() ?? new Date().toISOString(),

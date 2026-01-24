@@ -7,6 +7,7 @@ export interface Course {
   id: string;
   title: string;
   description: string | null;
+  teaser: string | null;
   slug: string;
   price: number;
   currency: string;

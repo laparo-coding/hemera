@@ -30,6 +30,7 @@ export interface Course {
   id: string;
   title: string;
   description: string | null;
+  teaser: string | null;
   slug: string;
   price: number;
   currency: string;
@@ -184,6 +185,7 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
       id: course.id,
       title: course.title,
       description: course.description,
+      teaser: course.teaser,
       slug: course.slug,
       price: course.price,
       currency: course.currency || 'EUR',

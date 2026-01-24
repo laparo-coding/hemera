@@ -19,7 +19,8 @@ import {
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
 
-export const dynamic = 'force-dynamic';
+// Cache testimonials for 60 seconds
+export const revalidate = 60;
 
 interface RouteParams {
   params: Promise<{ id: string }>;

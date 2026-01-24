@@ -24,6 +24,12 @@ export const courseCreateSchema = z.object({
     .string()
     .min(10, 'Description must be at least 10 characters')
     .trim(),
+  teaser: z
+    .string()
+    .max(300, 'Teaser must not exceed 300 characters')
+    .trim()
+    .optional()
+    .nullable(),
   price: z
     .number()
     .nonnegative('Price must be non-negative')
@@ -98,6 +104,12 @@ export const courseUpdateSchema = z.object({
     .min(10, 'Description must be at least 10 characters')
     .trim()
     .optional(),
+  teaser: z
+    .string()
+    .max(300, 'Teaser must not exceed 300 characters')
+    .trim()
+    .optional()
+    .nullable(),
   price: z
     .number()
     .nonnegative('Price must be non-negative')

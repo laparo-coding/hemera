@@ -13,6 +13,8 @@ export type {
 } from './CourseDetailLayout';
 export { CourseDetailLayout } from './CourseDetailLayout';
 export { CourseDetailSkeleton } from './CourseDetailSkeleton';
+export type { CourseHeaderProps } from './CourseHeader';
+export { CourseHeader } from './CourseHeader';
 export type { CourseHeroSectionProps } from './CourseHeroSection';
 export { CourseHeroSection } from './CourseHeroSection';
 export type { CourseOverviewSectionProps } from './CourseOverviewSection';

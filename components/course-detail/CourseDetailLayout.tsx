@@ -9,6 +9,7 @@ import { Box } from '@mui/material';
 import type React from 'react';
 import { colors } from '../../lib/design-tokens';
 import { BookingCTA } from './BookingCTA';
+import { CourseHeader } from './CourseHeader';
 import { CourseHeroSection } from './CourseHeroSection';
 import { CourseOverviewSection } from './CourseOverviewSection';
 import type { CurriculumModule } from './CurriculumSection';
@@ -56,8 +57,17 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
       sx={{
         width: '100%',
         backgroundColor: colors.cream,
+        overflow: 'visible',
       }}
     >
+      {/* 0. Course Header - Always visible with title and thumbnail */}
+      <CourseHeader
+        title={course.title}
+        level={course.level}
+        tagline={course.tagline}
+        thumbnailUrl={course.thumbnailUrl}
+      />
+
       {/* 1. Hero Section - Full-width with video (only if available) */}
       <CourseHeroSection
         title={course.title}
@@ -70,7 +80,6 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
 
       {/* 2. Overview Section - Description, objectives, instructor */}
       <CourseOverviewSection
-        title={course.title}
         description={course.description || 'Keine Beschreibung verfügbar.'}
         learningObjectives={course.learningObjectives || []}
         instructor={course.instructor || 'Hemera Academy Team'}

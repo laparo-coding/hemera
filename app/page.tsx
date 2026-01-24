@@ -147,7 +147,7 @@ export default async function HomePage() {
           level: mapLevelToIndicator(course.level, index),
           levelLabel: getLevelLabel(course.level),
           title: course.title,
-          description: course.description || '',
+          description: course.teaser || '',
           upcomingDates,
           detailHref: `/courses/${course.slug}`,
           ctaText: 'Mehr erfahren',

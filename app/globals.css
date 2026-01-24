@@ -39,6 +39,11 @@ a {
   --hemera-sage: #a6cdc6;
 }
 
+/* Clerk Modal: Transparenter Hintergrund für UserProfile Modal */
+.cl-modalBackdrop {
+  background-color: transparent !important;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 22, 64, 77;
