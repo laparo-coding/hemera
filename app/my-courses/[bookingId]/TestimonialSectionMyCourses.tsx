@@ -75,6 +75,7 @@ export default function TestimonialSectionMyCourses({
   const fetchTestimonial = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null); // Clear previous error
       const response = await fetch(`/api/bookings/${bookingId}/testimonial`);
 
       if (response.status === 404) {

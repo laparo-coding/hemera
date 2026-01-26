@@ -78,11 +78,8 @@ export async function submitTestimonialAction(
       };
     }
 
-    // Get city from Clerk metadata if available
-    const city =
-      (user.publicMetadata?.city as string) ||
-      (user.unsafeMetadata?.city as string) ||
-      null;
+    // Get city from Clerk metadata if available (only publicMetadata is trusted)
+    const city = (user.publicMetadata?.city as string) || null;
 
     const testimonial = await createTestimonial(parseResult.data, {
       firstName: user.firstName || 'Anonym',
@@ -139,11 +136,8 @@ export async function updateTestimonialAction(
       };
     }
 
-    // Get city from Clerk metadata if available
-    const city =
-      (user.publicMetadata?.city as string) ||
-      (user.unsafeMetadata?.city as string) ||
-      null;
+    // Get city from Clerk metadata if available (only publicMetadata is trusted)
+    const city = (user.publicMetadata?.city as string) || null;
 
     await updateTestimonial(testimonialId, userId, parseResult.data, {
       firstName: user.firstName || 'Anonym',
@@ -283,8 +277,8 @@ export async function deleteTestimonialAction(
       return { success: false, error: 'Erfahrungsbericht nicht gefunden' };
     }
 
-    // Verify ownership
-    if (testimonial.booking.userId !== userId) {
+    // Verify ownership (defensive check for booking relation)
+    if (!testimonial.booking || testimonial.booking.userId !== userId) {
       return { success: false, error: 'Keine Berechtigung' };
     }
 
