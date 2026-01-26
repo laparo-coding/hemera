@@ -253,6 +253,105 @@ function fixSuccessBooleans(items) {
 
 fixSuccessBooleans(collection.item || []);
 
+// Per-request test scripts for key endpoints
+// These align with README claims and catch regressions early
+const keyEndpointTests = {
+  'Deployment health status': [
+    'pm.test("Status is 200 OK", function () {',
+    '    pm.response.to.have.status(200);',
+    '});',
+    'pm.test("Has success boolean", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.be.a("boolean");',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+  ],
+  'List published courses': [
+    'pm.test("Status is 2xx", function () {',
+    '    pm.expect(pm.response.code).to.be.within(200, 299);',
+    '});',
+    'pm.test("Has success: true", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.equal(true);',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+    'pm.test("Has courses array", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.data.courses).to.be.an("array");',
+    '});',
+  ],
+  'List locations': [
+    'pm.test("Status is 2xx", function () {',
+    '    pm.expect(pm.response.code).to.be.within(200, 299);',
+    '});',
+    'pm.test("Has success: true", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.equal(true);',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+  ],
+  'List user bookings': [
+    'pm.test("Status is 2xx or 401", function () {',
+    '    pm.expect([200, 401]).to.include(pm.response.code);',
+    '});',
+    'pm.test("Has success boolean", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.be.a("boolean");',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+  ],
+  'Get auth providers': [
+    'pm.test("Status is 200 OK", function () {',
+    '    pm.response.to.have.status(200);',
+    '});',
+    'pm.test("Has success: true", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.equal(true);',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+  ],
+};
+
+// Add per-request test scripts to key endpoints
+function addEndpointTests(items) {
+  for (const item of items) {
+    if (item.request && keyEndpointTests[item.name]) {
+      item.event = item.event || [];
+      // Check if test event already exists
+      const hasTest = item.event.some(e => e.listen === 'test');
+      if (!hasTest) {
+        item.event.push({
+          listen: 'test',
+          script: {
+            type: 'text/javascript',
+            exec: keyEndpointTests[item.name],
+          },
+        });
+      }
+    }
+    if (item.item && Array.isArray(item.item)) {
+      addEndpointTests(item.item);
+    }
+  }
+}
+
+addEndpointTests(collection.item || []);
+
 // Normalize variable names: replace {{bearerToken}} with {{bearer_token}}
 // This ensures consistency with environment file and README
 let collectionStr = JSON.stringify(collection, null, 2);

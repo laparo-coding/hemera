@@ -127,7 +127,27 @@
                   "_postman_previewlanguage": "json"
                 }
               ],
-              "event": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status is 200 OK\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test(\"Has success boolean\", function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.success).to.be.a(\"boolean\");",
+                      "});",
+                      "pm.test(\"Has requestId\", function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json.requestId).to.be.a(\"string\");",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "protocolProfileBehavior": {
                 "disableBodyPruning": true
               }
@@ -409,7 +429,31 @@
               "_postman_previewlanguage": "json"
             }
           ],
-          "event": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 2xx\", function () {",
+                  "    pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test(\"Has success: true\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.equal(true);",
+                  "});",
+                  "pm.test(\"Has requestId\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.requestId).to.be.a(\"string\");",
+                  "});",
+                  "pm.test(\"Has courses array\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.courses).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           }
@@ -708,7 +752,27 @@
               "_postman_previewlanguage": "json"
             }
           ],
-          "event": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 2xx\", function () {",
+                  "    pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test(\"Has success: true\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.equal(true);",
+                  "});",
+                  "pm.test(\"Has requestId\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.requestId).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           }
@@ -1840,7 +1904,27 @@
               "_postman_previewlanguage": "json"
             }
           ],
-          "event": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 2xx or 401\", function () {",
+                  "    pm.expect([200, 401]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test(\"Has success boolean\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.a(\"boolean\");",
+                  "});",
+                  "pm.test(\"Has requestId\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.requestId).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           }
