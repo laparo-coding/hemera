@@ -227,6 +227,32 @@ function fixErrorResponses(items) {
 
 fixErrorResponses(collection.item || []);
 
+// Fix success boolean placeholders in response bodies
+// Success responses (2xx): "success": "<boolean>" → "success": true
+// Error responses (4xx/5xx): already fixed by fixErrorResponses above
+function fixSuccessBooleans(items) {
+  for (const item of items) {
+    if (item.response && Array.isArray(item.response)) {
+      for (const response of item.response) {
+        const statusCode = response.code;
+        // Only fix 2xx responses - error responses are handled by fixErrorResponses
+        if (statusCode >= 200 && statusCode < 300 && response.body) {
+          // Replace "<boolean>" placeholder with true for success responses
+          response.body = response.body.replace(
+            /"success":\s*"<boolean>"/g,
+            '"success": true'
+          );
+        }
+      }
+    }
+    if (item.item && Array.isArray(item.item)) {
+      fixSuccessBooleans(item.item);
+    }
+  }
+}
+
+fixSuccessBooleans(collection.item || []);
+
 // Normalize variable names: replace {{bearerToken}} with {{bearer_token}}
 // This ensures consistency with environment file and README
 let collectionStr = JSON.stringify(collection, null, 2);

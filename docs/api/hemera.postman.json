@@ -56,7 +56,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"status\": \"unhealthy\",\n    \"timestamp\": \"<dateTime>\",\n    \"version\": \"<string>\",\n    \"database\": \"disconnected\"\n  }\n}",
+              "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"status\": \"unhealthy\",\n    \"timestamp\": \"<dateTime>\",\n    \"version\": \"<string>\",\n    \"database\": \"disconnected\"\n  }\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             }
@@ -122,7 +122,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -210,7 +210,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -336,7 +336,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"courses\": [\n      {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      },\n      {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    ],\n    \"pagination\": {\n      \"page\": \"<integer>\",\n      \"limit\": \"<integer>\",\n      \"total\": \"<integer>\",\n      \"totalPages\": \"<integer>\"\n    }\n  }\n}",
+              "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"courses\": [\n      {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      },\n      {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    ],\n    \"pagination\": {\n      \"page\": \"<integer>\",\n      \"limit\": \"<integer>\",\n      \"total\": \"<integer>\",\n      \"totalPages\": \"<integer>\"\n    }\n  }\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
@@ -470,7 +470,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"<string>\",\n    \"price\": \"<integer>\",\n    \"startDate\": \"<dateTime>\",\n    \"currency\": \"<string>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"location\": {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"city\": \"<string>\",\n      \"slug\": \"<string>\"\n    }\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"<string>\",\n    \"price\": \"<integer>\",\n    \"startDate\": \"<dateTime>\",\n    \"currency\": \"<string>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"location\": {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"city\": \"<string>\",\n      \"slug\": \"<string>\"\n    }\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -591,7 +591,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -703,7 +703,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"slug\": \"36ox5cd7w\",\n      \"address\": \"<string>\",\n      \"city\": \"<string>\",\n      \"country\": \"DE\",\n      \"postalCode\": \"<string>\",\n      \"latitude\": \"<double>\",\n      \"longitude\": \"<double>\",\n      \"imageUrl\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"slug\": \"5if-s4q\",\n      \"address\": \"<string>\",\n      \"city\": \"<string>\",\n      \"country\": \"DE\",\n      \"postalCode\": \"<string>\",\n      \"latitude\": \"<double>\",\n      \"longitude\": \"<double>\",\n      \"imageUrl\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
+              "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"slug\": \"36ox5cd7w\",\n      \"address\": \"<string>\",\n      \"city\": \"<string>\",\n      \"country\": \"DE\",\n      \"postalCode\": \"<string>\",\n      \"latitude\": \"<double>\",\n      \"longitude\": \"<double>\",\n      \"imageUrl\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"slug\": \"5if-s4q\",\n      \"address\": \"<string>\",\n      \"city\": \"<string>\",\n      \"country\": \"DE\",\n      \"postalCode\": \"<string>\",\n      \"latitude\": \"<double>\",\n      \"longitude\": \"<double>\",\n      \"imageUrl\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             }
@@ -791,7 +791,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"tjkztv\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+              "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"tjkztv\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
@@ -967,7 +967,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"tjkztv\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"tjkztv\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -1119,7 +1119,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"tjkztv\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"tjkztv\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -1313,7 +1313,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -1533,7 +1533,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"formattedAddress\": \"<string>\",\n    \"confidence\": \"<float>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"formattedAddress\": \"<string>\",\n    \"confidence\": \"<float>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -1704,7 +1704,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"providers\": [\n      {\n        \"name\": \"<string>\",\n        \"enabled\": \"<boolean>\",\n        \"signInUrl\": \"<uri>\"\n      },\n      {\n        \"name\": \"<string>\",\n        \"enabled\": \"<boolean>\",\n        \"signInUrl\": \"<uri>\"\n      }\n    ]\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"providers\": [\n      {\n        \"name\": \"<string>\",\n        \"enabled\": \"<boolean>\",\n        \"signInUrl\": \"<uri>\"\n      },\n      {\n        \"name\": \"<string>\",\n        \"enabled\": \"<boolean>\",\n        \"signInUrl\": \"<uri>\"\n      }\n    ]\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -1794,7 +1794,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"userId\": \"<string>\",\n      \"courseId\": \"<string>\",\n      \"status\": \"COMPLETED\",\n      \"createdAt\": \"<dateTime>\",\n      \"paymentIntentId\": \"<string>\",\n      \"stripeSessionId\": \"<string>\",\n      \"amount\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"updatedAt\": \"<dateTime>\",\n      \"course\": {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    },\n    {\n      \"id\": \"<string>\",\n      \"userId\": \"<string>\",\n      \"courseId\": \"<string>\",\n      \"status\": \"CONFIRMED\",\n      \"createdAt\": \"<dateTime>\",\n      \"paymentIntentId\": \"<string>\",\n      \"stripeSessionId\": \"<string>\",\n      \"amount\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"updatedAt\": \"<dateTime>\",\n      \"course\": {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    }\n  ]\n}",
+              "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"userId\": \"<string>\",\n      \"courseId\": \"<string>\",\n      \"status\": \"COMPLETED\",\n      \"createdAt\": \"<dateTime>\",\n      \"paymentIntentId\": \"<string>\",\n      \"stripeSessionId\": \"<string>\",\n      \"amount\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"updatedAt\": \"<dateTime>\",\n      \"course\": {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    },\n    {\n      \"id\": \"<string>\",\n      \"userId\": \"<string>\",\n      \"courseId\": \"<string>\",\n      \"status\": \"CONFIRMED\",\n      \"createdAt\": \"<dateTime>\",\n      \"paymentIntentId\": \"<string>\",\n      \"stripeSessionId\": \"<string>\",\n      \"amount\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"updatedAt\": \"<dateTime>\",\n      \"course\": {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    }\n  ]\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
@@ -1923,7 +1923,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"userId\": \"<string>\",\n    \"courseId\": \"<string>\",\n    \"status\": \"CANCELLED\",\n    \"createdAt\": \"<dateTime>\",\n    \"paymentIntentId\": \"<string>\",\n    \"stripeSessionId\": \"<string>\",\n    \"amount\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"updatedAt\": \"<dateTime>\",\n    \"course\": {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"startDate\": \"<dateTime>\",\n      \"currency\": \"<string>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"location\": {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"city\": \"<string>\",\n        \"slug\": \"<string>\"\n      }\n    }\n  }\n}",
+              "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"userId\": \"<string>\",\n    \"courseId\": \"<string>\",\n    \"status\": \"CANCELLED\",\n    \"createdAt\": \"<dateTime>\",\n    \"paymentIntentId\": \"<string>\",\n    \"stripeSessionId\": \"<string>\",\n    \"amount\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"updatedAt\": \"<dateTime>\",\n    \"course\": {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"startDate\": \"<dateTime>\",\n      \"currency\": \"<string>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"location\": {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"city\": \"<string>\",\n        \"slug\": \"<string>\"\n      }\n    }\n  }\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
@@ -2153,7 +2153,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"IN_PROGRESS\",\n    \"completedAt\": \"<dateTime>\",\n    \"data\": {\n      \"key_0\": true\n    }\n  }\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"IN_PROGRESS\",\n    \"completedAt\": \"<dateTime>\",\n    \"data\": {\n      \"key_0\": true\n    }\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
@@ -2347,7 +2347,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
@@ -2492,7 +2492,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"COMPLETED\",\n    \"videoUrl\": \"<uri>\",\n    \"notes\": \"<string>\"\n  }\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"COMPLETED\",\n    \"videoUrl\": \"<uri>\",\n    \"notes\": \"<string>\"\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
@@ -2644,7 +2644,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -2734,7 +2734,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"COMPLETED\",\n    \"feedback\": \"<string>\",\n    \"rating\": \"<integer>\"\n  }\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"COMPLETED\",\n    \"feedback\": \"<string>\",\n    \"rating\": \"<integer>\"\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
@@ -2886,7 +2886,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -2976,7 +2976,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"COMPLETED\",\n    \"certificateUrl\": \"<uri>\",\n    \"score\": \"<number>\"\n  }\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"COMPLETED\",\n    \"certificateUrl\": \"<uri>\",\n    \"score\": \"<number>\"\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
@@ -3128,7 +3128,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -3218,7 +3218,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"url\": \"<uri>\",\n    \"filename\": \"<string>\",\n    \"uploadedAt\": \"<dateTime>\"\n  }\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"url\": \"<uri>\",\n    \"filename\": \"<string>\",\n    \"uploadedAt\": \"<dateTime>\"\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
@@ -3376,7 +3376,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -3460,7 +3460,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -3556,7 +3556,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"byq36ij3g\",\n      \"price\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"startDate\": \"<dateTime>\",\n      \"isPublished\": \"<boolean>\",\n      \"description\": \"<string>\",\n      \"endDate\": \"<dateTime>\",\n      \"locationId\": \"<string>\",\n      \"maxParticipants\": \"<integer>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"di3\",\n      \"price\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"startDate\": \"<dateTime>\",\n      \"isPublished\": \"<boolean>\",\n      \"description\": \"<string>\",\n      \"endDate\": \"<dateTime>\",\n      \"locationId\": \"<string>\",\n      \"maxParticipants\": \"<integer>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"byq36ij3g\",\n      \"price\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"startDate\": \"<dateTime>\",\n      \"isPublished\": \"<boolean>\",\n      \"description\": \"<string>\",\n      \"endDate\": \"<dateTime>\",\n      \"locationId\": \"<string>\",\n      \"maxParticipants\": \"<integer>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"di3\",\n      \"price\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"startDate\": \"<dateTime>\",\n      \"isPublished\": \"<boolean>\",\n      \"description\": \"<string>\",\n      \"endDate\": \"<dateTime>\",\n      \"locationId\": \"<string>\",\n      \"maxParticipants\": \"<integer>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -3726,7 +3726,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -3906,7 +3906,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -4000,7 +4000,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -4090,7 +4090,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"w67k25\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\",\n    \"enrollmentCount\": \"<integer>\",\n    \"bookings\": [\n      {\n        \"id\": \"<string>\",\n        \"userId\": \"<string>\",\n        \"courseId\": \"<string>\",\n        \"status\": \"CONFIRMED\",\n        \"createdAt\": \"<dateTime>\",\n        \"paymentIntentId\": \"<string>\",\n        \"stripeSessionId\": \"<string>\",\n        \"amount\": \"<integer>\",\n        \"currency\": \"EUR\",\n        \"updatedAt\": \"<dateTime>\",\n        \"course\": {\n          \"id\": \"<string>\",\n          \"title\": \"<string>\",\n          \"slug\": \"<string>\",\n          \"price\": \"<integer>\",\n          \"startDate\": \"<dateTime>\",\n          \"currency\": \"<string>\",\n          \"thumbnailUrl\": \"<uri>\",\n          \"location\": {\n            \"id\": \"<string>\",\n            \"name\": \"<string>\",\n            \"city\": \"<string>\",\n            \"slug\": \"<string>\"\n          }\n        }\n      },\n      {\n        \"id\": \"<string>\",\n        \"userId\": \"<string>\",\n        \"courseId\": \"<string>\",\n        \"status\": \"PENDING\",\n        \"createdAt\": \"<dateTime>\",\n        \"paymentIntentId\": \"<string>\",\n        \"stripeSessionId\": \"<string>\",\n        \"amount\": \"<integer>\",\n        \"currency\": \"EUR\",\n        \"updatedAt\": \"<dateTime>\",\n        \"course\": {\n          \"id\": \"<string>\",\n          \"title\": \"<string>\",\n          \"slug\": \"<string>\",\n          \"price\": \"<integer>\",\n          \"startDate\": \"<dateTime>\",\n          \"currency\": \"<string>\",\n          \"thumbnailUrl\": \"<uri>\",\n          \"location\": {\n            \"id\": \"<string>\",\n            \"name\": \"<string>\",\n            \"city\": \"<string>\",\n            \"slug\": \"<string>\"\n          }\n        }\n      }\n    ]\n  }\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"w67k25\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\",\n    \"enrollmentCount\": \"<integer>\",\n    \"bookings\": [\n      {\n        \"id\": \"<string>\",\n        \"userId\": \"<string>\",\n        \"courseId\": \"<string>\",\n        \"status\": \"CONFIRMED\",\n        \"createdAt\": \"<dateTime>\",\n        \"paymentIntentId\": \"<string>\",\n        \"stripeSessionId\": \"<string>\",\n        \"amount\": \"<integer>\",\n        \"currency\": \"EUR\",\n        \"updatedAt\": \"<dateTime>\",\n        \"course\": {\n          \"id\": \"<string>\",\n          \"title\": \"<string>\",\n          \"slug\": \"<string>\",\n          \"price\": \"<integer>\",\n          \"startDate\": \"<dateTime>\",\n          \"currency\": \"<string>\",\n          \"thumbnailUrl\": \"<uri>\",\n          \"location\": {\n            \"id\": \"<string>\",\n            \"name\": \"<string>\",\n            \"city\": \"<string>\",\n            \"slug\": \"<string>\"\n          }\n        }\n      },\n      {\n        \"id\": \"<string>\",\n        \"userId\": \"<string>\",\n        \"courseId\": \"<string>\",\n        \"status\": \"PENDING\",\n        \"createdAt\": \"<dateTime>\",\n        \"paymentIntentId\": \"<string>\",\n        \"stripeSessionId\": \"<string>\",\n        \"amount\": \"<integer>\",\n        \"currency\": \"EUR\",\n        \"updatedAt\": \"<dateTime>\",\n        \"course\": {\n          \"id\": \"<string>\",\n          \"title\": \"<string>\",\n          \"slug\": \"<string>\",\n          \"price\": \"<integer>\",\n          \"startDate\": \"<dateTime>\",\n          \"currency\": \"<string>\",\n          \"thumbnailUrl\": \"<uri>\",\n          \"location\": {\n            \"id\": \"<string>\",\n            \"name\": \"<string>\",\n            \"city\": \"<string>\",\n            \"slug\": \"<string>\"\n          }\n        }\n      }\n    ]\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
@@ -4242,7 +4242,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
@@ -4381,7 +4381,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                      "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
@@ -4547,7 +4547,7 @@
                               "value": "application/json"
                             }
                           ],
-                          "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"transferredCount\": \"<integer>\"\n  }\n}",
+                          "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"transferredCount\": \"<integer>\"\n  }\n}",
                           "cookie": [],
                           "_postman_previewlanguage": "json"
                         }
@@ -4639,7 +4639,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"clerkId\": \"<string>\",\n      \"email\": \"<email>\",\n      \"role\": \"ADMIN\",\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"clerkId\": \"<string>\",\n      \"email\": \"<email>\",\n      \"role\": \"USER\",\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"clerkId\": \"<string>\",\n      \"email\": \"<email>\",\n      \"role\": \"ADMIN\",\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"clerkId\": \"<string>\",\n      \"email\": \"<email>\",\n      \"role\": \"USER\",\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -4768,7 +4768,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"ADMIN\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"ADMIN\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -4864,7 +4864,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"ADMIN\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"ADMIN\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -4974,7 +4974,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"ADMIN\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"ADMIN\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -5058,7 +5058,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": \"\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -5126,7 +5126,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"email\": \"<email>\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"imageUrl\": \"<uri>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"email\": \"<email>\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"imageUrl\": \"<uri>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -5245,7 +5245,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"email\": \"<email>\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"imageUrl\": \"<uri>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"email\": \"<email>\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"imageUrl\": \"<uri>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
@@ -5946,7 +5946,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"status\": \"unhealthy\",\n    \"version\": \"<string>\",\n    \"uptime\": \"<integer>\",\n    \"memory\": {\n      \"used\": \"<integer>\",\n      \"total\": \"<integer>\",\n      \"percentage\": \"<float>\"\n    },\n    \"database\": {\n      \"connected\": \"<boolean>\",\n      \"latency\": \"<integer>\"\n    },\n    \"cache\": {\n      \"connected\": \"<boolean>\",\n      \"hitRate\": \"<float>\"\n    },\n    \"timestamp\": \"<dateTime>\"\n  }\n}",
+              "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"status\": \"unhealthy\",\n    \"version\": \"<string>\",\n    \"uptime\": \"<integer>\",\n    \"memory\": {\n      \"used\": \"<integer>\",\n      \"total\": \"<integer>\",\n      \"percentage\": \"<float>\"\n    },\n    \"database\": {\n      \"connected\": \"<boolean>\",\n      \"latency\": \"<integer>\"\n    },\n    \"cache\": {\n      \"connected\": \"<boolean>\",\n      \"hitRate\": \"<float>\"\n    },\n    \"timestamp\": \"<dateTime>\"\n  }\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
