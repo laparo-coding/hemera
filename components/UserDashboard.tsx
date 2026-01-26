@@ -12,10 +12,15 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import type { PaymentStatus } from '@prisma/client';
 import Link from 'next/link';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TERMS } from '@/lib/constants';
+import {
+  type BookingForCategorization,
+  categorizeBookings as categorizeBookingsUtil,
+} from '@/lib/utils/booking-categorization';
 import { CourseCard, DashboardSection } from './dashboard';
 
 // Design tokens from Hemera spec (matching landing page and auth pages)
@@ -48,8 +53,8 @@ interface Booking {
   stripeInvoicePdfUrl: string | null;
 }
 
-// Categorized bookings for dashboard sections
-interface CategorizedBookings {
+// Categorized bookings for dashboard display (with original Booking objects)
+interface CategorizedDashboardBookings {
   nextSeminar: Booking | null;
   upcoming: Booking[];
   completed: Booking[];
@@ -57,46 +62,48 @@ interface CategorizedBookings {
 }
 
 /**
- * Categorize bookings into dashboard sections
+ * Convert API booking to format expected by categorization utility
  */
-function categorizeBookings(bookings: Booking[]): CategorizedBookings {
-  const now = new Date();
-
-  // Filter out cancelled/failed
-  const activeBookings = bookings.filter(
-    b => !['CANCELLED', 'FAILED'].includes(b.paymentStatus)
-  );
-
-  // Separate upcoming and past
-  const upcomingBookings = activeBookings
-    .filter(b => {
-      const endDate = b.endDate
-        ? new Date(b.endDate)
-        : b.startDate
-          ? new Date(b.startDate)
-          : null;
-      return endDate && endDate > now;
-    })
-    .sort((a, b) => {
-      const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
-      const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
-      return dateA - dateB;
-    });
-
-  const pastBookings = activeBookings.filter(b => {
-    const endDate = b.endDate
-      ? new Date(b.endDate)
-      : b.startDate
-        ? new Date(b.startDate)
-        : null;
-    return endDate && endDate <= now;
-  });
-
+function toBookingForCategorization(
+  booking: Booking
+): BookingForCategorization {
   return {
-    nextSeminar: upcomingBookings[0] ?? null,
-    upcoming: upcomingBookings.slice(1),
-    completed: pastBookings.filter(b => b.hasParticipation),
-    noShow: pastBookings.filter(b => !b.hasParticipation),
+    id: booking.id,
+    paymentStatus: booking.paymentStatus as PaymentStatus,
+    course: {
+      startDate: booking.startDate ? new Date(booking.startDate) : null,
+      endDate: booking.endDate ? new Date(booking.endDate) : null,
+    },
+    participation: booking.hasParticipation ? { id: 'exists' } : null,
+  };
+}
+
+/**
+ * Categorize bookings into dashboard sections using the shared utility.
+ * Maps API bookings to the utility format, categorizes, then maps back.
+ */
+function categorizeBookings(bookings: Booking[]): CategorizedDashboardBookings {
+  // Create a map for quick lookup
+  const bookingMap = new Map(bookings.map(b => [b.id, b]));
+
+  // Convert to utility format and categorize
+  const forCategorization = bookings.map(toBookingForCategorization);
+  const result = categorizeBookingsUtil(forCategorization);
+
+  // Map back to original Booking objects
+  return {
+    nextSeminar: result.nextSeminar
+      ? (bookingMap.get(result.nextSeminar.id) ?? null)
+      : null,
+    upcoming: result.upcoming
+      .map(b => bookingMap.get(b.id))
+      .filter((b): b is Booking => b !== undefined),
+    completed: result.completed
+      .map(b => bookingMap.get(b.id))
+      .filter((b): b is Booking => b !== undefined),
+    noShow: result.noShow
+      .map(b => bookingMap.get(b.id))
+      .filter((b): b is Booking => b !== undefined),
   };
 }
 

@@ -51,15 +51,28 @@ function getCourseEndDate(booking: BookingForCategorization): Date | null {
 }
 
 /**
+ * Get the sort date for a booking (earliest date available).
+ * Bookings without dates sort to the end (far future).
+ */
+function getSortDate(booking: BookingForCategorization): number {
+  const startDate = booking.course.startDate?.getTime();
+  const endDate = booking.course.endDate?.getTime();
+  if (startDate != null) return startDate;
+  if (endDate != null) return endDate;
+  // No date: sort to far future (end of list)
+  return Number.MAX_SAFE_INTEGER;
+}
+
+/**
  * Categorizes bookings into the 4 dashboard sections.
  *
  * Rules:
  * 1. Cancelled/Failed bookings are excluded from all sections
- * 2. A course is "upcoming" if its end date is in the future
+ * 2. A course is "upcoming" if its end date is in the future OR has no date
  * 3. A course is "past" if its end date is in the past
  * 4. Past courses with a participation record go to "completed"
  * 5. Past courses without participation go to "noShow"
- * 6. Upcoming courses are sorted by startDate ascending
+ * 6. Upcoming courses are sorted by startDate ascending (no date = end)
  * 7. The first upcoming course becomes "nextSeminar"
  *
  * @param bookings Array of bookings to categorize
@@ -76,19 +89,18 @@ export function categorizeBookings(
   );
 
   // Separate into upcoming and past based on course end date
+  // Bookings without dates are treated as upcoming (sorted to end)
   const upcomingBookings = activeBookings
     .filter(b => {
       const endDate = getCourseEndDate(b);
-      return endDate && endDate > now;
+      // No date OR end date in future = upcoming
+      return !endDate || endDate > now;
     })
-    .sort((a, b) => {
-      const dateA = a.course.startDate?.getTime() || 0;
-      const dateB = b.course.startDate?.getTime() || 0;
-      return dateA - dateB;
-    });
+    .sort((a, b) => getSortDate(a) - getSortDate(b));
 
   const pastBookings = activeBookings.filter(b => {
     const endDate = getCourseEndDate(b);
+    // Only courses with an end date in the past
     return endDate && endDate <= now;
   });
 
@@ -126,17 +138,13 @@ export function getBookingSection(
 
   const endDate = getCourseEndDate(booking);
 
-  // No date means we can't categorize
-  if (!endDate) {
-    return 'excluded';
-  }
-
-  // Check if past or upcoming
-  if (endDate <= now) {
+  // No date = treated as upcoming (uses categorize to determine position)
+  // Past = completed or noShow based on participation
+  if (endDate && endDate <= now) {
     return booking.participation ? 'completed' : 'noShow';
   }
 
-  // It's upcoming - check if it's the next one
+  // It's upcoming (or no date) - check if it's the next one
   const categorized = categorizeBookings(allBookings, now);
   if (categorized.nextSeminar?.id === booking.id) {
     return 'nextSeminar';

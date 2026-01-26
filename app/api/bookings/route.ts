@@ -110,7 +110,7 @@ function normalizeBookings(bookings: BookingRecord[], requestId: string) {
       locationName: booking.course?.location?.name ?? null,
       locationSlug: booking.course?.location?.slug ?? null,
       locationCity: booking.course?.location?.city ?? null,
-      hasParticipation: booking.participation != null,
+      hasParticipation: booking.participation?.id != null,
       stripeInvoicePdfUrl: booking.stripeInvoicePdfUrl,
     };
   });
