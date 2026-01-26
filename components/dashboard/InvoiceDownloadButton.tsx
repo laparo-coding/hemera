@@ -144,10 +144,13 @@ export async function initiateInvoiceDownload(
     link.download = filename;
     document.body.appendChild(link);
     link.click();
-
-    // Cleanup
     document.body.removeChild(link);
-    URL.revokeObjectURL(objectUrl);
+
+    // Cleanup: Revoke the object URL after a short delay to ensure the download has started
+    // This prevents a race condition where the URL is revoked before the browser initiates download
+    setTimeout(() => {
+      URL.revokeObjectURL(objectUrl);
+    }, 100);
 
     return { success: true };
   } catch (error) {

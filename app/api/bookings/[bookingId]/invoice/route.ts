@@ -66,19 +66,27 @@ async function streamPdfDownload(
     throw new Error(`Failed to fetch PDF: ${pdfResponse.status}`);
   }
 
-  const pdfBuffer = await pdfResponse.arrayBuffer();
-
   // Generate filename from invoice ID (German: "Rechnung")
   const filename = `rechnung-${invoiceId}.pdf`;
 
-  return new Response(pdfBuffer, {
+  // Build response headers
+  const headers = new Headers({
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': `attachment; filename="${filename}"`,
+    'Cache-Control': 'private, max-age=3600',
+  });
+
+  // Pass through Content-Length from Stripe's response if available
+  const contentLength = pdfResponse.headers.get('Content-Length');
+  if (contentLength) {
+    headers.set('Content-Length', contentLength);
+  }
+
+  // Stream the PDF directly instead of buffering in memory
+  // This reduces server memory usage for large PDFs
+  return new Response(pdfResponse.body, {
     status: 200,
-    headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Length': pdfBuffer.byteLength.toString(),
-      'Cache-Control': 'private, max-age=3600',
-    },
+    headers,
   });
 }
 
