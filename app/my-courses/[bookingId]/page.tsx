@@ -4,6 +4,7 @@
  * Displays detailed information about a specific booked course.
  * Shows preparation materials, participation data, or debriefing info
  * depending on course status.
+ * Feature: 017-testimonial-management - Testimonial form for completed courses
  */
 
 import { requireAuthenticatedUser } from '../../../lib/auth/helpers';
@@ -11,6 +12,7 @@ import { requireAuthenticatedUser } from '../../../lib/auth/helpers';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+import { currentUser } from '@clerk/nextjs/server';
 import { ArrowBackOutlined } from '@mui/icons-material';
 import { Alert, Box, Paper, Stack, Typography } from '@mui/material';
 import type { Metadata } from 'next';
@@ -20,6 +22,7 @@ import { prisma } from '../../../lib/db/prisma';
 import DebriefingSection from './DebriefingSection';
 import PreparationSection from './PreparationSection';
 import ResultsSection from './ResultsSection';
+import TestimonialSectionMyCourses from './TestimonialSectionMyCourses';
 
 export const metadata: Metadata = {
   title: 'Seminardetails - Hemera Academy',
@@ -100,6 +103,20 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
   const courseEndDate = course.endDate || course.startDate;
   const isPast = courseEndDate ? courseEndDate <= now : false;
   const hasParticipation = participation !== null;
+
+  // Get user profile for testimonial form
+  const clerkUser = await currentUser();
+  const userProfile = clerkUser
+    ? {
+        firstName: clerkUser.firstName || 'Anonym',
+        lastName: clerkUser.lastName || '',
+        imageUrl: clerkUser.imageUrl || null,
+        city:
+          (clerkUser.publicMetadata?.city as string) ||
+          (clerkUser.unsafeMetadata?.city as string) ||
+          null,
+      }
+    : null;
 
   // Determine section type
   const getSectionType = (): 'UPCOMING' | 'COMPLETED' | 'NO_SHOW' => {
@@ -301,6 +318,14 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
         <>
           <ResultsSection participation={participation} />
           <DebriefingSection courseId={course.id} bookingId={booking.id} />
+          {/* Testimonial Form - only for completed courses with user profile */}
+          {userProfile && (
+            <TestimonialSectionMyCourses
+              bookingId={booking.id}
+              courseName={course.title}
+              userProfile={userProfile}
+            />
+          )}
         </>
       )}
 
