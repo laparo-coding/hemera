@@ -5,7 +5,7 @@
  * Streams the PDF directly to trigger immediate download without blank page.
  */
 
-import { currentUser } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../../lib/db/prisma';
 import { logError } from '../../../../../lib/errors';
@@ -50,23 +50,20 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
   try {
     // 1. Authentication check
-    const user = await currentUser();
-    if (!user?.id) {
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    // 2. Sync user to get DB user ID
-    const { syncUserFromClerk } = await import('../../../../../lib/api/users');
-    const syncedUser = await syncUserFromClerk(user);
-
-    // 3. Find booking with user ownership check
+    // 2. Find booking with user ownership check
+    // Note: Prisma booking.userId matches Clerk userId directly (no sync needed)
     const booking = await prisma.booking.findFirst({
       where: {
         id: bookingId,
-        userId: syncedUser.id,
+        userId,
       },
       select: {
         id: true,
@@ -77,7 +74,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    // 4. Check if booking exists
+    // 3. Check if booking exists
     if (!booking) {
       return NextResponse.json(
         { success: false, error: 'Booking not found' },
@@ -85,7 +82,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // 5. Validate invoice can be downloaded
+    // 4. Validate invoice can be downloaded
     const validation = validateInvoiceDownload(
       booking.paymentStatus,
       booking.stripeInvoiceId
@@ -100,7 +97,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // 6. Check if we have the PDF URL cached
+    // 5. Check if we have the PDF URL cached
     if (booking.stripeInvoicePdfUrl && booking.stripeInvoiceId) {
       return streamPdfDownload(
         booking.stripeInvoicePdfUrl,
@@ -108,7 +105,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // 7. If no cached URL but we have invoice ID, fetch from Stripe
+    // 6. If no cached URL but we have invoice ID, fetch from Stripe
     if (booking.stripeInvoiceId) {
       const { getInvoicePdfUrl } = await import(
         '../../../../../lib/services/stripe-invoice'
@@ -125,7 +122,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    // 8. If no invoice ID but we have session ID, try to get invoice from checkout session
+    // 7. If no invoice ID but we have session ID, try to get invoice from checkout session
     if (booking.stripeSessionId) {
       const { getInvoiceFromCheckoutSession } = await import(
         '../../../../../lib/services/stripe-invoice'
@@ -148,7 +145,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    // 9. No invoice available
+    // 8. No invoice available
     return NextResponse.json(
       { success: false, error: 'Invoice not available' },
       { status: 404 }

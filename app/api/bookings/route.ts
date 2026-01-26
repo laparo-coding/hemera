@@ -16,6 +16,40 @@ const CreateBookingSchema = z.object({
   courseId: z.string().min(1, 'Course ID is required'),
 });
 
+/**
+ * Sanitize data for error reporting to prevent large payloads
+ * - Ensures primitives are serialized correctly
+ * - Caps string lengths to avoid backend drops
+ */
+function sanitizeForErrorReporting(
+  data: Record<string, unknown>
+): Record<string, unknown> {
+  const MAX_STRING_LENGTH = 200;
+  const sanitized: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    if (typeof value === 'string') {
+      sanitized[key] =
+        value.length > MAX_STRING_LENGTH
+          ? `${value.substring(0, MAX_STRING_LENGTH)}...[truncated]`
+          : value;
+    } else if (typeof value === 'number' || typeof value === 'boolean') {
+      sanitized[key] = value;
+    } else if (value === null || value === undefined) {
+      sanitized[key] = value;
+    } else {
+      // Convert objects/arrays to string representation (capped)
+      const stringified = String(value);
+      sanitized[key] =
+        stringified.length > MAX_STRING_LENGTH
+          ? `${stringified.substring(0, MAX_STRING_LENGTH)}...[truncated]`
+          : stringified;
+    }
+  }
+
+  return sanitized;
+}
+
 type BookingRecord = {
   id: string;
   courseId: string;
@@ -33,7 +67,13 @@ function normalizeBookings(bookings: BookingRecord[], requestId: string) {
     if (!booking.course) {
       reportError(
         '[API /api/bookings GET] Missing course relation for booking',
-        { requestId, additionalData: { bookingId: booking.id } },
+        {
+          requestId,
+          additionalData: sanitizeForErrorReporting({
+            bookingId: String(booking.id), // Ensure primitive string
+            courseId: String(booking.courseId),
+          }),
+        },
         ErrorSeverity.WARNING
       );
     }

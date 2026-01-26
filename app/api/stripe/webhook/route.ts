@@ -36,18 +36,21 @@ const getWebhookSecret = () => {
 
 /**
  * Idempotency store to prevent duplicate webhook processing
+ * Map stores event ID -> timestamp for TTL-based eviction
  * In production, use Redis or a database
  */
-const processedEvents = new Set<string>();
-const _EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
+const processedEvents = new Map<string, number>();
+const _EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours (legacy, now using 1 hour TTL)
+const EVENT_TTL = 3600000; // 1 hour TTL for event deduplication
 
 // Clean up old events periodically
 setInterval(
   () => {
-    const _now = Date.now();
-    processedEvents.forEach(_eventId => {
-      // In real implementation, we'd check timestamp from storage
-      // For now, just clear after some time
+    const now = Date.now();
+    processedEvents.forEach((timestamp, eventId) => {
+      if (now - timestamp > EVENT_TTL) {
+        processedEvents.delete(eventId);
+      }
     });
   },
   60 * 60 * 1000
@@ -67,6 +70,7 @@ setInterval(
  */
 export async function POST(request: NextRequest) {
   const requestId = `webhook_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  let eventId: string | undefined;
 
   try {
     // Handle build time gracefully
@@ -129,7 +133,10 @@ export async function POST(request: NextRequest) {
       webhookSecret
     );
 
-    // Check for idempotency - prevent duplicate processing
+    // Store event ID for error handling
+    eventId = event.id;
+
+    // Check for idempotency - prevent duplicate processing within TTL window
     if (processedEvents.has(event.id)) {
       return NextResponse.json({
         success: true,
@@ -138,8 +145,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Mark event as being processed
-    processedEvents.add(event.id);
+    // Mark event as being processed with timestamp for TTL-based eviction
+    processedEvents.set(event.id, Date.now());
 
     // Handle different event types
     switch (event.type) {
@@ -255,6 +262,12 @@ export async function POST(request: NextRequest) {
       eventType: event.type,
     });
   } catch (error) {
+    // Remove from processed map on error to allow retry
+    // This enables Stripe to retry failed webhooks
+    if (eventId) {
+      processedEvents.delete(eventId);
+    }
+
     reportError(
       error instanceof Error
         ? error
@@ -262,9 +275,6 @@ export async function POST(request: NextRequest) {
       { requestId },
       ErrorSeverity.ERROR
     );
-
-    // Remove from processed set on error to allow retry
-    // In production, implement exponential backoff
 
     if (error instanceof Error) {
       // Handle specific Stripe errors

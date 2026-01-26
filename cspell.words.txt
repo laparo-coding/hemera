@@ -1,6 +1,7 @@
 
 Abrufen
 Achtsamkeitsbasierte
+Anfrageparameter
 Anmeldungstest
 Anonymization
 Arbeisleistung
@@ -346,6 +347,7 @@ pytest
 qodo
 queryability
 realen
+rechnung
 retriable
 rgba
 rollbar

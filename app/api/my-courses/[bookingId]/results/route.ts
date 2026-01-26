@@ -22,6 +22,14 @@ const resultsSchema = z.object({
   complete: z.boolean().optional(),
 });
 
+/**
+ * Type guard to validate bookingId parameter
+ * Ensures bookingId is a non-empty string
+ */
+function isValidBookingId(bookingId: unknown): bookingId is string {
+  return typeof bookingId === 'string' && bookingId.trim().length > 0;
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ bookingId: string }> }
@@ -35,10 +43,24 @@ export async function GET(
       );
     }
 
-    const { bookingId } = await params;
-    if (!bookingId) {
+    // Robustly parse and validate params
+    let resolvedParams: { bookingId: string };
+    try {
+      resolvedParams = await params;
+    } catch (error) {
+      serverInstance.error('Failed to resolve params in GET results', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json(
-        { error: 'Booking ID ist erforderlich' },
+        { error: 'Ungültige Anfrageparameter' },
+        { status: 400 }
+      );
+    }
+
+    const { bookingId } = resolvedParams;
+    if (!isValidBookingId(bookingId)) {
+      return NextResponse.json(
+        { error: 'Booking ID ist erforderlich und muss gültig sein' },
         { status: 400 }
       );
     }
@@ -99,10 +121,24 @@ export async function PUT(
       );
     }
 
-    const { bookingId } = await params;
-    if (!bookingId) {
+    // Robustly parse and validate params
+    let resolvedParams: { bookingId: string };
+    try {
+      resolvedParams = await params;
+    } catch (error) {
+      serverInstance.error('Failed to resolve params in PUT results', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return NextResponse.json(
-        { error: 'Booking ID ist erforderlich' },
+        { error: 'Ungültige Anfrageparameter' },
+        { status: 400 }
+      );
+    }
+
+    const { bookingId } = resolvedParams;
+    if (!isValidBookingId(bookingId)) {
+      return NextResponse.json(
+        { error: 'Booking ID ist erforderlich und muss gültig sein' },
         { status: 400 }
       );
     }
