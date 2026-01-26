@@ -24,6 +24,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
+import { TERMS } from '../../lib/constants';
 import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
 import { getLevelLabel } from '../../lib/utils/course-level';
 import { formatShortDate, formatTimeRange } from '../../lib/utils/date-format';
@@ -44,10 +45,10 @@ export default function CourseList({
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography variant='h6' color='text.secondary'>
-          Keine Kurse gefunden
+          {TERMS.noCoursesFound}
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-          Erstelle deinen ersten Kurs, um loszulegen
+          Erstelle dein erstes {TERMS.course}, um loszulegen
         </Typography>
       </Box>
     );

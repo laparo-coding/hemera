@@ -70,6 +70,13 @@ export async function geocodeAddress(
     }
 
     const firstResult = results[0];
+    if (!firstResult) {
+      return {
+        latitude: null,
+        longitude: null,
+        success: false,
+      };
+    }
     return {
       latitude: parseFloat(firstResult.lat),
       longitude: parseFloat(firstResult.lon),

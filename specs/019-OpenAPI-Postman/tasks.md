@@ -1,6 +1,6 @@
 # Tasks: OpenAPI 3.1 & Postman Collection
 
-**Input**: Design documents from `/specs/017-OpenAPI-Postman/`  
+**Input**: Design documents from `/specs/019-OpenAPI-Postman/`  
 **Prerequisites**: plan.md ✅, research.md ✅, data-model.md ✅, contracts/ ✅, quickstart.md ✅
 
 ## Execution Flow
@@ -110,7 +110,7 @@ Action: Script that:
 
 ### T006-T009 Details
 ```
-Source: specs/017-OpenAPI-Postman/data-model.md
+Source: specs/019-OpenAPI-Postman/data-model.md
 Target: docs/api/openapi.yaml → components/schemas/
 Note: All [P] tasks write to different schema sections - can run in parallel
 ```
@@ -132,7 +132,7 @@ Each task documents one tag group from contracts/ into openapi.yaml paths sectio
 
 ### T010-T017 Details
 ```
-Source: specs/017-OpenAPI-Postman/contracts/*.yaml
+Source: specs/019-OpenAPI-Postman/contracts/*.yaml
 Target: docs/api/openapi.yaml → paths/
 Action: Copy path definitions, add examples, verify $ref references
 Note: All [P] tasks document different paths - can run in parallel
@@ -210,7 +210,7 @@ Fix: Any violations before proceeding
 
 ### T024 Details
 ```
-Action: Manual validation following specs/017-OpenAPI-Postman/quickstart.md
+Action: Manual validation following specs/019-OpenAPI-Postman/quickstart.md
 Steps:
   1. Import openapi.yaml into Postman
   2. Import hemera.env.json

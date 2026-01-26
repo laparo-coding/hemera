@@ -23,6 +23,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { TERMS } from '@/lib/constants';
 import { getAvatarInitial } from '@/lib/utils/avatar';
 import { formatDate } from '../lib/utils/date-format';
 
@@ -177,13 +178,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
 
   const disableReason = useMemo(() => {
     if (!isBookingDisabled) return null;
-    if (course.userBookingStatus === 'PAID')
-      return 'Du hast diesen Kurs bereits gebucht.';
+    if (course.userBookingStatus === 'PAID') return TERMS.courseAlreadyBooked;
     if (course.availableSpots !== null && course.availableSpots === 0)
-      return 'Dieser Kurs ist aktuell ausgebucht.';
-    if (!course.isPublished)
-      return 'Dieser Kurs ist noch nicht veröffentlicht.';
-    if (isCourseInPast) return 'Der Kurstermin liegt in der Vergangenheit.';
+      return TERMS.courseSoldOut;
+    if (!course.isPublished) return TERMS.courseNotPublished;
+    if (isCourseInPast) return TERMS.courseDatePast;
     if (isBooking) return 'Buchung läuft...';
     return 'Buchung derzeit nicht möglich.';
   }, [
@@ -416,7 +415,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                 {course.description ? (
                   <Stack spacing={2}>
                     <Typography variant='h5' component='h2'>
-                      Kursbeschreibung
+                      {TERMS.courseDescription}
                     </Typography>
                     <Typography
                       variant='body1'

@@ -11,6 +11,7 @@ import {
   DatabaseConnectionError,
   logError,
 } from '../errors';
+import type { CurriculumModule } from '../schemas/admin/course';
 
 export interface CourseLocation {
   id: string;
@@ -49,6 +50,7 @@ export interface Course {
   thumbnailUrl?: string | null;
   instructor?: string | null;
   heroVideoPlaybackId?: string | null;
+  curriculum?: CurriculumModule[] | null;
 }
 
 export interface CourseWithSEO extends Course {
@@ -264,12 +266,16 @@ export async function getCourseById(id: string): Promise<Course> {
         ? Math.max(0, Number(course.capacity) - totalBookings)
         : null;
 
+    // Parse curriculum from JSON if present
+    const curriculum = course.curriculum as CurriculumModule[] | null;
+
     return {
       ...course,
       currency: course.currency || 'EUR',
       availableSpots,
       totalBookings,
       userBookingStatus: null,
+      curriculum,
     } as Course;
   } catch (error) {
     if (error instanceof CourseNotFoundError) {
@@ -331,12 +337,16 @@ export async function getCourseBySlug(slug: string): Promise<Course> {
         ? Math.max(0, Number(course.capacity) - totalBookings)
         : null;
 
+    // Parse curriculum from JSON if present
+    const curriculum = course.curriculum as CurriculumModule[] | null;
+
     return {
       ...course,
       currency: course.currency || 'EUR',
       availableSpots,
       totalBookings,
       userBookingStatus: null,
+      curriculum,
     } as Course;
   } catch (error) {
     if (
@@ -366,7 +376,10 @@ export async function getAllCourses(): Promise<Course[]> {
       },
     });
 
-    return courses;
+    return courses.map(course => ({
+      ...course,
+      curriculum: course.curriculum as CurriculumModule[] | null,
+    })) as Course[];
   } catch (error) {
     logError(error, { operation: 'getAllCourses' });
     throw new DatabaseConnectionError('fetching all courses', error as Error);
@@ -392,7 +405,12 @@ export async function getNextUpcomingCourse(): Promise<Course | null> {
       },
     });
 
-    return course;
+    if (!course) return null;
+
+    return {
+      ...course,
+      curriculum: course.curriculum as CurriculumModule[] | null,
+    } as Course;
   } catch (error) {
     logError(error, { operation: 'getNextUpcomingCourse' });
     throw new DatabaseConnectionError(

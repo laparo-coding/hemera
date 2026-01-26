@@ -9,16 +9,16 @@ import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import {
-  completeResultsStep,
+  completeResultStep,
   getParticipationByBookingId,
-  updateResults,
+  updateResult,
 } from '../../../../../lib/db/courseParticipation';
 import { serverInstance } from '../../../../../lib/monitoring/rollbar-official';
 
 // Zod schema for results input
 const resultsSchema = z.object({
-  resultsOutcome: z.string().max(2000).optional(),
-  resultsNotes: z.string().max(2000).optional(),
+  resultOutcome: z.string().max(2000).optional(),
+  resultNotes: z.string().max(2000).optional(),
   complete: z.boolean().optional(),
 });
 
@@ -90,9 +90,9 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: {
-        resultsOutcome: participation.resultsOutcome,
-        resultsNotes: participation.resultsNotes,
-        resultsCompletedAt: participation.resultsCompletedAt,
+        resultOutcome: participation.resultOutcome,
+        resultNotes: participation.resultNotes,
+        resultCompletedAt: participation.resultCompletedAt,
         status: participation.status,
         isComplete: participation.status === 'COMPLETE',
       },
@@ -179,11 +179,11 @@ export async function PUT(
     }
 
     // Update results data
-    await updateResults(participation.id, resultsData);
+    await updateResult(participation.id, resultsData);
 
     // If completing, mark entire participation as complete
     if (complete) {
-      await completeResultsStep(participation.id);
+      await completeResultStep(participation.id);
       serverInstance.info('Participation completed', {
         userId,
         bookingId,

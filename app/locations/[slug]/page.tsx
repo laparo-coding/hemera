@@ -52,13 +52,13 @@ export async function generateMetadata(
 
   const description = location.description
     ? location.description.substring(0, 160)
-    : `Kursstandort ${location.name} in ${location.city}. ${location.address}`;
+    : `Seminarstandort ${location.name} in ${location.city}. ${location.address}`;
 
   return {
-    title: `${location.name} | Kursstandort`,
+    title: `${location.name} | Seminarstandort`,
     description,
     openGraph: {
-      title: `${location.name} - Kursstandort`,
+      title: `${location.name} - Seminarstandort`,
       description,
       type: 'website',
       ...(location.imageUrl && { images: [{ url: location.imageUrl }] }),

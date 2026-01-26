@@ -18,7 +18,10 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import type { z } from 'zod';
+import { TERMS } from '../../lib/constants/terminology';
+import type { CurriculumModule } from '../../lib/schemas/admin/course';
 import { courseCreateSchema } from '../../lib/schemas/admin/course';
+import CurriculumEditor from './CurriculumEditor';
 import type { CourseImageUrls } from './FileUpload';
 import FileUpload from './FileUpload';
 
@@ -73,6 +76,8 @@ export default function CourseForm({
       capacity: initialData?.capacity || 20,
       isPublished: initialData?.isPublished ?? false,
       locationId: initialData?.locationId || null,
+      curriculum:
+        (initialData?.curriculum as CurriculumModule[] | null) || null,
     },
   });
 
@@ -100,7 +105,7 @@ export default function CourseForm({
         render={({ field }) => (
           <TextField
             {...field}
-            label='Kurstitel'
+            label={TERMS.courseTitle}
             required
             error={!!errors.title}
             helperText={errors.title?.message}
@@ -217,10 +222,38 @@ export default function CourseForm({
             onChange={e => {
               const dateStr = e.target.value;
               if (dateStr) {
-                // Parse as local date (not UTC)
-                const [year, month, day] = dateStr.split('-').map(Number);
-                const date = new Date(year, month - 1, day);
-                field.onChange(date);
+                // Parse as local date (not UTC) with validation
+                const parts = dateStr.split('-').map(Number);
+                const year = parts[0];
+                const month = parts[1];
+                const day = parts[2];
+
+                // Validate parsed values are valid numbers
+                if (
+                  year !== undefined &&
+                  !Number.isNaN(year) &&
+                  year > 0 &&
+                  month !== undefined &&
+                  !Number.isNaN(month) &&
+                  month >= 1 &&
+                  month <= 12 &&
+                  day !== undefined &&
+                  !Number.isNaN(day) &&
+                  day >= 1 &&
+                  day <= 31
+                ) {
+                  const date = new Date(year, month - 1, day);
+                  // Verify the date is valid (not Invalid Date)
+                  if (!Number.isNaN(date.getTime())) {
+                    field.onChange(date);
+                  } else {
+                    field.onChange(null);
+                  }
+                } else {
+                  field.onChange(null);
+                }
+              } else {
+                field.onChange(null);
               }
             }}
           />
@@ -247,10 +280,32 @@ export default function CourseForm({
                   : field.value || ''
               }
               onChange={e => {
-                const [hours, minutes] = e.target.value.split(':');
-                const date = new Date();
-                date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
-                field.onChange(date);
+                const timeStr = e.target.value;
+                if (timeStr) {
+                  const parts = timeStr.split(':');
+                  const hoursStr = parts[0];
+                  const minutesStr = parts[1];
+                  const hours = hoursStr ? parseInt(hoursStr, 10) : NaN;
+                  const minutes = minutesStr ? parseInt(minutesStr, 10) : NaN;
+
+                  // Validate parsed values are valid numbers in range
+                  if (
+                    !Number.isNaN(hours) &&
+                    hours >= 0 &&
+                    hours <= 23 &&
+                    !Number.isNaN(minutes) &&
+                    minutes >= 0 &&
+                    minutes <= 59
+                  ) {
+                    const date = new Date();
+                    date.setHours(hours, minutes, 0, 0);
+                    field.onChange(date);
+                  } else {
+                    field.onChange(null);
+                  }
+                } else {
+                  field.onChange(null);
+                }
               }}
             />
           )}
@@ -275,10 +330,32 @@ export default function CourseForm({
                   : field.value || ''
               }
               onChange={e => {
-                const [hours, minutes] = e.target.value.split(':');
-                const date = new Date();
-                date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
-                field.onChange(date);
+                const timeStr = e.target.value;
+                if (timeStr) {
+                  const parts = timeStr.split(':');
+                  const hoursStr = parts[0];
+                  const minutesStr = parts[1];
+                  const hours = hoursStr ? parseInt(hoursStr, 10) : NaN;
+                  const minutes = minutesStr ? parseInt(minutesStr, 10) : NaN;
+
+                  // Validate parsed values are valid numbers in range
+                  if (
+                    !Number.isNaN(hours) &&
+                    hours >= 0 &&
+                    hours <= 23 &&
+                    !Number.isNaN(minutes) &&
+                    minutes >= 0 &&
+                    minutes <= 59
+                  ) {
+                    const date = new Date();
+                    date.setHours(hours, minutes, 0, 0);
+                    field.onChange(date);
+                  } else {
+                    field.onChange(null);
+                  }
+                } else {
+                  field.onChange(null);
+                }
               }}
             />
           )}
@@ -350,9 +427,21 @@ export default function CourseForm({
         )}
       />
 
+      <Controller
+        name='curriculum'
+        control={control}
+        render={({ field }) => (
+          <CurriculumEditor
+            value={field.value as CurriculumModule[] | null | undefined}
+            onChange={field.onChange}
+            disabled={isLoading || isSubmitting}
+          />
+        )}
+      />
+
       <Box>
         <Typography variant='subtitle2' gutterBottom>
-          Kurs-Vorschaubild
+          {TERMS.coursePreview}
         </Typography>
         <FileUpload
           currentUrl={thumbnailUrl}

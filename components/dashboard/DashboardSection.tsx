@@ -9,6 +9,7 @@
 
 import { Box, Paper, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { TERMS } from '../../lib/constants/terminology';
 
 // Design tokens
 const colors = {
@@ -21,10 +22,10 @@ const colors = {
 
 // Section titles (German localization)
 export const SECTION_TITLES = {
-  NEXT_SEMINAR: 'Nächstes Seminar',
-  UPCOMING: 'Weitere gebuchte Seminare',
-  COMPLETED: 'Absolvierte Seminare',
-  NO_SHOW: 'Seminare ohne Teilnahme',
+  NEXT_SEMINAR: `Nächstes ${TERMS.course}`,
+  UPCOMING: `Weitere gebuchte ${TERMS.courses}`,
+  COMPLETED: `Absolvierte ${TERMS.courses}`,
+  NO_SHOW: `${TERMS.courses} ohne Teilnahme`,
 } as const;
 
 export type SectionType = keyof typeof SECTION_TITLES;
@@ -78,7 +79,7 @@ export default function DashboardSection({
 
   // Determine title and description
   const sectionTitle =
-    title || (sectionType ? SECTION_TITLES[sectionType] : 'Kurse');
+    title || (sectionType ? SECTION_TITLES[sectionType] : TERMS.courses);
   const sectionDescription = description;
 
   return (
@@ -135,7 +136,7 @@ export default function DashboardSection({
               opacity: 0.6,
             }}
           >
-            {emptyMessage || 'Keine Kurse in dieser Kategorie'}
+            {emptyMessage || `${TERMS.noCourses} in dieser Kategorie`}
           </Typography>
         </Box>
       ) : (

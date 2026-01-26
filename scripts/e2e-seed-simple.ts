@@ -28,7 +28,7 @@ async function main() {
         price: 100,
         currency: 'EUR',
         capacity: 20,
-        date: new Date('2025-11-15T10:00:00Z'),
+        startDate: new Date('2025-11-15T10:00:00Z'),
         isPublished: true,
       },
       {
@@ -38,7 +38,7 @@ async function main() {
         price: 100,
         currency: 'EUR',
         capacity: 25,
-        date: new Date('2025-11-20T14:00:00Z'),
+        startDate: new Date('2025-11-20T14:00:00Z'),
         isPublished: true,
       },
       {
@@ -48,7 +48,7 @@ async function main() {
         price: 100,
         currency: 'EUR',
         capacity: 30,
-        date: new Date('2025-11-25T16:00:00Z'),
+        startDate: new Date('2025-11-25T16:00:00Z'),
         isPublished: true,
       },
     ],

@@ -1,7 +1,7 @@
 # Implementation Plan: OpenAPI 3.1 & Postman Collection
 
-**Branch**: `017-OpenAPI-Postman` | **Date**: 2026-01-04 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `/specs/017-OpenAPI-Postman/spec.md`
+**Branch**: `019-OpenAPI-Postman` | **Date**: 2026-01-04 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `/specs/019-OpenAPI-Postman/spec.md`
 
 ## Execution Flow (/plan command scope)
 
@@ -65,7 +65,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 ### Documentation (this feature)
 
 ```
-specs/017-OpenAPI-Postman/
+specs/019-OpenAPI-Postman/
 ├── plan.md              # This file (/plan command output)
 ├── research.md          # Phase 0 output - OpenAPI/Postman best practices
 ├── data-model.md        # Phase 1 output - Schema definitions

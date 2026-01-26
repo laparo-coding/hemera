@@ -1,8 +1,10 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
+import { ZodError } from 'zod';
 import { checkUserAdminStatus } from '../../../../../lib/auth/helpers';
 import { prisma } from '../../../../../lib/db/prisma';
 import { serverInstance as rollbar } from '../../../../../lib/monitoring/rollbar-official';
+import { curriculumSchema } from '../../../../../lib/schemas/admin/course';
 import { getOrCreateRequestId } from '../../../../../lib/utils/request-id';
 
 export async function POST(request: NextRequest) {
@@ -37,6 +39,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate curriculum for each course if provided
+    for (let i = 0; i < courses.length; i++) {
+      const course = courses[i];
+      if (course?.curriculum !== undefined) {
+        try {
+          curriculumSchema.parse(course.curriculum);
+        } catch (zodError) {
+          if (zodError instanceof ZodError) {
+            rollbar.warning('Invalid curriculum data in bulk create request', {
+              requestId,
+              courseIndex: i,
+              issues: zodError.issues,
+            });
+            return NextResponse.json(
+              {
+                error: `Invalid curriculum structure for course at index ${i}`,
+                details: zodError.issues,
+              },
+              { status: 400 }
+            );
+          }
+          throw zodError;
+        }
+      }
+    }
+
     // Create courses in database
     const createdCourses = await prisma.course.createMany({
       data: courses.map(course => ({
@@ -51,6 +79,7 @@ export async function POST(request: NextRequest) {
         endTime: course.endTime ? new Date(course.endTime) : null,
         isPublished:
           course.isPublished !== undefined ? course.isPublished : true,
+        curriculum: course.curriculum ?? null,
       })),
     });
 

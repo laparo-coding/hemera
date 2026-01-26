@@ -137,7 +137,7 @@ export default async function CoursesPage() {
                 color: '#16404D',
               }}
             >
-              Alle Kurse
+              Alle Seminare
             </Typography>
             <Typography
               variant='h2'
@@ -152,7 +152,7 @@ export default async function CoursesPage() {
                 color: '#16404D',
               }}
             >
-              Entdecke unser komplettes Angebot an praxisnahen Kursen
+              Entdecke unser komplettes Angebot an praxisnahen Seminaren
             </Typography>
           </Container>
         </Box>
@@ -182,7 +182,7 @@ export default async function CoursesPage() {
                   sx={{ color: '#d32f2f', mb: 2 }}
                   gutterBottom
                 >
-                  Kurse konnten nicht geladen werden
+                  Seminare konnten nicht geladen werden
                 </Typography>
                 <Typography
                   variant='body1'
@@ -205,7 +205,7 @@ export default async function CoursesPage() {
                   Bald verfügbar!
                 </Typography>
                 <Typography variant='body1' color='text.secondary'>
-                  Neue Kurse kommen bald. Bleib dran für spannende
+                  Neue Seminare kommen bald. Bleib dran für spannende
                   Lernmöglichkeiten.
                 </Typography>
               </Box>

@@ -414,14 +414,15 @@ export async function markSummaryViewedAction(
       participation.courseId
     );
 
-    if (assets.length > 0) {
-      await recordSummaryPresented(participation.id, assets[0].source);
+    const firstAsset = assets[0];
+    if (assets.length > 0 && firstAsset) {
+      await recordSummaryPresented(participation.id, firstAsset.source);
 
       serverInstance.info('Summary viewed', {
         userId,
         participationId: participation.id,
         bookingId,
-        assetSource: assets[0].source,
+        assetSource: firstAsset.source,
         assetCount: assets.length,
       });
     }

@@ -33,6 +33,7 @@ import {
   type NameDisplayFormat,
 } from '@/lib/schemas/testimonial-schema';
 import { getAvatarInitial } from '@/lib/utils/avatar';
+import { TERMS } from '../../lib/constants';
 
 interface UserProfile {
   firstName: string;
@@ -195,8 +196,8 @@ export default function TestimonialForm({
           : 'Erfahrungsbericht schreiben'}
       </Typography>
       <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
-        Teile deine Erfahrungen zum Kurs &ldquo;{courseName}&rdquo; mit anderen
-        Interessenten.
+        Teile deine Erfahrungen zum {TERMS.course} &ldquo;{courseName}&rdquo;
+        mit anderen Interessenten.
       </Typography>
 
       {error && (
@@ -213,7 +214,7 @@ export default function TestimonialForm({
         fullWidth
         value={statement}
         onChange={e => setStatement(e.target.value)}
-        placeholder='Was hat dir am Kurs besonders gut gefallen? Was hast du gelernt?'
+        placeholder={`Was hat dir am ${TERMS.course} besonders gut gefallen? Was hast du gelernt?`}
         error={isOverLimit || (statement.length > 0 && isTooShort)}
         helperText={
           isOverLimit

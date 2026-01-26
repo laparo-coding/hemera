@@ -143,13 +143,14 @@ export async function PUT(
         participation.id,
         participation.courseId
       );
-      if (assets.length > 0) {
-        await recordSummaryPresented(participation.id, assets[0].source);
+      const firstAsset = assets[0];
+      if (assets.length > 0 && firstAsset) {
+        await recordSummaryPresented(participation.id, firstAsset.source);
         serverInstance.info('Summary marked as viewed', {
           userId,
           bookingId,
           participationId: participation.id,
-          assetSource: assets[0].source,
+          assetSource: firstAsset.source,
         });
       }
     }

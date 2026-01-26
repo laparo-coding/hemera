@@ -103,6 +103,7 @@ Metriken
 Motivationsquellen
 NEXTAUTH
 Nachbereitung
+Nachbereitungsmaterialien
 Nachbereitungsplan
 Nachverfolgbarkeit
 Navigationen
@@ -144,6 +145,7 @@ Runbooks
 Résumé
 Rückwärtskompatible
 Salbeigrün
+Sequenzdiagramm
 Serialisierungszeit
 Serverfehler
 Sicherheitsvulnerabilitäten
@@ -247,6 +249,7 @@ diffstat
 domcontentloaded
 dotenv
 dotenv-cli
+dotenvx
 durchführen
 durchstartest
 ebenfalls
@@ -257,17 +260,20 @@ entdecken
 entwicklen
 erfolgt
 erforderlich
+ergebnisse
 erhält
 erstellen
 erstellt
 esbenp
 explizit
 failen
+fehler
 finazielle
 firefox
 fkey
 formattedDate
 gatekeeping
+gecacht
 gefunden
 gelöscht
 generationenmanagement
@@ -312,6 +318,7 @@ martinkempdesign
 mehr
 munchen
 müssen
+nachbereitung
 nachvollziehbar
 networkidle
 nextauth
@@ -319,6 +326,7 @@ nicht
 noarchive
 noimageindex
 nominatim
+noshow
 nullable
 officedocument
 opencode
@@ -405,8 +413,6 @@ wordprocessingml
 wrongpassword
 wurde
 wurden
-gecacht
-Sequenzdiagramm
 zeitoptimiert
 zgkd
 zipcode

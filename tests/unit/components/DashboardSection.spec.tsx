@@ -5,6 +5,7 @@
  */
 
 import { describe, expect, it } from '@jest/globals';
+import { TERMS } from '../../../lib/constants/terminology';
 
 // Types for the DashboardSection component props
 interface DashboardSectionProps {
@@ -26,12 +27,12 @@ const shouldShowSection = (
   return true;
 };
 
-// Section titles (German localization)
+// Section titles (German localization) - use TERMS for consistency
 const SECTION_TITLES = {
-  NEXT_SEMINAR: 'Nächstes Seminar',
-  UPCOMING: 'Weitere gebuchte Seminare',
-  COMPLETED: 'Absolvierte Seminare',
-  NO_SHOW: 'Seminare ohne Teilnahme',
+  NEXT_SEMINAR: `Nächstes ${TERMS.course}`,
+  UPCOMING: `Weitere gebuchte ${TERMS.courses}`,
+  COMPLETED: `Absolvierte ${TERMS.courses}`,
+  NO_SHOW: `${TERMS.courses} ohne Teilnahme`,
 } as const;
 
 describe('DashboardSection Component', () => {

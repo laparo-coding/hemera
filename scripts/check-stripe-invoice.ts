@@ -19,8 +19,9 @@ async function main() {
     });
 
     let customerId: string;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    const existingCustomer = customers.data[0];
+    if (customers.data.length > 0 && existingCustomer) {
+      customerId = existingCustomer.id;
       console.log('   Found existing customer:', customerId);
     } else {
       const customer = await stripe.customers.create({

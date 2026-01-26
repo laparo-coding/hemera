@@ -7,9 +7,11 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
+import { ZodError } from 'zod';
 import { checkUserAdminStatus } from '../../../../../lib/auth/helpers';
 import { prisma } from '../../../../../lib/db/prisma';
 import { serverInstance as rollbar } from '../../../../../lib/monitoring/rollbar-official';
+import { curriculumSchema } from '../../../../../lib/schemas/admin/course';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -217,6 +219,29 @@ export async function PATCH(
 
     // Update course
     const { updatedAt: _, ...updateData } = body;
+
+    // Validate curriculum if provided
+    if (updateData.curriculum !== undefined) {
+      try {
+        curriculumSchema.parse(updateData.curriculum);
+      } catch (zodError) {
+        if (zodError instanceof ZodError) {
+          rollbar.warning('Invalid curriculum data in PATCH request', {
+            requestId,
+            courseId: id,
+            issues: zodError.issues,
+          });
+          return createErrorResponse(
+            'Invalid curriculum structure',
+            ErrorCodes.VALIDATION_ERROR,
+            requestId,
+            400
+          );
+        }
+        throw zodError;
+      }
+    }
+
     const updated = await prisma.course.update({
       where: { id },
       data: updateData,

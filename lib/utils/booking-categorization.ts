@@ -93,7 +93,7 @@ export function categorizeBookings(
   });
 
   // Extract next seminar (first upcoming)
-  const nextSeminar = upcomingBookings.length > 0 ? upcomingBookings[0] : null;
+  const nextSeminar = upcomingBookings[0] ?? null;
 
   // Remaining upcoming seminars
   const upcoming = upcomingBookings.slice(1);

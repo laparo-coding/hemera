@@ -70,6 +70,12 @@ async function main() {
     }
 
     const user = users[0];
+    if (!user) {
+      console.error(
+        '❌ Unerwarteter Fehler: User-Array leer nach Längenprüfung'
+      );
+      process.exit(3);
+    }
     const emails = user.emailAddresses ?? [];
     const primaryEmail =
       emails.find(e => e.id === user.primaryEmailAddressId)?.emailAddress ??

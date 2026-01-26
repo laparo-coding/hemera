@@ -176,12 +176,16 @@ export async function updateCourseAction(
       const [, enrollmentCount, requestedCapacity] = errorMessage.split(':');
       rollbar.warning('Capacity below enrollment count', {
         courseId: id,
-        enrollmentCount: Number.parseInt(enrollmentCount, 10),
-        requestedCapacity: Number.parseInt(requestedCapacity, 10),
+        enrollmentCount: enrollmentCount
+          ? Number.parseInt(enrollmentCount, 10)
+          : 0,
+        requestedCapacity: requestedCapacity
+          ? Number.parseInt(requestedCapacity, 10)
+          : 0,
       });
       return {
         success: false,
-        error: `Capacity cannot be less than current enrollment count (${enrollmentCount})`,
+        error: `Capacity cannot be less than current enrollment count (${enrollmentCount ?? 'unknown'})`,
         code: 'CAPACITY_BELOW_ENROLLMENTS',
       };
     }
@@ -247,11 +251,11 @@ export async function deleteCourseAction(
       const [, count, _enrollmentsJson] = errorMessage.split(':');
       rollbar.warning('Cannot delete course with active enrollments', {
         courseId: id,
-        enrollmentCount: Number.parseInt(count, 10),
+        enrollmentCount: count ? Number.parseInt(count, 10) : 0,
       });
       return {
         success: false,
-        error: `Cannot delete course with ${count} active enrollments. Transfer students first.`,
+        error: `Cannot delete course with ${count ?? 'some'} active enrollments. Transfer students first.`,
         code: 'ACTIVE_ENROLLMENTS_EXIST',
       };
     }
@@ -346,14 +350,14 @@ export async function transferEnrollmentsAction(
         errorMessage.split(':');
       rollbar.warning('Insufficient capacity for enrollment transfer', {
         sourceCourseId,
-        targetCapacity: Number.parseInt(capacity, 10),
-        currentEnrollments: Number.parseInt(current, 10),
-        transferCount: Number.parseInt(transfer, 10),
-        availableSlots: Number.parseInt(available, 10),
+        targetCapacity: capacity ? Number.parseInt(capacity, 10) : 0,
+        currentEnrollments: current ? Number.parseInt(current, 10) : 0,
+        transferCount: transfer ? Number.parseInt(transfer, 10) : 0,
+        availableSlots: available ? Number.parseInt(available, 10) : 0,
       });
       return {
         success: false,
-        error: `Target course has insufficient capacity (${available} slots available, ${transfer} needed)`,
+        error: `Target course has insufficient capacity (${available ?? '?'} slots available, ${transfer ?? '?'} needed)`,
         code: 'INSUFFICIENT_CAPACITY',
       };
     }

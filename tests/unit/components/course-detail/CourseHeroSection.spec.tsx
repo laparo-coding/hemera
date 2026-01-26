@@ -78,7 +78,7 @@ describe('CourseHeroSection', () => {
       const section = screen.getByTestId('hero-section');
       expect(section).toHaveAttribute(
         'aria-label',
-        'Kursvideo: Grundkurs Verhandlungstraining'
+        'Seminarvideo: Grundkurs Verhandlungstraining'
       );
     });
   });

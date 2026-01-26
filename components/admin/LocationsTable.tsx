@@ -34,6 +34,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { LocationResponse } from '@/lib/schemas/location-schema';
+import { TERMS } from '../../lib/constants';
 
 interface LocationsTableProps {
   locations: LocationResponse[];
@@ -209,7 +210,7 @@ export default function LocationsTable({
                         <Tooltip
                           title={
                             courseCount > 0
-                              ? 'Wird von Kursen verwendet'
+                              ? `Wird von ${TERMS.coursesDative} verwendet`
                               : 'Löschen'
                           }
                         >

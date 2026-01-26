@@ -64,6 +64,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
             select: {
               id: true,
               name: true,
+              slug: true,
               address: true,
               city: true,
               zipCode: true,

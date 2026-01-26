@@ -12,6 +12,7 @@ import { Box, Skeleton } from '@mui/material';
 import type { MuxPlayerCSSProperties } from '@mux/mux-player-react';
 import dynamic from 'next/dynamic';
 import type React from 'react';
+import { TERMS } from '../../lib/constants/terminology';
 import { colors } from '../../lib/design-tokens';
 
 // Dynamic import with SSR disabled to prevent hydration issues
@@ -48,7 +49,7 @@ export const CourseHeroSection: React.FC<CourseHeroSectionProps> = ({
     <Box
       component='section'
       data-testid='hero-section'
-      aria-label={`Kursvideo: ${title}`}
+      aria-label={`${TERMS.courseVideo}: ${title}`}
       sx={{
         width: '100%',
         aspectRatio: '16 / 9',

@@ -9,6 +9,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { deleteCourseAction } from '../../lib/actions/admin/courses';
+import { TERMS } from '../../lib/constants';
 import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
 import { deleteThumbnail } from '../../lib/utils/fileUpload';
 import CourseList from './CourseList';
@@ -48,7 +49,7 @@ export default function CourseListWithDelete({
       setSelectedCourse(null);
       router.refresh();
     } else {
-      setError(result.error || 'Fehler beim Löschen des Kurses');
+      setError(result.error || `Fehler beim Löschen des ${TERMS.course}s`);
     }
   };
 
@@ -68,7 +69,7 @@ export default function CourseListWithDelete({
       // Find the course to get its current updatedAt for optimistic locking
       const course = courses.find(c => c.id === courseId);
       if (!course) {
-        setError('Kurs nicht gefunden');
+        setError(TERMS.courseNotFound);
         return;
       }
 

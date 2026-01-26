@@ -2,7 +2,7 @@
 
 > OpenAPI 3.1.0 Spezifikation & Postman Collection für alle 56 Endpoints
 
-Diese Seite fasst die wichtigsten Schritte aus `specs/017-OpenAPI-Postman/quickstart.md` zusammen, damit du sofort loslegen kannst.
+Diese Seite fasst die wichtigsten Schritte aus `specs/019-OpenAPI-Postman/quickstart.md` zusammen, damit du sofort loslegen kannst.
 
 ## Dateien
 
@@ -75,11 +75,11 @@ Passe mindestens `baseUrl` und `clerkToken` an. Für Staging/Prod kannst du `bas
 |--------|-------|
 | `npx spectral lint docs/api/openapi.yaml` | Stellt sicher, dass die Spezifikation valide ist (bereits ausgeführt, 0 Warnungen/Fehler). |
 | Postman-Import laut Quickstart | Bestätigt, dass Collection + Environment sich ohne Fehler importieren lassen. |
-| Manuelle Requests (`/health`, `/bookings`) | Verifizieren, dass Server & Auth funktionieren. Beschrieben in `specs/017-OpenAPI-Postman/quickstart.md`. |
+| Manuelle Requests (`/health`, `/bookings`) | Verifizieren, dass Server & Auth funktionieren. Beschrieben in `specs/019-OpenAPI-Postman/quickstart.md`. |
 
 ## Weiterführende Ressourcen
 
-- Ausführliche Schritt-für-Schritt-Anleitung: [specs/017-OpenAPI-Postman/quickstart.md](../../specs/017-OpenAPI-Postman/quickstart.md)
+- Ausführliche Schritt-für-Schritt-Anleitung: [specs/019-OpenAPI-Postman/quickstart.md](../../specs/019-OpenAPI-Postman/quickstart.md)
 - OpenAPI Referenz: [docs/api/openapi.yaml](openapi.yaml)
 - Postman Collection: [docs/api/hemera.postman.json](hemera.postman.json)
 - Environment Template: [docs/api/hemera.env.json](hemera.env.json)

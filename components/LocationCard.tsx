@@ -27,6 +27,7 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import type { LocationResponse } from '@/lib/schemas/location-schema';
+import { getCourseCountLabel } from '../lib/constants/terminology';
 
 interface LocationCardProps {
   location: LocationResponse;
@@ -192,7 +193,7 @@ export default function LocationCard({
         {courseCount > 0 && (
           <Box sx={{ mt: 2 }}>
             <Chip
-              label={`${courseCount} ${courseCount === 1 ? 'Kurs' : 'Kurse'}`}
+              label={getCourseCountLabel(courseCount)}
               size='small'
               color='primary'
               variant='outlined'

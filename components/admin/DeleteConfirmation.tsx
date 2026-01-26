@@ -23,6 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
+import { TERMS } from '../../lib/constants';
 
 interface DeleteConfirmationProps {
   open: boolean;
@@ -64,7 +65,7 @@ export default function DeleteConfirmation({
     <Dialog open={open} onClose={onCancel} maxWidth='sm' fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <WarningIcon color='error' />
-        Kurs löschen
+        {TERMS.deleteCourse}
       </DialogTitle>
 
       <DialogContent>
@@ -82,7 +83,8 @@ export default function DeleteConfirmation({
             </Alert>
 
             <Typography variant='body2' color='text.secondary' gutterBottom>
-              Du musst alle angemeldeten Teilnehmer zu einem anderen Kurs
+              Du musst alle angemeldeten Teilnehmer zu einem anderen{' '}
+              {TERMS.course}
               übertragen, bevor du löschen kannst.
             </Typography>
 
@@ -113,7 +115,8 @@ export default function DeleteConfirmation({
           </>
         ) : (
           <Alert severity='info' sx={{ mt: 2 }}>
-            Dieser Kurs hat keine Anmeldungen und kann sicher gelöscht werden.
+            Dieses {TERMS.course} hat keine Anmeldungen und kann sicher gelöscht
+            werden.
           </Alert>
         )}
 
@@ -140,7 +143,7 @@ export default function DeleteConfirmation({
           disabled={!canDelete || isDeleting}
           startIcon={isDeleting ? <CircularProgress size={20} /> : null}
         >
-          {isDeleting ? 'Wird gelöscht...' : 'Kurs löschen'}
+          {isDeleting ? 'Wird gelöscht...' : TERMS.deleteCourse}
         </Button>
       </DialogActions>
     </Dialog>

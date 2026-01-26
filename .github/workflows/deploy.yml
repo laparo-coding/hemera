@@ -65,7 +65,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22.x'
+          node-version: '20.x'
           cache: 'npm'
 
       - name: Set BUILD_TIME (UTC)
@@ -573,7 +573,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22.x'
+          node-version: '20.x'
           cache: 'npm'
 
       - name: Install dependencies

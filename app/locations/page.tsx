@@ -10,8 +10,8 @@ import LocationCard from '@/components/LocationCard';
 import { listLocations } from '@/lib/services/location';
 
 export const metadata: Metadata = {
-  title: 'Kursstandorte | Hemera Academy',
-  description: 'Entdecke unsere Kursstandorte und Veranstaltungsorte',
+  title: 'Seminarstandorte | Hemera Academy',
+  description: 'Entdecke unsere Seminarstandorte und Veranstaltungsorte',
 };
 
 export const dynamic = 'force-dynamic';
@@ -31,7 +31,7 @@ export default async function LocationsPage() {
           color='text.secondary'
           sx={{ maxWidth: 600, mx: 'auto' }}
         >
-          Entdecke unsere Kursstandorte und finde den perfekten Ort für deine
+          Entdecke unsere Seminarstandorte und finde den perfekten Ort für deine
           Weiterbildung.
         </Typography>
       </Box>

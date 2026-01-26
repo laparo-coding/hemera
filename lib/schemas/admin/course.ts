@@ -7,6 +7,37 @@ export const CourseLevelEnum = z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']);
 export type CourseLevel = z.infer<typeof CourseLevelEnum>;
 
 /**
+ * Curriculum Topic Schema
+ */
+export const curriculumTopicSchema = z.object({
+  id: z.string(),
+  timeRange: z.string(),
+  title: z.string(),
+});
+
+/**
+ * Curriculum Module Schema
+ */
+export const curriculumModuleSchema = z.object({
+  id: z.string(),
+  day: z.number().int().positive(),
+  title: z.string(),
+  topics: z.array(curriculumTopicSchema),
+});
+
+/**
+ * Curriculum Schema (array of modules)
+ */
+export const curriculumSchema = z
+  .array(curriculumModuleSchema)
+  .optional()
+  .nullable();
+
+export type CurriculumTopic = z.infer<typeof curriculumTopicSchema>;
+export type CurriculumModule = z.infer<typeof curriculumModuleSchema>;
+export type Curriculum = z.infer<typeof curriculumSchema>;
+
+/**
  * Inferred type from courseCreateSchema
  */
 
@@ -86,6 +117,7 @@ export const courseCreateSchema = z.object({
     .cuid('Location ID must be a valid CUID')
     .optional()
     .nullable(),
+  curriculum: curriculumSchema,
 });
 
 /**
@@ -171,6 +203,7 @@ export const courseUpdateSchema = z.object({
     .cuid('Location ID must be a valid CUID')
     .optional()
     .nullable(),
+  curriculum: curriculumSchema,
   updatedAt: z.coerce.date(), // Required for optimistic locking
 });
 

@@ -44,8 +44,12 @@ export function generateRequestId(): string {
   };
   const b = getBytes();
   // Per RFC4122 section 4.4
-  b[6] = (b[6] & 0x0f) | 0x40; // version 4
-  b[8] = (b[8] & 0x3f) | 0x80; // variant 10xxxxxx
+  const b6 = b[6];
+  const b8 = b[8];
+  if (b6 !== undefined && b8 !== undefined) {
+    b[6] = (b6 & 0x0f) | 0x40; // version 4
+    b[8] = (b8 & 0x3f) | 0x80; // variant 10xxxxxx
+  }
   const toHex = (n: number) => n.toString(16).padStart(2, '0');
   const hex = Array.from(b).map(toHex).join('');
   return (

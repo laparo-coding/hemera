@@ -166,10 +166,10 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
         <CardContent sx={{ textAlign: 'center', py: 8 }}>
           <SchoolOutlined sx={{ fontSize: 64, color: colors.sage, mb: 2 }} />
           <Typography variant='h5' sx={{ color: colors.petrol, mb: 2 }}>
-            Noch keine Kurse gebucht
+            Noch keine Seminare gebucht
           </Typography>
           <Typography variant='body1' color='text.secondary'>
-            Entdecke unser Kursangebot und starte deine Lernreise.
+            Entdecke unser Seminarangebot und starte deine Lernreise.
           </Typography>
         </CardContent>
       </Card>
@@ -197,7 +197,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
             variant='h6'
             sx={{ color: colors.petrol, mb: 2, fontWeight: 600 }}
           >
-            Gebuchte Kurse ({notStartedEnrollments.length})
+            Gebuchte Seminare ({notStartedEnrollments.length})
           </Typography>
 
           {notStartedEnrollments.map(item => (
@@ -305,7 +305,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
                       {item.booking.course.title}
                     </Typography>
                     <Typography variant='body2' color='text.secondary'>
-                      Kursdatum:{' '}
+                      Seminardatum:{' '}
                       {item.booking.course.startDate
                         ? new Date(
                             item.booking.course.startDate
@@ -454,12 +454,12 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           variant='subtitle2'
           sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
         >
-          Was ist deine Absicht für diesen Kurs?
+          Was ist deine Absicht für dieses Seminar?
         </Typography>
         <textarea
           value={preparationIntent}
           onChange={e => setPreparationIntent(e.target.value)}
-          placeholder='Beschreibe, was du mit diesem Kurs erreichen möchtest...'
+          placeholder='Beschreibe, was du mit diesem Seminar erreichen möchtest...'
           style={{
             width: '100%',
             minHeight: '80px',
@@ -479,7 +479,7 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           variant='subtitle2'
           sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
         >
-          Welche Ergebnisse erwartest du nach dem Kurs?
+          Welche Ergebnisse erwartest du nach dem Seminar?
         </Typography>
         <textarea
           value={desiredResults}
