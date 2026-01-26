@@ -13,8 +13,8 @@ interface InvoiceDownloadButtonProps {
   onError?: (error: Error) => void;
 }
 
-// Simulated download logic
-const initiateInvoiceDownload = async (
+// Simulated download logic (prepared for future integration)
+const _initiateInvoiceDownload = async (
   bookingId: string
 ): Promise<{ success: boolean; redirectUrl?: string; error?: string }> => {
   // This will be implemented to call /api/bookings/[bookingId]/invoice
