@@ -43,19 +43,49 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
   const { bookingId } = await params;
   const user = await requireAuthenticatedUser();
 
-  // Fetch booking with related data
+  // Fetch booking with related data - use explicit select to minimize exposure
   const booking = await prisma.booking.findFirst({
     where: {
       id: bookingId,
       userId: user.id, // User.id is the Clerk ID
     },
-    include: {
+    select: {
+      id: true,
+      paymentStatus: true,
       course: {
-        include: {
-          location: true,
+        select: {
+          id: true,
+          title: true,
+          startDate: true,
+          endDate: true,
+          startTime: true,
+          endTime: true,
+          location: {
+            select: {
+              id: true,
+              name: true,
+              address: true,
+              city: true,
+              zipCode: true,
+            },
+          },
         },
       },
-      participation: true,
+      participation: {
+        select: {
+          id: true,
+          status: true,
+          preparationIntent: true,
+          desiredResults: true,
+          lineManagerProfile: true,
+          preparationCompletedAt: true,
+          debriefingPlan: true,
+          salaryDiscussionMonth: true,
+          resultOutcome: true,
+          resultNotes: true,
+          resultCompletedAt: true,
+        },
+      },
     },
   });
 
