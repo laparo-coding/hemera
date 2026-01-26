@@ -11,6 +11,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../../../../lib/auth/admin';
+import { ErrorSeverity, reportError } from '../../../../lib/monitoring/rollbar';
 import { uploadLocationImage } from '../../../../lib/utils/locationImageUpload';
 
 export async function POST(request: NextRequest) {
@@ -45,7 +46,11 @@ export async function POST(request: NextRequest) {
       url: result.url,
     });
   } catch (error) {
-    console.error('Location image upload error:', error);
+    reportError(
+      error instanceof Error ? error : 'Location image upload error',
+      { additionalData: { operation: 'location-image-upload' } },
+      ErrorSeverity.ERROR
+    );
     return NextResponse.json(
       { error: 'Failed to upload file' },
       { status: 500 }

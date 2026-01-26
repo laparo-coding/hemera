@@ -10,6 +10,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../../../../lib/auth/admin';
+import { ErrorSeverity, reportError } from '../../../../lib/monitoring/rollbar';
 import { uploadCourseImage } from '../../../../lib/utils/courseImageUpload';
 
 export async function POST(request: NextRequest) {
@@ -37,7 +38,11 @@ export async function POST(request: NextRequest) {
       url: result.urls?.thumbnail,
     });
   } catch (error) {
-    console.error('Upload error:', error);
+    reportError(
+      error instanceof Error ? error : 'Upload error',
+      { additionalData: { operation: 'thumbnail-upload' } },
+      ErrorSeverity.ERROR
+    );
     return NextResponse.json(
       { error: 'Failed to upload file' },
       { status: 500 }

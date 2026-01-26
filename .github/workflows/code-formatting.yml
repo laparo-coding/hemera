@@ -1,0 +1,32 @@
+name: Code Formatting Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  biome:
+    name: Biome Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+
+      - name: Run Biome
+        run: biome ci .
+
+      - name: Biome Check Results
+        if: failure()
+        run: |
+          echo "❌ Biome check failed!"
+          echo "Please run 'npm run lint' to fix formatting and linting issues."
+          echo ""
+          echo "Or run 'biome check --write .' to auto-fix issues."

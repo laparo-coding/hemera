@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '../../../lib/db/prisma';
 import { logError } from '../../../lib/errors';
+import { ErrorSeverity, reportError } from '../../../lib/monitoring/rollbar';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -30,9 +31,10 @@ type BookingRecord = {
 function normalizeBookings(bookings: BookingRecord[], requestId: string) {
   return bookings.map(booking => {
     if (!booking.course) {
-      console.warn(
+      reportError(
         '[API /api/bookings GET] Missing course relation for booking',
-        { requestId }
+        { requestId, additionalData: { bookingId: booking.id } },
+        ErrorSeverity.WARNING
       );
     }
 
@@ -120,7 +122,6 @@ export async function GET(request: Request) {
       operation: 'api/bookings#get',
       requestId: _requestId,
     });
-    console.error('[API /api/bookings GET] Error:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Invalid parameters' },

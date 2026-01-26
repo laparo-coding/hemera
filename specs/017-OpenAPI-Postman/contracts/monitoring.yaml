@@ -1,0 +1,94 @@
+# Monitoring Endpoints Contract
+
+paths:
+  /vitals:
+    get:
+      tags:
+        - Monitoring
+      operationId: getVitals
+      summary: Get application vitals
+      description: |
+        Returns application health metrics and performance data.
+        Used for monitoring dashboards and alerting systems.
+        
+        Rate limit: 100 req/min
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, prometheus]
+            default: json
+          description: Output format for metrics
+      responses:
+        '200':
+          description: Application vitals
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            enum: [healthy, degraded, unhealthy]
+                          version:
+                            type: string
+                            description: Application version
+                          uptime:
+                            type: integer
+                            description: Uptime in seconds
+                          memory:
+                            type: object
+                            properties:
+                              used:
+                                type: integer
+                                description: Memory used in bytes
+                              total:
+                                type: integer
+                                description: Total memory in bytes
+                              percentage:
+                                type: number
+                                format: float
+                          database:
+                            type: object
+                            properties:
+                              connected:
+                                type: boolean
+                              latency:
+                                type: integer
+                                description: DB latency in ms
+                          cache:
+                            type: object
+                            properties:
+                              connected:
+                                type: boolean
+                              hitRate:
+                                type: number
+                                format: float
+                          timestamp:
+                            type: string
+                            format: date-time
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds until rate limit resets
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

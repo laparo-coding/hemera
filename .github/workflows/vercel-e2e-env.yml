@@ -1,0 +1,84 @@
+name: 'Vercel: E2E Environment'
+
+on:
+  workflow_dispatch:
+    inputs:
+      e2e_email_capture:
+        description: 'Set E2E_EMAIL_CAPTURE (1 to enable)'
+        required: false
+        default: '1'
+      e2e_auth:
+        description: "Set E2E_AUTH (use 'credentials' to enable test credentials)"
+        required: false
+        default: ''
+      e2e_test_password:
+        description: 'Set E2E_TEST_PASSWORD (used when E2E_AUTH=credentials)'
+        required: false
+        default: 'password'
+
+jobs:
+  set-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Sanitize Vercel Token
+        run: |
+          set -euo pipefail
+          token=$(printf %s "${{ secrets.VERCEL_TOKEN }}" | tr -d '"' | tr -d "\n\r\t" | sed -e 's/^ *//' -e 's/ *$//')
+          echo "SANITIZED_VERCEL_TOKEN=$token" >> "$GITHUB_ENV"
+
+      - name: Validate inputs
+        run: |
+          AUTH_INPUT='${{ inputs.e2e_auth }}'
+          if [ -n "$AUTH_INPUT" ] && [ "$AUTH_INPUT" != "credentials" ]; then
+            echo "Invalid e2e_auth value: $AUTH_INPUT (allowed: empty or 'credentials')" >&2
+            exit 1
+          fi
+
+      - name: Set Vercel env variables (Preview scope)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          E2E_EMAIL_CAPTURE: ${{ inputs.e2e_email_capture }}
+          E2E_AUTH: ${{ inputs.e2e_auth }}
+          E2E_TEST_PASSWORD: ${{ inputs.e2e_test_password }}
+        run: |
+          set -e
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "Missing Vercel credentials. Please set VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID secrets." >&2
+            exit 1
+          fi
+
+          # Helper to remove and add env var
+          set_var() {
+            NAME="$1"; VALUE="$2"
+            if [ -z "$VALUE" ]; then
+              echo "Skipping $NAME (empty value)"
+              return 0
+            fi
+            # Remove existing without failing if not present
+            vercel env rm "$NAME" preview --yes --token "$SANITIZED_VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" --project "$VERCEL_PROJECT_ID" || true
+            # Add new value non-interactively
+            printf "%s" "$VALUE" | vercel env add "$NAME" preview --token "$SANITIZED_VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" --project "$VERCEL_PROJECT_ID"
+          }
+
+          set_var E2E_EMAIL_CAPTURE "$E2E_EMAIL_CAPTURE"
+          set_var E2E_AUTH "$E2E_AUTH"
+          if [ "$E2E_AUTH" = "credentials" ]; then
+            set_var E2E_TEST_PASSWORD "$E2E_TEST_PASSWORD"
+          fi
+
+      - name: Note
+        run: |
+          echo "Vercel Preview env updated. Trigger a new Preview deployment for changes to take effect."
