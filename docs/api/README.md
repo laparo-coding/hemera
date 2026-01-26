@@ -68,23 +68,32 @@ Passe mindestens `baseUrl` und `bearer_token` an.
 
 Die Collection setzt folgende Automatisierungen:
 
-- **Collection-Level Auth**: Jeder Request erhält automatisch `Authorization: Bearer {{bearer_token}}`
-- **Pre-Request Script**: Liest `bearer_token` aus dem Environment und fügt den Header hinzu
+- **Collection-Level Auth**: Bearer-Authentifizierung mit `{{bearer_token}}` – kein manueller `Authorization`-Header nötig
 - **Test Scripts** (laufen nach jedem Request):
   - Response-Zeit unter 2000ms
   - Valide JSON-Antwort
   - `success: true` für 2xx Responses
-  - Error-Struktur (`success: false`, `error`) für 4xx/5xx
+  - `requestId` vorhanden (Tracing)
+  - Error-Struktur (`success: false`, `error`, `code`) für 4xx/5xx
+- **Per-Endpoint-Tests** für Schlüssel-Endpoints (Health, Courses, Locations, Bookings, Auth)
 
-> Du musst keine manuellen Auth-Header setzen – fülle einfach `bearer_token` im Environment.
+> **Wichtig**: Fülle nur `bearer_token` im Environment – die Collection fügt den Header automatisch hinzu.
 
-## Validierung / Scripts
+## Validierung
 
-| Befehl | Zweck |
-|--------|-------|
-| `npx spectral lint docs/api/openapi.yaml` | OpenAPI-Spezifikation validieren |
-| `node scripts/validate-postman-import.mjs` | Postman Collection & Environment prüfen |
-| `node scripts/enhance-postman-collection.mjs` | Auth + Scripts zur Collection hinzufügen |
+Alle Befehle zur Prüfung von OpenAPI-Spec und Postman-Artefakten:
+
+```bash
+# OpenAPI-Spezifikation validieren (Spectral)
+npx spectral lint docs/api/openapi.yaml
+
+# Postman Collection & Environment prüfen
+node scripts/validate-postman-import.mjs
+
+# Collection regenerieren (nach OpenAPI-Änderungen)
+npx openapi-to-postmanv2 -s docs/api/openapi.yaml -o docs/api/hemera.postman.json
+node scripts/enhance-postman-collection.mjs
+```
 
 ## Troubleshooting
 
