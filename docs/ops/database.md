@@ -49,7 +49,11 @@ Die einfachste Methode für lokale Entwicklung nutzt Docker Compose mit persiste
 
 ### Voraussetzungen
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installiert und gestartet
+- **Docker Compose v2.0+** (via Docker Desktop, Colima, OrbStack, oder Podman)
+  - Prüfen: `docker compose version` sollte `v2.x` oder höher anzeigen
+  - Alternativen zu Docker Desktop:
+    - [Colima](https://github.com/abiosoft/colima): `brew install colima docker docker-compose && colima start`
+    - [OrbStack](https://orbstack.dev/): `brew install orbstack`
 
 ### Schnellstart
 
