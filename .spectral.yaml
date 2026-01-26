@@ -1,6 +1,19 @@
-extends: []
+# Spectral OpenAPI Linting Configuration
+# Feature: 019-OpenAPI-Postman
+#
+# Enforces Hemera API conventions and OpenAPI best practices
+
+extends:
+  - spectral:oas
+
 formats: [oas3]
+
 rules:
+  # ============================================
+  # OpenAPI 3.1 Standard Rules
+  # ============================================
+  
+  # Ensure OpenAPI version is 3.1.0
   openapi-3-1-version:
     description: Ensure the OpenAPI version is 3.1.0
     given: $.openapi
@@ -9,3 +22,62 @@ rules:
       functionOptions:
         match: "^3.1.0$"
     severity: warn
+  
+  # Ensure all operations have operationId
+  operation-operationId: error
+  
+  # Ensure all operations have tags
+  operation-tags: error
+  
+  # Ensure descriptions are present
+  operation-description: warn
+  info-description: warn
+  tag-description: warn
+  
+  # Ensure valid schema references
+  oas3-schema: error
+  no-$ref-siblings: error
+  
+  # ============================================
+  # Hemera Custom Rules
+  # ============================================
+  
+  # All API responses should include requestId for tracing
+  response-must-have-request-id:
+    description: All error responses should reference RequestId for tracing
+    message: "Response schema should include requestId property for error tracing"
+    severity: warn
+    given: "$.paths.*.*.responses[?(@property >= '400')].content.application/json.schema"
+    then:
+      field: "properties.requestId"
+      function: truthy
+  
+  # operationId should be camelCase and URL-safe
+  operation-operationId-valid:
+    description: operationId should be URL-safe camelCase
+    severity: error
+    given: "$.paths.*.*.operationId"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-zA-Z][a-zA-Z0-9]*$"
+  
+  # Path parameters should be camelCase
+  path-params-camel-case:
+    description: Path parameters should use camelCase
+    severity: warn
+    given: "$.paths.*.*.parameters[?(@.in == 'path')].name"
+    then:
+      function: casing
+      functionOptions:
+        type: camel
+
+  # ============================================
+  # Disabled Rules (intentionally relaxed)
+  # ============================================
+  
+  # Allow info.contact to be optional
+  info-contact: off
+  
+  # Allow info.license to be optional for internal APIs
+  info-license: off

@@ -35,12 +35,12 @@ Wenn du lieber direkt in Swagger UI schauen möchtest, kannst du `openapi.yaml` 
 | Variable | Beschreibung | Standardwert |
 |----------|--------------|--------------|
 | `baseUrl` | Aktive API-URL | `http://localhost:3000/api` |
-| `baseUrlStaging` | Staging-URL (Referenz) | `https://staging.hemera.app/api` |
-| `baseUrlProd` | Prod-URL (Referenz) | `https://hemera.app/api` |
-| `clerkToken` | Clerk JWT ohne `Bearer` Prefix | _(leer)_ |
-| `courseId`, `bookingId`, `locationId`, `userId` | Platzhalter für Workflows | _(leer)_ |
+| `bearer_token` | Clerk JWT ohne `Bearer` Prefix | _(leer)_ |
+| `clerk_session_id` | Clerk Session-ID für erweiterte Tests | _(leer)_ |
+| `test_user_id`, `test_course_id`, `test_booking_id` | IDs für Workflows | _(leer)_ |
+| `stripe_webhook_secret` | Stripe Webhook Secret für lokale Tests | _(leer)_ |
 
-Passe mindestens `baseUrl` und `clerkToken` an. Für Staging/Prod kannst du `baseUrl` temporär überschreiben.
+Passe mindestens `baseUrl` und `bearer_token` an.
 
 ## Schritt 4: Clerk JWT besorgen
 
@@ -55,12 +55,32 @@ Passe mindestens `baseUrl` und `clerkToken` an. Für Staging/Prod kannst du `bas
 
 1. Öffne das Clerk Dashboard → Users.
 2. Wähle deinen Test-User → `Sessions` → `View Token`.
-3. Kopiere das Token und speichere es in Postman.
+3. Kopiere das Token und speichere es in Postman unter `bearer_token`.
 
 ## Schritt 5: Erste Requests senden
 
 1. **Öffentliche Route testen**: `Public → GET /health` → `Send`. Du solltest `success: true` zurückbekommen.
-2. **Authentifizierte Route testen**: `Bookings → GET /bookings` → Environment muss `clerkToken` enthalten. Bei Erfolg siehst du deine Buchungen (oder eine leere Liste).
+2. **Authentifizierte Route testen**: `Bookings → GET /bookings` → Environment muss `bearer_token` enthalten. Bei Erfolg siehst du deine Buchungen (oder eine leere Liste).
+
+## Collection Features
+
+Die Collection enthält:
+
+- **Collection-Level Auth**: Bearer Token wird automatisch aus `{{bearer_token}}` gesetzt
+- **Pre-Request Script**: Setzt Authorization-Header automatisch
+- **Test Scripts**: 
+  - Response-Zeit unter 2000ms
+  - Valide JSON-Antwort
+  - `success: true` für 2xx Responses
+  - Error-Struktur (`success: false`, `error`) für 4xx/5xx
+
+## Validierung / Scripts
+
+| Befehl | Zweck |
+|--------|-------|
+| `npx spectral lint docs/api/openapi.yaml` | OpenAPI-Spezifikation validieren |
+| `node scripts/validate-postman-import.mjs` | Postman Collection & Environment prüfen |
+| `node scripts/enhance-postman-collection.mjs` | Auth + Scripts zur Collection hinzufügen |
 
 ## Troubleshooting
 
@@ -68,14 +88,6 @@ Passe mindestens `baseUrl` und `clerkToken` an. Für Staging/Prod kannst du `bas
 - **404 Not Found** → `baseUrl` stimmt nicht oder Endpoint gehört nicht zur gewählten Umgebung.
 - **CORS/Network Error** → Desktop-Version von Postman nutzen, falls lokale Requests blockiert werden.
 - **Signature-Header nötig (Webhooks)** → In den jeweiligen Requests findest du Platzhalter. Fülle sie mit echten Signaturen, bevor du gegen Live-Services testest.
-
-## Validierung / Tests
-
-| Schritt | Zweck |
-|--------|-------|
-| `npx spectral lint docs/api/openapi.yaml` | Stellt sicher, dass die Spezifikation valide ist (bereits ausgeführt, 0 Warnungen/Fehler). |
-| Postman-Import laut Quickstart | Bestätigt, dass Collection + Environment sich ohne Fehler importieren lassen. |
-| Manuelle Requests (`/health`, `/bookings`) | Verifizieren, dass Server & Auth funktionieren. Beschrieben in `specs/019-OpenAPI-Postman/quickstart.md`. |
 
 ## Weiterführende Ressourcen
 
