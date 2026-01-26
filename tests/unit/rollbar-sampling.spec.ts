@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 const ORIGINAL_ENV = process.env;
 
 // Deterministic random helper
-const makeDeterministicRandom = (sequence: number[]) => {
+const makeDeterministicRandom = (sequence: number[]): (() => number) => {
   let i = 0;
-  return () => sequence[i++ % sequence.length];
+  return () => sequence[i++ % sequence.length] ?? 0;
 };
 
 describe('Unit: Rollbar sampling logic', () => {

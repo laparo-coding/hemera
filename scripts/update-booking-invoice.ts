@@ -1,3 +1,4 @@
+/* cspell:disable -- contains generated IDs */
 import { prisma } from '../lib/db/prisma';
 
 async function main() {

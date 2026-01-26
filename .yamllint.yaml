@@ -8,6 +8,9 @@ rules:
   comments: disable # Prettier uses single space, yamllint wants 2
   comments-indentation: disable # comments vary in generated files
   document-start: disable # '---' not common in GH workflows
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1 # allow { type: string } in OpenAPI
   indentation:
     indent-sequences: consistent
 

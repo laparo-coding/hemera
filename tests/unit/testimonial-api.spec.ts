@@ -46,7 +46,11 @@ jest.mock('@/lib/services/testimonial', () => ({
 }));
 
 import { NextRequest } from 'next/server';
-import { GET, POST } from '@/app/api/courses/[id]/testimonials/route';
+import { GET } from '@/app/api/courses/[id]/testimonials/route';
+
+// POST is not yet implemented - placeholder for skipped tests
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const POST: any = undefined;
 
 describe('GET /api/courses/[id]/testimonials', () => {
   beforeEach(() => {
@@ -60,7 +64,9 @@ describe('GET /api/courses/[id]/testimonials', () => {
       'http://localhost/api/courses//testimonials'
     );
 
-    const response = await GET(request, { params: { id: '' } });
+    const response = await GET(request, {
+      params: Promise.resolve({ id: '' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(404);
@@ -75,7 +81,9 @@ describe('GET /api/courses/[id]/testimonials', () => {
       'http://localhost/api/courses/   /testimonials'
     );
 
-    const response = await GET(request, { params: { id: '   ' } });
+    const response = await GET(request, {
+      params: Promise.resolve({ id: '   ' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(404);
@@ -89,7 +97,9 @@ describe('GET /api/courses/[id]/testimonials', () => {
       'http://localhost/api/courses/invalid-id/testimonials'
     );
 
-    const response = await GET(request, { params: { id: 'invalid-id' } });
+    const response = await GET(request, {
+      params: Promise.resolve({ id: 'invalid-id' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(404);
@@ -104,7 +114,9 @@ describe('GET /api/courses/[id]/testimonials', () => {
       'http://localhost/api/courses/course-123/testimonials?limit=abc'
     );
 
-    const response = await GET(request, { params: { id: 'course-123' } });
+    const response = await GET(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -119,7 +131,9 @@ describe('GET /api/courses/[id]/testimonials', () => {
       'http://localhost/api/courses/course-123/testimonials?limit=-5'
     );
 
-    const response = await GET(request, { params: { id: 'course-123' } });
+    const response = await GET(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -134,7 +148,9 @@ describe('GET /api/courses/[id]/testimonials', () => {
       'http://localhost/api/courses/course-123/testimonials?limit=0'
     );
 
-    const response = await GET(request, { params: { id: 'course-123' } });
+    const response = await GET(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -150,7 +166,7 @@ describe('GET /api/courses/[id]/testimonials', () => {
       'http://localhost/api/courses/course-123/testimonials?limit=100'
     );
 
-    await GET(request, { params: { id: 'course-123' } });
+    await GET(request, { params: Promise.resolve({ id: 'course-123' }) });
 
     expect(mockGetPublishedTestimonialsForCourse).toHaveBeenCalledWith(
       'course-123',
@@ -182,7 +198,9 @@ describe('GET /api/courses/[id]/testimonials', () => {
       'http://localhost/api/courses/course-123/testimonials'
     );
 
-    const response = await GET(request, { params: { id: 'course-123' } });
+    const response = await GET(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -199,7 +217,7 @@ describe('GET /api/courses/[id]/testimonials', () => {
       'http://localhost/api/courses/my-course-slug/testimonials'
     );
 
-    await GET(request, { params: { id: 'my-course-slug' } });
+    await GET(request, { params: Promise.resolve({ id: 'my-course-slug' }) });
 
     expect(mockPrisma.course.findFirst).toHaveBeenCalledWith({
       where: {
@@ -228,7 +246,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: 'course-123' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(401);
@@ -247,7 +267,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: '' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: '' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -273,7 +295,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: 'invalid-id' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: 'invalid-id' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(404);
@@ -302,7 +326,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: 'course-123' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -335,7 +361,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: 'course-123' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -367,7 +395,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: 'course-123' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -399,7 +429,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: 'course-123' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(400);
@@ -438,7 +470,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: 'course-123' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(409);
@@ -477,7 +511,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: 'course-123' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(403);
@@ -524,7 +560,9 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    const response = await POST(request, { params: { id: 'course-123' } });
+    const response = await POST(request, {
+      params: Promise.resolve({ id: 'course-123' }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(201);
@@ -570,7 +608,7 @@ describe.skip('POST /api/courses/[id]/testimonials', () => {
       }
     );
 
-    await POST(request, { params: { id: 'course-123' } });
+    await POST(request, { params: Promise.resolve({ id: 'course-123' }) });
 
     // Verify the synced user was used when calling createTestimonial
     expect(mockCreateTestimonial).toHaveBeenCalledWith(

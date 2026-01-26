@@ -37,7 +37,7 @@ Wenn du lieber direkt in Swagger UI schauen möchtest, kannst du `openapi.yaml` 
 | `baseUrl` | Aktive API-URL | `http://localhost:3000/api` |
 | `baseUrlStaging` | Staging-URL (Referenz) | `https://staging.hemera.app/api` |
 | `baseUrlProd` | Prod-URL (Referenz) | `https://hemera.app/api` |
-| `clerkToken` | Clerk JWT ohne `Bearer ` | _(leer)_ |
+| `clerkToken` | Clerk JWT ohne `Bearer` Prefix | _(leer)_ |
 | `courseId`, `bookingId`, `locationId`, `userId` | Platzhalter für Workflows | _(leer)_ |
 
 Passe mindestens `baseUrl` und `clerkToken` an. Für Staging/Prod kannst du `baseUrl` temporär überschreiben.
@@ -49,7 +49,7 @@ Passe mindestens `baseUrl` und `clerkToken` an. Für Staging/Prod kannst du `bas
 1. Melde dich auf https://hemera.app an.
 2. Öffne DevTools → Network.
 3. Suche einen `/api` Request und kopiere den `Authorization` Header.
-4. Trage nur den Token-Teil nach `Bearer ` bei `clerkToken` ein.
+4. Trage nur den Token-Teil nach `Bearer` bei `clerkToken` ein.
 
 **Variante B (Clerk Dashboard, Dev/Test):**
 

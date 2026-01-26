@@ -305,10 +305,11 @@ describe('Booking Model Validations', () => {
       }
 
       for (let i = 0; i < statuses.length; i++) {
-        const status = statuses[i];
+        const status = statuses[i]!;
+        const user = testUsers[i]!;
         const booking = await prisma.booking.create({
           data: {
-            userId: testUsers[i].id,
+            userId: user.id,
             courseId: testCourse.id,
             amount: testCourse.price,
             paymentStatus: status,

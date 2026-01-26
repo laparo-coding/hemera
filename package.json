@@ -128,10 +128,6 @@
     "typescript": "^5.9.3",
     "webpack": "^5.104.1"
   },
-  "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=9.0.0"
-  },
   "prisma": {
     "seed": "node --loader ts-node/esm prisma/seed.ts"
   }

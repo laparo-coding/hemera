@@ -104,8 +104,8 @@ describe('Booking Categorization', () => {
       const result = categorizeBookings(bookings, now);
 
       // After removing next seminar (b1), remaining should be sorted
-      expect(result.upcoming[0].id).toBe('b2');
-      expect(result.upcoming[1].id).toBe('b3');
+      expect(result.upcoming[0]!.id).toBe('b2');
+      expect(result.upcoming[1]!.id).toBe('b3');
     });
   });
 
@@ -146,7 +146,7 @@ describe('Booking Categorization', () => {
       const result = categorizeBookings(bookings, now);
 
       expect(result.noShow.length).toBe(1);
-      expect(result.noShow[0].id).toBe('b1');
+      expect(result.noShow[0]!.id).toBe('b1');
     });
 
     it('should be empty when all past seminars have participation', () => {
