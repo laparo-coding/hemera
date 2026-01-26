@@ -32,15 +32,17 @@ Wenn du lieber direkt in Swagger UI schauen möchtest, kannst du `openapi.yaml` 
 
 ## Schritt 3: Environment anpassen
 
-| Variable | Beschreibung | Standardwert |
-|----------|--------------|--------------|
-| `baseUrl` | Aktive API-URL | `http://localhost:3000/api` |
-| `bearer_token` | Clerk JWT ohne `Bearer` Prefix | _(leer)_ |
-| `clerk_session_id` | Clerk Session-ID für erweiterte Tests | _(leer)_ |
-| `test_user_id`, `test_course_id`, `test_booking_id` | IDs für Workflows | _(leer)_ |
-| `stripe_webhook_secret` | Stripe Webhook Secret für lokale Tests | _(leer)_ |
+| Variable | Beschreibung | Typ | Standardwert |
+|----------|--------------|-----|--------------|
+| `baseUrl` | Aktive API-URL | default | `http://localhost:3000/api` |
+| `bearer_token` | Clerk JWT ohne `Bearer` Prefix | 🔒 secret | _(leer)_ |
+| `clerk_session_id` | Clerk Session-ID für erweiterte Tests | 🔒 secret | _(leer)_ |
+| `test_user_id`, `test_course_id`, `test_booking_id` | IDs für Workflows | default | _(leer)_ |
+| `stripe_webhook_secret` | Stripe Webhook Secret für lokale Tests | 🔒 secret | _(leer)_ |
 
 Passe mindestens `baseUrl` und `bearer_token` an.
+
+> ⚠️ **Sicherheitshinweis**: Variablen mit Typ `secret` werden in Postman maskiert und nicht in Exports übernommen. **Committe niemals echte Tokens** in `hemera.env.json`. Verwende stattdessen lokale Postman-Environments oder Environment-Variablen.
 
 ## Schritt 4: Clerk JWT besorgen
 
