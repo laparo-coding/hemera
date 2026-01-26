@@ -102,33 +102,48 @@ jobs:
           script: |
             const fs = require('fs');
             const cp = require('child_process');
-            const files = cp.execSync('ls -t .lighthouseci/*.json').toString().trim().split('\n');
-            const file = files[0];
-            const lhr = JSON.parse(fs.readFileSync(file, 'utf8'));
-            const pct = s => Math.round(((s?.score) ?? 0) * 100);
-            const c = lhr.categories;
-            const perf = pct(c.performance);
-            const acc = pct(c.accessibility);
-            const bp = pct(c['best-practices'] ?? c["best-practices"]);
-            const seo = pct(c.seo);
-            const url = lhr.requestedUrl;
-            const md = `\n## Lighthouse Summary\n\nURL: ${url}\nScores: Performance ${perf} | Accessibility ${acc} | Best-Practices ${bp} | SEO ${seo}\n`;
-            await core.summary.addRaw(md).write();
-            const body = [
-              `### 🌟 Lighthouse Report`,
-              `URL: ${url}`,
-              ``,
-              `- Performance: ${perf}`,
-              `- Accessibility: ${acc}`,
-              `- Best-Practices: ${bp}`,
-              `- SEO: ${seo}`,
-              ``,
-              `Artifacts: download the 'lighthouse-report' artifact from this workflow run for the full HTML report.`,
-            ].join('\n');
-            fs.writeFileSync('lhci-comment.md', body);
-            core.setOutput('perf', String(perf));
-            core.setOutput('acc', String(acc));
-            core.setOutput('url', url);
+            try {
+              const files = cp.execSync('ls -t .lighthouseci/*.json 2>/dev/null || echo ""').toString().trim().split('\n').filter(Boolean);
+              if (!files.length || !files[0]) {
+                console.log('No Lighthouse JSON files found');
+                fs.writeFileSync('lhci-comment.md', '### 🌟 Lighthouse Report\n\nNo report generated (site may be protected by SSO).');
+                return;
+              }
+              const file = files[0];
+              const lhr = JSON.parse(fs.readFileSync(file, 'utf8'));
+              const c = lhr.categories;
+              if (!c) {
+                console.log('No categories in Lighthouse report');
+                fs.writeFileSync('lhci-comment.md', '### 🌟 Lighthouse Report\n\nNo categories found (Lighthouse may have failed to audit the page).');
+                return;
+              }
+              const pct = s => Math.round(((s?.score) ?? 0) * 100);
+              const perf = pct(c.performance);
+              const acc = pct(c.accessibility);
+              const bp = pct(c['best-practices'] ?? c["best-practices"]);
+              const seo = pct(c.seo);
+              const url = lhr.requestedUrl;
+              const md = `\n## Lighthouse Summary\n\nURL: ${url}\nScores: Performance ${perf} | Accessibility ${acc} | Best-Practices ${bp} | SEO ${seo}\n`;
+              await core.summary.addRaw(md).write();
+              const body = [
+                `### 🌟 Lighthouse Report`,
+                `URL: ${url}`,
+                ``,
+                `- Performance: ${perf}`,
+                `- Accessibility: ${acc}`,
+                `- Best-Practices: ${bp}`,
+                `- SEO: ${seo}`,
+                ``,
+                `Artifacts: download the 'lighthouse-report' artifact from this workflow run for the full HTML report.`,
+              ].join('\n');
+              fs.writeFileSync('lhci-comment.md', body);
+              core.setOutput('perf', String(perf));
+              core.setOutput('acc', String(acc));
+              core.setOutput('url', url);
+            } catch (err) {
+              console.log('Error processing Lighthouse report:', err.message);
+              fs.writeFileSync('lhci-comment.md', `### 🌟 Lighthouse Report\n\nError: ${err.message}`);
+            }
 
       - name: Resolve PR number
         if: always()

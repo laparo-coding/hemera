@@ -406,7 +406,7 @@ describe('GET /api/courses - Contract Tests', () => {
 
       const searchResults = searchFilter('typescript');
       expect(searchResults).toHaveLength(1);
-      expect(searchResults[0].id).toBe('1');
+      expect(searchResults[0]!.id).toBe('1');
     });
   });
 

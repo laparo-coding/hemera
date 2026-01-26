@@ -25,8 +25,8 @@ describe('Contract: GET /api/my-courses/[bookingId]/summary', () => {
     };
 
     expect(responsePayload.assets).toHaveLength(2);
-    expect(responsePayload.assets[0].source).toBe('COURSE_DEFAULT');
-    expect(responsePayload.assets[1].source).toBe('BOOKING_OVERRIDE');
+    expect(responsePayload.assets[0]!.source).toBe('COURSE_DEFAULT');
+    expect(responsePayload.assets[1]!.source).toBe('BOOKING_OVERRIDE');
   });
 
   it('returns empty payload when no assets exist and marks summary as hidden', () => {
