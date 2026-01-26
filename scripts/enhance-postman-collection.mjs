@@ -188,7 +188,19 @@ function fixErrorResponses(items) {
 
 fixErrorResponses(collection.item || []);
 
-fs.writeFileSync(COLLECTION_PATH, JSON.stringify(collection, null, 2));
+// Normalize variable names: replace {{bearerToken}} with {{bearer_token}}
+// This ensures consistency with environment file and README
+let collectionStr = JSON.stringify(collection, null, 2);
+collectionStr = collectionStr.replace(
+  /\{\{bearerToken\}\}/g,
+  '{{bearer_token}}'
+);
+const normalizedCollection = JSON.parse(collectionStr);
+
+fs.writeFileSync(
+  COLLECTION_PATH,
+  JSON.stringify(normalizedCollection, null, 2)
+);
 console.log(
-  '✅ Added auth, pre-request script, tests, and fixed error responses'
+  '✅ Added auth, pre-request script, tests, fixed error responses, and normalized variable names'
 );
