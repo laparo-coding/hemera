@@ -7,17 +7,16 @@ import {
   Box,
   Button,
   CardContent,
-  Divider,
   Paper,
   Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/GridLegacy';
 import Link from 'next/link';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TERMS } from '@/lib/constants';
+import { CourseCard, DashboardSection } from './dashboard';
 
 // Design tokens from Hemera spec (matching landing page and auth pages)
 const colors = {
@@ -28,6 +27,7 @@ const colors = {
   white: '#FFFFFF',
 } as const;
 
+// Extended Booking interface with all fields needed for dashboard
 interface Booking {
   id: string;
   courseId: string;
@@ -36,6 +36,68 @@ interface Booking {
   currency: string;
   paymentStatus: string;
   createdAt: string;
+  // New fields for dashboard sections
+  startDate: string | null;
+  endDate: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  locationName: string | null;
+  locationSlug: string | null;
+  locationCity: string | null;
+  hasParticipation: boolean;
+  stripeInvoicePdfUrl: string | null;
+}
+
+// Categorized bookings for dashboard sections
+interface CategorizedBookings {
+  nextSeminar: Booking | null;
+  upcoming: Booking[];
+  completed: Booking[];
+  noShow: Booking[];
+}
+
+/**
+ * Categorize bookings into dashboard sections
+ */
+function categorizeBookings(bookings: Booking[]): CategorizedBookings {
+  const now = new Date();
+
+  // Filter out cancelled/failed
+  const activeBookings = bookings.filter(
+    b => !['CANCELLED', 'FAILED'].includes(b.paymentStatus)
+  );
+
+  // Separate upcoming and past
+  const upcomingBookings = activeBookings
+    .filter(b => {
+      const endDate = b.endDate
+        ? new Date(b.endDate)
+        : b.startDate
+          ? new Date(b.startDate)
+          : null;
+      return endDate && endDate > now;
+    })
+    .sort((a, b) => {
+      const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
+      const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
+      return dateA - dateB;
+    });
+
+  const pastBookings = activeBookings.filter(b => {
+    const endDate = b.endDate
+      ? new Date(b.endDate)
+      : b.startDate
+        ? new Date(b.startDate)
+        : null;
+    return endDate && endDate <= now;
+  });
+
+  return {
+    nextSeminar: upcomingBookings[0] ?? null,
+    upcoming: upcomingBookings.slice(1),
+    completed: pastBookings.filter(b => b.hasParticipation),
+    noShow: pastBookings.filter(b => !b.hasParticipation),
+  };
 }
 
 // Wrapper component that decides at build time which variant to render.
@@ -117,7 +179,6 @@ const UserDashboardE2E: React.FC = () => {
         <span style={{ display: 'none' }} data-testid='auth-service-error'>
           Service temporarily unavailable
         </span>
-        {/* user-role wird global im E2E-Header angezeigt; hier vermeiden wir doppelte Selektoren */}
         {/* Minimal metrics section expected by tests */}
         <Box
           data-testid='dashboard-metrics'
@@ -215,10 +276,10 @@ const UserDashboardClerk: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/bookings', {
-        credentials: 'include', // Send cookies for Clerk auth
+      const response = await fetch('/api/bookings?limit=100', {
+        credentials: 'include',
         headers: {
-          'Cache-Control': 'max-age=30', // Cache for 30 seconds
+          'Cache-Control': 'max-age=30',
         },
       });
 
@@ -244,188 +305,68 @@ const UserDashboardClerk: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    // Only fetch when user is loaded and available
     if (userLoaded && user) {
       fetchBookings();
     } else if (userLoaded && !user) {
-      // User is not authenticated
       setLoading(false);
     }
   }, [userLoaded, user, fetchBookings]);
 
-  // Memoized bookings list component
-  const BookingsList = useMemo(
+  // Categorize bookings into sections
+  const categorized = useMemo(() => categorizeBookings(bookings), [bookings]);
+
+  // Empty state component
+  const EmptyState = useMemo(
     () => (
-      <Paper
-        elevation={0}
-        data-testid='courses-card'
-        sx={{
-          p: { xs: 2, sm: 3, md: 4 },
-          borderRadius: '16px',
-          border: '1px solid rgba(22, 64, 77, 0.1)',
-          boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
-        }}
-      >
+      <Box sx={{ textAlign: 'center', py: 6 }}>
+        <SchoolOutlined sx={{ fontSize: 64, color: colors.sage, mb: 2 }} />
         <Typography
           sx={{
             fontFamily: '"Playfair Display", serif',
-            fontSize: '1.25rem',
+            fontSize: '1.5rem',
             fontWeight: 600,
             color: colors.petrol,
-            mb: 2,
+            mb: 1,
           }}
         >
-          Meine Buchungen
+          Beginne deine Lernreise
         </Typography>
-        <Divider sx={{ mb: 3, borderColor: 'rgba(22, 64, 77, 0.1)' }} />
-
-        {bookings.length === 0 ? (
-          <Box sx={{ textAlign: 'center', py: 6 }}>
-            <SchoolOutlined sx={{ fontSize: 64, color: colors.sage, mb: 2 }} />
-            <Typography
-              sx={{
-                fontFamily: '"Playfair Display", serif',
-                fontSize: '1.5rem',
-                fontWeight: 600,
-                color: colors.petrol,
-                mb: 1,
-              }}
-            >
-              Beginne deine Lernreise
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: '"Inter", sans-serif',
-                fontSize: '1rem',
-                color: colors.petrol,
-                opacity: 0.8,
-                mb: 3,
-                maxWidth: 400,
-                mx: 'auto',
-              }}
-            >
-              Entdecke unsere {TERMS.courses} und investiere in deine berufliche
-              Zukunft.
-            </Typography>
-            <Button
-              component={Link}
-              href='/courses'
-              variant='contained'
-              color='primary'
-              endIcon={<ArrowForwardOutlined />}
-              sx={{
-                fontFamily: '"Inter", sans-serif',
-                fontWeight: 600,
-                fontSize: '1rem',
-                textTransform: 'none',
-                borderRadius: '8px',
-                px: 4,
-                py: 1.5,
-              }}
-            >
-              {TERMS.discoverCourses}
-            </Button>
-          </Box>
-        ) : (
-          <Stack spacing={2}>
-            {bookings.map(booking => (
-              <Paper
-                key={booking.id}
-                elevation={0}
-                sx={{
-                  p: { xs: 2, sm: 3 },
-                  borderRadius: '12px',
-                  border: '1px solid rgba(22, 64, 77, 0.1)',
-                }}
-              >
-                <Grid container spacing={2} alignItems='center'>
-                  <Grid item xs={12} md={6}>
-                    <Stack direction='row' spacing={2} alignItems='center'>
-                      <SchoolOutlined sx={{ color: colors.petrol }} />
-                      <Box>
-                        <Typography
-                          sx={{
-                            fontFamily: '"Inter", sans-serif',
-                            fontSize: '1rem',
-                            fontWeight: 600,
-                            color: colors.petrol,
-                          }}
-                        >
-                          {booking.courseTitle}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontFamily: '"Inter", sans-serif',
-                            fontSize: '0.875rem',
-                            color: colors.petrol,
-                            opacity: 0.7,
-                          }}
-                        >
-                          Gebucht am{' '}
-                          {new Date(booking.createdAt).toLocaleDateString(
-                            'de-DE'
-                          )}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </Grid>
-
-                  <Grid item xs={12} md={3}>
-                    <Typography
-                      sx={{
-                        fontFamily: '"Inter", sans-serif',
-                        fontSize: '1rem',
-                        fontWeight: 700,
-                        color: colors.petrol,
-                      }}
-                    >
-                      {(booking.coursePrice / 100).toLocaleString('de-DE')} €
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12} md={3}>
-                    <Stack
-                      direction='row'
-                      spacing={1}
-                      alignItems='center'
-                      justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
-                    >
-                      {(booking.paymentStatus === 'PAID' ||
-                        booking.paymentStatus === 'CONFIRMED') && (
-                        <Link href='/my-courses' passHref>
-                          <Button
-                            variant='outlined'
-                            size='small'
-                            endIcon={<ArrowForwardOutlined />}
-                            sx={{
-                              ml: 1,
-                              borderColor: colors.petrol,
-                              color: colors.petrol,
-                              fontFamily: '"Inter", sans-serif',
-                              fontWeight: 500,
-                              '&:hover': {
-                                borderColor: colors.gold,
-                                backgroundColor: 'rgba(221, 168, 83, 0.1)',
-                              },
-                            }}
-                          >
-                            Vorbereitung
-                          </Button>
-                        </Link>
-                      )}
-                    </Stack>
-                  </Grid>
-                </Grid>
-              </Paper>
-            ))}
-          </Stack>
-        )}
-      </Paper>
+        <Typography
+          sx={{
+            fontFamily: '"Inter", sans-serif',
+            fontSize: '1rem',
+            color: colors.petrol,
+            opacity: 0.8,
+            mb: 3,
+            maxWidth: 400,
+            mx: 'auto',
+          }}
+        >
+          Entdecke unsere {TERMS.courses} und investiere in deine berufliche
+          Zukunft.
+        </Typography>
+        <Button
+          component={Link}
+          href='/courses'
+          variant='contained'
+          color='primary'
+          endIcon={<ArrowForwardOutlined />}
+          sx={{
+            fontFamily: '"Inter", sans-serif',
+            fontWeight: 600,
+            fontSize: '1rem',
+            textTransform: 'none',
+            borderRadius: '8px',
+            px: 4,
+            py: 1.5,
+          }}
+        >
+          {TERMS.discoverCourses}
+        </Button>
+      </Box>
     ),
-    [bookings]
+    []
   );
-
-  // Production path — E2E fallback handled above
 
   // Loading state with skeleton
   if (!userLoaded || loading) {
@@ -454,70 +395,29 @@ const UserDashboardClerk: React.FC = () => {
             sx={{ mb: 4, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
           />
 
-          {/* Stats cards skeleton */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            {[1, 2, 3, 4].map(item => (
-              <Grid item xs={12} sm={6} md={3} key={item}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: { xs: 2, sm: 3 },
-                    borderRadius: '16px',
-                    border: '1px solid rgba(22, 64, 77, 0.1)',
-                    boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
-                  }}
-                >
-                  <Stack direction='row' spacing={2} alignItems='center'>
-                    <Skeleton
-                      variant='circular'
-                      width={32}
-                      height={32}
-                      sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-                    />
-                    <Box sx={{ flex: 1 }}>
-                      <Skeleton
-                        variant='text'
-                        width='80%'
-                        height={20}
-                        sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-                      />
-                      <Skeleton
-                        variant='text'
-                        width='50%'
-                        height={32}
-                        sx={{ mt: 0.5, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-                      />
-                    </Box>
-                  </Stack>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-
-          {/* Bookings section skeleton */}
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2, sm: 3, md: 4 },
-              borderRadius: '16px',
-              border: '1px solid rgba(22, 64, 77, 0.1)',
-              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
-            }}
-          >
-            <Skeleton
-              variant='text'
-              width={180}
-              height={32}
-              sx={{ mb: 2, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-            />
-            <Divider sx={{ mb: 3, borderColor: 'rgba(22, 64, 77, 0.1)' }} />
-            {[1, 2, 3].map(row => (
+          {/* Section skeletons */}
+          {[1, 2].map(item => (
+            <Paper
+              key={item}
+              elevation={0}
+              sx={{
+                p: { xs: 2, sm: 3, md: 4 },
+                mb: 3,
+                borderRadius: '16px',
+                border: '1px solid rgba(22, 64, 77, 0.1)',
+                boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+              }}
+            >
+              <Skeleton
+                variant='text'
+                width={200}
+                height={32}
+                sx={{ mb: 3, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+              />
               <Paper
-                key={row}
                 elevation={0}
                 sx={{
                   p: { xs: 2, sm: 3 },
-                  mb: 2,
                   borderRadius: '12px',
                   border: '1px solid rgba(22, 64, 77, 0.1)',
                 }}
@@ -538,34 +438,30 @@ const UserDashboardClerk: React.FC = () => {
                     />
                     <Skeleton
                       variant='text'
-                      width='25%'
+                      width='60%'
                       height={16}
                       sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
                     />
                   </Box>
                   <Skeleton
-                    variant='text'
-                    width={80}
-                    height={20}
-                    sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-                  />
-                  <Skeleton
                     variant='rounded'
-                    width={100}
-                    height={24}
+                    width={120}
+                    height={36}
                     sx={{
                       bgcolor: 'rgba(166, 205, 198, 0.2)',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                     }}
                   />
                 </Box>
               </Paper>
-            ))}
-          </Paper>
+            </Paper>
+          ))}
         </Box>
       </Box>
     );
   }
+
+  const hasAnyBookings = bookings.length > 0;
 
   return (
     <Box
@@ -603,7 +499,7 @@ const UserDashboardClerk: React.FC = () => {
               opacity: 0.8,
             }}
           >
-            Hier findest du eine Übersicht über deine Buchungen und Aktivitäten.
+            Hier findest du eine Übersicht über deine {TERMS.courses}.
           </Typography>
         </Box>
 
@@ -622,8 +518,131 @@ const UserDashboardClerk: React.FC = () => {
           </Alert>
         )}
 
-        {/* Optimized Bookings List */}
-        {BookingsList}
+        {/* Empty state when no bookings */}
+        {!hasAnyBookings && (
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 3, sm: 4, md: 5 },
+              borderRadius: '16px',
+              border: '1px solid rgba(22, 64, 77, 0.1)',
+              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+              bgcolor: colors.white,
+            }}
+          >
+            {EmptyState}
+          </Paper>
+        )}
+
+        {/* Next Seminar Section */}
+        {categorized.nextSeminar && (
+          <DashboardSection
+            sectionType='NEXT_SEMINAR'
+            testId='section-next-seminar'
+          >
+            <Stack spacing={2}>
+              <CourseCard
+                id={categorized.nextSeminar.courseId}
+                bookingId={categorized.nextSeminar.id}
+                courseTitle={categorized.nextSeminar.courseTitle}
+                startDate={categorized.nextSeminar.startDate}
+                endDate={categorized.nextSeminar.endDate}
+                startTime={categorized.nextSeminar.startTime}
+                endTime={categorized.nextSeminar.endTime}
+                locationName={categorized.nextSeminar.locationName}
+                locationSlug={categorized.nextSeminar.locationSlug}
+                locationCity={categorized.nextSeminar.locationCity}
+                hasParticipation={categorized.nextSeminar.hasParticipation}
+                paymentStatus={categorized.nextSeminar.paymentStatus}
+                stripeInvoicePdfUrl={
+                  categorized.nextSeminar.stripeInvoicePdfUrl
+                }
+                sectionType='NEXT_SEMINAR'
+              />
+            </Stack>
+          </DashboardSection>
+        )}
+
+        {/* Upcoming Seminars Section */}
+        {categorized.upcoming.length > 0 && (
+          <DashboardSection sectionType='UPCOMING' testId='section-upcoming'>
+            <Stack spacing={2}>
+              {categorized.upcoming.map(booking => (
+                <CourseCard
+                  key={booking.id}
+                  id={booking.courseId}
+                  bookingId={booking.id}
+                  courseTitle={booking.courseTitle}
+                  startDate={booking.startDate}
+                  endDate={booking.endDate}
+                  startTime={booking.startTime}
+                  endTime={booking.endTime}
+                  locationName={booking.locationName}
+                  locationSlug={booking.locationSlug}
+                  locationCity={booking.locationCity}
+                  hasParticipation={booking.hasParticipation}
+                  paymentStatus={booking.paymentStatus}
+                  stripeInvoicePdfUrl={booking.stripeInvoicePdfUrl}
+                  sectionType='UPCOMING'
+                />
+              ))}
+            </Stack>
+          </DashboardSection>
+        )}
+
+        {/* Completed Seminars Section */}
+        {categorized.completed.length > 0 && (
+          <DashboardSection sectionType='COMPLETED' testId='section-completed'>
+            <Stack spacing={2}>
+              {categorized.completed.map(booking => (
+                <CourseCard
+                  key={booking.id}
+                  id={booking.courseId}
+                  bookingId={booking.id}
+                  courseTitle={booking.courseTitle}
+                  startDate={booking.startDate}
+                  endDate={booking.endDate}
+                  startTime={booking.startTime}
+                  endTime={booking.endTime}
+                  locationName={booking.locationName}
+                  locationSlug={booking.locationSlug}
+                  locationCity={booking.locationCity}
+                  hasParticipation={booking.hasParticipation}
+                  paymentStatus={booking.paymentStatus}
+                  stripeInvoicePdfUrl={booking.stripeInvoicePdfUrl}
+                  sectionType='COMPLETED'
+                />
+              ))}
+            </Stack>
+          </DashboardSection>
+        )}
+
+        {/* No-Show Seminars Section */}
+        {categorized.noShow.length > 0 && (
+          <DashboardSection sectionType='NO_SHOW' testId='section-no-show'>
+            <Stack spacing={2}>
+              {categorized.noShow.map(booking => (
+                <CourseCard
+                  key={booking.id}
+                  id={booking.courseId}
+                  bookingId={booking.id}
+                  courseTitle={booking.courseTitle}
+                  startDate={booking.startDate}
+                  endDate={booking.endDate}
+                  startTime={booking.startTime}
+                  endTime={booking.endTime}
+                  locationName={booking.locationName}
+                  locationSlug={booking.locationSlug}
+                  locationCity={booking.locationCity}
+                  hasParticipation={booking.hasParticipation}
+                  paymentStatus={booking.paymentStatus}
+                  stripeInvoicePdfUrl={booking.stripeInvoicePdfUrl}
+                  sectionType='NO_SHOW'
+                />
+              ))}
+            </Stack>
+          </DashboardSection>
+        )}
       </Box>
     </Box>
   );

@@ -57,8 +57,24 @@ type BookingRecord = {
   amount: number | null;
   currency: string | null;
   createdAt: Date;
+  stripeInvoiceId: string | null;
+  stripeInvoicePdfUrl: string | null;
   course?: {
+    id: string;
     title: string | null;
+    startDate: Date | null;
+    endDate: Date | null;
+    startTime: Date | null;
+    endTime: Date | null;
+    location?: {
+      id: string;
+      name: string;
+      slug: string;
+      city: string | null;
+    } | null;
+  } | null;
+  participation?: {
+    id: string;
   } | null;
 };
 
@@ -86,6 +102,16 @@ function normalizeBookings(bookings: BookingRecord[], requestId: string) {
       currency: booking.currency ?? 'EUR',
       paymentStatus: booking.paymentStatus,
       createdAt: booking.createdAt,
+      // New fields for dashboard
+      startDate: booking.course?.startDate?.toISOString() ?? null,
+      endDate: booking.course?.endDate?.toISOString() ?? null,
+      startTime: booking.course?.startTime?.toISOString() ?? null,
+      endTime: booking.course?.endTime?.toISOString() ?? null,
+      locationName: booking.course?.location?.name ?? null,
+      locationSlug: booking.course?.location?.slug ?? null,
+      locationCity: booking.course?.location?.city ?? null,
+      hasParticipation: booking.participation !== null,
+      stripeInvoicePdfUrl: booking.stripeInvoicePdfUrl,
     };
   });
 }
@@ -122,9 +148,27 @@ export async function GET(request: Request) {
         include: {
           course: {
             select: {
+              id: true,
               title: true,
               price: true,
               currency: true,
+              startDate: true,
+              endDate: true,
+              startTime: true,
+              endTime: true,
+              location: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  city: true,
+                },
+              },
+            },
+          },
+          participation: {
+            select: {
+              id: true,
             },
           },
         },
