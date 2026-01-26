@@ -43,26 +43,70 @@ npx prisma migrate dev --name init
 node prisma/seed.ts
 ```
 
-## Option C — Lokal per Docker
+## Option C — Lokal per Docker Compose (empfohlen)
 
-1. Postgres starten (Docker):
+Die einfachste Methode für lokale Entwicklung nutzt Docker Compose mit persistenten Daten.
+
+### Voraussetzungen
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installiert und gestartet
+
+### Schnellstart
+
+1. PostgreSQL Container starten:
 
 ```bash
-docker run --name hemera-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=hemera -p 5432:5432 -d postgres:16
+npm run db:docker:start
 ```
 
-1. `.env.local` setzen:
+2. `.env.local` setzen (oder von `.env.local.example` kopieren):
 
 ```bash
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/hemera?schema=hemera
 ```
 
-1. Migration + Seed:
+3. Migration + Seed ausführen:
 
 ```bash
-npx prisma migrate dev --name init
-node prisma/seed.ts
+npm run db:migrate
+npm run db:seed
 ```
+
+4. Entwicklung starten:
+
+```bash
+npm run dev
+```
+
+### Docker-Befehle
+
+| Befehl | Beschreibung |
+|--------|--------------|
+| `npm run db:docker:start` | Container starten (Port 5432) |
+| `npm run db:docker:stop` | Container stoppen (Daten bleiben erhalten) |
+| `npm run db:docker:reset` | Container und Daten löschen, neu starten |
+| `npm run db:docker:logs` | Container-Logs anzeigen |
+
+### Datenpersistenz
+
+- Daten werden in einem Docker Volume (`hemera-postgres-data`) gespeichert
+- `db:docker:stop` behält die Daten bei
+- `db:docker:reset` löscht alle Daten und startet frisch
+
+### Port-Konflikt (5432 belegt)
+
+Falls Port 5432 bereits belegt ist:
+
+1. In `docker-compose.yml` den Port ändern:
+   ```yaml
+   ports:
+     - "5433:5432"  # Alternativer Port
+   ```
+
+2. `DATABASE_URL` in `.env.local` anpassen:
+   ```bash
+   DATABASE_URL=postgres://postgres:postgres@localhost:5433/hemera?schema=hemera
+   ```
 
 ## Wo wird `DATABASE_URL` genutzt?
 
