@@ -2,7 +2,35 @@
  * GET /api/bookings/[bookingId]/invoice
  *
  * Downloads the Stripe invoice PDF for a specific booking.
- * Streams the PDF directly to trigger immediate download without blank page.
+ *
+ * ## Document Streaming Flow
+ *
+ * ```
+ * Client                    API Route                    Stripe CDN
+ *   |                           |                            |
+ *   |------ GET /invoice ------>|                            |
+ *   |                           |------- fetch PDF --------->|
+ *   |                           |<------ PDF binary ---------|
+ *   |<----- PDF Response -------|                            |
+ *   |   (Content-Type: pdf)     |                            |
+ *   |   (Content-Disposition)   |                            |
+ * ```
+ *
+ * ### Response Headers
+ * - `Content-Type: application/pdf`
+ * - `Content-Disposition: attachment; filename="rechnung-{invoiceId}.pdf"`
+ * - `Content-Length: {size}`
+ * - `Cache-Control: private, max-age=3600`
+ *
+ * ### Error Responses (JSON)
+ * - 401: Unauthorized (not logged in)
+ * - 404: Booking not found or invoice not available
+ * - 400: Booking not paid
+ * - 500: Internal server error
+ *
+ * ### Caching Strategy
+ * The PDF URL from Stripe is cached in the database (`stripeInvoicePdfUrl`)
+ * to avoid repeated Stripe API calls. URLs are fetched on-demand if not cached.
  */
 
 import { auth } from '@clerk/nextjs/server';
@@ -16,7 +44,17 @@ interface RouteParams {
 }
 
 /**
- * Fetches PDF from URL and returns it as a downloadable response
+ * Fetches PDF from Stripe CDN and returns it as a downloadable response.
+ *
+ * The PDF is fetched server-side to:
+ * 1. Hide Stripe URLs from client (security)
+ * 2. Add proper Content-Disposition header for download
+ * 3. Handle Stripe authentication transparently
+ *
+ * @param pdfUrl - Stripe's invoice PDF URL (e.g., https://invoice.stripe.com/...)
+ * @param invoiceId - Stripe invoice ID for filename generation
+ * @returns Response with PDF binary and download headers
+ * @throws Error if Stripe PDF fetch fails
  */
 async function streamPdfDownload(
   pdfUrl: string,
@@ -28,19 +66,27 @@ async function streamPdfDownload(
     throw new Error(`Failed to fetch PDF: ${pdfResponse.status}`);
   }
 
-  const pdfBuffer = await pdfResponse.arrayBuffer();
-
-  // Generate filename from invoice ID
+  // Generate filename from invoice ID (German: "Rechnung")
   const filename = `rechnung-${invoiceId}.pdf`;
 
-  return new Response(pdfBuffer, {
+  // Build response headers
+  const headers = new Headers({
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': `attachment; filename="${filename}"`,
+    'Cache-Control': 'private, max-age=3600',
+  });
+
+  // Pass through Content-Length from Stripe's response if available
+  const contentLength = pdfResponse.headers.get('Content-Length');
+  if (contentLength) {
+    headers.set('Content-Length', contentLength);
+  }
+
+  // Stream the PDF directly instead of buffering in memory
+  // This reduces server memory usage for large PDFs
+  return new Response(pdfResponse.body, {
     status: 200,
-    headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Length': pdfBuffer.byteLength.toString(),
-      'Cache-Control': 'private, max-age=3600',
-    },
+    headers,
   });
 }
 
