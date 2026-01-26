@@ -119,5 +119,76 @@ collection.variable = [
   },
 ];
 
+// Error response templates with correct domain codes
+const errorResponseTemplates = {
+  400: {
+    success: false,
+    error: 'Invalid request parameters',
+    code: 'VALIDATION_ERROR',
+    requestId: '550e8400-e29b-41d4-a716-446655440000',
+  },
+  401: {
+    success: false,
+    error: 'Authentication required',
+    code: 'UNAUTHORIZED',
+    requestId: '550e8400-e29b-41d4-a716-446655440001',
+  },
+  403: {
+    success: false,
+    error: 'You do not have permission to access this resource',
+    code: 'FORBIDDEN',
+    requestId: '550e8400-e29b-41d4-a716-446655440002',
+  },
+  404: {
+    success: false,
+    error: 'Resource not found',
+    code: 'NOT_FOUND',
+    requestId: '550e8400-e29b-41d4-a716-446655440003',
+  },
+  409: {
+    success: false,
+    error: 'Resource already exists or conflicts with current state',
+    code: 'CONFLICT',
+    requestId: '550e8400-e29b-41d4-a716-446655440004',
+  },
+  429: {
+    success: false,
+    error: 'Rate limit exceeded. Try again later.',
+    code: 'RATE_LIMITED',
+    requestId: '550e8400-e29b-41d4-a716-446655440005',
+  },
+  500: {
+    success: false,
+    error: 'An unexpected error occurred',
+    code: 'INTERNAL_ERROR',
+    requestId: '550e8400-e29b-41d4-a716-446655440006',
+  },
+};
+
+// Fix error response bodies in all items recursively
+function fixErrorResponses(items) {
+  for (const item of items) {
+    if (item.response && Array.isArray(item.response)) {
+      for (const response of item.response) {
+        const statusCode = response.code;
+        if (statusCode >= 400 && errorResponseTemplates[statusCode]) {
+          response.body = JSON.stringify(
+            errorResponseTemplates[statusCode],
+            null,
+            2
+          );
+        }
+      }
+    }
+    if (item.item && Array.isArray(item.item)) {
+      fixErrorResponses(item.item);
+    }
+  }
+}
+
+fixErrorResponses(collection.item || []);
+
 fs.writeFileSync(COLLECTION_PATH, JSON.stringify(collection, null, 2));
-console.log('✅ Added auth, pre-request script, and tests to collection');
+console.log(
+  '✅ Added auth, pre-request script, tests, and fixed error responses'
+);

@@ -137,16 +137,7 @@ paths:
                           pagination:
                             $ref: '#/components/schemas/Pagination'
         '429':
-          description: Rate limit exceeded
-          headers:
-            Retry-After:
-              schema:
-                type: integer
-              description: Seconds until next request allowed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/RateLimited'
   /courses/next:
     get:
       tags: [Public, Courses]
@@ -167,11 +158,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/CourseSummary'
         '404':
-          description: No upcoming courses
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
   /courses/{id}:
     get:
       tags: [Public, Courses]
@@ -199,11 +186,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/Course'
         '404':
-          description: Course not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
   /locations:
     get:
       tags: [Public, Locations]
@@ -370,17 +353,9 @@ paths:
                       data:
                         $ref: '#/components/schemas/Location'
         '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
     delete:
       tags: [Locations]
       operationId: deleteLocation
@@ -403,23 +378,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/StandardResponse'
         '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
   /locations/geocode:
     post:
       tags: [Locations]
@@ -473,21 +436,9 @@ paths:
                             type: number
                             format: float
         '400':
-          description: Invalid address
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '429':
-          description: Rate limit exceeded
-          headers:
-            Retry-After:
-              schema:
-                type: integer
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/RateLimited'
   /auth/providers:
     get:
       tags: [Auth]
@@ -545,11 +496,7 @@ paths:
                         items:
                           $ref: '#/components/schemas/Booking'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
       security:
         - clerkAuth: []
     post:
@@ -582,23 +529,11 @@ paths:
                       data:
                         $ref: '#/components/schemas/Booking'
         '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
         '409':
-          description: Already booked
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
       security:
         - clerkAuth: []
   /my-courses/{bookingId}/preparation:
@@ -627,17 +562,9 @@ paths:
                       data:
                         $ref: '#/components/schemas/PreparationPhase'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Booking not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
       security:
         - clerkAuth: []
     put:
@@ -673,11 +600,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StandardResponse'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
       security:
         - clerkAuth: []
   /my-courses/{bookingId}/summary:
@@ -706,11 +629,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/SummaryPhase'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
       security:
         - clerkAuth: []
     put:
@@ -772,11 +691,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/DebriefingPhase'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
       security:
         - clerkAuth: []
     put:
@@ -842,11 +757,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/ResultPhase'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
       security:
         - clerkAuth: []
     put:
@@ -917,11 +828,7 @@ paths:
                             type: string
                             format: date-time
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
       security:
         - clerkAuth: []
     post:
@@ -1005,17 +912,9 @@ paths:
                         items:
                           $ref: '#/components/schemas/Course'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
       security:
         - clerkAuth: []
     post:
@@ -1069,17 +968,9 @@ paths:
                       data:
                         $ref: '#/components/schemas/Course'
         '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
       security:
         - clerkAuth: []
   /admin/courses/create:
@@ -1166,11 +1057,7 @@ paths:
                                 items:
                                   $ref: '#/components/schemas/Booking'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
       security:
         - clerkAuth: []
     patch:
@@ -1225,11 +1112,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/Course'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
       security:
         - clerkAuth: []
     delete:
@@ -1252,11 +1135,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StandardResponse'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
       security:
         - clerkAuth: []
   /admin/courses/{id}/transfer-enrollments:
@@ -1328,11 +1207,7 @@ paths:
                         items:
                           $ref: '#/components/schemas/User'
         '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
       security:
         - clerkAuth: []
     post:
@@ -1478,11 +1353,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/UserProfile'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
       security:
         - clerkAuth: []
     put:
@@ -1512,11 +1383,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/UserProfile'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
       security:
         - clerkAuth: []
   /webhooks/stripe:
@@ -1572,23 +1439,11 @@ paths:
                     type: boolean
                     example: true
         '400':
-          description: Invalid payload
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Invalid signature
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Processing error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
   /webhooks/clerk:
     post:
       tags: [Webhooks]
@@ -1639,17 +1494,9 @@ paths:
                     type: boolean
                     example: true
         '400':
-          description: Invalid payload
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Invalid signature
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
   /vitals:
     get:
       tags: [Monitoring]
@@ -1708,21 +1555,9 @@ paths:
                             type: string
                             format: date-time
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
         '429':
-          description: Rate limit exceeded
-          headers:
-            Retry-After:
-              schema:
-                type: integer
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/RateLimited'
       security:
         - clerkAuth: []
 components:

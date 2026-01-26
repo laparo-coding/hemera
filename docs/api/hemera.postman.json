@@ -5,7 +5,7 @@
       "description": "",
       "item": [
         {
-          "id": "9678caa5-ac9c-4e9a-a9a8-941f605f30da",
+          "id": "de408ccf-93fd-4b27-a1cd-b59ef2e6ec40",
           "name": "Health check",
           "request": {
             "name": "Health check",
@@ -31,7 +31,7 @@
           },
           "response": [
             {
-              "id": "970b9233-8cc2-495c-bf5d-00fbba00bb6d",
+              "id": "3116897f-1c94-4d48-8cfc-7dbdede24875",
               "name": "Health status",
               "originalRequest": {
                 "url": {
@@ -65,7 +65,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"status\": \"healthy\",\n    \"timestamp\": \"<dateTime>\",\n    \"version\": \"<string>\",\n    \"database\": \"connected\"\n  }\n}",
+              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"status\": \"unhealthy\",\n    \"timestamp\": \"<dateTime>\",\n    \"version\": \"<string>\",\n    \"database\": \"disconnected\"\n  }\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             }
@@ -80,7 +80,7 @@
           "description": "",
           "item": [
             {
-              "id": "e28cbe3e-faa6-424c-a945-51b74d092e7b",
+              "id": "d6d15c0a-7ad7-45bb-a370-408062f949cb",
               "name": "Deployment health status",
               "request": {
                 "name": "Deployment health status",
@@ -106,7 +106,7 @@
               },
               "response": [
                 {
-                  "id": "2cd98e2a-559b-4b54-af43-30a9798bd9be",
+                  "id": "ceedbbf0-8a7c-4fcd-81dd-218cadf74265",
                   "name": "Deployment health status",
                   "originalRequest": {
                     "url": {
@@ -151,7 +151,7 @@
               }
             },
             {
-              "id": "f5662378-010f-4c74-a0aa-b8ec37fd2a87",
+              "id": "e07b0248-5e78-4580-802d-ad30691befe8",
               "name": "Update deployment health",
               "request": {
                 "name": "Update deployment health",
@@ -190,7 +190,7 @@
               },
               "response": [
                 {
-                  "id": "1f1ff030-0483-42d0-9cdd-1e333b85b6cb",
+                  "id": "cbb1b12e-d36e-4792-8fb0-f21c97ab071a",
                   "name": "Health updated",
                   "originalRequest": {
                     "url": {
@@ -256,7 +256,7 @@
       "description": "",
       "item": [
         {
-          "id": "c2243d22-dc24-4b1d-bf6e-b4d145d1eb48",
+          "id": "712adf67-5abd-4364-a047-4e624b6e08fe",
           "name": "List published courses",
           "request": {
             "name": "List published courses",
@@ -310,7 +310,7 @@
           },
           "response": [
             {
-              "id": "abc0fefe-b675-45e2-82d8-ea891d8f6b5c",
+              "id": "90f11ea5-013c-4329-bf86-6ea3459e008f",
               "name": "List of courses",
               "originalRequest": {
                 "url": {
@@ -377,7 +377,7 @@
               "_postman_previewlanguage": "json"
             },
             {
-              "id": "3233bcde-937f-49b3-9738-ae7832545c07",
+              "id": "8a5760e9-c972-48e0-84ac-5f0df60c4fe4",
               "name": "Rate limit exceeded",
               "originalRequest": {
                 "url": {
@@ -448,7 +448,7 @@
                   "value": "<integer>"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+              "body": "{\n  \"success\": false,\n  \"error\": \"Rate limit exceeded. Try again later.\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440005\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             }
@@ -463,7 +463,7 @@
           "description": "",
           "item": [
             {
-              "id": "ed598e68-bd24-4ac8-af36-c72e55a0d466",
+              "id": "d9f5c54c-bb22-48bb-8fea-a343abbf58f6",
               "name": "Get next upcoming course",
               "request": {
                 "name": "Get next upcoming course",
@@ -489,7 +489,7 @@
               },
               "response": [
                 {
-                  "id": "19048074-9874-4b05-a4c5-070a493addc0",
+                  "id": "4a5061f8-9c71-43bf-a9bf-bc1baed34145",
                   "name": "Next course",
                   "originalRequest": {
                     "url": {
@@ -528,8 +528,8 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "ab384e99-9f99-401f-a267-62d7d139c628",
-                  "name": "No upcoming courses",
+                  "id": "adcead0f-0050-4c1b-ab57-d99048a88f50",
+                  "name": "Resource not found",
                   "originalRequest": {
                     "url": {
                       "path": ["courses", "next"],
@@ -562,7 +562,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Resource not found\",\n  \"code\": \"NOT_FOUND\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440003\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -579,7 +579,7 @@
           "description": "",
           "item": [
             {
-              "id": "94beb5a2-bb18-42f1-9d61-2c0aac361980",
+              "id": "26f62ddd-d4f5-460c-8c73-17df1e596deb",
               "name": "Get course details",
               "request": {
                 "name": "Get course details",
@@ -616,7 +616,7 @@
               },
               "response": [
                 {
-                  "id": "263a3902-dc50-4603-9cf7-137ed04ec381",
+                  "id": "f124b643-2949-464f-94be-7fcba50e83ff",
                   "name": "Course details",
                   "originalRequest": {
                     "url": {
@@ -661,13 +661,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"wgmslls\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "25570486-b926-4a51-987a-97003b91d71d",
-                  "name": "Course not found",
+                  "id": "d7418582-09c5-4d52-9f23-dc99154ffdd5",
+                  "name": "Resource not found",
                   "originalRequest": {
                     "url": {
                       "path": ["courses", ":id"],
@@ -711,7 +711,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Resource not found\",\n  \"code\": \"NOT_FOUND\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440003\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -730,7 +730,7 @@
       "description": "",
       "item": [
         {
-          "id": "e0805a7a-4cad-4dca-ad4e-cac53cc72278",
+          "id": "78a71829-8c85-4b48-94e4-8c2e8ac47977",
           "name": "List locations",
           "request": {
             "name": "List locations",
@@ -756,7 +756,7 @@
           },
           "response": [
             {
-              "id": "def939cd-4c3f-4871-bdcb-d649317800c6",
+              "id": "9a88659c-c08c-48e5-b97e-5a72e70df55e",
               "name": "List of locations",
               "originalRequest": {
                 "url": {
@@ -790,7 +790,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"slug\": \"n7-9m2mtmm\",\n      \"address\": \"<string>\",\n      \"city\": \"<string>\",\n      \"country\": \"DE\",\n      \"postalCode\": \"<string>\",\n      \"latitude\": \"<double>\",\n      \"longitude\": \"<double>\",\n      \"imageUrl\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"slug\": \"6pn85zm\",\n      \"address\": \"<string>\",\n      \"city\": \"<string>\",\n      \"country\": \"DE\",\n      \"postalCode\": \"<string>\",\n      \"latitude\": \"<double>\",\n      \"longitude\": \"<double>\",\n      \"imageUrl\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
+              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"slug\": \"36ox5cd7w\",\n      \"address\": \"<string>\",\n      \"city\": \"<string>\",\n      \"country\": \"DE\",\n      \"postalCode\": \"<string>\",\n      \"latitude\": \"<double>\",\n      \"longitude\": \"<double>\",\n      \"imageUrl\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"slug\": \"5if-s4q\",\n      \"address\": \"<string>\",\n      \"city\": \"<string>\",\n      \"country\": \"DE\",\n      \"postalCode\": \"<string>\",\n      \"latitude\": \"<double>\",\n      \"longitude\": \"<double>\",\n      \"imageUrl\": \"<uri>\",\n      \"description\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             }
@@ -801,7 +801,7 @@
           }
         },
         {
-          "id": "0a04b784-1876-4769-8754-527d12d86ef5",
+          "id": "e5c44ff1-dd69-4896-9088-cf40fbd7d6a5",
           "name": "Create location",
           "request": {
             "name": "Create location",
@@ -848,7 +848,7 @@
           },
           "response": [
             {
-              "id": "6b153166-68f9-4225-983d-09606f17b4b7",
+              "id": "c51f5e42-a275-4a86-b0a2-0bf7c01cea3a",
               "name": "Location created",
               "originalRequest": {
                 "url": {
@@ -895,12 +895,12 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"8f\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"tjkztv\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
             {
-              "id": "1cefd32e-5aac-4bbd-84c3-fd379d3f3dba",
+              "id": "ff84850f-d5c1-4fe7-968d-dc82db543541",
               "name": "Validation error",
               "originalRequest": {
                 "url": {
@@ -947,12 +947,12 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+              "body": "{\n  \"success\": false,\n  \"error\": \"Invalid request parameters\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440000\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
             {
-              "id": "b8d40d34-e353-45d4-9f5e-ada1e9533e3e",
+              "id": "af629835-cc4d-45ae-a539-6f2713736bf9",
               "name": "Insufficient permissions",
               "originalRequest": {
                 "url": {
@@ -999,7 +999,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+              "body": "{\n  \"success\": false,\n  \"error\": \"You do not have permission to access this resource\",\n  \"code\": \"FORBIDDEN\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             }
@@ -1014,7 +1014,7 @@
           "description": "",
           "item": [
             {
-              "id": "3ff33c39-93dd-4257-a674-535f779b836b",
+              "id": "d7922bb1-96a5-4ed3-970c-57c53a85095c",
               "name": "Get location details",
               "request": {
                 "name": "Get location details",
@@ -1051,7 +1051,7 @@
               },
               "response": [
                 {
-                  "id": "b7115c9f-2611-4b0e-8dc2-d22f73786eef",
+                  "id": "2d266926-ce7b-4f7c-9ff2-411d17a8db23",
                   "name": "Location details",
                   "originalRequest": {
                     "url": {
@@ -1096,12 +1096,12 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"8f\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"tjkztv\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "a5eaf8ff-c770-42da-8f1a-3273d7de57c1",
+                  "id": "24b12818-75e6-43a8-8f12-de12f80d4ec9",
                   "name": "Resource not found",
                   "originalRequest": {
                     "url": {
@@ -1146,7 +1146,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Resource not found\",\n  \"code\": \"NOT_FOUND\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440003\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -1157,7 +1157,7 @@
               }
             },
             {
-              "id": "0fd7a638-698a-472e-bb9e-3090cd26fb28",
+              "id": "ecceaeb4-1c74-444d-8b29-58286a87c8ea",
               "name": "Update location",
               "request": {
                 "name": "Update location",
@@ -1215,7 +1215,7 @@
               },
               "response": [
                 {
-                  "id": "69f225d5-7584-4434-89d1-9ac149f2366a",
+                  "id": "3c4e0696-d0ae-4d7e-8900-7ca1807b5435",
                   "name": "Location updated",
                   "originalRequest": {
                     "url": {
@@ -1273,13 +1273,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"8f\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"name\": \"<string>\",\n    \"slug\": \"tjkztv\",\n    \"address\": \"<string>\",\n    \"city\": \"<string>\",\n    \"country\": \"DE\",\n    \"postalCode\": \"<string>\",\n    \"latitude\": \"<double>\",\n    \"longitude\": \"<double>\",\n    \"imageUrl\": \"<uri>\",\n    \"description\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "4e8b48fc-3d11-4ba1-9328-bcaaad2f85b0",
-                  "name": "Forbidden",
+                  "id": "1d849628-3786-47ac-a719-a98b82b1a287",
+                  "name": "Insufficient permissions",
                   "originalRequest": {
                     "url": {
                       "path": ["locations", ":id"],
@@ -1336,13 +1336,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"You do not have permission to access this resource\",\n  \"code\": \"FORBIDDEN\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "a79da819-0fe8-459a-bf78-215e0a90128d",
-                  "name": "Not found",
+                  "id": "fccd3f76-c7a3-41dd-a66a-77747fb6d193",
+                  "name": "Resource not found",
                   "originalRequest": {
                     "url": {
                       "path": ["locations", ":id"],
@@ -1399,7 +1399,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Resource not found\",\n  \"code\": \"NOT_FOUND\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440003\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -1410,7 +1410,7 @@
               }
             },
             {
-              "id": "10c96a40-fec1-48ca-975e-14e614182773",
+              "id": "7dfc6fc6-8f0d-4925-a0de-affb4642048f",
               "name": "Delete location",
               "request": {
                 "name": "Delete location",
@@ -1455,7 +1455,7 @@
               },
               "response": [
                 {
-                  "id": "3d733bd9-3b1c-4de9-a199-9829c40474e0",
+                  "id": "57f02b13-acb1-4fe7-81c7-b545bf166528",
                   "name": "Location deleted",
                   "originalRequest": {
                     "url": {
@@ -1505,8 +1505,8 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "6c9631a4-75df-4ea6-8760-2f75c27bacd2",
-                  "name": "Forbidden",
+                  "id": "6a3b4fa5-a802-4335-9906-2a2994233b35",
+                  "name": "Insufficient permissions",
                   "originalRequest": {
                     "url": {
                       "path": ["locations", ":id"],
@@ -1550,13 +1550,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"You do not have permission to access this resource\",\n  \"code\": \"FORBIDDEN\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "8b4e67c8-173d-4be6-a37b-b50ffce5fdc6",
-                  "name": "Not found",
+                  "id": "2b2db9c4-259d-4a17-a140-77f267cf2dc2",
+                  "name": "Resource not found",
                   "originalRequest": {
                     "url": {
                       "path": ["locations", ":id"],
@@ -1600,13 +1600,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Resource not found\",\n  \"code\": \"NOT_FOUND\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440003\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "8e328df9-ef26-4b62-ae09-dd5f9df6a2f6",
-                  "name": "Conflict",
+                  "id": "7d42931c-7cdb-4829-8502-04b951c3e11f",
+                  "name": "Resource conflict",
                   "originalRequest": {
                     "url": {
                       "path": ["locations", ":id"],
@@ -1650,7 +1650,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Resource already exists or conflicts with current state\",\n  \"code\": \"CONFLICT\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440004\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -1667,7 +1667,7 @@
           "description": "",
           "item": [
             {
-              "id": "2839917b-00df-4975-8ccb-f8131d275b6f",
+              "id": "e9c9a799-5d64-44a6-97fb-369e37078f79",
               "name": "Geocode address",
               "request": {
                 "name": "Geocode address",
@@ -1714,7 +1714,7 @@
               },
               "response": [
                 {
-                  "id": "6deebd38-1255-44d6-8f76-5aa51d41bf58",
+                  "id": "8d09e1a2-2df1-472f-a89e-c6e809e4352b",
                   "name": "Geocoding result",
                   "originalRequest": {
                     "url": {
@@ -1766,8 +1766,8 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "93f3e266-426a-4f9d-9b17-c2aa1a9dcdd9",
-                  "name": "Invalid address",
+                  "id": "3effbb5d-076d-450a-bcb8-1d56667eb59f",
+                  "name": "Validation error",
                   "originalRequest": {
                     "url": {
                       "path": ["locations", "geocode"],
@@ -1813,12 +1813,12 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Invalid request parameters\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440000\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "3e078176-02ee-4be9-a462-bd07ae7efff9",
+                  "id": "f68b2eda-b5fa-4127-9bb1-4eab535526ca",
                   "name": "Rate limit exceeded",
                   "originalRequest": {
                     "url": {
@@ -1867,14 +1867,14 @@
                     {
                       "disabled": false,
                       "description": {
-                        "content": "",
+                        "content": "Seconds until next request allowed",
                         "type": "text/plain"
                       },
                       "key": "Retry-After",
                       "value": "<integer>"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Rate limit exceeded. Try again later.\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440005\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -1897,7 +1897,7 @@
           "description": "",
           "item": [
             {
-              "id": "d2cf98aa-9f02-48da-9321-0c4682d72e1f",
+              "id": "89d7b4df-1157-4328-bbb6-d89b8835f61a",
               "name": "List authentication providers",
               "request": {
                 "name": "List authentication providers",
@@ -1923,7 +1923,7 @@
               },
               "response": [
                 {
-                  "id": "f2e810fe-2197-428f-bd32-6b7b9cf6b76a",
+                  "id": "e4ee765f-1b78-40e6-8988-0bc9bcface5c",
                   "name": "Providers list",
                   "originalRequest": {
                     "url": {
@@ -1976,7 +1976,7 @@
       "description": "",
       "item": [
         {
-          "id": "d94eee1e-cc5a-4dd0-9a65-7ddf07afafc0",
+          "id": "b7ba9e39-1ebb-4f6f-9275-29df72718b1d",
           "name": "List user bookings",
           "request": {
             "name": "List user bookings",
@@ -1995,7 +1995,7 @@
                     "type": "text/plain"
                   },
                   "key": "status",
-                  "value": "CONFIRMED"
+                  "value": "CANCELLED"
                 }
               ],
               "variable": []
@@ -2020,7 +2020,7 @@
           },
           "response": [
             {
-              "id": "9a6d98d5-e39c-4dee-b6e9-0358819c95ae",
+              "id": "67b2bbdc-4fa9-4cdc-bfc2-7745af982ea0",
               "name": "Bookings list",
               "originalRequest": {
                 "url": {
@@ -2034,7 +2034,7 @@
                         "type": "text/plain"
                       },
                       "key": "status",
-                      "value": "CONFIRMED"
+                      "value": "CANCELLED"
                     }
                   ],
                   "variable": []
@@ -2064,13 +2064,13 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"userId\": \"<string>\",\n      \"courseId\": \"<string>\",\n      \"status\": \"CONFIRMED\",\n      \"createdAt\": \"<dateTime>\",\n      \"paymentIntentId\": \"<string>\",\n      \"stripeSessionId\": \"<string>\",\n      \"amount\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"updatedAt\": \"<dateTime>\",\n      \"course\": {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    },\n    {\n      \"id\": \"<string>\",\n      \"userId\": \"<string>\",\n      \"courseId\": \"<string>\",\n      \"status\": \"COMPLETED\",\n      \"createdAt\": \"<dateTime>\",\n      \"paymentIntentId\": \"<string>\",\n      \"stripeSessionId\": \"<string>\",\n      \"amount\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"updatedAt\": \"<dateTime>\",\n      \"course\": {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    }\n  ]\n}",
+              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"userId\": \"<string>\",\n      \"courseId\": \"<string>\",\n      \"status\": \"COMPLETED\",\n      \"createdAt\": \"<dateTime>\",\n      \"paymentIntentId\": \"<string>\",\n      \"stripeSessionId\": \"<string>\",\n      \"amount\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"updatedAt\": \"<dateTime>\",\n      \"course\": {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    },\n    {\n      \"id\": \"<string>\",\n      \"userId\": \"<string>\",\n      \"courseId\": \"<string>\",\n      \"status\": \"CONFIRMED\",\n      \"createdAt\": \"<dateTime>\",\n      \"paymentIntentId\": \"<string>\",\n      \"stripeSessionId\": \"<string>\",\n      \"amount\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"updatedAt\": \"<dateTime>\",\n      \"course\": {\n        \"id\": \"<string>\",\n        \"title\": \"<string>\",\n        \"slug\": \"<string>\",\n        \"price\": \"<integer>\",\n        \"startDate\": \"<dateTime>\",\n        \"currency\": \"<string>\",\n        \"thumbnailUrl\": \"<uri>\",\n        \"location\": {\n          \"id\": \"<string>\",\n          \"name\": \"<string>\",\n          \"city\": \"<string>\",\n          \"slug\": \"<string>\"\n        }\n      }\n    }\n  ]\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
             {
-              "id": "c1c7cede-5271-444c-9b3d-7d95e96264cb",
-              "name": "Unauthorized",
+              "id": "f2646f89-d925-4de2-ac2f-ca331e143c64",
+              "name": "Authentication required",
               "originalRequest": {
                 "url": {
                   "path": ["bookings"],
@@ -2083,7 +2083,7 @@
                         "type": "text/plain"
                       },
                       "key": "status",
-                      "value": "CONFIRMED"
+                      "value": "CANCELLED"
                     }
                   ],
                   "variable": []
@@ -2113,7 +2113,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+              "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             }
@@ -2124,7 +2124,7 @@
           }
         },
         {
-          "id": "adb76db4-0033-4457-a62e-cc55fcbbe706",
+          "id": "d27f0540-5609-40e0-9ad2-c1da3c1f71ac",
           "name": "Create booking",
           "request": {
             "name": "Create booking",
@@ -2171,7 +2171,7 @@
           },
           "response": [
             {
-              "id": "b0e44da6-d956-40d6-81b5-a882d700a92a",
+              "id": "93dc20b2-e570-4e43-b125-922cec875fbe",
               "name": "Booking created",
               "originalRequest": {
                 "url": {
@@ -2218,12 +2218,12 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"userId\": \"<string>\",\n    \"courseId\": \"<string>\",\n    \"status\": \"CONFIRMED\",\n    \"createdAt\": \"<dateTime>\",\n    \"paymentIntentId\": \"<string>\",\n    \"stripeSessionId\": \"<string>\",\n    \"amount\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"updatedAt\": \"<dateTime>\",\n    \"course\": {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"startDate\": \"<dateTime>\",\n      \"currency\": \"<string>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"location\": {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"city\": \"<string>\",\n        \"slug\": \"<string>\"\n      }\n    }\n  }\n}",
+              "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"userId\": \"<string>\",\n    \"courseId\": \"<string>\",\n    \"status\": \"CANCELLED\",\n    \"createdAt\": \"<dateTime>\",\n    \"paymentIntentId\": \"<string>\",\n    \"stripeSessionId\": \"<string>\",\n    \"amount\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"updatedAt\": \"<dateTime>\",\n    \"course\": {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"<string>\",\n      \"price\": \"<integer>\",\n      \"startDate\": \"<dateTime>\",\n      \"currency\": \"<string>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"location\": {\n        \"id\": \"<string>\",\n        \"name\": \"<string>\",\n        \"city\": \"<string>\",\n        \"slug\": \"<string>\"\n      }\n    }\n  }\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
             {
-              "id": "0ad5eaf4-f38e-496d-a81a-614830a9d973",
+              "id": "5bf18372-d37c-4f0e-aaa6-b3ee045afcca",
               "name": "Validation error",
               "originalRequest": {
                 "url": {
@@ -2270,13 +2270,13 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+              "body": "{\n  \"success\": false,\n  \"error\": \"Invalid request parameters\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440000\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
             {
-              "id": "bcd486d0-64b0-4e5a-acf3-1566de7c8c3f",
-              "name": "Unauthorized",
+              "id": "4e3e9718-f84f-4cd6-aaa2-e9d3994e3d9e",
+              "name": "Authentication required",
               "originalRequest": {
                 "url": {
                   "path": ["bookings"],
@@ -2322,13 +2322,13 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+              "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
             {
-              "id": "5084c046-3fd7-48b5-8c8d-0c28eb4e93f4",
-              "name": "Already booked",
+              "id": "44403077-b82f-41d9-8741-43d9823f153a",
+              "name": "Resource conflict",
               "originalRequest": {
                 "url": {
                   "path": ["bookings"],
@@ -2374,7 +2374,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+              "body": "{\n  \"success\": false,\n  \"error\": \"Resource already exists or conflicts with current state\",\n  \"code\": \"CONFLICT\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440004\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             }
@@ -2399,7 +2399,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "156850a1-3f91-427b-8630-155f387165c0",
+                  "id": "6518a062-8654-4d1a-a625-c8f55f52b15d",
                   "name": "Get preparation phase",
                   "request": {
                     "name": "Get preparation phase",
@@ -2444,7 +2444,7 @@
                   },
                   "response": [
                     {
-                      "id": "a3964400-8e0e-44ff-8d58-28d42adc118e",
+                      "id": "bd48d152-0312-4bc5-91ad-6f7cbb5cc57e",
                       "name": "Preparation phase data",
                       "originalRequest": {
                         "url": {
@@ -2489,13 +2489,13 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"COMPLETED\",\n    \"completedAt\": \"<dateTime>\",\n    \"data\": {\n      \"key_0\": 7646.861224772015\n    }\n  }\n}",
+                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"IN_PROGRESS\",\n    \"completedAt\": \"<dateTime>\",\n    \"data\": {\n      \"key_0\": true\n    }\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "e4d749f3-73d8-4218-9a6b-32175c67f5f0",
-                      "name": "Unauthorized",
+                      "id": "3cc3b763-3c67-435a-b4d2-a94919abf7cb",
+                      "name": "Authentication required",
                       "originalRequest": {
                         "url": {
                           "path": ["my-courses", ":bookingId", "preparation"],
@@ -2539,13 +2539,13 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "45e859a0-7e4d-47f4-b5da-05b4d3ea2796",
-                      "name": "Booking not found",
+                      "id": "a28290b3-c4e7-4dd7-bd19-c153a2f25e1b",
+                      "name": "Resource not found",
                       "originalRequest": {
                         "url": {
                           "path": ["my-courses", ":bookingId", "preparation"],
@@ -2589,7 +2589,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Resource not found\",\n  \"code\": \"NOT_FOUND\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440003\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -2600,7 +2600,7 @@
                   }
                 },
                 {
-                  "id": "7c5d5f75-2a0d-4892-9995-a35a20c6e917",
+                  "id": "ef7aa1a3-efd3-420f-92e3-d501dce3bd15",
                   "name": "Update preparation phase",
                   "request": {
                     "name": "Update preparation phase",
@@ -2638,7 +2638,7 @@
                     "method": "PUT",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"status\": \"COMPLETED\",\n  \"data\": {\n    \"key_0\": 140\n  }\n}",
+                      "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"data\": {\n    \"key_0\": \"string\",\n    \"key_1\": 7332.281255682847,\n    \"key_2\": \"string\"\n  }\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -2658,7 +2658,7 @@
                   },
                   "response": [
                     {
-                      "id": "a8c20e94-5863-4a68-b598-431fc3862fcc",
+                      "id": "48cb270b-f887-48e5-872e-3d2eff99210d",
                       "name": "Preparation updated",
                       "originalRequest": {
                         "url": {
@@ -2699,7 +2699,7 @@
                         "method": "PUT",
                         "body": {
                           "mode": "raw",
-                          "raw": "{\n  \"status\": \"COMPLETED\",\n  \"data\": {\n    \"key_0\": 140\n  }\n}",
+                          "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"data\": {\n    \"key_0\": \"string\",\n    \"key_1\": 7332.281255682847,\n    \"key_2\": \"string\"\n  }\n}",
                           "options": {
                             "raw": {
                               "headerFamily": "json",
@@ -2721,8 +2721,8 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "bc6ec0c2-ed4d-4a95-acd8-43f6e3240d50",
-                      "name": "Unauthorized",
+                      "id": "bf21dcf2-eddd-45d8-81b7-f854c1529c25",
+                      "name": "Authentication required",
                       "originalRequest": {
                         "url": {
                           "path": ["my-courses", ":bookingId", "preparation"],
@@ -2762,7 +2762,7 @@
                         "method": "PUT",
                         "body": {
                           "mode": "raw",
-                          "raw": "{\n  \"status\": \"COMPLETED\",\n  \"data\": {\n    \"key_0\": 140\n  }\n}",
+                          "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"data\": {\n    \"key_0\": \"string\",\n    \"key_1\": 7332.281255682847,\n    \"key_2\": \"string\"\n  }\n}",
                           "options": {
                             "raw": {
                               "headerFamily": "json",
@@ -2779,7 +2779,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -2796,7 +2796,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "1f6d40e0-b8dc-45b7-ba72-91dc17b6cd1a",
+                  "id": "d6ecd112-7719-4660-9ca7-52d9aa7d5cae",
                   "name": "Get summary phase",
                   "request": {
                     "name": "Get summary phase",
@@ -2841,7 +2841,7 @@
                   },
                   "response": [
                     {
-                      "id": "a2e29d2c-bd49-4fc9-afe6-62d5e33fb795",
+                      "id": "8225bb46-8ffb-4a58-9cb9-07e3cb0cf349",
                       "name": "Summary phase data",
                       "originalRequest": {
                         "url": {
@@ -2886,13 +2886,13 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"NOT_STARTED\",\n    \"videoUrl\": \"<uri>\",\n    \"notes\": \"<string>\"\n  }\n}",
+                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"bookingId\": \"<string>\",\n    \"status\": \"COMPLETED\",\n    \"videoUrl\": \"<uri>\",\n    \"notes\": \"<string>\"\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "e3144d7f-0749-4482-a41d-24c22d2ecf92",
-                      "name": "Unauthorized",
+                      "id": "53f88f2c-e0b6-4c5e-b83e-33c082a9d961",
+                      "name": "Authentication required",
                       "originalRequest": {
                         "url": {
                           "path": ["my-courses", ":bookingId", "summary"],
@@ -2936,7 +2936,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -2947,7 +2947,7 @@
                   }
                 },
                 {
-                  "id": "dcb746f4-03d4-4f4b-8f8d-079e7fd3b39e",
+                  "id": "87d07d0c-f394-4cb1-aca2-abd689d701ba",
                   "name": "Update summary phase",
                   "request": {
                     "name": "Update summary phase",
@@ -2985,7 +2985,7 @@
                     "method": "PUT",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"status\": \"COMPLETED\",\n  \"notes\": \"<string>\"\n}",
+                      "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"notes\": \"<string>\"\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -3005,7 +3005,7 @@
                   },
                   "response": [
                     {
-                      "id": "a657bb02-d2db-4762-9da4-d1f2f70e5351",
+                      "id": "a0ad904c-221b-433b-ac1f-566e31784ebb",
                       "name": "Summary updated",
                       "originalRequest": {
                         "url": {
@@ -3046,7 +3046,7 @@
                         "method": "PUT",
                         "body": {
                           "mode": "raw",
-                          "raw": "{\n  \"status\": \"COMPLETED\",\n  \"notes\": \"<string>\"\n}",
+                          "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"notes\": \"<string>\"\n}",
                           "options": {
                             "raw": {
                               "headerFamily": "json",
@@ -3080,7 +3080,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "3968908e-785a-424d-a200-1eadd798b3a7",
+                  "id": "4553156e-19b8-40f7-afe8-13e5a4091774",
                   "name": "Get debriefing phase",
                   "request": {
                     "name": "Get debriefing phase",
@@ -3125,7 +3125,7 @@
                   },
                   "response": [
                     {
-                      "id": "39a1f58f-6bbf-4ddd-95bd-44155528d41b",
+                      "id": "09172bb8-5235-4bb0-ac20-4009774a3c1f",
                       "name": "Debriefing phase data",
                       "originalRequest": {
                         "url": {
@@ -3175,8 +3175,8 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "a989fd78-0321-4b74-82bd-9902d861b3f5",
-                      "name": "Unauthorized",
+                      "id": "ebc93c6d-1a06-4711-b975-4b2c8817d4e4",
+                      "name": "Authentication required",
                       "originalRequest": {
                         "url": {
                           "path": ["my-courses", ":bookingId", "debriefing"],
@@ -3220,7 +3220,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -3231,7 +3231,7 @@
                   }
                 },
                 {
-                  "id": "d9f4f898-f12f-41a7-8864-a32caf2456bc",
+                  "id": "3827ea34-a67c-40fb-85a0-5f07e05181b0",
                   "name": "Update debriefing phase",
                   "request": {
                     "name": "Update debriefing phase",
@@ -3269,7 +3269,7 @@
                     "method": "PUT",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"status\": \"COMPLETED\",\n  \"feedback\": \"<string>\",\n  \"rating\": \"<integer>\"\n}",
+                      "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"feedback\": \"<string>\",\n  \"rating\": \"<integer>\"\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -3289,7 +3289,7 @@
                   },
                   "response": [
                     {
-                      "id": "51883ecc-cc69-4ab7-a3e3-bf98cc5a29a4",
+                      "id": "ea6f4782-0aba-4d07-8d46-e5cb4ee6b904",
                       "name": "Debriefing updated",
                       "originalRequest": {
                         "url": {
@@ -3330,7 +3330,7 @@
                         "method": "PUT",
                         "body": {
                           "mode": "raw",
-                          "raw": "{\n  \"status\": \"COMPLETED\",\n  \"feedback\": \"<string>\",\n  \"rating\": \"<integer>\"\n}",
+                          "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"feedback\": \"<string>\",\n  \"rating\": \"<integer>\"\n}",
                           "options": {
                             "raw": {
                               "headerFamily": "json",
@@ -3364,7 +3364,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "c769fdd5-e49b-4d21-b621-4afb71bf9965",
+                  "id": "7625db04-c210-4079-9f29-368f9932ecc8",
                   "name": "Get result phase",
                   "request": {
                     "name": "Get result phase",
@@ -3409,7 +3409,7 @@
                   },
                   "response": [
                     {
-                      "id": "a72bf9bd-e0e1-4a1e-bf77-b0dc63dd7bb7",
+                      "id": "51e89879-c903-463c-a786-82a9356865c6",
                       "name": "Result phase data",
                       "originalRequest": {
                         "url": {
@@ -3459,8 +3459,8 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "ccfc5579-6746-4492-b12b-99ec48a8830e",
-                      "name": "Unauthorized",
+                      "id": "83a64178-518e-402d-bdb2-adbe394379b1",
+                      "name": "Authentication required",
                       "originalRequest": {
                         "url": {
                           "path": ["my-courses", ":bookingId", "result"],
@@ -3504,7 +3504,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -3515,7 +3515,7 @@
                   }
                 },
                 {
-                  "id": "b0b9f4b4-6666-4a24-b1ba-d094c66e7775",
+                  "id": "ce9dd779-acb2-4106-ac6b-c9c3dc2e421b",
                   "name": "Update result phase",
                   "request": {
                     "name": "Update result phase",
@@ -3553,7 +3553,7 @@
                     "method": "PUT",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"status\": \"COMPLETED\",\n  \"score\": \"<number>\"\n}",
+                      "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"score\": \"<number>\"\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -3573,7 +3573,7 @@
                   },
                   "response": [
                     {
-                      "id": "65b5df70-eb56-48e0-8c60-642b5eb030ca",
+                      "id": "3c9a3bc0-460f-4905-9664-40b2adf157cc",
                       "name": "Result updated",
                       "originalRequest": {
                         "url": {
@@ -3614,7 +3614,7 @@
                         "method": "PUT",
                         "body": {
                           "mode": "raw",
-                          "raw": "{\n  \"status\": \"COMPLETED\",\n  \"score\": \"<number>\"\n}",
+                          "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"score\": \"<number>\"\n}",
                           "options": {
                             "raw": {
                               "headerFamily": "json",
@@ -3648,7 +3648,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "7f2c5af0-9844-44ae-8355-c773bf3a2f45",
+                  "id": "df79e5ff-7a00-4bbe-bcae-eb3e20d61bef",
                   "name": "Get resume",
                   "request": {
                     "name": "Get resume",
@@ -3693,7 +3693,7 @@
                   },
                   "response": [
                     {
-                      "id": "0f1954e8-9200-4c3f-a90d-7ff1cccc2b7d",
+                      "id": "58ecdf48-4c52-4d6f-95ca-35c509f440fa",
                       "name": "Resume details",
                       "originalRequest": {
                         "url": {
@@ -3743,8 +3743,8 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "84784b01-af31-44eb-be97-519f8816eb08",
-                      "name": "Unauthorized",
+                      "id": "504c6be4-d9a8-4994-baa7-49f788c45e45",
+                      "name": "Authentication required",
                       "originalRequest": {
                         "url": {
                           "path": ["my-courses", ":bookingId", "resume"],
@@ -3788,7 +3788,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -3799,7 +3799,7 @@
                   }
                 },
                 {
-                  "id": "faf2edda-fcdc-476b-8dd7-da0de3ba1d59",
+                  "id": "2997a91d-e127-46c5-8152-ab325bcf76a3",
                   "name": "Upload resume",
                   "request": {
                     "name": "Upload resume",
@@ -3860,7 +3860,7 @@
                   },
                   "response": [
                     {
-                      "id": "9885276c-550d-441a-94e9-7e417fa42a6f",
+                      "id": "f01b0d3f-329f-4109-8a76-e449972da0a5",
                       "name": "Resume uploaded",
                       "originalRequest": {
                         "url": {
@@ -3932,7 +3932,7 @@
                   }
                 },
                 {
-                  "id": "229d4604-9a35-4bc7-9fee-2a1dcbe0523e",
+                  "id": "62dc850c-6cc0-4a91-9bf1-ea2319b4e0cb",
                   "name": "Delete resume",
                   "request": {
                     "name": "Delete resume",
@@ -3977,7 +3977,7 @@
                   },
                   "response": [
                     {
-                      "id": "3263286f-8a02-4e16-a962-d4c0423ce2b8",
+                      "id": "e804eea8-bacd-45b0-a1a0-af2dbaaa0f4c",
                       "name": "Resume deleted",
                       "originalRequest": {
                         "url": {
@@ -4047,7 +4047,7 @@
           "description": "",
           "item": [
             {
-              "id": "41e36b98-6635-4026-bd31-564cd5297f03",
+              "id": "e4b41ca0-1a16-444d-9de1-cddf92b840fe",
               "name": "List all courses (admin)",
               "request": {
                 "name": "List all courses (admin)",
@@ -4091,7 +4091,7 @@
               },
               "response": [
                 {
-                  "id": "97329fcf-442c-4772-b0e0-147d7d337de8",
+                  "id": "bf5d3c83-af5e-4aaa-9452-adf6415225e6",
                   "name": "Courses list",
                   "originalRequest": {
                     "url": {
@@ -4135,13 +4135,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"fntnc\",\n      \"price\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"startDate\": \"<dateTime>\",\n      \"isPublished\": \"<boolean>\",\n      \"description\": \"<string>\",\n      \"endDate\": \"<dateTime>\",\n      \"locationId\": \"<string>\",\n      \"maxParticipants\": \"<integer>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"q\",\n      \"price\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"startDate\": \"<dateTime>\",\n      \"isPublished\": \"<boolean>\",\n      \"description\": \"<string>\",\n      \"endDate\": \"<dateTime>\",\n      \"locationId\": \"<string>\",\n      \"maxParticipants\": \"<integer>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
+                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"byq36ij3g\",\n      \"price\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"startDate\": \"<dateTime>\",\n      \"isPublished\": \"<boolean>\",\n      \"description\": \"<string>\",\n      \"endDate\": \"<dateTime>\",\n      \"locationId\": \"<string>\",\n      \"maxParticipants\": \"<integer>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"title\": \"<string>\",\n      \"slug\": \"di3\",\n      \"price\": \"<integer>\",\n      \"currency\": \"EUR\",\n      \"startDate\": \"<dateTime>\",\n      \"isPublished\": \"<boolean>\",\n      \"description\": \"<string>\",\n      \"endDate\": \"<dateTime>\",\n      \"locationId\": \"<string>\",\n      \"maxParticipants\": \"<integer>\",\n      \"thumbnailUrl\": \"<uri>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "b0370cf8-396a-48d8-8905-13b5039c4802",
-                  "name": "Unauthorized",
+                  "id": "bd35a15d-7554-44eb-8891-803ea8b14dd5",
+                  "name": "Authentication required",
                   "originalRequest": {
                     "url": {
                       "path": ["admin", "courses"],
@@ -4184,13 +4184,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "46b5d808-1691-40fc-8a80-bd8aeb75e3ab",
-                  "name": "Forbidden",
+                  "id": "e95f61b1-8825-4961-a564-d52fab051af0",
+                  "name": "Insufficient permissions",
                   "originalRequest": {
                     "url": {
                       "path": ["admin", "courses"],
@@ -4233,7 +4233,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"You do not have permission to access this resource\",\n  \"code\": \"FORBIDDEN\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -4244,7 +4244,7 @@
               }
             },
             {
-              "id": "889bb8b3-1f90-48ef-b17a-4569fe109cfe",
+              "id": "fe9df7b1-38c5-4587-b680-2fd245e22262",
               "name": "Create course",
               "request": {
                 "name": "Create course",
@@ -4291,7 +4291,7 @@
               },
               "response": [
                 {
-                  "id": "710a8523-fec8-4d88-8e00-8e5b3edd5871",
+                  "id": "fab7baeb-447f-4ca2-ad5d-50ae05d0216d",
                   "name": "Course created",
                   "originalRequest": {
                     "url": {
@@ -4338,12 +4338,12 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"wgmslls\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "7d7528e1-797b-40df-83a0-e3c887d46dcf",
+                  "id": "276d3ff6-f0e8-4496-b9f1-557f25d37d94",
                   "name": "Validation error",
                   "originalRequest": {
                     "url": {
@@ -4390,13 +4390,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Invalid request parameters\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440000\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "b5066871-2232-4bdd-a475-2d841c31e3df",
-                  "name": "Forbidden",
+                  "id": "05cb9a5d-5bf6-43a9-a0c4-199d28b93265",
+                  "name": "Insufficient permissions",
                   "originalRequest": {
                     "url": {
                       "path": ["admin", "courses"],
@@ -4442,7 +4442,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"You do not have permission to access this resource\",\n  \"code\": \"FORBIDDEN\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -4457,7 +4457,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "263af01b-9a6a-42cf-9efd-30721f7ecf28",
+                  "id": "2fa48051-f462-44b7-a415-62954df95c0b",
                   "name": "Create course (DEPRECATED)",
                   "request": {
                     "name": "Create course (DEPRECATED)",
@@ -4504,7 +4504,7 @@
                   },
                   "response": [
                     {
-                      "id": "d8d80585-269c-4c82-b4a5-76c94c0ad6ee",
+                      "id": "dc20dc7e-80bb-4dc9-8aca-322d5bf7aae2",
                       "name": "Course created (legacy)",
                       "originalRequest": {
                         "url": {
@@ -4568,7 +4568,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "f953b1b9-e31f-40cb-9cf8-b9a83c5ef416",
+                  "id": "4c89b86b-2e01-4a5d-a834-457f3d89647c",
                   "name": "Delete course (DEPRECATED)",
                   "request": {
                     "name": "Delete course (DEPRECATED)",
@@ -4615,7 +4615,7 @@
                   },
                   "response": [
                     {
-                      "id": "658a974d-efeb-40b5-b954-eb2c5a151c5f",
+                      "id": "7d4cf60c-00c0-4262-ac5b-d242fc3c9d0b",
                       "name": "Course deleted (legacy)",
                       "originalRequest": {
                         "url": {
@@ -4679,7 +4679,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "5463526c-2be9-4875-af5e-21354538e569",
+                  "id": "a80d283f-3229-4de4-93ea-a44a34c978de",
                   "name": "Get course (admin view)",
                   "request": {
                     "name": "Get course (admin view)",
@@ -4724,7 +4724,7 @@
                   },
                   "response": [
                     {
-                      "id": "7a2d9d4d-8064-47f2-b4c7-5ce9028fce5a",
+                      "id": "4d518c99-41c0-444d-af15-edc5de593f87",
                       "name": "Course details",
                       "originalRequest": {
                         "url": {
@@ -4769,13 +4769,13 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"l2\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\",\n    \"enrollmentCount\": \"<integer>\",\n    \"bookings\": [\n      {\n        \"id\": \"<string>\",\n        \"userId\": \"<string>\",\n        \"courseId\": \"<string>\",\n        \"status\": \"COMPLETED\",\n        \"createdAt\": \"<dateTime>\",\n        \"paymentIntentId\": \"<string>\",\n        \"stripeSessionId\": \"<string>\",\n        \"amount\": \"<integer>\",\n        \"currency\": \"EUR\",\n        \"updatedAt\": \"<dateTime>\",\n        \"course\": {\n          \"id\": \"<string>\",\n          \"title\": \"<string>\",\n          \"slug\": \"<string>\",\n          \"price\": \"<integer>\",\n          \"startDate\": \"<dateTime>\",\n          \"currency\": \"<string>\",\n          \"thumbnailUrl\": \"<uri>\",\n          \"location\": {\n            \"id\": \"<string>\",\n            \"name\": \"<string>\",\n            \"city\": \"<string>\",\n            \"slug\": \"<string>\"\n          }\n        }\n      },\n      {\n        \"id\": \"<string>\",\n        \"userId\": \"<string>\",\n        \"courseId\": \"<string>\",\n        \"status\": \"COMPLETED\",\n        \"createdAt\": \"<dateTime>\",\n        \"paymentIntentId\": \"<string>\",\n        \"stripeSessionId\": \"<string>\",\n        \"amount\": \"<integer>\",\n        \"currency\": \"EUR\",\n        \"updatedAt\": \"<dateTime>\",\n        \"course\": {\n          \"id\": \"<string>\",\n          \"title\": \"<string>\",\n          \"slug\": \"<string>\",\n          \"price\": \"<integer>\",\n          \"startDate\": \"<dateTime>\",\n          \"currency\": \"<string>\",\n          \"thumbnailUrl\": \"<uri>\",\n          \"location\": {\n            \"id\": \"<string>\",\n            \"name\": \"<string>\",\n            \"city\": \"<string>\",\n            \"slug\": \"<string>\"\n          }\n        }\n      }\n    ]\n  }\n}",
+                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"w67k25\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\",\n    \"enrollmentCount\": \"<integer>\",\n    \"bookings\": [\n      {\n        \"id\": \"<string>\",\n        \"userId\": \"<string>\",\n        \"courseId\": \"<string>\",\n        \"status\": \"CONFIRMED\",\n        \"createdAt\": \"<dateTime>\",\n        \"paymentIntentId\": \"<string>\",\n        \"stripeSessionId\": \"<string>\",\n        \"amount\": \"<integer>\",\n        \"currency\": \"EUR\",\n        \"updatedAt\": \"<dateTime>\",\n        \"course\": {\n          \"id\": \"<string>\",\n          \"title\": \"<string>\",\n          \"slug\": \"<string>\",\n          \"price\": \"<integer>\",\n          \"startDate\": \"<dateTime>\",\n          \"currency\": \"<string>\",\n          \"thumbnailUrl\": \"<uri>\",\n          \"location\": {\n            \"id\": \"<string>\",\n            \"name\": \"<string>\",\n            \"city\": \"<string>\",\n            \"slug\": \"<string>\"\n          }\n        }\n      },\n      {\n        \"id\": \"<string>\",\n        \"userId\": \"<string>\",\n        \"courseId\": \"<string>\",\n        \"status\": \"PENDING\",\n        \"createdAt\": \"<dateTime>\",\n        \"paymentIntentId\": \"<string>\",\n        \"stripeSessionId\": \"<string>\",\n        \"amount\": \"<integer>\",\n        \"currency\": \"EUR\",\n        \"updatedAt\": \"<dateTime>\",\n        \"course\": {\n          \"id\": \"<string>\",\n          \"title\": \"<string>\",\n          \"slug\": \"<string>\",\n          \"price\": \"<integer>\",\n          \"startDate\": \"<dateTime>\",\n          \"currency\": \"<string>\",\n          \"thumbnailUrl\": \"<uri>\",\n          \"location\": {\n            \"id\": \"<string>\",\n            \"name\": \"<string>\",\n            \"city\": \"<string>\",\n            \"slug\": \"<string>\"\n          }\n        }\n      }\n    ]\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "344f3e3d-87ff-45bb-b335-cfdc4dce3cd0",
-                      "name": "Not found",
+                      "id": "47ed9753-ac80-47bd-9860-2edbbe4fbf59",
+                      "name": "Resource not found",
                       "originalRequest": {
                         "url": {
                           "path": ["admin", "courses", ":id"],
@@ -4819,7 +4819,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Resource not found\",\n  \"code\": \"NOT_FOUND\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440003\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -4830,7 +4830,7 @@
                   }
                 },
                 {
-                  "id": "ddfbe1dd-5cf7-4817-b7ae-f86d60297ab5",
+                  "id": "8a8669ff-bff5-4a72-9d09-39ae888a2a17",
                   "name": "Update course",
                   "request": {
                     "name": "Update course",
@@ -4888,7 +4888,7 @@
                   },
                   "response": [
                     {
-                      "id": "936abaff-9b49-4d4c-91a8-cd1e0ddd3452",
+                      "id": "2d3aab14-3793-468d-b36c-60a5f9f53d4d",
                       "name": "Course updated",
                       "originalRequest": {
                         "url": {
@@ -4946,13 +4946,13 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"wgmslls\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                      "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "447df42e-3ef5-459c-a2ff-cc7479319c6c",
-                      "name": "Not found",
+                      "id": "a2855b94-00aa-41a0-8ea1-7423aaa0b360",
+                      "name": "Resource not found",
                       "originalRequest": {
                         "url": {
                           "path": ["admin", "courses", ":id"],
@@ -5009,7 +5009,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Resource not found\",\n  \"code\": \"NOT_FOUND\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440003\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -5020,7 +5020,7 @@
                   }
                 },
                 {
-                  "id": "45927463-47df-4337-8c3e-bff0a80cae87",
+                  "id": "ac162b0e-c209-4a8a-ac8e-984e9223494b",
                   "name": "Delete course",
                   "request": {
                     "name": "Delete course",
@@ -5065,7 +5065,7 @@
                   },
                   "response": [
                     {
-                      "id": "affbb7c2-c6f8-4361-b4fb-486fb02557b9",
+                      "id": "134226cf-8454-470f-b8f4-4b297bf4b63a",
                       "name": "Course deleted",
                       "originalRequest": {
                         "url": {
@@ -5115,8 +5115,8 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "7aca27be-373b-4d6b-9347-487593d606b9",
-                      "name": "Not found",
+                      "id": "1050acbd-c7e3-43ac-89c4-5b6b9af0281d",
+                      "name": "Resource not found",
                       "originalRequest": {
                         "url": {
                           "path": ["admin", "courses", ":id"],
@@ -5160,7 +5160,7 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                      "body": "{\n  \"success\": false,\n  \"error\": \"Resource not found\",\n  \"code\": \"NOT_FOUND\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440003\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     }
@@ -5175,7 +5175,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "01e1b025-04b4-445c-85e8-fea47c11bedb",
+                      "id": "837c139a-30a6-4cd4-93e5-708e238d40a0",
                       "name": "Transfer enrollments",
                       "request": {
                         "name": "Transfer enrollments",
@@ -5238,7 +5238,7 @@
                       },
                       "response": [
                         {
-                          "id": "79f866b2-78c4-40e2-bd2b-e7d727d6629f",
+                          "id": "07762a1c-61e8-43ae-a4a6-c1e563ca7cd2",
                           "name": "Enrollments transferred",
                           "originalRequest": {
                             "url": {
@@ -5322,7 +5322,7 @@
           "description": "",
           "item": [
             {
-              "id": "b0ef54c1-f423-418f-81f7-a54eb25b6a16",
+              "id": "c1b94db6-2b9e-4299-b5c9-453a78c29ee0",
               "name": "List users (admin)",
               "request": {
                 "name": "List users (admin)",
@@ -5366,7 +5366,7 @@
               },
               "response": [
                 {
-                  "id": "a3e72d95-64cf-4472-b695-a4beca6fb8dd",
+                  "id": "6c94dc41-e51e-4d3a-952d-f1813244c9d8",
                   "name": "Users list",
                   "originalRequest": {
                     "url": {
@@ -5410,13 +5410,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"clerkId\": \"<string>\",\n      \"email\": \"<email>\",\n      \"role\": \"USER\",\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"clerkId\": \"<string>\",\n      \"email\": \"<email>\",\n      \"role\": \"USER\",\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
+                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": [\n    {\n      \"id\": \"<string>\",\n      \"clerkId\": \"<string>\",\n      \"email\": \"<email>\",\n      \"role\": \"ADMIN\",\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"clerkId\": \"<string>\",\n      \"email\": \"<email>\",\n      \"role\": \"USER\",\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"createdAt\": \"<dateTime>\",\n      \"updatedAt\": \"<dateTime>\"\n    }\n  ]\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "3c6249ee-2741-4604-9eb0-67d7b2c48cfc",
-                  "name": "Forbidden",
+                  "id": "8c613feb-81df-452d-ab1b-b4dbc122bc43",
+                  "name": "Insufficient permissions",
                   "originalRequest": {
                     "url": {
                       "path": ["admin", "users"],
@@ -5459,7 +5459,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"You do not have permission to access this resource\",\n  \"code\": \"FORBIDDEN\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -5470,7 +5470,7 @@
               }
             },
             {
-              "id": "d90bcc35-e50c-4fd0-b592-c1c84247b8a5",
+              "id": "d71028dc-e0c1-4ef7-b89c-3a8f28b2c4d7",
               "name": "Create user",
               "request": {
                 "name": "Create user",
@@ -5517,7 +5517,7 @@
               },
               "response": [
                 {
-                  "id": "53617efb-4195-4683-bd43-d4db009f6ca4",
+                  "id": "bf7c4bc4-0bb1-4fa4-a31f-9ed0c10fae50",
                   "name": "User created",
                   "originalRequest": {
                     "url": {
@@ -5564,7 +5564,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"USER\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"ADMIN\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -5587,7 +5587,7 @@
           "description": "",
           "item": [
             {
-              "id": "0045e388-d3b0-4a62-afe0-75f2bf64515e",
+              "id": "d66ac92e-156f-426f-8329-4d110fac419a",
               "name": "Get user details",
               "request": {
                 "name": "Get user details",
@@ -5632,7 +5632,7 @@
               },
               "response": [
                 {
-                  "id": "2436b55e-8235-4bc1-9ab4-34285ffbf240",
+                  "id": "932479e1-ccc5-496d-a576-629d94e386ff",
                   "name": "User details",
                   "originalRequest": {
                     "url": {
@@ -5677,7 +5677,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"USER\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"ADMIN\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -5688,7 +5688,7 @@
               }
             },
             {
-              "id": "80869c2e-5e10-4946-a46a-c37377024bf3",
+              "id": "51f46ae0-f476-4d3b-bd45-2a145f056f08",
               "name": "Update user",
               "request": {
                 "name": "Update user",
@@ -5746,7 +5746,7 @@
               },
               "response": [
                 {
-                  "id": "2a76e6df-011e-4fe4-aa11-720598ed5c42",
+                  "id": "373759f6-b43b-4130-a6a5-78f08534e9aa",
                   "name": "User updated",
                   "originalRequest": {
                     "url": {
@@ -5804,7 +5804,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"USER\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": \"<boolean>\",\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"clerkId\": \"<string>\",\n    \"email\": \"<email>\",\n    \"role\": \"ADMIN\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -5815,7 +5815,7 @@
               }
             },
             {
-              "id": "7cfeb6a3-c191-4e31-9c41-e621c0893fb3",
+              "id": "563984d9-18b0-475d-80cd-a6437f5707bc",
               "name": "Delete user",
               "request": {
                 "name": "Delete user",
@@ -5860,7 +5860,7 @@
               },
               "response": [
                 {
-                  "id": "964b7023-17d3-4578-bef0-101bad42868d",
+                  "id": "3fa92503-24b2-4072-b1b8-41aed63528db",
                   "name": "User deleted",
                   "originalRequest": {
                     "url": {
@@ -5922,7 +5922,7 @@
           "description": "",
           "item": [
             {
-              "id": "39fbaff0-681a-4a2d-a213-b65bb3b8df4c",
+              "id": "6f569caa-aaee-414d-b34c-a548bb7a8b56",
               "name": "Get current user profile",
               "request": {
                 "name": "Get current user profile",
@@ -5956,7 +5956,7 @@
               },
               "response": [
                 {
-                  "id": "fb58e199-1683-400e-99af-b234cd9c6fac",
+                  "id": "6608cb1d-af26-4a13-ad18-790a39c93ec0",
                   "name": "Profile",
                   "originalRequest": {
                     "url": {
@@ -5995,8 +5995,8 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "55876166-e099-49d3-a678-5c33ea27d75c",
-                  "name": "Unauthorized",
+                  "id": "acb7b3c2-f688-4dab-9d40-9a32ffd58a55",
+                  "name": "Authentication required",
                   "originalRequest": {
                     "url": {
                       "path": ["users", "profile"],
@@ -6029,7 +6029,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -6040,7 +6040,7 @@
               }
             },
             {
-              "id": "93d2664a-906b-4279-9ce2-a2808a164ab3",
+              "id": "f41f505f-4701-43f9-9525-0d910015f730",
               "name": "Update current user profile",
               "request": {
                 "name": "Update current user profile",
@@ -6087,7 +6087,7 @@
               },
               "response": [
                 {
-                  "id": "df1b7a68-24d1-4a1c-aae8-a4cf1d735830",
+                  "id": "97349620-8f74-4073-9b26-d335d87c33f1",
                   "name": "Profile updated",
                   "originalRequest": {
                     "url": {
@@ -6139,8 +6139,8 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "f5672f94-738c-4594-809e-67cc6cb09081",
-                  "name": "Unauthorized",
+                  "id": "aff8fef2-2488-4288-a9c1-b1e48462628d",
+                  "name": "Authentication required",
                   "originalRequest": {
                     "url": {
                       "path": ["users", "profile"],
@@ -6186,7 +6186,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -6209,7 +6209,7 @@
           "description": "",
           "item": [
             {
-              "id": "760d8c6f-03f9-4e73-a417-88c62f20133d",
+              "id": "a9ab4209-85dd-419d-bfc9-c683e4f8453b",
               "name": "Stripe webhook receiver",
               "request": {
                 "name": "Stripe webhook receiver",
@@ -6257,7 +6257,7 @@
               },
               "response": [
                 {
-                  "id": "cf881c1d-ff26-4bfc-ab98-d2fdfb849485",
+                  "id": "0a343398-3e37-434c-8c22-bf0c040b05e3",
                   "name": "Webhook processed",
                   "originalRequest": {
                     "url": {
@@ -6318,8 +6318,8 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "efc57aa3-9970-4768-b90e-613103406a52",
-                  "name": "Invalid payload",
+                  "id": "50bb917a-eb08-4a47-b12e-75a011824260",
+                  "name": "Validation error",
                   "originalRequest": {
                     "url": {
                       "path": ["webhooks", "stripe"],
@@ -6374,13 +6374,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Invalid request parameters\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440000\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "cef7310c-b6ad-4bb9-a117-3daac59efa5e",
-                  "name": "Invalid signature",
+                  "id": "72faf02d-5f8e-4b28-b55a-9c392df99f7e",
+                  "name": "Authentication required",
                   "originalRequest": {
                     "url": {
                       "path": ["webhooks", "stripe"],
@@ -6435,13 +6435,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "3268e188-410e-4cee-875d-7e541cc3e16e",
-                  "name": "Processing error",
+                  "id": "c9ffda8c-f109-4af5-9126-0212bebe80fa",
+                  "name": "Internal server error",
                   "originalRequest": {
                     "url": {
                       "path": ["webhooks", "stripe"],
@@ -6496,7 +6496,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"An unexpected error occurred\",\n  \"code\": \"INTERNAL_ERROR\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440006\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -6513,7 +6513,7 @@
           "description": "",
           "item": [
             {
-              "id": "9659e2b4-6aca-418a-9823-02df4080ec6b",
+              "id": "49ba9f7e-eccd-4715-844d-9b0c6d84b8e4",
               "name": "Clerk webhook receiver",
               "request": {
                 "name": "Clerk webhook receiver",
@@ -6579,7 +6579,7 @@
               },
               "response": [
                 {
-                  "id": "41be1bb9-7382-4008-831c-301f2aac308e",
+                  "id": "9345cadd-c21f-450e-9903-9ec9b326c932",
                   "name": "Webhook processed",
                   "originalRequest": {
                     "url": {
@@ -6658,8 +6658,8 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "ce5f18c4-9275-4768-9fef-3d37d828f68f",
-                  "name": "Invalid payload",
+                  "id": "80638497-d3e1-4e89-8e0d-84cc6ffe0dbb",
+                  "name": "Validation error",
                   "originalRequest": {
                     "url": {
                       "path": ["webhooks", "clerk"],
@@ -6732,13 +6732,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Invalid request parameters\",\n  \"code\": \"VALIDATION_ERROR\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440000\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "60f3628d-a44f-4faf-91c8-7ee9e1c4d336",
-                  "name": "Invalid signature",
+                  "id": "49c684dd-740a-40c8-adb4-26a50c23cef8",
+                  "name": "Authentication required",
                   "originalRequest": {
                     "url": {
                       "path": ["webhooks", "clerk"],
@@ -6811,7 +6811,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+                  "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -6830,7 +6830,7 @@
       "description": "",
       "item": [
         {
-          "id": "8229aace-11ad-447a-b1fb-cda39e54e4d5",
+          "id": "9631c8c8-0fd0-4fa5-97c6-45823bf6d5bd",
           "name": "Get application vitals",
           "request": {
             "name": "Get application vitals",
@@ -6874,7 +6874,7 @@
           },
           "response": [
             {
-              "id": "de136324-4250-4b48-a09f-05b634190d66",
+              "id": "b8df9a34-1e09-4d50-b719-f8d1a074b980",
               "name": "Vitals data",
               "originalRequest": {
                 "url": {
@@ -6923,8 +6923,8 @@
               "_postman_previewlanguage": "json"
             },
             {
-              "id": "95871ee1-7eeb-4d70-9965-90a1c7db6369",
-              "name": "Unauthorized",
+              "id": "79b8652d-7cc8-40dc-a4ed-34e0213e7946",
+              "name": "Authentication required",
               "originalRequest": {
                 "url": {
                   "path": ["vitals"],
@@ -6967,12 +6967,12 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+              "body": "{\n  \"success\": false,\n  \"error\": \"Authentication required\",\n  \"code\": \"UNAUTHORIZED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440001\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             },
             {
-              "id": "fb4e709c-7bfc-4f2c-b933-5483a98fc818",
+              "id": "399947e4-02a5-4a9e-b6d9-a7674eda225d",
               "name": "Rate limit exceeded",
               "originalRequest": {
                 "url": {
@@ -7018,14 +7018,14 @@
                 {
                   "disabled": false,
                   "description": {
-                    "content": "",
+                    "content": "Seconds until next request allowed",
                     "type": "text/plain"
                   },
                   "key": "Retry-After",
                   "value": "<integer>"
                 }
               ],
-              "body": "{\n  \"success\": \"<boolean>\",\n  \"error\": \"<string>\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"<uuid>\"\n}",
+              "body": "{\n  \"success\": false,\n  \"error\": \"Rate limit exceeded. Try again later.\",\n  \"code\": \"RATE_LIMITED\",\n  \"requestId\": \"550e8400-e29b-41d4-a716-446655440005\"\n}",
               "cookie": [],
               "_postman_previewlanguage": "json"
             }
@@ -7137,7 +7137,7 @@
     }
   ],
   "info": {
-    "_postman_id": "edf527f8-0adb-42f9-8f9f-e8d6ea64e91a",
+    "_postman_id": "fd1202a6-92d7-443c-88d4-b700fcd75757",
     "name": "Hemera API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "description": {
