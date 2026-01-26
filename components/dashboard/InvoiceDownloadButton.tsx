@@ -25,6 +25,7 @@
  * ### API Error Responses
  *
  * The API returns JSON for errors (not PDF):
+ * - 400: `{ success: false, error: 'Booking not paid' }`
  * - 401: `{ success: false, error: 'Unauthorized' }`
  * - 404: `{ success: false, error: 'Booking/Invoice not found' }`
  * - 500: `{ success: false, error: 'Internal server error' }`
@@ -59,6 +60,7 @@ export const ERROR_MESSAGES = {
   UNAUTHORIZED: 'Nicht autorisiert',
   FORBIDDEN: 'Zugriff verweigert',
   NOT_FOUND: 'Rechnung nicht verfügbar',
+  NOT_PAID: 'Buchung noch nicht bezahlt',
   NETWORK: 'Netzwerkfehler - bitte erneut versuchen',
   GENERIC: 'Ein Fehler ist aufgetreten',
 } as const;
@@ -79,6 +81,8 @@ interface InvoiceDownloadButtonProps {
  */
 function getErrorMessageForStatus(status: number): string {
   switch (status) {
+    case 400:
+      return ERROR_MESSAGES.NOT_PAID;
     case 401:
       return ERROR_MESSAGES.UNAUTHORIZED;
     case 403:
