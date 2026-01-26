@@ -22,9 +22,9 @@ test.describe('Academy page', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: /hemera academy/i })
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /alle kurse/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /alle seminare/i })).toBeVisible();
     await expect(
-      page.getByRole('link', { name: /kurse entdecken/i })
+      page.getByRole('link', { name: /seminare entdecken/i })
     ).toBeVisible();
 
     const title = await page.title();
