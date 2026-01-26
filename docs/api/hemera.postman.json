@@ -26,8 +26,7 @@
               }
             ],
             "method": "GET",
-            "body": {},
-            "auth": null
+            "body": {}
           },
           "response": [
             {
@@ -93,8 +92,7 @@
                   }
                 ],
                 "method": "GET",
-                "body": {},
-                "auth": null
+                "body": {}
               },
               "response": [
                 {
@@ -169,8 +167,7 @@
                       "language": "json"
                     }
                   }
-                },
-                "auth": null
+                }
               },
               "response": [
                 {
@@ -281,8 +278,7 @@
               }
             ],
             "method": "GET",
-            "body": {},
-            "auth": null
+            "body": {}
           },
           "response": [
             {
@@ -444,8 +440,7 @@
                   }
                 ],
                 "method": "GET",
-                "body": {},
-                "auth": null
+                "body": {}
               },
               "response": [
                 {
@@ -555,8 +550,7 @@
                   }
                 ],
                 "method": "GET",
-                "body": {},
-                "auth": null
+                "body": {}
               },
               "response": [
                 {
@@ -679,8 +673,7 @@
               }
             ],
             "method": "GET",
-            "body": {},
-            "auth": null
+            "body": {}
           },
           "response": [
             {
@@ -755,15 +748,6 @@
                   "language": "json"
                 }
               }
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}"
-                }
-              ]
             }
           },
           "response": [
@@ -942,8 +926,7 @@
                   }
                 ],
                 "method": "GET",
-                "body": {},
-                "auth": null
+                "body": {}
               },
               "response": [
                 {
@@ -1082,15 +1065,6 @@
                       "language": "json"
                     }
                   }
-                },
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
                 }
               },
               "response": [
@@ -1298,16 +1272,7 @@
                   }
                 ],
                 "method": "DELETE",
-                "body": {},
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
-                }
+                "body": {}
               },
               "response": [
                 {
@@ -1525,15 +1490,6 @@
                       "language": "json"
                     }
                   }
-                },
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
                 }
               },
               "response": [
@@ -1718,8 +1674,7 @@
                   }
                 ],
                 "method": "GET",
-                "body": {},
-                "auth": null
+                "body": {}
               },
               "response": [
                 {
@@ -1799,16 +1754,7 @@
               }
             ],
             "method": "GET",
-            "body": {},
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}"
-                }
-              ]
-            }
+            "body": {}
           },
           "response": [
             {
@@ -1934,15 +1880,6 @@
                   "language": "json"
                 }
               }
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}"
-                }
-              ]
             }
           },
           "response": [
@@ -2175,16 +2112,7 @@
                       }
                     ],
                     "method": "GET",
-                    "body": {},
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
-                    }
+                    "body": {}
                   },
                   "response": [
                     {
@@ -2365,15 +2293,6 @@
                           "language": "json"
                         }
                       }
-                    },
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
                     }
                   },
                   "response": [
@@ -2532,16 +2451,7 @@
                       }
                     ],
                     "method": "GET",
-                    "body": {},
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
-                    }
+                    "body": {}
                   },
                   "response": [
                     {
@@ -2680,15 +2590,6 @@
                           "language": "json"
                         }
                       }
-                    },
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
                     }
                   },
                   "response": [
@@ -2792,16 +2693,7 @@
                       }
                     ],
                     "method": "GET",
-                    "body": {},
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
-                    }
+                    "body": {}
                   },
                   "response": [
                     {
@@ -2940,15 +2832,6 @@
                           "language": "json"
                         }
                       }
-                    },
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
                     }
                   },
                   "response": [
@@ -3052,16 +2935,7 @@
                       }
                     ],
                     "method": "GET",
-                    "body": {},
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
-                    }
+                    "body": {}
                   },
                   "response": [
                     {
@@ -3200,15 +3074,6 @@
                           "language": "json"
                         }
                       }
-                    },
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
                     }
                   },
                   "response": [
@@ -3312,16 +3177,7 @@
                       }
                     ],
                     "method": "GET",
-                    "body": {},
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
-                    }
+                    "body": {}
                   },
                   "response": [
                     {
@@ -3463,15 +3319,6 @@
                           "type": "file"
                         }
                       ]
-                    },
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
                     }
                   },
                   "response": [
@@ -3572,16 +3419,7 @@
                       }
                     ],
                     "method": "DELETE",
-                    "body": {},
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
-                    }
+                    "body": {}
                   },
                   "response": [
                     {
@@ -3678,16 +3516,7 @@
                   }
                 ],
                 "method": "GET",
-                "body": {},
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
-                }
+                "body": {}
               },
               "response": [
                 {
@@ -3854,15 +3683,6 @@
                       "language": "json"
                     }
                   }
-                },
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
                 }
               },
               "response": [
@@ -4043,15 +3863,6 @@
                           "language": "json"
                         }
                       }
-                    },
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
                     }
                   },
                   "response": [
@@ -4146,15 +3957,6 @@
                           "language": "json"
                         }
                       }
-                    },
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
                     }
                   },
                   "response": [
@@ -4247,16 +4049,7 @@
                       }
                     ],
                     "method": "GET",
-                    "body": {},
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
-                    }
+                    "body": {}
                   },
                   "response": [
                     {
@@ -4395,15 +4188,6 @@
                           "language": "json"
                         }
                       }
-                    },
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
                     }
                   },
                   "response": [
@@ -4556,16 +4340,7 @@
                       }
                     ],
                     "method": "DELETE",
-                    "body": {},
-                    "auth": {
-                      "type": "bearer",
-                      "bearer": [
-                        {
-                          "key": "token",
-                          "value": "{{bearer_token}}"
-                        }
-                      ]
-                    }
+                    "body": {}
                   },
                   "response": [
                     {
@@ -4713,15 +4488,6 @@
                               "language": "json"
                             }
                           }
-                        },
-                        "auth": {
-                          "type": "bearer",
-                          "bearer": [
-                            {
-                              "key": "token",
-                              "value": "{{bearer_token}}"
-                            }
-                          ]
                         }
                       },
                       "response": [
@@ -4833,16 +4599,7 @@
                   }
                 ],
                 "method": "GET",
-                "body": {},
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
-                }
+                "body": {}
               },
               "response": [
                 {
@@ -4968,15 +4725,6 @@
                       "language": "json"
                     }
                   }
-                },
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
                 }
               },
               "response": [
@@ -5075,16 +4823,7 @@
                   }
                 ],
                 "method": "GET",
-                "body": {},
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
-                }
+                "body": {}
               },
               "response": [
                 {
@@ -5181,15 +4920,6 @@
                       "language": "json"
                     }
                   }
-                },
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
                 }
               },
               "response": [
@@ -5287,16 +5017,7 @@
                   }
                 ],
                 "method": "DELETE",
-                "body": {},
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
-                }
+                "body": {}
               },
               "response": [
                 {
@@ -5375,16 +5096,7 @@
                   }
                 ],
                 "method": "GET",
-                "body": {},
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
-                }
+                "body": {}
               },
               "response": [
                 {
@@ -5490,15 +5202,6 @@
                       "language": "json"
                     }
                   }
-                },
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{bearer_token}}"
-                    }
-                  ]
                 }
               },
               "response": [
@@ -5652,8 +5355,7 @@
                       "language": "json"
                     }
                   }
-                },
-                "auth": null
+                }
               },
               "response": [
                 {
@@ -5942,8 +5644,7 @@
                       "language": "json"
                     }
                   }
-                },
-                "auth": null
+                }
               },
               "response": [
                 {
@@ -6205,16 +5906,7 @@
               }
             ],
             "method": "GET",
-            "body": {},
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{bearer_token}}"
-                }
-              ]
-            }
+            "body": {}
           },
           "response": [
             {

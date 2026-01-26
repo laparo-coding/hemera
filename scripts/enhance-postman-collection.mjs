@@ -50,6 +50,13 @@ function removeHardcodedAuthHeaders(items) {
       }
     }
 
+    // Remove per-request auth blocks (inherit from collection)
+    if (item.request) {
+      delete item.request.auth;
+    }
+    // Also remove auth property from item itself
+    delete item.auth;
+
     // Recurse into nested items (folders)
     if (item.item && Array.isArray(item.item)) {
       removeHardcodedAuthHeaders(item.item);
