@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useLayoutEffect, useState } from 'react';
+import { TERMS } from '../../lib/constants/terminology';
 import { SignedIn, SignedOut, UserButton } from '../auth/ClerkComponents';
 import ClientOnly from '../ClientOnly';
 
@@ -202,7 +203,7 @@ export function PublicNavigation({
                         },
                       }}
                     >
-                      Meine Kurse
+                      {TERMS.myCourses}
                     </Button>
                   )}
                   <UserButton

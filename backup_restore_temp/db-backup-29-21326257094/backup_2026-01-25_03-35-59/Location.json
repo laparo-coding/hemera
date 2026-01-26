@@ -1,0 +1,20 @@
+[
+  {
+    "id": "cmjr23rha000004jz58lzwctj",
+    "slug": "gartenhotel-fette-henne",
+    "name": "Gartenhotel Fette Henne",
+    "description": "Von einem besonderen Ort, der den unterschiedlichen Persönlichkeiten unserer Gäste vollständig gerecht wird. Durch echtes und persönliches Interesse an Dir und Deinem Wohlergehen machen wir unser Zuhause zu Deinem zweiten Zuhause.",
+    "address": "Schildsheider Str. 47",
+    "zipCode": "40699",
+    "city": "Erkrath",
+    "email": "gartenhotel@fettehennehotels.de",
+    "phone": "+49 2104 13830",
+    "website": "https://www.gartenhotel-fettehenne.de/",
+    "imageUrl": "https://fwdhpoytjheqeqjq.public.blob.vercel-storage.com/location-images/exterior/1767006581959-6220ag.webp",
+    "roomImageUrl": "https://fwdhpoytjheqeqjq.public.blob.vercel-storage.com/location-images/room/1767006585847-0cuoc.webp",
+    "latitude": 51.2052406,
+    "longitude": 6.9653751,
+    "createdAt": "2025-12-29T11:09:56.061Z",
+    "updatedAt": "2025-12-29T11:09:56.061Z"
+  }
+]

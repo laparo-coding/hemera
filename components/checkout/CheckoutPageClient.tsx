@@ -12,6 +12,7 @@ import {
 import { Elements } from '@stripe/react-stripe-js';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import { TERMS } from '../../lib/constants/terminology';
 import StripeCheckoutForm from '../payment/StripeCheckoutForm';
 import { stripeAppearance, stripePromise } from '../payment/StripeProvider';
 
@@ -77,7 +78,7 @@ function CheckoutContent() {
     }
 
     if (!courseRef) {
-      setError('Kein Kurs ausgewählt');
+      setError(TERMS.noCourseSelected);
       setLoading(false);
       return;
     }
@@ -140,7 +141,9 @@ function CheckoutContent() {
     };
 
     fetchCourseAndCreatePaymentIntent();
-  }, [isLoaded, user, courseRef, stripeEnabled]);
+    // Note: stripeEnabled is a constant from env, not included in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, user, courseRef]);
 
   const handlePaymentSuccess = async (paymentIntentResult: { id: string }) => {
     try {

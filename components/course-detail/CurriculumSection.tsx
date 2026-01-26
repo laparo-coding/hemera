@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import type React from 'react';
 import { useState } from 'react';
+import { TERMS } from '../../lib/constants/terminology';
 import { colors, spacing, typography } from '../../lib/design-tokens';
 
 export interface CurriculumTopic {
@@ -151,7 +152,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
             textAlign: 'center',
           }}
         >
-          Kursablauf
+          {TERMS.courseProgress}
         </Typography>
 
         {/* Accordions */}

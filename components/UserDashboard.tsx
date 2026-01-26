@@ -17,6 +17,7 @@ import Grid from '@mui/material/GridLegacy';
 import Link from 'next/link';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { TERMS } from '@/lib/constants';
 
 // Design tokens from Hemera spec (matching landing page and auth pages)
 const colors = {
@@ -215,7 +216,7 @@ const UserDashboardClerk: React.FC = () => {
       setError(null);
 
       const response = await fetch('/api/bookings', {
-        // Add cache headers for better performance
+        credentials: 'include', // Send cookies for Clerk auth
         headers: {
           'Cache-Control': 'max-age=30', // Cache for 30 seconds
         },
@@ -303,7 +304,8 @@ const UserDashboardClerk: React.FC = () => {
                 mx: 'auto',
               }}
             >
-              Entdecke unsere Kurse und investiere in deine berufliche Zukunft.
+              Entdecke unsere {TERMS.courses} und investiere in deine berufliche
+              Zukunft.
             </Typography>
             <Button
               component={Link}
@@ -321,7 +323,7 @@ const UserDashboardClerk: React.FC = () => {
                 py: 1.5,
               }}
             >
-              Kurse entdecken
+              {TERMS.discoverCourses}
             </Button>
           </Box>
         ) : (

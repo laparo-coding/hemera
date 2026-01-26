@@ -11,6 +11,7 @@ import EuroIcon from '@mui/icons-material/Euro';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Box, Container, Paper, Typography } from '@mui/material';
 import type React from 'react';
+import { TERMS } from '../../lib/constants';
 import { colors, shadows, spacing, typography } from '../../lib/design-tokens';
 import { BookingCTA } from './BookingCTA';
 
@@ -227,7 +228,7 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
                     letterSpacing: 1,
                   }}
                 >
-                  Kursgebühr
+                  {TERMS.courseFee}
                 </Typography>
                 <Typography
                   variant='h6'

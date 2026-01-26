@@ -1,0 +1,169 @@
+# Webhooks Endpoints Contract
+# Note: These are endpoints where Hemera RECEIVES webhooks from external services,
+# not endpoints where Hemera sends webhooks.
+
+paths:
+  /webhooks/stripe:
+    post:
+      tags:
+        - Webhooks
+      operationId: handleStripeWebhook
+      summary: Stripe webhook receiver
+      description: |
+        Receives and processes Stripe webhook events.
+        Validates signature using STRIPE_WEBHOOK_SECRET.
+
+        **Handled Events:**
+        - `checkout.session.completed` - Payment successful
+        - `payment_intent.succeeded` - Direct payment success
+        - `payment_intent.payment_failed` - Payment failed
+        - `customer.subscription.updated` - Subscription changes
+        - `invoice.payment_failed` - Recurring payment failed
+
+        **Security:** Requires valid Stripe-Signature header
+      parameters:
+        - name: Stripe-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Stripe webhook signature for verification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Event ID
+                object:
+                  type: string
+                  enum: [event]
+                type:
+                  type: string
+                  description: Event type (e.g., checkout.session.completed)
+                data:
+                  type: object
+                  properties:
+                    object:
+                      type: object
+                      description: Event payload
+                created:
+                  type: integer
+                  description: Unix timestamp
+                livemode:
+                  type: boolean
+                api_version:
+                  type: string
+              required:
+                - id
+                - type
+                - data
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+        '400':
+          description: Invalid webhook payload or signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid or missing Stripe-Signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Webhook processing error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /webhooks/clerk:
+    post:
+      tags:
+        - Webhooks
+      operationId: handleClerkWebhook
+      summary: Clerk webhook receiver
+      description: |
+        Receives and processes Clerk webhook events for user sync.
+        Validates signature using CLERK_WEBHOOK_SECRET.
+
+        **Handled Events:**
+        - `user.created` - New user registered
+        - `user.updated` - User profile changed
+        - `user.deleted` - User account deleted
+        - `session.created` - New login session
+        - `session.ended` - Session terminated
+
+        **Security:** Requires valid svix signature headers
+      parameters:
+        - name: svix-id
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: svix-timestamp
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: svix-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Webhook event type
+                data:
+                  type: object
+                  description: Event payload
+                object:
+                  type: string
+                  enum: [event]
+              required:
+                - type
+                - data
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+        '400':
+          description: Invalid webhook payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

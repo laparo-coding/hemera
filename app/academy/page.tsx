@@ -8,13 +8,13 @@ import {
 import { SCHEMA_COMBINATIONS } from '../../lib/seo/schemas';
 
 export const metadata: Metadata = {
-  title: 'Hemera Academy – Über unsere Kurse',
+  title: 'Hemera Academy – Über unsere Seminare',
   description:
-    'Erfahre mehr über die Hemera Academy: Ziele, Lernformate und wie du mit unseren Kursen durchstartest.',
+    'Erfahre mehr über die Hemera Academy: Ziele, Lernformate und wie du mit unseren Seminaren durchstartest.',
   openGraph: {
-    title: 'Hemera Academy – Über unsere Kurse',
+    title: 'Hemera Academy – Über unsere Seminare',
     description:
-      'Erfahre mehr über die Hemera Academy: Ziele, Lernformate und wie du mit unseren Kursen durchstartest.',
+      'Erfahre mehr über die Hemera Academy: Ziele, Lernformate und wie du mit unseren Seminaren durchstartest.',
     url: `${SITE_CONFIG.url}/academy`,
     siteName: SITE_CONFIG.name,
     images: [
@@ -30,9 +30,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hemera Academy – Über unsere Kurse',
+    title: 'Hemera Academy – Über unsere Seminare',
     description:
-      'Erfahre mehr über die Hemera Academy: Ziele, Lernformate und wie du mit unseren Kursen durchstartest.',
+      'Erfahre mehr über die Hemera Academy: Ziele, Lernformate und wie du mit unseren Seminaren durchstartest.',
     site: SOCIAL_CONFIG.twitter.site,
     creator: SOCIAL_CONFIG.twitter.creator,
     // Stelle sicher, dass Twitter ebenfalls eine absolute Bild-URL erhält
@@ -72,7 +72,7 @@ export default function AcademyPage() {
                   href='/courses'
                   className='text-gray-600 hover:text-gray-900'
                 >
-                  Alle Kurse
+                  Alle Seminare
                 </a>
               </nav>
             </div>
@@ -84,8 +84,8 @@ export default function AcademyPage() {
             Lernen, das dich weiterbringt
           </h2>
           <p className='text-gray-700 leading-relaxed mb-6'>
-            Die Hemera Academy bietet praxisnahe Kurse für Entwickler:innen und
-            Tech-Professionals. Alle Inhalte sind auf Deutsch, Preise inkl.
+            Die Hemera Academy bietet praxisnahe Seminare für Entwickler:innen
+            und Tech-Professionals. Alle Inhalte sind auf Deutsch, Preise inkl.
             MwSt., und die Buchung erfolgt intern über dein Benutzerkonto.
           </p>
 
@@ -118,7 +118,7 @@ export default function AcademyPage() {
               className='inline-flex items-center px-5 py-3 rounded-md text-white hover:opacity-90'
               style={{ backgroundColor: '#16404D' }}
             >
-              Kurse entdecken
+              Seminare entdecken
               <svg
                 className='ml-2 -mr-1 w-5 h-5'
                 fill='none'

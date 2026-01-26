@@ -77,7 +77,7 @@ describe('Locations API Integration Tests', () => {
       });
 
       expect(locations).toHaveLength(2);
-      expect(locations[0]._count.courses).toBe(0);
+      expect(locations[0]!._count.courses).toBe(0);
     });
   });
 

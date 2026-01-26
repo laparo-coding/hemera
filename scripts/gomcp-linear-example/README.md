@@ -6,7 +6,7 @@ Dieses Minimalbeispiel demonstriert, wie ein Go-Programm den Linear MCP Server
 ## Voraussetzungen
 
 - Go 1.25+
-- Node.js 18+
+- Node.js 20+ (siehe package.json engines)
 - Linear Personal API Key (Token)
 
 ## Install

@@ -18,6 +18,7 @@ import {
   Typography,
 } from '@mui/material';
 import type React from 'react';
+import { TERMS } from '../../lib/constants/terminology';
 import { colors, spacing, typography } from '../../lib/design-tokens';
 import { BookingCTA } from './BookingCTA';
 
@@ -61,7 +62,7 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
             textAlign: 'center',
           }}
         >
-          Kursübersicht
+          {TERMS.courseOverview}
         </Typography>
 
         {/* Description */}
@@ -168,7 +169,7 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
             courseId={courseId}
             courseSlug={courseSlug}
             variant='secondary'
-            label='Kurs buchen'
+            label={TERMS.bookCourse}
           />
         </Box>
       </Container>

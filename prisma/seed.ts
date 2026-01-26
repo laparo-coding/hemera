@@ -144,6 +144,8 @@ async function main() {
   for (let i = 0; i < coursesWithSummaries.length; i++) {
     const course = coursesWithSummaries[i];
     const playbackId = muxTestPlaybackIds[i];
+    if (!course || !playbackId) continue;
+
     const assetId = `test-asset-${course.id}`;
     const title = `Zusammenfassung: ${course.title}`;
 

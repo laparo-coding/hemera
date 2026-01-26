@@ -4,6 +4,13 @@ This repository is currently in a planning/documentation phase. Features are def
 under `specs/` using a specs-first workflow. Implementation follows a structured approach with
 automated code review and quality assurance through Qodo PR Agent integration.
 
+## Prerequisites
+
+- **Node.js**: >= 20.0.0 (see `engines` in package.json, `.nvmrc` for pinned version)
+- **npm**: >= 9.0.0
+
+Run `nvm use` to switch to the correct Node version automatically.
+
 ## Workflow
 
 1. Specify a feature in `specs/<###-slug>/spec.md`.

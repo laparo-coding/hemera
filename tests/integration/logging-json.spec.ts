@@ -28,13 +28,13 @@ describe('Integration: Structured JSON logging with requestId', () => {
     logger.info('Demo event', { foo: 'bar' });
 
     expect(calls.length).toBe(1);
-    const entry = calls[0];
+    const entry = calls[0]!;
     expect(entry.message).toBe('Demo event');
     expect(entry.payload).toBeDefined();
     // our ApiLogger puts requestId and context in the payload
     expect(entry.payload.requestId).toBe(ctx.id);
     expect(entry.payload.context).toBeDefined();
-    expect(entry.payload.context.id).toBe(ctx.id);
+    expect(entry.payload.context!.id).toBe(ctx.id);
     // timestamp is set by logger
     expect(typeof entry.payload.timestamp).toBe('string');
   });

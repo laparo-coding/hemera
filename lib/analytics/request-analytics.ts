@@ -165,6 +165,8 @@ export class RequestAnalytics {
     // Berechne Statistiken für jede Gruppe
     grouped.forEach((metrics, key) => {
       const [method, route] = key.split(':');
+      if (!method || !route) return;
+
       const totalRequests = metrics.length;
       const successfulRequests = metrics.filter(m => m.statusCode < 400).length;
       const failedRequests = totalRequests - successfulRequests;

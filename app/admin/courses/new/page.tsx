@@ -10,8 +10,8 @@ import { listLocations } from '@/lib/services/location';
 import NewCourseForm from './NewCourseForm';
 
 export const metadata: Metadata = {
-  title: 'Neuen Kurs erstellen | Admin',
-  description: 'Neuen Kurs erstellen',
+  title: 'Neues Seminar erstellen | Admin',
+  description: 'Neues Seminar erstellen',
 };
 
 // Prevent static generation - this page needs DB access at runtime

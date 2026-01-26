@@ -181,11 +181,12 @@ export class DeploymentAlertSystem {
     // Durchschnittliche Response Time
     const responseTimes = Object.keys(metrics)
       .filter(key => key.endsWith('_response_time'))
-      .map(key => metrics[key]);
+      .map(key => metrics[key])
+      .filter((value): value is number => typeof value === 'number');
 
     if (responseTimes.length > 0) {
-      metrics.avg_response_time =
-        responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
+      const sum = responseTimes.reduce((a, b) => a + b, 0);
+      metrics.avg_response_time = sum / responseTimes.length;
     }
 
     // Error Rate (vereinfacht)

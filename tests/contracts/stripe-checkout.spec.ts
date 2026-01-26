@@ -176,7 +176,7 @@ describe('POST /api/stripe/checkout - Contract Tests', () => {
       validClerkTokens.forEach(token => {
         expect(token).toMatch(/^Bearer /);
         expect(token.split(' ')[1]).toBeDefined();
-        expect(token.split(' ')[1].length).toBeGreaterThan(10);
+        expect(token.split(' ')[1]!.length).toBeGreaterThan(10);
       });
     });
 

@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { updateBookingPaymentStatus } from '../../../../lib/api/bookings';
+import { ErrorSeverity, reportError } from '../../../../lib/monitoring/rollbar';
 import { STRIPE_API_VERSION } from '../../../../lib/stripe/config';
 
 // Skip Stripe initialization during build process
@@ -35,18 +36,21 @@ const getWebhookSecret = () => {
 
 /**
  * Idempotency store to prevent duplicate webhook processing
+ * Map stores event ID -> timestamp for TTL-based eviction
  * In production, use Redis or a database
  */
-const processedEvents = new Set<string>();
-const _EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
+const processedEvents = new Map<string, number>();
+const _EVENT_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours (legacy, now using 1 hour TTL)
+const EVENT_TTL = 3600000; // 1 hour TTL for event deduplication
 
 // Clean up old events periodically
 setInterval(
   () => {
-    const _now = Date.now();
-    processedEvents.forEach(_eventId => {
-      // In real implementation, we'd check timestamp from storage
-      // For now, just clear after some time
+    const now = Date.now();
+    processedEvents.forEach((timestamp, eventId) => {
+      if (now - timestamp > EVENT_TTL) {
+        processedEvents.delete(eventId);
+      }
     });
   },
   60 * 60 * 1000
@@ -66,12 +70,11 @@ setInterval(
  */
 export async function POST(request: NextRequest) {
   const requestId = `webhook_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  console.log(`[${requestId}] Webhook received`);
+  let eventId: string | undefined;
 
   try {
     // Handle build time gracefully
     if (isBuildTime) {
-      console.log(`[${requestId}] Build time detected - webhook unavailable`);
       return NextResponse.json(
         {
           success: false,
@@ -100,7 +103,6 @@ export async function POST(request: NextRequest) {
     const signature = headersList.get('stripe-signature');
 
     if (!signature) {
-      console.warn(`[${requestId}] Missing Stripe signature`);
       return NextResponse.json(
         {
           success: false,
@@ -115,7 +117,6 @@ export async function POST(request: NextRequest) {
     const rawBody = await request.text();
 
     if (!rawBody) {
-      console.warn(`[${requestId}] Empty request body`);
       return NextResponse.json(
         {
           success: false,
@@ -126,25 +127,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(
-      `[${requestId}] Processing webhook with signature verification`
-    );
-
     const event = stripe.webhooks.constructEvent(
       rawBody,
       signature,
       webhookSecret
     );
 
-    console.log(`[${requestId}] Webhook event verified`, {
-      eventId: event.id,
-      eventType: event.type,
-      created: event.created,
-    });
+    // Store event ID for error handling
+    eventId = event.id;
 
-    // Check for idempotency - prevent duplicate processing
+    // Check for idempotency - prevent duplicate processing within TTL window
     if (processedEvents.has(event.id)) {
-      console.info(`[${requestId}] Event already processed: ${event.id}`);
       return NextResponse.json({
         success: true,
         message: 'Event already processed',
@@ -152,63 +145,57 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Mark event as being processed
-    processedEvents.add(event.id);
+    // Mark event as being processed with timestamp for TTL-based eviction
+    processedEvents.set(event.id, Date.now());
 
     // Handle different event types
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        console.log(`[${requestId}] Processing checkout.session.completed`, {
-          sessionId: session.id,
-          customerEmail: session.customer_email,
-          paymentStatus: session.payment_status,
-        });
 
         // Extract metadata
         const { courseId, userId, bookingId } = session.metadata || {};
 
         if (!courseId || !userId) {
-          console.error(`[${requestId}] Missing required metadata`, {
-            courseId,
-            userId,
-            sessionId: session.id,
-          });
+          reportError(
+            `[${requestId}] Missing required metadata in checkout session`,
+            {
+              requestId,
+              additionalData: { sessionId: session.id, courseId, userId },
+            },
+            ErrorSeverity.ERROR
+          );
           break;
         }
 
         // Update booking status to PAID
         if (bookingId) {
           await updateBookingPaymentStatus(bookingId, PaymentStatus.PAID);
-          console.log(`[${requestId}] Booking ${bookingId} marked as PAID`);
         }
-
-        // Log successful payment
-        console.log(`[${requestId}] Payment successful`, {
-          sessionId: session.id,
-          courseId,
-          userId,
-          bookingId,
-          amount: session.amount_total,
-          currency: session.currency,
-        });
 
         break;
       }
 
       case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log(`[${requestId}] Processing payment_intent.payment_failed`, {
-          paymentIntentId: paymentIntent.id,
-          lastPaymentError: paymentIntent.last_payment_error?.message,
-        });
 
         // Extract metadata
         const { bookingId } = paymentIntent.metadata || {};
 
         if (bookingId) {
           await updateBookingPaymentStatus(bookingId, PaymentStatus.FAILED);
-          console.log(`[${requestId}] Booking ${bookingId} marked as FAILED`);
+          reportError(
+            `[${requestId}] Payment failed for booking`,
+            {
+              requestId,
+              additionalData: {
+                bookingId,
+                paymentIntentId: paymentIntent.id,
+                error: paymentIntent.last_payment_error?.message,
+              },
+            },
+            ErrorSeverity.WARNING
+          );
         }
 
         break;
@@ -216,18 +203,12 @@ export async function POST(request: NextRequest) {
 
       case 'payment_intent.canceled': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log(`[${requestId}] Processing payment_intent.canceled`, {
-          paymentIntentId: paymentIntent.id,
-        });
 
         // Extract metadata
         const { bookingId } = paymentIntent.metadata || {};
 
         if (bookingId) {
           await updateBookingPaymentStatus(bookingId, PaymentStatus.CANCELLED);
-          console.log(
-            `[${requestId}] Booking ${bookingId} marked as CANCELLED`
-          );
         }
 
         break;
@@ -235,12 +216,19 @@ export async function POST(request: NextRequest) {
 
       case 'charge.dispute.created': {
         const dispute = event.data.object as Stripe.Dispute;
-        console.warn(`[${requestId}] Dispute created`, {
-          disputeId: dispute.id,
-          amount: dispute.amount,
-          reason: dispute.reason,
-          chargeId: dispute.charge,
-        });
+        reportError(
+          `[${requestId}] Dispute created`,
+          {
+            requestId,
+            additionalData: {
+              disputeId: dispute.id,
+              amount: dispute.amount,
+              reason: dispute.reason,
+              chargeId: dispute.charge,
+            },
+          },
+          ErrorSeverity.WARNING
+        );
 
         // TODO: Handle dispute - potentially mark booking as disputed
         // Could trigger notification to admins
@@ -257,27 +245,15 @@ export async function POST(request: NextRequest) {
           amount_paid?: number;
           amount_due?: number;
         };
-        console.log(`[${requestId}] Processing ${event.type}`, {
-          invoiceId: invoiceData.id,
-          subscriptionId: invoiceData.subscription,
-          amount: invoiceData.amount_paid || invoiceData.amount_due,
-        });
-
         // Handle subscription payments if applicable
         break;
       }
 
       default: {
-        console.info(`[${requestId}] Unhandled event type: ${event.type}`);
+        // Unhandled event type - silently ignore
         break;
       }
     }
-
-    // Log successful webhook processing
-    console.log(`[${requestId}] Webhook processed successfully`, {
-      eventId: event.id,
-      eventType: event.type,
-    });
 
     return NextResponse.json({
       success: true,
@@ -286,10 +262,19 @@ export async function POST(request: NextRequest) {
       eventType: event.type,
     });
   } catch (error) {
-    console.error(`[${requestId}] Webhook processing failed:`, error);
+    // Remove from processed map on error to allow retry
+    // This enables Stripe to retry failed webhooks
+    if (eventId) {
+      processedEvents.delete(eventId);
+    }
 
-    // Remove from processed set on error to allow retry
-    // In production, implement exponential backoff
+    reportError(
+      error instanceof Error
+        ? error
+        : `[${requestId}] Webhook processing failed`,
+      { requestId },
+      ErrorSeverity.ERROR
+    );
 
     if (error instanceof Error) {
       // Handle specific Stripe errors

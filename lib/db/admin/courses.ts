@@ -5,7 +5,8 @@
  * All functions include enrollment counts and proper error handling.
  */
 
-import type { CourseLevel } from '@prisma/client';
+import type { CourseLevel, Prisma } from '@prisma/client';
+import { curriculumSchema } from '../../schemas/admin/course';
 import type { CourseWithEnrollmentCount } from '../../types/admin';
 import { prisma } from '../prisma';
 
@@ -69,15 +70,36 @@ export async function createCourse(data: {
   capacity: number;
   locationId?: string | null;
   isPublished?: boolean;
+  curriculum?: Prisma.InputJsonValue | null;
 }): Promise<CourseWithEnrollmentCount> {
+  // Validate curriculum structure if provided
+  if (data.curriculum !== undefined && data.curriculum !== null) {
+    curriculumSchema.parse(data.curriculum);
+  }
+
   // Always create courses as unpublished - admin must explicitly publish later
-  const { isPublished: _ignored, ...restData } = data;
+  const {
+    isPublished: _ignored,
+    locationId,
+    curriculum,
+    teaser,
+    thumbnailUrl,
+    ...restData
+  } = data;
   const course = await prisma.course.create({
     data: {
       ...restData,
       slug: generateSlug(data.title),
       currency: 'EUR',
       isPublished: false,
+      // Handle optional fields that may be null
+      ...(teaser !== undefined ? { teaser } : {}),
+      ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
+      ...(curriculum !== undefined && curriculum !== null
+        ? { curriculum }
+        : {}),
+      // Connect location if provided, otherwise omit
+      ...(locationId ? { location: { connect: { id: locationId } } } : {}),
     },
     include: {
       _count: {
@@ -108,10 +130,23 @@ export async function updateCourse(
     thumbnailUrl?: string | null;
     capacity?: number;
     locationId?: string | null;
+    curriculum?: Prisma.InputJsonValue | null;
     updatedAt: Date;
   }
 ): Promise<CourseWithEnrollmentCount> {
-  const { updatedAt, ...updateData } = data;
+  // Validate curriculum structure if provided
+  if (data.curriculum !== undefined && data.curriculum !== null) {
+    curriculumSchema.parse(data.curriculum);
+  }
+
+  const {
+    updatedAt,
+    locationId,
+    curriculum,
+    teaser,
+    thumbnailUrl,
+    ...updateData
+  } = data;
 
   // Check for concurrent edits (optimistic locking)
   const existing = await prisma.course.findUnique({
@@ -140,9 +175,18 @@ export async function updateCourse(
     }
   }
 
-  return prisma.course.update({
+  // Build update data, handling optional nullable fields
+  const prismaUpdateData = {
+    ...updateData,
+    ...(teaser !== undefined ? { teaser } : {}),
+    ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
+    ...(curriculum !== undefined && curriculum !== null ? { curriculum } : {}),
+    ...(locationId !== undefined ? { locationId } : {}),
+  };
+
+  const updated = await prisma.course.update({
     where: { id },
-    data: updateData,
+    data: prismaUpdateData,
     include: {
       _count: {
         select: {
@@ -151,6 +195,7 @@ export async function updateCourse(
       },
     },
   });
+  return updated;
 }
 
 /**

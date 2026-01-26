@@ -7,6 +7,7 @@
     "jsx": "react-jsx",
     "noEmit": true,
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -34,6 +35,15 @@
   ],
   "exclude": [
     "node_modules",
+    ".next",
+    ".vercel",
+    ".git",
+    "playwright-report",
+    "test-results",
+    "prisma/migrations",
+    "coverage",
+    "dist",
+    "build",
     "scripts/e2e-seed.ts",
     "tests/unit/components/**/*.spec.tsx"
   ]

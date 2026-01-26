@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '../../../lib/db/prisma';
 import { logError } from '../../../lib/errors';
+import { ErrorSeverity, reportError } from '../../../lib/monitoring/rollbar';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -14,6 +15,40 @@ const BookingQuerySchema = z.object({
 const CreateBookingSchema = z.object({
   courseId: z.string().min(1, 'Course ID is required'),
 });
+
+/**
+ * Sanitize data for error reporting to prevent large payloads
+ * - Ensures primitives are serialized correctly
+ * - Caps string lengths to avoid backend drops
+ */
+function sanitizeForErrorReporting(
+  data: Record<string, unknown>
+): Record<string, unknown> {
+  const MAX_STRING_LENGTH = 200;
+  const sanitized: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    if (typeof value === 'string') {
+      sanitized[key] =
+        value.length > MAX_STRING_LENGTH
+          ? `${value.substring(0, MAX_STRING_LENGTH)}...[truncated]`
+          : value;
+    } else if (typeof value === 'number' || typeof value === 'boolean') {
+      sanitized[key] = value;
+    } else if (value === null || value === undefined) {
+      sanitized[key] = value;
+    } else {
+      // Convert objects/arrays to string representation (capped)
+      const stringified = String(value);
+      sanitized[key] =
+        stringified.length > MAX_STRING_LENGTH
+          ? `${stringified.substring(0, MAX_STRING_LENGTH)}...[truncated]`
+          : stringified;
+    }
+  }
+
+  return sanitized;
+}
 
 type BookingRecord = {
   id: string;
@@ -30,9 +65,16 @@ type BookingRecord = {
 function normalizeBookings(bookings: BookingRecord[], requestId: string) {
   return bookings.map(booking => {
     if (!booking.course) {
-      console.warn(
+      reportError(
         '[API /api/bookings GET] Missing course relation for booking',
-        { requestId }
+        {
+          requestId,
+          additionalData: sanitizeForErrorReporting({
+            bookingId: String(booking.id), // Ensure primitive string
+            courseId: String(booking.courseId),
+          }),
+        },
+        ErrorSeverity.WARNING
       );
     }
 
@@ -120,7 +162,6 @@ export async function GET(request: Request) {
       operation: 'api/bookings#get',
       requestId: _requestId,
     });
-    console.error('[API /api/bookings GET] Error:', error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Invalid parameters' },

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { CourseDetailCourse } from '../../../components/course-detail';
 import { CourseDetailLayout } from '../../../components/course-detail';
+import type { CurriculumModule } from '../../../components/course-detail/CurriculumSection';
 import { getCourseById, getCourseBySlug } from '../../../lib/api/courses';
 import {
   CourseNotFoundError,
@@ -18,6 +19,26 @@ export { genMetadata as generateMetadata };
 
 // Revalidate every 60 seconds for fresh data while enabling caching
 export const revalidate = 60;
+
+/**
+ * Runtime guard to ensure curriculum is a valid array of modules.
+ * Protects against legacy data that may contain non-array values.
+ */
+function ensureCurriculumArray(curriculum: unknown): CurriculumModule[] {
+  if (!Array.isArray(curriculum)) {
+    return [];
+  }
+  // Filter out any malformed modules (must have id, day, title, topics)
+  return curriculum.filter(
+    (mod): mod is CurriculumModule =>
+      typeof mod === 'object' &&
+      mod !== null &&
+      typeof mod.id === 'string' &&
+      typeof mod.day === 'number' &&
+      typeof mod.title === 'string' &&
+      Array.isArray(mod.topics)
+  );
+}
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -172,7 +193,8 @@ export default async function CourseDetailPage({ params }: PageProps) {
       : null,
     // These will come from extended course data in future
     learningObjectives: [],
-    curriculumModules: [],
+    // Curriculum from database with runtime guard for legacy data
+    curriculumModules: ensureCurriculumArray(course.curriculum),
     testimonials: [],
   };
 

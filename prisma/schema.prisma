@@ -32,11 +32,13 @@ model Course {
   title         String
   description   String?
   teaser        String?
+  curriculum    Json?
   slug          String              @unique
   price         Int
   currency      String              @default("EUR")
   capacity      Int                 @default(20)
   startDate     DateTime?           @map("start_date")
+  endDate       DateTime?           @map("end_date")
   startTime     DateTime?           @map("start_time")
   endTime       DateTime?           @map("end_time")
   isPublished   Boolean             @default(false) @map("is_published")
@@ -71,6 +73,9 @@ model Booking {
   paymentStatus         PaymentStatus        @default(PENDING) @map("payment_status")
   stripePaymentIntentId String?              @map("stripe_payment_intent_id")
   stripeSessionId       String?              @map("stripe_session_id")
+  stripeInvoiceId       String?              @map("stripe_invoice_id")
+  stripeInvoiceUrl      String?              @map("stripe_invoice_url")
+  stripeInvoicePdfUrl   String?              @map("stripe_invoice_pdf_url")
   amount                Int
   currency              String               @default("EUR")
   createdAt             DateTime             @default(now()) @map("created_at")

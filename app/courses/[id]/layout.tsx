@@ -25,8 +25,8 @@ export async function generateMetadata({
     if (!res.ok) {
       // Fallback metadata when course is not found
       return generateSEOMetadata({
-        title: 'Kurs',
-        description: 'Kursdetails und Informationen.',
+        title: 'Seminar',
+        description: 'Seminardetails und Informationen.',
         canonicalUrl: `${SITE_CONFIG.url}/courses/${identifier}`,
       });
     }
@@ -46,7 +46,7 @@ export async function generateMetadata({
     const canonicalSlug = course?.slug ?? identifier;
     const description = truncateDescription(
       course?.description ??
-        'Kursdetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.',
+        'Seminardetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.',
       160
     );
     // Use Twitter image from database if available, otherwise fallback
@@ -65,8 +65,8 @@ export async function generateMetadata({
   } catch (_) {
     // Network or parsing error – provide minimal but valid metadata
     return generateSEOMetadata({
-      title: 'Kurs',
-      description: 'Kursdetails und Informationen.',
+      title: 'Seminar',
+      description: 'Seminardetails und Informationen.',
       canonicalUrl: `${SITE_CONFIG.url}/courses/${identifier}`,
     });
   }

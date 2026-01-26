@@ -1,0 +1,236 @@
+[
+  {
+    "id": "user_test_1768767308082",
+    "name": null,
+    "email": "test-1768767308082@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T20:15:08.228Z",
+    "updatedAt": "2026-01-18T20:15:08.228Z"
+  },
+  {
+    "id": "user_enrolled_1768767309012",
+    "name": null,
+    "email": "enrolled-1768767309012@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T20:15:09.161Z",
+    "updatedAt": "2026-01-18T20:15:09.161Z"
+  },
+  {
+    "id": "user_student_1768767309372",
+    "name": null,
+    "email": "student-1768767309372@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T20:15:09.528Z",
+    "updatedAt": "2026-01-18T20:15:09.528Z"
+  },
+  {
+    "id": "cmjqsyb9t000beb6wrcgta28n",
+    "name": null,
+    "email": "test-1766991225177@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2025-12-29T06:53:45.232Z",
+    "updatedAt": "2025-12-29T06:53:45.232Z"
+  },
+  {
+    "id": "cmjqsyble000geb6wjaou6lkc",
+    "name": null,
+    "email": "enrolled-1766991225596@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2025-12-29T06:53:45.650Z",
+    "updatedAt": "2025-12-29T06:53:45.650Z"
+  },
+  {
+    "id": "cmjqsybph000jeb6wxfud8u5w",
+    "name": null,
+    "email": "student-1766991225743@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2025-12-29T06:53:45.797Z",
+    "updatedAt": "2025-12-29T06:53:45.797Z"
+  },
+  {
+    "id": "user_test_1768767323672",
+    "name": null,
+    "email": "test-1768767323672@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T20:15:23.819Z",
+    "updatedAt": "2026-01-18T20:15:23.819Z"
+  },
+  {
+    "id": "user_enrolled_1768767324632",
+    "name": null,
+    "email": "enrolled-1768767324632@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T20:15:24.791Z",
+    "updatedAt": "2026-01-18T20:15:24.791Z"
+  },
+  {
+    "id": "user_student_1768767324968",
+    "name": null,
+    "email": "student-1768767324968@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T20:15:25.130Z",
+    "updatedAt": "2026-01-18T20:15:25.130Z"
+  },
+  {
+    "id": "cmki7adj4000bfkc1rq4nnv7c",
+    "name": null,
+    "email": "test-1768647889223@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-17T11:04:49.408Z",
+    "updatedAt": "2026-01-17T11:04:49.408Z"
+  },
+  {
+    "id": "cmki7ae4a000gfkc1leildqlp",
+    "name": null,
+    "email": "enrolled-1768647889976@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-17T11:04:50.170Z",
+    "updatedAt": "2026-01-17T11:04:50.170Z"
+  },
+  {
+    "id": "cmki7aec2000jfkc1ac9jtcx2",
+    "name": null,
+    "email": "student-1768647890255@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-17T11:04:50.450Z",
+    "updatedAt": "2026-01-17T11:04:50.450Z"
+  },
+  {
+    "id": "cmkjl2z1u000bea9jwf7x7jr3",
+    "name": null,
+    "email": "test-1768731524629@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T10:18:44.850Z",
+    "updatedAt": "2026-01-18T10:18:44.850Z"
+  },
+  {
+    "id": "cmkjl2zua000gea9j54629yqk",
+    "name": null,
+    "email": "enrolled-1768731525645@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T10:18:45.874Z",
+    "updatedAt": "2026-01-18T10:18:45.874Z"
+  },
+  {
+    "id": "cmkjl304x000jea9jjj67qpi7",
+    "name": null,
+    "email": "student-1768731525986@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T10:18:46.257Z",
+    "updatedAt": "2026-01-18T10:18:46.257Z"
+  },
+  {
+    "id": "user_test_1768763904344",
+    "name": null,
+    "email": "test-1768763904344@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T19:18:24.623Z",
+    "updatedAt": "2026-01-18T19:18:24.623Z"
+  },
+  {
+    "id": "user_enrolled_1768763905663",
+    "name": null,
+    "email": "enrolled-1768763905663@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T19:18:25.929Z",
+    "updatedAt": "2026-01-18T19:18:25.929Z"
+  },
+  {
+    "id": "user_student_1768763906114",
+    "name": null,
+    "email": "student-1768763906114@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T19:18:26.363Z",
+    "updatedAt": "2026-01-18T19:18:26.363Z"
+  },
+  {
+    "id": "user_test_1768763923063",
+    "name": null,
+    "email": "test-1768763923063@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T19:18:43.417Z",
+    "updatedAt": "2026-01-18T19:18:43.417Z"
+  },
+  {
+    "id": "user_enrolled_1768763924493",
+    "name": null,
+    "email": "enrolled-1768763924493@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T19:18:44.761Z",
+    "updatedAt": "2026-01-18T19:18:44.761Z"
+  },
+  {
+    "id": "user_student_1768763924956",
+    "name": null,
+    "email": "student-1768763924956@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T19:18:45.202Z",
+    "updatedAt": "2026-01-18T19:18:45.202Z"
+  },
+  {
+    "id": "user_test_1768764889527",
+    "name": null,
+    "email": "test-1768764889527@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T19:34:49.799Z",
+    "updatedAt": "2026-01-18T19:34:49.799Z"
+  },
+  {
+    "id": "user_enrolled_1768764890852",
+    "name": null,
+    "email": "enrolled-1768764890852@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T19:34:51.042Z",
+    "updatedAt": "2026-01-18T19:34:51.042Z"
+  },
+  {
+    "id": "user_student_1768764891219",
+    "name": null,
+    "email": "student-1768764891219@example.com",
+    "emailVerified": null,
+    "image": null,
+    "createdAt": "2026-01-18T19:34:51.422Z",
+    "updatedAt": "2026-01-18T19:34:51.422Z"
+  },
+  {
+    "id": "user_38aX2y8wCFqaAPMxUw25EQi7U5h",
+    "name": "Andreas Bernt-Bärtl",
+    "email": "abb@laparo.biz",
+    "emailVerified": null,
+    "image": "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvdXBsb2FkZWQvaW1nXzM4ZEJUcWpRazBUTkpGeHBGY01pOEFhSUwyQyJ9",
+    "createdAt": "2026-01-24T08:18:13.466Z",
+    "updatedAt": "2026-01-24T13:21:47.526Z"
+  },
+  {
+    "id": "user_33d5cUFNs8SidF8uH2odnxESJhR",
+    "name": "Andreas Bernt-Bärtl",
+    "email": "a.berntbaertl@googlemail.com",
+    "emailVerified": null,
+    "image": "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18zM2Q1Y1VpZ1FsOUE3eTZDaUJLdWpGcVp4RzAifQ",
+    "createdAt": "2026-01-23T19:44:13.281Z",
+    "updatedAt": "2026-01-24T22:50:16.501Z"
+  }
+]

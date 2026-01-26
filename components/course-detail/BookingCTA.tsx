@@ -10,6 +10,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import Link from 'next/link';
 import type React from 'react';
+import { TERMS } from '../../lib/constants';
 import { colors, typography } from '../../lib/design-tokens';
 
 export interface BookingCTAProps {
@@ -134,8 +135,8 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
         size='large'
         aria-label={
           price
-            ? `Kurs buchen für ${formatPrice(price, currency)}`
-            : 'Kurs buchen'
+            ? `${TERMS.bookCourse} für ${formatPrice(price, currency)}`
+            : TERMS.bookCourse
         }
         sx={{
           backgroundColor: colors.petrol,

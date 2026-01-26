@@ -7,8 +7,9 @@ import type { Metadata } from 'next';
 import { MyCoursesClient } from './MyCoursesClient';
 
 export const metadata: Metadata = {
-  title: 'Meine Kurse - Hemera Academy',
-  description: 'Verwalte deine gebuchten Kurse und verfolge deinen Fortschritt',
+  title: 'Meine Seminare - Hemera Academy',
+  description:
+    'Verwalte deine gebuchten Seminare und verfolge deinen Fortschritt',
 };
 
 // Design tokens
@@ -35,11 +36,11 @@ export default async function MyCoursesPage() {
         component='h1'
         sx={{ color: colors.petrol, fontWeight: 600, mb: 1 }}
       >
-        Meine Kurse
+        Meine Seminare
       </Typography>
 
       <Typography variant='body1' color='text.secondary' sx={{ mb: 4 }}>
-        Verfolge den Fortschritt deines Kurses
+        Verfolge den Fortschritt deines Seminars
       </Typography>
 
       <MyCoursesClient userId={user.id} />

@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
+import { TERMS } from '../../lib/constants/terminology';
 
 // Hemera Design Tokens
 const colors = {
@@ -80,7 +81,7 @@ export function DashboardNavigation() {
                 },
               }}
             >
-              Meine Kurse
+              {TERMS.myCourses}
             </Button>
 
             <Button
@@ -96,7 +97,7 @@ export function DashboardNavigation() {
                 },
               }}
             >
-              Kurse
+              {TERMS.courses}
             </Button>
 
             <UserButton

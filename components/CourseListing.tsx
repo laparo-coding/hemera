@@ -5,6 +5,7 @@ import { de } from 'date-fns/locale';
 import Image from 'next/image';
 import Link from 'next/link';
 import type React from 'react';
+import { TERMS } from '@/lib/constants';
 import { getAvatarInitial } from '@/lib/utils/avatar';
 
 export interface Course {
@@ -314,11 +315,11 @@ const CourseListing: React.FC<CourseListingProps> = ({
             />
           </svg>
           <h3 className='text-lg font-medium text-gray-900 mb-2'>
-            Keine Kurse gefunden
+            {TERMS.noCoursesFound}
           </h3>
           <p className='text-gray-500'>
-            Es sind derzeit keine Kurse verfügbar. Schauen Sie später wieder
-            vorbei!
+            Es sind derzeit keine {TERMS.courses} verfügbar. Schauen Sie später
+            wieder vorbei!
           </p>
         </div>
       </div>
@@ -378,7 +379,7 @@ const CourseListing: React.FC<CourseListingProps> = ({
               </>
             ) : (
               <>
-                Mehr Kurse laden
+                Mehr {TERMS.courses} laden
                 <svg
                   className='ml-2 -mr-1 w-5 h-5'
                   fill='none'

@@ -14,8 +14,9 @@ function extractFirstSentence(text: string): string {
   // Match first sentence ending with . ! or ?
   // Handle common abbreviations like "z.B.", "bzw.", "Dr.", "ca."
   const match = text.match(/^(.+?[.!?])(?:\s|$)/);
-  if (match) {
-    return match[1].trim();
+  const firstMatch = match?.[1];
+  if (firstMatch) {
+    return firstMatch.trim();
   }
   // If no sentence ending found, return first 150 chars with ellipsis
   if (text.length > 150) {
