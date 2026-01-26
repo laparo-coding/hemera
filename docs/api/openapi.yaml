@@ -286,17 +286,9 @@ paths:
                       data:
                         $ref: '#/components/schemas/Location'
         '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
   /locations/{id}:
     get:
       tags: [Public, Locations]
@@ -324,11 +316,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/Location'
         '404':
-          description: Location not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
     put:
       tags: [Locations]
       operationId: updateLocation
@@ -2093,3 +2081,86 @@ components:
           type: string
           enum: [connected, disconnected]
       required: [status, timestamp]
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Invalid request parameters"
+            code: VALIDATION_ERROR
+            requestId: "550e8400-e29b-41d4-a716-446655440000"
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Authentication required"
+            code: UNAUTHORIZED
+            requestId: "550e8400-e29b-41d4-a716-446655440001"
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "You do not have permission to access this resource"
+            code: FORBIDDEN
+            requestId: "550e8400-e29b-41d4-a716-446655440002"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Resource not found"
+            code: NOT_FOUND
+            requestId: "550e8400-e29b-41d4-a716-446655440003"
+    Conflict:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Resource already exists or conflicts with current state"
+            code: CONFLICT
+            requestId: "550e8400-e29b-41d4-a716-446655440004"
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds until next request allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Rate limit exceeded. Try again later."
+            code: RATE_LIMITED
+            requestId: "550e8400-e29b-41d4-a716-446655440005"
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "An unexpected error occurred"
+            code: INTERNAL_ERROR
+            requestId: "550e8400-e29b-41d4-a716-446655440006"
