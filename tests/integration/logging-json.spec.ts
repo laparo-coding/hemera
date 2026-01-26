@@ -28,7 +28,7 @@ describe('Integration: Structured JSON logging with requestId', () => {
     logger.info('Demo event', { foo: 'bar' });
 
     expect(calls).toHaveLength(1);
-    const entry = calls[0];
+    const entry = calls[0]!;
     expect(entry.message).toBe('Demo event');
     expect(entry.payload).toBeDefined();
     // our ApiLogger puts requestId and context in the payload

@@ -23,7 +23,7 @@ import {
   expect,
   it,
 } from '@jest/globals';
-import { prisma } from '../../../lib/db/prisma';
+import { prisma } from '../../lib/db/prisma';
 
 // Check if server is available before running HTTP-based tests
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -74,7 +74,7 @@ describeWithServer('Admin Course API - Contract Tests', () => {
       await prisma.booking.deleteMany({
         where: {
           courseId: {
-            in: testCourses.map(c => c.id),
+            in: testCourses.map((c: { id: string }) => c.id),
           },
         },
       });
@@ -107,7 +107,7 @@ describeWithServer('Admin Course API - Contract Tests', () => {
       await prisma.booking.deleteMany({
         where: {
           courseId: {
-            in: testCourses.map(c => c.id),
+            in: testCourses.map((c: { id: string }) => c.id),
           },
         },
       });

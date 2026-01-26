@@ -7,7 +7,7 @@
 
 import { afterAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { PaymentStatus } from '@prisma/client';
-import { closeDb, prisma } from '../../../lib/db/prisma';
+import { closeDb, prisma } from '../../lib/db/prisma';
 
 describe('GET /api/bookings - Enhanced Response Contract', () => {
   let testCourse: { id: string };
