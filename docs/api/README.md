@@ -1,6 +1,6 @@
 # Hemera API Doku
 
-> OpenAPI 3.1.0 Spezifikation & Postman Collection für alle 56 Endpoints
+> OpenAPI 3.1.0 Spezifikation & Postman Collection für alle 44 Endpoints
 
 Diese Seite fasst die wichtigsten Schritte aus `specs/019-OpenAPI-Postman/quickstart.md` zusammen, damit du sofort loslegen kannst.
 
@@ -10,7 +10,7 @@ Diese Seite fasst die wichtigsten Schritte aus `specs/019-OpenAPI-Postman/quicks
 |-------|-------|
 | `openapi.yaml` | Vollständige OpenAPI 3.1.0 Spezifikation (Tags: Public, Auth, Bookings, Courses, Locations, Admin, Webhooks, Monitoring) |
 | `hemera.postman.json` | Postman Collection v2.1 inkl. Ordnern nach Tags und globalen Pre-Request/Test-Skripten |
-| `hemera.env.json` | Environment-Vorlage mit Basis-URLs, Clerk-Token und Platzhaltern für IDs |
+| `hemera.env.json` | Environment-Vorlage mit `baseUrl`, `bearer_token` und Test-IDs |
 
 ## Schritt 1: OpenAPI importieren
 
@@ -28,7 +28,7 @@ Wenn du lieber direkt in Swagger UI schauen möchtest, kannst du `openapi.yaml` 
 2. Importiere danach `docs/api/hemera.env.json` als Environment.
 3. Wähle das Environment oben rechts aus.
 
-> Hinweis: Die Collection enthält bereits ein Pre-Request-Skript, das automatisch den `Authorization`-Header setzt, wenn `clerkToken` im Environment hinterlegt ist. Außerdem laufen Basistests (Statuscode, Antwortzeit, Hemera-Wrapper) nach jedem Request.
+> **Wichtig**: Die Collection setzt automatisch den `Authorization: Bearer {{bearer_token}}` Header für alle Requests. Du musst nur die Variable `bearer_token` im Environment füllen. Zusätzlich laufen nach jedem Request automatische Tests (Response-Zeit, JSON-Validierung, Success-Feld).
 
 ## Schritt 3: Environment anpassen
 
@@ -49,7 +49,7 @@ Passe mindestens `baseUrl` und `bearer_token` an.
 1. Melde dich auf https://hemera.app an.
 2. Öffne DevTools → Network.
 3. Suche einen `/api` Request und kopiere den `Authorization` Header.
-4. Trage nur den Token-Teil nach `Bearer` bei `clerkToken` ein.
+4. Trage nur den Token-Teil (nach `Bearer `) in `bearer_token` ein.
 
 **Variante B (Clerk Dashboard, Dev/Test):**
 
@@ -64,15 +64,17 @@ Passe mindestens `baseUrl` und `bearer_token` an.
 
 ## Collection Features
 
-Die Collection enthält:
+Die Collection setzt folgende Automatisierungen:
 
-- **Collection-Level Auth**: Bearer Token wird automatisch aus `{{bearer_token}}` gesetzt
-- **Pre-Request Script**: Setzt Authorization-Header automatisch
-- **Test Scripts**: 
+- **Collection-Level Auth**: Jeder Request erhält automatisch `Authorization: Bearer {{bearer_token}}`
+- **Pre-Request Script**: Liest `bearer_token` aus dem Environment und fügt den Header hinzu
+- **Test Scripts** (laufen nach jedem Request):
   - Response-Zeit unter 2000ms
   - Valide JSON-Antwort
   - `success: true` für 2xx Responses
   - Error-Struktur (`success: false`, `error`) für 4xx/5xx
+
+> Du musst keine manuellen Auth-Header setzen – fülle einfach `bearer_token` im Environment.
 
 ## Validierung / Scripts
 
