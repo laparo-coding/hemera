@@ -13,15 +13,18 @@ rules:
   # OpenAPI 3.1 Standard Rules
   # ============================================
   
-  # Ensure OpenAPI version is 3.1.0
+  # Ensure OpenAPI version is exactly 3.1.x (escape dots for regex)
+  # Note: spectral:oas handles format validation; this enforces 3.1.x minimum
   openapi-3-1-version:
-    description: Ensure the OpenAPI version is 3.1.0
-    given: $.openapi
+    description: Hemera requires OpenAPI 3.1.x specification
+    message: "OpenAPI version must be 3.1.x (found {{value}})"
+    given: $
     then:
+      field: openapi
       function: pattern
       functionOptions:
-        match: "^3.1.0$"
-    severity: warn
+        match: "^3\\.1\\.[0-9]+$"
+    severity: error
   
   # Ensure all operations have operationId
   operation-operationId: error
