@@ -224,6 +224,9 @@ jobs:
     if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.environment == 'production')
     # Production deploys on Vercel can take longer (build + finalize). Bump timeout to avoid premature cancellation.
     timeout-minutes: 60
+    environment:
+      name: Production
+      url: https://hemera-tau.vercel.app
 
     steps:
       - name: Checkout code
