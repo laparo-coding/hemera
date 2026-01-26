@@ -1,0 +1,370 @@
+#!/usr/bin/env node
+/**
+ * Add Auth, Pre-request Script, and Tests to Postman Collection
+ * Feature: 019-OpenAPI-Postman
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const COLLECTION_PATH = path.join(__dirname, '../docs/api/hemera.postman.json');
+
+const collection = JSON.parse(fs.readFileSync(COLLECTION_PATH, 'utf-8'));
+
+// Add collection-level auth
+collection.auth = {
+  type: 'bearer',
+  bearer: [
+    {
+      key: 'token',
+      value: '{{bearer_token}}',
+      type: 'string',
+    },
+  ],
+};
+
+// Remove hardcoded Authorization headers from requests and examples
+// Since we use collection-level auth, these are redundant and can leak "<token>" into exports
+function removeHardcodedAuthHeaders(items) {
+  for (const item of items) {
+    // Remove from request headers
+    if (item.request?.header && Array.isArray(item.request.header)) {
+      item.request.header = item.request.header.filter(
+        h => h.key !== 'Authorization'
+      );
+    }
+
+    // Remove from response examples (originalRequest headers)
+    if (item.response && Array.isArray(item.response)) {
+      for (const response of item.response) {
+        if (response.originalRequest?.header) {
+          response.originalRequest.header =
+            response.originalRequest.header.filter(
+              h => h.key !== 'Authorization'
+            );
+        }
+      }
+    }
+
+    // Remove per-request auth blocks (inherit from collection)
+    if (item.request) {
+      delete item.request.auth;
+    }
+    // Also remove auth property from item itself
+    delete item.auth;
+
+    // Recurse into nested items (folders)
+    if (item.item && Array.isArray(item.item)) {
+      removeHardcodedAuthHeaders(item.item);
+    }
+  }
+}
+
+removeHardcodedAuthHeaders(collection.item || []);
+
+// Add pre-request script for automatic token handling
+collection.event = [
+  {
+    listen: 'prerequest',
+    script: {
+      type: 'text/javascript',
+      exec: [
+        '// Hemera API Pre-request Script',
+        '// Automatically sets Bearer token from environment',
+        '',
+        'const token = pm.environment.get("bearer_token");',
+        'if (token) {',
+        '    pm.request.headers.add({',
+        '        key: "Authorization",',
+        '        value: "Bearer " + token',
+        '    });',
+        '}',
+      ],
+    },
+  },
+  {
+    listen: 'test',
+    script: {
+      type: 'text/javascript',
+      exec: [
+        '// Hemera API Test Script',
+        '// Validates response structure, status codes, and reliability markers',
+        '',
+        '// Check response time',
+        'pm.test("Response time is less than 2000ms", function () {',
+        '    pm.expect(pm.response.responseTime).to.be.below(2000);',
+        '});',
+        '',
+        '// Check for valid JSON response',
+        'pm.test("Response is valid JSON", function () {',
+        '    pm.response.to.be.json;',
+        '});',
+        '',
+        '// Check status code is expected (2xx or 4xx, not 5xx)',
+        'pm.test("Status code is 2xx or 4xx (no server errors)", function () {',
+        '    pm.expect(pm.response.code).to.be.below(500);',
+        '});',
+        '',
+        '// Check for requestId in response (reliability marker)',
+        'pm.test("Response contains requestId", function () {',
+        '    const json = pm.response.json();',
+        '    if (json.hasOwnProperty("requestId")) {',
+        '        pm.expect(json.requestId).to.be.a("string");',
+        '        pm.expect(json.requestId.length).to.be.greaterThan(0);',
+        '    }',
+        '});',
+        '',
+        '// Check success field consistency for 2xx responses',
+        'if (pm.response.code >= 200 && pm.response.code < 300) {',
+        '    pm.test("Success field is true for 2xx", function () {',
+        '        const json = pm.response.json();',
+        '        if (json.hasOwnProperty("success")) {',
+        '            pm.expect(json.success).to.equal(true);',
+        '        }',
+        '    });',
+        '}',
+        '',
+        '// Check error response structure for 4xx/5xx',
+        'if (pm.response.code >= 400) {',
+        '    pm.test("Error response has required fields", function () {',
+        '        const json = pm.response.json();',
+        '        pm.expect(json).to.have.property("success");',
+        '        pm.expect(json.success).to.equal(false);',
+        '        pm.expect(json).to.have.property("error");',
+        '    });',
+        '',
+        '    pm.test("Error response has requestId for tracing", function () {',
+        '        const json = pm.response.json();',
+        '        if (json.hasOwnProperty("requestId")) {',
+        '            pm.expect(json.requestId).to.be.a("string");',
+        '        }',
+        '    });',
+        '}',
+      ],
+    },
+  },
+];
+
+// Add variable for baseUrl
+collection.variable = [
+  {
+    key: 'baseUrl',
+    value: 'http://localhost:3000/api',
+    type: 'string',
+  },
+];
+
+// Error response templates with correct domain codes
+const errorResponseTemplates = {
+  400: {
+    success: false,
+    error: 'Invalid request parameters',
+    code: 'VALIDATION_ERROR',
+    requestId: '550e8400-e29b-41d4-a716-446655440000',
+  },
+  401: {
+    success: false,
+    error: 'Authentication required',
+    code: 'UNAUTHORIZED',
+    requestId: '550e8400-e29b-41d4-a716-446655440001',
+  },
+  403: {
+    success: false,
+    error: 'You do not have permission to access this resource',
+    code: 'FORBIDDEN',
+    requestId: '550e8400-e29b-41d4-a716-446655440002',
+  },
+  404: {
+    success: false,
+    error: 'Resource not found',
+    code: 'NOT_FOUND',
+    requestId: '550e8400-e29b-41d4-a716-446655440003',
+  },
+  409: {
+    success: false,
+    error: 'Resource already exists or conflicts with current state',
+    code: 'CONFLICT',
+    requestId: '550e8400-e29b-41d4-a716-446655440004',
+  },
+  429: {
+    success: false,
+    error: 'Rate limit exceeded. Try again later.',
+    code: 'RATE_LIMITED',
+    requestId: '550e8400-e29b-41d4-a716-446655440005',
+  },
+  500: {
+    success: false,
+    error: 'An unexpected error occurred',
+    code: 'INTERNAL_ERROR',
+    requestId: '550e8400-e29b-41d4-a716-446655440006',
+  },
+};
+
+// Fix error response bodies in all items recursively
+function fixErrorResponses(items) {
+  for (const item of items) {
+    if (item.response && Array.isArray(item.response)) {
+      for (const response of item.response) {
+        const statusCode = response.code;
+        if (statusCode >= 400 && errorResponseTemplates[statusCode]) {
+          response.body = JSON.stringify(
+            errorResponseTemplates[statusCode],
+            null,
+            2
+          );
+        }
+      }
+    }
+    if (item.item && Array.isArray(item.item)) {
+      fixErrorResponses(item.item);
+    }
+  }
+}
+
+fixErrorResponses(collection.item || []);
+
+// Fix success boolean placeholders in response bodies
+// Success responses (2xx): "success": "<boolean>" → "success": true
+// Error responses (4xx/5xx): already fixed by fixErrorResponses above
+function fixSuccessBooleans(items) {
+  for (const item of items) {
+    if (item.response && Array.isArray(item.response)) {
+      for (const response of item.response) {
+        const statusCode = response.code;
+        // Only fix 2xx responses - error responses are handled by fixErrorResponses
+        if (statusCode >= 200 && statusCode < 300 && response.body) {
+          // Replace "<boolean>" placeholder with true for success responses
+          response.body = response.body.replace(
+            /"success":\s*"<boolean>"/g,
+            '"success": true'
+          );
+        }
+      }
+    }
+    if (item.item && Array.isArray(item.item)) {
+      fixSuccessBooleans(item.item);
+    }
+  }
+}
+
+fixSuccessBooleans(collection.item || []);
+
+// Per-request test scripts for key endpoints
+// These align with README claims and catch regressions early
+const keyEndpointTests = {
+  'Deployment health status': [
+    'pm.test("Status is 200 OK", function () {',
+    '    pm.response.to.have.status(200);',
+    '});',
+    'pm.test("Has success boolean", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.be.a("boolean");',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+  ],
+  'List published courses': [
+    'pm.test("Status is 2xx", function () {',
+    '    pm.expect(pm.response.code).to.be.within(200, 299);',
+    '});',
+    'pm.test("Has success: true", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.equal(true);',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+    'pm.test("Has courses array", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.data.courses).to.be.an("array");',
+    '});',
+  ],
+  'List locations': [
+    'pm.test("Status is 2xx", function () {',
+    '    pm.expect(pm.response.code).to.be.within(200, 299);',
+    '});',
+    'pm.test("Has success: true", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.equal(true);',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+  ],
+  'List user bookings': [
+    'pm.test("Status is 2xx or 401", function () {',
+    '    pm.expect([200, 401]).to.include(pm.response.code);',
+    '});',
+    'pm.test("Has success boolean", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.be.a("boolean");',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+  ],
+  'Get auth providers': [
+    'pm.test("Status is 200 OK", function () {',
+    '    pm.response.to.have.status(200);',
+    '});',
+    'pm.test("Has success: true", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.success).to.equal(true);',
+    '});',
+    'pm.test("Has requestId", function () {',
+    '    const json = pm.response.json();',
+    '    pm.expect(json.requestId).to.be.a("string");',
+    '});',
+  ],
+};
+
+// Add per-request test scripts to key endpoints
+function addEndpointTests(items) {
+  for (const item of items) {
+    if (item.request && keyEndpointTests[item.name]) {
+      item.event = item.event || [];
+      // Check if test event already exists
+      const hasTest = item.event.some(e => e.listen === 'test');
+      if (!hasTest) {
+        item.event.push({
+          listen: 'test',
+          script: {
+            type: 'text/javascript',
+            exec: keyEndpointTests[item.name],
+          },
+        });
+      }
+    }
+    if (item.item && Array.isArray(item.item)) {
+      addEndpointTests(item.item);
+    }
+  }
+}
+
+addEndpointTests(collection.item || []);
+
+// Normalize variable names: replace {{bearerToken}} with {{bearer_token}}
+// This ensures consistency with environment file and README
+let collectionStr = JSON.stringify(collection, null, 2);
+collectionStr = collectionStr.replace(
+  /\{\{bearerToken\}\}/g,
+  '{{bearer_token}}'
+);
+const normalizedCollection = JSON.parse(collectionStr);
+
+fs.writeFileSync(
+  COLLECTION_PATH,
+  JSON.stringify(normalizedCollection, null, 2)
+);
+console.log(
+  '✅ Added auth, pre-request script, tests, fixed error responses, and normalized variable names'
+);

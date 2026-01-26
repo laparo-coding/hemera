@@ -206,8 +206,8 @@ describe('User Course Detail Page Integration', () => {
         orderBy: { sortOrder: 'asc' },
       });
 
-      expect(assets.length).toBe(2);
-      expect(assets[0]!.title).toBe('Zusammenfassung Video 1');
+      expect(assets).toHaveLength(2);
+      expect(assets[0].title).toBe('Zusammenfassung Video 1');
     });
 
     it('should load participation documents', async () => {
@@ -231,8 +231,8 @@ describe('User Course Detail Page Integration', () => {
         },
       });
 
-      expect(documents.length).toBe(1);
-      expect(documents[0]!.fileName).toBe('Teilnahmebestätigung.pdf');
+      expect(documents).toHaveLength(1);
+      expect(documents[0].fileName).toBe('Teilnahmebestätigung.pdf');
     });
   });
 

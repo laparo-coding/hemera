@@ -305,8 +305,9 @@ describe('Dashboard Sections Integration', () => {
         orderBy: { course: { startDate: 'asc' } },
       });
 
-      expect(upcomingBookings[0]!.course.title).toBe('Nächstes Seminar Kurs');
-      expect(upcomingBookings[1]!.course.title).toBe('Weiteres Seminar');
+      expect(upcomingBookings).toHaveLength(2);
+      expect(upcomingBookings[0].course.title).toBe('Nächstes Seminar Kurs');
+      expect(upcomingBookings[1].course.title).toBe('Weiteres Seminar');
     });
   });
 

@@ -1,0 +1,24 @@
+# Compose v2 schema (no 'version' field required)
+# Requires: Docker Compose v2.0+ (docker compose) or docker-compose v2.0+
+# See: https://docs.docker.com/compose/compose-file/04-version-and-name/
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: hemera-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hemera
+    ports:
+      - "5432:5432"
+    volumes:
+      - hemera-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hemera"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  hemera-postgres-data:
