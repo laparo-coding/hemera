@@ -215,7 +215,7 @@ const UserDashboardClerk: React.FC = () => {
       setError(null);
 
       const response = await fetch('/api/bookings', {
-        // Add cache headers for better performance
+        credentials: 'include', // Send cookies for Clerk auth
         headers: {
           'Cache-Control': 'max-age=30', // Cache for 30 seconds
         },
