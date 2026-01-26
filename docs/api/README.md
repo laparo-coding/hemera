@@ -42,7 +42,7 @@ Wenn du lieber direkt in Swagger UI schauen möchtest, kannst du `openapi.yaml` 
 
 Passe mindestens `baseUrl` und `bearer_token` an.
 
-> ⚠️ **Sicherheitshinweis**: Variablen mit Typ `secret` werden in Postman maskiert und nicht in Exports übernommen. **Committe niemals echte Tokens** in `hemera.env.json`. Verwende stattdessen lokale Postman-Environments oder Environment-Variablen.
+> ⚠️ **Sicherheitshinweis**: Variablen mit Typ `secret` werden in Postman maskiert und nicht in Exports übernommen. **Speichere niemals echte Tokens** in `hemera.env.json`. Verwende stattdessen lokale Postman-Environments oder Environment-Variablen.
 
 ## Schritt 4: Clerk JWT besorgen
 
@@ -51,7 +51,7 @@ Passe mindestens `baseUrl` und `bearer_token` an.
 1. Melde dich auf https://hemera.app an.
 2. Öffne DevTools → Network.
 3. Suche einen `/api` Request und kopiere den `Authorization` Header.
-4. Trage nur den Token-Teil (nach `Bearer `) in `bearer_token` ein.
+4. Trage nur den Token-Teil (nach `Bearer`) in `bearer_token` ein.
 
 **Variante B (Clerk Dashboard, Dev/Test):**
 
