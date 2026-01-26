@@ -44,14 +44,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "GET",
@@ -119,14 +111,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -207,14 +191,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -351,14 +327,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "GET",
@@ -418,14 +386,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "GET",
@@ -502,14 +462,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -541,14 +493,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -640,14 +584,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -690,14 +626,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -769,14 +697,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "GET",
@@ -865,14 +785,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "POST",
@@ -917,14 +829,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "POST",
@@ -969,14 +873,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "POST",
@@ -1075,14 +971,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -1125,14 +1013,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -1243,14 +1123,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "PUT",
@@ -1306,14 +1178,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "PUT",
@@ -1369,14 +1233,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "PUT",
@@ -1479,14 +1335,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "DELETE",
@@ -1529,14 +1377,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "DELETE",
@@ -1579,14 +1419,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "DELETE",
@@ -1629,14 +1461,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "DELETE",
@@ -1731,14 +1555,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -1783,14 +1599,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -1835,14 +1643,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -1936,14 +1736,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -2043,14 +1835,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "GET",
@@ -2092,14 +1876,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "GET",
@@ -2188,14 +1964,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "POST",
@@ -2240,14 +2008,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "POST",
@@ -2292,14 +2052,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "POST",
@@ -2344,14 +2096,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "POST",
@@ -2468,14 +2212,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -2518,14 +2254,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -2568,14 +2296,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -2686,14 +2406,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "PUT",
@@ -2749,14 +2461,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "PUT",
@@ -2865,14 +2569,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -2915,14 +2611,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -3033,14 +2721,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "PUT",
@@ -3149,14 +2829,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -3199,14 +2871,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -3317,14 +2981,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "PUT",
@@ -3433,14 +3089,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -3483,14 +3131,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -3601,14 +3241,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "PUT",
@@ -3717,14 +3349,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -3767,14 +3391,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -3888,14 +3504,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "POST",
@@ -4001,14 +3609,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "DELETE",
@@ -4114,14 +3714,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -4163,14 +3755,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -4212,14 +3796,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -4308,14 +3884,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -4360,14 +3928,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -4412,14 +3972,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -4521,14 +4073,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "POST",
@@ -4632,14 +4176,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "DELETE",
@@ -4748,14 +4284,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -4798,14 +4326,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "GET",
@@ -4916,14 +4436,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "PATCH",
@@ -4979,14 +4491,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "PATCH",
@@ -5089,14 +4593,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "DELETE",
@@ -5139,14 +4635,6 @@
                           {
                             "key": "Accept",
                             "value": "application/json"
-                          },
-                          {
-                            "description": {
-                              "content": "Added as a part of security scheme: bearer",
-                              "type": "text/plain"
-                            },
-                            "key": "Authorization",
-                            "value": "Bearer <token>"
                           }
                         ],
                         "method": "DELETE",
@@ -5271,14 +4759,6 @@
                               {
                                 "key": "Accept",
                                 "value": "application/json"
-                              },
-                              {
-                                "description": {
-                                  "content": "Added as a part of security scheme: bearer",
-                                  "type": "text/plain"
-                                },
-                                "key": "Authorization",
-                                "value": "Bearer <token>"
                               }
                             ],
                             "method": "POST",
@@ -5389,14 +4869,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -5438,14 +4910,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -5534,14 +4998,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -5656,14 +5112,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -5774,14 +5222,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "PUT",
@@ -5884,14 +5324,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "DELETE",
@@ -5969,14 +5401,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -6008,14 +5432,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "GET",
@@ -6104,14 +5520,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "PUT",
@@ -6156,14 +5564,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "PUT",
@@ -6283,14 +5683,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -6344,14 +5736,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -6405,14 +5789,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -6466,14 +5842,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -6623,14 +5991,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -6702,14 +6062,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -6781,14 +6133,6 @@
                       {
                         "key": "Accept",
                         "value": "application/json"
-                      },
-                      {
-                        "description": {
-                          "content": "Added as a part of security scheme: bearer",
-                          "type": "text/plain"
-                        },
-                        "key": "Authorization",
-                        "value": "Bearer <token>"
                       }
                     ],
                     "method": "POST",
@@ -6897,14 +6241,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "GET",
@@ -6946,14 +6282,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "GET",
@@ -6995,14 +6323,6 @@
                   {
                     "key": "Accept",
                     "value": "application/json"
-                  },
-                  {
-                    "description": {
-                      "content": "Added as a part of security scheme: bearer",
-                      "type": "text/plain"
-                    },
-                    "key": "Authorization",
-                    "value": "Bearer <token>"
                   }
                 ],
                 "method": "GET",

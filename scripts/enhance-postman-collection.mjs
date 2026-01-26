@@ -27,6 +27,38 @@ collection.auth = {
   ],
 };
 
+// Remove hardcoded Authorization headers from requests and examples
+// Since we use collection-level auth, these are redundant and can leak "<token>" into exports
+function removeHardcodedAuthHeaders(items) {
+  for (const item of items) {
+    // Remove from request headers
+    if (item.request?.header && Array.isArray(item.request.header)) {
+      item.request.header = item.request.header.filter(
+        h => h.key !== 'Authorization'
+      );
+    }
+
+    // Remove from response examples (originalRequest headers)
+    if (item.response && Array.isArray(item.response)) {
+      for (const response of item.response) {
+        if (response.originalRequest?.header) {
+          response.originalRequest.header =
+            response.originalRequest.header.filter(
+              h => h.key !== 'Authorization'
+            );
+        }
+      }
+    }
+
+    // Recurse into nested items (folders)
+    if (item.item && Array.isArray(item.item)) {
+      removeHardcodedAuthHeaders(item.item);
+    }
+  }
+}
+
+removeHardcodedAuthHeaders(collection.item || []);
+
 // Add pre-request script for automatic token handling
 collection.event = [
   {
