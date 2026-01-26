@@ -158,6 +158,9 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
+    environment:
+      name: Preview
+      url: ${{ steps.deploy.outputs.url }}
 
     steps:
       - name: Checkout code
