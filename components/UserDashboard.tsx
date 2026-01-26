@@ -461,7 +461,11 @@ const UserDashboardClerk: React.FC = () => {
     );
   }
 
-  const hasAnyBookings = bookings.length > 0;
+  const hasAnyBookings =
+    categorized.nextSeminar !== null ||
+    categorized.upcoming.length > 0 ||
+    categorized.completed.length > 0 ||
+    categorized.noShow.length > 0;
 
   return (
     <Box
