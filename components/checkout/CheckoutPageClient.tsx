@@ -141,6 +141,7 @@ function CheckoutContent() {
     };
 
     fetchCourseAndCreatePaymentIntent();
+    // biome-ignore lint/correctness/useExhaustiveDependencies: stripeEnabled is a stable env check
   }, [isLoaded, user, courseRef, stripeEnabled]);
 
   const handlePaymentSuccess = async (paymentIntentResult: { id: string }) => {

@@ -10,7 +10,7 @@ paths:
       description: |
         Returns application health metrics and performance data.
         Used for monitoring dashboards and alerting systems.
-        
+
         Rate limit: 100 req/min
       security:
         - clerkAuth: []

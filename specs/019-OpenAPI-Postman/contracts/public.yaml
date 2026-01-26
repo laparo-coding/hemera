@@ -72,7 +72,7 @@ paths:
       summary: List published courses
       description: |
         Returns a list of all published courses.
-        
+
         **Rate Limit**: 100 requests/minute per IP
       security: []
       parameters:

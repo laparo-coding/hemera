@@ -12,14 +12,14 @@ paths:
       description: |
         Receives and processes Stripe webhook events.
         Validates signature using STRIPE_WEBHOOK_SECRET.
-        
+
         **Handled Events:**
         - `checkout.session.completed` - Payment successful
         - `payment_intent.succeeded` - Direct payment success
         - `payment_intent.payment_failed` - Payment failed
         - `customer.subscription.updated` - Subscription changes
         - `invoice.payment_failed` - Recurring payment failed
-        
+
         **Security:** Requires valid Stripe-Signature header
       parameters:
         - name: Stripe-Signature
@@ -100,14 +100,14 @@ paths:
       description: |
         Receives and processes Clerk webhook events for user sync.
         Validates signature using CLERK_WEBHOOK_SECRET.
-        
+
         **Handled Events:**
         - `user.created` - New user registered
         - `user.updated` - User profile changed
         - `user.deleted` - User account deleted
         - `session.created` - New login session
         - `session.ended` - Session terminated
-        
+
         **Security:** Requires valid svix signature headers
       parameters:
         - name: svix-id
