@@ -32,7 +32,7 @@ This directory contains feature specifications for the Hemera project.
 ### 2026-01-26
 
 - **Removed**: `018-create-a-complete/` — Placeholder spec was split into two separate features:
-  - `018-docker-postgres/` — Docker Compose for local PostgreSQL development
+  - `020-docker-postgres/` — Docker Compose for local PostgreSQL development
   - `018-user-dashboard/` — User dashboard enhancements
 
 ## Style Guide

@@ -1,6 +1,6 @@
 # Tasks: Local Docker PostgreSQL for Development
 
-**Input**: Design documents from `/specs/018-docker-postgres/`  
+**Input**: Design documents from `/specs/020-docker-postgres/`  
 **Prerequisites**: plan.md ✅, research.md ✅, quickstart.md ✅
 
 ## Execution Flow (main)

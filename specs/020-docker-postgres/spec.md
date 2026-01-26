@@ -1,6 +1,6 @@
 # Feature Specification: Local Docker PostgreSQL for Development
 
-**Feature Branch**: `018-docker-postgres`  
+**Feature Branch**: `020-docker-postgres`  
 **Created**: 2026-01-26  
 **Status**: Draft  
 **Input**: User description: "Create a docker container locally to host a Postgres database for local development. The database setup must be the same as for production to streamline development. Adapt the workflows to utilise the database for local development."

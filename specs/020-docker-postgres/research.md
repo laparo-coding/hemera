@@ -1,7 +1,7 @@
 # Research: Local Docker PostgreSQL Setup
 
 **Date**: 2026-01-26  
-**Feature**: 018-docker-postgres
+**Feature**: 020-docker-postgres
 
 ## Current State Analysis
 
