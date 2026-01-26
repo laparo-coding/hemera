@@ -4,10 +4,11 @@
  * Tests for the invoice download button with error handling.
  */
 
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 
-// Types for the InvoiceDownloadButton component
-interface InvoiceDownloadButtonProps {
+// Types for the InvoiceDownloadButton component (prepared for future use)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface _InvoiceDownloadButtonProps {
   bookingId: string;
   disabled?: boolean;
   onError?: (error: Error) => void;
