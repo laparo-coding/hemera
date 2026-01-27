@@ -44,7 +44,6 @@
     "coverage",
     "dist",
     "build",
-    "scripts/e2e-seed.ts",
-    "tests/unit/components/**/*.spec.tsx"
+    "scripts/e2e-seed.ts"
   ]
 }

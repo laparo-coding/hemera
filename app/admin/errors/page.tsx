@@ -29,6 +29,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/GridLegacy';
 import { useCallback, useEffect, useState } from 'react';
+import { logClientWarning } from '../../../lib/errors/client';
 
 interface ErrorMetrics {
   errorCount: number;
@@ -70,7 +71,7 @@ export default function ErrorDashboard() {
       const data = await response.json();
       setMetrics(data.metrics);
     } catch (_error) {
-      console.warn('Failed to fetch error metrics:', _error);
+      logClientWarning('Failed to fetch error metrics', { error: _error });
     }
   }, [timeRange]);
   const fetchLogs = useCallback(async () => {
@@ -79,7 +80,7 @@ export default function ErrorDashboard() {
       const data = await response.json();
       setErrorLogs(data.errors);
     } catch (_error) {
-      console.warn('Failed to fetch error logs:', _error);
+      logClientWarning('Failed to fetch error logs', { error: _error });
     }
   }, []);
   const resolveError = async (errorId: string) => {
@@ -94,7 +95,7 @@ export default function ErrorDashboard() {
         logs.map(log => (log.id === errorId ? { ...log, resolved: true } : log))
       );
     } catch (_error) {
-      console.warn('Failed to resolve error:', _error);
+      logClientWarning('Failed to resolve error', { error: _error });
     }
   };
   const refreshData = useCallback(async () => {

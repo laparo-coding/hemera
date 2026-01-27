@@ -12,6 +12,7 @@ import { BookingCTA } from './BookingCTA';
 import { CourseHeader } from './CourseHeader';
 import { CourseHeroSection } from './CourseHeroSection';
 import { CourseOverviewSection } from './CourseOverviewSection';
+import { CourseRecommendationSection } from './CourseRecommendationSection';
 import type { CurriculumModule } from './CurriculumSection';
 import { CurriculumSection } from './CurriculumSection';
 import { DatesPricingSection } from './DatesPricingSection';
@@ -40,6 +41,10 @@ export interface CourseDetailCourse {
   learningObjectives?: string[];
   curriculumModules?: CurriculumModule[];
   testimonials?: Testimonial[];
+  /** Passende Voraussetzungen für das Seminar */
+  recommended?: string | null;
+  /** Keine passenden Voraussetzungen für das Seminar */
+  notRecommended?: string | null;
 }
 
 export interface CourseDetailLayoutProps {
@@ -89,6 +94,12 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
 
       {/* 3. Curriculum Section - Accordion with day modules */}
       <CurriculumSection modules={course.curriculumModules || []} />
+
+      {/* 3.5. Recommendation Section - Prerequisites info */}
+      <CourseRecommendationSection
+        recommended={course.recommended}
+        notRecommended={course.notRecommended}
+      />
 
       {/* 4. Dates & Pricing Section */}
       <DatesPricingSection

@@ -1,0 +1,94 @@
+name: Production Smoke Tests
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC (7 AM CET, 8 AM CEST)
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  smoke-test:
+    name: Production Smoke Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run production smoke tests
+        env:
+          PRODUCTION_URL: https://hemera.academy
+          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+        run: npx playwright test --project=production-smoke
+
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-smoke-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+      # Alert on failure - notify via GitHub issue comment
+      - name: Create failure notification
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🔴 Production Smoke Tests Failed';
+            const body = `## Production Smoke Test Failure
+
+            **Workflow Run**: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            **Date**: ${new Date().toISOString()}
+
+            The daily production smoke tests have failed. Please investigate immediately.
+
+            ### Next Steps
+            1. Check the [workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            2. Verify https://hemera.academy is accessible
+            3. Check for recent deployments that may have caused issues
+
+            cc @${context.repo.owner}`;
+
+            // Find existing open issue or create new one
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'production-smoke-failure'
+            });
+
+            if (issues.data.length > 0) {
+              // Comment on existing issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues.data[0].number,
+                body: body
+              });
+            } else {
+              // Create new issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['production-smoke-failure', 'bug', 'priority:high']
+              });
+            }

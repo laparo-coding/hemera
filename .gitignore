@@ -58,6 +58,9 @@ final-test-*.png
 robuster-test-*.png
 server-test.png
 signin-page-test.png
+
+# Playwright auth state
+.auth/
 test-*.png
 
 # Temporary files

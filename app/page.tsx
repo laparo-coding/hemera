@@ -6,6 +6,7 @@ import {
   HeroSection,
 } from '../components/landing';
 import { getFeaturedCourses } from '../lib/api/courses';
+import { serverInstance } from '../lib/monitoring/rollbar-official';
 import { generateLandingPageMetadata } from '../lib/seo/metadata';
 import { SCHEMA_COMBINATIONS } from '../lib/seo/schemas';
 import { getLevelLabel } from '../lib/utils/course-level';
@@ -164,7 +165,9 @@ export default async function HomePage() {
     }
   } catch (error) {
     // Log error but don't crash - use static courses as fallback
-    console.error('Failed to fetch featured courses:', error);
+    serverInstance.error(
+      error instanceof Error ? error : new Error(String(error))
+    );
   }
 
   // JSON-LD Structured Data for SEO

@@ -4,6 +4,7 @@
  * Task: T023
  */
 
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import type {
   GeocodeRequest,
   GeocodeResponse,
@@ -49,7 +50,7 @@ export async function geocodeAddress(
     });
 
     if (!response.ok) {
-      console.error(
+      serverInstance.warning(
         `Nominatim API error: ${response.status} ${response.statusText}`
       );
       return {
@@ -83,7 +84,9 @@ export async function geocodeAddress(
       success: true,
     };
   } catch (error) {
-    console.error('Geocoding error:', error);
+    serverInstance.error(
+      error instanceof Error ? error : new Error(String(error))
+    );
     return {
       latitude: null,
       longitude: null,

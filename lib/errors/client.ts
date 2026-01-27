@@ -46,6 +46,7 @@ export function logClientError(
   if (!rollbar) {
     // In dev/test mode, log to console
     if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Fallback when Rollbar unavailable
       console.error('[ClientError]', error, context);
     }
     return;
@@ -70,6 +71,7 @@ export function logClientWarning(
 
   if (!rollbar) {
     if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Fallback when Rollbar unavailable
       console.warn('[ClientWarning]', message, context);
     }
     return;

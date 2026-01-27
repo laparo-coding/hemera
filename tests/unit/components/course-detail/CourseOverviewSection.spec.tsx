@@ -21,6 +21,8 @@ describe('CourseOverviewSection', () => {
       'Umgang mit schwierigen Situationen',
     ],
     instructor: 'Dr. Maria Schmidt',
+    courseId: 'test-course-id',
+    courseSlug: 'verhandlungstechniken',
   };
 
   describe('Description rendering', () => {

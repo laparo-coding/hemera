@@ -13,6 +13,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { TERMS } from '../../lib/constants/terminology';
+import { logClientError } from '../../lib/errors/client';
 import StripeCheckoutForm from '../payment/StripeCheckoutForm';
 import { stripeAppearance, stripePromise } from '../payment/StripeProvider';
 
@@ -122,7 +123,7 @@ function CheckoutContent() {
 
         setPaymentIntent(data);
       } catch (err) {
-        console.error('Payment intent creation error:', err);
+        logClientError(err, { context: 'Payment intent creation' });
         let errorMessage = 'Fehler beim Laden des Zahlungsformulars';
 
         if (err instanceof Error) {
@@ -142,7 +143,6 @@ function CheckoutContent() {
 
     fetchCourseAndCreatePaymentIntent();
     // Note: stripeEnabled is a constant from env, not included in deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, user, courseRef]);
 
   const handlePaymentSuccess = async (paymentIntentResult: { id: string }) => {

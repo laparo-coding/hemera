@@ -97,7 +97,7 @@ describe('Dashboard Sections Integration', () => {
     });
 
     // Create bookings
-    const booking1 = await prisma.booking.create({
+    const _booking1 = await prisma.booking.create({
       data: {
         userId: testUser.id,
         courseId: upcomingCourse1.id,

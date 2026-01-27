@@ -127,6 +127,7 @@ export function guardDestructiveOperation(operationName: string): void {
       `points to localhost or a local file.`,
     ].join('\n');
 
+    // biome-ignore lint/suspicious/noConsole: CLI script output for developer safety warnings
     console.error(errorMessage);
     throw new Error(
       `Production database protection: ${operationName} blocked. See console for details.`
@@ -135,9 +136,11 @@ export function guardDestructiveOperation(operationName: string): void {
 
   // Log that we're proceeding (for audit trail)
   if (check.canOverride) {
+    // biome-ignore lint/suspicious/noConsole: CLI script output for developer safety warnings
     console.warn(
       `⚠️  DESTRUCTIVE OPERATION OVERRIDE: ${operationName} on ${check.databaseUrl}`
     );
+    // biome-ignore lint/suspicious/noConsole: CLI script output for developer safety warnings
     console.warn(`   Reasons it would be blocked: ${check.reasons.join(', ')}`);
   }
 }
@@ -153,6 +156,7 @@ export async function guardDestructiveOperationAsync(
   guardDestructiveOperation(operationName);
 
   if (delayMs > 0) {
+    // biome-ignore lint/suspicious/noConsole: CLI script output for developer safety warnings
     console.log(
       `⏳ Proceeding with ${operationName} in ${delayMs / 1000}s... (Ctrl+C to abort)`
     );

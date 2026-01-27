@@ -7,7 +7,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 // Types for the InvoiceDownloadButton component (prepared for future use)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// biome-ignore lint/correctness/noUnusedVariables: prepared for future use
 interface _InvoiceDownloadButtonProps {
   bookingId: string;
   disabled?: boolean;

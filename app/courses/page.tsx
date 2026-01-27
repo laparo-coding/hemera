@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import type { CourseCardProps } from '../../components/landing';
 import CourseCard from '../../components/landing/CourseCard';
 import { getPublishedCourses } from '../../lib/api/courses';
+import { serverInstance } from '../../lib/monitoring/rollbar-official';
 import { generateCourseListMetadata } from '../../lib/seo/metadata';
 import { SCHEMA_COMBINATIONS } from '../../lib/seo/schemas';
 import { getLevelLabel } from '../../lib/utils/course-level';
@@ -91,9 +92,9 @@ export default async function CoursesPage() {
     }
   } catch (err) {
     if (process.env.E2E_TEST === 'true') {
-      console.warn('[CoursesPage] getPublishedCourses failed in E2E mode', err);
+      // In E2E mode, silently fail - don't log expected failures
     } else {
-      console.error('[CoursesPage] Failed to fetch courses:', err);
+      serverInstance.error(err instanceof Error ? err : new Error(String(err)));
       fetchError = err instanceof Error ? err : new Error('Unbekannter Fehler');
     }
   }

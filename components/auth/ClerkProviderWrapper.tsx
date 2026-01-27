@@ -4,6 +4,7 @@ import { deDE } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { clerkConfig } from '../../lib/auth/clerk-config';
+import { logClientError, logClientWarning } from '../../lib/errors/client';
 
 // Custom German localization with overrides
 const customDeDE = {
@@ -59,9 +60,9 @@ class ClerkErrorBoundary extends Component<
       error.message?.includes('pk_test_');
 
     if (isClerkError) {
-      console.warn(
-        '[ClerkErrorBoundary] Caught Clerk error, using fallback:',
-        error.message
+      logClientWarning(
+        '[ClerkErrorBoundary] Caught Clerk error, using fallback',
+        { error: error.message }
       );
       return { hasError: true, error };
     }
@@ -71,7 +72,10 @@ class ClerkErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('[ClerkErrorBoundary] Error caught:', error, errorInfo);
+    logClientError(error, {
+      component: 'ClerkErrorBoundary',
+      componentStack: errorInfo.componentStack,
+    });
   }
 
   render() {
@@ -146,7 +150,10 @@ export default function ClerkProviderWrapper({
 
   if (bypass) {
     if (reason) {
-      console.warn(`[ClerkProviderWrapper] Clerk bypassed: ${reason}`);
+      // Only log in development - this is expected behavior in test mode
+      if (process.env.NODE_ENV === 'development') {
+        logClientWarning('[ClerkProviderWrapper] Clerk bypassed', { reason });
+      }
     }
     return <>{children}</>;
   }

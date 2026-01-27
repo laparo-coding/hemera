@@ -71,6 +71,10 @@ export async function createCourse(data: {
   locationId?: string | null;
   isPublished?: boolean;
   curriculum?: Prisma.InputJsonValue | null;
+  // Learning Path fields (021)
+  recommended?: string | null;
+  notRecommended?: string | null;
+  isNonPublic?: boolean;
 }): Promise<CourseWithEnrollmentCount> {
   // Validate curriculum structure if provided
   if (data.curriculum !== undefined && data.curriculum !== null) {
@@ -84,6 +88,9 @@ export async function createCourse(data: {
     curriculum,
     teaser,
     thumbnailUrl,
+    recommended,
+    notRecommended,
+    isNonPublic,
     ...restData
   } = data;
   const course = await prisma.course.create({
@@ -100,6 +107,10 @@ export async function createCourse(data: {
         : {}),
       // Connect location if provided, otherwise omit
       ...(locationId ? { location: { connect: { id: locationId } } } : {}),
+      // Learning Path fields (021)
+      ...(recommended !== undefined ? { recommended } : {}),
+      ...(notRecommended !== undefined ? { notRecommended } : {}),
+      ...(isNonPublic !== undefined ? { isNonPublic } : {}),
     },
     include: {
       _count: {
@@ -132,6 +143,10 @@ export async function updateCourse(
     locationId?: string | null;
     curriculum?: Prisma.InputJsonValue | null;
     updatedAt: Date;
+    // Learning Path fields (021)
+    recommended?: string | null;
+    notRecommended?: string | null;
+    isNonPublic?: boolean;
   }
 ): Promise<CourseWithEnrollmentCount> {
   // Validate curriculum structure if provided
@@ -145,6 +160,9 @@ export async function updateCourse(
     curriculum,
     teaser,
     thumbnailUrl,
+    recommended,
+    notRecommended,
+    isNonPublic,
     ...updateData
   } = data;
 
@@ -182,6 +200,10 @@ export async function updateCourse(
     ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
     ...(curriculum !== undefined && curriculum !== null ? { curriculum } : {}),
     ...(locationId !== undefined ? { locationId } : {}),
+    // Learning Path fields (021)
+    ...(recommended !== undefined ? { recommended } : {}),
+    ...(notRecommended !== undefined ? { notRecommended } : {}),
+    ...(isNonPublic !== undefined ? { isNonPublic } : {}),
   };
 
   const updated = await prisma.course.update({

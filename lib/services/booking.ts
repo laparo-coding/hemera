@@ -13,6 +13,10 @@ export interface CreateBookingParams {
   currency?: string;
   stripeSessionId?: string;
   stripePaymentIntentId?: string;
+  // Learning Path (021): Allow PRE_BOOKED status for prerequisite review
+  // PRE_BOOKED bookings await admin approval before payment
+  // Transition rules enforced at lines 57-81
+  paymentStatus?: PaymentStatus;
 }
 
 export interface BookingSearchParams {
@@ -38,6 +42,7 @@ export async function createBooking(
     currency = 'USD',
     stripeSessionId,
     stripePaymentIntentId,
+    paymentStatus: initialPaymentStatus,
   } = params;
 
   // Check if user already has a booking for this course
@@ -49,6 +54,48 @@ export async function createBooking(
       },
     },
   });
+
+  // Learning Path (021): Prevent duplicate bookings including PRE_BOOKED
+  // Only allow creating new booking if:
+  // - No existing booking, OR
+  // - Existing booking is CANCELLED (can be re-attempted)
+  //
+  // TRANSITION RULES:
+  // ✅ Allowed: null → PRE_BOOKED
+  // ✅ Allowed: null → PENDING
+  // ✅ Allowed: CANCELLED → PRE_BOOKED (retry after rejection)
+  // ✅ Allowed: CANCELLED → PENDING (retry after cancellation)
+  // ❌ Blocked: PENDING → PRE_BOOKED (active checkout exists)
+  // ❌ Blocked: PAID → PRE_BOOKED (already enrolled)
+  // ❌ Blocked: PRE_BOOKED → PRE_BOOKED (duplicate review request)
+  // ❌ Blocked: PRE_BOOKED → PENDING (review pending, cannot checkout)
+  // ❌ Blocked: FAILED → PRE_BOOKED (previous attempt failed)
+  // ❌ Blocked: FAILED → PENDING (previous attempt failed)
+  //
+  // @see docs/features/021-learning-path/PRE_BOOKED_APPROVAL_WORKFLOW.md
+  if (existingBooking) {
+    const existingStatus = existingBooking.paymentStatus;
+    const isActiveBooking = existingStatus !== PaymentStatus.CANCELLED;
+
+    // Block ANY new booking attempt if an active booking exists
+    // This prevents:
+    // - PRE_BOOKED → PENDING (cannot checkout while review is pending)
+    // - PENDING → PRE_BOOKED (cannot request review while checkout is active)
+    // - PRE_BOOKED → PRE_BOOKED (duplicate review request)
+    // - PENDING → PENDING (duplicate checkout)
+    if (isActiveBooking) {
+      // Provide specific error message for PRE_BOOKED
+      if (existingStatus === PaymentStatus.PRE_BOOKED) {
+        throw new Error(
+          'Deine Buchung wird gerade geprüft. Bitte warte auf die Freigabe durch einen Administrator.'
+        );
+      }
+
+      throw new Error(
+        `Du hast diesen Kurs bereits gebucht (Status: ${existingStatus})`
+      );
+    }
+  }
 
   // Check if course exists and is published
   const course = await prisma.course.findUnique({
@@ -96,7 +143,12 @@ export async function createBooking(
     updateData.currency = currency;
   }
 
-  if (existingBooking?.paymentStatus === PaymentStatus.CANCELLED) {
+  // Learning Path (021): Only allow CANCELLED -> PENDING transition
+  // Do NOT allow automatic status updates for PRE_BOOKED bookings
+  if (
+    existingBooking?.paymentStatus === PaymentStatus.CANCELLED &&
+    initialPaymentStatus !== PaymentStatus.PRE_BOOKED
+  ) {
     updateData.paymentStatus = PaymentStatus.PENDING;
   }
 
@@ -113,7 +165,7 @@ export async function createBooking(
         courseId,
         amount,
         currency,
-        paymentStatus: PaymentStatus.PENDING,
+        paymentStatus: initialPaymentStatus ?? PaymentStatus.PENDING,
         ...(stripeSessionId && { stripeSessionId }),
         ...(stripePaymentIntentId && { stripePaymentIntentId }),
       },

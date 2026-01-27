@@ -27,6 +27,12 @@ export const colors = {
 
   /** Light gray for borders and dividers */
   lightGray: '#E5E5E5',
+
+  /** Black for success indicators */
+  success: '#000000',
+
+  /** Red for warning indicators */
+  warning: '#FF0000',
 } as const;
 
 export type ColorKey = keyof typeof colors;

@@ -116,7 +116,17 @@ Nominatim
 OPENAI
 Ogmx
 OpenAPIV
+Outperf
+outperformer
+outperformers
+Outperformer
 PGSSL
+toggleable
+unconfigured
+Hauptorchestrator
+Voraussetzungsnachweis
+Voraussetzungsprüfung
+Voraussetzungs
 Paginierung
 Participations
 Partytown
@@ -167,8 +177,11 @@ TTFB
 Teamdynamik
 Teilnahme
 Teilnahmedaten
+Textareas
 Timestamptz
 Tracke
+Transaktionale
+transaktionale
 Transparente
 Ttfb
 Unauthentifizierte
@@ -226,6 +239,7 @@ claude
 clxxx
 clxxxxxxxxxxxxxxxxxx
 clxxxxxxxxxxxxxxxxxxxxxxxx
+clxyz
 cockroachlabs
 colima
 colorhunt
@@ -328,9 +342,11 @@ networkidle
 nextauth
 nicht
 noarchive
+nodomain
 noimageindex
 nominatim
 noshow
+notanemail
 nullable
 officedocument
 opencode
@@ -338,6 +354,7 @@ openstreetmap
 openxmlformats
 orbstack
 organizat
+outperformer
 pageview
 parallelizable
 parseable
@@ -371,6 +388,7 @@ résumé
 résumés
 saoudrizwan
 schrittene
+superadmin
 seeden
 sein
 seminare

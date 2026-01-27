@@ -174,7 +174,7 @@ test.describe('Dashboard Mobile Layout', () => {
     ];
 
     for (const sectionId of sections) {
-      const section = page.locator(`[data-testid="${sectionId}"]`);
+      const _section = page.locator(`[data-testid="${sectionId}"]`);
       // Section may or may not be visible depending on data
       // Just verify the page structure works on mobile
     }

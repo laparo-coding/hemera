@@ -38,7 +38,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         });
     } else if (process.env.NODE_ENV !== 'production') {
       // Fallback: console.error in test/E2E or development mode
-      // eslint-disable-next-line no-console
+      // biome-ignore lint/suspicious/noConsole: Fallback when Rollbar unavailable
       console.error(error);
     }
   }, [error, isRollbarDisabled]);

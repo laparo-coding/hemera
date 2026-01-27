@@ -18,6 +18,10 @@ Auto-generated from all feature plans. Last updated: 2025-01-15
 - PostgreSQL via Prisma models (course participation, documents, summary assets) (016-course-assignments)
 - Docker Compose 3.8+, Bash scripts + Docker Desktop, PostgreSQL 16, Prisma ORM (existing) (020-docker-postgres)
 - PostgreSQL 16 via Docker container with optional persistent volumes (020-docker-postgres)
+- TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Prisma ORM, Material-UI v5, Clerk auth, Loops.so SDK (new), Rollbar (021-learning-path)
+- PostgreSQL via Prisma (existing schema extension) (021-learning-path)
+- TypeScript 5.9, Next.js 16, React 19 + Jest, Playwright, @testing-library/react, Rollbar (022-test-coverage)
+- PostgreSQL via Prisma 7.3 (022-test-coverage)
 
 - TypeScript 5.x, Next.js 15.5.6, React 18+ + MUI v5+, Clerk (auth), Rollbar (monitoring), Prisma
   (ORM)
@@ -68,9 +72,9 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
+- 022-test-coverage: Added TypeScript 5.9, Next.js 16, React 19 + Jest, Playwright, @testing-library/react, Rollbar
+- 021-learning-path: Added TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Prisma ORM, Material-UI v5, Clerk auth, Loops.so SDK (new), Rollbar
 - 020-docker-postgres: Added Docker Compose 3.8+, Bash scripts + Docker Desktop, PostgreSQL 16, Prisma ORM (existing)
-- 020-docker-postgres: Added Docker Compose 3.8+, Bash scripts + Docker Desktop, PostgreSQL 16, Prisma ORM (existing)
-- 017-testimonial-management: Added Testimonial entity with admin approval workflow, name display format options, WYSIWYG preview
 
 ## PR Review Process
 

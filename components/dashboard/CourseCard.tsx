@@ -118,9 +118,9 @@ export const getLocationDisplayText = (
  * Check if invoice download should be visible
  */
 const shouldShowInvoiceButton = (
-  sectionType: CourseCardProps['sectionType'],
+  _sectionType: CourseCardProps['sectionType'],
   paymentStatus: string,
-  invoiceUrl: string | null
+  _invoiceUrl: string | null
 ): boolean => {
   // Show invoice for all paid bookings, regardless of course status
   // Users should be able to download their invoice immediately after payment
