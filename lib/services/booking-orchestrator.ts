@@ -178,9 +178,9 @@ async function notifyAdminsForReview(
     // Safe: isValidEmail ensures userEmail is non-null and valid
     const customerEmail = userEmail!.trim();
 
-    // Guard: Check Loops API key (no I/O)
-    if (!isLoopsConfigured()) {
-      serverInstance.warn(
+    // Guard: Check Loops API key (no I/O) - use silent since we log our own message
+    if (!isLoopsConfigured(true)) {
+      serverInstance.info(
         'Skipped prerequisite review email - Loops not configured',
         {
           context: 'BookingOrchestrator.notifyAdminsForReview',

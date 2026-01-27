@@ -76,18 +76,29 @@ function sanitizeError(error: unknown): { type: string; message: string } {
  * Check if Loops email service is properly configured.
  * Logs a warning if the API key is missing.
  */
+
+// Memoize the configuration warning to log only once per process
+let loopsConfigWarningLogged = false;
+
 /**
  * Check if Loops API key is configured.
  * Used to guard email operations before attempting to send.
+ *
+ * @param silent - If true, don't log warning (use for repeated checks)
  */
-export function isLoopsConfigured(): boolean {
+export function isLoopsConfigured(silent = false): boolean {
   const apiKey = process.env.LOOPS_API_KEY;
   if (!apiKey) {
-    serverInstance.warn('Loops email service not configured', {
-      context: 'LoopsService.isLoopsConfigured',
-      message:
-        'LOOPS_API_KEY environment variable is missing - email functionality disabled',
-    });
+    // Only log the warning once per process to avoid log spam
+    if (!silent && !loopsConfigWarningLogged) {
+      loopsConfigWarningLogged = true;
+      serverInstance.info(
+        'Loops email service not configured - LOOPS_API_KEY missing',
+        {
+          context: 'LoopsService.isLoopsConfigured',
+        }
+      );
+    }
     return false;
   }
   return true;
