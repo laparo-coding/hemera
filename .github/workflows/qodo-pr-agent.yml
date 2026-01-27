@@ -30,7 +30,7 @@ jobs:
           # Configure which PR events trigger the action
           github_action_config.pr_actions: '["opened", "reopened", "ready_for_review", "review_requested"]'
           # Custom review instructions for TypeScript/Next.js project
-          pr_reviewer.extra_instructions: 'Focus on TypeScript best practices, Next.js 14 App Router patterns, React 18 hooks usage, Prisma ORM queries, Material-UI components, security vulnerabilities, and performance issues. Check for proper error handling, async/await patterns, and adherence to project constitution requirements.'
+          pr_reviewer.extra_instructions: 'Focus on TypeScript best practices, Next.js 15.5.6 App Router patterns, React 18 hooks usage, Prisma ORM queries, Material-UI components, security vulnerabilities, and performance issues. Check for proper error handling, async/await patterns, and adherence to project constitution requirements.'
           # Language-specific settings for TypeScript
           pr_code_suggestions.num_code_suggestions: '6'
           pr_code_suggestions.suggestions_score_threshold: '7'
