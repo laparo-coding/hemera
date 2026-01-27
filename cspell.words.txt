@@ -177,8 +177,11 @@ TTFB
 Teamdynamik
 Teilnahme
 Teilnahmedaten
+Textareas
 Timestamptz
 Tracke
+Transaktionale
+transaktionale
 Transparente
 Ttfb
 Unauthentifizierte
@@ -385,6 +388,7 @@ résumé
 résumés
 saoudrizwan
 schrittene
+superadmin
 seeden
 sein
 seminare
