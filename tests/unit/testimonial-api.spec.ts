@@ -222,6 +222,8 @@ describe('GET /api/courses/[id]/testimonials', () => {
     expect(mockPrisma.course.findFirst).toHaveBeenCalledWith({
       where: {
         OR: [{ id: 'my-course-slug' }, { slug: 'my-course-slug' }],
+        isNonPublic: false,
+        isPublished: true,
       },
       select: { id: true },
     });

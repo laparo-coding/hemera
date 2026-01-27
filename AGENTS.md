@@ -65,14 +65,13 @@ npm run db:migrate # Prisma migrations against local env
 
 ---
 
-# Repository Tour
-
-## 🎯 What This Repository Does
+## 🎯 Repository Overview
 
 Hemera is a specs-first Next.js platform for the Hemera Academy, delivering course discovery,
 bookings, and admin tooling backed by Stripe payments, Clerk auth, and Prisma/Postgres data.
 
 **Key responsibilities:**
+
 - Serve a premium marketing site and academy landing experience with SEO metadata.
 - Orchestrate bookings, prerequisite learning paths, and PRE_BOOKED approval workflows.
 - Provide admin dashboards, monitoring, and automated quality gates for deployments.
@@ -82,6 +81,7 @@ bookings, and admin tooling backed by Stripe payments, Clerk auth, and Prisma/Po
 ## 🏗️ Architecture Overview
 
 ### System Context
+
 ```
 Prospective Student → Next.js App (app/*) → Prisma Client → Vercel Postgres
                                       ↓
@@ -89,6 +89,7 @@ Prospective Student → Next.js App (app/*) → Prisma Client → Vercel Postgre
 ```
 
 ### Key Components
+
 - **App Router surfaces (`app/`):** Route groups for public academy pages, protected dashboards,
 and API handlers (`app/api/*`) that expose booking, payment, monitoring, and health endpoints.
 - **Domain services (`lib/`):** Course, booking, and learning-path orchestration (`lib/api`,
@@ -99,6 +100,7 @@ a pg adapter fallback for CI/local flows; seeds and migrations align with specs-
 scripts that enforce deploy readiness and tooling automation.
 
 ### Data Flow
+
 1. Visitor hits a Next.js route (e.g., `app/courses/[slug]`) or API endpoint under `app/api/*`.
 2. Server actions/services call Prisma helpers (for courses, bookings, participations) via
    `lib/api/*` and `lib/db/prisma`.
@@ -150,12 +152,14 @@ hemera/
 ## 🔧 Technology Stack
 
 ### Core Technologies
+
 - **Language:** TypeScript 5.9 (strict ESM) for both React UI and Node scripts.
 - **Framework:** Next.js 16 App Router with React 19 for hybrid SSR/ISR and API routes.
 - **Database:** Vercel Postgres via Prisma 7.3 (Accelerate in prod, pg adapter locally/Testcontainers).
 - **Styling/UI:** MUI 7, Emotion 11, custom theme tokens (`lib/theme.ts`, `components/ThemeRegistry`).
 
 ### Key Libraries
+
 - **Clerk (`@clerk/nextjs`):** Authentication + user profiles across app/admin areas.
 - **Stripe (`@stripe/stripe-js`, `stripe`):** Checkout + webhooks for paid courses.
 - **Playwright + Jest:** High-signal E2E and unit/contract verification.
@@ -163,6 +167,7 @@ hemera/
 - **Loops SDK:** Transactional email automation for learning-path workflows.
 
 ### Development Tools
+
 - **Biome:** Unified formatter/linter (indent, quotes, imports).
 - **Prisma CLI:** Schema generation, migrations, and seeds.
 - **Husky + lint-staged:** Pre-commit enforcement for Biome + cspell.
@@ -172,6 +177,7 @@ hemera/
 ## 🌐 External Dependencies
 
 ### Required Services
+
 - **Clerk:** Auth provider; requires `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`.
 - **Stripe:** Payments/webhooks; `scripts/check-stripe-key.mjs` validates keys before deployments.
 - **Vercel Postgres:** Primary data store, accessed via Prisma (`DATABASE_URL`, optional
@@ -180,10 +186,9 @@ hemera/
 - **Loops.so:** Transactional emails for PRE_BOOKED notifications (`LOOPS_API_KEY`).
 
 ### Optional Integrations
+
 - **Vercel Protection bypass tokens:** Used by Playwright via `x-vercel-protection-bypass` header.
 - **Mux / next-video:** Managed video assets if marketing pages require streaming.
-
----
 
 ### Environment Variables
 
@@ -209,6 +214,7 @@ E2E_TEST=0|1  # toggles mocks/fixtures for tests
 ## 🔄 Common Workflows
 
 ### Specs-first Feature Delivery
+
 1. Draft feature spec under `specs/<id-slug>/spec.md`.
 2. Produce `plan.md` and `tasks.md` before writing code.
 3. Implement app/lib/prisma changes following tasks; keep docs updated (`docs/features/*`).
@@ -218,6 +224,7 @@ E2E_TEST=0|1  # toggles mocks/fixtures for tests
 **Code path:** `specs/*` → `plans/` → implementation in `app/*` + `lib/*` + `prisma/*`.
 
 ### PRE_BOOKED Learning Path Review
+
 1. User books an intermediate/advanced course without prerequisites → booking flagged PRE_BOOKED via
    `lib/services/learning-path` and persisted through Prisma.
 2. Loops sends admin/customer emails from templates listed in README.
@@ -231,11 +238,13 @@ E2E_TEST=0|1  # toggles mocks/fixtures for tests
 ## 📈 Performance & Scale
 
 ### Performance Considerations
+
 - Playwright `performance.spec.ts` guards Core Web Vitals; server analytics live in
   `lib/analytics/request-analytics.ts` with test-friendly schedulers.
 - `next-video` + MUI theme tokenization keep landing visuals optimized by default.
 
 ### Monitoring
+
 - Build metadata derived from `instrumentation.ts` + `lib/buildInfo.ts` and surfaced via
   `/api/health` for uptime probes.
 - Rollbar + custom monitoring components (`components/monitoring`, `lib/monitoring`) log runtime
@@ -246,6 +255,7 @@ E2E_TEST=0|1  # toggles mocks/fixtures for tests
 ## 🚨 Things to Be Careful About
 
 ### 🔒 Security Considerations
+
 - Sensitive env files (`.env*`) are ignored—never commit secrets.
 - Stripe + Clerk secrets must be present before running DB migrations or E2E flows; `scripts/db-*`
   guard destructive commands (`db:reset` disabled by default).
@@ -254,3 +264,4 @@ E2E_TEST=0|1  # toggles mocks/fixtures for tests
 - Rollbar and Loops calls are retried but should not block checkout; handle fallbacks gracefully.
 
 *Update to last commit: c500c1743f34f39d027c8001d82f242f533f289b*
+

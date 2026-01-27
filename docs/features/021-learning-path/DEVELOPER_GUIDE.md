@@ -3,11 +3,13 @@
 ## Quick Reference
 
 ### API Endpoint
+
 ```
 PATCH /api/admin/bookings/[id]/review
 ```
 
 ### Request Body
+
 ```typescript
 {
   "action": "approve" | "reject"
@@ -19,6 +21,7 @@ PATCH /api/admin/bookings/[id]/review
 ## How to Approve a PRE_BOOKED Booking
 
 ### Step 1: Validate Status
+
 ```typescript
 // Ensure booking is PRE_BOOKED before processing
 if (booking.paymentStatus !== 'PRE_BOOKED') {
@@ -27,6 +30,7 @@ if (booking.paymentStatus !== 'PRE_BOOKED') {
 ```
 
 ### Step 2: Use Atomic Update
+
 ```typescript
 // CRITICAL: Use updateMany with status precondition
 const result = await prisma.booking.updateMany({
@@ -49,6 +53,7 @@ if (result.count === 0) {
 ```
 
 ### Step 3: Return Updated Booking
+
 ```typescript
 const booking = await prisma.booking.findUnique({
   where: { id: bookingId },
@@ -67,6 +72,7 @@ return res.status(200).json({
 ## How to Reject a PRE_BOOKED Booking
 
 ### Step 1: Send Rejection Email
+
 ```typescript
 import { sendBookingRejectedEmail } from '@/lib/services/loops';
 
@@ -82,6 +88,7 @@ if (customerEmail && customerEmail.length > 0) {
 ```
 
 ### Step 2: Use Atomic Delete
+
 ```typescript
 // CRITICAL: Use deleteMany with status precondition
 const result = await prisma.booking.deleteMany({
@@ -99,6 +106,7 @@ if (result.count === 0) {
 ```
 
 ### Step 3: Return Success
+
 ```typescript
 return res.status(200).json({ message: 'Booking rejected and removed' });
 ```
@@ -127,6 +135,7 @@ PRE_BOOKED → deleted   (reject → booking removed)
 ## Common Mistakes to Avoid
 
 ### ❌ DON'T: Use `update()` instead of `updateMany()`
+
 ```typescript
 // ❌ WRONG: No race condition protection
 await prisma.booking.update({
@@ -136,6 +145,7 @@ await prisma.booking.update({
 ```
 
 ### ✅ DO: Use `updateMany()` with status precondition
+
 ```typescript
 // ✅ CORRECT: Atomic operation with precondition
 const result = await prisma.booking.updateMany({
@@ -152,6 +162,7 @@ if (result.count === 0) {
 ```
 
 ### ❌ DON'T: Forget to validate email before sending
+
 ```typescript
 // ❌ WRONG: Can fail with empty email
 await sendBookingRejectedEmail({
@@ -161,6 +172,7 @@ await sendBookingRejectedEmail({
 ```
 
 ### ✅ DO: Validate and trim email first
+
 ```typescript
 // ✅ CORRECT: Validate before sending
 const customerEmail = booking.user.email?.trim();
@@ -170,6 +182,7 @@ if (customerEmail && customerEmail.length > 0) {
 ```
 
 ### ❌ DON'T: Set `reviewedAt`/`reviewedBy` on rejection
+
 ```typescript
 // ❌ WRONG: These fields are for approvals only
 await prisma.booking.deleteMany({
@@ -182,6 +195,7 @@ await prisma.booking.deleteMany({
 ```
 
 ### ✅ DO: Only set review fields on approve
+
 ```typescript
 // ✅ CORRECT: Review fields only for approved bookings
 // On rejection, just delete the booking
@@ -209,6 +223,7 @@ Before processing a review request:
 ## Testing Guide
 
 ### Unit Test: Approve Flow
+
 ```typescript
 it('should approve PRE_BOOKED booking with reviewedAt and reviewedBy', async () => {
   const booking = await createTestBooking({ paymentStatus: 'PRE_BOOKED' });
@@ -232,6 +247,7 @@ it('should approve PRE_BOOKED booking with reviewedAt and reviewedBy', async () 
 ```
 
 ### Unit Test: Reject Flow
+
 ```typescript
 it('should delete PRE_BOOKED booking and send email', async () => {
   const booking = await createTestBooking({ 
