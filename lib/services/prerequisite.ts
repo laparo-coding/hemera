@@ -14,7 +14,6 @@
  * - CourseParticipation with status = 'COMPLETE'
  */
 
-import { clerkClient } from '@clerk/nextjs/server';
 import type { CourseLevel } from '@prisma/client';
 import { prisma } from '../db/prisma';
 import { reportError } from '../monitoring/rollbar';

@@ -257,7 +257,7 @@ test.describe('Dashboard Sections E2E', () => {
       await page.goto('/dashboard');
 
       // Should use informal "Du" form
-      const pageContent = await page.content();
+      const _pageContent = await page.content();
 
       // Common German dashboard terms should appear
       // (only if user is authenticated and has content)

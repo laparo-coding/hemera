@@ -13,7 +13,7 @@ import type {
 } from '@/lib/schemas/admin/booking';
 
 describe('PATCH /api/admin/bookings/{id}/review - Contract Tests', () => {
-  const ENDPOINT = '/api/admin/bookings/:id/review';
+  const _ENDPOINT = '/api/admin/bookings/:id/review';
 
   describe('Request Schema Validation', () => {
     it('should accept approve action', () => {

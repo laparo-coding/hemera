@@ -6,7 +6,7 @@
  * These tests define the expected behavior and should FAIL until implementation.
  */
 
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 
 // Mock types for testing (service not yet implemented)
 interface EmailResult {
@@ -162,7 +162,7 @@ describe('LoopsService', () => {
         { email: 'valid@example.com', name: 'Valid Admin', userId: 'user_1' },
       ];
       // Contract: Only include admins with valid email
-      const validAdmins = admins.filter(a => a.email && a.email.includes('@'));
+      const validAdmins = admins.filter(a => a.email?.includes('@'));
 
       expect(validAdmins).toHaveLength(1);
     });

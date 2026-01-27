@@ -1,8 +1,9 @@
 /**
  * Check and fix Grundkurs thumbnailUrl
  */
+
+import { resolve } from 'node:path';
 import { config } from 'dotenv';
-import { resolve } from 'path';
 
 config({ path: resolve(process.cwd(), '.env.local') });
 

@@ -6,7 +6,7 @@
  * These tests define the expected behavior and should FAIL until implementation.
  */
 
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 
 // Mock types for testing (service not yet implemented)
 interface PrerequisiteResult {

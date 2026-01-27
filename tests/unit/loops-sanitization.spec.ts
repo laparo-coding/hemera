@@ -127,7 +127,7 @@ describe('Loops Email Sanitization', () => {
     // In real implementation, you might export these for testing or test via integration
 
     it('should mask email addresses in logs', () => {
-      const testCases = [
+      const _testCases = [
         { input: 'john.doe@example.com', expected: /j\*\*\*e@example\.com/ },
         { input: 'a@test.com', expected: /a\*\*\*@test\.com/ },
         { input: 'ab@test.com', expected: /a\*\*\*@test\.com/ },
@@ -148,7 +148,7 @@ describe('Loops Email Sanitization', () => {
     });
 
     it('should handle unknown error types safely', () => {
-      const unknownError = { someProperty: 'value', token: 'secret123' };
+      const _unknownError = { someProperty: 'value', token: 'secret123' };
 
       // Expected to return { type: 'UnknownError', message: '[object Object]' }
       // Should NOT expose the token or other properties

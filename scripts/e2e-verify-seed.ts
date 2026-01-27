@@ -1,5 +1,5 @@
+import fs from 'node:fs';
 import { PrismaClient } from '@prisma/client';
-import fs from 'fs';
 
 // For E2E tests with SQLite, Prisma will use the built-in driver from DATABASE_URL
 // We don't pass any options since the adapter is only needed for PostgreSQL in production

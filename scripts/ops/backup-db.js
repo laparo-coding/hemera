@@ -7,8 +7,8 @@
  */
 
 const { PrismaClient, Prisma } = require('@prisma/client');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 async function backup() {
   const prisma = new PrismaClient();
@@ -23,17 +23,17 @@ async function backup() {
 
     // Get all model names dynamically from Prisma
     const models = Object.values(Prisma.ModelName);
-    console.log('📋 Models to backup: ' + models.join(', '));
+    console.log(`📋 Models to backup: ${models.join(', ')}`);
 
     for (const model of models) {
       try {
         const modelName = model.charAt(0).toLowerCase() + model.slice(1);
         const data = await prisma[modelName].findMany();
         fs.writeFileSync(
-          path.join(backupDir, model + '.json'),
+          path.join(backupDir, `${model}.json`),
           JSON.stringify(data, null, 2)
         );
-        console.log('✅ ' + model + ': ' + data.length + ' records');
+        console.log(`✅ ${model}: ${data.length} records`);
       } catch (e) {
         hasErrors = true;
         console.log(
@@ -48,11 +48,9 @@ async function backup() {
       }
     }
 
-    console.log(
-      '\n✅ Backup completed!' + (hasErrors ? ' (with warnings)' : '')
-    );
+    console.log(`\n✅ Backup completed!${hasErrors ? ' (with warnings)' : ''}`);
   } catch (error) {
-    console.error('❌ Backup failed: ' + (error.message || 'Unknown error'));
+    console.error(`❌ Backup failed: ${error.message || 'Unknown error'}`);
     await prisma.$disconnect();
     process.exit(1);
   } finally {
