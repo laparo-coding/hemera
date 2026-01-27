@@ -17,20 +17,14 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import {
   CourseParticipationStepper,
   ResumeUploader,
   SummaryAssetList,
 } from '../../../components/participation';
-import type {
-  CourseEnrollment,
-  ParticipationSummary,
-} from '../../../lib/actions/participation';
-import {
-  getParticipationAction,
-  startParticipationAction,
-} from '../../../lib/actions/participation';
+import type { ParticipationSummary } from '../../../lib/actions/participation';
+import { startParticipationAction } from '../../../lib/actions/participation';
 import type { PreparationInput } from '../../../lib/db/courseParticipation';
 
 // Design tokens

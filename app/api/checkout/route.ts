@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
       where: {
         id: validatedData.courseId,
         isPublished: true,
+        isNonPublic: false, // Exclude Learning Path invite-only courses
       },
     });
 

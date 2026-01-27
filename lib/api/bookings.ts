@@ -63,6 +63,7 @@ export async function createBooking(data: CreateBookingData): Promise<Booking> {
       where: {
         id: data.courseId,
         isPublished: true,
+        isNonPublic: false, // Exclude Learning Path invite-only courses
       },
     });
 
@@ -341,6 +342,11 @@ export function isValidStatusTransition(
     [PaymentStatus.PENDING]: [
       PaymentStatus.PAID,
       PaymentStatus.FAILED,
+      PaymentStatus.CANCELLED,
+    ],
+    // Learning Path (021): PRE_BOOKED can transition to PENDING (approved) or CANCELLED (rejected)
+    [PaymentStatus.PRE_BOOKED]: [
+      PaymentStatus.PENDING,
       PaymentStatus.CANCELLED,
     ],
     [PaymentStatus.PAID]: [

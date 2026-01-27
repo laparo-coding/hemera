@@ -3,8 +3,9 @@
  *
  * Run with: source .env.local && npx tsx scripts/fix-grundkurs-price.ts
  */
+
+import { resolve } from 'node:path';
 import { config } from 'dotenv';
-import { resolve } from 'path';
 
 // Load .env.local explicitly
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -13,7 +14,7 @@ import { PrismaClient } from '@prisma/client';
 
 console.log(
   'Using accelerateUrl:',
-  process.env.PRISMA_ACCELERATE_URL?.slice(0, 40) + '...'
+  `${process.env.PRISMA_ACCELERATE_URL?.slice(0, 40)}...`
 );
 
 const prisma = new PrismaClient({

@@ -6,6 +6,7 @@ describe('PaymentStatus Enum Handling', () => {
     it('should have all required payment status values', () => {
       const expectedStatuses = [
         'PENDING',
+        'PRE_BOOKED', // 021-learning-path: Prerequisites review required
         'PAID',
         'FAILED',
         'CANCELLED',

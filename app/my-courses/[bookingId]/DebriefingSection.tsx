@@ -8,7 +8,7 @@
 'use client';
 
 import { PlayCircleOutlined, VideoLibraryOutlined } from '@mui/icons-material';
-import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
+import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
 
 // Design tokens
 const colors = {

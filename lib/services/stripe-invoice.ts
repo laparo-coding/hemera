@@ -144,7 +144,7 @@ export async function getInvoiceDetails(invoiceId: string): Promise<{
  */
 export function validateInvoiceDownload(
   paymentStatus: string,
-  invoiceId: string | null | undefined
+  _invoiceId: string | null | undefined
 ): { valid: boolean; error?: string } {
   // Check payment status
   const paidStatuses = ['PAID', 'CONFIRMED'];

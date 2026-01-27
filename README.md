@@ -99,6 +99,32 @@ Failure to monitor constitutes a process violation per the constitution
 
   Do not commit real keys. `.gitignore` already excludes `.env*` files.
 
+## Learning Path & Email Notifications (021)
+
+The Learning Path feature uses [Loops.so](https://loops.so/) for transactional emails.
+
+### Required Environment Variables
+
+```bash
+# .env.local
+LOOPS_API_KEY=loops_xxxxx  # Get from Loops.so Dashboard → API
+```
+
+### Transactional Email Templates
+
+Create the following templates in your Loops.so dashboard:
+
+| Template ID | Purpose | Variables |
+|-------------|---------|-----------|
+| `prerequisite-review` | Admin notification for PRE_BOOKED booking | `customerName`, `courseTitle`, `adminUrl` |
+| `booking-rejected` | Customer rejection notice | `firstName`, `courseTitle` |
+
+### Feature Behavior
+
+- **PRE_BOOKED Status**: Applied when unqualified users book INTERMEDIATE/ADVANCED courses
+- **Admin Review**: Pending bookings visible at `/admin/bookings/pending`
+- **Silent Failure**: Email failures are logged to Rollbar but don't block booking flow
+
 ## Tests & Troubleshooting
 
 - Jest not exiting? Check for open handles:

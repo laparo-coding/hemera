@@ -96,8 +96,10 @@ export async function getPublishedCourses(): Promise<Course[]> {
       });
     }
 
-    // Filter published courses
-    const courses = allCourses.filter(course => course.isPublished);
+    // Filter published courses (exclude non-public courses for Learning Path feature)
+    const courses = allCourses.filter(
+      course => course.isPublished && !course.isNonPublic
+    );
 
     // Compute availability (FR-011): derive from internal capacities/bookings
     const courseIds = courses.map(c => c.id);
@@ -172,6 +174,7 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
     const courses = await prisma.course.findMany({
       where: {
         isPublished: true,
+        isNonPublic: false, // Exclude Learning Path invite-only courses
       },
       include: {
         location: {
@@ -252,7 +255,11 @@ export async function getCourseById(id: string): Promise<Course> {
       },
     });
 
-    if (!courseRecord || !courseRecord.isPublished) {
+    if (
+      !courseRecord ||
+      !courseRecord.isPublished ||
+      courseRecord.isNonPublic
+    ) {
       throw new CourseNotFoundError(id);
     }
 
@@ -323,7 +330,7 @@ export async function getCourseBySlug(slug: string): Promise<Course> {
       throw new CourseNotFoundError(`slug:${slug}`);
     }
 
-    if (!courseRecord.isPublished) {
+    if (!courseRecord.isPublished || courseRecord.isNonPublic) {
       throw new CourseNotPublishedError(courseRecord.id);
     }
 
@@ -396,6 +403,7 @@ export async function getNextUpcomingCourse(): Promise<Course | null> {
     const course = await prisma.course.findFirst({
       where: {
         isPublished: true,
+        isNonPublic: false, // Exclude Learning Path invite-only courses
         startDate: {
           gte: now,
         },
@@ -426,16 +434,18 @@ export async function getNextUpcomingCourse(): Promise<Course | null> {
  */
 export async function getCourseStats() {
   try {
-    const [total, published, unpublished] = await Promise.all([
+    const [total, published, unpublished, nonPublic] = await Promise.all([
       prisma.course.count(),
-      prisma.course.count({ where: { isPublished: true } }),
+      prisma.course.count({ where: { isPublished: true, isNonPublic: false } }),
       prisma.course.count({ where: { isPublished: false } }),
+      prisma.course.count({ where: { isNonPublic: true } }),
     ]);
 
     return {
       total,
       published,
       unpublished,
+      nonPublic,
     };
   } catch (error) {
     logError(error, { operation: 'getCourseStats' });

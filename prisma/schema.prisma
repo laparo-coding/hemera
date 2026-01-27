@@ -15,46 +15,51 @@ datasource db {
 // - User.id uses Clerk ID directly (no auto-generated cuid)
 
 model User {
-  id            String    @id // Clerk User ID (e.g., user_xxxxx)
-  name          String?
-  email         String?   @unique(map: "users_email_unique")
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  bookings      Booking[]
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  id             String    @id // Clerk User ID (e.g., user_xxxxx)
+  name           String?
+  email          String?   @unique(map: "users_email_unique")
+  emailVerified  DateTime? @map("email_verified")
+  image          String?
+  isOutperformer Boolean   @default(false) @map("is_outperformer")
+  bookings       Booking[]
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   @@map("users")
 }
 
 model Course {
-  id            String              @id @default(cuid())
-  title         String
-  description   String?
-  teaser        String?
-  curriculum    Json?
-  slug          String              @unique
-  price         Int
-  currency      String              @default("EUR")
-  capacity      Int                 @default(20)
-  startDate     DateTime?           @map("start_date")
-  endDate       DateTime?           @map("end_date")
-  startTime     DateTime?           @map("start_time")
-  endTime       DateTime?           @map("end_time")
-  isPublished   Boolean             @default(false) @map("is_published")
-  createdAt     DateTime            @default(now()) @map("created_at")
-  updatedAt     DateTime            @updatedAt @map("updated_at")
-  instructor    String              @default("TBD")
-  level         CourseLevel         @default(BEGINNER)
-  thumbnailUrl  String?             @map("thumbnail_url")
-  imageDetail   String?             @map("image_detail")
-  imageTwitter  String?             @map("image_twitter")
-  heroVideoPlaybackId String?       @map("hero_video_playback_id")
-  locationId    String?             @map("location_id")
-  location      Location?           @relation(fields: [locationId], references: [id])
-  bookings      Booking[]
-  summaryAssets CourseSummaryAsset[]
-  testimonials  Testimonial[]
+  id                  String              @id @default(cuid())
+  title               String
+  description         String?
+  teaser              String?
+  curriculum          Json?
+  slug                String              @unique
+  price               Int
+  currency            String              @default("EUR")
+  capacity            Int                 @default(20)
+  startDate           DateTime?           @map("start_date")
+  endDate             DateTime?           @map("end_date")
+  startTime           DateTime?           @map("start_time")
+  endTime             DateTime?           @map("end_time")
+  isPublished         Boolean             @default(false) @map("is_published")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+  instructor          String              @default("TBD")
+  level               CourseLevel         @default(BEGINNER)
+  thumbnailUrl        String?             @map("thumbnail_url")
+  imageDetail         String?             @map("image_detail")
+  imageTwitter        String?             @map("image_twitter")
+  heroVideoPlaybackId String?             @map("hero_video_playback_id")
+  locationId          String?             @map("location_id")
+  // Learning Path fields (021)
+  recommended         String?             @map("recommended") @db.VarChar(300)
+  notRecommended      String?             @map("not_recommended") @db.VarChar(300)
+  isNonPublic         Boolean             @default(false) @map("is_non_public")
+  location            Location?           @relation(fields: [locationId], references: [id])
+  bookings            Booking[]
+  summaryAssets       CourseSummaryAsset[]
+  testimonials        Testimonial[]
 
   @@index([startDate])
   @@map("courses")
@@ -78,6 +83,9 @@ model Booking {
   stripeInvoicePdfUrl   String?              @map("stripe_invoice_pdf_url")
   amount                Int
   currency              String               @default("EUR")
+  // Learning Path fields (021)
+  reviewedAt            DateTime?            @map("reviewed_at")
+  reviewedBy            String?              @map("reviewed_by")
   createdAt             DateTime             @default(now()) @map("created_at")
   updatedAt             DateTime             @updatedAt @map("updated_at")
   course                Course               @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -91,6 +99,7 @@ model Booking {
 
 enum PaymentStatus {
   PENDING
+  PRE_BOOKED
   PAID
   FAILED
   CANCELLED

@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getCurrentUserWithSync } from '../../../../lib/api/users';
 import { StripeConfigurationError } from '../../../../lib/errors';
 import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
-import { createBooking } from '../../../../lib/services/booking';
+import { handleBookingWithPrerequisites } from '../../../../lib/services/booking-orchestrator';
 import { getCourseByIdOrSlug } from '../../../../lib/services/course';
 import {
   createPaymentIntent,
@@ -81,34 +81,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create booking with initial PENDING status
-    let booking;
-    try {
-      booking = await createBooking({
-        userId: syncedUser.id,
-        courseId: course.id,
-        amount: course.price,
-        currency: course.currency,
-      });
-    } catch (bookingError) {
-      const message =
-        bookingError instanceof Error
-          ? bookingError.message
-          : String(bookingError);
-      serverInstance.error('Booking creation failed', {
-        error: message,
-        userId: syncedUser.id,
-        courseId: course.id,
-      });
-      // Pass through meaningful errors like "Course is full"
-      if (message.includes('full') || message.includes('not published')) {
-        return NextResponse.json({ error: message }, { status: 400 });
-      }
+    // Learning Path (021): Orchestrator handles prerequisite check + booking creation
+    const orchestratorResult = await handleBookingWithPrerequisites({
+      userId: syncedUser.id,
+      userEmail: syncedUser.email,
+      userName: syncedUser.name,
+      course,
+    });
+
+    // Handle orchestrator errors
+    if (!orchestratorResult.success) {
       return NextResponse.json(
-        { error: 'Buchung konnte nicht erstellt werden' },
+        { error: orchestratorResult.error },
         { status: 500 }
       );
     }
+
+    // Handle PRE_BOOKED flow (requires admin review)
+    if (orchestratorResult.requiresReview) {
+      return NextResponse.json(
+        {
+          requiresReview: true,
+          bookingId: orchestratorResult.bookingId,
+          message: orchestratorResult.message,
+          missingPrerequisite: orchestratorResult.missingPrerequisite,
+        },
+        { status: 202 }
+      );
+    }
+
+    // Qualified: Booking created, now create payment intent
+    const booking = { id: orchestratorResult.bookingId };
 
     // Create payment intent
     let paymentIntent;
