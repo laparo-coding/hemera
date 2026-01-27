@@ -1,0 +1,369 @@
+# Course Participation Endpoints Contract
+
+paths:
+  /my-courses/{bookingId}/preparation:
+    get:
+      tags:
+        - Courses
+      operationId: getPreparation
+      summary: Get preparation phase
+      description: Returns the preparation phase data for a booking
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      responses:
+        '200':
+          description: Preparation phase data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PreparationPhase'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Courses
+      operationId: updatePreparation
+      summary: Update preparation phase
+      description: Updates the preparation phase data
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [IN_PROGRESS, COMPLETED]
+                data:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Preparation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /my-courses/{bookingId}/summary:
+    get:
+      tags:
+        - Courses
+      operationId: getSummary
+      summary: Get summary phase
+      description: Returns the summary phase data for a booking
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      responses:
+        '200':
+          description: Summary phase data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SummaryPhase'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Courses
+      operationId: updateSummary
+      summary: Update summary phase
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [IN_PROGRESS, COMPLETED]
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Summary updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+
+  /my-courses/{bookingId}/debriefing:
+    get:
+      tags:
+        - Courses
+      operationId: getDebriefing
+      summary: Get debriefing phase
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      responses:
+        '200':
+          description: Debriefing phase data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DebriefingPhase'
+    put:
+      tags:
+        - Courses
+      operationId: updateDebriefing
+      summary: Update debriefing phase
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [IN_PROGRESS, COMPLETED]
+                feedback:
+                  type: string
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+      responses:
+        '200':
+          description: Debriefing updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+
+  /my-courses/{bookingId}/result:
+    get:
+      tags:
+        - Courses
+      operationId: getResult
+      summary: Get result phase
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      responses:
+        '200':
+          description: Result phase data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ResultPhase'
+    put:
+      tags:
+        - Courses
+      operationId: updateResult
+      summary: Update result phase
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [IN_PROGRESS, COMPLETED]
+                score:
+                  type: number
+      responses:
+        '200':
+          description: Result updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+
+  /my-courses/{bookingId}/resume:
+    get:
+      tags:
+        - Courses
+      operationId: getResume
+      summary: Get uploaded resume
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      responses:
+        '200':
+          description: Resume data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          url:
+                            type: string
+                            format: uri
+                          filename:
+                            type: string
+                          uploadedAt:
+                            type: string
+                            format: date-time
+    post:
+      tags:
+        - Courses
+      operationId: uploadResume
+      summary: Upload resume
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        '201':
+          description: Resume uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+    delete:
+      tags:
+        - Courses
+      operationId: deleteResume
+      summary: Delete resume
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      responses:
+        '200':
+          description: Resume deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'

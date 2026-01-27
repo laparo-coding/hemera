@@ -50,6 +50,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Find course by ID or slug in a single query
     const course = await prisma.course.findFirst({
       where: {
+        isPublished: true,
+        isNonPublic: false, // Exclude Learning Path invite-only courses
         OR: [{ id }, { slug: id }],
       },
       select: { id: true },

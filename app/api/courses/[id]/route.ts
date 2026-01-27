@@ -15,6 +15,7 @@ export async function GET(
     const courseRecord = await prisma.course.findFirst({
       where: {
         isPublished: true,
+        isNonPublic: false, // Exclude Learning Path invite-only courses
         OR: [{ id }, { slug: id }],
       },
       include: {

@@ -1,0 +1,157 @@
+name: 'Deploy: Production (Manual)'
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_ref:
+        description: 'Git ref to deploy (branch, tag, or SHA)'
+        type: string
+        required: true
+        default: main
+
+concurrency:
+  group: manual-production-deploy-${{ github.ref || inputs.target_ref }}
+  cancel-in-progress: false
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+  deploy-production-manual:
+    name: Deploy Production (Manual)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code (target ref)
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.target_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Sanitize Vercel Token
+        run: |
+          set -euo pipefail
+          token=$(printf %s "$VERCEL_TOKEN" | tr -d '"' | tr -d "\n\r\t" | sed -e 's/^ *//' -e 's/ *$//')
+          echo "SANITIZED_VERCEL_TOKEN=$token" >> "$GITHUB_ENV"
+
+      - name: Verify Vercel Auth
+        run: |
+          set -euo pipefail
+          vercel --version
+          vercel whoami --token "$SANITIZED_VERCEL_TOKEN" || true
+      - name: Set BUILD_TIME (UTC)
+        run: echo "BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+
+      - name: Pull Vercel Environment Information
+        run: |
+          set -euo pipefail
+          attempts=0
+          rc=1
+          : > /tmp/vercel_pull.log
+          while [ $attempts -lt 3 ]; do
+            attempts=$((attempts+1))
+            echo "Attempt $attempts: vercel pull --yes --environment=production --debug --scope=***"
+            set +e
+            vercel pull --yes --environment=production --debug --scope="$VERCEL_ORG_ID" --token="$SANITIZED_VERCEL_TOKEN" 2>&1 | tee /tmp/vercel_pull.log
+            rc=$?
+            set -e
+            [ $rc -eq 0 ] && break
+            echo "vercel pull attempt $attempts failed (exit $rc). Retrying in 10s..."
+            sleep 10
+          done
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning::vercel pull failed repeatedly. Showing last 120 lines:"
+            tail -n 120 /tmp/vercel_pull.log || true
+            exit 1
+          fi
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --debug --scope="$VERCEL_ORG_ID" --token="$SANITIZED_VERCEL_TOKEN"
+        env:
+          BUILD_TIME: ${{ env.BUILD_TIME }}
+
+      - name: Deploy Project Artifacts to Vercel
+        id: deploy
+        run: |
+          set -euo pipefail
+          # Try direct production deploy (prebuilt)
+          attempts=0
+          rc=1
+          url=""
+          : > /tmp/vercel_deploy.log
+          while [ $attempts -lt 2 ]; do
+            attempts=$((attempts+1))
+            echo "Attempt $attempts: vercel deploy --prebuilt --prod --yes --scope=*** --token=*** --debug"
+            set +e
+            vercel deploy --prebuilt --prod --yes --debug --scope="$VERCEL_ORG_ID" --token="$SANITIZED_VERCEL_TOKEN" 2>&1 | tee /tmp/vercel_deploy.log
+            rc=$?
+            set -e
+            url=$(grep -Eo 'https://[^[:space:]]+\.vercel\.app' /tmp/vercel_deploy.log | tail -n1 || true)
+            [ $rc -eq 0 ] && [ -n "${url:-}" ] && break
+            echo "Vercel deploy attempt $attempts failed (exit $rc, url='${url:-}'). Retrying in 10s..."
+            sleep 10
+          done
+
+          # Fallback: preview deploy, then promote to prod
+          if [ -z "${url:-}" ] || [ "$rc" -ne 0 ]; then
+            echo "::warning::Production deploy failed or no URL. Falling back to preview deploy and promotion."
+            attempts=0
+            rc=1
+            preview_url=""
+            : > /tmp/vercel_deploy_preview.log
+            while [ $attempts -lt 2 ]; do
+              attempts=$((attempts+1))
+              echo "Attempt $attempts: vercel deploy --prebuilt --yes --scope=*** --token=*** --debug (preview)"
+              set +e
+              vercel deploy --prebuilt --yes --debug --scope="$VERCEL_ORG_ID" --token="$SANITIZED_VERCEL_TOKEN" 2>&1 | tee /tmp/vercel_deploy_preview.log
+              rc=$?
+              set -e
+              preview_url=$(grep -Eo 'https://[^[:space:]]+\.vercel\.app' /tmp/vercel_deploy_preview.log | tail -n1 || true)
+              [ $rc -eq 0 ] && [ -n "${preview_url:-}" ] && break
+              echo "Preview deploy attempt $attempts failed (exit $rc, url='${preview_url:-}'). Retrying in 10s..."
+              sleep 10
+            done
+            if [ -n "${preview_url:-}" ]; then
+              echo "Promoting preview to prod: $preview_url"
+              : > /tmp/vercel_promote.log
+              set +e
+              vercel promote "$preview_url" --prod --yes --debug --scope="$VERCEL_ORG_ID" --token="$SANITIZED_VERCEL_TOKEN" 2>&1 | tee /tmp/vercel_promote.log
+              rc=$?
+              set -e
+              url=$(grep -Eo 'https://[^[:space:]]+\.vercel\.app' /tmp/vercel_promote.log | tail -n1 || true)
+              # Fallback: if promotion didn't print a URL, keep preview URL (not ideal, but provides something to test)
+              if [ -z "${url:-}" ] && [ -n "${preview_url:-}" ]; then
+                url="$preview_url"
+              fi
+            fi
+          fi
+
+          # Diagnostics if URL is still missing
+          if [ -z "${url:-}" ]; then
+            echo "::warning::No Vercel URL matched in output. Showing last 200 lines of logs:"
+            tail -n 200 /tmp/vercel_deploy.log || true
+            tail -n 200 /tmp/vercel_deploy_preview.log || true
+            tail -n 200 /tmp/vercel_promote.log || true
+          fi
+
+          if [ "$rc" -ne 0 ] || [ -z "${url:-}" ]; then
+            echo "::error::Vercel deployment failed (exit $rc) and no URL was captured."
+            exit 1
+          fi
+
+          echo "Resolved deployment URL: ${url}"
+          echo "url=${url}" >> "$GITHUB_OUTPUT"
+
+      - name: Print Deployment URL
+        run: echo "Deployment URL=${{ steps.deploy.outputs.url }}"

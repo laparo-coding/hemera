@@ -11,7 +11,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Box,
   Button,
+  Checkbox,
   CircularProgress,
+  FormControlLabel,
   MenuItem,
   TextField,
   Typography,
@@ -78,6 +80,10 @@ export default function CourseForm({
       locationId: initialData?.locationId || null,
       curriculum:
         (initialData?.curriculum as CurriculumModule[] | null) || null,
+      // Learning Path fields (021)
+      recommended: initialData?.recommended || null,
+      notRecommended: initialData?.notRecommended || null,
+      isNonPublic: initialData?.isNonPublic ?? false,
     },
   });
 
@@ -146,7 +152,7 @@ export default function CourseForm({
             error={!!errors.teaser}
             helperText={
               errors.teaser?.message ||
-              `${(field.value || '').length}/300 Zeichen`
+              `${(field.value || '').trim().length}/300 Zeichen`
             }
             fullWidth
             disabled={isLoading || isSubmitting}
@@ -427,6 +433,117 @@ export default function CourseForm({
         )}
       />
 
+      {/* Learning Path fields (021) */}
+      <Box sx={{ mt: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+        <Typography variant='subtitle2' gutterBottom sx={{ mb: 2 }}>
+          Lernpfad-Empfehlungen
+        </Typography>
+
+        <Controller
+          name='recommended'
+          control={control}
+          render={({ field }) => {
+            const currentLength = (field.value || '').trim().length;
+            const maxLength = 300;
+            const isNearLimit = currentLength > maxLength * 0.9;
+            const isOverLimit = currentLength > maxLength;
+
+            return (
+              <TextField
+                {...field}
+                value={field.value || ''}
+                label='Passende Voraussetzungen'
+                placeholder='z.B. Grundkurs Laparoskopie abgeschlossen'
+                multiline
+                rows={2}
+                error={!!errors.recommended}
+                helperText={
+                  errors.recommended?.message ||
+                  `Zeichen: ${currentLength}/${maxLength}${isNearLimit ? ' ⚠️ Limit fast erreicht' : ''} • Erscheint als "Das sind passende Voraussetzungen für das Seminar"`
+                }
+                fullWidth
+                disabled={isLoading || isSubmitting}
+                inputProps={{ maxLength }}
+                sx={{ mb: 2 }}
+                onChange={e => field.onChange(e.target.value || null)}
+                FormHelperTextProps={{
+                  sx: {
+                    color: isOverLimit
+                      ? 'error.main'
+                      : isNearLimit
+                        ? 'warning.main'
+                        : 'text.secondary',
+                  },
+                }}
+              />
+            );
+          }}
+        />
+
+        <Controller
+          name='notRecommended'
+          control={control}
+          render={({ field }) => {
+            const currentLength = (field.value || '').trim().length;
+            const maxLength = 300;
+            const isNearLimit = currentLength > maxLength * 0.9;
+            const isOverLimit = currentLength > maxLength;
+
+            return (
+              <TextField
+                {...field}
+                value={field.value || ''}
+                label='Nicht passende Voraussetzungen'
+                placeholder='z.B. Keine laparoskopischen Vorkenntnisse'
+                multiline
+                rows={2}
+                error={!!errors.notRecommended}
+                helperText={
+                  errors.notRecommended?.message ||
+                  `Zeichen: ${currentLength}/${maxLength}${isNearLimit ? ' ⚠️ Limit fast erreicht' : ''} • Erscheint als "Das sind keine passenden Voraussetzungen für das Seminar"`
+                }
+                fullWidth
+                disabled={isLoading || isSubmitting}
+                inputProps={{ maxLength }}
+                sx={{ mb: 2 }}
+                onChange={e => field.onChange(e.target.value || null)}
+                FormHelperTextProps={{
+                  sx: {
+                    color: isOverLimit
+                      ? 'error.main'
+                      : isNearLimit
+                        ? 'warning.main'
+                        : 'text.secondary',
+                  },
+                }}
+              />
+            );
+          }}
+        />
+
+        <Controller
+          name='isNonPublic'
+          control={control}
+          render={({ field }) => (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={field.value}
+                  onChange={e => field.onChange(e.target.checked)}
+                  disabled={isLoading || isSubmitting}
+                />
+              }
+              label={
+                <Typography variant='body2' color='text.secondary'>
+                  Nicht-öffentlicher Kurs (wird nicht in der Kursliste
+                  angezeigt)
+                </Typography>
+              }
+            />
+          )}
+        />
+      </Box>
+
       <Controller
         name='curriculum'
         control={control}
@@ -463,20 +580,20 @@ export default function CourseForm({
           name='isPublished'
           control={control}
           render={({ field }) => (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <input
-                type='checkbox'
-                id='isPublished'
-                checked={field.value}
-                onChange={e => field.onChange(e.target.checked)}
-                disabled={isLoading || isSubmitting}
-              />
-              <label htmlFor='isPublished' style={{ cursor: 'pointer' }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={field.value}
+                  onChange={e => field.onChange(e.target.checked)}
+                  disabled={isLoading || isSubmitting}
+                />
+              }
+              label={
                 <Typography variant='body2' color='text.secondary'>
                   Sofort veröffentlichen
                 </Typography>
-              </label>
-            </Box>
+              }
+            />
           )}
         />
 

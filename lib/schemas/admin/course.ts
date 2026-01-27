@@ -118,6 +118,26 @@ export const courseCreateSchema = z.object({
     .optional()
     .nullable(),
   curriculum: curriculumSchema,
+  // Learning Path fields (021)
+  recommended: z
+    .string()
+    .max(300, 'Empfehlung darf maximal 300 Zeichen haben')
+    .trim()
+    .min(1, 'Empfehlung darf nicht leer sein')
+    .optional()
+    .nullable()
+    .or(z.literal(''))
+    .transform(val => val || null),
+  notRecommended: z
+    .string()
+    .max(300, 'Nicht-Empfehlung darf maximal 300 Zeichen haben')
+    .trim()
+    .min(1, 'Nicht-Empfehlung darf nicht leer sein')
+    .optional()
+    .nullable()
+    .or(z.literal(''))
+    .transform(val => val || null),
+  isNonPublic: z.boolean().default(false),
 });
 
 /**
@@ -204,6 +224,26 @@ export const courseUpdateSchema = z.object({
     .optional()
     .nullable(),
   curriculum: curriculumSchema,
+  // Learning Path fields (021)
+  recommended: z
+    .string()
+    .max(300, 'Empfehlung darf maximal 300 Zeichen haben')
+    .trim()
+    .min(1, 'Empfehlung darf nicht leer sein')
+    .optional()
+    .nullable()
+    .or(z.literal(''))
+    .transform(val => val || null),
+  notRecommended: z
+    .string()
+    .max(300, 'Nicht-Empfehlung darf maximal 300 Zeichen haben')
+    .trim()
+    .min(1, 'Nicht-Empfehlung darf nicht leer sein')
+    .optional()
+    .nullable()
+    .or(z.literal(''))
+    .transform(val => val || null),
+  isNonPublic: z.boolean().optional(),
   updatedAt: z.coerce.date(), // Required for optimistic locking
 });
 

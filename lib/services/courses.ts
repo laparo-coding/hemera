@@ -31,6 +31,7 @@ export async function getCourses(): Promise<CourseWithBookings[]> {
   const courses = await prisma.course.findMany({
     where: {
       isPublished: true,
+      isNonPublic: false, // Exclude Learning Path invite-only courses
     },
     orderBy: {
       startDate: 'asc',

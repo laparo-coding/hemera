@@ -1,0 +1,283 @@
+# Public Endpoints Contract
+
+paths:
+  /health:
+    get:
+      tags:
+        - Public
+      operationId: getHealth
+      summary: Health check
+      description: Returns application health status
+      security: []
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HealthCheck'
+
+  /health/deployment:
+    get:
+      tags:
+        - Public
+      operationId: getDeploymentHealth
+      summary: Deployment health status
+      description: Returns deployment-specific health information
+      security: []
+      responses:
+        '200':
+          description: Deployment health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+    post:
+      tags:
+        - Public
+      operationId: updateDeploymentHealth
+      summary: Update deployment health
+      description: Updates deployment health status (internal use)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                version:
+                  type: string
+      responses:
+        '200':
+          description: Health updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+
+  /courses:
+    get:
+      tags:
+        - Public
+        - Courses
+      operationId: listCourses
+      summary: List published courses
+      description: |
+        Returns a list of all published courses.
+        
+        **Rate Limit**: 100 requests/minute per IP
+      security: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: locationId
+          in: query
+          schema:
+            type: string
+            format: cuid
+      responses:
+        '200':
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          courses:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/CourseSummary'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+        '429':
+          description: Too Many Requests
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Seconds until next request allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /courses/next:
+    get:
+      tags:
+        - Public
+        - Courses
+      operationId: getNextCourse
+      summary: Get next upcoming course
+      description: Returns the next scheduled course
+      security: []
+      responses:
+        '200':
+          description: Next course
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CourseSummary'
+        '404':
+          description: No upcoming courses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /courses/{id}:
+    get:
+      tags:
+        - Public
+        - Courses
+      operationId: getCourse
+      summary: Get course details
+      description: Returns detailed information about a specific course
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      responses:
+        '200':
+          description: Course details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Course'
+        '404':
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /locations:
+    get:
+      tags:
+        - Public
+        - Locations
+      operationId: listLocations
+      summary: List locations
+      description: Returns a list of all training locations
+      security: []
+      responses:
+        '200':
+          description: List of locations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Location'
+
+  /locations/{id}:
+    get:
+      tags:
+        - Public
+        - Locations
+      operationId: getLocation
+      summary: Get location details
+      description: Returns detailed information about a specific location
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: cuid
+      responses:
+        '200':
+          description: Location details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Location'
+        '404':
+          description: Location not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /locations/by-slug/{slug}:
+    get:
+      tags:
+        - Public
+        - Locations
+      operationId: getLocationBySlug
+      summary: Get location by slug
+      description: Returns location details using URL-friendly slug
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^[a-z0-9-]+$
+      responses:
+        '200':
+          description: Location details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Location'
+        '404':
+          description: Location not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

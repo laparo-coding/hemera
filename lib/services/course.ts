@@ -1,4 +1,4 @@
-import { PaymentStatus } from '@prisma/client';
+import { type CourseLevel, PaymentStatus } from '@prisma/client';
 import { prisma } from '../db/prisma';
 
 export { PaymentStatus } from '@prisma/client';
@@ -16,6 +16,7 @@ export interface Course {
   startTime?: Date | null;
   endTime?: Date | null;
   isPublished: boolean;
+  level: CourseLevel;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,7 +51,9 @@ export interface CourseSearchParams {
 export async function getCourses(
   params?: CourseSearchParams
 ): Promise<CourseWithBookings[]> {
-  const where: Record<string, unknown> = {};
+  const where: Record<string, unknown> = {
+    isNonPublic: false, // Exclude Learning Path invite-only courses by default
+  };
 
   if (params?.title) {
     where.title = {
@@ -93,12 +96,21 @@ export async function getCourses(
 
 /**
  * Get course by ID
+ * By default, excludes non-public courses (Learning Path invite-only).
  */
 export async function getCourseById(
-  id: string
+  id: string,
+  options?: { includeNonPublic?: boolean }
 ): Promise<CourseWithBookings | null> {
+  const where: Record<string, unknown> = { id };
+
+  // Exclude non-public courses by default (can be overridden by admin endpoints)
+  if (!options?.includeNonPublic) {
+    where.isNonPublic = false;
+  }
+
   return (await prisma.course.findUnique({
-    where: { id },
+    where: where as { id: string },
     include: {
       bookings: true,
     },
@@ -108,14 +120,23 @@ export async function getCourseById(
 /**
  * Get course by ID or slug
  * Convenience helper to resolve a course reference that may be a UUID (id) or a human-friendly slug.
+ * By default, excludes non-public courses (Learning Path invite-only).
  */
 export async function getCourseByIdOrSlug(
-  idOrSlug: string
+  idOrSlug: string,
+  options?: { includeNonPublic?: boolean }
 ): Promise<CourseWithBookings | null> {
+  const where: Record<string, unknown> = {
+    OR: [{ id: idOrSlug }, { slug: idOrSlug }],
+  };
+
+  // Exclude non-public courses by default (can be overridden by admin endpoints)
+  if (!options?.includeNonPublic) {
+    where.isNonPublic = false;
+  }
+
   return (await prisma.course.findFirst({
-    where: {
-      OR: [{ id: idOrSlug }, { slug: idOrSlug }],
-    },
+    where,
     include: {
       bookings: true,
     },
@@ -195,6 +216,8 @@ export async function searchCourses(
 ): Promise<CourseWithBookings[]> {
   return (await prisma.course.findMany({
     where: {
+      isPublished: true,
+      isNonPublic: false, // Exclude Learning Path invite-only courses
       OR: [
         {
           title: {
