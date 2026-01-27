@@ -242,11 +242,13 @@ NEXT_PUBLIC_APP_URL=https://app.hemera-academy.de
 ## TODOs (Fehlende Features)
 
 ### Kritisch
+
 - [ ] Admin-Dashboard für PRE_BOOKED Liste (`app/admin/bookings/pending/page.tsx`)
 - [ ] Customer-UI für PRE_BOOKED Status-Anzeige
 - [ ] E2E-Tests für kompletten Approval-Flow
 
 ### Nice-to-Have
+
 - [ ] Auto-Approval-Regeln
 - [ ] Voraussetzungsnachweis hochladen (Zertifikat)
 - [ ] Review-Zeit-SLA (>48h Alert)

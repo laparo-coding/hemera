@@ -243,12 +243,14 @@ enum PaymentStatus {
 **Main Functions:**
 
 #### `handleBookingWithPrerequisites()`
+
 - Validates course level
 - Checks user prerequisites
 - Routes to PRE_BOOKED or normal flow
 - Returns structured result
 
 **Usage:**
+
 ```typescript
 const result = await handleBookingWithPrerequisites({
   userId: 'user_123',
@@ -265,6 +267,7 @@ if (result.requiresReview) {
 ```
 
 #### `createPreBookedWithNotification()`
+
 - Creates PRE_BOOKED booking
 - Fetches admin emails
 - Sends notification (non-blocking)

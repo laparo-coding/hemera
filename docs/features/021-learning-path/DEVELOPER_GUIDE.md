@@ -267,6 +267,7 @@ it('should delete PRE_BOOKED booking and send email', async () => {
 ```
 
 ### Unit Test: Race Condition Protection
+
 ```typescript
 it('should prevent double approval with atomic updateMany', async () => {
   const booking = await createTestBooking({ paymentStatus: 'PRE_BOOKED' });

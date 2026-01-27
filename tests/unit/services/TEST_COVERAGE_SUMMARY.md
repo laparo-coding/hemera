@@ -1,16 +1,19 @@
 # Test Coverage Summary: PRE_BOOKED Feature
 
 ## Overview
+
 Comprehensive unit test coverage for the Learning Path (021) PRE_BOOKED booking workflow, including status transitions, validation rules, and orchestration logic.
 
 ## Test Files
 
 ### 1. `tests/unit/services/booking-transitions.spec.ts` ✅
+
 **12 tests, 100% passing**
 
 #### Coverage Areas:
 
 **PRE_BOOKED Creation Rules (5 tests)**
+
 - ✅ Creates PRE_BOOKED when no existing booking exists
 - ✅ Rejects PRE_BOOKED when PENDING booking exists
 - ✅ Rejects PRE_BOOKED when another PRE_BOOKED exists (duplicate prevention)
@@ -18,30 +21,36 @@ Comprehensive unit test coverage for the Learning Path (021) PRE_BOOKED booking 
 - ✅ Allows PRE_BOOKED when CANCELLED booking exists (retry scenario)
 
 **Status Transition Logic (2 tests)**
+
 - ✅ Does NOT transition CANCELLED → PENDING when creating PRE_BOOKED
 - ✅ Transitions CANCELLED → PENDING for normal bookings
 
 **Initial Status Parameter (3 tests)**
+
 - ✅ Creates booking with explicit PRE_BOOKED status
 - ✅ Defaults to PENDING when no status specified
 - ✅ Respects custom initial status (e.g., CONFIRMED)
 
 **Edge Cases (2 tests)**
+
 - ✅ Rejects PRE_BOOKED when FAILED booking exists
 - ✅ Allows normal booking update when PRE_BOOKED exists
 
 ### 2. `tests/unit/services/booking-orchestrator.spec.ts` ✅
+
 **13 tests, 100% passing**
 
 #### Coverage Areas:
 
 **handleBookingWithPrerequisites (4 tests)**
+
 - ✅ Returns error when course.level is missing
 - ✅ Creates PRE_BOOKED when user not qualified
 - ✅ Returns success without PRE_BOOKED when user qualified
 - ✅ Handles BEGINNER courses (no prerequisites)
 
 **createPreBookedWithNotification (7 tests)**
+
 - ✅ Creates PRE_BOOKED and sends admin notification
 - ✅ Succeeds even if email notification fails (non-blocking)
 - ✅ Returns error when booking creation fails
@@ -51,12 +60,14 @@ Comprehensive unit test coverage for the Learning Path (021) PRE_BOOKED booking 
 - ✅ Uses fallback name when userName is null
 
 **Email Notification Edge Cases (2 tests)**
+
 - ✅ Handles empty/whitespace email gracefully
 - ✅ Handles ADVANCED course level correctly
 
 ## Key Validation Coverage
 
 ### Business Rules Tested
+
 1. **Duplicate Prevention**: Cannot create multiple PRE_BOOKED bookings for same course
 2. **Active Booking Protection**: Cannot create PRE_BOOKED over PENDING/PAID/FAILED bookings
 3. **Retry Support**: Can create PRE_BOOKED when previous booking was CANCELLED
@@ -64,6 +75,7 @@ Comprehensive unit test coverage for the Learning Path (021) PRE_BOOKED booking 
 5. **Email Orchestration**: Non-blocking email, graceful degradation
 
 ### Error Scenarios Covered
+
 - Missing course level
 - Duplicate PRE_BOOKED attempts
 - Active booking conflicts
@@ -72,6 +84,7 @@ Comprehensive unit test coverage for the Learning Path (021) PRE_BOOKED booking 
 - No admin emails available
 
 ### Data Validation
+
 - Email presence and format (empty strings, whitespace)
 - Name extraction (first name from full name)
 - Fallback values (default name: "Teilnehmer")

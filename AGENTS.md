@@ -264,4 +264,3 @@ E2E_TEST=0|1  # toggles mocks/fixtures for tests
 - Rollbar and Loops calls are retried but should not block checkout; handle fallbacks gracefully.
 
 *Update to last commit: c500c1743f34f39d027c8001d82f242f533f289b*
-
