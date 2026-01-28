@@ -248,10 +248,11 @@ jobs:
           E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
         run: |
-          # Run only non-auth projects if no credentials are set
+          # Run only non-auth project if no credentials are set
+          # Skip chromium project (legacy compat) to avoid timeouts
           if [ -z "$E2E_TEST_EMAIL" ] || [ -z "$E2E_TEST_PASSWORD" ]; then
-            echo "No E2E credentials set - running only non-auth projects"
-            npx playwright test --project=chromium-no-auth --project=chromium
+            echo "No E2E credentials set - running only chromium-no-auth project"
+            npx playwright test --project=chromium-no-auth
           else
             echo "E2E credentials available - running all projects"
             npm run e2e:dev

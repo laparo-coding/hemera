@@ -31,14 +31,17 @@ test.describe('Production Smoke Tests', () => {
 
     expect(response?.status()).toBe(200);
 
-    // Verify course cards or course list is visible
-    await expect(
-      page.getByRole('heading', { name: /kurse|academy|courses/i }).first().or(
-        page.locator('[data-testid="course-card"]').first()
-      ).or(
-        page.getByText(/kurs|course/i).first()
-      )
-    ).toBeVisible({ timeout: 15000 });
+    // Verify any course-related content is visible (check one locator at a time)
+    const courseHeading = page.getByRole('heading', { name: /kurse|academy|courses/i }).first();
+    const courseCard = page.locator('[data-testid="course-card"]').first();
+    const courseText = page.getByText(/kurs|course/i).first();
+
+    // At least one of these should be visible
+    const hasHeading = await courseHeading.isVisible().catch(() => false);
+    const hasCard = await courseCard.isVisible().catch(() => false);
+    const hasText = await courseText.isVisible().catch(() => false);
+
+    expect(hasHeading || hasCard || hasText).toBe(true);
   });
 
   test('sign-in page loads', async ({ page }) => {
