@@ -8,7 +8,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCourseById } from '@/lib/db/admin/courses';
-import type { CurriculumModule } from '@/lib/schemas/admin/course';
+import {
+  type CurriculumModule,
+  curriculumSchema,
+} from '@/lib/schemas/admin/course';
 import { listLocations } from '@/lib/services/location';
 import EditCourseForm from './EditCourseForm';
 
@@ -61,7 +64,9 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
     capacity: course.capacity,
     updatedAt: course.updatedAt.toISOString(),
     locationId: course.locationId,
-    curriculum: course.curriculum as CurriculumModule[] | null,
+    curriculum: curriculumSchema.safeParse(course.curriculum).success
+      ? (curriculumSchema.parse(course.curriculum) as CurriculumModule[] | null)
+      : null,
     isPublished: course.isPublished,
     recommended: course.recommended,
     notRecommended: course.notRecommended,
