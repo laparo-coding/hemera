@@ -302,7 +302,25 @@ export async function handleBookingWithPrerequisites(
   const prerequisiteResult = await checkPrerequisite(userId, course.level);
 
   // Not qualified: Create PRE_BOOKED booking and notify admins
-  if (!prerequisiteResult.qualified && prerequisiteResult.missingLevel) {
+  if (!prerequisiteResult.qualified) {
+    // Guard: Ensure missingLevel is set when not qualified
+    if (!prerequisiteResult.missingLevel) {
+      serverInstance.error(
+        'Prerequisite check returned not qualified but no missing level',
+        {
+          context: 'BookingOrchestrator.handleBookingWithPrerequisites',
+          userId,
+          courseId: course.id,
+          courseLevel: course.level,
+        }
+      );
+      return {
+        success: false,
+        error:
+          'Voraussetzungsprüfung fehlgeschlagen. Bitte kontaktiere den Support.',
+      };
+    }
+
     return await createPreBookedWithNotification(
       params,
       prerequisiteResult.missingLevel
