@@ -58,17 +58,50 @@ function maskEmail(email: string): string {
 /**
  * Sanitize error for logging - extract only safe fields, exclude headers/tokens.
  * Never logs full error objects that might contain API responses.
+ *
+ * Redacts:
+ * - API keys/tokens (Bearer, api_key, authorization patterns)
+ * - Raw HTTP responses that might contain secrets
+ * - Email addresses in error messages
  */
 function sanitizeError(error: unknown): { type: string; message: string } {
+  let message: string;
+  let type: string;
+
   if (error instanceof Error) {
-    return {
-      type: error.name,
-      message: error.message,
-    };
+    type = error.name;
+    message = error.message;
+  } else {
+    type = 'UnknownError';
+    message = String(error);
   }
+
+  // Redact potential secrets from error message
+  const redactedMessage = message
+    // Redact Bearer tokens
+    .replace(/Bearer\s+[A-Za-z0-9\-._~+/]+=*/gi, 'Bearer [REDACTED]')
+    // Redact API keys (common patterns)
+    .replace(
+      /api[_-]?key[=:]\s*["']?[A-Za-z0-9\-._]+["']?/gi,
+      'api_key=[REDACTED]'
+    )
+    .replace(/loops_[A-Za-z0-9]{20,}/gi, '[REDACTED_LOOPS_KEY]')
+    // Redact authorization headers
+    .replace(
+      /authorization[=:]\s*["']?[^"'\s]+["']?/gi,
+      'authorization=[REDACTED]'
+    )
+    // Redact email addresses (keep domain for context)
+    .replace(
+      /([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+      '[EMAIL]@$2'
+    )
+    // Truncate overly long messages (might be raw responses)
+    .substring(0, 500);
+
   return {
-    type: 'UnknownError',
-    message: String(error),
+    type,
+    message: redactedMessage + (message.length > 500 ? '...[truncated]' : ''),
   };
 }
 
