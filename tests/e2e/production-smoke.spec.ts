@@ -33,7 +33,7 @@ test.describe('Production Smoke Tests', () => {
 
     // Verify course cards or course list is visible
     await expect(
-      page.getByRole('heading', { name: /kurse|academy|courses/i }).or(
+      page.getByRole('heading', { name: /kurse|academy|courses/i }).first().or(
         page.locator('[data-testid="course-card"]').first()
       ).or(
         page.getByText(/kurs|course/i).first()
