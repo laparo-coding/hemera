@@ -138,25 +138,6 @@ export async function getPublishedCourses(): Promise<Course[]> {
       } as Course;
     });
 
-    if (process.env.NODE_ENV !== 'production') {
-      try {
-        const samplePreview = enriched.slice(0, 3).map(course => ({
-          id: course.id,
-          slug: course.slug,
-          published: course.isPublished,
-        }));
-        console.info('[getPublishedCourses]', {
-          count: enriched.length,
-          sample: samplePreview,
-        });
-      } catch (logError) {
-        console.warn(
-          '[getPublishedCourses] failed to log debug info',
-          logError
-        );
-      }
-    }
-
     return enriched;
   } catch (error) {
     logError(error, { operation: 'getPublishedCourses' });

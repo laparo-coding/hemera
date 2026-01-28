@@ -112,7 +112,7 @@ export default function TestimonialForm({
     );
   }, [userProfile, nameFormat]);
 
-  const characterCount = statement.length;
+  const characterCount = statement.trim().length;
   const isOverLimit = characterCount > MAX_STATEMENT_LENGTH;
   const isTooShort = characterCount < 10;
 
@@ -215,11 +215,11 @@ export default function TestimonialForm({
         value={statement}
         onChange={e => setStatement(e.target.value)}
         placeholder={`Was hat dir am ${TERMS.course} besonders gut gefallen? Was hast du gelernt?`}
-        error={isOverLimit || (statement.length > 0 && isTooShort)}
+        error={isOverLimit || (characterCount > 0 && isTooShort)}
         helperText={
           isOverLimit
             ? `Maximal ${MAX_STATEMENT_LENGTH} Zeichen erlaubt`
-            : isTooShort && statement.length > 0
+            : isTooShort && characterCount > 0
               ? 'Mindestens 10 Zeichen erforderlich'
               : `${characterCount} / ${MAX_STATEMENT_LENGTH} Zeichen`
         }

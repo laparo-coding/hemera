@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Qualified: Booking created, now create payment intent
-    const booking = { id: orchestratorResult.bookingId };
+    const bookingId = orchestratorResult.bookingId;
 
     // Create payment intent
     let paymentIntent;
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         metadata: {
           courseId: course.id,
           userId: syncedUser.id,
-          bookingId: booking.id,
+          bookingId,
           courseName: course.title,
         },
       });
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
             : String(stripeError),
         userId: syncedUser.id,
         courseId: course.id,
-        bookingId: booking.id,
+        bookingId,
       });
       return NextResponse.json(
         { error: 'Zahlungsabwicklung fehlgeschlagen' },
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
       amount: course.price,
       currency: course.currency,
       courseName: course.title,
-      bookingId: booking.id,
+      bookingId,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

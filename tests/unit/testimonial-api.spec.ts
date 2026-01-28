@@ -49,7 +49,7 @@ import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/courses/[id]/testimonials/route';
 
 // POST is not yet implemented - placeholder for skipped tests
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: placeholder for future implementation
 const POST: any = undefined;
 
 describe('GET /api/courses/[id]/testimonials', () => {

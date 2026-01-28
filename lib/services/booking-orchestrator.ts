@@ -178,9 +178,9 @@ async function notifyAdminsForReview(
     // Safe: isValidEmail ensures userEmail is non-null and valid
     const customerEmail = userEmail!.trim();
 
-    // Guard: Check Loops API key (no I/O)
-    if (!isLoopsConfigured()) {
-      serverInstance.warn(
+    // Guard: Check Loops API key (no I/O) - use silent since we log our own message
+    if (!isLoopsConfigured(true)) {
+      serverInstance.info(
         'Skipped prerequisite review email - Loops not configured',
         {
           context: 'BookingOrchestrator.notifyAdminsForReview',
@@ -302,7 +302,25 @@ export async function handleBookingWithPrerequisites(
   const prerequisiteResult = await checkPrerequisite(userId, course.level);
 
   // Not qualified: Create PRE_BOOKED booking and notify admins
-  if (!prerequisiteResult.qualified && prerequisiteResult.missingLevel) {
+  if (!prerequisiteResult.qualified) {
+    // Guard: Ensure missingLevel is set when not qualified
+    if (!prerequisiteResult.missingLevel) {
+      serverInstance.error(
+        'Prerequisite check returned not qualified but no missing level',
+        {
+          context: 'BookingOrchestrator.handleBookingWithPrerequisites',
+          userId,
+          courseId: course.id,
+          courseLevel: course.level,
+        }
+      );
+      return {
+        success: false,
+        error:
+          'Voraussetzungsprüfung fehlgeschlagen. Bitte kontaktiere den Support.',
+      };
+    }
+
     return await createPreBookedWithNotification(
       params,
       prerequisiteResult.missingLevel

@@ -39,6 +39,34 @@ export default defineConfig({
         timeout: 180_000,
       },
   projects: [
+    // Auth setup project - creates authenticated state for tests requiring login
+    {
+      name: 'setup',
+      testMatch: /auth-setup\.ts/,
+    },
+    // Authenticated browser - uses saved auth state, depends on setup
+    {
+      name: 'chromium-auth',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: '.auth/user.json',
+        launchOptions: {
+          args: ['--incognito'],
+        },
+      },
+      dependencies: ['setup'],
+    },
+    // Unauthenticated browser - for public page tests
+    {
+      name: 'chromium-no-auth',
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: ['--incognito'],
+        },
+      },
+    },
+    // Default chromium project (legacy compat)
     {
       name: 'chromium',
       use: {
@@ -47,6 +75,15 @@ export default defineConfig({
           args: ['--incognito'],
         },
       },
+    },
+    // Production smoke tests - scheduled daily, read-only
+    {
+      name: 'production-smoke',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.PRODUCTION_URL || 'https://hemera.academy',
+      },
+      testMatch: /production-smoke\.spec\.ts/,
     },
   ],
 });
