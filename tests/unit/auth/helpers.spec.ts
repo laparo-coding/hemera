@@ -6,9 +6,25 @@
 import type { User } from '@clerk/nextjs/server';
 
 // Store the original env values
-const originalDisableClerk = process.env.NEXT_PUBLIC_DISABLE_CLERK;
-const originalE2ETest = process.env.E2E_TEST;
-const originalNodeEnv = process.env.NODE_ENV;
+const originalEnvValues = {
+  NEXT_PUBLIC_DISABLE_CLERK: process.env.NEXT_PUBLIC_DISABLE_CLERK,
+  E2E_TEST: process.env.E2E_TEST,
+  NODE_ENV: process.env.NODE_ENV,
+};
+
+/**
+ * Restore environment variables to their original values.
+ * Handles both defined and undefined original states.
+ */
+function restoreEnv() {
+  for (const [key, value] of Object.entries(originalEnvValues)) {
+    if (value !== undefined) {
+      process.env[key] = value;
+    } else {
+      delete process.env[key];
+    }
+  }
+}
 
 // Mock Clerk
 jest.mock('@clerk/nextjs/server', () => ({
@@ -47,14 +63,14 @@ describe('Auth Helpers', () => {
     // Keep NODE_ENV as 'test' but that's checked in the isMockAuthEnvironment
   });
 
+  afterEach(() => {
+    // Restore original values after each test to prevent cross-test pollution
+    restoreEnv();
+  });
+
   afterAll(() => {
-    // Restore original env values
-    if (originalDisableClerk !== undefined) {
-      process.env.NEXT_PUBLIC_DISABLE_CLERK = originalDisableClerk;
-    }
-    if (originalE2ETest !== undefined) {
-      process.env.E2E_TEST = originalE2ETest;
-    }
+    // Final cleanup: restore original env values
+    restoreEnv();
   });
 
   describe('Mock Auth Environment', () => {

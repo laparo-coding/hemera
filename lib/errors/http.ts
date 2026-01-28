@@ -105,18 +105,73 @@ export async function toHttpError(
 }
 
 /**
+ * Check if an error is a Prisma error by inspecting its properties.
+ *
+ * **Why heuristics over instanceof/constructor.name:**
+ * - `instanceof` checks fail across module boundaries and bundler configurations
+ * - `constructor.name` is brittle: minification can mangle names, and mocking
+ *   in tests requires fragile `Object.defineProperty` hacks
+ * - Prisma errors consistently have a `clientVersion` property, and known
+ *   request errors have a `code` starting with 'P' (e.g., P2002)
+ * - These structural checks are stable across Prisma versions and test environments
+ *
+ * @param error - The error to check
+ * @returns Object indicating if it's a Prisma error and its type
+ */
+function isPrismaError(error: Error): {
+  isPrisma: boolean;
+  type?: 'known' | 'validation' | 'unknown';
+} {
+  const err = error as Record<string, unknown>;
+
+  // PrismaClientKnownRequestError has a 'code' property starting with 'P'
+  if (
+    typeof err.code === 'string' &&
+    err.code.startsWith('P') &&
+    'clientVersion' in err
+  ) {
+    return { isPrisma: true, type: 'known' };
+  }
+
+  // PrismaClientValidationError has specific message patterns
+  if (
+    'clientVersion' in err &&
+    (error.message.includes('Invalid') ||
+      error.message.includes('Argument') ||
+      error.message.includes('Unknown arg'))
+  ) {
+    return { isPrisma: true, type: 'validation' };
+  }
+
+  // PrismaClientUnknownRequestError has clientVersion but no code
+  if ('clientVersion' in err && !('code' in err)) {
+    return { isPrisma: true, type: 'unknown' };
+  }
+
+  return { isPrisma: false };
+}
+
+/**
  * Get appropriate HTTP status code for standard errors
  */
 function getStatusCodeForError(error: Error): number {
+  // Check for Prisma errors first using robust detection
+  const prismaCheck = isPrismaError(error);
+  if (prismaCheck.isPrisma) {
+    switch (prismaCheck.type) {
+      case 'known':
+        return 400;
+      case 'validation':
+        return 422;
+      case 'unknown':
+        return 500;
+    }
+  }
+
+  // Fallback to constructor name for other known error types
   const errorName = error.constructor.name;
 
   switch (errorName) {
-    case 'PrismaClientKnownRequestError':
-      return 400;
-    case 'PrismaClientUnknownRequestError':
-      return 500;
-    case 'PrismaClientValidationError':
-      return 422;
     case 'NotFoundError':
       return 404;
     case 'ValidationError':

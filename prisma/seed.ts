@@ -58,6 +58,7 @@ async function main() {
       capacity: 25,
       ...convertDateToFields('2026-01-15T10:00:00Z'),
       isPublished: true,
+      curriculum: null, // Managed via Admin UI
     },
     {
       title: 'Fortgeschrittene Verhandlungsstrategien',
@@ -69,6 +70,7 @@ async function main() {
       capacity: 20,
       ...convertDateToFields('2026-02-20T14:00:00Z'),
       isPublished: true,
+      curriculum: null,
     },
     {
       title: 'Masterclass: Exzellenz in Verhandlungen',
@@ -80,6 +82,7 @@ async function main() {
       capacity: 12,
       ...convertDateToFields('2026-03-28T10:00:00Z'),
       isPublished: true,
+      curriculum: null,
     },
   ];
 
@@ -87,8 +90,13 @@ async function main() {
   // (P2022 ColumnNotFound). Raw SQL bypasses the Prisma Client query compiler.
   // See: https://github.com/prisma/prisma/issues/27357
   for (const course of seedCourses) {
+    // Ensure curriculumJson is either null or a valid JSON string
+    // Explicitly handle null/undefined to avoid 'null' string or invalid casts
+    const curriculumJson =
+      course.curriculum != null ? JSON.stringify(course.curriculum) : null;
+
     await prisma.$executeRaw`
-      INSERT INTO courses (id, title, description, slug, price, currency, capacity, start_date, start_time, end_time, is_published, instructor, level, created_at, updated_at)
+      INSERT INTO courses (id, title, description, slug, price, currency, capacity, start_date, start_time, end_time, is_published, instructor, level, curriculum, created_at, updated_at)
       VALUES (
         gen_random_uuid()::text,
         ${course.title},
@@ -103,6 +111,7 @@ async function main() {
         ${course.isPublished},
         'TBD',
         'BEGINNER',
+        ${curriculumJson}::jsonb,
         NOW(),
         NOW()
       )
@@ -116,6 +125,7 @@ async function main() {
         start_time = EXCLUDED.start_time,
         end_time = EXCLUDED.end_time,
         is_published = EXCLUDED.is_published,
+        curriculum = EXCLUDED.curriculum,
         updated_at = NOW()
     `;
   }

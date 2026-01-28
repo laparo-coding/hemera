@@ -6,9 +6,30 @@
  */
 
 import type { CourseLevel, Prisma } from '@prisma/client';
+import { CurriculumValidationError } from '../../errors/domain';
 import { curriculumSchema } from '../../schemas/admin/course';
 import type { CourseWithEnrollmentCount } from '../../types/admin';
 import { prisma } from '../prisma';
+
+/**
+ * Validate and parse curriculum data using safeParse
+ * Returns validated data or throws a sanitized domain error
+ */
+function validateCurriculum(
+  curriculum: Prisma.InputJsonValue | null | undefined
+): Prisma.InputJsonValue | null | undefined {
+  if (curriculum === undefined || curriculum === null) {
+    return curriculum;
+  }
+
+  const result = curriculumSchema.safeParse(curriculum);
+  if (!result.success) {
+    // Throw sanitized error without exposing schema internals
+    throw new CurriculumValidationError(result.error.issues.length);
+  }
+
+  return result.data as Prisma.InputJsonValue;
+}
 
 /**
  * List all courses sorted by startTime (nearest first)
@@ -76,16 +97,14 @@ export async function createCourse(data: {
   notRecommended?: string | null;
   isNonPublic?: boolean;
 }): Promise<CourseWithEnrollmentCount> {
-  // Validate curriculum structure if provided
-  if (data.curriculum !== undefined && data.curriculum !== null) {
-    curriculumSchema.parse(data.curriculum);
-  }
+  const validatedCurriculum = validateCurriculum(data.curriculum);
 
   // Always create courses as unpublished - admin must explicitly publish later
+  // curriculum is excluded - we use validatedCurriculum instead
   const {
     isPublished: _ignored,
     locationId,
-    curriculum,
+    curriculum: _unusedCurriculum,
     teaser,
     thumbnailUrl,
     recommended,
@@ -102,8 +121,8 @@ export async function createCourse(data: {
       // Handle optional fields that may be null
       ...(teaser !== undefined ? { teaser } : {}),
       ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
-      ...(curriculum !== undefined && curriculum !== null
-        ? { curriculum }
+      ...(validatedCurriculum !== undefined && validatedCurriculum !== null
+        ? { curriculum: validatedCurriculum }
         : {}),
       // Connect location if provided, otherwise omit
       ...(locationId ? { location: { connect: { id: locationId } } } : {}),
@@ -149,15 +168,13 @@ export async function updateCourse(
     isNonPublic?: boolean;
   }
 ): Promise<CourseWithEnrollmentCount> {
-  // Validate curriculum structure if provided
-  if (data.curriculum !== undefined && data.curriculum !== null) {
-    curriculumSchema.parse(data.curriculum);
-  }
+  const validatedCurriculum = validateCurriculum(data.curriculum);
 
+  // curriculum is excluded - we use validatedCurriculum instead
   const {
     updatedAt,
     locationId,
-    curriculum,
+    curriculum: _unusedCurriculum,
     teaser,
     thumbnailUrl,
     recommended,
@@ -198,7 +215,9 @@ export async function updateCourse(
     ...updateData,
     ...(teaser !== undefined ? { teaser } : {}),
     ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
-    ...(curriculum !== undefined && curriculum !== null ? { curriculum } : {}),
+    ...(validatedCurriculum !== undefined && validatedCurriculum !== null
+      ? { curriculum: validatedCurriculum }
+      : {}),
     ...(locationId !== undefined ? { locationId } : {}),
     // Learning Path fields (021)
     ...(recommended !== undefined ? { recommended } : {}),

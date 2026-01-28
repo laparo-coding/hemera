@@ -3,6 +3,8 @@ import { currentUser } from '@clerk/nextjs/server';
 
 export type UserRole = 'user' | 'admin' | 'moderator';
 
+const VALID_ROLES: readonly UserRole[] = ['user', 'admin', 'moderator'] as const;
+
 export interface NavigationItem {
   label: string;
   href: string;
@@ -11,10 +13,22 @@ export interface NavigationItem {
 
 /**
  * Get user role from Clerk metadata
+ * Falls back to 'user' if role is missing, undefined, or invalid
+ * Normalizes role to lowercase to handle casing variations
  */
 export async function getUserRole(): Promise<UserRole> {
   const user = await currentUser();
-  return (user?.publicMetadata?.role as UserRole) || 'user';
+  const role = user?.publicMetadata?.role;
+
+  // Normalize to lowercase string and validate against known roles
+  if (typeof role === 'string') {
+    const normalizedRole = role.toLowerCase().trim();
+    if (VALID_ROLES.includes(normalizedRole as UserRole)) {
+      return normalizedRole as UserRole;
+    }
+  }
+
+  return 'user';
 }
 
 /**

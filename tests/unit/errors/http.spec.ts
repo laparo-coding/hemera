@@ -81,8 +81,14 @@ describe('HTTP Error Handling', () => {
       const body = await response.json();
 
       expect(response.status).toBe(500);
-      expect(body.error.message).toBe('An unexpected error occurred');
-      expect(body.error.code).toBe('INTERNAL_SERVER_ERROR');
+      expect(body.error).toMatchObject({
+        message: 'An unexpected error occurred',
+        code: 'INTERNAL_SERVER_ERROR',
+        category: 'infrastructure',
+        statusCode: 500,
+      });
+      expect(body.error.requestId).toBe('test-req-id');
+      expect(body.error.timestamp).toBeDefined();
     });
 
     it('should use provided requestId', async () => {
@@ -94,16 +100,35 @@ describe('HTTP Error Handling', () => {
       expect(body.error.requestId).toBe('custom-req-id');
     });
 
-    it('should handle Prisma errors with correct status codes', async () => {
-      // Create error with specific constructor name
-      const prismaError = new Error('Validation error');
-      Object.defineProperty(prismaError.constructor, 'name', {
-        value: 'PrismaClientValidationError',
-      });
+    it('should handle Prisma validation errors with correct status codes', async () => {
+      // Create error with Prisma-like structure (clientVersion + validation message)
+      const prismaError = new Error('Invalid `prisma.course.create()` invocation');
+      (prismaError as unknown as Record<string, unknown>).clientVersion = '5.0.0';
 
       const response = await toHttpError(prismaError);
 
       expect(response.status).toBe(422);
+    });
+
+    it('should handle Prisma known request errors with correct status codes', async () => {
+      // Create error with Prisma-like structure (code starting with P)
+      const prismaError = new Error('Unique constraint failed');
+      (prismaError as unknown as Record<string, unknown>).code = 'P2002';
+      (prismaError as unknown as Record<string, unknown>).clientVersion = '5.0.0';
+
+      const response = await toHttpError(prismaError);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should handle Prisma unknown errors with 500 status', async () => {
+      // Create error with only clientVersion (unknown Prisma error)
+      const prismaError = new Error('Database connection failed');
+      (prismaError as unknown as Record<string, unknown>).clientVersion = '5.0.0';
+
+      const response = await toHttpError(prismaError);
+
+      expect(response.status).toBe(500);
     });
   });
 
