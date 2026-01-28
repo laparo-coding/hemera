@@ -13,7 +13,10 @@ import { useState } from 'react';
 import type { z } from 'zod';
 import CourseForm from '@/components/admin/CourseForm';
 import { updateCourseAction } from '@/lib/actions/admin/courses';
-import type { courseCreateSchema } from '@/lib/schemas/admin/course';
+import type {
+  CurriculumModule,
+  courseCreateSchema,
+} from '@/lib/schemas/admin/course';
 
 type FormData = z.input<typeof courseCreateSchema>;
 
@@ -29,9 +32,16 @@ interface CourseData {
   instructor: string;
   level: string;
   thumbnailUrl?: string | null;
+  imageDetail?: string | null;
+  imageTwitter?: string | null;
   capacity: number;
   updatedAt: string | Date;
   locationId?: string | null;
+  curriculum?: CurriculumModule[] | null;
+  isPublished?: boolean;
+  recommended?: string | null;
+  notRecommended?: string | null;
+  isNonPublic?: boolean;
 }
 
 interface LocationOption {
@@ -104,8 +114,15 @@ export default function EditCourseForm({
             instructor: course.instructor,
             level: course.level as 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED',
             thumbnailUrl: course.thumbnailUrl,
+            imageDetail: course.imageDetail,
+            imageTwitter: course.imageTwitter,
             capacity: course.capacity,
             locationId: course.locationId,
+            curriculum: course.curriculum,
+            isPublished: course.isPublished,
+            recommended: course.recommended,
+            notRecommended: course.notRecommended,
+            isNonPublic: course.isNonPublic,
           }}
           locations={locations}
           onSubmit={handleSubmit}

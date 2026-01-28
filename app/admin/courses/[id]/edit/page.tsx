@@ -8,6 +8,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCourseById } from '@/lib/db/admin/courses';
+import type { CurriculumModule } from '@/lib/schemas/admin/course';
 import { listLocations } from '@/lib/services/location';
 import EditCourseForm from './EditCourseForm';
 
@@ -55,9 +56,16 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
     instructor: course.instructor,
     level: course.level,
     thumbnailUrl: course.thumbnailUrl,
+    imageDetail: course.imageDetail,
+    imageTwitter: course.imageTwitter,
     capacity: course.capacity,
     updatedAt: course.updatedAt.toISOString(),
     locationId: course.locationId,
+    curriculum: course.curriculum as CurriculumModule[] | null,
+    isPublished: course.isPublished,
+    recommended: course.recommended,
+    notRecommended: course.notRecommended,
+    isNonPublic: course.isNonPublic,
   };
 
   return <EditCourseForm course={courseData} locations={locationOptions} />;
