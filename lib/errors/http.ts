@@ -122,7 +122,7 @@ function isPrismaError(error: Error): {
   isPrisma: boolean;
   type?: 'known' | 'validation' | 'unknown';
 } {
-  const err = error as Record<string, unknown>;
+  const err = error as unknown as Record<string, unknown>;
 
   // PrismaClientKnownRequestError has a 'code' property starting with 'P'
   if (

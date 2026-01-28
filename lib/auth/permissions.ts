@@ -3,7 +3,11 @@ import { currentUser } from '@clerk/nextjs/server';
 
 export type UserRole = 'user' | 'admin' | 'moderator';
 
-const VALID_ROLES: readonly UserRole[] = ['user', 'admin', 'moderator'] as const;
+const VALID_ROLES: readonly UserRole[] = [
+  'user',
+  'admin',
+  'moderator',
+] as const;
 
 export interface NavigationItem {
   label: string;

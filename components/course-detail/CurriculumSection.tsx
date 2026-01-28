@@ -43,60 +43,12 @@ export interface CurriculumSectionProps {
   modules: CurriculumModule[];
 }
 
-// Placeholder curriculum data for MVP
-const PLACEHOLDER_CURRICULUM: CurriculumModule[] = [
-  {
-    id: 'day-1',
-    day: 1,
-    title: 'Grundlagen der Verhandlung',
-    topics: [
-      {
-        id: 't1',
-        timeRange: '09:00 - 09:30',
-        title: 'Stelle dich und deinen Plan vor',
-      },
-      {
-        id: 't2',
-        timeRange: '09:30 - 10:00',
-        title: 'So gehst du ein Gespräch rein, so nicht',
-      },
-      { id: 't3', timeRange: '10:00 - 10:30', title: 'Videoanalyse 1' },
-      { id: 't4', timeRange: '10:30 - 11:00', title: 'Videoanalyse 2' },
-      { id: 't5', timeRange: '11:00 - 11:15', title: 'Pause' },
-      { id: 't6', timeRange: '11:15 - 11:45', title: 'Videoanalyse 4' },
-      { id: 't7', timeRange: '11:45 - 12:15', title: 'Videoanalyse 5' },
-      { id: 't8', timeRange: '12:15 - 12:45', title: 'Videoanalyse 6' },
-      { id: 't9', timeRange: '12:45 - 13:30', title: 'Mittagspause' },
-      {
-        id: 't10',
-        timeRange: '13:30 - 14:00',
-        title: 'Verhandele dein Ergebnis, nicht deine Gefühle',
-      },
-      { id: 't11', timeRange: '14:30 - 15:00', title: 'Gehaltsgespräch 1' },
-      { id: 't12', timeRange: '15:00 - 15:30', title: 'Gehaltsgespräch 2' },
-      { id: 't13', timeRange: '15:30 - 16:00', title: 'Gehaltsgespräch 3' },
-      { id: 't14', timeRange: '16:00 - 16:15', title: 'Pause' },
-      { id: 't15', timeRange: '16:15 - 16:45', title: 'Gehaltsgespräch 4' },
-      { id: 't16', timeRange: '16:45 - 17:15', title: 'Gehaltsgespräch 5' },
-      { id: 't17', timeRange: '17:15 - 17:45', title: 'Gehaltsgespräch 6' },
-      {
-        id: 't18',
-        timeRange: '17:45 - 18:15',
-        title: 'Bereite dich vor. Ab jetzt zählt es',
-      },
-    ],
-  },
-];
-
 export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
   modules,
 }) => {
-  // Use placeholder if no modules provided
-  const displayModules = modules.length > 0 ? modules : PLACEHOLDER_CURRICULUM;
-
-  // First accordion expanded by default
+  // First accordion expanded by default (hooks must be called unconditionally)
   const [expanded, setExpanded] = useState<string | false>(
-    displayModules[0]?.id || false
+    modules[0]?.id || false
   );
 
   const handleChange =
@@ -104,27 +56,9 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
       setExpanded(isExpanded ? panel : false);
     };
 
-  // Empty state
-  if (displayModules.length === 0) {
-    return (
-      <Box
-        component='section'
-        data-testid='curriculum-section'
-        sx={{
-          backgroundColor: colors.white,
-          py: spacing.sectionPy,
-        }}
-      >
-        <Container maxWidth={spacing.containerMaxWidth}>
-          <Typography
-            variant='body1'
-            sx={{ textAlign: 'center', color: colors.petrol }}
-          >
-            Kein Curriculum verfügbar
-          </Typography>
-        </Container>
-      </Box>
-    );
+  // No fallback data - if no curriculum from DB, show nothing
+  if (modules.length === 0) {
+    return null;
   }
 
   return (
@@ -165,7 +99,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
             mx: 'auto',
           }}
         >
-          {displayModules.map(module => (
+          {modules.map(module => (
             <Accordion
               key={module.id}
               expanded={expanded === module.id}

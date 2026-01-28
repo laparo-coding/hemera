@@ -130,7 +130,7 @@ const shouldShowInvoiceButton = (
 };
 
 export default function CourseCard({
-  id,
+  id: _id,
   bookingId,
   courseTitle,
   startDate,
@@ -140,7 +140,7 @@ export default function CourseCard({
   locationName,
   locationSlug,
   locationCity,
-  hasParticipation,
+  hasParticipation: _hasParticipation,
   paymentStatus,
   stripeInvoicePdfUrl,
   sectionType,

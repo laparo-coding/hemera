@@ -24,8 +24,8 @@ interface DebriefingSectionProps {
 }
 
 export default function DebriefingSection({
-  courseId,
-  bookingId,
+  courseId: _courseId,
+  bookingId: _bookingId,
 }: DebriefingSectionProps) {
   // In the future, this could fetch debriefing videos or documents
   // For now, we show a placeholder
