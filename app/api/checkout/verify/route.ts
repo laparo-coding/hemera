@@ -1,7 +1,8 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { PaymentStatus, Prisma } from '@prisma/client';
+import { PaymentStatus } from '@prisma/client';
 import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { syncClerkUserToDatabase } from '../../../../lib/api/users';
 import { prisma } from '../../../../lib/db/prisma';
 import { STRIPE_API_VERSION } from '../../../../lib/stripe/config';
 
@@ -189,20 +190,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    await prisma.user.upsert({
-      where: { id: user.id },
-      update: {
-        name: user.fullName || user.firstName || null,
-        email: user.primaryEmailAddress?.emailAddress || null,
-        image: user.imageUrl || null,
-      },
-      create: {
-        id: user.id,
-        name: user.fullName || user.firstName || null,
-        email: user.primaryEmailAddress?.emailAddress || null,
-        image: user.imageUrl || null,
-      },
-    });
+    await syncClerkUserToDatabase(
+      user.id,
+      user.primaryEmailAddress?.emailAddress || null,
+      user.fullName || user.firstName || null,
+      user.imageUrl || null
+    );
 
     // Check if booking already exists (to prevent duplicates)
     // Check for existing booking by user & course if not already found by session

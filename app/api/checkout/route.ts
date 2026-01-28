@@ -2,6 +2,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { z } from 'zod';
+import { syncClerkUserToDatabase } from '../../../lib/api/users';
 import { prisma } from '../../../lib/db/prisma';
 import { STRIPE_API_VERSION } from '../../../lib/stripe/config';
 
@@ -88,20 +89,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    await prisma.user.upsert({
-      where: { id: user.id },
-      update: {
-        name: user.fullName || user.firstName || null,
-        email: user.primaryEmailAddress?.emailAddress || null,
-        image: user.imageUrl || null,
-      },
-      create: {
-        id: user.id,
-        name: user.fullName || user.firstName || null,
-        email: user.primaryEmailAddress?.emailAddress || null,
-        image: user.imageUrl || null,
-      },
-    });
+    await syncClerkUserToDatabase(
+      user.id,
+      user.primaryEmailAddress?.emailAddress || null,
+      user.fullName || user.firstName || null,
+      user.imageUrl || null
+    );
 
     // Check if user already has a booking for this course
     const existingBooking = await prisma.booking.findFirst({

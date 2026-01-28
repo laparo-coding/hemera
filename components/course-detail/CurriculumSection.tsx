@@ -89,7 +89,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
           {TERMS.courseProgress}
         </Typography>
 
-        {/* Accordions */}
+        {/* Accordions - or direct display for single-day courses */}
         <Paper
           elevation={2}
           sx={{
@@ -99,75 +99,115 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
             mx: 'auto',
           }}
         >
-          {modules.map(module => (
-            <Accordion
-              key={module.id}
-              expanded={expanded === module.id}
-              onChange={handleChange(module.id)}
-              disableGutters
-              sx={{
-                '&:before': { display: 'none' },
-                borderBottom: `1px solid ${colors.lightGray}`,
-                '&:last-of-type': { borderBottom: 'none' },
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: colors.petrol }} />}
-                sx={{
-                  backgroundColor:
-                    expanded === module.id ? colors.cream : colors.white,
-                  px: { xs: 2, md: 4 },
-                  py: 1,
-                }}
-              >
-                <Typography
-                  variant='h6'
-                  sx={{
-                    fontFamily: typography.heading,
-                    fontWeight: 600,
-                    color: colors.petrol,
-                  }}
-                >
-                  {module.title}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails sx={{ px: { xs: 2, md: 4 }, py: 2 }}>
-                <Table size='small'>
-                  <TableBody>
-                    {module.topics.map(topic => (
-                      <TableRow
-                        key={topic.id}
+          {modules.length === 1 ? (
+            // Single-day course: show topics directly without accordion
+            <Box sx={{ px: { xs: 2, md: 4 }, py: 2 }}>
+              <Table size='small'>
+                <TableBody>
+                  {modules[0].topics.map(topic => (
+                    <TableRow
+                      key={topic.id}
+                      sx={{
+                        '&:last-child td': { borderBottom: 0 },
+                      }}
+                    >
+                      <TableCell
                         sx={{
-                          '&:last-child td': { borderBottom: 0 },
+                          fontFamily: typography.body,
+                          fontWeight: 500,
+                          color: colors.gold,
+                          whiteSpace: 'nowrap',
+                          width: '140px',
+                          pl: 0,
                         }}
                       >
-                        <TableCell
+                        {topic.timeRange || '–'}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontFamily: typography.body,
+                          color: colors.petrol,
+                        }}
+                      >
+                        {topic.title || 'Thema'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          ) : (
+            // Multi-day course: show accordions
+            modules.map(module => (
+              <Accordion
+                key={module.id}
+                expanded={expanded === module.id}
+                onChange={handleChange(module.id)}
+                disableGutters
+                sx={{
+                  '&:before': { display: 'none' },
+                  borderBottom: `1px solid ${colors.lightGray}`,
+                  '&:last-of-type': { borderBottom: 'none' },
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon sx={{ color: colors.petrol }} />}
+                  sx={{
+                    backgroundColor:
+                      expanded === module.id ? colors.cream : colors.white,
+                    px: { xs: 2, md: 4 },
+                    py: 1,
+                  }}
+                >
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      fontFamily: typography.heading,
+                      fontWeight: 600,
+                      color: colors.petrol,
+                    }}
+                  >
+                    {module.title}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ px: { xs: 2, md: 4 }, py: 2 }}>
+                  <Table size='small'>
+                    <TableBody>
+                      {module.topics.map(topic => (
+                        <TableRow
+                          key={topic.id}
                           sx={{
-                            fontFamily: typography.body,
-                            fontWeight: 500,
-                            color: colors.gold,
-                            whiteSpace: 'nowrap',
-                            width: '140px',
-                            pl: 0,
+                            '&:last-child td': { borderBottom: 0 },
                           }}
                         >
-                          {topic.timeRange}
-                        </TableCell>
-                        <TableCell
-                          sx={{
-                            fontFamily: typography.body,
-                            color: colors.petrol,
-                          }}
-                        >
-                          {topic.title}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </AccordionDetails>
-            </Accordion>
-          ))}
+                          <TableCell
+                            sx={{
+                              fontFamily: typography.body,
+                              fontWeight: 500,
+                              color: colors.gold,
+                              whiteSpace: 'nowrap',
+                              width: '140px',
+                              pl: 0,
+                            }}
+                          >
+                            {topic.timeRange || '–'}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontFamily: typography.body,
+                              color: colors.petrol,
+                            }}
+                          >
+                            {topic.title || 'Thema'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </AccordionDetails>
+              </Accordion>
+            ))
+          )}
         </Paper>
       </Container>
     </Box>
