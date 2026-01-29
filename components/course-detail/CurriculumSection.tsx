@@ -99,7 +99,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
             mx: 'auto',
           }}
         >
-          {modules.length === 1 ? (
+          {modules.length === 1 && modules[0] ? (
             // Single-day course: show topics directly without accordion
             <Box sx={{ px: { xs: 2, md: 4 }, py: 2 }}>
               <Table size='small'>

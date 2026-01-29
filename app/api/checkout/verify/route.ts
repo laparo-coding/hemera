@@ -1,5 +1,5 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { PaymentStatus } from '@prisma/client';
+import { PaymentStatus, Prisma } from '@prisma/client';
 import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { syncClerkUserToDatabase } from '../../../../lib/api/users';
