@@ -3,7 +3,10 @@ import { headers } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { updateBookingPaymentStatus } from '../../../../lib/api/bookings';
-import { ErrorSeverity, reportError } from '../../../../lib/monitoring/rollbar';
+import {
+  ErrorSeverity,
+  reportError,
+} from '../../../../lib/monitoring/rollbar-official';
 import { STRIPE_API_VERSION } from '../../../../lib/stripe/config';
 
 // Skip Stripe initialization during build process

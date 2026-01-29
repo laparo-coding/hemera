@@ -11,8 +11,7 @@
 
 import { clerkClient } from '@clerk/nextjs/server';
 import { LoopsClient } from 'loops';
-import { reportError } from '../monitoring/rollbar';
-import { serverInstance } from '../monitoring/rollbar-official';
+import { reportError, serverInstance } from '../monitoring/rollbar-official';
 
 export interface LoopsEmailResult {
   success: boolean;

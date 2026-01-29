@@ -69,7 +69,6 @@ Add proper types for monitoring, analytics, and observability code.
 
 ### Files to Update
 
-- [ ] `lib/monitoring/rollbar.ts` - Rollbar integration
 - [ ] `lib/monitoring/rollbar-official.ts` - Official Rollbar client
 - [ ] `lib/monitoring/deployment-monitor.ts` - Deployment monitoring
 - [ ] `lib/monitoring/deployment-alerts.ts` - Alert system

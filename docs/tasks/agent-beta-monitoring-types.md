@@ -14,7 +14,7 @@ Add proper TypeScript types for all monitoring, observability, and analytics cod
 
 ## Files to Update
 
-### 1. lib/monitoring/rollbar.ts & rollbar-official.ts
+### 1. lib/monitoring/rollbar-official.ts
 
 **Current Issues**: Rollbar SDK objects typed as `any` **Tasks**:
 

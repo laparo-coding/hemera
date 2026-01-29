@@ -11,7 +11,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/auth/helpers';
 import { prisma } from '@/lib/db/prisma';
-import { reportError } from '@/lib/monitoring/rollbar';
+import { reportError } from '@/lib/monitoring/rollbar-official';
 import {
   createTestimonialSchema,
   updateTestimonialSchema,

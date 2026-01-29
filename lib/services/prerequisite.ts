@@ -16,7 +16,7 @@
 
 import type { CourseLevel } from '@prisma/client';
 import { prisma } from '../db/prisma';
-import { reportError } from '../monitoring/rollbar';
+import { reportError } from '../monitoring/rollbar-official';
 
 export interface CompletedCourse {
   courseId: string;

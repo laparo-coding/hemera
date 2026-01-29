@@ -4,7 +4,10 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '../../../lib/db/prisma';
 import { logError } from '../../../lib/errors';
-import { ErrorSeverity, reportError } from '../../../lib/monitoring/rollbar';
+import {
+  ErrorSeverity,
+  reportError,
+} from '../../../lib/monitoring/rollbar-official';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
