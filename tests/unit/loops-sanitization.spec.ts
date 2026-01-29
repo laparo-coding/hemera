@@ -16,10 +16,6 @@ jest.mock('../../lib/monitoring/rollbar-official', () => ({
     warn: jest.fn(),
     info: jest.fn(),
   },
-}));
-
-// Mock reportError
-jest.mock('../../lib/monitoring/rollbar', () => ({
   reportError: jest.fn(),
 }));
 
