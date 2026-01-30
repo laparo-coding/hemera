@@ -46,6 +46,9 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
     city: loc.city,
   }));
 
+  // Validate curriculum once using safeParse
+  const curriculumResult = curriculumSchema.safeParse(course.curriculum);
+
   // Serialize dates for client component
   const courseData = {
     id: course.id,
@@ -64,8 +67,8 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
     capacity: course.capacity,
     updatedAt: course.updatedAt.toISOString(),
     locationId: course.locationId,
-    curriculum: curriculumSchema.safeParse(course.curriculum).success
-      ? (curriculumSchema.parse(course.curriculum) as CurriculumModule[] | null)
+    curriculum: curriculumResult.success
+      ? ((curriculumResult.data ?? null) as CurriculumModule[] | null)
       : null,
     isPublished: course.isPublished,
     recommended: course.recommended,
