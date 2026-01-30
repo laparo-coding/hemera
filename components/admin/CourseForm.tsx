@@ -175,13 +175,11 @@ export default function CourseForm({
         control={control}
         render={({ field }) => {
           const maxLength = 300;
-
           return (
             <TextField
               {...field}
               value={field.value || ''}
               label={TERMS.recommendedLabel}
-              placeholder={TERMS.recommendedPlaceholder}
               multiline
               rows={2}
               error={!!errors.recommended}
@@ -192,6 +190,7 @@ export default function CourseForm({
               fullWidth
               disabled={isLoading || isSubmitting}
               inputProps={{ maxLength }}
+              InputLabelProps={{ shrink: true }}
               onChange={e => field.onChange(e.target.value || null)}
             />
           );
@@ -203,13 +202,11 @@ export default function CourseForm({
         control={control}
         render={({ field }) => {
           const maxLength = 300;
-
           return (
             <TextField
               {...field}
               value={field.value || ''}
               label={TERMS.notRecommendedLabel}
-              placeholder={TERMS.notRecommendedPlaceholder}
               multiline
               rows={2}
               error={!!errors.notRecommended}
@@ -220,6 +217,7 @@ export default function CourseForm({
               fullWidth
               disabled={isLoading || isSubmitting}
               inputProps={{ maxLength }}
+              InputLabelProps={{ shrink: true }}
               onChange={e => field.onChange(e.target.value || null)}
             />
           );
