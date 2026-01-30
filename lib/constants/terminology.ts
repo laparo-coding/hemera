@@ -86,12 +86,12 @@ export const TERMS = {
   recommendedPlaceholder: 'z.B. Grundkurs Laparoskopie abgeschlossen',
   notRecommendedPlaceholder: 'z.B. Keine laparoskopischen Vorkenntnisse',
   noLocationSelected: 'Kein Ort ausgewählt',
-  locationHelperText: 'Optional - Ort des Kurses',
+  locationHelperText: 'Optional - Ort des Seminars',
 
   // Visibility Labels
   isNonPublicLabel:
-    'Nicht-öffentlicher Kurs (wird nicht in der Kursliste angezeigt)',
-  isPublishedLabel: 'Sofort veröffentlichen (Kurs ist buchbar)',
+    'Nicht-öffentliches Seminar (wird nicht in der Seminarliste angezeigt)',
+  isPublishedLabel: 'Sofort veröffentlichen (Seminar ist buchbar)',
 
   // Buttons & Actions
   cancelButton: 'Abbrechen',

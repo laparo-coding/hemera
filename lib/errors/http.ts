@@ -165,6 +165,8 @@ function getStatusCodeForError(error: Error): number {
         return 422;
       case 'unknown':
         return 500;
+      default:
+        return 500;
     }
   }
 

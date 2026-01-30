@@ -52,7 +52,7 @@ export default function CourseForm({
   locations = [],
   onSubmit,
   onCancel,
-  submitLabel = 'Save Course',
+  submitLabel = 'Seminar speichern',
   isLoading = false,
 }: CourseFormProps) {
   const {

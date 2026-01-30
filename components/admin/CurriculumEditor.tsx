@@ -163,12 +163,7 @@ export default function CurriculumEditor({
 
   const updateModuleTitle = useCallback(
     (moduleId: string, title: string) => {
-      const trimmedTitle = title.trim();
-      onChange(
-        modules.map(m =>
-          m.id === moduleId ? { ...m, title: trimmedTitle } : m
-        )
-      );
+      onChange(modules.map(m => (m.id === moduleId ? { ...m, title } : m)));
     },
     [modules, onChange]
   );
@@ -193,14 +188,13 @@ export default function CurriculumEditor({
       field: 'timeRange' | 'title',
       topicValue: string
     ) => {
-      const trimmedValue = topicValue.trim();
       onChange(
         modules.map(m =>
           m.id === moduleId
             ? {
                 ...m,
                 topics: m.topics.map(t =>
-                  t.id === topicId ? { ...t, [field]: trimmedValue } : t
+                  t.id === topicId ? { ...t, [field]: topicValue } : t
                 ),
               }
             : m
@@ -208,6 +202,28 @@ export default function CurriculumEditor({
       );
     },
     [modules, onChange]
+  );
+
+  // Trim whitespace on blur for better UX
+  const trimModuleTitle = useCallback(
+    (moduleId: string) => {
+      const module = modules.find(m => m.id === moduleId);
+      if (module && module.title !== module.title.trim()) {
+        updateModuleTitle(moduleId, module.title.trim());
+      }
+    },
+    [modules, updateModuleTitle]
+  );
+
+  const trimTopic = useCallback(
+    (moduleId: string, topicId: string, field: 'timeRange' | 'title') => {
+      const module = modules.find(m => m.id === moduleId);
+      const topic = module?.topics.find(t => t.id === topicId);
+      if (topic && topic[field] !== topic[field].trim()) {
+        updateTopic(moduleId, topicId, field, topic[field].trim());
+      }
+    },
+    [modules, updateTopic]
   );
 
   return (
@@ -269,6 +285,7 @@ export default function CurriculumEditor({
                   label='Titel'
                   value={module.title}
                   onChange={e => updateModuleTitle(module.id, e.target.value)}
+                  onBlur={() => trimModuleTitle(module.id)}
                   onClick={e => e.stopPropagation()}
                   disabled={disabled}
                   placeholder='z.B. Grundlagen der Verhandlung'
@@ -318,6 +335,7 @@ export default function CurriculumEditor({
                           e.target.value
                         )
                       }
+                      onBlur={() => trimTopic(module.id, topic.id, 'timeRange')}
                       disabled={disabled}
                       placeholder='09:00 - 09:30'
                       sx={{ width: 140, bgcolor: 'white' }}
@@ -333,6 +351,7 @@ export default function CurriculumEditor({
                           e.target.value
                         )
                       }
+                      onBlur={() => trimTopic(module.id, topic.id, 'title')}
                       disabled={disabled}
                       placeholder='Thema / Aktivität'
                       sx={{ flexGrow: 1, bgcolor: 'white' }}

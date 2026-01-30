@@ -5,7 +5,7 @@
  * All functions include enrollment counts and proper error handling.
  */
 
-import type { CourseLevel, Prisma } from '@prisma/client';
+import { type CourseLevel, Prisma } from '@prisma/client';
 import { CurriculumValidationError } from '../../errors/domain';
 import { curriculumSchema } from '../../schemas/admin/course';
 import type { CourseWithEnrollmentCount } from '../../types/admin';
@@ -13,13 +13,16 @@ import { prisma } from '../prisma';
 
 /**
  * Validate and parse curriculum data using safeParse
- * Returns validated data or throws a sanitized domain error
+ * Returns validated data, Prisma.DbNull for null, or undefined if not provided
  */
 function validateCurriculum(
   curriculum: Prisma.InputJsonValue | null | undefined
-): Prisma.InputJsonValue | null | undefined {
-  if (curriculum === undefined || curriculum === null) {
-    return curriculum;
+): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined {
+  if (curriculum === undefined) {
+    return undefined;
+  }
+  if (curriculum === null) {
+    return Prisma.DbNull;
   }
 
   const result = curriculumSchema.safeParse(curriculum);
@@ -121,7 +124,7 @@ export async function createCourse(data: {
       // Handle optional fields that may be null
       ...(teaser !== undefined ? { teaser } : {}),
       ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
-      ...(validatedCurriculum !== undefined && validatedCurriculum !== null
+      ...(validatedCurriculum !== undefined
         ? { curriculum: validatedCurriculum }
         : {}),
       // Connect location if provided, otherwise omit
@@ -215,7 +218,7 @@ export async function updateCourse(
     ...updateData,
     ...(teaser !== undefined ? { teaser } : {}),
     ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
-    ...(validatedCurriculum !== undefined && validatedCurriculum !== null
+    ...(validatedCurriculum !== undefined
       ? { curriculum: validatedCurriculum }
       : {}),
     ...(locationId !== undefined ? { locationId } : {}),

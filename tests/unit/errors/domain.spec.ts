@@ -7,6 +7,7 @@ import {
   CourseNotFoundError,
   CourseNotPublishedError,
   CourseSlugAlreadyExistsError,
+  CurriculumValidationError,
   BookingNotFoundError,
   BookingAlreadyExistsError,
   InvalidBookingStatusError,
@@ -206,6 +207,23 @@ describe('Domain Errors', () => {
       expect(error.statusCode).toBe(422);
       expect(error.errorCode).toBe('USER_VALIDATION_ERROR');
       expect(error.category).toBe('validation');
+    });
+
+    it('CurriculumValidationError should have correct properties', () => {
+      const error = new CurriculumValidationError(3);
+
+      expect(error.statusCode).toBe(422);
+      expect(error.errorCode).toBe('CURRICULUM_VALIDATION_ERROR');
+      expect(error.category).toBe('validation');
+      expect(error.context).toEqual({ invalidFieldCount: 3 });
+    });
+
+    it('CurriculumValidationError without fieldCount should work', () => {
+      const error = new CurriculumValidationError();
+
+      expect(error.statusCode).toBe(422);
+      expect(error.errorCode).toBe('CURRICULUM_VALIDATION_ERROR');
+      expect(error.message).toContain('Invalid curriculum structure');
     });
   });
 

@@ -26,6 +26,21 @@ import { useState } from 'react';
 import { TERMS } from '../../lib/constants/terminology';
 import { colors, spacing, typography } from '../../lib/design-tokens';
 
+// Shared styles for curriculum table cells
+const timeRangeCellSx = {
+  fontFamily: typography.body,
+  fontWeight: 500,
+  color: colors.gold,
+  whiteSpace: 'nowrap',
+  width: '140px',
+  pl: 0,
+} as const;
+
+const titleCellSx = {
+  fontFamily: typography.body,
+  color: colors.petrol,
+} as const;
+
 export interface CurriculumTopic {
   id: string;
   timeRange: string;
@@ -111,24 +126,10 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
                         '&:last-child td': { borderBottom: 0 },
                       }}
                     >
-                      <TableCell
-                        sx={{
-                          fontFamily: typography.body,
-                          fontWeight: 500,
-                          color: colors.gold,
-                          whiteSpace: 'nowrap',
-                          width: '140px',
-                          pl: 0,
-                        }}
-                      >
+                      <TableCell sx={timeRangeCellSx}>
                         {topic.timeRange || '–'}
                       </TableCell>
-                      <TableCell
-                        sx={{
-                          fontFamily: typography.body,
-                          color: colors.petrol,
-                        }}
-                      >
+                      <TableCell sx={titleCellSx}>
                         {topic.title || 'Thema'}
                       </TableCell>
                     </TableRow>
@@ -180,24 +181,10 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
                             '&:last-child td': { borderBottom: 0 },
                           }}
                         >
-                          <TableCell
-                            sx={{
-                              fontFamily: typography.body,
-                              fontWeight: 500,
-                              color: colors.gold,
-                              whiteSpace: 'nowrap',
-                              width: '140px',
-                              pl: 0,
-                            }}
-                          >
+                          <TableCell sx={timeRangeCellSx}>
                             {topic.timeRange || '–'}
                           </TableCell>
-                          <TableCell
-                            sx={{
-                              fontFamily: typography.body,
-                              color: colors.petrol,
-                            }}
-                          >
+                          <TableCell sx={titleCellSx}>
                             {topic.title || 'Thema'}
                           </TableCell>
                         </TableRow>

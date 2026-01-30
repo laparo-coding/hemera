@@ -233,7 +233,13 @@ export async function syncClerkUserToDatabase(
         const migratedUser = await prisma.user.findUnique({
           where: { id: clerkId },
         });
-        if (migratedUser) return migratedUser;
+        if (migratedUser) {
+          return migratedUser;
+        }
+        // Transaction succeeded but user not found - should not happen
+        throw new DatabaseConnectionError(
+          'Migration completed but user not found'
+        );
       } catch (error) {
         // Handle race condition: another request may have already migrated this user
         if (

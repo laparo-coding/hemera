@@ -66,6 +66,36 @@ describe('Permissions Helpers', () => {
 
       expect(role).toBe('user');
     });
+
+    it('should normalize uppercase role to lowercase', async () => {
+      mockCurrentUser.mockResolvedValue({
+        publicMetadata: { role: 'ADMIN' },
+      } as unknown as User);
+
+      const role = await getUserRole();
+
+      expect(role).toBe('admin');
+    });
+
+    it('should trim whitespace from role', async () => {
+      mockCurrentUser.mockResolvedValue({
+        publicMetadata: { role: '  moderator  ' },
+      } as unknown as User);
+
+      const role = await getUserRole();
+
+      expect(role).toBe('moderator');
+    });
+
+    it('should fallback to user for invalid role', async () => {
+      mockCurrentUser.mockResolvedValue({
+        publicMetadata: { role: 'invalid_role' },
+      } as unknown as User);
+
+      const role = await getUserRole();
+
+      expect(role).toBe('user');
+    });
   });
 
   describe('hasPermission', () => {

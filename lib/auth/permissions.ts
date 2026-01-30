@@ -27,7 +27,7 @@ export async function getUserRole(): Promise<UserRole> {
   // Normalize to lowercase string and validate against known roles
   if (typeof role === 'string') {
     const normalizedRole = role.toLowerCase().trim();
-    if (VALID_ROLES.includes(normalizedRole as UserRole)) {
+    if ((VALID_ROLES as readonly string[]).includes(normalizedRole)) {
       return normalizedRole as UserRole;
     }
   }
