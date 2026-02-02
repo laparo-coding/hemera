@@ -126,7 +126,6 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     if (htmlContent) {
       // Always delete old blob before uploading new content
-      // (Vercel Blob doesn't allow overwriting without explicit flag)
       try {
         await del(existingMaterial.blobUrl);
       } catch {
@@ -135,10 +134,25 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
       // Upload new content
       const blobPathname = `course-material/${newIdentifier}.html`;
-      const blob = await put(blobPathname, htmlContent, {
-        access: 'public',
-        contentType: 'text/html',
-      });
+      let blob;
+      try {
+        blob = await put(blobPathname, htmlContent, {
+          access: 'public',
+          contentType: 'text/html',
+        });
+      } catch (blobError) {
+        serverInstance.error('Blob upload failed during update', {
+          identifier: newIdentifier,
+          error: blobError instanceof Error ? blobError.message : 'Unknown error',
+        });
+        return NextResponse.json(
+          {
+            error: 'blob_error',
+            message: 'Upload zu Blob-Storage fehlgeschlagen',
+          },
+          { status: 502 }
+        );
+      }
 
       updateData.blobUrl = blob.url;
       updateData.blobPathname = blob.pathname;

@@ -109,10 +109,25 @@ export async function POST(request: NextRequest) {
 
     // Upload HTML to Vercel Blob
     const blobPathname = `course-material/${identifier}.html`;
-    const blob = await put(blobPathname, htmlContent, {
-      access: 'public', // Changed to public for easier access, can be changed to private with token
-      contentType: 'text/html',
-    });
+    let blob;
+    try {
+      blob = await put(blobPathname, htmlContent, {
+        access: 'public',
+        contentType: 'text/html',
+      });
+    } catch (blobError) {
+      serverInstance.error('Blob upload failed', {
+        identifier,
+        error: blobError instanceof Error ? blobError.message : 'Unknown error',
+      });
+      return NextResponse.json(
+        {
+          error: 'blob_error',
+          message: 'Upload zu Blob-Storage fehlgeschlagen',
+        },
+        { status: 502 }
+      );
+    }
 
     // Create database record
     const material = await createMaterial({
