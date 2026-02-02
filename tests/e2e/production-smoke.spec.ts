@@ -76,8 +76,10 @@ test.describe('Production Smoke Tests', () => {
 
     expect(response.status()).toBe(200);
 
-    const data = await response.json();
-    expect(data.status).toBe('ok');
+    const json = await response.json();
+    // API responses are wrapped: { success: true, data: {...}, meta: {...} }
+    expect(json.success).toBe(true);
+    expect(json.data.status).toBe('ok');
   });
 
   // Test with authentication if credentials are provided
