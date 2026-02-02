@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
     if (!user?.id) {
       // E2E test fallback: when Clerk is disabled, return 401 early
       if (isClerkDisabled()) {
-        logger.info('E2E test mode: Clerk disabled, rejecting geocode request');
+        logger.info('E2E-Testmodus: Clerk deaktiviert, Geocoding-Anfrage abgelehnt');
         return createErrorResponse(
-          'Authentication disabled in E2E mode',
+          'Authentifizierung im E2E-Modus deaktiviert',
           ErrorCodes.UNAUTHORIZED,
           requestId,
           401
