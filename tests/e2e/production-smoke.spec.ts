@@ -54,7 +54,7 @@ test.describe('Production Smoke Tests', () => {
     await expect(
       page.locator('body').or(page.locator('main')).or(page.locator('form')),
     ).toBeVisible({ timeout: 5000 });
-    
+
     test.info().annotations.push({
       type: 'info',
       description: 'Sign-in page loaded (HTTP 200) - page structure verified',
