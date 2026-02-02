@@ -55,15 +55,19 @@ export interface CurriculumModule {
 }
 
 export interface CurriculumSectionProps {
-  modules: CurriculumModule[];
+  modules?: CurriculumModule[] | null;
 }
 
 export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
-  modules,
+  modules = [],
 }) => {
+  // Ensure modules is always an array (guard against undefined/null)
+  const safeModules = Array.isArray(modules) ? modules : [];
+
   // First accordion expanded by default (hooks must be called unconditionally)
+  // Safe access with guard - won't throw if array is empty
   const [expanded, setExpanded] = useState<string | false>(
-    modules[0]?.id || false
+    safeModules.length > 0 ? safeModules[0]!.id : false
   );
 
   const handleChange =
@@ -72,7 +76,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
     };
 
   // No fallback data - if no curriculum from DB, show nothing
-  if (modules.length === 0) {
+  if (safeModules.length === 0) {
     return null;
   }
 
@@ -114,12 +118,12 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
             mx: 'auto',
           }}
         >
-          {modules.length === 1 && modules[0] ? (
+          {safeModules.length === 1 && safeModules[0] ? (
             // Single-day course: show topics directly without accordion
             <Box sx={{ px: { xs: 2, md: 4 }, py: 2 }}>
               <Table size='small'>
                 <TableBody>
-                  {modules[0].topics.map(topic => (
+                  {safeModules[0].topics.map(topic => (
                     <TableRow
                       key={topic.id}
                       sx={{
@@ -139,7 +143,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
             </Box>
           ) : (
             // Multi-day course: show accordions
-            modules.map(module => (
+            safeModules.map(module => (
               <Accordion
                 key={module.id}
                 expanded={expanded === module.id}
