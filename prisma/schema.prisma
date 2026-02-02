@@ -277,3 +277,16 @@ model Testimonial {
   @@index([courseId, status])
   @@map("testimonials")
 }
+
+// SEMINAR MATERIALS (023-slide-editor)
+model SeminarMaterial {
+  id           String   @id @default(cuid())
+  identifier   String   @unique
+  title        String
+  blobUrl      String
+  blobPathname String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("seminar_materials")
+}

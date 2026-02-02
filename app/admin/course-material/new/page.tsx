@@ -19,7 +19,7 @@ export default function NeuSeminarmaterialPage() {
 
   const handleSubmit = async (data: {
     title: string;
-    identifier: string;
+    identifier?: string;
     htmlContent: string;
   }) => {
     setIsSubmitting(true);
