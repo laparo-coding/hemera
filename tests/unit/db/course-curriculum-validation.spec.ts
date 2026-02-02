@@ -269,7 +269,7 @@ describe('Course DB Layer - Curriculum Validation', () => {
                 message: expect.any(String),
               }),
             ]),
-            receivedData: expect.any(String),
+            receivedDataSummary: expect.any(String),
           }),
         }),
         ErrorSeverity.WARNING
