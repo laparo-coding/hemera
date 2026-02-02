@@ -37,7 +37,9 @@ export function PublicNavigation({
   const isClerkConfigured = Boolean(
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
   );
-  const isE2E = process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
+  const isE2E =
+    process.env.E2E_TEST === '1' ||
+    process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
   const useClerk = isClerkConfigured && !isE2E;
 
   // In E2E mode, pick up mocked role from localStorage (set by tests/auth-helper)
