@@ -300,7 +300,7 @@ describe('Course DB Layer - Curriculum Validation', () => {
       expect(additionalData.issues.length).toBeGreaterThan(0);
 
       // Each issue should have path (e.g., "0.day", "0.title")
-      additionalData.issues.forEach(issue => {
+      additionalData.issues.forEach((issue: { path: string; code: string; message: string }) => {
         expect(issue).toHaveProperty('path');
         expect(issue).toHaveProperty('code');
         expect(issue).toHaveProperty('message');

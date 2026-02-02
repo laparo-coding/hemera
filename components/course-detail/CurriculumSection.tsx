@@ -65,9 +65,9 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
   const safeModules = Array.isArray(modules) ? modules : [];
 
   // First accordion expanded by default (hooks must be called unconditionally)
-  // Safe access with guard - won't throw if array is empty
+  // Safe access with optional chaining - won't throw if array is empty
   const [expanded, setExpanded] = useState<string | false>(
-    safeModules.length > 0 ? safeModules[0]!.id : false
+    safeModules[0]?.id ?? false
   );
 
   const handleChange =

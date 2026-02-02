@@ -65,6 +65,7 @@ export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
       <Stack spacing={3}>
         {error && (
           <Box
+            role='alert'
             sx={{
               p: 2,
               bgcolor: 'error.light',
@@ -111,7 +112,9 @@ export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
             placeholder='<h1>Titel</h1><p>Inhalt...</p>'
             required
             disabled={isSubmitting}
-            sx={{ fontFamily: 'monospace', fontSize: '0.875rem' }}
+            InputProps={{
+              sx: { fontFamily: 'monospace', fontSize: '0.875rem' },
+            }}
           />
           <Typography variant='caption' sx={{ mt: 1, display: 'block' }}>
             HTML wird später im WYSIWYG-Editor editierbar sein

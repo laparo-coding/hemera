@@ -10,19 +10,16 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { MaterialForm } from '@/components/admin/MaterialForm';
 
 export default function NeuSeminarmaterialPage() {
   const router = useRouter();
-  const [_isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (data: {
     title: string;
     identifier?: string;
     htmlContent: string;
   }) => {
-    setIsSubmitting(true);
     try {
       const response = await fetch('/api/admin/course-material', {
         method: 'POST',
@@ -31,14 +28,21 @@ export default function NeuSeminarmaterialPage() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Erstellen fehlgeschlagen');
+        let errorMessage = 'Erstellen fehlgeschlagen';
+        try {
+          const error = await response.json();
+          errorMessage = error.message || errorMessage;
+        } catch {
+          // Non-JSON response, use default message
+        }
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
       router.push(`/admin/course-material/${result.id}`);
-    } finally {
-      setIsSubmitting(false);
+    } catch (error) {
+      // Error will be caught by MaterialForm error state
+      throw error;
     }
   };
 

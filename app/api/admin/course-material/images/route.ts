@@ -11,7 +11,12 @@ import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(request: NextRequest) {
@@ -91,10 +96,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(
-      { url: blob.url },
-      { status: 200 }
-    );
+    return NextResponse.json({ url: blob.url }, { status: 200 });
   } catch (error) {
     serverInstance.error('Failed to upload image', {
       error: error instanceof Error ? error.message : 'Unknown error',

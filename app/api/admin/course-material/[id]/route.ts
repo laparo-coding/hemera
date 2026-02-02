@@ -141,12 +141,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       blobPathname?: string;
     } = {};
 
-    if (title) updateData.title = title;
+    if (title !== undefined) updateData.title = title;
 
     // If identifier changes, we need to re-upload with new pathname
     const newIdentifier = identifier || existingMaterial.identifier;
 
-    if (htmlContent) {
+    if (htmlContent !== undefined) {
       // Always delete old blob before uploading new content
       try {
         await del(existingMaterial.blobUrl);
@@ -165,7 +165,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       } catch (blobError) {
         serverInstance.error('Blob upload failed during update', {
           identifier: newIdentifier,
-          error: blobError instanceof Error ? blobError.message : 'Unknown error',
+          error:
+            blobError instanceof Error ? blobError.message : 'Unknown error',
         });
         return NextResponse.json(
           {
@@ -180,7 +181,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       updateData.blobPathname = blob.pathname;
     }
 
-    if (identifier) {
+    if (identifier !== undefined) {
       updateData.identifier = identifier;
     }
 

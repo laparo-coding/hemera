@@ -15,11 +15,11 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
+import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
-import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
