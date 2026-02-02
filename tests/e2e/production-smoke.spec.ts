@@ -49,19 +49,15 @@ test.describe('Production Smoke Tests', () => {
 
     expect(response?.status()).toBe(200);
 
-    // Just verify page structure is present - Clerk loading can be flaky in production
-    // The important thing is that the page responds with 200
-    const hasContent = await Promise.any([
-      page.locator('body').isVisible().then(v => v ? true : Promise.reject()),
-      page.locator('main').isVisible().then(v => v ? true : Promise.reject()),
-      page.locator('form').isVisible().then(v => v ? true : Promise.reject()),
-    ]).catch(() => true); // Always pass if page responded with 200
-
-    expect(hasContent).toBe(true);
+    // Verify at least one structural element is visible
+    // Use Playwright's or() combinator for resilient multi-element checking
+    await expect(
+      page.locator('body').or(page.locator('main')).or(page.locator('form')),
+    ).toBeVisible({ timeout: 5000 });
     
     test.info().annotations.push({
       type: 'info',
-      description: 'Sign-in page loaded (HTTP 200) - Clerk form verification skipped for production stability',
+      description: 'Sign-in page loaded (HTTP 200) - page structure verified',
     });
   });
 
