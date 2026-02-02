@@ -19,10 +19,15 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
+        {
+          error: 'unauthorized',
+          message: 'Authentifizierung erforderlich',
+        },
         { status: 401 }
       );
     }
+
+    // TODO: Add admin role check when checkAdminRole() is implemented
 
     const material = await getMaterialById(id);
 

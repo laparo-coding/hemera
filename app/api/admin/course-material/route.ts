@@ -71,14 +71,36 @@ export async function POST(request: NextRequest) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
+        {
+          error: 'unauthorized',
+          message: 'Authentifizierung erforderlich',
+        },
         { status: 401 }
       );
     }
 
-    // TODO: Add admin role check
+    // TODO: Add admin role check when checkAdminRole() is implemented
+    // const isAdmin = await checkAdminRole(userId);
+    // if (!isAdmin) {
+    //   return NextResponse.json(
+    //     { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
+    //     { status: 403 }
+    //   );
+    // }
 
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: 'Ungültiges JSON-Format',
+        },
+        { status: 400 }
+      );
+    }
+
     const parsed = seminarMaterialCreateSchema.safeParse(body);
 
     if (!parsed.success) {

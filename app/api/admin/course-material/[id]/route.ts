@@ -25,10 +25,15 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
+        {
+          error: 'unauthorized',
+          message: 'Authentifizierung erforderlich',
+        },
         { status: 401 }
       );
     }
+
+    // TODO: Add admin role check when checkAdminRole() is implemented
 
     const material = await getMaterialById(id);
 
@@ -70,10 +75,15 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
+        {
+          error: 'unauthorized',
+          message: 'Authentifizierung erforderlich',
+        },
         { status: 401 }
       );
     }
+
+    // TODO: Add admin role check when checkAdminRole() is implemented
 
     const existingMaterial = await getMaterialById(id);
 
@@ -84,7 +94,19 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: 'Ungültiges JSON-Format',
+        },
+        { status: 400 }
+      );
+    }
+
     const parsed = seminarMaterialUpdateSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -198,10 +220,15 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
+        {
+          error: 'unauthorized',
+          message: 'Authentifizierung erforderlich',
+        },
         { status: 401 }
       );
     }
+
+    // TODO: Add admin role check when checkAdminRole() is implemented
 
     const material = await getMaterialById(id);
 

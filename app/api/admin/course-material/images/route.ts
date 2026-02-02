@@ -20,10 +20,15 @@ export async function POST(request: NextRequest) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
+        {
+          error: 'unauthorized',
+          message: 'Authentifizierung erforderlich',
+        },
         { status: 401 }
       );
     }
+
+    // TODO: Add admin role check when checkAdminRole() is implemented
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
