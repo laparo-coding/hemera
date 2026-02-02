@@ -100,10 +100,9 @@ export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
         />
 
         <Box>
-          <Typography variant='subtitle1' sx={{ mb: 1 }}>
-            HTML-Inhalt
-          </Typography>
           <TextField
+            id='html-content'
+            label='HTML-Inhalt'
             value={htmlContent}
             onChange={e => setHtmlContent(e.target.value)}
             fullWidth

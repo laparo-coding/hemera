@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
       logger.warn('Unauthorized attempt to geocode');
       return createErrorResponse(
-        'Authentication required',
+        'Authentifizierung erforderlich',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     if (!adminCheck) {
       logger.warn('Non-admin user attempted to geocode', { userId: user.id });
       return createErrorResponse(
-        'Admin permission required',
+        'Admin-Berechtigung erforderlich',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
