@@ -48,7 +48,7 @@ jobs:
       # Alert on failure - notify via GitHub issue comment
       - name: Create failure notification
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const title = '🔴 Production Smoke Tests Failed';
