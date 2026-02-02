@@ -5,6 +5,7 @@
 
 import { type User as ClerkUser, currentUser } from '@clerk/nextjs/server';
 import type { User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../db/prisma';
 import {
   DatabaseConnectionError,
@@ -87,47 +88,184 @@ export async function getCurrentUserWithSync(): Promise<User> {
   if (existingByEmail && existingByEmail.id !== clerkId) {
     // Migrate legacy user to Clerk ID
     // Migration logged via Rollbar monitoring in production
+    // Use retry-on-conflict to handle race conditions between concurrent requests
 
-    return await prisma.$transaction(async tx => {
-      // 1. Create new user with Clerk ID (use temp email to avoid unique constraint)
-      await tx.user.create({
-        data: {
-          id: clerkId,
-          name,
-          image,
-          email: `migrating-${clerkId}@temp.local`,
-        },
-      });
+    try {
+      return await prisma.$transaction(async tx => {
+        // 1. Create new user with Clerk ID (use temp email to avoid unique constraint)
+        await tx.user.create({
+          data: {
+            id: clerkId,
+            name,
+            image,
+            email: `migrating-${clerkId}@example.invalid`,
+          },
+        });
 
-      // 2. Update all bookings to use Clerk ID
-      await tx.booking.updateMany({
-        where: { userId: existingByEmail.id },
-        data: { userId: clerkId },
-      });
+        // 2. Update all bookings to use Clerk ID
+        await tx.booking.updateMany({
+          where: { userId: existingByEmail.id },
+          data: { userId: clerkId },
+        });
 
-      // 3. Delete old user
-      await tx.user.delete({
-        where: { id: existingByEmail.id },
-      });
+        // 3. Delete old user
+        await tx.user.delete({
+          where: { id: existingByEmail.id },
+        });
 
-      // 4. Update new user with correct email
-      return await tx.user.update({
-        where: { id: clerkId },
-        data: { email },
+        // 4. Update new user with correct email
+        return await tx.user.update({
+          where: { id: clerkId },
+          data: { email },
+        });
       });
-    });
+    } catch (error) {
+      // Handle race condition: another request may have already migrated this user
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        (error.code === 'P2002' || error.code === 'P2025')
+      ) {
+        // P2002: Unique constraint violation (user already created)
+        // P2025: Record not found (legacy user already deleted)
+        // Retry by fetching the now-migrated user
+        const migratedUser = await prisma.user.findUnique({
+          where: { id: clerkId },
+        });
+        if (migratedUser) {
+          return await prisma.user.update({
+            where: { id: clerkId },
+            data: { name, email, image },
+          });
+        }
+      }
+      throw error;
+    }
   }
 
   // Create new user with Clerk ID
-  const user = await prisma.user.create({
-    data: { id: clerkId, name, email, image },
-  });
+  try {
+    const user = await prisma.user.create({
+      data: { id: clerkId, name, email, image },
+    });
 
-  if (!user) {
-    throw new DatabaseConnectionError('Failed to sync user with database');
+    if (!user) {
+      throw new DatabaseConnectionError('Failed to sync user with database');
+    }
+
+    return user;
+  } catch (error) {
+    // Handle race condition: another request may have created this user
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      const existingUser = await prisma.user.findUnique({
+        where: { id: clerkId },
+      });
+      if (existingUser) {
+        return await prisma.user.update({
+          where: { id: clerkId },
+          data: { name, email, image },
+        });
+      }
+    }
+    throw error;
+  }
+}
+
+/**
+ * Sync a Clerk user to the local database with legacy user migration.
+ * Handles email conflicts by migrating legacy users to Clerk IDs.
+ * Uses retry-on-conflict to handle race conditions between concurrent requests.
+ *
+ * @param clerkId - The Clerk user ID
+ * @param email - The user's email address (optional)
+ * @param name - The user's display name (optional)
+ * @param image - The user's profile image URL (optional)
+ * @returns The synced or created user
+ */
+export async function syncClerkUserToDatabase(
+  clerkId: string,
+  email: string | null,
+  name: string | null,
+  image: string | null
+): Promise<User> {
+  if (email) {
+    const existingByEmail = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingByEmail && existingByEmail.id !== clerkId) {
+      // Migrate legacy user to Clerk ID
+      try {
+        await prisma.$transaction(async tx => {
+          // 1. Create new user with temp email
+          await tx.user.upsert({
+            where: { id: clerkId },
+            update: { name, image },
+            create: {
+              id: clerkId,
+              name,
+              image,
+              email: `migrating-${clerkId}@example.invalid`,
+            },
+          });
+
+          // 2. Update all bookings to use Clerk ID
+          await tx.booking.updateMany({
+            where: { userId: existingByEmail.id },
+            data: { userId: clerkId },
+          });
+
+          // 3. Delete old user
+          await tx.user.delete({
+            where: { id: existingByEmail.id },
+          });
+
+          // 4. Update new user with correct email
+          await tx.user.update({
+            where: { id: clerkId },
+            data: { email },
+          });
+        });
+
+        // Return the migrated user
+        const migratedUser = await prisma.user.findUnique({
+          where: { id: clerkId },
+        });
+        if (migratedUser) {
+          return migratedUser;
+        }
+        // Transaction succeeded but user not found - should not happen
+        throw new DatabaseConnectionError(
+          'Migration completed but user not found'
+        );
+      } catch (error) {
+        // Handle race condition: another request may have already migrated this user
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          (error.code === 'P2002' || error.code === 'P2025')
+        ) {
+          // P2002: Unique constraint violation (user already created)
+          // P2025: Record not found (legacy user already deleted)
+          // Just upsert the user
+          return await prisma.user.upsert({
+            where: { id: clerkId },
+            update: { name, email, image },
+            create: { id: clerkId, name, email, image },
+          });
+        }
+        throw error;
+      }
+    }
   }
 
-  return user;
+  // No legacy user conflict or no email, safe to upsert directly
+  return await prisma.user.upsert({
+    where: { id: clerkId },
+    update: { name, email, image },
+    create: { id: clerkId, name, email, image },
+  });
 }
 
 /**
@@ -517,15 +655,21 @@ export async function syncUserFromClerk(clerkUser: ClerkUser): Promise<User> {
         // Migrate legacy user to Clerk ID
         // Migration logged via Rollbar monitoring in production
 
-        // Use transaction: First create new user, then update bookings, then delete old
+        // Use transaction: First create/upsert new user, then update bookings, then delete old
         return await prisma.$transaction(async tx => {
-          // 1. Create new user with Clerk ID (use different email temporarily to avoid unique constraint)
-          const _newUser = await tx.user.create({
-            data: {
+          // 1. Upsert user with Clerk ID (handles race conditions)
+          const _newUser = await tx.user.upsert({
+            where: { id: clerkId },
+            update: {
+              name,
+              image,
+              // Keep temp email during migration
+            },
+            create: {
               id: clerkId,
               name,
               image,
-              email: `migrating-${clerkId}@temp.local`,
+              email: `migrating-${clerkId}@example.invalid`,
             },
           });
 

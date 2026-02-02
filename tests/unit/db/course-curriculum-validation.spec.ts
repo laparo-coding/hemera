@@ -5,7 +5,7 @@
  * using Zod schema before persisting to the database.
  */
 
-import { ZodError } from 'zod';
+import { CurriculumValidationError } from '../../../lib/errors/domain';
 
 // We need to mock prisma before importing the module
 jest.mock('../../../lib/db/prisma', () => ({
@@ -97,7 +97,7 @@ describe('Course DB Layer - Curriculum Validation', () => {
           ...validCourseData,
           curriculum: invalidCurriculum as unknown as null,
         })
-      ).rejects.toThrow(ZodError);
+      ).rejects.toThrow(CurriculumValidationError);
     });
 
     it('should reject curriculum with missing required fields', async () => {
@@ -113,7 +113,7 @@ describe('Course DB Layer - Curriculum Validation', () => {
           ...validCourseData,
           curriculum: invalidCurriculum as unknown as null,
         })
-      ).rejects.toThrow(ZodError);
+      ).rejects.toThrow(CurriculumValidationError);
     });
 
     it('should reject curriculum with invalid topic structure', async () => {
@@ -131,7 +131,7 @@ describe('Course DB Layer - Curriculum Validation', () => {
           ...validCourseData,
           curriculum: invalidCurriculum as unknown as null,
         })
-      ).rejects.toThrow(ZodError);
+      ).rejects.toThrow(CurriculumValidationError);
     });
   });
 
@@ -185,7 +185,7 @@ describe('Course DB Layer - Curriculum Validation', () => {
           curriculum: invalidCurriculum as unknown as null,
           updatedAt,
         })
-      ).rejects.toThrow(ZodError);
+      ).rejects.toThrow(CurriculumValidationError);
     });
 
     it('should reject curriculum with negative day number', async () => {
@@ -203,7 +203,7 @@ describe('Course DB Layer - Curriculum Validation', () => {
           curriculum: invalidCurriculum as unknown as null,
           updatedAt,
         })
-      ).rejects.toThrow(ZodError);
+      ).rejects.toThrow(CurriculumValidationError);
     });
   });
 });

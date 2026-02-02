@@ -7,7 +7,7 @@ on:
         description: 'Base URL for E2E (e.g., https://hemera-<preview>.vercel.app)'
         required: false
       ref:
-        description: 'Git ref or branch to checkout (e.g., 006-observability-monitoring-baseline)'
+        description: 'Git ref or branch to checkout'
         required: false
   pull_request:
     types: [opened, synchronize, reopened]
@@ -29,37 +29,22 @@ jobs:
       - name: Check for frontend changes
         id: check
         run: |
-          # Define patterns for frontend files
-          # - Pages and layouts in app/ (excluding api/)
-          # - Components
-          # - Public assets
-          # - Styles
           frontend_patterns=(
             'app/.*\.(tsx|jsx)$'
             'components/.*\.(tsx|jsx|ts|js)$'
             'public/.*'
             'styles/.*\.(css|scss|sass)$'
           )
-
-          # Exclude API routes
           exclude_patterns=(
             'app/api/.*'
           )
-
-          # Get changed files
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            # For PRs, compare with base branch
             changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.sha }})
           else
-            # For pushes, compare with previous commit
             changed_files=$(git diff --name-only HEAD~1 HEAD)
           fi
-
           has_frontend_changes=false
-
-          # Check each changed file against patterns
           while IFS= read -r file; do
-            # Skip if matches exclude patterns
             excluded=false
             for exclude_pattern in "${exclude_patterns[@]}"; do
               if echo "$file" | grep -qE "$exclude_pattern"; then
@@ -67,12 +52,9 @@ jobs:
                 break
               fi
             done
-
             if [ "$excluded" = true ]; then
               continue
             fi
-
-            # Check if matches frontend patterns
             for pattern in "${frontend_patterns[@]}"; do
               if echo "$file" | grep -qE "$pattern"; then
                 echo "Found frontend change: $file"
@@ -81,19 +63,43 @@ jobs:
               fi
             done
           done <<< "$changed_files"
-
           echo "has_frontend_changes=$has_frontend_changes" >> "$GITHUB_OUTPUT"
           echo "Frontend changes detected: $has_frontend_changes"
 
   e2e:
     runs-on: ubuntu-latest
     needs: [check-frontend-changes]
-    # Run on PR events with frontend changes or on other trigger events
-    # Skip if PR with no frontend changes detected
     if: |
       (github.event_name == 'pull_request' && needs.check-frontend-changes.result == 'success' && needs.check-frontend-changes.outputs.has_frontend_changes == 'true') ||
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success')
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: hemera_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d hemera_e2e"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 30
+          --health-start-period 20s
+
+    env:
+      DATABASE_URL: 'postgresql://postgres:postgres@127.0.0.1:5432/hemera_e2e'
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+      NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
+      NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /dashboard
+      NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: /dashboard
+
     steps:
       - name: Resolve ref to checkout
         id: ref
@@ -101,7 +107,6 @@ jobs:
           if [ -n "${{ inputs.ref }}" ]; then
             echo "ref=${{ inputs.ref }}" >> "$GITHUB_OUTPUT"
           else
-            # Fall back to the triggering ref (PR branch, default branch, or push ref)
             echo "ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
           fi
 
@@ -117,16 +122,32 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm ci
-          # Install SQLite adapter for Prisma 7 E2E tests
-          npm install @prisma/adapter-better-sqlite3 better-sqlite3
+        run: npm ci
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Install jq (for parsing event payload)
-        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Install jq and Postgres client
+        run: sudo apt-get update && sudo apt-get install -y jq postgresql-client
+
+      - name: Wait for Postgres to be ready
+        env:
+          PGPASSWORD: postgres
+          PGUSER: postgres
+          PGDATABASE: hemera_e2e
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+        run: |
+          echo "Waiting for Postgres service..."
+          for i in {1..30}; do
+            if pg_isready -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE"; then
+              echo "Postgres is ready after $i attempts"
+              break
+            fi
+            echo "Waiting for Postgres... attempt $i/30"
+            sleep 2
+          done
+          psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE" -c "SELECT 1;" || exit 1
 
       - name: Determine Base URL
         id: base
@@ -139,7 +160,6 @@ jobs:
             URL="${ENV_URL:-$TARGET}"
             if [ -n "$URL" ]; then
               if echo "$URL" | grep -qE 'vercel\.app|vercel\.com'; then
-                echo "Detected protected preview URL ($URL); defaulting to local server for CI." >&2
                 echo "base=http://localhost:3000" >> "$GITHUB_OUTPUT"
               else
                 echo "base=$URL" >> "$GITHUB_OUTPUT"
@@ -151,27 +171,20 @@ jobs:
             echo "base=http://localhost:3000" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check base reachability and SSO redirect
+      - name: Check base reachability
         id: basecheck
         run: |
           RAW_BASE="${{ steps.base.outputs.base }}"
-          # Normalize trailing slash
           RAW_BASE=${RAW_BASE%/}
           CHECK_URL_API="$RAW_BASE/api/health"
-          CHECK_URL_ROOT="$RAW_BASE/"
-          echo "Checking reachability: $CHECK_URL_API and $CHECK_URL_ROOT"
-          # Get final effective URL after redirects and the HTTP status for both
-          EFFECTIVE_API=$(curl -s -L -o /dev/null -w "%{url_effective}" "$CHECK_URL_API") || true
-          STATUS_API=$(curl -s -o /dev/null -w "%{http_code}" "$CHECK_URL_API") || STATUS_API=000
-          EFFECTIVE_ROOT=$(curl -s -L -o /dev/null -w "%{url_effective}" "$CHECK_URL_ROOT") || true
-          STATUS_ROOT=$(curl -s -o /dev/null -w "%{http_code}" "$CHECK_URL_ROOT") || STATUS_ROOT=000
-          echo "API Effective: ${EFFECTIVE_API:-$CHECK_URL_API} (status: $STATUS_API)"
-          echo "ROOT Effective: ${EFFECTIVE_ROOT:-$CHECK_URL_ROOT} (status: $STATUS_ROOT)"
+          echo "Checking reachability: $CHECK_URL_API"
+          STATUS_API=$(curl -s -o /dev/null -w "%{http_code}" "$CHECK_URL_API" --connect-timeout 5) || STATUS_API=000
+          echo "API status: $STATUS_API"
           USE_LOCAL=0
           FINAL_BASE="$RAW_BASE"
-          # If the URL redirects to Vercel login/SSO or non-2xx, fall back to localhost
-          if echo "$EFFECTIVE_API $EFFECTIVE_ROOT" | grep -qi "vercel.com/login" || echo "$EFFECTIVE_API $EFFECTIVE_ROOT" | grep -qi "/sso-api" || [ "$STATUS_API" -lt 200 ] || [ "$STATUS_API" -ge 400 ] || [ "$STATUS_ROOT" -lt 200 ] || [ "$STATUS_ROOT" -ge 400 ]; then
-            echo "Preview appears protected by Vercel SSO or unreachable. Falling back to local server."
+          # Status 000 means connection failed, treat as unreachable
+          if [ "$STATUS_API" = "000" ] || [ "$STATUS_API" -lt 200 ] || [ "$STATUS_API" -ge 400 ]; then
+            echo "URL unreachable (status=$STATUS_API). Using local server."
             USE_LOCAL=1
             FINAL_BASE="http://localhost:3000"
           fi
@@ -182,63 +195,44 @@ jobs:
         run: |
           echo "Using base URL: ${{ steps.basecheck.outputs.final_base }} (use_local=${{ steps.basecheck.outputs.use_local }})"
 
-      - name: Setup test database and environment
+      - name: Setup database schema
         run: |
-          # Create a minimal .env.local for tests with mock Clerk keys
-          cat > .env.local << EOF
-          NEXTAUTH_URL=http://localhost:3000
-          NEXTAUTH_SECRET=test-secret-for-ci-only
-          DATABASE_URL=file:./test.db
-
-          # Mock Clerk configuration for CI tests
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_mock_ci_key_for_testing_only
-          CLERK_SECRET_KEY=sk_test_mock_ci_secret_for_testing_only
-          NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-          NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-          NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
-          NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
-          EOF
-
-          # Create a temporary SQLite schema for CI testing
-          cp prisma/schema.prisma prisma/schema.prisma.backup
-          sed -i.bak 's/provider = "postgresql"/provider = "sqlite"/g' prisma/schema.prisma
-          sed -i.bak 's/@db\.Text//g' prisma/schema.prisma
-          sed -i.bak 's/@db\.VarChar([0-9]*)//g' prisma/schema.prisma
-          # Clean up backup files
-          rm -f prisma/schema.prisma.bak
-
-          # Use SQLite seed script with better-sqlite3 adapter for Prisma 7
-          echo "Using SQLite seed script with adapter for E2E tests"
-
-      - name: Run Prisma setup
-        run: |
-          # Clear any cached Prisma clients and Next.js build artifacts
-          rm -rf .next node_modules/.prisma
-
           npx prisma generate
-          npx prisma db push --force-reset
-          # Run E2E seed with SQLite adapter
+          npx prisma migrate deploy
           npx tsx scripts/e2e-seed.ts
-          # Verify seed data via raw SQL
           echo "Verifying seed data..."
-          npx prisma db execute --stdin <<'SQL'
-          SELECT COUNT(*) AS published_count FROM courses WHERE is_published = 1;
-          SQL
-        env:
-          DATABASE_URL: file:./test.db
+          npx prisma db execute --stdin <<< "SELECT COUNT(*) AS published_count FROM courses WHERE is_published = true;"
 
       - name: Start Next.js server in background
         if: steps.basecheck.outputs.use_local == '1'
         run: |
-          npm run dev &
-          # Wait for server to be ready
-          timeout 60 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 2; done'
+          npm run dev > /tmp/nextjs.log 2>&1 &
+          SERVER_PID=$!
+          echo "Started Next.js server with PID $SERVER_PID"
+          echo "Waiting for server to be ready..."
+          for i in {1..60}; do
+            if curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
+              echo "Server is ready after $((i*2)) seconds"
+              break
+            fi
+            if ! kill -0 $SERVER_PID 2>/dev/null; then
+              echo "Server process died unexpectedly!"
+              cat /tmp/nextjs.log || true
+              exit 1
+            fi
+            echo "Waiting for server... attempt $i/60"
+            sleep 2
+          done
+          if ! curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
+            echo "Server failed to start after 120 seconds"
+            cat /tmp/nextjs.log || true
+            exit 1
+          fi
         env:
           NODE_ENV: development
-          DATABASE_URL: file:./test.db
-          E2E_TEST: true
-          NEXT_PUBLIC_DISABLE_CLERK: 1
-          NEXT_PUBLIC_DISABLE_ROLLBAR: 1
+          E2E_TEST: 'true'
+          NEXT_PUBLIC_DISABLE_CLERK: '1'
+          NEXT_PUBLIC_DISABLE_ROLLBAR: '1'
 
       - name: Run E2E tests
         id: e2e
@@ -247,9 +241,8 @@ jobs:
           PLAYWRIGHT_BASE_URL: ${{ steps.basecheck.outputs.final_base }}
           E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          NEXT_PUBLIC_DISABLE_CLERK: '1'
         run: |
-          # Run only non-auth project if no credentials are set
-          # Skip chromium project (legacy compat) to avoid timeouts
           if [ -z "$E2E_TEST_EMAIL" ] || [ -z "$E2E_TEST_PASSWORD" ]; then
             echo "No E2E credentials set - running only chromium-no-auth project"
             npx playwright test --project=chromium-no-auth
@@ -278,7 +271,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Comment E2E result on PR
-        if: ${{ github.event_name == 'pull_request' }}
+        if: github.event_name == 'pull_request'
         continue-on-error: true
         uses: actions/github-script@v8
         env:
@@ -307,16 +300,7 @@ jobs:
             }
 
       - name: Fail if tests failed
-        if: ${{ steps.e2e.outcome == 'failure' }}
+        if: steps.e2e.outcome == 'failure'
         run: |
           echo "E2E tests failed" >&2
           exit 1
-
-      - name: Restore Prisma schema and config
-        if: always()
-        run: |
-          if [ -f prisma/schema.prisma.backup ]; then
-            mv prisma/schema.prisma.backup prisma/schema.prisma
-          fi
-          # No prisma.config.ts to restore - using package.json configuration
-          echo "Prisma configuration handled via package.json"

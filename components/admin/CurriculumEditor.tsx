@@ -16,6 +16,11 @@ import {
   AccordionSummary,
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   TextField,
   Typography,
@@ -61,6 +66,15 @@ export default function CurriculumEditor({
     modules[0]?.id ?? false
   );
 
+  // Confirmation dialog state
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    type: 'module' | 'topic';
+    moduleId: string;
+    topicId?: string;
+    title: string;
+  } | null>(null);
+
   const handleAccordionChange = useCallback(
     (panelId: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panelId : false);
@@ -85,6 +99,68 @@ export default function CurriculumEditor({
     [modules, onChange]
   );
 
+  const removeTopic = useCallback(
+    (moduleId: string, topicId: string) => {
+      onChange(
+        modules.map(m =>
+          m.id === moduleId
+            ? { ...m, topics: m.topics.filter(t => t.id !== topicId) }
+            : m
+        )
+      );
+    },
+    [modules, onChange]
+  );
+
+  const handleModuleDeleteClick = useCallback(
+    (e: React.MouseEvent, moduleId: string, moduleTitle: string) => {
+      e.stopPropagation();
+      setDeleteDialog({
+        open: true,
+        type: 'module',
+        moduleId,
+        title: moduleTitle || `Tag`,
+      });
+    },
+    []
+  );
+
+  const handleTopicDeleteClick = useCallback(
+    (
+      e: React.MouseEvent,
+      moduleId: string,
+      topicId: string,
+      topicTitle: string
+    ) => {
+      e.stopPropagation();
+      setDeleteDialog({
+        open: true,
+        type: 'topic',
+        moduleId,
+        topicId,
+        title: topicTitle || 'Dieses Thema',
+      });
+    },
+    []
+  );
+
+  const handleDeleteConfirm = useCallback(() => {
+    if (!deleteDialog) return;
+    try {
+      if (deleteDialog.type === 'module') {
+        removeModule(deleteDialog.moduleId);
+      } else if (deleteDialog.topicId) {
+        removeTopic(deleteDialog.moduleId, deleteDialog.topicId);
+      }
+    } finally {
+      setDeleteDialog(null);
+    }
+  }, [deleteDialog, removeModule, removeTopic]);
+
+  const handleDeleteCancel = useCallback(() => {
+    setDeleteDialog(null);
+  }, []);
+
   const updateModuleTitle = useCallback(
     (moduleId: string, title: string) => {
       onChange(modules.map(m => (m.id === moduleId ? { ...m, title } : m)));
@@ -98,19 +174,6 @@ export default function CurriculumEditor({
         modules.map(m =>
           m.id === moduleId
             ? { ...m, topics: [...m.topics, createEmptyTopic()] }
-            : m
-        )
-      );
-    },
-    [modules, onChange]
-  );
-
-  const removeTopic = useCallback(
-    (moduleId: string, topicId: string) => {
-      onChange(
-        modules.map(m =>
-          m.id === moduleId
-            ? { ...m, topics: m.topics.filter(t => t.id !== topicId) }
             : m
         )
       );
@@ -139,6 +202,28 @@ export default function CurriculumEditor({
       );
     },
     [modules, onChange]
+  );
+
+  // Trim whitespace on blur for better UX
+  const trimModuleTitle = useCallback(
+    (moduleId: string) => {
+      const module = modules.find(m => m.id === moduleId);
+      if (module && module.title !== module.title.trim()) {
+        updateModuleTitle(moduleId, module.title.trim());
+      }
+    },
+    [modules, updateModuleTitle]
+  );
+
+  const trimTopic = useCallback(
+    (moduleId: string, topicId: string, field: 'timeRange' | 'title') => {
+      const module = modules.find(m => m.id === moduleId);
+      const topic = module?.topics.find(t => t.id === topicId);
+      if (topic && topic[field] !== topic[field].trim()) {
+        updateTopic(moduleId, topicId, field, topic[field].trim());
+      }
+    },
+    [modules, updateTopic]
   );
 
   return (
@@ -178,41 +263,46 @@ export default function CurriculumEditor({
             sx={{ mb: 1 }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant='subtitle2' sx={{ minWidth: 60 }}>
+                Tag {module.day}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {/* Module header with editable title and delete button */}
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 2,
-                  width: '100%',
-                  pr: 2,
+                  mb: 2,
+                  pb: 2,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
                 }}
               >
-                <Typography variant='subtitle2' sx={{ minWidth: 60 }}>
-                  Tag {module.day}
-                </Typography>
                 <TextField
                   size='small'
+                  label='Titel'
                   value={module.title}
                   onChange={e => updateModuleTitle(module.id, e.target.value)}
+                  onBlur={() => trimModuleTitle(module.id)}
                   onClick={e => e.stopPropagation()}
                   disabled={disabled}
-                  placeholder='Titel des Tages'
-                  sx={{ flexGrow: 1 }}
+                  placeholder='z.B. Grundlagen der Verhandlung'
+                  sx={{ flexGrow: 1, bgcolor: 'white' }}
                 />
                 <IconButton
                   size='small'
                   color='error'
-                  onClick={e => {
-                    e.stopPropagation();
-                    removeModule(module.id);
-                  }}
+                  onClick={e =>
+                    handleModuleDeleteClick(e, module.id, module.title)
+                  }
                   disabled={disabled}
+                  title='Tag löschen'
                 >
                   <DeleteIcon fontSize='small' />
                 </IconButton>
               </Box>
-            </AccordionSummary>
-            <AccordionDetails>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {module.topics.map((topic, topicIndex) => (
                   <Box
@@ -222,8 +312,10 @@ export default function CurriculumEditor({
                       alignItems: 'center',
                       gap: 1,
                       p: 1,
-                      bgcolor: 'grey.50',
+                      bgcolor: 'white',
                       borderRadius: 1,
+                      border: '1px solid',
+                      borderColor: 'grey.200',
                     }}
                   >
                     <Typography
@@ -243,9 +335,10 @@ export default function CurriculumEditor({
                           e.target.value
                         )
                       }
+                      onBlur={() => trimTopic(module.id, topic.id, 'timeRange')}
                       disabled={disabled}
                       placeholder='09:00 - 09:30'
-                      sx={{ width: 140 }}
+                      sx={{ width: 140, bgcolor: 'white' }}
                     />
                     <TextField
                       size='small'
@@ -258,14 +351,22 @@ export default function CurriculumEditor({
                           e.target.value
                         )
                       }
+                      onBlur={() => trimTopic(module.id, topic.id, 'title')}
                       disabled={disabled}
                       placeholder='Thema / Aktivität'
-                      sx={{ flexGrow: 1 }}
+                      sx={{ flexGrow: 1, bgcolor: 'white' }}
                     />
                     <IconButton
                       size='small'
                       color='error'
-                      onClick={() => removeTopic(module.id, topic.id)}
+                      onClick={e =>
+                        handleTopicDeleteClick(
+                          e,
+                          module.id,
+                          topic.id,
+                          topic.title
+                        )
+                      }
                       disabled={disabled || module.topics.length <= 1}
                     >
                       <DeleteIcon fontSize='small' />
@@ -286,6 +387,46 @@ export default function CurriculumEditor({
           </Accordion>
         ))
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={deleteDialog?.open ?? false}
+        onClose={handleDeleteCancel}
+        aria-labelledby='delete-dialog-title'
+        aria-describedby='delete-dialog-description'
+      >
+        <DialogTitle id='delete-dialog-title'>
+          {deleteDialog?.type === 'module'
+            ? `„${deleteDialog?.title}" löschen?`
+            : `Thema „${deleteDialog?.title}" löschen?`}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id='delete-dialog-description'>
+            {deleteDialog?.type === 'module'
+              ? `Möchtest du den Tag „${deleteDialog?.title}" und alle zugehörigen Themen wirklich löschen?`
+              : `Möchtest du das Thema „${deleteDialog?.title}" wirklich löschen?`}{' '}
+            Diese Aktion kann nicht rückgängig gemacht werden.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleDeleteCancel}
+            color='inherit'
+            autoFocus
+            aria-label='Löschen abbrechen'
+          >
+            Abbrechen
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            color='error'
+            variant='contained'
+            aria-label={`${deleteDialog?.title} endgültig löschen`}
+          >
+            Löschen
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

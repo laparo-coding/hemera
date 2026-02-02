@@ -39,6 +39,17 @@ export class CourseSlugAlreadyExistsError extends ValidationError {
   }
 }
 
+export class CurriculumValidationError extends ValidationError {
+  readonly errorCode = 'CURRICULUM_VALIDATION_ERROR';
+
+  constructor(fieldCount?: number) {
+    super(
+      'Invalid curriculum structure. Expected an array of curriculum items.',
+      fieldCount !== undefined ? { invalidFieldCount: fieldCount } : undefined
+    );
+  }
+}
+
 // ===== BOOKING ERRORS =====
 export class BookingNotFoundError extends BusinessError {
   readonly errorCode = 'BOOKING_NOT_FOUND';

@@ -14,6 +14,8 @@ import {
   Checkbox,
   CircularProgress,
   FormControlLabel,
+  FormGroup,
+  FormLabel,
   MenuItem,
   TextField,
   Typography,
@@ -50,7 +52,7 @@ export default function CourseForm({
   locations = [],
   onSubmit,
   onCancel,
-  submitLabel = 'Save Course',
+  submitLabel = 'Seminar speichern',
   isLoading = false,
 }: CourseFormProps) {
   const {
@@ -114,9 +116,12 @@ export default function CourseForm({
             label={TERMS.courseTitle}
             required
             error={!!errors.title}
-            helperText={errors.title?.message}
+            helperText={
+              errors.title?.message || `${(field.value || '').trim().length}/50`
+            }
             fullWidth
             disabled={isLoading || isSubmitting}
+            inputProps={{ maxLength: 50 }}
           />
         )}
       />
@@ -127,14 +132,18 @@ export default function CourseForm({
         render={({ field }) => (
           <TextField
             {...field}
-            label='Beschreibung'
+            label={TERMS.descriptionLabel}
             required
             multiline
-            rows={4}
+            rows={8}
             error={!!errors.description}
-            helperText={errors.description?.message}
+            helperText={
+              errors.description?.message ||
+              `${(field.value || '').trim().length}/900`
+            }
             fullWidth
             disabled={isLoading || isSubmitting}
+            inputProps={{ maxLength: 900 }}
           />
         )}
       />
@@ -146,19 +155,73 @@ export default function CourseForm({
           <TextField
             {...field}
             value={field.value || ''}
-            label='Teaser (Kurzbeschreibung für Übersichten)'
+            label={TERMS.teaserLabel}
             multiline
             rows={2}
             error={!!errors.teaser}
             helperText={
               errors.teaser?.message ||
-              `${(field.value || '').trim().length}/300 Zeichen`
+              `${(field.value || '').trim().length}/200`
             }
             fullWidth
             disabled={isLoading || isSubmitting}
-            inputProps={{ maxLength: 300 }}
+            inputProps={{ maxLength: 200 }}
           />
         )}
+      />
+
+      <Controller
+        name='recommended'
+        control={control}
+        render={({ field }) => {
+          const maxLength = 300;
+          return (
+            <TextField
+              {...field}
+              value={field.value || ''}
+              label={TERMS.recommendedLabel}
+              multiline
+              rows={2}
+              error={!!errors.recommended}
+              helperText={
+                errors.recommended?.message ||
+                `${(field.value || '').trim().length}/${maxLength}`
+              }
+              fullWidth
+              disabled={isLoading || isSubmitting}
+              inputProps={{ maxLength }}
+              InputLabelProps={{ shrink: true }}
+              onChange={e => field.onChange(e.target.value || null)}
+            />
+          );
+        }}
+      />
+
+      <Controller
+        name='notRecommended'
+        control={control}
+        render={({ field }) => {
+          const maxLength = 300;
+          return (
+            <TextField
+              {...field}
+              value={field.value || ''}
+              label={TERMS.notRecommendedLabel}
+              multiline
+              rows={2}
+              error={!!errors.notRecommended}
+              helperText={
+                errors.notRecommended?.message ||
+                `${(field.value || '').trim().length}/${maxLength}`
+              }
+              fullWidth
+              disabled={isLoading || isSubmitting}
+              inputProps={{ maxLength }}
+              InputLabelProps={{ shrink: true }}
+              onChange={e => field.onChange(e.target.value || null)}
+            />
+          );
+        }}
       />
 
       <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
@@ -169,7 +232,7 @@ export default function CourseForm({
             <TextField
               {...field}
               type='number'
-              label='Preis (€)'
+              label={TERMS.priceLabel}
               required
               error={!!errors.price}
               helperText={errors.price?.message}
@@ -191,7 +254,7 @@ export default function CourseForm({
             <TextField
               {...field}
               type='number'
-              label='Kapazität'
+              label={TERMS.capacityLabel}
               required
               error={!!errors.capacity}
               helperText={errors.capacity?.message}
@@ -214,7 +277,7 @@ export default function CourseForm({
           <TextField
             {...field}
             type='date'
-            label='Startdatum'
+            label={TERMS.startDateLabel}
             required
             error={!!errors.startDate}
             helperText={errors.startDate?.message}
@@ -274,7 +337,7 @@ export default function CourseForm({
             <TextField
               {...field}
               type='time'
-              label='Startzeit'
+              label={TERMS.startTimeLabel}
               required
               error={!!errors.startTime}
               helperText={errors.startTime?.message}
@@ -324,7 +387,7 @@ export default function CourseForm({
             <TextField
               {...field}
               type='time'
-              label='Endzeit'
+              label={TERMS.endTimeLabel}
               required
               error={!!errors.endTime}
               helperText={errors.endTime?.message}
@@ -375,7 +438,7 @@ export default function CourseForm({
           render={({ field }) => (
             <TextField
               {...field}
-              label='Dozent/in'
+              label={TERMS.instructorLabel}
               required
               error={!!errors.instructor}
               helperText={errors.instructor?.message}
@@ -391,15 +454,17 @@ export default function CourseForm({
             <TextField
               {...field}
               select
-              label='Niveau'
+              label={TERMS.levelLabel}
               required
               error={!!errors.level}
               helperText={errors.level?.message}
               disabled={isLoading || isSubmitting}
             >
-              <MenuItem value='BEGINNER'>Basis</MenuItem>
-              <MenuItem value='INTERMEDIATE'>Fortgeschrittene</MenuItem>
-              <MenuItem value='ADVANCED'>Masterclass</MenuItem>
+              <MenuItem value='BEGINNER'>{TERMS.levelBeginner}</MenuItem>
+              <MenuItem value='INTERMEDIATE'>
+                {TERMS.levelIntermediate}
+              </MenuItem>
+              <MenuItem value='ADVANCED'>{TERMS.levelAdvanced}</MenuItem>
             </TextField>
           )}
         />
@@ -412,17 +477,15 @@ export default function CourseForm({
           <TextField
             {...field}
             select
-            label='Veranstaltungsort'
+            label={TERMS.locationLabel}
             error={!!errors.locationId}
-            helperText={
-              errors.locationId?.message || 'Optional - Ort des Kurses'
-            }
+            helperText={errors.locationId?.message || TERMS.locationHelperText}
             disabled={isLoading || isSubmitting}
             value={field.value || ''}
             onChange={e => field.onChange(e.target.value || null)}
           >
             <MenuItem value=''>
-              <em>Kein Ort ausgewählt</em>
+              <em>{TERMS.noLocationSelected}</em>
             </MenuItem>
             {locations.map(location => (
               <MenuItem key={location.id} value={location.id}>
@@ -432,117 +495,6 @@ export default function CourseForm({
           </TextField>
         )}
       />
-
-      {/* Learning Path fields (021) */}
-      <Box sx={{ mt: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
-        <Typography variant='subtitle2' gutterBottom sx={{ mb: 2 }}>
-          Lernpfad-Empfehlungen
-        </Typography>
-
-        <Controller
-          name='recommended'
-          control={control}
-          render={({ field }) => {
-            const currentLength = (field.value || '').trim().length;
-            const maxLength = 300;
-            const isNearLimit = currentLength > maxLength * 0.9;
-            const isOverLimit = currentLength > maxLength;
-
-            return (
-              <TextField
-                {...field}
-                value={field.value || ''}
-                label='Passende Voraussetzungen'
-                placeholder='z.B. Grundkurs Laparoskopie abgeschlossen'
-                multiline
-                rows={2}
-                error={!!errors.recommended}
-                helperText={
-                  errors.recommended?.message ||
-                  `Zeichen: ${currentLength}/${maxLength}${isNearLimit ? ' ⚠️ Limit fast erreicht' : ''} • Erscheint als "Das sind passende Voraussetzungen für das Seminar"`
-                }
-                fullWidth
-                disabled={isLoading || isSubmitting}
-                inputProps={{ maxLength }}
-                sx={{ mb: 2 }}
-                onChange={e => field.onChange(e.target.value || null)}
-                FormHelperTextProps={{
-                  sx: {
-                    color: isOverLimit
-                      ? 'error.main'
-                      : isNearLimit
-                        ? 'warning.main'
-                        : 'text.secondary',
-                  },
-                }}
-              />
-            );
-          }}
-        />
-
-        <Controller
-          name='notRecommended'
-          control={control}
-          render={({ field }) => {
-            const currentLength = (field.value || '').trim().length;
-            const maxLength = 300;
-            const isNearLimit = currentLength > maxLength * 0.9;
-            const isOverLimit = currentLength > maxLength;
-
-            return (
-              <TextField
-                {...field}
-                value={field.value || ''}
-                label='Nicht passende Voraussetzungen'
-                placeholder='z.B. Keine laparoskopischen Vorkenntnisse'
-                multiline
-                rows={2}
-                error={!!errors.notRecommended}
-                helperText={
-                  errors.notRecommended?.message ||
-                  `Zeichen: ${currentLength}/${maxLength}${isNearLimit ? ' ⚠️ Limit fast erreicht' : ''} • Erscheint als "Das sind keine passenden Voraussetzungen für das Seminar"`
-                }
-                fullWidth
-                disabled={isLoading || isSubmitting}
-                inputProps={{ maxLength }}
-                sx={{ mb: 2 }}
-                onChange={e => field.onChange(e.target.value || null)}
-                FormHelperTextProps={{
-                  sx: {
-                    color: isOverLimit
-                      ? 'error.main'
-                      : isNearLimit
-                        ? 'warning.main'
-                        : 'text.secondary',
-                  },
-                }}
-              />
-            );
-          }}
-        />
-
-        <Controller
-          name='isNonPublic'
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={field.value}
-                  onChange={e => field.onChange(e.target.checked)}
-                  disabled={isLoading || isSubmitting}
-                />
-              }
-              label={
-                <Typography variant='body2' color='text.secondary'>
-                  Nicht-öffentlicher Kurs (wird nicht in der Kursliste
-                  angezeigt)
-                </Typography>
-              }
-            />
-          )}
-        />
-      </Box>
 
       <Controller
         name='curriculum'
@@ -567,57 +519,93 @@ export default function CourseForm({
         />
       </Box>
 
+      {/* Visibility Settings Fieldset */}
+      <Box
+        component='fieldset'
+        sx={{
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 1,
+          p: 2,
+          mt: 2,
+        }}
+      >
+        <FormLabel component='legend' sx={{ px: 1, fontWeight: 600 }}>
+          {TERMS.visibilityLabel}
+        </FormLabel>
+        <FormGroup>
+          <Controller
+            name='isNonPublic'
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={field.value}
+                    onChange={e => field.onChange(e.target.checked)}
+                    disabled={isLoading || isSubmitting}
+                  />
+                }
+                label={
+                  <Typography variant='body2' color='text.secondary'>
+                    {TERMS.isNonPublicLabel}
+                  </Typography>
+                }
+              />
+            )}
+          />
+
+          <Controller
+            name='isPublished'
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={field.value}
+                    onChange={e => field.onChange(e.target.checked)}
+                    disabled={isLoading || isSubmitting}
+                  />
+                }
+                label={
+                  <Typography variant='body2' color='text.secondary'>
+                    {TERMS.isPublishedLabel}
+                  </Typography>
+                }
+              />
+            )}
+          />
+        </FormGroup>
+      </Box>
+
       <Box
         sx={{
           display: 'flex',
           gap: 2,
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           alignItems: 'center',
           mt: 2,
         }}
       >
-        <Controller
-          name='isPublished'
-          control={control}
-          render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={field.value}
-                  onChange={e => field.onChange(e.target.checked)}
-                  disabled={isLoading || isSubmitting}
-                />
-              }
-              label={
-                <Typography variant='body2' color='text.secondary'>
-                  Sofort veröffentlichen
-                </Typography>
-              }
-            />
-          )}
-        />
-
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          {onCancel && (
-            <Button
-              variant='outlined'
-              color='primary'
-              onClick={onCancel}
-              disabled={isLoading || isSubmitting}
-            >
-              Abbrechen
-            </Button>
-          )}
+        {onCancel && (
           <Button
-            type='submit'
-            variant='contained'
+            variant='outlined'
             color='primary'
+            onClick={onCancel}
             disabled={isLoading || isSubmitting}
-            startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
           >
-            {isSubmitting ? 'Wird gespeichert...' : submitLabel}
+            {TERMS.cancelButton}
           </Button>
-        </Box>
+        )}
+        <Button
+          type='submit'
+          variant='contained'
+          color='primary'
+          disabled={isLoading || isSubmitting}
+          startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+        >
+          {isSubmitting ? TERMS.savingMessage : submitLabel}
+        </Button>
       </Box>
     </Box>
   );

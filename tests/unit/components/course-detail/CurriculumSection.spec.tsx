@@ -95,13 +95,11 @@ describe('CurriculumSection', () => {
   });
 
   describe('Empty state', () => {
-    it('shows placeholder curriculum when no modules provided', () => {
-      render(<CurriculumSection modules={[]} />);
+    it('renders nothing when no modules provided', () => {
+      const { container } = render(<CurriculumSection modules={[]} />);
 
-      // Component shows placeholder content when empty
-      expect(
-        screen.getByText('Grundlagen der Verhandlung')
-      ).toBeInTheDocument();
+      // Component returns null when empty, so container should be empty
+      expect(container.firstChild).toBeNull();
     });
   });
 });

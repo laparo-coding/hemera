@@ -61,6 +61,41 @@ export const TERMS = {
   // Instructor/Participant terms
   courseParticipant: 'Seminarteilnehmer',
   courseParticipants: 'Seminarteilnehmer',
+
+  // Form Labels
+  descriptionLabel: 'Beschreibung',
+  teaserLabel: 'Kurzbeschreibung',
+  recommendedLabel: 'Passende Voraussetzungen',
+  notRecommendedLabel: 'Nicht passende Voraussetzungen',
+  priceLabel: 'Preis (€)',
+  capacityLabel: 'Kapazität',
+  startDateLabel: 'Startdatum',
+  startTimeLabel: 'Startzeit',
+  endTimeLabel: 'Endzeit',
+  instructorLabel: 'Dozent/in',
+  levelLabel: 'Niveau',
+  locationLabel: 'Veranstaltungsort',
+  visibilityLabel: 'Sichtbarkeit',
+
+  // Level Options
+  levelBeginner: 'Basis',
+  levelIntermediate: 'Fortgeschrittene',
+  levelAdvanced: 'Masterclass',
+
+  // Placeholders & Helper Text
+  recommendedPlaceholder: 'z.B. Grundkurs Laparoskopie abgeschlossen',
+  notRecommendedPlaceholder: 'z.B. Keine laparoskopischen Vorkenntnisse',
+  noLocationSelected: 'Kein Ort ausgewählt',
+  locationHelperText: 'Optional - Ort des Seminars',
+
+  // Visibility Labels
+  isNonPublicLabel:
+    'Nicht-öffentliches Seminar (wird nicht in der Seminarliste angezeigt)',
+  isPublishedLabel: 'Sofort veröffentlichen (Seminar ist buchbar)',
+
+  // Buttons & Actions
+  cancelButton: 'Abbrechen',
+  savingMessage: 'Wird gespeichert...',
 } as const;
 
 /**

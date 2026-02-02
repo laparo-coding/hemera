@@ -77,7 +77,7 @@ throw new CourseNotFoundError('Course not found', { courseId: '123' });
 ### Manuelles Error Reporting
 
 ```typescript
-import { reportError, ErrorSeverity } from '@/lib/monitoring/rollbar';
+import { reportError, ErrorSeverity } from '@/lib/monitoring/rollbar-official';
 
 // Server-side manual reporting
 reportError(
@@ -136,7 +136,7 @@ import { RollbarProviderWrapper, RollbarErrorBoundaryWrapper } from '@/lib/monit
 ### Performance Monitoring
 
 ```typescript
-import { reportPerformanceIssue } from '@/lib/monitoring/rollbar';
+import { reportPerformanceIssue } from '@/lib/monitoring/rollbar-official';
 
 const startTime = Date.now();
 // ... slow operation
@@ -148,7 +148,7 @@ reportPerformanceIssue('database-query', duration, 1000);
 ### User Action Tracking
 
 ```typescript
-import { recordUserAction } from '@/lib/monitoring/rollbar';
+import { recordUserAction } from '@/lib/monitoring/rollbar-official';
 import { recordClientUserAction } from '@/lib/monitoring/rollbar-react';
 
 // Server-side
@@ -206,7 +206,7 @@ Jeder Request erhält automatisch:
 ### Security Monitoring
 
 ```typescript
-import { reportSecurityIncident } from '@/lib/monitoring/rollbar';
+import { reportSecurityIncident } from '@/lib/monitoring/rollbar-official';
 
 // Automatische Security Alerts
 reportSecurityIncident('unauthorized-access-attempt', {
