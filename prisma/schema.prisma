@@ -2,6 +2,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Datasource configuration is moved to prisma.config.ts (Prisma 7)
+// The DATABASE_URL environment variable is required for prisma CLI commands
+// (prisma generate, prisma migrate deploy, etc.)
+// See: https://pris.ly/d/config-datasource
 datasource db {
   provider = "postgresql"
 }
@@ -272,4 +276,17 @@ model Testimonial {
 
   @@index([courseId, status])
   @@map("testimonials")
+}
+
+// SEMINAR MATERIALS (023-slide-editor)
+model SeminarMaterial {
+  id           String   @id @default(cuid())
+  identifier   String   @unique
+  title        String
+  blobUrl      String
+  blobPathname String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("seminar_materials")
 }

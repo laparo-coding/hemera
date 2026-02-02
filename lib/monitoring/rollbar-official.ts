@@ -18,7 +18,7 @@ interface RollbarTestInstance {
 }
 
 // Enablement rules unify various legacy flags used across the repo/scripts
-const isE2EMode = process.env.E2E_TEST === 'true';
+const isE2EMode = process.env.E2E_TEST === '1';
 const isTestMode =
   process.env.NODE_ENV === 'test' ||
   // Jest sets JEST_WORKER_ID for each worker process

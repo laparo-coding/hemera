@@ -193,7 +193,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           BUILD_TIME: ${{ env.BUILD_TIME }}
           # Temporary safeguard: disable Clerk during preview build to avoid prerender failures
-          NEXT_PUBLIC_DISABLE_CLERK: 1
+          NEXT_PUBLIC_DISABLE_CLERK: '1'
 
       - name: Deploy Project Artifacts to Vercel
         id: deploy

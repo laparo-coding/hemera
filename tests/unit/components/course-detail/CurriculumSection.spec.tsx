@@ -101,5 +101,19 @@ describe('CurriculumSection', () => {
       // Component returns null when empty, so container should be empty
       expect(container.firstChild).toBeNull();
     });
+
+    it('renders nothing when modules is undefined', () => {
+      const { container } = render(<CurriculumSection modules={undefined} />);
+
+      // Component returns null with undefined, so container should be empty
+      expect(container.firstChild).toBeNull();
+    });
+
+    it('renders nothing when modules is null', () => {
+      const { container } = render(<CurriculumSection modules={null} />);
+
+      // Component returns null with null, so container should be empty
+      expect(container.firstChild).toBeNull();
+    });
   });
 });

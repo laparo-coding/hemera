@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { syncClerkUserToDatabase } from '../../../lib/api/users';
 import { prisma } from '../../../lib/db/prisma';
 import { STRIPE_API_VERSION } from '../../../lib/stripe/config';
+import { isClerkDisabled } from '../../../lib/utils/clerk-disabled-check';
 
 // Skip Stripe initialization during build process
 const isBuildTime =
@@ -63,6 +64,20 @@ export async function POST(request: NextRequest) {
     const user = await currentUser();
 
     if (!user?.id) {
+      // E2E test fallback: when Clerk is disabled, use mock user
+      if (isClerkDisabled()) {
+        return NextResponse.json(
+          {
+            success: true,
+            message:
+              'E2E-Testmodus: Clerk deaktiviert, Mock-Benutzer wird verwendet',
+            sessionId: `mock-session-${Date.now()}`,
+            mockMode: true,
+          },
+          { status: 200 }
+        );
+      }
+
       return NextResponse.json(
         { success: false, error: 'Authentication required' },
         { status: 401 }

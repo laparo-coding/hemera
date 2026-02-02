@@ -7,6 +7,7 @@
 
 import { type CourseLevel, Prisma } from '@prisma/client';
 import { CurriculumValidationError } from '../../errors/domain';
+import { ErrorSeverity, reportError } from '../../monitoring/rollbar-official';
 import { curriculumSchema } from '../../schemas/admin/course';
 import type { CourseWithEnrollmentCount } from '../../types/admin';
 import { prisma } from '../prisma';
@@ -14,6 +15,9 @@ import { prisma } from '../prisma';
 /**
  * Validate and parse curriculum data using safeParse
  * Returns validated data, Prisma.DbNull for null, or undefined if not provided
+ *
+ * Full validation errors are logged server-side for diagnostics,
+ * while a sanitized error is thrown to prevent information leakage
  */
 function validateCurriculum(
   curriculum: Prisma.InputJsonValue | null | undefined
@@ -27,7 +31,42 @@ function validateCurriculum(
 
   const result = curriculumSchema.safeParse(curriculum);
   if (!result.success) {
-    // Throw sanitized error without exposing schema internals
+    // Log full Zod validation issues server-side for diagnostics
+    // This includes detailed field paths and error messages
+    const validationDetails = result.error.issues.map(issue => ({
+      path: issue.path.join('.'),
+      code: issue.code,
+      message: issue.message,
+    }));
+
+    // Create a compact summary to avoid bloating the Rollbar event (128KB limit)
+    const receivedDataSummary =
+      typeof curriculum === 'object'
+        ? JSON.stringify({
+            type: Array.isArray(curriculum) ? 'array' : 'object',
+            keys: Array.isArray(curriculum)
+              ? curriculum.slice(0, 5).map((_, i) => i)
+              : Object.keys(curriculum).slice(0, 5),
+            size: Array.isArray(curriculum)
+              ? curriculum.length
+              : Object.keys(curriculum).length,
+          })
+        : String(curriculum);
+
+    reportError(
+      'Curriculum validation failed',
+      {
+        additionalData: {
+          issueCount: result.error.issues.length,
+          issues: validationDetails,
+          receivedDataSummary,
+        },
+      },
+      ErrorSeverity.WARNING
+    );
+
+    // Throw sanitized error without exposing schema internals or received data
+    // This prevents information leakage to the admin UI
     throw new CurriculumValidationError(result.error.issues.length);
   }
 

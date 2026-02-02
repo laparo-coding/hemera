@@ -49,15 +49,16 @@ export const courseCreateSchema = z.object({
   title: z
     .string()
     .min(3, 'Title must be at least 3 characters')
-    .max(200, 'Title must not exceed 200 characters')
+    .max(50, 'Title must not exceed 50 characters')
     .trim(),
   description: z
     .string()
     .min(10, 'Description must be at least 10 characters')
+    .max(900, 'Description must not exceed 900 characters')
     .trim(),
   teaser: z
     .string()
-    .max(300, 'Teaser must not exceed 300 characters')
+    .max(200, 'Teaser must not exceed 200 characters')
     .trim()
     .optional()
     .nullable(),
@@ -148,17 +149,18 @@ export const courseUpdateSchema = z.object({
   title: z
     .string()
     .min(3, 'Title must be at least 3 characters')
-    .max(200, 'Title must not exceed 200 characters')
+    .max(50, 'Title must not exceed 50 characters')
     .trim()
     .optional(),
   description: z
     .string()
     .min(10, 'Description must be at least 10 characters')
+    .max(900, 'Description must not exceed 900 characters')
     .trim()
     .optional(),
   teaser: z
     .string()
-    .max(300, 'Teaser must not exceed 300 characters')
+    .max(200, 'Teaser must not exceed 200 characters')
     .trim()
     .optional()
     .nullable(),

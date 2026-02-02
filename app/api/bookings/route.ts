@@ -8,6 +8,7 @@ import {
   ErrorSeverity,
   reportError,
 } from '../../../lib/monitoring/rollbar-official';
+import { isClerkDisabled } from '../../../lib/utils/clerk-disabled-check';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -129,6 +130,18 @@ export async function GET(request: Request) {
 
     const user = await currentUser();
     if (!user?.id) {
+      // E2E test fallback: when Clerk is disabled, return 401 early
+      if (isClerkDisabled()) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Authentication disabled in E2E mode',
+            mockMode: true,
+          },
+          { status: 401 }
+        );
+      }
+
       return NextResponse.json(
         { success: false, error: 'Authentication required' },
         { status: 401 }
@@ -227,6 +240,18 @@ export async function POST(request: Request) {
   try {
     const user = await currentUser();
     if (!user?.id) {
+      // E2E test fallback: when Clerk is disabled, return 401 early
+      if (isClerkDisabled()) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Authentication disabled in E2E mode',
+            mockMode: true,
+          },
+          { status: 401 }
+        );
+      }
+
       return NextResponse.json(
         { success: false, error: 'Authentication required' },
         { status: 401 }

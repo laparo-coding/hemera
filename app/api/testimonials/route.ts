@@ -23,6 +23,7 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
+import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 import {
   createRequestContext,
   getOrCreateRequestId,
@@ -102,6 +103,16 @@ export async function POST(request: NextRequest) {
     // Get user profile from Clerk
     const user = await currentUser();
     if (!user) {
+      // E2E test fallback: when Clerk is disabled, return 401 early
+      if (isClerkDisabled()) {
+        return createErrorResponse(
+          'Authentifizierung im E2E-Modus deaktiviert',
+          ErrorCodes.UNAUTHORIZED,
+          requestId,
+          401
+        );
+      }
+
       return createErrorResponse(
         'Benutzer nicht gefunden',
         ErrorCodes.UNAUTHORIZED,

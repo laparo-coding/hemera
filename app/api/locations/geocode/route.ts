@@ -15,6 +15,7 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
+import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 import {
   createRequestContext,
   getOrCreateRequestId,
@@ -40,9 +41,20 @@ export async function POST(request: NextRequest) {
     const user = await currentUser();
 
     if (!user?.id) {
+      // E2E test fallback: when Clerk is disabled, return 401 early
+      if (isClerkDisabled()) {
+        logger.info('E2E-Testmodus: Clerk deaktiviert, Geocoding-Anfrage abgelehnt');
+        return createErrorResponse(
+          'Authentifizierung im E2E-Modus deaktiviert',
+          ErrorCodes.UNAUTHORIZED,
+          requestId,
+          401
+        );
+      }
+
       logger.warn('Unauthorized attempt to geocode');
       return createErrorResponse(
-        'Authentication required',
+        'Authentifizierung erforderlich',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -54,7 +66,7 @@ export async function POST(request: NextRequest) {
     if (!adminCheck) {
       logger.warn('Non-admin user attempted to geocode', { userId: user.id });
       return createErrorResponse(
-        'Admin permission required',
+        'Admin-Berechtigung erforderlich',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -70,7 +82,7 @@ export async function POST(request: NextRequest) {
         errors: validation.error.issues,
       });
       return createErrorResponse(
-        'Invalid input data',
+        'Ungültige Eingabedaten',
         ErrorCodes.INVALID_INPUT,
         requestId,
         400
@@ -93,7 +105,7 @@ export async function POST(request: NextRequest) {
       error instanceof Error ? error : new Error(String(error))
     );
     return createErrorResponse(
-      'Error during geocoding',
+      'Fehler bei der Geocodierung',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

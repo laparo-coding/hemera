@@ -15,6 +15,7 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
+import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 import {
   createRequestContext,
   getOrCreateRequestId,
@@ -66,6 +67,19 @@ export async function POST(request: NextRequest) {
     const user = await currentUser();
 
     if (!user?.id) {
+      // E2E test fallback: when Clerk is disabled, return 401 early
+      if (isClerkDisabled()) {
+        logger.info(
+          'E2E test mode: Clerk disabled, rejecting location creation'
+        );
+        return createErrorResponse(
+          'Authentifizierung ist im E2E-Modus deaktiviert',
+          ErrorCodes.UNAUTHORIZED,
+          requestId,
+          401
+        );
+      }
+
       logger.warn('Unauthorized attempt to create location');
       return createErrorResponse(
         'Authentication required',

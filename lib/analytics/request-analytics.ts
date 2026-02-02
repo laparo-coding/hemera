@@ -338,7 +338,7 @@ export const analytics = RequestAnalytics.getInstance();
 const isTestEnv =
   process.env.NODE_ENV === 'test' ||
   typeof process.env.JEST_WORKER_ID !== 'undefined' ||
-  process.env.E2E_TEST === 'true';
+  process.env.E2E_TEST === '1';
 
 let cleanupTimer: ReturnType<typeof setInterval> | undefined;
 

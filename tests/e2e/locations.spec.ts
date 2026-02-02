@@ -17,7 +17,7 @@ import { expect, test } from '@playwright/test';
 import { AuthHelper } from './auth-helper';
 
 // Skip all location tests in CI - requires Clerk authentication
-const skipInCI = !!process.env.CI || process.env.E2E_TEST === 'true';
+const skipInCI = !!process.env.CI || process.env.E2E_TEST === '1';
 
 // Test location data
 const TEST_LOCATION = {

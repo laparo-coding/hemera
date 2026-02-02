@@ -18,7 +18,7 @@ export function RollbarProviderWrapper({
 }: RollbarProviderWrapperProps) {
   if (
     process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
-    process.env.E2E_TEST === 'true'
+    process.env.E2E_TEST === '1'
   ) {
     return <>{children}</>; // Disable rollbar during E2E
   }

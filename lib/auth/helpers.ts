@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation';
 function isMockAuthEnvironment(): boolean {
   return (
     process.env.NEXT_PUBLIC_DISABLE_CLERK === '1' ||
-    process.env.E2E_TEST === 'true' ||
+    process.env.E2E_TEST === '1' ||
     process.env.NODE_ENV === 'test'
   );
 }
