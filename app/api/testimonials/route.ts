@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       // E2E test fallback: when Clerk is disabled, return 401 early
       if (isClerkDisabled()) {
         return createErrorResponse(
-          'Authentication disabled in E2E mode',
+          'Authentifizierung im E2E-Modus deaktiviert',
           ErrorCodes.UNAUTHORIZED,
           requestId,
           401

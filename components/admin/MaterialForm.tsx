@@ -125,6 +125,7 @@ export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
           type='submit'
           variant='contained'
           disabled={isSubmitting || !title || !htmlContent}
+          aria-busy={isSubmitting}
           sx={{ alignSelf: 'flex-start' }}
         >
           {isSubmitting ? (
