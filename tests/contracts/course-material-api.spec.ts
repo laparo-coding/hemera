@@ -53,6 +53,9 @@ import {
 import { GET as GET_CONTENT } from '@/app/api/admin/course-material/[id]/content/route';
 import { POST as POST_IMAGE } from '@/app/api/admin/course-material/images/route';
 
+// Shared helper for creating params promise (Next.js 15 dynamic route params)
+const createParams = (id: string) => Promise.resolve({ id });
+
 describe('GET /api/admin/course-material', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -61,7 +64,6 @@ describe('GET /api/admin/course-material', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material');
     const response = await GET();
     const json = await response.json();
 
@@ -204,8 +206,6 @@ describe('GET /api/admin/course-material/[id]', () => {
     jest.clearAllMocks();
   });
 
-  const createParams = (id: string) => Promise.resolve({ id });
-
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
@@ -255,8 +255,6 @@ describe('PUT /api/admin/course-material/[id]', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
-  const createParams = (id: string) => Promise.resolve({ id });
 
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
@@ -360,8 +358,6 @@ describe('DELETE /api/admin/course-material/[id]', () => {
     jest.clearAllMocks();
   });
 
-  const createParams = (id: string) => Promise.resolve({ id });
-
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
@@ -420,8 +416,6 @@ describe('GET /api/admin/course-material/[id]/content', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
-  const createParams = (id: string) => Promise.resolve({ id });
 
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });

@@ -208,7 +208,7 @@ jobs:
           # Prisma 7 uses prisma.config.ts for datasource configuration
           PRISMA_CONFIG_PATH: './prisma.config.ts'
         run: |
-          echo "DATABASE_URL is set: $([[ -n \"$DATABASE_URL\" ]] && echo 'yes' || echo 'no')"
+          echo "DATABASE_URL is set: $([[ -n $DATABASE_URL ]] && echo 'yes' || echo 'no')"
           echo "Generating Prisma Client..."
           npx prisma generate
           echo "Deploying database migrations..."
