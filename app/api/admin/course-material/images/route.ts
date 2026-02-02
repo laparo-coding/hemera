@@ -18,7 +18,8 @@ const ALLOWED_IMAGE_TYPES = [
   'image/webp',
   'image/gif',
 ];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+// 4.4 MB limit to stay under Vercel Functions 4.5 MB request body limit
+const MAX_FILE_SIZE = 4.4 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
   try {
