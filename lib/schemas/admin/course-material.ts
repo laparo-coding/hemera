@@ -76,10 +76,10 @@ export function generateSlug(title: string): string {
 
   return (
     title
-      // Convert German umlauts
-      .replace(/ä/g, 'ae')
-      .replace(/ö/g, 'oe')
-      .replace(/ü/g, 'ue')
+      // Convert German umlauts (lowercase and uppercase)
+      .replace(/[äÄ]/g, 'ae')
+      .replace(/[öÖ]/g, 'oe')
+      .replace(/[üÜ]/g, 'ue')
       .replace(/ß/g, 'ss')
       // Convert to lowercase
       .toLowerCase()

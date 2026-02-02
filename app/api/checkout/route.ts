@@ -69,7 +69,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             success: true,
-            message: 'E2E-Testmodus: Clerk deaktiviert, Mock-Benutzer wird verwendet',
+            message:
+              'E2E-Testmodus: Clerk deaktiviert, Mock-Benutzer wird verwendet',
             sessionId: `mock-session-${Date.now()}`,
             mockMode: true,
           },
