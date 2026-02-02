@@ -15,7 +15,7 @@ export function isClerkDisabled(): boolean {
  * Check if running in E2E test mode
  */
 export function isE2ETestMode(): boolean {
-  return process.env.E2E_TEST === '1';
+  return process.env.E2E_TEST === 'true';
 }
 
 /**

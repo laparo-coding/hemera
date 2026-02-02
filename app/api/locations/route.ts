@@ -15,11 +15,11 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
-import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
+import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -69,11 +69,9 @@ export async function POST(request: NextRequest) {
     if (!user?.id) {
       // E2E test fallback: when Clerk is disabled, return 401 early
       if (isClerkDisabled()) {
-        logger.info(
-          'E2E test mode: Clerk disabled, rejecting location creation'
-        );
+        logger.info('E2E test mode: Clerk disabled, rejecting location creation');
         return createErrorResponse(
-          'Authentifizierung ist im E2E-Modus deaktiviert',
+          'Authentication disabled in E2E mode',
           ErrorCodes.UNAUTHORIZED,
           requestId,
           401

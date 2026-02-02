@@ -15,11 +15,11 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
-import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
+import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
     if (!user?.id) {
       // E2E test fallback: when Clerk is disabled, return 401 early
       if (isClerkDisabled()) {
-        logger.info('E2E-Testmodus: Clerk deaktiviert, Geocoding-Anfrage abgelehnt');
+        logger.info('E2E test mode: Clerk disabled, rejecting geocode request');
         return createErrorResponse(
-          'Authentifizierung im E2E-Modus deaktiviert',
+          'Authentication disabled in E2E mode',
           ErrorCodes.UNAUTHORIZED,
           requestId,
           401
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
       logger.warn('Unauthorized attempt to geocode');
       return createErrorResponse(
-        'Authentifizierung erforderlich',
+        'Authentication required',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     if (!adminCheck) {
       logger.warn('Non-admin user attempted to geocode', { userId: user.id });
       return createErrorResponse(
-        'Admin-Berechtigung erforderlich',
+        'Admin permission required',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         errors: validation.error.issues,
       });
       return createErrorResponse(
-        'Ungültige Eingabedaten',
+        'Invalid input data',
         ErrorCodes.INVALID_INPUT,
         requestId,
         400
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       error instanceof Error ? error : new Error(String(error))
     );
     return createErrorResponse(
-      'Fehler bei der Geocodierung',
+      'Error during geocoding',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

@@ -53,9 +53,6 @@ import {
 import { GET as GET_CONTENT } from '@/app/api/admin/course-material/[id]/content/route';
 import { POST as POST_IMAGE } from '@/app/api/admin/course-material/images/route';
 
-// Shared helper for creating params promise (Next.js 15 dynamic route params)
-const createParams = (id: string) => Promise.resolve({ id });
-
 describe('GET /api/admin/course-material', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -64,6 +61,7 @@ describe('GET /api/admin/course-material', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
+    const request = new NextRequest('http://localhost/api/admin/course-material');
     const response = await GET();
     const json = await response.json();
 
@@ -206,6 +204,8 @@ describe('GET /api/admin/course-material/[id]', () => {
     jest.clearAllMocks();
   });
 
+  const createParams = (id: string) => Promise.resolve({ id });
+
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
@@ -255,6 +255,8 @@ describe('PUT /api/admin/course-material/[id]', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
+  const createParams = (id: string) => Promise.resolve({ id });
 
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
@@ -358,6 +360,8 @@ describe('DELETE /api/admin/course-material/[id]', () => {
     jest.clearAllMocks();
   });
 
+  const createParams = (id: string) => Promise.resolve({ id });
+
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
@@ -417,6 +421,8 @@ describe('GET /api/admin/course-material/[id]/content', () => {
     jest.clearAllMocks();
   });
 
+  const createParams = (id: string) => Promise.resolve({ id });
+
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
@@ -458,24 +464,22 @@ describe('GET /api/admin/course-material/[id]/content', () => {
 
     // Mock global fetch for blob content
     const originalFetch = global.fetch;
-    try {
-      global.fetch = jest.fn().mockResolvedValue({
-        ok: true,
-        text: () => Promise.resolve('<p>Test HTML content</p>'),
-      });
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve('<p>Test HTML content</p>'),
+    });
 
-      const request = new NextRequest(
-        'http://localhost/api/admin/course-material/mat_1/content'
-      );
-      const response = await GET_CONTENT(request, { params: createParams('mat_1') });
-      const json = await response.json();
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_1/content'
+    );
+    const response = await GET_CONTENT(request, { params: createParams('mat_1') });
+    const json = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(json.htmlContent).toBe('<p>Test HTML content</p>');
-      expect(json.id).toBe('mat_1');
-    } finally {
-      global.fetch = originalFetch;
-    }
+    expect(response.status).toBe(200);
+    expect(json.htmlContent).toBe('<p>Test HTML content</p>');
+    expect(json.id).toBe('mat_1');
+
+    global.fetch = originalFetch;
   });
 });
 
