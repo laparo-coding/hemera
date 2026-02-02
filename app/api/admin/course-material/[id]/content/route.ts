@@ -1,5 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
+import { isAdmin } from '@/lib/auth/helpers';
 import { getMaterialById } from '@/lib/api/course-material';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
@@ -27,7 +28,13 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // TODO: Add admin role check when checkAdminRole() is implemented
+    const adminCheck = await isAdmin();
+    if (!adminCheck) {
+      return NextResponse.json(
+        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
+        { status: 403 }
+      );
+    }
 
     const material = await getMaterialById(id);
 

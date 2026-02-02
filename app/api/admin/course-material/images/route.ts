@@ -9,6 +9,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
+import { isAdmin } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 const ALLOWED_IMAGE_TYPES = [
@@ -33,7 +34,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Add admin role check when checkAdminRole() is implemented
+    const adminCheck = await isAdmin();
+    if (!adminCheck) {
+      return NextResponse.json(
+        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
+        { status: 403 }
+      );
+    }
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;

@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { del, put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
+import { isAdmin } from '@/lib/auth/helpers';
 import {
   deleteMaterial,
   getMaterialById,
@@ -33,7 +34,13 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // TODO: Add admin role check when checkAdminRole() is implemented
+    const adminCheckGet = await isAdmin();
+    if (!adminCheckGet) {
+      return NextResponse.json(
+        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
+        { status: 403 }
+      );
+    }
 
     const material = await getMaterialById(id);
 
@@ -83,7 +90,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // TODO: Add admin role check when checkAdminRole() is implemented
+    const adminCheck = await isAdmin();
+    if (!adminCheck) {
+      return NextResponse.json(
+        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
+        { status: 403 }
+      );
+    }
 
     const existingMaterial = await getMaterialById(id);
 
@@ -229,7 +242,13 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // TODO: Add admin role check when checkAdminRole() is implemented
+    const adminCheckDelete = await isAdmin();
+    if (!adminCheckDelete) {
+      return NextResponse.json(
+        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
+        { status: 403 }
+      );
+    }
 
     const material = await getMaterialById(id);
 

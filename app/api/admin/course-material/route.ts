@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
+import { isAdmin } from '@/lib/auth/helpers';
 import {
   createMaterial,
   getAllMaterials,
@@ -27,14 +28,13 @@ export async function GET() {
       );
     }
 
-    // TODO: Add admin role check
-    // const isAdmin = await checkAdminRole(userId);
-    // if (!isAdmin) {
-    //   return NextResponse.json(
-    //     { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-    //     { status: 403 }
-    //   );
-    // }
+    const adminCheck = await isAdmin();
+    if (!adminCheck) {
+      return NextResponse.json(
+        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
+        { status: 403 }
+      );
+    }
 
     const materials = await getAllMaterials();
 
@@ -79,14 +79,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Add admin role check when checkAdminRole() is implemented
-    // const isAdmin = await checkAdminRole(userId);
-    // if (!isAdmin) {
-    //   return NextResponse.json(
-    //     { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-    //     { status: 403 }
-    //   );
-    // }
+    const adminCheck = await isAdmin();
+    if (!adminCheck) {
+      return NextResponse.json(
+        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
+        { status: 403 }
+      );
+    }
 
     let body;
     try {
