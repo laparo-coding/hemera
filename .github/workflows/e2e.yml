@@ -177,14 +177,14 @@ jobs:
           RAW_BASE="${{ steps.base.outputs.base }}"
           RAW_BASE=${RAW_BASE%/}
           CHECK_URL_API="$RAW_BASE/api/health"
-          CHECK_URL_ROOT="$RAW_BASE/"
           echo "Checking reachability: $CHECK_URL_API"
-          STATUS_API=$(curl -s -o /dev/null -w "%{http_code}" "$CHECK_URL_API") || STATUS_API=000
-          STATUS_ROOT=$(curl -s -o /dev/null -w "%{http_code}" "$CHECK_URL_ROOT") || STATUS_ROOT=000
+          STATUS_API=$(curl -s -o /dev/null -w "%{http_code}" "$CHECK_URL_API" --connect-timeout 5) || STATUS_API=000
+          echo "API status: $STATUS_API"
           USE_LOCAL=0
           FINAL_BASE="$RAW_BASE"
-          if [ "$STATUS_API" -lt 200 ] || [ "$STATUS_API" -ge 400 ]; then
-            echo "URL unreachable. Falling back to local server."
+          # Status 000 means connection failed, treat as unreachable
+          if [ "$STATUS_API" = "000" ] || [ "$STATUS_API" -lt 200 ] || [ "$STATUS_API" -ge 400 ]; then
+            echo "URL unreachable (status=$STATUS_API). Using local server."
             USE_LOCAL=1
             FINAL_BASE="http://localhost:3000"
           fi
