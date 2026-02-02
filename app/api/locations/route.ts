@@ -19,6 +19,7 @@ import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
+import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -66,6 +67,17 @@ export async function POST(request: NextRequest) {
     const user = await currentUser();
 
     if (!user?.id) {
+      // E2E test fallback: when Clerk is disabled, return 401 early
+      if (isClerkDisabled()) {
+        logger.info('E2E test mode: Clerk disabled, rejecting location creation');
+        return createErrorResponse(
+          'Authentication disabled in E2E mode',
+          ErrorCodes.UNAUTHORIZED,
+          requestId,
+          401
+        );
+      }
+
       logger.warn('Unauthorized attempt to create location');
       return createErrorResponse(
         'Authentication required',

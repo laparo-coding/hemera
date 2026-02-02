@@ -5,6 +5,10 @@ import Stripe from 'stripe';
 import { syncClerkUserToDatabase } from '../../../../lib/api/users';
 import { prisma } from '../../../../lib/db/prisma';
 import { STRIPE_API_VERSION } from '../../../../lib/stripe/config';
+import {
+  isClerkDisabled,
+  getE2ETestUserId,
+} from '../../../../lib/utils/clerk-disabled-check';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -56,6 +60,19 @@ export async function GET(request: NextRequest) {
 
     const user = await currentUser();
     if (!user?.id) {
+      // E2E test fallback: when Clerk is disabled, return test-friendly response
+      if (isClerkDisabled()) {
+        return NextResponse.json(
+          {
+            success: true,
+            message: 'E2E test mode: Clerk disabled, skipping verification',
+            booking: null,
+            mockMode: true,
+          },
+          { status: 200 }
+        );
+      }
+
       return NextResponse.json(
         { success: false, error: 'Authentication required' },
         { status: 401 }
