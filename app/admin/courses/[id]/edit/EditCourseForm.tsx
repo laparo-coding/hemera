@@ -13,8 +13,10 @@ import { useState } from 'react';
 import type { z } from 'zod';
 import CourseForm from '@/components/admin/CourseForm';
 import { updateCourseAction } from '@/lib/actions/admin/courses';
-import type { CurriculumModule } from '@/lib/schemas/admin/course';
-import { courseCreateSchema } from '@/lib/schemas/admin/course';
+import type {
+  CurriculumModule,
+  courseCreateSchema,
+} from '@/lib/schemas/admin/course';
 
 type FormData = z.input<typeof courseCreateSchema>;
 

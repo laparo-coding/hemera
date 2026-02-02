@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
 
 /**
  * Invoice Download E2E Tests
@@ -11,6 +12,9 @@ import { test, expect } from '@playwright/test';
  * - User must have at least one paid booking with Stripe invoice
  */
 test.describe('Invoice Download', () => {
+  // Skip entire suite if auth state file doesn't exist (no E2E credentials in CI)
+  test.skip(!fs.existsSync('.auth/user.json'), 'Skipping auth-required tests - no auth state available');
+  
   test.use({ storageState: '.auth/user.json' });
 
   test.beforeEach(async ({ page, request }) => {
