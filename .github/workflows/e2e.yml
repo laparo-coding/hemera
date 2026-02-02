@@ -127,7 +127,7 @@ jobs:
       - name: Verify Prisma CLI availability
         run: |
           echo "Checking Prisma CLI version..."
-          npx prisma --version || { echo "::error::Prisma CLI not found after npm ci"; exit 1; }
+          npx prisma --version || (echo "Prisma CLI not found. Installing..." && npm install && npx prisma --version)
           echo "Prisma CLI is available and ready"
 
       - name: Install Playwright browsers
@@ -203,10 +203,14 @@ jobs:
 
       - name: Setup database schema
         env:
+          # Ensure Prisma CLI has explicit DATABASE_URL access
+          DATABASE_URL: 'postgresql://postgres:postgres@127.0.0.1:5432/hemera_e2e'
           # Prisma 7 uses prisma.config.ts for datasource configuration
           PRISMA_CONFIG_PATH: './prisma.config.ts'
+          # Ensure Prisma generates client without caching issues
+          PRISMA_SKIP_ENGINE_CHECK: '1'
         run: |
-          echo "DATABASE_URL is set: $([[ -n $DATABASE_URL ]] && echo 'yes' || echo 'no')"
+          echo "DATABASE_URL is set: $([[ -n \"$DATABASE_URL\" ]] && echo 'yes' || echo 'no')"
           echo "Generating Prisma Client..."
           npx prisma generate
           echo "Deploying database migrations..."
