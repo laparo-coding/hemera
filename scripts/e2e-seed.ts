@@ -1,34 +1,36 @@
 /**
  * E2E Test Seed Script
  *
- * This script is used for E2E testing with SQLite.
- * For Prisma 7, we need the better-sqlite3 adapter.
+ * This script seeds the E2E test database (PostgreSQL) with minimal test data.
  *
  * SAFETY: This script includes production database protection to prevent
  * accidental data loss if misconfigured to point at production.
  */
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { PrismaClient } from '@prisma/client';
 import {
   getDatabaseEnvironmentInfo,
   guardDestructiveOperation,
 } from '../lib/db/production-guard.js';
 
-// Validate we're using SQLite (E2E tests should ALWAYS use SQLite)
-const databaseUrl = process.env.DATABASE_URL || 'file:./test.db';
-if (!databaseUrl.startsWith('file:')) {
-  console.error('🚨 SAFETY ERROR: E2E seed must use SQLite (file: URL)');
-  console.error(`   Current DATABASE_URL: ${databaseUrl.substring(0, 30)}...`);
-  console.error('   Set DATABASE_URL=file:./test.db for E2E tests');
+// Validate we're using the E2E database (PostgreSQL in CI, or local test DB)
+const databaseUrl = process.env.DATABASE_URL || '';
+if (!databaseUrl) {
+  console.error('🚨 ERROR: DATABASE_URL is not set');
   process.exit(1);
 }
 
-// Prisma 7 requires an adapter for all databases
-const adapter = new PrismaBetterSqlite3({
-  url: databaseUrl,
-});
+// Block production URLs
+if (
+  databaseUrl.includes('vercel-storage.com') ||
+  databaseUrl.includes('pooler.supabase') ||
+  databaseUrl.includes('neon.tech')
+) {
+  console.error('🚨 SAFETY ERROR: E2E seed must NOT run against production!');
+  console.error(`   Current DATABASE_URL looks like production.`);
+  process.exit(1);
+}
 
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting E2E seed...');
