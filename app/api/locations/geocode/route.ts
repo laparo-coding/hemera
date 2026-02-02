@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         errors: validation.error.issues,
       });
       return createErrorResponse(
-        'Invalid input data',
+        'Ungültige Eingabedaten',
         ErrorCodes.INVALID_INPUT,
         requestId,
         400
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       error instanceof Error ? error : new Error(String(error))
     );
     return createErrorResponse(
-      'Error during geocoding',
+      'Fehler bei der Geocodierung',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
