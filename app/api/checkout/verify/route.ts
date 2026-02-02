@@ -5,10 +5,7 @@ import Stripe from 'stripe';
 import { syncClerkUserToDatabase } from '../../../../lib/api/users';
 import { prisma } from '../../../../lib/db/prisma';
 import { STRIPE_API_VERSION } from '../../../../lib/stripe/config';
-import {
-  isClerkDisabled,
-  getE2ETestUserId,
-} from '../../../../lib/utils/clerk-disabled-check';
+import { isClerkDisabled } from '../../../../lib/utils/clerk-disabled-check';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';

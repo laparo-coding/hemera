@@ -1,7 +1,7 @@
 /**
  * DEPRECATED: This file is kept for backward compatibility only.
  * Please import directly from './rollbar-official.ts' instead.
- * 
+ *
  * All Rollbar exports have been consolidated into rollbar-official.ts
  * to maintain a single source of truth and prevent import drift.
  */
@@ -11,15 +11,15 @@
 // but encourages migration to the correct import path
 export {
   clientConfig,
-  serverInstance,
-  rollbar,
-  rollbarConfig,
   clientRollbarConfig,
+  createErrorContext,
+  type ErrorContext,
   ErrorSeverity,
   type ErrorSeverityType,
-  type ErrorContext,
-  createErrorContext,
-  reportError,
-  recordUserAction,
   flushRollbar,
+  recordUserAction,
+  reportError,
+  rollbar,
+  rollbarConfig,
+  serverInstance,
 } from './rollbar-official';
