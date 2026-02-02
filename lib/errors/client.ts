@@ -13,7 +13,7 @@ import { clientConfig } from '../monitoring/rollbar-official';
 // Check if we're in test/E2E mode
 const isDisabled =
   process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
-  process.env.E2E_TEST === 'true' ||
+  process.env.E2E_TEST === '1' ||
   process.env.NODE_ENV === 'test';
 
 // Client-side Rollbar instance (lazy initialization)

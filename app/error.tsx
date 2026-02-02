@@ -11,7 +11,7 @@ interface ErrorPageProps {
 
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
   const isRollbarDisabled =
-    process.env.E2E_TEST === 'true' ||
+    process.env.E2E_TEST === '1' ||
     process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
     process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0';
 

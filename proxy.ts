@@ -4,8 +4,7 @@ import { NextResponse } from 'next/server';
 
 // In E2E test mode, bypass Clerk middleware entirely
 const isE2EMode =
-  process.env.E2E_TEST === 'true' ||
-  process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
+  process.env.E2E_TEST === '1' || process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
 
 // Prepare a Clerk middleware instance for non-E2E mode
 const clerkMw = clerkMiddleware();

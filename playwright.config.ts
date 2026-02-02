@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 const hasExternalBase = !!process.env.PLAYWRIGHT_BASE_URL;
 const webServerCommand = process.env.PW_WEB_SERVER_COMMAND || 'npm run dev';
 const e2eEnvPrefix =
-  'E2E_TEST=true NEXT_PUBLIC_DISABLE_CLERK=1 NEXT_PUBLIC_DISABLE_ROLLBAR=1';
+  'E2E_TEST=1 NEXT_PUBLIC_DISABLE_CLERK=1 NEXT_PUBLIC_DISABLE_ROLLBAR=1';
 
 export default defineConfig({
   testDir: './tests/e2e',

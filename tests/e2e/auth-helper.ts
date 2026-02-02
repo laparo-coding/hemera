@@ -55,7 +55,7 @@ export class AuthHelper {
   private shouldMockAuth(): boolean {
     return (
       !!process.env.CI ||
-      process.env.E2E_TEST === 'true' ||
+      process.env.E2E_TEST === '1' ||
       process.env.NEXT_PUBLIC_DISABLE_CLERK === '1'
     );
   }

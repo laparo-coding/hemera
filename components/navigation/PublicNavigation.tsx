@@ -38,7 +38,7 @@ export function PublicNavigation({
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
   );
   const isE2E =
-    process.env.E2E_TEST === 'true' ||
+    process.env.E2E_TEST === '1' ||
     process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
   const useClerk = isClerkConfigured && !isE2E;
 

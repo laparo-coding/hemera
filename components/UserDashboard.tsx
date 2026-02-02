@@ -112,7 +112,7 @@ function categorizeBookings(bookings: Booking[]): CategorizedDashboardBookings {
 const UserDashboard: React.FC = () => {
   const isE2EBuild =
     process.env.NEXT_PUBLIC_DISABLE_CLERK === '1' ||
-    process.env.E2E_TEST === 'true';
+    process.env.E2E_TEST === '1';
 
   return isE2EBuild ? <UserDashboardE2E /> : <UserDashboardClerk />;
 };

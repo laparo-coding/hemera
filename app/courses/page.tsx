@@ -91,7 +91,7 @@ export default async function CoursesPage() {
       });
     }
   } catch (err) {
-    if (process.env.E2E_TEST === 'true') {
+    if (process.env.E2E_TEST === '1') {
       // In E2E mode, silently fail - don't log expected failures
     } else {
       serverInstance.error(err instanceof Error ? err : new Error(String(err)));
