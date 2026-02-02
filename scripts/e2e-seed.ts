@@ -6,7 +6,9 @@
  * SAFETY: This script includes production database protection to prevent
  * accidental data loss if misconfigured to point at production.
  */
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
 import {
   getDatabaseEnvironmentInfo,
   guardDestructiveOperation,
@@ -30,7 +32,10 @@ if (
   process.exit(1);
 }
 
-const prisma = new PrismaClient();
+// Create PG pool and Prisma client with adapter (required for Prisma 7)
+const pool = new Pool({ connectionString: databaseUrl });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Starting E2E seed...');
@@ -108,4 +113,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });
