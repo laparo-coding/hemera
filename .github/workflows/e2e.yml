@@ -203,8 +203,6 @@ jobs:
 
       - name: Setup database schema
         env:
-          # Ensure Prisma CLI has explicit DATABASE_URL access
-          DATABASE_URL: 'postgresql://postgres:postgres@127.0.0.1:5432/hemera_e2e'
           # Prisma 7 uses prisma.config.ts for datasource configuration
           PRISMA_CONFIG_PATH: './prisma.config.ts'
         run: |
