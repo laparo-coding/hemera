@@ -27,6 +27,7 @@ import {
   createRequestContext,
   getOrCreateRequestId,
 } from '@/lib/utils/request-id';
+import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,6 +103,16 @@ export async function POST(request: NextRequest) {
     // Get user profile from Clerk
     const user = await currentUser();
     if (!user) {
+      // E2E test fallback: when Clerk is disabled, return 401 early
+      if (isClerkDisabled()) {
+        return createErrorResponse(
+          'Authentication disabled in E2E mode',
+          ErrorCodes.UNAUTHORIZED,
+          requestId,
+          401
+        );
+      }
+
       return createErrorResponse(
         'Benutzer nicht gefunden',
         ErrorCodes.UNAUTHORIZED,
