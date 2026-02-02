@@ -464,22 +464,24 @@ describe('GET /api/admin/course-material/[id]/content', () => {
 
     // Mock global fetch for blob content
     const originalFetch = global.fetch;
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      text: () => Promise.resolve('<p>Test HTML content</p>'),
-    });
+    try {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve('<p>Test HTML content</p>'),
+      });
 
-    const request = new NextRequest(
-      'http://localhost/api/admin/course-material/mat_1/content'
-    );
-    const response = await GET_CONTENT(request, { params: createParams('mat_1') });
-    const json = await response.json();
+      const request = new NextRequest(
+        'http://localhost/api/admin/course-material/mat_1/content'
+      );
+      const response = await GET_CONTENT(request, { params: createParams('mat_1') });
+      const json = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(json.htmlContent).toBe('<p>Test HTML content</p>');
-    expect(json.id).toBe('mat_1');
-
-    global.fetch = originalFetch;
+      expect(response.status).toBe(200);
+      expect(json.htmlContent).toBe('<p>Test HTML content</p>');
+      expect(json.id).toBe('mat_1');
+    } finally {
+      global.fetch = originalFetch;
+    }
   });
 });
 
