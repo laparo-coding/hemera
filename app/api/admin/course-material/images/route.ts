@@ -49,7 +49,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const formData = await request.formData();
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+    } catch {
+      return NextResponse.json(
+        { error: 'validation_error', message: 'Ungültiges Formular-Format' },
+        { status: 400 }
+      );
+    }
     const file = formData.get('file') as File | null;
 
     if (!file) {
@@ -67,7 +75,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'validation_error',
-          message: 'Datei darf maximal 5MB groß sein',
+          message: 'Datei darf maximal 4,4 MB groß sein',
         },
         { status: 400 }
       );
@@ -82,7 +90,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'validation_error',
-          message: validation.error || 'Ungültiger Dateityp',
+          message:
+            'Ungültige Bilddatei. Bitte überprüfe das Format und versuche es erneut.',
         },
         { status: 400 }
       );
@@ -113,7 +122,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'blob_error',
-          message: 'Image-Upload zu Blob fehlgeschlagen',
+          message: 'Bild-Upload zu Blob fehlgeschlagen',
         },
         { status: 502 }
       );

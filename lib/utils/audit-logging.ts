@@ -50,8 +50,9 @@ export function logAuditEvent(
   };
 
   // Log to Rollbar with "audit" tag for easy filtering
+  // Note: userId remains only in structured metadata, not in human-readable message
   if (status === 'failure') {
-    serverInstance.warning(`Audit: ${action} failed for user ${userId}`, {
+    serverInstance.warning(`Audit: ${action} failed`, {
       ...auditLog,
     });
   } else {

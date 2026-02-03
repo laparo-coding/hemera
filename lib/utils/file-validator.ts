@@ -12,9 +12,24 @@ export async function detectMimeType(
 ): Promise<string | null> {
   const view = new Uint8Array(buffer);
 
-  // JPEG: FF D8 FF
+  // Check minimum buffer length before accessing bytes
+  if (view.length < 3) {
+    return null;
+  }
+
+  // JPEG: FF D8 FF (needs 3 bytes)
   if (view[0] === 0xff && view[1] === 0xd8 && view[2] === 0xff) {
     return 'image/jpeg';
+  }
+
+  // GIF: 47 49 46 (needs 3 bytes)
+  if (view[0] === 0x47 && view[1] === 0x49 && view[2] === 0x46) {
+    return 'image/gif';
+  }
+
+  // PNG needs 4 bytes
+  if (view.length < 4) {
+    return null;
   }
 
   // PNG: 89 50 4E 47
@@ -27,9 +42,9 @@ export async function detectMimeType(
     return 'image/png';
   }
 
-  // GIF: 47 49 46 (GIF8 or GIF9)
-  if (view[0] === 0x47 && view[1] === 0x49 && view[2] === 0x46) {
-    return 'image/gif';
+  // WebP needs 12 bytes
+  if (view.length < 12) {
+    return null;
   }
 
   // WebP: RIFF...WEBP

@@ -20,7 +20,7 @@ type RouteParams = {
 };
 
 /**
- * GET /api/admin/seminarmaterial/[id]
+ * GET /api/admin/course-material/[id]
  * Get a single seminar material
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
@@ -76,13 +76,15 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * PUT /api/admin/seminarmaterial/[id]
+ * PUT /api/admin/course-material/[id]
  * Update a seminar material
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
+  // Extract id before try block so it's available in catch for logging
+  const { id } = await params;
+
   try {
     const { userId } = await auth();
-    const { id } = await params;
 
     if (!userId) {
       return NextResponse.json(
@@ -281,13 +283,15 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * DELETE /api/admin/seminarmaterial/[id]
+ * DELETE /api/admin/course-material/[id]
  * Delete a seminar material
  */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+  // Extract id before try block so it's available in catch for logging
+  const { id } = await params;
+
   try {
     const { userId } = await auth();
-    const { id } = await params;
 
     if (!userId) {
       return NextResponse.json(
