@@ -59,8 +59,6 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       id: material.id,
       identifier: material.identifier,
       title: material.title,
-      blobUrl: material.blobUrl,
-      blobPathname: material.blobPathname,
       createdAt: material.createdAt.toISOString(),
       updatedAt: material.updatedAt.toISOString(),
     });
@@ -182,7 +180,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json(
           {
             error: 'validation_error',
-            message: `HTML-Validierung fehlgeschlagen: ${htmlValidation.errors[0]}`,
+            message:
+              'HTML-Validierung fehlgeschlagen. Bitte entferne unsichere Inhalte und versuche es erneut.',
           },
           { status: 400 }
         );

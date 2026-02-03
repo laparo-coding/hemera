@@ -20,25 +20,34 @@ export default function NeuSeminarmaterialPage() {
     identifier?: string;
     htmlContent: string;
   }) => {
-    const response = await fetch('/api/admin/course-material', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch('/api/admin/course-material', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-    if (!response.ok) {
-      let errorMessage = 'Erstellen fehlgeschlagen';
-      try {
-        const error = await response.json();
-        errorMessage = error.message || errorMessage;
-      } catch {
-        // Non-JSON response, use default message
+      if (!response.ok) {
+        let errorMessage = 'Erstellen fehlgeschlagen';
+        try {
+          const error = await response.json();
+          errorMessage = error.message || errorMessage;
+        } catch {
+          // Non-JSON response, use default message
+        }
+        throw new Error(errorMessage);
       }
-      throw new Error(errorMessage);
-    }
 
-    const result = await response.json();
-    router.push(`/admin/course-material/${result.id}`);
+      const result = await response.json();
+      if (!result || typeof result.id !== 'string') {
+        throw new Error('Ungültige Serverantwort');
+      }
+      router.push(`/admin/course-material/${result.id}`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Erstellen fehlgeschlagen';
+      throw new Error(message);
+    }
   };
 
   return (

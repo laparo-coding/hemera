@@ -142,17 +142,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: blob.url }, { status: 200 });
   } catch (error) {
-    const userId = (await auth()).userId;
-    logAuditEvent(
-      'IMAGE_UPLOAD',
-      userId || 'unknown',
-      undefined,
-      'image',
-      'failure',
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }
-    );
+    let auditUserId = 'unknown';
+    try {
+      const { userId } = await auth();
+      if (userId) auditUserId = userId;
+    } catch {
+      // Auth failed, use 'unknown'
+    }
+    logAuditEvent('IMAGE_UPLOAD', auditUserId, undefined, 'image', 'failure', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     serverInstance.error('Failed to upload image', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });

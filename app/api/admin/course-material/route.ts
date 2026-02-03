@@ -217,10 +217,16 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    const userId2 = (await auth()).userId;
+    let auditUserId = 'unknown';
+    try {
+      const { userId } = await auth();
+      if (userId) auditUserId = userId;
+    } catch {
+      // Auth failed, use 'unknown'
+    }
     logAuditEvent(
       'COURSE_MATERIAL_CREATE',
-      userId2 || 'unknown',
+      auditUserId,
       undefined,
       'course-material',
       'failure',
