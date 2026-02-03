@@ -32,6 +32,13 @@ export interface MockClerkUser {
   };
 }
 
+/**
+ * Create a mock Clerk user for testing purposes
+ * Used when Clerk is disabled to allow API routes to function in E2E environments
+ *
+ * TODO: Integrate with E2E test helpers once the E2E course-material tests are added
+ * @see specs/023-slide-editor for planned E2E test coverage
+ */
 export function createMockClerkUser(userId: string): MockClerkUser {
   const mockEmail = `test-user-${userId}@hemera-e2e.test`;
   return {
@@ -48,6 +55,9 @@ export function createMockClerkUser(userId: string): MockClerkUser {
 /**
  * Generate a deterministic test user ID for E2E tests
  * Uses a fixed prefix to ensure the same user ID across test runs
+ *
+ * TODO: Integrate with E2E test helpers once the E2E course-material tests are added
+ * @see specs/023-slide-editor for planned E2E test coverage
  */
 export function getE2ETestUserId(): string {
   return 'test-user-e2e-001';
