@@ -149,7 +149,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'validation_error',
-          message: 'Der generierte Identifier ist ungültig. Bitte einen Identifier manuell angeben.',
+          message:
+            'Der generierte Identifier ist ungültig. Bitte einen Identifier manuell angeben.',
         },
         { status: 400 }
       );
