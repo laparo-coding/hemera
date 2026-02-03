@@ -59,9 +59,9 @@ export interface CurriculumSectionProps {
 }
 
 export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
-  modules = [],
+  modules,
 }) => {
-  // Ensure modules is always an array (guard against undefined/null)
+  // Ensure modules is always an array (handles undefined, null, and invalid types)
   const safeModules = Array.isArray(modules) ? modules : [];
 
   // First accordion expanded by default (hooks must be called unconditionally)
