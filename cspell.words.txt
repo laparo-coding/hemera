@@ -74,6 +74,7 @@ Gehaltsverhandlungen
 Gemini
 Generationenmanagement
 Generierungszeit
+Geocodierung
 Gesprächsanlayse
 Getenv
 GitHub
@@ -212,6 +213,7 @@ Unveröffentlichen
 VARCHAR
 Validierungsfehler
 Validierungsregeln
+Validierungsschemas
 Validierungstests
 Verbindungs
 Vercel
@@ -363,6 +365,7 @@ golangci
 gomcp
 googlecloud
 gopkg
+groesse
 grundkurs
 healthcheck
 hemera

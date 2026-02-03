@@ -269,7 +269,10 @@ describe('Course DB Layer - Curriculum Validation', () => {
                 message: expect.any(String),
               }),
             ]),
-            receivedDataSummary: expect.any(String),
+            // receivedDataSummary is now an object with type and keyCount
+            receivedDataSummary: expect.objectContaining({
+              type: expect.any(String),
+            }),
           }),
         }),
         ErrorSeverity.WARNING

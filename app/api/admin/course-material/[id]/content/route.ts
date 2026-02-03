@@ -1,3 +1,4 @@
+// biome-ignore assist/source/organizeImports: Clerk auth must be imported first
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/auth/helpers';
@@ -9,7 +10,7 @@ type RouteParams = {
 };
 
 /**
- * GET /api/admin/seminarmaterial/[id]/content
+ * GET /api/admin/course-material/[id]/content
  * Get the HTML content of a seminar material
  * Fetches the content from Vercel Blob
  */

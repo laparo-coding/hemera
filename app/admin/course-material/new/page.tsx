@@ -39,10 +39,14 @@ export default function NeuSeminarmaterialPage() {
       }
 
       const result = await response.json();
+      if (!result || typeof result.id !== 'string') {
+        throw new Error('Ungültige Serverantwort');
+      }
       router.push(`/admin/course-material/${result.id}`);
     } catch (error) {
-      // Error will be caught by MaterialForm error state
-      throw error;
+      const message =
+        error instanceof Error ? error.message : 'Erstellen fehlgeschlagen';
+      throw new Error(message);
     }
   };
 
@@ -71,7 +75,10 @@ export default function NeuSeminarmaterialPage() {
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <IconButton onClick={() => router.push('/admin/course-material')}>
+        <IconButton
+          onClick={() => router.push('/admin/course-material')}
+          aria-label='Zurück zur Seminarmaterial-Übersicht'
+        >
           <ArrowBackIcon />
         </IconButton>
         <Typography variant='h4' component='h1'>

@@ -1,14 +1,18 @@
+// biome-ignore assist/source/organizeImports: Clerk auth must be imported first for proper Next.js initialization
 import { auth } from '@clerk/nextjs/server';
 import { del, put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from '@/lib/auth/helpers';
+
 import {
   deleteMaterial,
   getMaterialById,
   isIdentifierTaken,
   updateMaterial,
 } from '@/lib/api/course-material';
+import { isAdmin } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { logAuditEvent } from '@/lib/utils/audit-logging';
+import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
 import { seminarMaterialUpdateSchema } from '@/lib/schemas/admin/course-material';
 
 type RouteParams = {
@@ -16,7 +20,7 @@ type RouteParams = {
 };
 
 /**
- * GET /api/admin/seminarmaterial/[id]
+ * GET /api/admin/course-material/[id]
  * Get a single seminar material
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
@@ -55,8 +59,6 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       id: material.id,
       identifier: material.identifier,
       title: material.title,
-      blobUrl: material.blobUrl,
-      blobPathname: material.blobPathname,
       createdAt: material.createdAt.toISOString(),
       updatedAt: material.updatedAt.toISOString(),
     });
@@ -72,13 +74,15 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * PUT /api/admin/seminarmaterial/[id]
+ * PUT /api/admin/course-material/[id]
  * Update a seminar material
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
+  // Extract id before try block so it's available in catch for logging
+  const { id } = await params;
+
   try {
     const { userId } = await auth();
-    const { id } = await params;
 
     if (!userId) {
       return NextResponse.json(
@@ -160,22 +164,65 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const newIdentifier = identifier || existingMaterial.identifier;
 
     if (htmlContent !== undefined) {
+      // Validate HTML content for security
+      const htmlValidation = validateHtmlContent(htmlContent);
+      if (!htmlValidation.safe) {
+        logAuditEvent(
+          'COURSE_MATERIAL_UPDATE',
+          userId,
+          id,
+          'course-material',
+          'failure',
+          {
+            error: `XSS validation failed: ${htmlValidation.errors.join(', ')}`,
+          }
+        );
+        return NextResponse.json(
+          {
+            error: 'validation_error',
+            message:
+              'HTML-Validierung fehlgeschlagen. Bitte entferne unsichere Inhalte und versuche es erneut.',
+          },
+          { status: 400 }
+        );
+      }
+
+      // Sanitize HTML
+      const sanitizedHtml = sanitizeHtml(htmlContent);
+
       // Always delete old blob before uploading new content
       try {
         await del(existingMaterial.blobUrl);
-      } catch {
-        // Ignore delete errors - blob may not exist
+      } catch (deleteError) {
+        // Log but don't fail - blob might not exist
+        serverInstance.warning('Failed to delete old blob during update', {
+          blobUrl: existingMaterial.blobUrl,
+          error:
+            deleteError instanceof Error
+              ? deleteError.message
+              : 'Unknown error',
+        });
       }
 
       // Upload new content
       const blobPathname = `course-material/${newIdentifier}.html`;
       let blob;
       try {
-        blob = await put(blobPathname, htmlContent, {
+        blob = await put(blobPathname, sanitizedHtml, {
           access: 'public',
           contentType: 'text/html',
         });
       } catch (blobError) {
+        logAuditEvent(
+          'COURSE_MATERIAL_UPDATE',
+          userId,
+          id,
+          'course-material',
+          'failure',
+          {
+            error: `Blob upload failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`,
+          }
+        );
         serverInstance.error('Blob upload failed during update', {
           identifier: newIdentifier,
           error:
@@ -198,6 +245,17 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       updateData.identifier = identifier;
     }
 
+    // Validate that at least one field is being updated
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: 'Mindestens ein Feld muss aktualisiert werden',
+        },
+        { status: 400 }
+      );
+    }
+
     const material = await updateMaterial(id, updateData);
 
     return NextResponse.json({
@@ -210,6 +268,17 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       updatedAt: material.updatedAt.toISOString(),
     });
   } catch (error) {
+    const userId2 = (await auth()).userId;
+    logAuditEvent(
+      'COURSE_MATERIAL_UPDATE',
+      userId2 || 'unknown',
+      id,
+      'course-material',
+      'failure',
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    );
     serverInstance.error('Failed to update seminar material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -224,13 +293,15 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * DELETE /api/admin/seminarmaterial/[id]
+ * DELETE /api/admin/course-material/[id]
  * Delete a seminar material
  */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+  // Extract id before try block so it's available in catch for logging
+  const { id } = await params;
+
   try {
     const { userId } = await auth();
-    const { id } = await params;
 
     if (!userId) {
       return NextResponse.json(
@@ -272,8 +343,34 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     // Delete database record
     await deleteMaterial(id);
 
+    // Log successful deletion
+    logAuditEvent(
+      'COURSE_MATERIAL_DELETE',
+      userId,
+      id,
+      'course-material',
+      'success',
+      {
+        details: {
+          identifier: material.identifier,
+          title: material.title,
+        },
+      }
+    );
+
     return new NextResponse(null, { status: 204 });
   } catch (error) {
+    const userId2 = (await auth()).userId;
+    logAuditEvent(
+      'COURSE_MATERIAL_DELETE',
+      userId2 || 'unknown',
+      id,
+      'course-material',
+      'failure',
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    );
     serverInstance.error('Failed to delete seminar material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });

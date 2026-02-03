@@ -1,20 +1,24 @@
+// biome-ignore assist/source/organizeImports: Clerk auth must be imported first for proper Next.js initialization
 import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from '@/lib/auth/helpers';
+
 import {
   createMaterial,
   getAllMaterials,
   isIdentifierTaken,
 } from '@/lib/api/course-material';
+import { isAdmin } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { logAuditEvent } from '@/lib/utils/audit-logging';
+import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
 import {
   generateSlug,
   seminarMaterialCreateSchema,
 } from '@/lib/schemas/admin/course-material';
 
 /**
- * GET /api/admin/seminarmaterial
+ * GET /api/admin/course-material
  * List all seminar materials
  */
 export async function GET() {
@@ -114,8 +118,43 @@ export async function POST(request: NextRequest) {
 
     const { title, identifier: providedIdentifier, htmlContent } = parsed.data;
 
+    // Validate HTML content for security
+    const htmlValidation = validateHtmlContent(htmlContent);
+    if (!htmlValidation.safe) {
+      logAuditEvent(
+        'COURSE_MATERIAL_CREATE',
+        userId,
+        undefined,
+        'course-material',
+        'failure',
+        { error: `XSS validation failed: ${htmlValidation.errors.join(', ')}` }
+      );
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: `HTML-Validierung fehlgeschlagen: ${htmlValidation.errors[0]}`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize HTML to remove any potentially dangerous content
+    const sanitizedHtml = sanitizeHtml(htmlContent);
+
     // Generate or use provided identifier
     const identifier = providedIdentifier || generateSlug(title);
+
+    // Validate identifier is not empty (can happen with titles like "---")
+    if (!identifier || identifier.length < 2) {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message:
+            'Der generierte Identifier ist ungültig. Bitte einen Identifier manuell angeben.',
+        },
+        { status: 400 }
+      );
+    }
 
     // Check if identifier is already taken
     if (await isIdentifierTaken(identifier)) {
@@ -132,11 +171,21 @@ export async function POST(request: NextRequest) {
     const blobPathname = `course-material/${identifier}.html`;
     let blob;
     try {
-      blob = await put(blobPathname, htmlContent, {
+      blob = await put(blobPathname, sanitizedHtml, {
         access: 'public',
         contentType: 'text/html',
       });
     } catch (blobError) {
+      logAuditEvent(
+        'COURSE_MATERIAL_CREATE',
+        userId,
+        identifier,
+        'course-material',
+        'failure',
+        {
+          error: `Blob upload failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`,
+        }
+      );
       serverInstance.error('Blob upload failed', {
         identifier,
         error: blobError instanceof Error ? blobError.message : 'Unknown error',
@@ -158,6 +207,15 @@ export async function POST(request: NextRequest) {
       blobPathname: blob.pathname,
     });
 
+    logAuditEvent(
+      'COURSE_MATERIAL_CREATE',
+      userId,
+      material.id,
+      'course-material',
+      'success',
+      { details: { identifier, title } }
+    );
+
     return NextResponse.json(
       {
         id: material.id,
@@ -171,6 +229,23 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
+    let auditUserId = 'unknown';
+    try {
+      const { userId } = await auth();
+      if (userId) auditUserId = userId;
+    } catch {
+      // Auth failed, use 'unknown'
+    }
+    logAuditEvent(
+      'COURSE_MATERIAL_CREATE',
+      auditUserId,
+      undefined,
+      'course-material',
+      'failure',
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    );
     serverInstance.error('Failed to create seminar material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });

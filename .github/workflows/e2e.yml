@@ -250,19 +250,22 @@ jobs:
       - name: Run E2E tests
         id: e2e
         continue-on-error: true
+        # Secrets are optional - gracefully handle missing credentials to avoid flaky tests
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.basecheck.outputs.final_base }}
-          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
-          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL || '' }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD || '' }}
           E2E_TEST: '1'
           NEXT_PUBLIC_DISABLE_CLERK: '1'
           NEXT_PUBLIC_DISABLE_ROLLBAR: '1'
         run: |
           if [ -z "$E2E_TEST_EMAIL" ] || [ -z "$E2E_TEST_PASSWORD" ]; then
-            echo "No E2E credentials set - running only chromium-no-auth project"
+            echo "⚠️  WARNING: E2E credentials not configured (E2E_TEST_EMAIL, E2E_TEST_PASSWORD)"
+            echo "   Running authenticated tests: SKIPPED (chromium-no-auth only)"
+            echo "   Set secrets in repository settings to enable full test coverage"
             npx playwright test --project=chromium-no-auth
           else
-            echo "E2E credentials available - running all projects"
+            echo "✓ E2E credentials available - running full test suite (all projects)"
             npm run e2e:dev
           fi
 

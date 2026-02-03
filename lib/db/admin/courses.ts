@@ -40,18 +40,16 @@ function validateCurriculum(
     }));
 
     // Create a compact summary to avoid bloating the Rollbar event (128KB limit)
+    // Only log structure metadata without exposing user data or keys
     const receivedDataSummary =
-      typeof curriculum === 'object'
-        ? JSON.stringify({
+      typeof curriculum === 'object' && curriculum !== null
+        ? {
             type: Array.isArray(curriculum) ? 'array' : 'object',
-            keys: Array.isArray(curriculum)
-              ? curriculum.slice(0, 5).map((_, i) => i)
-              : Object.keys(curriculum).slice(0, 5),
-            size: Array.isArray(curriculum)
+            keyCount: Array.isArray(curriculum)
               ? curriculum.length
               : Object.keys(curriculum).length,
-          })
-        : String(curriculum);
+          }
+        : { type: typeof curriculum, value: 'non-object' };
 
     reportError(
       'Curriculum validation failed',

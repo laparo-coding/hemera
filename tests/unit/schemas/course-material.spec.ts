@@ -19,9 +19,11 @@ describe('identifierSchema', () => {
     expect(identifierSchema.safeParse('my-course-intro').success).toBe(true);
   });
 
-  it('rejects identifiers with uppercase', () => {
+  it('normalizes uppercase to lowercase and accepts them', () => {
+    // identifierSchema applies .toLowerCase() before regex validation
     const result = identifierSchema.safeParse('Test-Material');
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
+    expect(result.data).toBe('test-material');
   });
 
   it('rejects identifiers with special characters', () => {

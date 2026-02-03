@@ -36,16 +36,29 @@ const config: Config = {
   coverageReporters: ['text', 'lcov', 'html'],
   coverageThreshold: {
     global: {
-      branches: 20,
-      functions: 40,
-      lines: 25,
-      statements: 25,
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70,
     },
     './lib/services/': {
-      branches: 70,
-      functions: 30,
-      lines: 30,
-      statements: 30,
+      branches: 85,
+      functions: 85,
+      lines: 85,
+      statements: 85,
+    },
+    // Per-path overrides for areas with inherently low testability
+    './lib/monitoring/': {
+      branches: 50,
+      functions: 50,
+      lines: 50,
+      statements: 50,
+    },
+    './lib/stripe/': {
+      branches: 60,
+      functions: 60,
+      lines: 60,
+      statements: 60,
     },
   },
 };

@@ -62,7 +62,8 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(
           {
             success: true,
-            message: 'E2E-Testmodus: Clerk deaktiviert, Verifikation übersprungen',
+            message:
+              'E2E-Testmodus: Clerk deaktiviert, Verifikation übersprungen',
             booking: null,
             mockMode: true,
           },

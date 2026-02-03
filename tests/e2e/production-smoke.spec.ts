@@ -49,12 +49,10 @@ test.describe('Production Smoke Tests', () => {
 
     expect(response?.status()).toBe(200);
 
-    // Verify at least one structural element is visible
-    // Use Playwright's or() combinator for resilient multi-element checking
-    await expect(
-      page.locator('body').or(page.locator('main')).or(page.locator('form')),
-    ).toBeVisible({ timeout: 5000 });
-    
+    // Verify page has loaded with structural content
+    // Use body as the primary indicator - it's always present and unique
+    await expect(page.locator('body')).toBeVisible({ timeout: 5000 });
+
     test.info().annotations.push({
       type: 'info',
       description: 'Sign-in page loaded (HTTP 200) - page structure verified',
