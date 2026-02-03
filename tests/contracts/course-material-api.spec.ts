@@ -85,7 +85,7 @@ describe('GET /api/admin/course-material', () => {
       },
     ]);
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material');
+    const request = new NextRequest('http://localhost/api/admin/course-material');
     const response = await GET();
     const json = await response.json();
 
@@ -98,7 +98,7 @@ describe('GET /api/admin/course-material', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.seminarMaterial.findMany.mockResolvedValue([]);
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material');
+    const request = new NextRequest('http://localhost/api/admin/course-material');
     const response = await GET();
     const json = await response.json();
 
@@ -115,7 +115,7 @@ describe('POST /api/admin/course-material', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material', {
+    const request = new NextRequest('http://localhost/api/admin/course-material', {
       method: 'POST',
       body: JSON.stringify({ title: 'Test', htmlContent: '<p>Test</p>' }),
     });
@@ -129,7 +129,7 @@ describe('POST /api/admin/course-material', () => {
   it('returns 400 for missing required fields', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material', {
+    const request = new NextRequest('http://localhost/api/admin/course-material', {
       method: 'POST',
       body: JSON.stringify({ title: '' }),
     });
@@ -158,7 +158,7 @@ describe('POST /api/admin/course-material', () => {
       updatedAt: new Date(),
     });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material', {
+    const request = new NextRequest('http://localhost/api/admin/course-material', {
       method: 'POST',
       body: JSON.stringify({
         title: 'Test Material',
@@ -185,7 +185,7 @@ describe('POST /api/admin/course-material', () => {
       identifier: 'test-material',
     });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material', {
+    const request = new NextRequest('http://localhost/api/admin/course-material', {
       method: 'POST',
       body: JSON.stringify({
         title: 'Test Material',
@@ -209,7 +209,7 @@ describe('GET /api/admin/course-material/[id]', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_1');
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1');
     const response = await GET_SINGLE(request, { params: createParams('mat_1') });
     const json = await response.json();
 
@@ -221,7 +221,7 @@ describe('GET /api/admin/course-material/[id]', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.seminarMaterial.findUnique.mockResolvedValue(null);
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_999');
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_999');
     const response = await GET_SINGLE(request, { params: createParams('mat_999') });
     const json = await response.json();
 
@@ -241,7 +241,7 @@ describe('GET /api/admin/course-material/[id]', () => {
       updatedAt: new Date('2025-01-01'),
     });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_1');
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1');
     const response = await GET_SINGLE(request, { params: createParams('mat_1') });
     const json = await response.json();
 
@@ -259,7 +259,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
       method: 'PUT',
       body: JSON.stringify({ title: 'Updated' }),
     });
@@ -274,7 +274,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.seminarMaterial.findUnique.mockResolvedValue(null);
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_999', {
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_999', {
       method: 'PUT',
       body: JSON.stringify({ title: 'Updated' }),
     });
@@ -306,7 +306,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
       updatedAt: new Date(),
     });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
       method: 'PUT',
       body: JSON.stringify({ title: 'New Title' }),
     });
@@ -342,7 +342,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
       updatedAt: new Date(),
     });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
       method: 'PUT',
       body: JSON.stringify({ htmlContent: '<p>New content</p>' }),
     });
@@ -361,7 +361,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
       method: 'DELETE',
     });
     const response = await DELETE(request, { params: createParams('mat_1') });
@@ -375,7 +375,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.seminarMaterial.findUnique.mockResolvedValue(null);
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_999', {
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_999', {
       method: 'DELETE',
     });
     const response = await DELETE(request, { params: createParams('mat_999') });
@@ -399,7 +399,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
     mockDel.mockResolvedValue(undefined);
     mockPrisma.seminarMaterial.delete.mockResolvedValue({});
 
-    const _request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
       method: 'DELETE',
     });
     const response = await DELETE(request, { params: createParams('mat_1') });
@@ -420,7 +420,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const _request = new NextRequest(
+    const request = new NextRequest(
       'http://localhost/api/admin/course-material/mat_1/content'
     );
     const response = await GET_CONTENT(request, { params: createParams('mat_1') });
@@ -434,7 +434,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.seminarMaterial.findUnique.mockResolvedValue(null);
 
-    const _request = new NextRequest(
+    const request = new NextRequest(
       'http://localhost/api/admin/course-material/mat_999/content'
     );
     const response = await GET_CONTENT(request, { params: createParams('mat_999') });
@@ -464,7 +464,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
         text: () => Promise.resolve('<p>Test HTML content</p>'),
       });
 
-      const _request = new NextRequest(
+      const request = new NextRequest(
         'http://localhost/api/admin/course-material/mat_1/content'
       );
       const response = await GET_CONTENT(request, { params: createParams('mat_1') });
@@ -490,7 +490,7 @@ describe('POST /api/admin/course-material/images', () => {
     const formData = new FormData();
     formData.append('file', new Blob(['test'], { type: 'image/jpeg' }), 'test.jpg');
 
-    const _request = new NextRequest(
+    const request = new NextRequest(
       'http://localhost/api/admin/course-material/images',
       { method: 'POST', body: formData }
     );
@@ -506,7 +506,7 @@ describe('POST /api/admin/course-material/images', () => {
 
     const formData = new FormData();
 
-    const _request = new NextRequest(
+    const request = new NextRequest(
       'http://localhost/api/admin/course-material/images',
       { method: 'POST', body: formData }
     );
@@ -527,7 +527,7 @@ describe('POST /api/admin/course-material/images', () => {
       'test.pdf'
     );
 
-    const _request = new NextRequest(
+    const request = new NextRequest(
       'http://localhost/api/admin/course-material/images',
       { method: 'POST', body: formData }
     );
@@ -551,7 +551,7 @@ describe('POST /api/admin/course-material/images', () => {
     const formData = new FormData();
     formData.append('file', imageBlob, 'test.jpg');
 
-    const _request = new NextRequest(
+    const request = new NextRequest(
       'http://localhost/api/admin/course-material/images',
       { method: 'POST', body: formData }
     );
