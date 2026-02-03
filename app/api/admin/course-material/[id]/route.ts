@@ -11,6 +11,8 @@ import {
 } from '@/lib/api/course-material';
 import { isAdmin } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { logAuditEvent } from '@/lib/utils/audit-logging';
+import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
 import { seminarMaterialUpdateSchema } from '@/lib/schemas/admin/course-material';
 
 type RouteParams = {
@@ -162,22 +164,64 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const newIdentifier = identifier || existingMaterial.identifier;
 
     if (htmlContent !== undefined) {
+      // Validate HTML content for security
+      const htmlValidation = validateHtmlContent(htmlContent);
+      if (!htmlValidation.safe) {
+        logAuditEvent(
+          'COURSE_MATERIAL_UPDATE',
+          userId,
+          id,
+          'course-material',
+          'failure',
+          {
+            error: `XSS validation failed: ${htmlValidation.errors.join(', ')}`,
+          }
+        );
+        return NextResponse.json(
+          {
+            error: 'validation_error',
+            message: `HTML-Validierung fehlgeschlagen: ${htmlValidation.errors[0]}`,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Sanitize HTML
+      const sanitizedHtml = sanitizeHtml(htmlContent);
+
       // Always delete old blob before uploading new content
       try {
         await del(existingMaterial.blobUrl);
-      } catch {
-        // Ignore delete errors - blob may not exist
+      } catch (deleteError) {
+        // Log but don't fail - blob might not exist
+        serverInstance.warning('Failed to delete old blob during update', {
+          blobUrl: existingMaterial.blobUrl,
+          error:
+            deleteError instanceof Error
+              ? deleteError.message
+              : 'Unknown error',
+        });
       }
 
       // Upload new content
       const blobPathname = `course-material/${newIdentifier}.html`;
       let blob;
       try {
-        blob = await put(blobPathname, htmlContent, {
+        blob = await put(blobPathname, sanitizedHtml, {
           access: 'public',
           contentType: 'text/html',
         });
       } catch (blobError) {
+        logAuditEvent(
+          'COURSE_MATERIAL_UPDATE',
+          userId,
+          id,
+          'course-material',
+          'failure',
+          {
+            error: `Blob upload failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`,
+          }
+        );
         serverInstance.error('Blob upload failed during update', {
           identifier: newIdentifier,
           error:
@@ -212,6 +256,17 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       updatedAt: material.updatedAt.toISOString(),
     });
   } catch (error) {
+    const userId2 = (await auth()).userId;
+    logAuditEvent(
+      'COURSE_MATERIAL_UPDATE',
+      userId2 || 'unknown',
+      id,
+      'course-material',
+      'failure',
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    );
     serverInstance.error('Failed to update seminar material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -274,8 +329,32 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     // Delete database record
     await deleteMaterial(id);
 
+    // Log successful deletion
+    logAuditEvent(
+      'COURSE_MATERIAL_DELETE',
+      userId,
+      id,
+      'course-material',
+      'success',
+      {
+        identifier: material.identifier,
+        title: material.title,
+      }
+    );
+
     return new NextResponse(null, { status: 204 });
   } catch (error) {
+    const userId2 = (await auth()).userId;
+    logAuditEvent(
+      'COURSE_MATERIAL_DELETE',
+      userId2 || 'unknown',
+      id,
+      'course-material',
+      'failure',
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    );
     serverInstance.error('Failed to delete seminar material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });

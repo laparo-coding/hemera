@@ -10,6 +10,8 @@ import {
 } from '@/lib/api/course-material';
 import { isAdmin } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { logAuditEvent } from '@/lib/utils/audit-logging';
+import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
 import {
   generateSlug,
   seminarMaterialCreateSchema,
@@ -116,6 +118,29 @@ export async function POST(request: NextRequest) {
 
     const { title, identifier: providedIdentifier, htmlContent } = parsed.data;
 
+    // Validate HTML content for security
+    const htmlValidation = validateHtmlContent(htmlContent);
+    if (!htmlValidation.safe) {
+      logAuditEvent(
+        'COURSE_MATERIAL_CREATE',
+        userId,
+        undefined,
+        'course-material',
+        'failure',
+        { error: `XSS validation failed: ${htmlValidation.errors.join(', ')}` }
+      );
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: `HTML-Validierung fehlgeschlagen: ${htmlValidation.errors[0]}`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize HTML to remove any potentially dangerous content
+    const sanitizedHtml = sanitizeHtml(htmlContent);
+
     // Generate or use provided identifier
     const identifier = providedIdentifier || generateSlug(title);
 
@@ -134,11 +159,21 @@ export async function POST(request: NextRequest) {
     const blobPathname = `course-material/${identifier}.html`;
     let blob;
     try {
-      blob = await put(blobPathname, htmlContent, {
+      blob = await put(blobPathname, sanitizedHtml, {
         access: 'public',
         contentType: 'text/html',
       });
     } catch (blobError) {
+      logAuditEvent(
+        'COURSE_MATERIAL_CREATE',
+        userId,
+        identifier,
+        'course-material',
+        'failure',
+        {
+          error: `Blob upload failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`,
+        }
+      );
       serverInstance.error('Blob upload failed', {
         identifier,
         error: blobError instanceof Error ? blobError.message : 'Unknown error',
@@ -160,6 +195,15 @@ export async function POST(request: NextRequest) {
       blobPathname: blob.pathname,
     });
 
+    logAuditEvent(
+      'COURSE_MATERIAL_CREATE',
+      userId,
+      material.id,
+      'course-material',
+      'success',
+      { details: { identifier, title } }
+    );
+
     return NextResponse.json(
       {
         id: material.id,
@@ -173,6 +217,17 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
+    const userId2 = (await auth()).userId;
+    logAuditEvent(
+      'COURSE_MATERIAL_CREATE',
+      userId2 || 'unknown',
+      undefined,
+      'course-material',
+      'failure',
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    );
     serverInstance.error('Failed to create seminar material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });

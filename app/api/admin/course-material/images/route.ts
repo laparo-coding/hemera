@@ -13,6 +13,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { isAdmin } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { logAuditEvent } from '@/lib/utils/audit-logging';
+import { validateImageFile } from '@/lib/utils/file-validator';
 
 const ALLOWED_IMAGE_TYPES = [
   'image/jpeg',
@@ -39,6 +41,9 @@ export async function POST(request: NextRequest) {
 
     const adminCheck = await isAdmin();
     if (!adminCheck) {
+      logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
+        error: 'Insufficient permissions',
+      });
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
         { status: 403 }
@@ -55,23 +60,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
-    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    // Validate file size (before reading content)
+    if (file.size > MAX_FILE_SIZE) {
+      logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
+        error: `File size ${file.size} exceeds limit ${MAX_FILE_SIZE}`,
+      });
       return NextResponse.json(
         {
           error: 'validation_error',
-          message: 'Nur JPEG, PNG, WebP und GIF sind erlaubt',
+          message: 'Datei darf maximal 5MB groß sein',
         },
         { status: 400 }
       );
     }
 
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
+    // Server-side file validation: check MIME type and file content
+    const validation = await validateImageFile(file, ALLOWED_IMAGE_TYPES);
+    if (!validation.valid) {
+      logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
+        error: validation.error,
+      });
       return NextResponse.json(
         {
           error: 'validation_error',
-          message: 'Datei darf maximal 5MB groß sein',
+          message: validation.error || 'Ungültiger Dateityp',
         },
         { status: 400 }
       );
@@ -91,10 +103,12 @@ export async function POST(request: NextRequest) {
         contentType: file.type,
       });
     } catch (blobError) {
+      logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
+        error: `Blob upload failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`,
+      });
       serverInstance.error('Image blob upload failed', {
         filename,
         fileSize: file.size,
-        fileType: file.type,
         error: blobError instanceof Error ? blobError.message : 'Unknown error',
       });
       return NextResponse.json(
@@ -106,8 +120,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    logAuditEvent('IMAGE_UPLOAD', userId, blob.url, 'image', 'success', {
+      details: { filename, sizeBytes: file.size },
+    });
+
     return NextResponse.json({ url: blob.url }, { status: 200 });
   } catch (error) {
+    const userId = (await auth()).userId;
+    logAuditEvent(
+      'IMAGE_UPLOAD',
+      userId || 'unknown',
+      undefined,
+      'image',
+      'failure',
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    );
     serverInstance.error('Failed to upload image', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
