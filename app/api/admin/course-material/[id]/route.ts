@@ -341,8 +341,10 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       'course-material',
       'success',
       {
-        identifier: material.identifier,
-        title: material.title,
+        details: {
+          identifier: material.identifier,
+          title: material.title,
+        },
       }
     );
 
