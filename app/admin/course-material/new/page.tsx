@@ -66,7 +66,10 @@ export default function NeuSeminarmaterialPage() {
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <IconButton onClick={() => router.push('/admin/course-material')}>
+        <IconButton
+          onClick={() => router.push('/admin/course-material')}
+          aria-label='Zurück zur Seminarmaterial-Übersicht'
+        >
           <ArrowBackIcon />
         </IconButton>
         <Typography variant='h4' component='h1'>
