@@ -1,12 +1,14 @@
+// biome-ignore assist/source/organizeImports: Clerk auth must be imported first for proper Next.js initialization
 import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from '@/lib/auth/helpers';
+
 import {
   createMaterial,
   getAllMaterials,
   isIdentifierTaken,
 } from '@/lib/api/course-material';
+import { isAdmin } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   generateSlug,

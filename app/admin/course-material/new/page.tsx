@@ -20,30 +20,25 @@ export default function NeuSeminarmaterialPage() {
     identifier?: string;
     htmlContent: string;
   }) => {
-    try {
-      const response = await fetch('/api/admin/course-material', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+    const response = await fetch('/api/admin/course-material', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-      if (!response.ok) {
-        let errorMessage = 'Erstellen fehlgeschlagen';
-        try {
-          const error = await response.json();
-          errorMessage = error.message || errorMessage;
-        } catch {
-          // Non-JSON response, use default message
-        }
-        throw new Error(errorMessage);
+    if (!response.ok) {
+      let errorMessage = 'Erstellen fehlgeschlagen';
+      try {
+        const error = await response.json();
+        errorMessage = error.message || errorMessage;
+      } catch {
+        // Non-JSON response, use default message
       }
-
-      const result = await response.json();
-      router.push(`/admin/course-material/${result.id}`);
-    } catch (error) {
-      // Error will be caught by MaterialForm error state
-      throw error;
+      throw new Error(errorMessage);
     }
+
+    const result = await response.json();
+    router.push(`/admin/course-material/${result.id}`);
   };
 
   return (

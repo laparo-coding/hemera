@@ -1,3 +1,4 @@
+// biome-ignore assist/source/organizeImports: Clerk auth must be imported first
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/auth/helpers';
