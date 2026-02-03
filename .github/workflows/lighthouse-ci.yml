@@ -78,8 +78,15 @@ jobs:
 
       - name: Run Lighthouse CI (collect)
         if: steps.target.outputs.url != ''
+        env:
+          LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
         run: |
-          lhci collect --url "${{ steps.target.outputs.url }}" --config=.lighthouserc.json
+          # Add Vercel protection bypass header if secret is available
+          EXTRA_HEADERS=""
+          if [ -n "${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" ]; then
+            EXTRA_HEADERS="--extra-headers.x-vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}"
+          fi
+          lhci collect --url "${{ steps.target.outputs.url }}" --config=.lighthouserc.json $EXTRA_HEADERS
 
       - name: Generate HTML report
         if: steps.target.outputs.url != ''
