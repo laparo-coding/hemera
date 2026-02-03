@@ -590,3 +590,4 @@ zwar
 Überwachbarkeit
 über
 übergeben
+Geocodierung
