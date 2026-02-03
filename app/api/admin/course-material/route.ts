@@ -144,6 +144,17 @@ export async function POST(request: NextRequest) {
     // Generate or use provided identifier
     const identifier = providedIdentifier || generateSlug(title);
 
+    // Validate identifier is not empty (can happen with titles like "---")
+    if (!identifier || identifier.length < 2) {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: 'Der generierte Identifier ist ungültig. Bitte einen Identifier manuell angeben.',
+        },
+        { status: 400 }
+      );
+    }
+
     // Check if identifier is already taken
     if (await isIdentifierTaken(identifier)) {
       return NextResponse.json(

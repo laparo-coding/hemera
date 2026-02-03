@@ -245,6 +245,17 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       updateData.identifier = identifier;
     }
 
+    // Validate that at least one field is being updated
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: 'Mindestens ein Feld muss aktualisiert werden',
+        },
+        { status: 400 }
+      );
+    }
+
     const material = await updateMaterial(id, updateData);
 
     return NextResponse.json({

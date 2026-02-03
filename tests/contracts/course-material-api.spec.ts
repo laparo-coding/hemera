@@ -354,6 +354,30 @@ describe('PUT /api/admin/course-material/[id]', () => {
     expect(response.status).toBe(200);
     expect(mockPut).toHaveBeenCalled();
   });
+
+  it('returns 400 for empty update payload', async () => {
+    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockPrisma.seminarMaterial.findUnique.mockResolvedValue({
+      id: 'mat_1',
+      identifier: 'test-material',
+      title: 'Test',
+      blobUrl: 'https://blob.vercel-storage.com/test.html',
+      blobPathname: 'course-material/test.html',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
+      method: 'PUT',
+      body: JSON.stringify({}),
+    });
+    const response = await PUT(request, { params: createParams('mat_1') });
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json.error).toBe('validation_error');
+    expect(json.message).toContain('Mindestens ein Feld');
+  });
 });
 
 describe('DELETE /api/admin/course-material/[id]', () => {
