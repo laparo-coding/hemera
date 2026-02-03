@@ -40,6 +40,9 @@ jest.mock('@/lib/monitoring/rollbar-official', () => ({
   serverInstance: {
     error: jest.fn(),
     warning: jest.fn(),
+    info: jest.fn(),
+    debug: jest.fn(),
+    log: jest.fn(),
   },
 }));
 
