@@ -6,7 +6,6 @@
  * Uploads to Vercel Blob and returns public CDN URL
  */
 
-// biome-ignore assist/source/organizeImports: Clerk auth must be imported first for proper Next.js initialization
 import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
