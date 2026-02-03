@@ -48,17 +48,17 @@ export type Curriculum = z.infer<typeof curriculumSchema>;
 export const courseCreateSchema = z.object({
   title: z
     .string()
-    .min(3, 'Title must be at least 3 characters')
-    .max(50, 'Title must not exceed 50 characters')
+    .min(3, 'Titel muss mindestens 3 Zeichen haben')
+    .max(50, 'Titel darf maximal 50 Zeichen haben')
     .trim(),
   description: z
     .string()
-    .min(10, 'Description must be at least 10 characters')
-    .max(900, 'Description must not exceed 900 characters')
+    .min(10, 'Beschreibung muss mindestens 10 Zeichen haben')
+    .max(900, 'Beschreibung darf maximal 900 Zeichen haben')
     .trim(),
   teaser: z
     .string()
-    .max(200, 'Teaser must not exceed 200 characters')
+    .max(200, 'Teaser darf maximal 200 Zeichen haben')
     .trim()
     .optional()
     .nullable(),

@@ -18,7 +18,7 @@ import {
 } from '@/lib/schemas/admin/course-material';
 
 /**
- * GET /api/admin/seminarmaterial
+ * GET /api/admin/course-material
  * List all seminar materials
  */
 export async function GET() {

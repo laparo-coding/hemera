@@ -26,7 +26,10 @@ export const identifierSchema = z
  */
 export const htmlContentSchema = z
   .string()
-  .max(2097152, 'HTML-Inhalt darf maximal 2MB groß sein');
+  .refine(
+    value => new TextEncoder().encode(value).length <= 2097152,
+    'HTML-Inhalt darf maximal 2MB groß sein'
+  );
 
 /**
  * Schema for creating a new seminar material

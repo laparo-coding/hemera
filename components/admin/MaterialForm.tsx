@@ -90,7 +90,7 @@ export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
         />
 
         <TextField
-          label='Identifier (optional)'
+          label='Kennung (optional)'
           value={identifier}
           onChange={e => setIdentifier(e.target.value)}
           fullWidth

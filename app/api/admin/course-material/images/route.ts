@@ -97,10 +97,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // MIME type to file extension mapping
+    const MIME_TO_EXT: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+    };
+
     // Generate unique filename
     const timestamp = Date.now();
     const randomId = Math.random().toString(36).substring(2, 8);
-    const fileExtension = file.type.split('/')[1];
+    const fileExtension = MIME_TO_EXT[file.type] || 'bin';
     const filename = `course-material/images/${timestamp}-${randomId}.${fileExtension}`;
 
     // Upload to Vercel Blob

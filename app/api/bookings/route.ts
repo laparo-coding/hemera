@@ -245,7 +245,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             success: false,
-            error: 'Authentication disabled in E2E mode',
+            error: 'Authentifizierung im E2E-Modus deaktiviert',
             mockMode: true,
           },
           { status: 401 }
@@ -253,7 +253,7 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(
-        { success: false, error: 'Authentication required' },
+        { success: false, error: 'Authentifizierung erforderlich' },
         { status: 401 }
       );
     }

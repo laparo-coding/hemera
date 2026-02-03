@@ -70,6 +70,7 @@ export function validateClerkDisableContext(): {
   allowed: boolean;
   reason?: string;
 } {
+  // E2E_TEST uses '1' (our convention), CI uses 'true' (GitHub Actions default)
   const isE2E = process.env.E2E_TEST === '1';
   const isCI = process.env.CI === 'true';
 
