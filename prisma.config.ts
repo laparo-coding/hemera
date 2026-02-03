@@ -8,14 +8,11 @@ import { config } from 'dotenv';
 config({ path: '.env.local' });
 config({ path: '.env' });
 
-const databaseUrl = process.env.DATABASE_URL;
-
-if (!databaseUrl) {
-  throw new Error(
-    'DATABASE_URL environment variable is not set. ' +
-      'Please set it in .env.local, .env, or as an environment variable.'
-  );
-}
+// Allow prisma generate to work without DATABASE_URL (for CI/client-only generation)
+// The actual connection will fail at runtime if not set, but generate only needs the schema
+const databaseUrl =
+  process.env.DATABASE_URL ||
+  'postgresql://placeholder:placeholder@localhost:5432/placeholder';
 
 export default defineConfig({
   datasource: {
