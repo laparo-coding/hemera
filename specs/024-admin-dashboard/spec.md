@@ -224,6 +224,9 @@ interface CurriculumItem {
 - [ ] Clerk-Benutzerdaten werden angezeigt
 - [ ] Outperformer-Checkbox pro Benutzer
 - [ ] Checkbox-Änderung wird gespeichert
+- [ ] Benutzer löschen möglich
+- [ ] Rolle zuweisen möglich (Admin/User)
+- [ ] Filter "Nur Outperformer anzeigen" verfügbar
 
 ### AC-5: Kursverwaltung
 - [ ] Curriculum-Items zeigen Seminarmaterial-Feld
@@ -232,7 +235,10 @@ interface CurriculumItem {
 ### AC-6: Berichte & Analysen
 - [ ] API Health-Daten werden angezeigt
 - [ ] Systemstatus ist hier integriert
-- [ ] Daten werden periodisch aktualisiert
+- [ ] Daten werden manuell aktualisiert (bei Seitenaufruf + Refresh-Button)
+- [ ] Buchungsstatistiken (Anzahl Buchungen, Umsatz)
+- [ ] Kursauslastung pro Kurs
+- [ ] Benutzer-Wachstum (neue Registrierungen)
 
 ### AC-7: Input-Felder
 - [ ] Alle Input-Felder haben Placeholder-Text
@@ -262,6 +268,15 @@ interface CurriculumItem {
 
 ## Open Questions
 
-1. Soll der Systemstatus aus `/admin/settings` komplett nach Reports verschoben werden?
-2. Welche zusätzlichen Metriken sollen in Reports & Analytics angezeigt werden?
-3. Soll die Outperformer-Liste filterbar/exportierbar sein?
+1. ~~Soll der Systemstatus aus `/admin/settings` komplett nach Reports verschoben werden?~~ → Ja, komplett verschieben
+2. ~~Welche zusätzlichen Metriken sollen in Reports & Analytics angezeigt werden?~~ → Buchungen, Kursauslastung, Benutzer-Wachstum
+3. ~~Soll die Outperformer-Liste filterbar/exportierbar sein?~~ → Nur filterbar (kein Export)
+
+## Clarifications
+
+### Session 2026-02-04
+- Q: Welches Aktualisierungsintervall für Health-Status in "Berichte & Analysen"? → A: Manuell (bei Seitenaufruf + Refresh-Button)
+- Q: Welche Aktionen soll Admin auf Benutzer ausführen können? → A: Ansicht + Löschen + Rolle zuweisen
+- Q: Systemstatus aus Settings nach Reports verschieben? → A: Ja, komplett verschieben (aus Settings entfernen)
+- Q: Outperformer-Liste filterbar/exportierbar? → A: Nur filterbar (Checkbox "Nur Outperformer anzeigen")
+- Q: Welche Metriken in Reports & Analytics? → A: Health + Buchungen + Kursauslastung + Benutzer-Wachstum
