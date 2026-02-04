@@ -1,8 +1,10 @@
 /**
  * Course List Component
+ * Feature: 024-admin-dashboard (PublishSwitch integration)
  *
  * Displays all courses in a table sorted by start time
  * with enrollment counts and admin actions.
+ * Uses PublishSwitch for publishing/unpublishing courses.
  */
 
 'use client';
@@ -28,7 +30,7 @@ import { TERMS } from '../../lib/constants';
 import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
 import { getLevelLabel } from '../../lib/utils/course-level';
 import { formatShortDate, formatTimeRange } from '../../lib/utils/date-format';
-import PublishToggle from './PublishToggle';
+import { PublishSwitch } from './PublishSwitch';
 
 interface CourseListProps {
   courses: CourseWithEnrollmentCount[];
@@ -65,8 +67,7 @@ export default function CourseList({
             <TableCell>Startzeit</TableCell>
             <TableCell align='right'>Preis</TableCell>
             <TableCell align='center'>Teilnehmer</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Veröffentlichen</TableCell>
+            <TableCell>Veröffentlicht</TableCell>
             <TableCell align='right'>Aktionen</TableCell>
           </TableRow>
         </TableHead>
@@ -111,18 +112,11 @@ export default function CourseList({
                 />
               </TableCell>
               <TableCell>
-                <Chip
-                  label={course.isPublished ? 'Veröffentlicht' : 'Entwurf'}
-                  size='small'
-                  color={course.isPublished ? 'success' : 'default'}
-                  variant='outlined'
-                />
-              </TableCell>
-              <TableCell>
                 {onPublishToggle && (
-                  <PublishToggle
+                  <PublishSwitch
                     courseId={course.id}
                     isPublished={course.isPublished}
+                    courseTitle={course.title}
                     onToggle={onPublishToggle}
                   />
                 )}

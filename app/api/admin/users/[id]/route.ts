@@ -14,7 +14,7 @@ import { getOrCreateRequestId } from '../../../../../lib/utils/request-id';
 // CORS headers for external app access
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, PATCH, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
@@ -308,6 +308,121 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     });
     const errorResponse = createErrorResponse(
       'Failed to update user',
+      ErrorCodes.INTERNAL_ERROR,
+      requestId,
+      500
+    );
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      errorResponse.headers.set(key, value);
+    });
+    return errorResponse;
+  }
+}
+
+/**
+ * DELETE /api/admin/users/[id]
+ * Delete a user (024-admin-dashboard)
+ */
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  const requestId = getOrCreateRequestId(request);
+  let targetUserId: string | undefined;
+
+  try {
+    const params = await context.params;
+    targetUserId = params.id;
+
+    // Validate user ID
+    if (!targetUserId || targetUserId.trim() === '') {
+      const errorResponse = createErrorResponse(
+        'Invalid user ID',
+        ErrorCodes.VALIDATION_ERROR,
+        requestId,
+        400
+      );
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
+      });
+      return errorResponse;
+    }
+
+    // Authentication check
+    let userId: string | null = null;
+    try {
+      const authResult = await auth();
+      userId = authResult.userId;
+    } catch (_authError) {
+      const errorResponse = createErrorResponse(
+        'Unauthorized access',
+        ErrorCodes.UNAUTHORIZED,
+        requestId,
+        401
+      );
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
+      });
+      return errorResponse;
+    }
+
+    if (!userId) {
+      const errorResponse = createErrorResponse(
+        'Unauthorized access',
+        ErrorCodes.UNAUTHORIZED,
+        requestId,
+        401
+      );
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
+      });
+      return errorResponse;
+    }
+
+    // Admin authorization check
+    const isAdmin = await checkUserAdminStatus(userId);
+    if (!isAdmin) {
+      const errorResponse = createErrorResponse(
+        'Admin privileges required',
+        ErrorCodes.FORBIDDEN,
+        requestId,
+        403
+      );
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
+      });
+      return errorResponse;
+    }
+
+    // Prevent self-deletion
+    if (userId === targetUserId) {
+      const errorResponse = createErrorResponse(
+        'Du kannst dein eigenes Konto nicht löschen',
+        ErrorCodes.FORBIDDEN,
+        requestId,
+        403
+      );
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
+      });
+      return errorResponse;
+    }
+
+    // Delete user via Clerk
+    const { deleteUser } = await import('@/lib/api/admin-users');
+    await deleteUser(targetUserId);
+
+    // Return 204 No Content
+    return new NextResponse(null, {
+      status: 204,
+      headers: corsHeaders,
+    });
+  } catch (error) {
+    serverInstance.error('Failed to delete user', {
+      context: 'AdminUsers.DELETE',
+      userId: targetUserId || 'unknown',
+      requestId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+    const errorResponse = createErrorResponse(
+      'Failed to delete user',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

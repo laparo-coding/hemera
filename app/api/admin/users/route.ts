@@ -80,6 +80,37 @@ export async function GET(request: NextRequest) {
       return errorResponse;
     }
 
+    // Parse query parameters for enhanced filtering (024-admin-dashboard)
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+    const search = url.searchParams.get('search') || undefined;
+    const outperformerOnly =
+      url.searchParams.get('outperformerOnly') === 'true';
+    const sortBy = url.searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = url.searchParams.get('sortOrder') || 'desc';
+
+    // If enhanced mode requested (has pagination params), use new API
+    if (url.searchParams.has('page') || url.searchParams.has('limit')) {
+      const { getAdminUsers } = await import('@/lib/api/admin-users');
+
+      const result = await getAdminUsers({
+        page,
+        limit,
+        search,
+        outperformerOnly,
+        sortBy: sortBy as 'name' | 'email' | 'createdAt' | 'lastSignInAt',
+        sortOrder: sortOrder as 'asc' | 'desc',
+      });
+
+      const response = createSuccessResponse(result, requestId);
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
+    }
+
+    // Legacy mode: return Prisma users
     const users = await prisma.user.findMany({
       include: {
         _count: {

@@ -39,6 +39,7 @@ Detekt
 Deutsch
 Dockerfiles
 Duplikatsschutz
+Durchschn
 ECONNREFUSED
 ENOTFOUND
 EOCDR
@@ -147,6 +148,7 @@ Paginierung
 Participations
 Partytown
 Pexels
+Plattformverwaltung
 Platzhalterinhalte
 Playfair
 Plätze
@@ -229,6 +231,7 @@ Verhandlungskompetenzen
 Verhandlungssituationen
 Verhandlungsstrategien
 Verhandlungsziel
+Veröffentlich
 Videocam
 Voraussetzungs
 Voraussetzungsnachweis
@@ -428,6 +431,7 @@ monday
 mozu
 mqtt
 munchen
+müller
 müssen
 nachbereitung
 nachvollziehbar
@@ -535,6 +539,7 @@ stdr
 storyselling
 stretchr
 subheadline
+subpages
 subsetting
 supabase
 superadmin
