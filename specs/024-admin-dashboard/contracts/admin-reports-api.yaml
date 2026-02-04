@@ -1,0 +1,273 @@
+openapi: 3.1.0
+info:
+  title: Admin Reports API
+  version: 1.0.0
+  description: API for dashboard statistics and system health
+
+servers:
+  - url: /api/admin
+
+paths:
+  /reports/stats:
+    get:
+      summary: Get dashboard statistics
+      description: Returns aggregated statistics for bookings, revenue, courses, and user growth
+      operationId: getDashboardStats
+      tags:
+        - Reports
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStatsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /reports/health:
+    get:
+      summary: Get extended health status
+      description: Returns detailed system health including service checks
+      operationId: getHealthStatus
+      tags:
+        - Reports
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  schemas:
+    DashboardStatsResponse:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/DashboardStats'
+        requestId:
+          type: string
+
+    DashboardStats:
+      type: object
+      required:
+        - bookings
+        - revenue
+        - courses
+        - users
+      properties:
+        bookings:
+          $ref: '#/components/schemas/BookingStats'
+        revenue:
+          $ref: '#/components/schemas/RevenueStats'
+        courses:
+          $ref: '#/components/schemas/CourseStats'
+        users:
+          $ref: '#/components/schemas/UserStats'
+
+    BookingStats:
+      type: object
+      required:
+        - total
+        - confirmed
+        - pending
+        - thisMonth
+      properties:
+        total:
+          type: integer
+          description: Total number of bookings
+        confirmed:
+          type: integer
+          description: Number of confirmed bookings
+        pending:
+          type: integer
+          description: Number of pending bookings
+        thisMonth:
+          type: integer
+          description: Bookings created this month
+
+    RevenueStats:
+      type: object
+      required:
+        - total
+        - thisMonth
+        - currency
+      properties:
+        total:
+          type: integer
+          description: Total revenue in cents
+        thisMonth:
+          type: integer
+          description: Revenue this month in cents
+        currency:
+          type: string
+          enum: [EUR]
+          default: EUR
+
+    CourseStats:
+      type: object
+      required:
+        - total
+        - published
+        - utilization
+      properties:
+        total:
+          type: integer
+          description: Total number of courses
+        published:
+          type: integer
+          description: Number of published courses
+        utilization:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseUtilization'
+
+    CourseUtilization:
+      type: object
+      required:
+        - courseId
+        - courseTitle
+        - bookingCount
+      properties:
+        courseId:
+          type: string
+        courseTitle:
+          type: string
+        bookingCount:
+          type: integer
+        capacity:
+          type: integer
+          nullable: true
+        utilizationPercent:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 100
+
+    UserStats:
+      type: object
+      required:
+        - total
+        - newThisMonth
+        - growth
+      properties:
+        total:
+          type: integer
+          description: Total number of users
+        newThisMonth:
+          type: integer
+          description: New registrations this month
+        growth:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonthlyGrowth'
+
+    MonthlyGrowth:
+      type: object
+      required:
+        - month
+        - count
+      properties:
+        month:
+          type: string
+          description: Month in YYYY-MM format
+        count:
+          type: integer
+          description: Number of new users
+
+    HealthStatusResponse:
+      type: object
+      required:
+        - data
+        - requestId
+      properties:
+        data:
+          $ref: '#/components/schemas/HealthStatus'
+        requestId:
+          type: string
+
+    HealthStatus:
+      type: object
+      required:
+        - status
+        - timestamp
+        - version
+        - environment
+        - checks
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+        environment:
+          type: string
+        checks:
+          type: object
+          required:
+            - database
+            - clerk
+            - stripe
+          properties:
+            database:
+              $ref: '#/components/schemas/ServiceCheck'
+            clerk:
+              $ref: '#/components/schemas/ServiceCheck'
+            stripe:
+              $ref: '#/components/schemas/ServiceCheck'
+
+    ServiceCheck:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        latency:
+          type: integer
+          description: Response time in milliseconds
+        message:
+          type: string
+          description: Error message if status is error
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - requestId
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+        requestId:
+          type: string
+
+  responses:
+    Unauthorized:
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Not authorized (admin required)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
