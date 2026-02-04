@@ -38,6 +38,12 @@ Als Admin möchte ich bei jedem Curriculum-Item ein Seminarmaterial verlinken k�
 ### US-5: Admin überwacht Systemstatus
 Als Admin möchte ich in "Berichte & Analysen" den API-Health-Status und Systemstatus sehen.
 
+### US-6: Admin veröffentlicht Kurse per Toggle
+Als Admin möchte ich den Veröffentlichungsstatus eines Kurses per Toggle ändern können, ohne eine separate Aktion auszuführen.
+
+### US-7: Admin verwaltet Standorte einheitlich
+Als Admin möchte ich, dass die Standortverwaltung das gleiche Layout wie die Kursverwaltung hat.
+
 ## Technical Requirements
 
 ### TR-1: Layout-Standardisierung
@@ -161,6 +167,24 @@ interface CurriculumItem {
 />
 ```
 
+### TR-10: Kurs-Veröffentlichungs-Toggle
+
+```typescript
+// Toggle ersetzt Status-Spalte und "Veröffentlichen"-Button
+<Switch
+  checked={course.isPublished}
+  onChange={() => togglePublishStatus(course.id)}
+  inputProps={{ 'aria-label': 'Veröffentlichungsstatus' }}
+/>
+// Label: "Veröffentlicht" / "Unveröffentlicht"
+```
+
+### TR-11: Standortverwaltung Layout-Angleichung
+
+- Suchfunktion entfernen
+- Gleiches Tabellen-Layout wie Kursverwaltung
+- Gleiche Spaltenstruktur und Abstände
+
 ## UI/UX Requirements
 
 ### UX-1: Website Header Breite
@@ -231,6 +255,14 @@ interface CurriculumItem {
 ### AC-5: Kursverwaltung
 - [ ] Curriculum-Items zeigen Seminarmaterial-Feld
 - [ ] Verlinkung zu bestehendem Seminarmaterial möglich
+- [ ] Status-Spalte ersetzt durch Toggle "Veröffentlicht"/"Unveröffentlicht"
+- [ ] Toggle ändert Status direkt per Klick
+- [ ] Spalte "Veröffentlichen" entfernt
+
+### AC-5a: Standortverwaltung
+- [ ] Suchfunktion entfernt
+- [ ] Layout identisch mit Kursverwaltung
+- [ ] Gleiche Tabellenstruktur und Abstände
 
 ### AC-6: Berichte & Analysen
 - [ ] API Health-Daten werden angezeigt
