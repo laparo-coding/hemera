@@ -4,9 +4,7 @@
  * Task: T036
  */
 
-import AddIcon from '@mui/icons-material/Add';
-import { Box, Button, Skeleton } from '@mui/material';
-import Link from 'next/link';
+import { Box, Skeleton } from '@mui/material';
 import { Suspense } from 'react';
 import { AdminPageContainer } from '@/components/admin/AdminPageContainer';
 import { ADMIN_LABELS } from '@/lib/constants/admin';
@@ -53,13 +51,6 @@ export default async function AdminLocationsPage() {
         { label: ADMIN_LABELS.locations, href: '/admin/locations' },
       ]}
       titleProps={{ 'data-testid': 'admin-locations-page' }}
-      actions={
-        <Link href='/admin/locations/new' style={{ textDecoration: 'none' }}>
-          <Button variant='contained' startIcon={<AddIcon />}>
-            Neuer Veranstaltungsort
-          </Button>
-        </Link>
-      }
     >
       <Suspense fallback={<LocationsSkeleton />}>
         <LocationsContent />

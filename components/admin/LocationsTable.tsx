@@ -7,6 +7,7 @@
  */
 
 import {
+  Add as AddIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
   Map as MapIcon,
@@ -16,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import {
   Box,
+  Button,
   Chip,
   IconButton,
   InputAdornment,
@@ -115,6 +117,13 @@ export default function LocationsTable({
             ),
           }}
         />
+        <Button
+          variant='contained'
+          startIcon={<AddIcon />}
+          onClick={() => router.push('/admin/locations/new')}
+        >
+          Neuer Veranstaltungsort
+        </Button>
       </Box>
 
       <TableContainer>
