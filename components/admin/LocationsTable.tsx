@@ -129,21 +129,13 @@ export default function LocationsTable({
       <TableContainer>
         <Table stickyHeader aria-label='Locations Tabelle'>
           <TableHead>
-            <TableRow>
-              <TableCell sx={{ bgcolor: 'background.paper' }}>Name</TableCell>
-              <TableCell sx={{ bgcolor: 'background.paper' }}>
-                Adresse
-              </TableCell>
-              <TableCell sx={{ bgcolor: 'background.paper' }}>Stadt</TableCell>
-              <TableCell align='center' sx={{ bgcolor: 'background.paper' }}>
-                Karte
-              </TableCell>
-              <TableCell align='center' sx={{ bgcolor: 'background.paper' }}>
-                Kurse
-              </TableCell>
-              <TableCell align='right' sx={{ bgcolor: 'background.paper' }}>
-                Aktionen
-              </TableCell>
+            <TableRow sx={{ bgcolor: 'background.paper' }}>
+              <TableCell>Name</TableCell>
+              <TableCell>Adresse</TableCell>
+              <TableCell>Stadt</TableCell>
+              <TableCell align='center'>Karte</TableCell>
+              <TableCell align='center'>Kurse</TableCell>
+              <TableCell align='right'>Aktionen</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
