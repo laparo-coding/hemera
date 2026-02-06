@@ -23,7 +23,7 @@ npm run dev
 Navigate to: `http://localhost:3000/admin`
 
 **Expected**: 
-- 3-column grid with 7 cards
+- 3-column grid with 6 cards
 - No footer visible
 - No welcome message
 - All text in German
@@ -169,7 +169,7 @@ npx playwright test tests/e2e/admin-dashboard.spec.ts --ui
 
 ## Definition of Done Checklist
 
-- [ ] Dashboard shows 7 cards in 3-column grid
+- [ ] Dashboard shows 6 cards in 3-column grid
 - [ ] Breadcrumb visible on all admin subpages
 - [ ] Footer removed from admin layout
 - [ ] Welcome message removed from dashboard
