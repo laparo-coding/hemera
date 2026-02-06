@@ -32,15 +32,27 @@ export async function getAdminUsers(
 
   const offset = (page - 1) * limit;
 
-  // Get users from Clerk
+  // Get all users from Clerk via pagination (iterative fetch)
   const clerk = await clerkClient();
-  const clerkResponse = await clerk.users.getUserList({
-    limit: 100, // Fetch more to allow filtering
-    offset: 0,
-    orderBy: sortBy === 'createdAt' ? '-created_at' : undefined,
-  });
+  let allClerkUsers: Awaited<
+    ReturnType<typeof clerk.users.getUserList>
+  >['data'] = [];
+  let clerkOffset = 0;
+  const clerkLimit = 100;
+  let hasMore = true;
 
-  let users = clerkResponse.data;
+  while (hasMore) {
+    const clerkResponse = await clerk.users.getUserList({
+      limit: clerkLimit,
+      offset: clerkOffset,
+      orderBy: sortBy === 'createdAt' ? '-created_at' : undefined,
+    });
+    allClerkUsers = allClerkUsers.concat(clerkResponse.data);
+    clerkOffset += clerkLimit;
+    hasMore = clerkResponse.data.length === clerkLimit;
+  }
+
+  let users = allClerkUsers;
 
   // Apply search filter
   if (search) {
@@ -209,9 +221,25 @@ export async function updateUserRole(
 }
 
 /**
- * Delete a user
+ * Delete a user (soft delete: anonymize data in Prisma, delete from Clerk)
+ * Uses same soft-delete pattern as lib/api/users.ts deleteUser
  */
 export async function deleteUser(userId: string): Promise<void> {
+  if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+    throw new Error('Invalid user ID provided');
+  }
+
+  // Soft delete: anonymize user data in Prisma (keep records for audit)
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      email: `deleted-${userId}@example.com`,
+      name: 'Deleted User',
+      image: null,
+    },
+  });
+
+  // Hard delete: remove from Clerk
   const clerk = await clerkClient();
   await clerk.users.deleteUser(userId);
 }

@@ -12,13 +12,15 @@ import { ADMIN_LAYOUT, DASHBOARD_CARDS } from '@/lib/constants/admin';
 import { DashboardCard } from './DashboardCard';
 
 export function DashboardGrid() {
+  const enabledCards = DASHBOARD_CARDS.filter(card => card.enabled);
+
   return (
     <Grid
       container
       spacing={ADMIN_LAYOUT.GRID_SPACING}
       data-testid='admin-dashboard-grid'
     >
-      {DASHBOARD_CARDS.map(card => (
+      {enabledCards.map(card => (
         <Grid
           key={card.id}
           size={{

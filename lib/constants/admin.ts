@@ -52,7 +52,7 @@ export const ADMIN_ROUTES = {
 export const DASHBOARD_CARDS = [
   {
     id: 'users',
-    titleDe: 'Benutzer',
+    titleDe: 'Benutzerverwaltung',
     descriptionDe: 'Benutzerkonten und Rollen verwalten',
     route: ADMIN_ROUTES.USERS,
     icon: 'People',
@@ -60,23 +60,15 @@ export const DASHBOARD_CARDS = [
   },
   {
     id: 'courses',
-    titleDe: 'Seminare',
+    titleDe: 'Kursverwaltung',
     descriptionDe: 'Seminare erstellen und bearbeiten',
     route: ADMIN_ROUTES.COURSES,
     icon: 'School',
     enabled: true,
   },
   {
-    id: 'course-material',
-    titleDe: 'Material',
-    descriptionDe: 'Seminarmaterialien verwalten',
-    route: ADMIN_ROUTES.COURSE_MATERIAL,
-    icon: 'Folder',
-    enabled: true,
-  },
-  {
     id: 'locations',
-    titleDe: 'Veranstaltungsorte',
+    titleDe: 'Standortverwaltung',
     descriptionDe: 'Veranstaltungsorte verwalten',
     route: ADMIN_ROUTES.LOCATIONS,
     icon: 'LocationOn',
@@ -84,7 +76,7 @@ export const DASHBOARD_CARDS = [
   },
   {
     id: 'testimonials',
-    titleDe: 'Erfahrungsberichte',
+    titleDe: 'Testimonial-Verwaltung',
     descriptionDe: 'Erfahrungsberichte prüfen und freigeben',
     route: ADMIN_ROUTES.TESTIMONIALS,
     icon: 'FormatQuote',
@@ -104,6 +96,14 @@ export const DASHBOARD_CARDS = [
     descriptionDe: 'Website konfigurieren',
     route: ADMIN_ROUTES.SETTINGS,
     icon: 'Settings',
+    enabled: true,
+  },
+  {
+    id: 'course-material',
+    titleDe: 'Seminarmaterial',
+    descriptionDe: 'Seminarmaterialien verwalten',
+    route: ADMIN_ROUTES.COURSE_MATERIAL,
+    icon: 'Folder',
     enabled: false, // Coming soon
   },
 ] as const;

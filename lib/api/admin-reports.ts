@@ -19,18 +19,40 @@ import type {
 } from '@/lib/types/admin';
 
 /**
+ * Helper: Fetch all users from Clerk via pagination
+ */
+async function getAllClerkUsers() {
+  const clerk = await clerkClient();
+  let allUsers: Awaited<ReturnType<typeof clerk.users.getUserList>>['data'] =
+    [];
+  let offset = 0;
+  const limit = 100;
+  let hasMore = true;
+
+  while (hasMore) {
+    const response = await clerk.users.getUserList({
+      limit,
+      offset,
+    });
+    allUsers = allUsers.concat(response.data);
+    offset += limit;
+    hasMore = response.data.length === limit;
+  }
+
+  return allUsers;
+}
+
+/**
  * Get dashboard statistics
  */
 export async function getDashboardStats(): Promise<DashboardStats> {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  // Get user counts from Clerk
-  const clerk = await clerkClient();
-  const clerkUsers = await clerk.users.getUserList({ limit: 500 });
-  const totalUsers = clerkUsers.totalCount;
-
-  const newUsersLast30Days = clerkUsers.data.filter(
+  // Get user counts from Clerk (iterative fetch)
+  const allClerkUsers = await getAllClerkUsers();
+  const totalUsers = allClerkUsers.length;
+  const newUsersLast30Days = allClerkUsers.filter(
     user => new Date(user.createdAt) >= thirtyDaysAgo
   ).length;
 
@@ -215,11 +237,11 @@ export async function getCourseUtilization(): Promise<
  * Get user growth statistics
  */
 export async function getUserGrowthStats(): Promise<UserGrowthStats> {
-  const clerk = await clerkClient();
-  const users = await clerk.users.getUserList({ limit: 500 });
+  // Get all users from Clerk (iterative fetch)
+  const allClerkUsers = await getAllClerkUsers();
 
   // Count admins
-  const admins = users.data.filter(
+  const admins = allClerkUsers.filter(
     user => user.publicMetadata?.role === 'admin'
   ).length;
 
@@ -237,12 +259,12 @@ export async function getUserGrowthStats(): Promise<UserGrowthStats> {
     const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
     const month = monthDate.toISOString().slice(0, 7); // YYYY-MM
 
-    const newUsersInMonth = users.data.filter(user => {
+    const newUsersInMonth = allClerkUsers.filter(user => {
       const createdAt = new Date(user.createdAt);
       return createdAt >= monthDate && createdAt <= monthEnd;
     }).length;
 
-    const cumulativeTotal = users.data.filter(user => {
+    const cumulativeTotal = allClerkUsers.filter(user => {
       const createdAt = new Date(user.createdAt);
       return createdAt <= monthEnd;
     }).length;
