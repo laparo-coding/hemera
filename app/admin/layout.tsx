@@ -45,7 +45,14 @@ export default async function AdminLayout({
       >
         <PublicNavigation />
 
-        <Box component='main' sx={{ paddingTop: '64px', flexGrow: 1 }}>
+        <Box
+          component='main'
+          sx={{
+            paddingTop: '64px',
+            flexGrow: 1,
+            bgcolor: 'background.paper',
+          }}
+        >
           <Container maxWidth='lg' sx={{ mt: 4, mb: 4 }}>
             {children}
           </Container>
