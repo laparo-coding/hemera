@@ -254,7 +254,12 @@ export default function SeminarMaterialTable({
         <TableContainer>
           <Table stickyHeader aria-label='Seminarmaterial Tabelle'>
             <TableHead>
-              <TableRow sx={{ bgcolor: 'background.paper' }}>
+              <TableRow
+                sx={{
+                  bgcolor: 'background.paper',
+                  '& th': { backgroundColor: 'background.paper' },
+                }}
+              >
                 <TableCell>Titel</TableCell>
                 <TableCell>Kennung</TableCell>
                 <TableCell>Erstellt am</TableCell>
