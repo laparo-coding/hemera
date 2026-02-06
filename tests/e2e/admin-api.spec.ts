@@ -79,9 +79,9 @@ test.describe('Admin API CORS Support', () => {
     // Should return 200 OK
     expect(response.status()).toBe(200);
 
-    // Should include CORS headers (origin is restricted to app domain, not wildcard)
+    // Should include CORS headers
     const headers = response.headers();
-    expect(headers['access-control-allow-origin']).toBeTruthy();
+    expect(headers['access-control-allow-origin']).toBe('*');
     expect(headers['access-control-allow-methods']).toContain('GET');
     expect(headers['access-control-allow-headers']).toContain('Authorization');
   });
@@ -96,9 +96,9 @@ test.describe('Admin API CORS Support', () => {
     // Should return 200 OK
     expect(response.status()).toBe(200);
 
-    // Should include CORS headers (origin is restricted to app domain, not wildcard)
+    // Should include CORS headers
     const headers = response.headers();
-    expect(headers['access-control-allow-origin']).toBeTruthy();
+    expect(headers['access-control-allow-origin']).toBe('*');
     expect(headers['access-control-allow-methods']).toContain('GET');
     expect(headers['access-control-allow-headers']).toContain('Authorization');
   });
@@ -113,9 +113,9 @@ test.describe('Admin API CORS Support', () => {
     // Should return 200 OK
     expect(response.status()).toBe(200);
 
-    // Should include CORS headers (origin is restricted to app domain, not wildcard)
+    // Should include CORS headers
     const headers = response.headers();
-    expect(headers['access-control-allow-origin']).toBeTruthy();
+    expect(headers['access-control-allow-origin']).toBe('*');
     expect(headers['access-control-allow-methods']).toContain('GET');
     expect(headers['access-control-allow-headers']).toContain('Authorization');
   });
@@ -130,9 +130,9 @@ test.describe('Admin API CORS Support', () => {
     // Should return 200 OK
     expect(response.status()).toBe(200);
 
-    // Should include CORS headers (origin is restricted to app domain, not wildcard)
+    // Should include CORS headers
     const headers = response.headers();
-    expect(headers['access-control-allow-origin']).toBeTruthy();
+    expect(headers['access-control-allow-origin']).toBe('*');
     expect(headers['access-control-allow-methods']).toContain('GET');
     expect(headers['access-control-allow-headers']).toContain('Authorization');
   });
@@ -142,9 +142,9 @@ test.describe('Admin API CORS Support', () => {
   }) => {
     const response = await request.get('/api/admin/users');
 
-    // Should include CORS headers even on error responses (origin is restricted, not wildcard)
+    // Should include CORS headers even on error responses
     const headers = response.headers();
-    expect(headers['access-control-allow-origin']).toBeTruthy();
+    expect(headers['access-control-allow-origin']).toBe('*');
   });
 });
 
