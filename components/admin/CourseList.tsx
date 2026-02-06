@@ -137,15 +137,23 @@ export default function CourseList({
       <TableContainer>
         <Table stickyHeader aria-label='Kurse Tabelle'>
           <TableHead>
-            <TableRow sx={{ bgcolor: 'background.paper' }}>
-              <TableCell>Titel</TableCell>
-              <TableCell>Dozent/in</TableCell>
-              <TableCell>Niveau</TableCell>
-              <TableCell>Datum</TableCell>
-              <TableCell align='right'>Preis</TableCell>
-              <TableCell align='center'>Teilnehmer</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align='right'>Aktionen</TableCell>
+            <TableRow>
+              <TableCell sx={{ bgcolor: 'background.paper' }}>Titel</TableCell>
+              <TableCell sx={{ bgcolor: 'background.paper' }}>
+                Dozent/in
+              </TableCell>
+              <TableCell sx={{ bgcolor: 'background.paper' }}>Niveau</TableCell>
+              <TableCell sx={{ bgcolor: 'background.paper' }}>Datum</TableCell>
+              <TableCell align='right' sx={{ bgcolor: 'background.paper' }}>
+                Preis
+              </TableCell>
+              <TableCell align='center' sx={{ bgcolor: 'background.paper' }}>
+                Teilnehmer
+              </TableCell>
+              <TableCell sx={{ bgcolor: 'background.paper' }}>Status</TableCell>
+              <TableCell align='right' sx={{ bgcolor: 'background.paper' }}>
+                Aktionen
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

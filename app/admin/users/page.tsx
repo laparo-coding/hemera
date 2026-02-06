@@ -157,6 +157,7 @@ export default function UsersPage() {
   return (
     <AdminPageContainer
       title={ADMIN_LABELS.users}
+      subtitle='Verwalte Benutzerkonten, Rollen und Berechtigungen.'
       breadcrumbs={[{ label: ADMIN_LABELS.users, href: '/admin/users' }]}
       titleProps={{ 'data-testid': 'admin-users-page' }}
     >

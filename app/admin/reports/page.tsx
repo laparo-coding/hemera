@@ -149,6 +149,7 @@ export default function ReportsPage() {
   return (
     <AdminPageContainer
       title={ADMIN_LABELS.reports}
+      subtitle='Statistiken, Auslastung und Systemstatus auf einen Blick.'
       breadcrumbs={[{ label: ADMIN_LABELS.reports, href: '/admin/reports' }]}
       titleProps={{ 'data-testid': 'admin-reports-page' }}
     >
