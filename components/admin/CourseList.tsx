@@ -39,6 +39,7 @@ import { TERMS } from '../../lib/constants';
 import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
 import { getLevelLabel } from '../../lib/utils/course-level';
 import { formatShortDate, formatTimeRange } from '../../lib/utils/date-format';
+import { normalizeForSearch } from '../../lib/utils/searchNormalization';
 import { PublishSwitch } from './PublishSwitch';
 
 interface CourseListProps {
@@ -58,10 +59,10 @@ export default function CourseList({
 
   // Filter courses based on search
   const filteredCourses = courses.filter(course => {
-    const searchLower = searchQuery.toLowerCase();
+    const searchLower = normalizeForSearch(searchQuery);
     return (
-      (course.title?.toLowerCase() ?? '').includes(searchLower) ||
-      (course.instructor?.toLowerCase() ?? '').includes(searchLower)
+      normalizeForSearch(course.title).includes(searchLower) ||
+      normalizeForSearch(course.instructor).includes(searchLower)
     );
   });
 

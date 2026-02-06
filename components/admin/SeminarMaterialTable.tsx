@@ -37,6 +37,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { normalizeForSearch } from '@/lib/utils/searchNormalization';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
 interface SeminarMaterial {
@@ -109,10 +110,10 @@ export default function SeminarMaterialTable({
 
   // Filter materials based on search
   const filteredMaterials = materials.filter(material => {
-    const searchLower = searchQuery.toLowerCase();
+    const searchLower = normalizeForSearch(searchQuery);
     return (
-      (material.title?.toLowerCase() ?? '').includes(searchLower) ||
-      (material.identifier?.toLowerCase() ?? '').includes(searchLower)
+      normalizeForSearch(material.title).includes(searchLower) ||
+      normalizeForSearch(material.identifier).includes(searchLower)
     );
   });
 

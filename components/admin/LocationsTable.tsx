@@ -36,6 +36,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { LocationResponse } from '@/lib/schemas/location-schema';
+import { normalizeForSearch } from '@/lib/utils/searchNormalization';
 import { TERMS } from '../../lib/constants';
 
 interface LocationsTableProps {
@@ -56,11 +57,11 @@ export default function LocationsTable({
 
   // Filter locations based on search
   const filteredLocations = locations.filter(location => {
-    const searchLower = searchQuery.toLowerCase();
+    const searchLower = normalizeForSearch(searchQuery);
     return (
-      (location.name?.toLowerCase() ?? '').includes(searchLower) ||
-      (location.city?.toLowerCase() ?? '').includes(searchLower) ||
-      (location.address?.toLowerCase() ?? '').includes(searchLower)
+      normalizeForSearch(location.name).includes(searchLower) ||
+      normalizeForSearch(location.city).includes(searchLower) ||
+      normalizeForSearch(location.address).includes(searchLower)
     );
   });
 
