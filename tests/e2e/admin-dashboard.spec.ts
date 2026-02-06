@@ -12,7 +12,7 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
     await page.setViewportSize({ width: 1280, height: 720 });
   });
 
-  test('should display dashboard with 7 cards in 3-column grid', async ({
+  test('should display dashboard with 6 cards in 3-column grid', async ({
     page,
   }) => {
     // Navigate to admin dashboard (will be redirected if not auth'd in non-CI)
@@ -30,9 +30,9 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
     const dashboardGrid = page.locator('[data-testid="admin-dashboard-grid"]');
     await expect(dashboardGrid).toBeVisible();
 
-    // Should have exactly 7 cards
+    // Should have exactly 6 cards
     const cards = page.locator('[data-testid^="dashboard-card-"]');
-    await expect(cards).toHaveCount(7);
+    await expect(cards).toHaveCount(6);
 
     // Verify card titles are in German
     await expect(page.getByText('Benutzer')).toBeVisible();
@@ -40,7 +40,6 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
     await expect(page.getByText('Material')).toBeVisible();
     await expect(page.getByText('Veranstaltungsorte')).toBeVisible();
     await expect(page.getByText('Erfahrungsberichte')).toBeVisible();
-    await expect(page.getByText('Systemeinstellungen')).toBeVisible();
     await expect(page.getByText('Berichte & Analysen')).toBeVisible();
   });
 
@@ -85,18 +84,6 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
     // Verify breadcrumb
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
     await expect(breadcrumb).toContainText('Berichte & Analysen');
-  });
-
-  test('should show disabled state for coming soon features', async ({
-    page,
-  }) => {
-    await page.goto('/admin');
-
-    if (process.env.CI) return;
-
-    // Settings card should be disabled
-    const settingsCard = page.locator('[data-testid="dashboard-card-settings"]');
-    await expect(settingsCard).toHaveAttribute('aria-disabled', 'true');
   });
 
   test('should not display footer on admin pages', async ({ page }) => {
@@ -172,6 +159,6 @@ test.describe('Admin Dashboard - Responsive Layout', () => {
 
     // Cards should stack vertically
     const cards = page.locator('[data-testid^="dashboard-card-"]');
-    await expect(cards).toHaveCount(7);
+    await expect(cards).toHaveCount(6);
   });
 });

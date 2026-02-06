@@ -98,14 +98,6 @@ export const DASHBOARD_CARDS = [
     icon: 'Analytics',
     enabled: true,
   },
-  {
-    id: 'settings',
-    titleDe: 'Systemeinstellungen',
-    descriptionDe: 'Website konfigurieren',
-    route: ADMIN_ROUTES.SETTINGS,
-    icon: 'Settings',
-    enabled: true,
-  },
 ] as const;
 
 /**
