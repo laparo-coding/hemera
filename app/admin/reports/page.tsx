@@ -31,6 +31,16 @@ import type {
   ServiceHealth,
 } from '@/lib/types/admin';
 
+const STATUS_LABELS: Record<string, string> = {
+  healthy: 'Gesund',
+  degraded: 'Eingeschränkt',
+  unhealthy: 'Nicht verfügbar',
+};
+
+function getStatusLabel(status: string): string {
+  return STATUS_LABELS[status] ?? status;
+}
+
 function ServiceHealthChip({ service }: { service: ServiceHealth }) {
   const statusColor =
     service.status === 'healthy'
@@ -41,7 +51,7 @@ function ServiceHealthChip({ service }: { service: ServiceHealth }) {
 
   return (
     <Chip
-      label={`${service.nameDe}: ${service.status}`}
+      label={`${service.nameDe}: ${getStatusLabel(service.status)}`}
       color={statusColor}
       size='small'
       sx={{ mr: 1, mb: 1 }}
@@ -266,7 +276,7 @@ export default function ReportsPage() {
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Typography variant='h6' gutterBottom>
-            Benutzer-Wachstum
+            Benutzerwachstum
           </Typography>
           <Grid container spacing={2}>
             <Grid size={{ xs: 6, md: 3 }}>
@@ -333,7 +343,7 @@ export default function ReportsPage() {
                   Gesamtstatus:
                 </Typography>
                 <Chip
-                  label={health.overall}
+                  label={getStatusLabel(health.overall)}
                   color={
                     health.overall === 'healthy'
                       ? 'success'
