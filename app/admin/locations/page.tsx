@@ -56,7 +56,7 @@ export default async function AdminLocationsPage() {
       actions={
         <Link href='/admin/locations/new' style={{ textDecoration: 'none' }}>
           <Button variant='contained' startIcon={<AddIcon />}>
-            Neue Location
+            Neuer Veranstaltungsort
           </Button>
         </Link>
       }

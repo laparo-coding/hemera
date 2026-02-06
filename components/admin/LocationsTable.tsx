@@ -7,7 +7,6 @@
  */
 
 import {
-  Add as AddIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
   Map as MapIcon,
@@ -17,7 +16,6 @@ import {
 } from '@mui/icons-material';
 import {
   Box,
-  Button,
   Chip,
   IconButton,
   InputAdornment,
@@ -33,7 +31,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { LocationResponse } from '@/lib/schemas/location-schema';
@@ -118,11 +115,6 @@ export default function LocationsTable({
             ),
           }}
         />
-        <Link href='/admin/locations/new' style={{ textDecoration: 'none' }}>
-          <Button variant='contained' startIcon={<AddIcon />}>
-            Neue Location
-          </Button>
-        </Link>
       </Box>
 
       <TableContainer>
