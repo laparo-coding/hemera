@@ -65,7 +65,7 @@ Navigate to: `http://localhost:3000/admin`
    - System Health section with status indicators
    - Buchungsstatistiken
    - Kursauslastung
-   - Benutzer-Wachstum
+   - Benutzerwachstum
 3. Click "Aktualisieren" button
 4. **Expected**: Data refreshes without page reload
 

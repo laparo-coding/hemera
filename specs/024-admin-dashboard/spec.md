@@ -270,7 +270,7 @@ interface CurriculumItem {
 - [ ] Daten werden manuell aktualisiert (bei Seitenaufruf + Refresh-Button)
 - [ ] Buchungsstatistiken (Anzahl Buchungen, Umsatz)
 - [ ] Kursauslastung pro Kurs
-- [ ] Benutzer-Wachstum (neue Registrierungen)
+- [ ] Benutzerwachstum (neue Registrierungen)
 
 ### AC-7: Input-Felder
 - [ ] Alle Input-Felder haben Placeholder-Text
@@ -301,7 +301,7 @@ interface CurriculumItem {
 ## Open Questions
 
 1. ~~Soll der Systemstatus aus `/admin/settings` komplett nach Reports verschoben werden?~~ → Ja, komplett verschieben
-2. ~~Welche zusätzlichen Metriken sollen in Reports & Analytics angezeigt werden?~~ → Buchungen, Kursauslastung, Benutzer-Wachstum
+2. ~~Welche zusätzlichen Metriken sollen in Reports & Analytics angezeigt werden?~~ → Buchungen, Kursauslastung, Benutzerwachstum
 3. ~~Soll die Outperformer-Liste filterbar/exportierbar sein?~~ → Nur filterbar (kein Export)
 
 ## Clarifications
@@ -311,4 +311,4 @@ interface CurriculumItem {
 - Q: Welche Aktionen soll Admin auf Benutzer ausführen können? → A: Ansicht + Löschen + Rolle zuweisen
 - Q: Systemstatus aus Settings nach Reports verschieben? → A: Ja, komplett verschieben (aus Settings entfernen)
 - Q: Outperformer-Liste filterbar/exportierbar? → A: Nur filterbar (Checkbox "Nur Outperformer anzeigen")
-- Q: Welche Metriken in Reports & Analytics? → A: Health + Buchungen + Kursauslastung + Benutzer-Wachstum
+- Q: Welche Metriken in Reports & Analytics? → A: Health + Buchungen + Kursauslastung + Benutzerwachstum

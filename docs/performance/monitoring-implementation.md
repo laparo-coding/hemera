@@ -156,7 +156,7 @@ GET /api/admin/analytics?type=trace&requestId=xyz123
 
 ## 📈 Monitoring-Metriken
 
-### System-Health
+### Systemzustand
 
 **Verfügbare Metriken:**
 
