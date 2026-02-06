@@ -277,7 +277,7 @@ export async function getUserGrowthStats(): Promise<UserGrowthStats> {
   }
 
   return {
-    total: users.totalCount,
+    total: allClerkUsers.length,
     outperformers,
     admins,
     monthlyGrowth,
