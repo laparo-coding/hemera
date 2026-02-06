@@ -158,7 +158,7 @@ export default function UsersPage() {
     <AdminPageContainer
       title={ADMIN_LABELS.users}
       breadcrumbs={[{ label: ADMIN_LABELS.users, href: '/admin/users' }]}
-      data-testid='admin-users-page'
+      titleProps={{ 'data-testid': 'admin-users-page' }}
     >
       {error && (
         <Alert severity='error' sx={{ mb: 3 }}>

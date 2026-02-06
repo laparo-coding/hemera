@@ -23,3 +23,5 @@ export {
   ERROR_MESSAGES,
   initiateInvoiceDownload,
 } from './InvoiceDownloadButton';
+export { UserBreadcrumb, type UserBreadcrumbItem } from './UserBreadcrumb';
+export { UserPageContainer } from './UserPageContainer';

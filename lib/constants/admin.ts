@@ -52,7 +52,7 @@ export const ADMIN_ROUTES = {
 export const DASHBOARD_CARDS = [
   {
     id: 'users',
-    titleDe: 'Benutzerverwaltung',
+    titleDe: 'Benutzer',
     descriptionDe: 'Benutzerkonten und Rollen verwalten',
     route: ADMIN_ROUTES.USERS,
     icon: 'People',
@@ -60,35 +60,35 @@ export const DASHBOARD_CARDS = [
   },
   {
     id: 'courses',
-    titleDe: 'Kursverwaltung',
-    descriptionDe: 'Kurse erstellen und bearbeiten',
+    titleDe: 'Seminare',
+    descriptionDe: 'Seminare erstellen und bearbeiten',
     route: ADMIN_ROUTES.COURSES,
     icon: 'School',
     enabled: true,
   },
   {
+    id: 'course-material',
+    titleDe: 'Material',
+    descriptionDe: 'Seminarmaterialien verwalten',
+    route: ADMIN_ROUTES.COURSE_MATERIAL,
+    icon: 'Folder',
+    enabled: true,
+  },
+  {
     id: 'locations',
-    titleDe: 'Standortverwaltung',
-    descriptionDe: 'Kursstandorte verwalten',
+    titleDe: 'Veranstaltungsorte',
+    descriptionDe: 'Veranstaltungsorte verwalten',
     route: ADMIN_ROUTES.LOCATIONS,
     icon: 'LocationOn',
     enabled: true,
   },
   {
     id: 'testimonials',
-    titleDe: 'Testimonial-Verwaltung',
+    titleDe: 'Erfahrungsberichte',
     descriptionDe: 'Erfahrungsberichte prüfen und freigeben',
     route: ADMIN_ROUTES.TESTIMONIALS,
     icon: 'FormatQuote',
     enabled: true,
-  },
-  {
-    id: 'settings',
-    titleDe: 'Systemeinstellungen',
-    descriptionDe: 'Plattform-Einstellungen konfigurieren',
-    route: ADMIN_ROUTES.SETTINGS,
-    icon: 'Settings',
-    enabled: false, // Coming soon
   },
   {
     id: 'reports',
@@ -97,6 +97,14 @@ export const DASHBOARD_CARDS = [
     route: ADMIN_ROUTES.REPORTS,
     icon: 'Analytics',
     enabled: true,
+  },
+  {
+    id: 'settings',
+    titleDe: 'Systemeinstellungen',
+    descriptionDe: 'Website konfigurieren',
+    route: ADMIN_ROUTES.SETTINGS,
+    icon: 'Settings',
+    enabled: false, // Coming soon
   },
 ] as const;
 
@@ -109,12 +117,12 @@ export const ADMIN_LABELS = {
   backToDashboard: 'Zurück zum Dashboard',
 
   // Page titles
-  users: 'Benutzerverwaltung',
+  users: 'Benutzer',
   reports: 'Berichte & Analysen',
-  courses: 'Seminarverwaltung',
-  locations: 'Standortverwaltung',
+  courses: 'Seminare',
+  locations: 'Veranstaltungsorte',
   testimonials: 'Erfahrungsberichte',
-  bookings: 'Buchungsverwaltung',
+  bookings: 'Buchungen',
 
   // Actions
   save: 'Speichern',

@@ -145,50 +145,51 @@ export function UserList({
   };
 
   return (
-    <Box>
-      {/* Filters */}
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 2,
-          mb: 3,
-          flexWrap: 'wrap',
-          alignItems: 'center',
-        }}
-      >
-        {/* Search */}
+    <Paper>
+      {/* Filters and Search */}
+      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
         <Box
-          component='form'
-          onSubmit={handleSearchSubmit}
-          sx={{ flex: 1, minWidth: 200 }}
+          sx={{
+            display: 'flex',
+            gap: 2,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}
         >
-          <TextField
-            data-testid='user-search-input'
-            placeholder='Suchen...'
-            size='small'
-            fullWidth
-            value={searchValue}
-            onChange={e => setSearchValue(e.target.value)}
-            disabled={isLoading}
-          />
-        </Box>
-
-        {/* Outperformer Filter */}
-        <FormControlLabel
-          data-testid='outperformer-filter'
-          control={
-            <Checkbox
-              checked={queryParams.outperformerOnly || false}
-              onChange={handleOutperformerFilterChange}
+          {/* Search */}
+          <Box
+            component='form'
+            onSubmit={handleSearchSubmit}
+            sx={{ flex: 1, minWidth: 200 }}
+          >
+            <TextField
+              data-testid='user-search-input'
+              placeholder='Suchen...'
+              size='small'
+              fullWidth
+              value={searchValue}
+              onChange={e => setSearchValue(e.target.value)}
               disabled={isLoading}
             />
-          }
-          label={ADMIN_LABELS.outperformerOnly}
-        />
+          </Box>
+
+          {/* Outperformer Filter */}
+          <FormControlLabel
+            data-testid='outperformer-filter'
+            control={
+              <Checkbox
+                checked={queryParams.outperformerOnly || false}
+                onChange={handleOutperformerFilterChange}
+                disabled={isLoading}
+              />
+            }
+            label={ADMIN_LABELS.outperformerOnly}
+          />
+        </Box>
       </Box>
 
       {/* Table */}
-      <TableContainer component={Paper}>
+      <TableContainer>
         <Table>
           <TableHead data-testid='user-list-header'>
             <TableRow>
@@ -292,7 +293,9 @@ export function UserList({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            mt: 2,
+            p: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
           }}
         >
           <Typography variant='body2' color='text.secondary'>
@@ -340,6 +343,6 @@ export function UserList({
           <ListItemText>{ADMIN_LABELS.deleteUser}</ListItemText>
         </MenuItem>
       </Menu>
-    </Box>
+    </Paper>
   );
 }

@@ -8,6 +8,7 @@
  */
 
 import AnalyticsIcon from '@mui/icons-material/Analytics';
+import FolderIcon from '@mui/icons-material/Folder';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PeopleIcon from '@mui/icons-material/People';
@@ -35,6 +36,7 @@ interface DashboardCardProps {
 const iconMap: Record<string, ReactNode> = {
   People: <PeopleIcon sx={{ fontSize: 48 }} />,
   School: <SchoolIcon sx={{ fontSize: 48 }} />,
+  Folder: <FolderIcon sx={{ fontSize: 48 }} />,
   LocationOn: <LocationOnIcon sx={{ fontSize: 48 }} />,
   FormatQuote: <FormatQuoteIcon sx={{ fontSize: 48 }} />,
   Settings: <SettingsIcon sx={{ fontSize: 48 }} />,

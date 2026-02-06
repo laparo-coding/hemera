@@ -23,7 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import { AdminBreadcrumb } from '@/components/admin/AdminBreadcrumb';
+import { AdminPageContainer } from '@/components/admin/AdminPageContainer';
 import { ADMIN_LABELS } from '@/lib/constants/admin';
 import type {
   AdminReportsResponse,
@@ -147,15 +147,11 @@ export default function ReportsPage() {
       : 0;
 
   return (
-    <Box data-testid='admin-reports-page'>
-      <AdminBreadcrumb
-        items={[{ label: ADMIN_LABELS.reports, href: '/admin/reports' }]}
-      />
-
-      <Typography variant='h4' component='h1' gutterBottom sx={{ mt: 2 }}>
-        {ADMIN_LABELS.reports}
-      </Typography>
-
+    <AdminPageContainer
+      title={ADMIN_LABELS.reports}
+      breadcrumbs={[{ label: ADMIN_LABELS.reports, href: '/admin/reports' }]}
+      titleProps={{ 'data-testid': 'admin-reports-page' }}
+    >
       {error && (
         <Alert severity='error' sx={{ mb: 3 }}>
           {error}
@@ -325,24 +321,30 @@ export default function ReportsPage() {
 
           {health && (
             <>
-              <Box sx={{ mb: 2 }}>
-                <Typography variant='body2' color='text.secondary' gutterBottom>
-                  Gesamtstatus:{' '}
-                  <Chip
-                    label={health.overall}
-                    color={
-                      health.overall === 'healthy'
-                        ? 'success'
-                        : health.overall === 'degraded'
-                          ? 'warning'
-                          : 'error'
-                    }
-                    size='small'
-                  />
+              <Box
+                sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
+              >
+                <Typography
+                  variant='body2'
+                  color='text.secondary'
+                  component='span'
+                >
+                  Gesamtstatus:
                 </Typography>
+                <Chip
+                  label={health.overall}
+                  color={
+                    health.overall === 'healthy'
+                      ? 'success'
+                      : health.overall === 'degraded'
+                        ? 'warning'
+                        : 'error'
+                  }
+                  size='small'
+                />
               </Box>
 
-              <Typography variant='body2' gutterBottom>
+              <Typography variant='body2' component='span' sx={{ mr: 1 }}>
                 Services:
               </Typography>
               <Box sx={{ mb: 2 }}>
@@ -360,6 +362,6 @@ export default function ReportsPage() {
           )}
         </CardContent>
       </Card>
-    </Box>
+    </AdminPageContainer>
   );
 }

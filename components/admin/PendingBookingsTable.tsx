@@ -7,6 +7,7 @@
  *
  * Displays bookings awaiting admin review (PRE_BOOKED status).
  * Allows admins to approve or reject bookings.
+ * Includes pagination for better UX with many bookings.
  */
 
 import {
@@ -27,6 +28,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Tooltip,
   Typography,
@@ -106,6 +108,10 @@ export default function PendingBookingsTable({
   const [reviewAction, setReviewAction] = useState<'approve' | 'reject'>(
     'approve'
   );
+
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const fetchPendingBookings = useCallback(async () => {
     setLoading(true);
@@ -224,78 +230,101 @@ export default function PendingBookingsTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {bookings.map(booking => (
-              <TableRow key={booking.id} hover>
-                <TableCell>
-                  <Typography variant='body2'>
-                    {formatDate(booking.createdAt)}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography>
-                    {booking.user.firstName} {booking.user.lastName}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant='body2' color='text.secondary'>
-                    {booking.user.email}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography>{booking.course.title}</Typography>
-                  {booking.course.startDate && (
-                    <Typography variant='caption' color='text.secondary'>
-                      Start: {formatDate(booking.course.startDate)}
+            {bookings
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map(booking => (
+                <TableRow key={booking.id} hover>
+                  <TableCell>
+                    <Typography variant='body2'>
+                      {formatDate(booking.createdAt)}
                     </Typography>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={getLevelLabel(booking.course.level)}
-                    color={getLevelColor(booking.course.level)}
-                    size='small'
-                  />
-                </TableCell>
-                <TableCell>
-                  {booking.user.isOutperformer ? (
+                  </TableCell>
+                  <TableCell>
+                    <Typography>
+                      {booking.user.firstName} {booking.user.lastName}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant='body2' color='text.secondary'>
+                      {booking.user.email}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography>{booking.course.title}</Typography>
+                    {booking.course.startDate && (
+                      <Typography variant='caption' color='text.secondary'>
+                        Start: {formatDate(booking.course.startDate)}
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
                     <Chip
-                      label='Ja'
-                      color='success'
+                      label={getLevelLabel(booking.course.level)}
+                      color={getLevelColor(booking.course.level)}
                       size='small'
-                      variant='outlined'
                     />
-                  ) : (
-                    <Chip
-                      label='Nein'
-                      color='default'
-                      size='small'
-                      variant='outlined'
-                    />
-                  )}
-                </TableCell>
-                <TableCell align='right'>
-                  <Tooltip title='Genehmigen'>
-                    <IconButton
-                      color='success'
-                      onClick={() => handleOpenReviewDialog(booking, 'approve')}
-                    >
-                      <ApproveIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title='Ablehnen'>
-                    <IconButton
-                      color='error'
-                      onClick={() => handleOpenReviewDialog(booking, 'reject')}
-                    >
-                      <RejectIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                  <TableCell>
+                    {booking.user.isOutperformer ? (
+                      <Chip
+                        label='Ja'
+                        color='success'
+                        size='small'
+                        variant='outlined'
+                      />
+                    ) : (
+                      <Chip
+                        label='Nein'
+                        color='default'
+                        size='small'
+                        variant='outlined'
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align='right'>
+                    <Tooltip title='Genehmigen'>
+                      <IconButton
+                        color='success'
+                        onClick={() =>
+                          handleOpenReviewDialog(booking, 'approve')
+                        }
+                      >
+                        <ApproveIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title='Ablehnen'>
+                      <IconButton
+                        color='error'
+                        onClick={() =>
+                          handleOpenReviewDialog(booking, 'reject')
+                        }
+                      >
+                        <RejectIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <TablePagination
+        component='div'
+        count={bookings.length}
+        page={page}
+        onPageChange={(_, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={e => {
+          setRowsPerPage(parseInt(e.target.value, 10));
+          setPage(0);
+        }}
+        rowsPerPageOptions={[5, 10, 25]}
+        labelRowsPerPage='Pro Seite:'
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} von ${count}`
+        }
+      />
 
       {selectedBooking && (
         <BookingReviewDialog

@@ -6,9 +6,11 @@
  */
 
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Button, Paper, Typography } from '@mui/material';
+import { Button } from '@mui/material';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { AdminPageContainer } from '@/components/admin/AdminPageContainer';
+import { ADMIN_LABELS } from '@/lib/constants/admin';
 import CourseListWithDelete from '../../../components/admin/CourseListWithDelete';
 import { listCourses } from '../../../lib/db/admin/courses';
 
@@ -25,28 +27,20 @@ export default async function AdminCoursesPage() {
   const courses = await listCourses();
 
   return (
-    <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 3,
-        }}
-      >
-        <Typography variant='h4' component='h1'>
-          Seminarverwaltung
-        </Typography>
+    <AdminPageContainer
+      title={ADMIN_LABELS.courses}
+      subtitle='Erstelle und verwalte Seminare für deine Akademie'
+      breadcrumbs={[{ label: ADMIN_LABELS.courses, href: '/admin/courses' }]}
+      titleProps={{ 'data-testid': 'admin-courses-page' }}
+      actions={
         <Link href='/admin/courses/new' style={{ textDecoration: 'none' }}>
-          <Button variant='contained' color='primary' startIcon={<AddIcon />}>
-            Neues Seminar erstellen
+          <Button variant='contained' startIcon={<AddIcon />}>
+            Neues Seminar
           </Button>
         </Link>
-      </Box>
-
-      <Paper elevation={2}>
-        <CourseListWithDelete courses={courses} />
-      </Paper>
-    </Box>
+      }
+    >
+      <CourseListWithDelete courses={courses} />
+    </AdminPageContainer>
   );
 }

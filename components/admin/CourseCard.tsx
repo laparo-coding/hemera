@@ -94,7 +94,7 @@ export default function CourseCard({
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography variant='body2'>
-            <strong>Instructor:</strong> {course.instructor}
+            <strong>Instructor:</strong> {course.instructor || '—'}
           </Typography>
 
           <Typography variant='body2'>

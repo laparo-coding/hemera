@@ -5,8 +5,9 @@
  * Admin interface for managing testimonial approvals
  */
 
-import { Box, Container, Typography } from '@mui/material';
+import { AdminPageContainer } from '@/components/admin/AdminPageContainer';
 import AdminTestimonialList from '@/components/admin/AdminTestimonialList';
+import { ADMIN_LABELS } from '@/lib/constants/admin';
 
 export const metadata = {
   title: 'Erfahrungsberichte verwalten | Admin',
@@ -15,17 +16,15 @@ export const metadata = {
 
 export default function AdminTestimonialsPage() {
   return (
-    <Container maxWidth='lg' sx={{ py: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant='h4' component='h1' gutterBottom fontWeight='bold'>
-          Erfahrungsberichte
-        </Typography>
-        <Typography variant='body1' color='text.secondary'>
-          Prüfe und gib Erfahrungsberichte von Kursteilnehmern frei.
-        </Typography>
-      </Box>
-
+    <AdminPageContainer
+      title={ADMIN_LABELS.testimonials}
+      subtitle='Prüfe und gib Erfahrungsberichte von Kursteilnehmern frei.'
+      breadcrumbs={[
+        { label: ADMIN_LABELS.testimonials, href: '/admin/testimonials' },
+      ]}
+      titleProps={{ 'data-testid': 'admin-testimonials-page' }}
+    >
       <AdminTestimonialList />
-    </Container>
+    </AdminPageContainer>
   );
 }

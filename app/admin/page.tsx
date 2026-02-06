@@ -21,7 +21,7 @@ export default async function AdminPage() {
     <AdminPageContainer
       title='Admin Dashboard'
       breadcrumbs={[]}
-      data-testid='admin-page'
+      titleProps={{ 'data-testid': 'admin-page' }}
     >
       <Box sx={{ mb: 4 }}>
         <Typography variant='body1' color='text.secondary'>

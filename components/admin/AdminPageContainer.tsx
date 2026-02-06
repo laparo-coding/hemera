@@ -25,6 +25,10 @@ interface AdminPageContainerProps {
   children: ReactNode;
   /** Optional action buttons for the header area */
   actions?: ReactNode;
+  /** Optional props for the h1 title (e.g., data-testid) */
+  titleProps?: React.HTMLAttributes<HTMLHeadingElement> & {
+    'data-testid'?: string;
+  };
 }
 
 export function AdminPageContainer({
@@ -33,6 +37,7 @@ export function AdminPageContainer({
   breadcrumbs = [],
   children,
   actions,
+  titleProps,
 }: AdminPageContainerProps) {
   return (
     <Container
@@ -58,7 +63,12 @@ export function AdminPageContainer({
         }}
       >
         <Box>
-          <Typography variant='h4' component='h1' gutterBottom={!!subtitle}>
+          <Typography
+            variant='h4'
+            component='h1'
+            gutterBottom={!!subtitle}
+            {...titleProps}
+          >
             {title}
           </Typography>
           {subtitle && (
