@@ -313,7 +313,7 @@ export default function ReportsPage() {
             alignItems='center'
             sx={{ mb: 2 }}
           >
-            <Typography variant='h6'>System-Health</Typography>
+            <Typography variant='h6'>Systemzustand</Typography>
             <Button
               variant='outlined'
               size='small'

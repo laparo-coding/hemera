@@ -148,7 +148,7 @@ export const ADMIN_LABELS = {
   systemStatus: 'Systemstatus',
   bookingStats: 'Buchungsstatistiken',
   courseUtilization: 'Kursauslastung',
-  userGrowth: 'Benutzer-Wachstum',
+  userGrowth: 'Benutzerwachstum',
   healthy: 'Gesund',
   degraded: 'Eingeschränkt',
   unhealthy: 'Nicht verfügbar',

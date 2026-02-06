@@ -59,7 +59,7 @@ test.describe('Admin Reports - Dashboard Stats', () => {
 
     const growthSection = page.locator('[data-testid="reports-growth-section"]');
     await expect(growthSection).toBeVisible();
-    await expect(growthSection).toContainText('Benutzer-Wachstum');
+    await expect(growthSection).toContainText('Benutzerwachstum');
     await expect(growthSection).toContainText('Outperformer');
   });
 });
