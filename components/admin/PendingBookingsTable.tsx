@@ -216,10 +216,10 @@ export default function PendingBookingsTable({
         </Tooltip>
       </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ bgcolor: 'background.paper' }}>
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ bgcolor: 'background.paper' }}>
               <TableCell>Datum</TableCell>
               <TableCell>Teilnehmer</TableCell>
               <TableCell>E-Mail</TableCell>

@@ -5,10 +5,7 @@
  * with actions to create, edit, and delete.
  */
 
-import AddIcon from '@mui/icons-material/Add';
-import { Button } from '@mui/material';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { AdminPageContainer } from '@/components/admin/AdminPageContainer';
 import { ADMIN_LABELS } from '@/lib/constants/admin';
 import CourseListWithDelete from '../../../components/admin/CourseListWithDelete';
@@ -32,13 +29,6 @@ export default async function AdminCoursesPage() {
       subtitle='Erstelle und verwalte Seminare für deine Akademie'
       breadcrumbs={[{ label: ADMIN_LABELS.courses, href: '/admin/courses' }]}
       titleProps={{ 'data-testid': 'admin-courses-page' }}
-      actions={
-        <Link href='/admin/courses/new' style={{ textDecoration: 'none' }}>
-          <Button variant='contained' startIcon={<AddIcon />}>
-            Neues Seminar
-          </Button>
-        </Link>
-      }
     >
       <CourseListWithDelete courses={courses} />
     </AdminPageContainer>

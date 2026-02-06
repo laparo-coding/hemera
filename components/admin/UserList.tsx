@@ -145,7 +145,9 @@ export function UserList({
   };
 
   return (
-    <Paper>
+    <Paper
+      sx={{ width: '100%', overflow: 'hidden', bgcolor: 'background.paper' }}
+    >
       {/* Filters and Search */}
       <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
         <Box
@@ -192,7 +194,7 @@ export function UserList({
       <TableContainer>
         <Table>
           <TableHead data-testid='user-list-header'>
-            <TableRow>
+            <TableRow sx={{ bgcolor: 'background.paper' }}>
               <TableCell>{ADMIN_LABELS.name}</TableCell>
               <TableCell>{ADMIN_LABELS.email}</TableCell>
               <TableCell>{ADMIN_LABELS.role}</TableCell>
