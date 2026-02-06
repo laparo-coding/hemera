@@ -7,10 +7,14 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '../../../../lib/utils/api-response';
-import { getCorsHeaders } from '../../../../lib/utils/cors';
 import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
 
-const corsHeaders = getCorsHeaders();
+// CORS headers for external app access
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });

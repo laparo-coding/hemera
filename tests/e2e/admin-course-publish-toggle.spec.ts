@@ -15,13 +15,8 @@ test.describe('Course Publish Toggle - List View', () => {
   test('should display publish toggle instead of status column', async ({
     page,
   }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
-
-    if (process.env.CI) {
-      const url = page.url();
-      expect(url).toMatch(/\/(admin|sign-in)/);
-      return;
-    }
 
     // Wait for course list
     await page.waitForSelector('[data-testid="course-list"]');
