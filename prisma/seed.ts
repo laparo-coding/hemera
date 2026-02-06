@@ -41,48 +41,119 @@ async function main() {
     await prisma.$executeRaw`DELETE FROM course_summary_assets`;
     guardDestructiveOperation('seed.ts: DELETE courses');
     await prisma.$executeRaw`DELETE FROM courses`;
+    guardDestructiveOperation('seed.ts: DELETE locations');
+    await prisma.$executeRaw`DELETE FROM locations`;
     console.log('✅ Existing data cleared\n');
   } else {
     console.log('⚠️  Skipping data deletion - production database detected');
     console.log('   Will only upsert courses (safe operation)\n');
   }
 
+  // --------------------------------------------
+  // Seed Location (matching production data)
+  // --------------------------------------------
+  console.log('📍 Seeding Location...');
+  const locationId = 'seed-location-gartenhotel';
+  await prisma.$executeRaw`
+    INSERT INTO locations (id, slug, name, description, address, zip_code, city, email, phone, website, image_url, room_image_url, latitude, longitude, created_at, updated_at)
+    VALUES (
+      ${locationId},
+      'gartenhotel-fette-henne',
+      'Gartenhotel Fette Henne',
+      'Von einem besonderen Ort, der den unterschiedlichen Persönlichkeiten unserer Gäste vollständig gerecht wird. Durch echtes und persönliches Interesse an Dir und Deinem Wohlergehen machen wir unser Zuhause zu Deinem zweiten Zuhause.',
+      'Schildsheider Str. 47',
+      '40699',
+      'Erkrath',
+      'gartenhotel@fettehennehotels.de',
+      '+49 2104 13830',
+      'https://www.gartenhotel-fettehenne.de/',
+      'https://fwdhpoytjheqeqjq.public.blob.vercel-storage.com/location-images/exterior/1767006581959-6220ag.webp',
+      'https://fwdhpoytjheqeqjq.public.blob.vercel-storage.com/location-images/room/1767006585847-0cuoc.webp',
+      51.2052406,
+      6.9653751,
+      NOW(),
+      NOW()
+    )
+    ON CONFLICT (slug) DO UPDATE SET
+      name = EXCLUDED.name,
+      description = EXCLUDED.description,
+      address = EXCLUDED.address,
+      zip_code = EXCLUDED.zip_code,
+      city = EXCLUDED.city,
+      email = EXCLUDED.email,
+      phone = EXCLUDED.phone,
+      website = EXCLUDED.website,
+      image_url = EXCLUDED.image_url,
+      room_image_url = EXCLUDED.room_image_url,
+      latitude = EXCLUDED.latitude,
+      longitude = EXCLUDED.longitude,
+      updated_at = NOW()
+  `;
+  console.log('   ✔ Location "Gartenhotel Fette Henne" seeded');
+
   const seedCourses = [
     {
-      title: 'Grundlagen der Gehaltsverhandlung',
+      title: 'Gehe zielsicher durch dein Gehaltsgespräch',
       description:
-        'Lerne die fundamentalen Strategien und Techniken für erfolgreiche Gehaltsverhandlungen. Perfekt für den Einstieg.',
+        'Du führst nicht dein erstes Gehaltsgespräch, aber eine gewisse Unsicherheit verspürst du trotzdem noch, wenn es darum geht, deine Foderungen zu artikulieren. Du wünscht dir diese Art von Leichtigkeit mit der du sonst Gespräche führt, aber etwas hält dich zurück. Du fragst dich, ob dein Gegenüber merkt, worum es dir geht. Wenn du jetzt dein Ziel erreichen möchtest, braucht es Klarheit und eine souveränes Auftreten.\nDieser Kurs ist so strukturiert, dass du deine Stärke findest, während du dich und die anderen Teilnehmerinnen in verschiedenen Gesprächssituationen erlebst. Du gewinnt durch Gesprächspraxis die Sicherheit, deine Zeile erreichen',
+      teaser:
+        'Du führst nicht dein erstes Gehaltsgespräch, aber eine gewisse Unsicherheit verspürst du trotzdem noch, wenn es darum geht, deine Foderungen zu artikulieren.',
       slug: 'grundkurs',
-      price: 14900,
+      price: 30000,
       currency: 'EUR',
-      capacity: 25,
-      ...convertDateToFields('2026-01-15T10:00:00Z'),
+      capacity: 6,
+      startDate: new Date('2026-06-19T22:00:00.000Z'),
+      startTime: new Date('2025-12-28T08:00:00.000Z'),
+      endTime: new Date('2026-01-12T17:15:00.000Z'),
       isPublished: true,
-      curriculum: null, // Managed via Admin UI
+      instructor: 'Andreas',
+      level: 'BEGINNER' as const,
+      thumbnailUrl:
+        'https://fwdhpoytjheqeqjq.public.blob.vercel-storage.com/course-images/1766998295102-ppry5-thumbnail.webp',
+      curriculum: null,
+      locationId: locationId,
     },
     {
       title: 'Fortgeschrittene Verhandlungsstrategien',
       description:
         'Vertiefe deine Kenntnisse mit fortgeschrittenen Taktiken und lerne, auch schwierige Situationen zu meistern.',
+      teaser:
+        'Vertiefe deine Kenntnisse mit fortgeschrittenen Taktiken und lerne, auch schwierige Situationen zu meistern.',
       slug: 'fortgeschrittene',
-      price: 29900,
+      price: 50000,
       currency: 'EUR',
-      capacity: 20,
-      ...convertDateToFields('2026-02-20T14:00:00Z'),
+      capacity: 12,
+      startDate: new Date('2026-09-18T22:00:00.000Z'),
+      startTime: new Date('2025-12-28T08:00:00.000Z'),
+      endTime: new Date('2025-12-28T16:00:00.000Z'),
       isPublished: true,
+      instructor: 'Andreas',
+      level: 'INTERMEDIATE' as const,
+      thumbnailUrl:
+        'https://fwdhpoytjheqeqjq.public.blob.vercel-storage.com/course-images/1766998946755-ojg6wr-thumbnail.webp',
       curriculum: null,
+      locationId: locationId,
     },
     {
       title: 'Masterclass: Exzellenz in Verhandlungen',
       description:
         'Meistere die Kunst der Verhandlung auf höchstem Niveau und erreiche deine anspruchsvollsten Ziele.',
+      teaser:
+        'Meistere die Kunst der Verhandlung auf höchstem Niveau und erreiche deine anspruchsvollsten Ziele.',
       slug: 'masterclass',
-      price: 49900,
+      price: 70000,
       currency: 'EUR',
-      capacity: 12,
-      ...convertDateToFields('2026-03-28T10:00:00Z'),
+      capacity: 7,
+      startDate: new Date('2027-01-22T23:00:00.000Z'),
+      startTime: new Date('2025-12-28T08:00:00.000Z'),
+      endTime: new Date('2025-12-28T17:00:00.000Z'),
       isPublished: true,
+      instructor: 'Andreas',
+      level: 'ADVANCED' as const,
+      thumbnailUrl:
+        'https://fwdhpoytjheqeqjq.public.blob.vercel-storage.com/course-images/1766998974161-5cijz7-thumbnail.webp',
       curriculum: null,
+      locationId: locationId,
     },
   ];
 
@@ -96,11 +167,12 @@ async function main() {
       course.curriculum != null ? JSON.stringify(course.curriculum) : null;
 
     await prisma.$executeRaw`
-      INSERT INTO courses (id, title, description, slug, price, currency, capacity, start_date, start_time, end_time, is_published, instructor, level, curriculum, created_at, updated_at)
+      INSERT INTO courses (id, title, description, teaser, slug, price, currency, capacity, start_date, start_time, end_time, is_published, instructor, level, thumbnail_url, curriculum, location_id, created_at, updated_at)
       VALUES (
         gen_random_uuid()::text,
         ${course.title},
         ${course.description},
+        ${course.teaser},
         ${course.slug},
         ${course.price},
         ${course.currency},
@@ -109,15 +181,18 @@ async function main() {
         ${course.startTime},
         ${course.endTime},
         ${course.isPublished},
-        'TBD',
-        'BEGINNER',
+        ${course.instructor},
+        ${course.level},
+        ${course.thumbnailUrl},
         ${curriculumJson}::jsonb,
+        ${course.locationId},
         NOW(),
         NOW()
       )
       ON CONFLICT (slug) DO UPDATE SET
         title = EXCLUDED.title,
         description = EXCLUDED.description,
+        teaser = EXCLUDED.teaser,
         price = EXCLUDED.price,
         currency = EXCLUDED.currency,
         capacity = EXCLUDED.capacity,
@@ -125,7 +200,11 @@ async function main() {
         start_time = EXCLUDED.start_time,
         end_time = EXCLUDED.end_time,
         is_published = EXCLUDED.is_published,
+        instructor = EXCLUDED.instructor,
+        level = EXCLUDED.level,
+        thumbnail_url = EXCLUDED.thumbnail_url,
         curriculum = EXCLUDED.curriculum,
+        location_id = EXCLUDED.location_id,
         updated_at = NOW()
     `;
   }
