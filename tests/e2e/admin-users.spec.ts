@@ -33,9 +33,8 @@ test.describe('Admin User Management - List View', () => {
   });
 
   test('should support pagination', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users');
-
-    if (process.env.CI) return;
 
     // Pagination controls should be visible
     const pagination = page.locator('[data-testid="user-list-pagination"]');
@@ -46,9 +45,8 @@ test.describe('Admin User Management - List View', () => {
   });
 
   test('should support search filtering', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users');
-
-    if (process.env.CI) return;
 
     // Search input should be visible
     const searchInput = page.locator('[data-testid="user-search-input"]');
@@ -64,9 +62,8 @@ test.describe('Admin User Management - List View', () => {
   });
 
   test('should support Outperformer filter', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users');
-
-    if (process.env.CI) return;
 
     // Outperformer filter toggle should be visible
     const filterToggle = page.locator('[data-testid="outperformer-filter"]');
@@ -85,11 +82,8 @@ test.describe('Admin User Management - Actions', () => {
   test('should show action menu with view, role assign, delete options', async ({
     page,
   }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users');
-
-    if (process.env.CI) return;
-
-    // Wait for user list to load
     await page.waitForSelector('[data-testid^="user-row-"]');
 
     // Click action button on first user
@@ -108,11 +102,8 @@ test.describe('Admin User Management - Actions', () => {
   test('should show confirmation dialog before deleting user', async ({
     page,
   }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users');
-
-    if (process.env.CI) return;
-
-    // Wait for and click first user's action menu
     await page.waitForSelector('[data-testid^="user-row-"]');
     await page.click('[data-testid^="user-row-"] [data-testid="action-menu-button"]');
 
@@ -131,9 +122,8 @@ test.describe('Admin User Management - Actions', () => {
   });
 
   test('should show role assignment dialog', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users');
-
-    if (process.env.CI) return;
 
     // Open action menu
     await page.waitForSelector('[data-testid^="user-row-"]');
@@ -156,9 +146,8 @@ test.describe('Admin User Management - Outperformer Badge', () => {
   test('should display Outperformer badge for qualified users', async ({
     page,
   }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users?outperformerOnly=true');
-
-    if (process.env.CI) return;
 
     // Wait for filtered list
     await page.waitForSelector('[data-testid^="user-row-"]');
@@ -176,9 +165,8 @@ test.describe('Admin User Management - Outperformer Badge', () => {
 
 test.describe('Admin User Management - Breadcrumb', () => {
   test('should display correct breadcrumb path', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users');
-
-    if (process.env.CI) return;
 
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
     await expect(breadcrumb).toBeVisible();

@@ -31,14 +31,13 @@ import type {
   ServiceHealth,
 } from '@/lib/types/admin';
 
-const STATUS_LABELS: Record<string, string> = {
-  healthy: 'Gesund',
-  degraded: 'Eingeschränkt',
-  unhealthy: 'Nicht verfügbar',
-};
-
 function getStatusLabel(status: string): string {
-  return STATUS_LABELS[status] ?? status;
+  const labels: Record<string, string> = {
+    healthy: ADMIN_LABELS.healthy,
+    degraded: ADMIN_LABELS.degraded,
+    unhealthy: ADMIN_LABELS.unhealthy,
+  };
+  return labels[status] ?? status;
 }
 
 function ServiceHealthChip({ service }: { service: ServiceHealth }) {
@@ -170,7 +169,7 @@ export default function ReportsPage() {
       )}
 
       {/* Dashboard Overview Stats */}
-      <Card sx={{ mb: 4 }}>
+      <Card sx={{ mb: 4 }} data-testid='reports-overview-section'>
         <CardContent>
           <Typography variant='h6' gutterBottom>
             Übersicht
@@ -202,7 +201,7 @@ export default function ReportsPage() {
       </Card>
 
       {/* Booking Stats */}
-      <Card sx={{ mb: 4 }}>
+      <Card sx={{ mb: 4 }} data-testid='reports-bookings-section'>
         <CardContent>
           <Typography variant='h6' gutterBottom>
             Buchungsstatistiken
@@ -223,17 +222,17 @@ export default function ReportsPage() {
             <Grid size={{ xs: 6, md: 3 }}>
               <StatCard
                 title='Bestätigt'
-                value={bookings?.byStatus.CONFIRMED ?? 0}
+                value={bookings?.byStatus?.CONFIRMED ?? 0}
               />
             </Grid>
             <Grid size={{ xs: 6, md: 3 }}>
               <StatCard
                 title='Ausstehend'
-                value={bookings?.byStatus.PENDING ?? 0}
+                value={bookings?.byStatus?.PENDING ?? 0}
               />
             </Grid>
           </Grid>
-          {bookings?.revenue.total !== undefined && (
+          {bookings?.revenue?.total !== undefined && (
             <Box sx={{ mt: 2 }}>
               <Typography variant='body1' color='text.secondary'>
                 Gesamtumsatz:{' '}
@@ -250,7 +249,7 @@ export default function ReportsPage() {
       </Card>
 
       {/* Course Utilization */}
-      <Card sx={{ mb: 4 }}>
+      <Card sx={{ mb: 4 }} data-testid='reports-utilization-section'>
         <CardContent>
           <Typography variant='h6' gutterBottom>
             Kursauslastung
@@ -273,7 +272,7 @@ export default function ReportsPage() {
       </Card>
 
       {/* User Growth */}
-      <Card sx={{ mb: 4 }}>
+      <Card sx={{ mb: 4 }} data-testid='reports-growth-section'>
         <CardContent>
           <Typography variant='h6' gutterBottom>
             Benutzerwachstum
@@ -305,7 +304,7 @@ export default function ReportsPage() {
       </Card>
 
       {/* Health Status */}
-      <Card>
+      <Card data-testid='reports-health-section'>
         <CardContent>
           <Stack
             direction='row'
@@ -322,7 +321,7 @@ export default function ReportsPage() {
               }
               onClick={handleRefreshHealth}
               disabled={healthLoading}
-              data-testid='refresh-health-button'
+              data-testid='health-refresh-button'
             >
               Aktualisieren
             </Button>
@@ -359,11 +358,28 @@ export default function ReportsPage() {
                 Services:
               </Typography>
               <Box sx={{ mb: 2 }}>
-                <ServiceHealthChip service={health.services.database} />
-                <ServiceHealthChip service={health.services.clerk} />
-                <ServiceHealthChip service={health.services.stripe} />
-                <ServiceHealthChip service={health.services.rollbar} />
+                {Object.values(health.services).map(service => (
+                  <ServiceHealthChip key={service.name} service={service} />
+                ))}
               </Box>
+
+              {health.build && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant='body2' color='text.secondary'>
+                    Version: {health.build.version}
+                  </Typography>
+                  {health.build.commitSha && (
+                    <Typography variant='body2' color='text.secondary'>
+                      Commit: {health.build.commitSha.slice(0, 7)}
+                    </Typography>
+                  )}
+                  {health.build.environment && (
+                    <Typography variant='body2' color='text.secondary'>
+                      Umgebung: {health.build.environment}
+                    </Typography>
+                  )}
+                </Box>
+              )}
 
               <Typography variant='body2' color='text.secondary'>
                 Zuletzt aktualisiert:{' '}

@@ -37,9 +37,8 @@ test.describe('Course Publish Toggle - List View', () => {
   });
 
   test('should show toggle with correct states', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
-
-    if (process.env.CI) return;
 
     await page.waitForSelector('[data-testid^="publish-toggle-"]', {
       timeout: 5000,
@@ -57,9 +56,8 @@ test.describe('Course Publish Toggle - List View', () => {
   test('should toggle publish status with optimistic update', async ({
     page,
   }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
-
-    if (process.env.CI) return;
 
     await page.waitForSelector('[data-testid^="publish-toggle-"]');
 
@@ -77,9 +75,8 @@ test.describe('Course Publish Toggle - List View', () => {
   });
 
   test('should show loading state during toggle', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
-
-    if (process.env.CI) return;
 
     await page.waitForSelector('[data-testid^="publish-toggle-"]');
 
@@ -99,9 +96,8 @@ test.describe('Course Publish Toggle - List View', () => {
   });
 
   test('should show error toast on toggle failure', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
-
-    if (process.env.CI) return;
 
     await page.waitForSelector('[data-testid^="publish-toggle-"]');
 
@@ -126,9 +122,8 @@ test.describe('Course Publish Toggle - List View', () => {
 
 test.describe('Course Publish Toggle - Accessibility', () => {
   test('should be keyboard accessible', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
-
-    if (process.env.CI) return;
 
     await page.waitForSelector('[data-testid^="publish-toggle-"]');
 
@@ -145,9 +140,8 @@ test.describe('Course Publish Toggle - Accessibility', () => {
   });
 
   test('should have proper ARIA attributes', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
-
-    if (process.env.CI) return;
 
     await page.waitForSelector('[data-testid^="publish-toggle-"]');
 
@@ -165,9 +159,8 @@ test.describe('Course Publish Toggle - Accessibility', () => {
 
 test.describe('Course Publish Toggle - Visual States', () => {
   test('should show green for published courses', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
-
-    if (process.env.CI) return;
 
     await page.waitForSelector('[data-testid^="publish-toggle-"]');
 
@@ -182,9 +175,8 @@ test.describe('Course Publish Toggle - Visual States', () => {
   });
 
   test('should show visual indicator for draft courses', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
-
-    if (process.env.CI) return;
 
     await page.waitForSelector('[data-testid^="publish-toggle-"]');
 

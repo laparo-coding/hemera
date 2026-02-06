@@ -44,9 +44,8 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
   });
 
   test('should have consistent max-width of 1280px', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin');
-
-    if (process.env.CI) return;
 
     const container = page.locator('[data-testid="admin-page-container"]');
     const box = await container.boundingBox();
@@ -57,9 +56,8 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
   });
 
   test('should navigate to user management page', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin');
-
-    if (process.env.CI) return;
 
     // Click on user management card
     await page.click('[data-testid="dashboard-card-users"]');
@@ -73,9 +71,8 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
   });
 
   test('should navigate to reports page', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin');
-
-    if (process.env.CI) return;
 
     // Click on reports card
     await page.click('[data-testid="dashboard-card-reports"]');
@@ -87,9 +84,8 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
   });
 
   test('should not display footer on admin pages', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin');
-
-    if (process.env.CI) return;
 
     // Footer should not be visible
     const footer = page.locator('footer');
@@ -97,9 +93,8 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
   });
 
   test('should not display welcome message', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin');
-
-    if (process.env.CI) return;
 
     // No "Willkommen" or welcome text
     const welcomeText = page.getByText(/willkommen/i);
@@ -111,9 +106,7 @@ test.describe('Admin Dashboard - Breadcrumb Navigation', () => {
   test('should show correct breadcrumb hierarchy on subpages', async ({
     page,
   }) => {
-    if (process.env.CI) return;
-
-    // Navigate directly to a subpage
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/courses');
 
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
@@ -129,8 +122,7 @@ test.describe('Admin Dashboard - Breadcrumb Navigation', () => {
   });
 
   test('should navigate back to dashboard via breadcrumb', async ({ page }) => {
-    if (process.env.CI) return;
-
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users');
 
     // Click on dashboard breadcrumb
@@ -141,10 +133,9 @@ test.describe('Admin Dashboard - Breadcrumb Navigation', () => {
 
 test.describe('Admin Dashboard - Responsive Layout', () => {
   test('should adapt grid for tablet viewport', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/admin');
-
-    if (process.env.CI) return;
 
     // Grid should still be visible but adapt
     const dashboardGrid = page.locator('[data-testid="admin-dashboard-grid"]');
@@ -152,10 +143,9 @@ test.describe('Admin Dashboard - Responsive Layout', () => {
   });
 
   test('should adapt grid for mobile viewport', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/admin');
-
-    if (process.env.CI) return;
 
     // Cards should stack vertically
     const cards = page.locator('[data-testid^="dashboard-card-"]');

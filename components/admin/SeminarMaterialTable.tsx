@@ -2,7 +2,7 @@
 
 /**
  * SeminarMaterialTable Component - Admin data table for seminar materials
- * Feature: 023-slide-editor
+ * Feature: 024-admin-dashboard
  *
  * Displays all seminar materials in a searchable, paginated table
  * with actions for viewing, editing, and deleting.
@@ -84,18 +84,19 @@ export default function SeminarMaterialTable({
     useState<SeminarMaterial | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const fetchMaterials = useCallback(async () => {
+  const fetchMaterials = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/admin/course-material');
+      const response = await fetch('/api/admin/course-material', { signal });
       if (!response.ok) {
         throw new Error('Fehler beim Laden der Materialien');
       }
       const data = await response.json();
       setMaterials(data.materials || []);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setError(
         err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten'
       );
@@ -105,7 +106,9 @@ export default function SeminarMaterialTable({
   }, []);
 
   useEffect(() => {
-    fetchMaterials();
+    const controller = new AbortController();
+    fetchMaterials(controller.signal);
+    return () => controller.abort();
   }, [fetchMaterials]);
 
   // Filter materials based on search
@@ -172,6 +175,8 @@ export default function SeminarMaterialTable({
       setMaterialToDelete(null);
       fetchMaterials();
     } catch (err) {
+      setDeleteDialogOpen(false);
+      setMaterialToDelete(null);
       setError(err instanceof Error ? err.message : 'Fehler beim Löschen');
     } finally {
       setDeleteLoading(false);
