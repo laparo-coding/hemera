@@ -185,6 +185,6 @@ test.describe('Admin User Management - Breadcrumb', () => {
 
     // Check hierarchy
     await expect(breadcrumb.locator('a').first()).toContainText('Admin Dashboard');
-    await expect(breadcrumb).toContainText('Benutzerverwaltung');
+    await expect(breadcrumb).toContainText('Benutzer');
   });
 });

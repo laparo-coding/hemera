@@ -138,7 +138,12 @@ export default function CourseList({
       <TableContainer>
         <Table stickyHeader aria-label='Kurse Tabelle'>
           <TableHead>
-            <TableRow sx={{ bgcolor: 'background.paper' }}>
+            <TableRow
+              sx={{
+                bgcolor: 'background.paper',
+                '& th': { backgroundColor: 'background.paper' },
+              }}
+            >
               <TableCell>Titel</TableCell>
               <TableCell>Dozent/in</TableCell>
               <TableCell>Niveau</TableCell>

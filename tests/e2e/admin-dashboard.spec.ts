@@ -12,7 +12,7 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
     await page.setViewportSize({ width: 1280, height: 720 });
   });
 
-  test('should display dashboard with 6 cards in 3-column grid', async ({
+  test('should display dashboard with 7 cards in 3-column grid', async ({
     page,
   }) => {
     // Navigate to admin dashboard (will be redirected if not auth'd in non-CI)
@@ -30,15 +30,16 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
     const dashboardGrid = page.locator('[data-testid="admin-dashboard-grid"]');
     await expect(dashboardGrid).toBeVisible();
 
-    // Should have exactly 6 cards
+    // Should have exactly 7 cards
     const cards = page.locator('[data-testid^="dashboard-card-"]');
-    await expect(cards).toHaveCount(6);
+    await expect(cards).toHaveCount(7);
 
     // Verify card titles are in German
-    await expect(page.getByText('Benutzerverwaltung')).toBeVisible();
-    await expect(page.getByText('Kursverwaltung')).toBeVisible();
-    await expect(page.getByText('Standortverwaltung')).toBeVisible();
-    await expect(page.getByText('Testimonial-Verwaltung')).toBeVisible();
+    await expect(page.getByText('Benutzer')).toBeVisible();
+    await expect(page.getByText('Seminare')).toBeVisible();
+    await expect(page.getByText('Material')).toBeVisible();
+    await expect(page.getByText('Veranstaltungsorte')).toBeVisible();
+    await expect(page.getByText('Erfahrungsberichte')).toBeVisible();
     await expect(page.getByText('Systemeinstellungen')).toBeVisible();
     await expect(page.getByText('Berichte & Analysen')).toBeVisible();
   });
@@ -69,7 +70,7 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
     await expect(breadcrumb).toBeVisible();
     await expect(breadcrumb).toContainText('Admin Dashboard');
-    await expect(breadcrumb).toContainText('Benutzerverwaltung');
+    await expect(breadcrumb).toContainText('Benutzer');
   });
 
   test('should navigate to reports page', async ({ page }) => {
@@ -137,7 +138,7 @@ test.describe('Admin Dashboard - Breadcrumb Navigation', () => {
     await expect(dashboardLink).toHaveAttribute('href', '/admin');
 
     // Current page should not be a link
-    await expect(breadcrumb).toContainText('Kursverwaltung');
+    await expect(breadcrumb).toContainText('Seminare');
   });
 
   test('should navigate back to dashboard via breadcrumb', async ({ page }) => {
@@ -171,6 +172,6 @@ test.describe('Admin Dashboard - Responsive Layout', () => {
 
     // Cards should stack vertically
     const cards = page.locator('[data-testid^="dashboard-card-"]');
-    await expect(cards).toHaveCount(6);
+    await expect(cards).toHaveCount(7);
   });
 });

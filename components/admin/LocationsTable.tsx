@@ -130,7 +130,12 @@ export default function LocationsTable({
       <TableContainer>
         <Table stickyHeader aria-label='Locations Tabelle'>
           <TableHead>
-            <TableRow sx={{ bgcolor: 'background.paper' }}>
+            <TableRow
+              sx={{
+                bgcolor: 'background.paper',
+                '& th': { backgroundColor: 'background.paper' },
+              }}
+            >
               <TableCell>Name</TableCell>
               <TableCell>Adresse</TableCell>
               <TableCell>Stadt</TableCell>
