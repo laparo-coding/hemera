@@ -70,6 +70,7 @@ export const TERMS = {
   priceLabel: 'Preis (€)',
   capacityLabel: 'Kapazität',
   startDateLabel: 'Startdatum',
+  endDateLabel: 'Enddatum',
   startTimeLabel: 'Startzeit',
   endTimeLabel: 'Endzeit',
   instructorLabel: 'Dozent/in',

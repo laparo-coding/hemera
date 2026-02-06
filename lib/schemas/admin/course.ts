@@ -70,6 +70,11 @@ export const courseCreateSchema = z.object({
   startDate: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val)),
+  endDate: z
+    .union([z.string(), z.date()])
+    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .optional()
+    .nullable(),
   startTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val)),
@@ -173,6 +178,11 @@ export const courseUpdateSchema = z.object({
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
     .optional(),
+  endDate: z
+    .union([z.string(), z.date()])
+    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .optional()
+    .nullable(),
   startTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))

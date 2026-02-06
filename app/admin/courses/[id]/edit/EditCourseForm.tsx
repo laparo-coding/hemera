@@ -27,6 +27,7 @@ interface CourseData {
   teaser: string | null;
   price: number;
   startDate: string | Date;
+  endDate?: string | Date | null;
   startTime: string | Date;
   endTime: string | Date;
   instructor: string;
@@ -88,7 +89,7 @@ export default function EditCourseForm({
   return (
     <Box>
       <Typography variant='h4' component='h1' gutterBottom>
-        Kurs bearbeiten
+        Seminar bearbeiten
       </Typography>
 
       {error && (
@@ -107,6 +108,7 @@ export default function EditCourseForm({
             startDate: course.startDate
               ? new Date(course.startDate)
               : new Date(),
+            endDate: course.endDate ? new Date(course.endDate) : null,
             startTime: course.startTime
               ? new Date(course.startTime)
               : new Date(),

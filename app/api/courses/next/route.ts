@@ -21,14 +21,10 @@ export async function GET(_request: NextRequest) {
     });
 
     if (!course) {
-      // Return a mock course for testing
-      const mockCourse = {
-        id: 'mock-course-1',
-        title: 'Grundlagen der Gehaltsverhandlung',
-        date: '2026-01-15T10:00:00.000Z',
-        slug: 'grundkurs',
-      };
-      return NextResponse.json(mockCourse);
+      return NextResponse.json(
+        { error: 'No upcoming course found' },
+        { status: 404 }
+      );
     }
 
     // Format the response to match the expected interface

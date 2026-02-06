@@ -78,52 +78,9 @@ function mapLevelToIndicator(
   return (['A', 'B', 'C'] as const)[index] || 'A';
 }
 
-// Static fallback course data
-const staticCourses: CourseCardProps[] = [
-  {
-    courseId: 'grundkurs',
-    level: 'A',
-    levelLabel: 'Basis',
-    title: 'Grundlagen der Gehaltsverhandlung',
-    description:
-      'Lerne die fundamentalen Strategien und Techniken für erfolgreiche Gehaltsverhandlungen. Perfekt für den Einstieg.',
-    upcomingDates: [
-      { date: new Date('2025-01-15'), formattedDate: '15. Januar 2025' },
-    ],
-    detailHref: '/courses/grundkurs',
-    ctaText: 'Mehr erfahren',
-  },
-  {
-    courseId: 'fortgeschrittene',
-    level: 'B',
-    levelLabel: 'Fortgeschrittene',
-    title: 'Fortgeschrittene Verhandlungsstrategien',
-    description:
-      'Vertiefe deine Kenntnisse mit fortgeschrittenen Taktiken und lerne, auch schwierige Situationen zu meistern.',
-    upcomingDates: [
-      { date: new Date('2025-02-20'), formattedDate: '20. Februar 2025' },
-    ],
-    detailHref: '/courses/fortgeschrittene',
-    ctaText: 'Mehr erfahren',
-  },
-  {
-    courseId: 'masterclass',
-    level: 'C',
-    levelLabel: 'Masterclass',
-    title: 'Masterclass: Exzellenz in Verhandlungen',
-    description:
-      'Das Expertenprogramm für komplexe Verhandlungssituationen. Für alle, die ihre Fähigkeiten perfektionieren wollen.',
-    upcomingDates: [
-      { date: new Date('2025-03-28'), formattedDate: '28. März 2025' },
-    ],
-    detailHref: '/courses/masterclass',
-    ctaText: 'Mehr erfahren',
-  },
-];
-
 export default async function HomePage() {
-  // Fetch real courses from API (fallback to static data on error)
-  let featuredCourses: CourseCardProps[] = staticCourses;
+  // Fetch courses from database
+  let featuredCourses: CourseCardProps[] = [];
 
   try {
     const dbCourses = await getFeaturedCourses(3);
@@ -164,7 +121,7 @@ export default async function HomePage() {
       });
     }
   } catch (error) {
-    // Log error but don't crash - use static courses as fallback
+    // Log error but don't crash - show empty course section
     serverInstance.error(
       error instanceof Error ? error : new Error(String(error))
     );
