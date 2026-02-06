@@ -23,15 +23,15 @@ npm run dev
 Navigate to: `http://localhost:3000/admin`
 
 **Expected**: 
-- 3-column grid with 6 cards
+- 3-column grid with 7 cards
 - No footer visible
 - No welcome message
 - All text in German
 
 ### 3. Test Breadcrumb Navigation
 
-1. Click on "Kursverwaltung" card
-2. **Expected**: Breadcrumb shows "Admin Dashboard > Kursverwaltung"
+1. Click on "Seminare" card
+2. **Expected**: Breadcrumb shows "Admin Dashboard > Seminare"
 3. Click "Admin Dashboard" in breadcrumb
 4. **Expected**: Returns to main dashboard
 
@@ -47,7 +47,7 @@ Navigate to: `http://localhost:3000/admin`
 
 ### 5. Test User Management
 
-1. Click "Benutzerverwaltung" card
+1. Click "Benutzer" card
 2. **Expected**: Table of users with columns:
    - Name
    - E-Mail
@@ -71,10 +71,10 @@ Navigate to: `http://localhost:3000/admin`
 
 ### 7. Test Location Management
 
-1. Click "Standortverwaltung" card
+1. Click "Veranstaltungsorte" card
 2. **Expected**: 
    - No search field visible
-   - Table layout matches Kursverwaltung style
+   - Table layout matches Seminare style
    - Same column spacing and structure
 
 ## API Validation
@@ -169,7 +169,7 @@ npx playwright test tests/e2e/admin-dashboard.spec.ts --ui
 
 ## Definition of Done Checklist
 
-- [ ] Dashboard shows 6 cards in 3-column grid
+- [ ] Dashboard shows 7 cards in 3-column grid
 - [ ] Breadcrumb visible on all admin subpages
 - [ ] Footer removed from admin layout
 - [ ] Welcome message removed from dashboard
