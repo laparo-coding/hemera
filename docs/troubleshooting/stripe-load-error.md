@@ -112,4 +112,3 @@ The `CheckoutPageClient` component provides a full example of safe Stripe usage 
 - Restart the dev server when environment variables change
 - Use the centralized `env.ts` for all environment variable access
 - Implement error handling when using external scripts like Stripe
-
