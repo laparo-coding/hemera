@@ -15,7 +15,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface StripeCheckoutFormProps {
   clientSecret: string;
@@ -46,6 +46,36 @@ export default function StripeCheckoutForm({
     'success' | 'error' | 'info' | null
   >(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [stripeTimedOut, setStripeTimedOut] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Stripe loading timeout — Safari ITP can block Stripe.js entirely
+  useEffect(() => {
+    if (stripe) {
+      // Stripe loaded successfully, clear any pending timeout
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      return;
+    }
+
+    if (!stripeConfigured) return;
+
+    // Give Stripe 10 seconds to load before showing an error
+    timeoutRef.current = setTimeout(() => {
+      setStripeTimedOut(true);
+      setMessage(
+        'Das Zahlungsformular konnte nicht geladen werden. ' +
+          'Falls du Safari verwendest, deaktiviere bitte unter ' +
+          'Einstellungen → Datenschutz die Option „Cross-Site-Tracking verhindern" ' +
+          'oder verwende einen anderen Browser (Chrome/Firefox).'
+      );
+      setMessageType('error');
+      setIsLoaded(true);
+    }, 10_000);
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [stripe, stripeConfigured]);
 
   useEffect(() => {
     if (!stripe) {
@@ -155,6 +185,24 @@ export default function StripeCheckoutForm({
   }
 
   if (!stripe || !elements || !isLoaded) {
+    // If Stripe timed out (e.g. Safari ITP blocking), show error instead of spinner
+    if (stripeTimedOut && message) {
+      return (
+        <Paper elevation={2} sx={{ p: 3, maxWidth: 500, mx: 'auto' }}>
+          <Alert severity='error' sx={{ mb: 2 }}>
+            {message}
+          </Alert>
+          <Button
+            variant='outlined'
+            fullWidth
+            onClick={() => window.location.reload()}
+          >
+            Seite neu laden
+          </Button>
+        </Paper>
+      );
+    }
+
     return (
       <Box
         display='flex'

@@ -9,10 +9,13 @@ export const publishableKey =
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
 
 // Safely load Stripe only if publishable key is configured
+// Note: Do NOT silently swallow errors — Safari ITP can block Stripe.js,
+// and downstream components need to detect the failure (via timeout/null check).
 export const stripePromise =
   publishableKey && publishableKey.length > 0
-    ? loadStripe(publishableKey).catch(() => {
-        // Silently handle Stripe loading errors
+    ? loadStripe(publishableKey).catch(err => {
+        // biome-ignore lint/suspicious/noConsole: Critical payment error logging
+        console.error('[Stripe] Laden fehlgeschlagen:', err);
         return null;
       })
     : null;
