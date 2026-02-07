@@ -123,11 +123,14 @@ export async function createCourse(data: {
   teaser?: string | null;
   price: number;
   startDate: Date;
+  endDate?: Date | null;
   startTime: Date;
   endTime: Date;
   instructor: string;
   level: CourseLevel;
   thumbnailUrl?: string | null;
+  imageDetail?: string | null;
+  imageTwitter?: string | null;
   capacity: number;
   locationId?: string | null;
   isPublished?: boolean;
@@ -147,6 +150,9 @@ export async function createCourse(data: {
     curriculum: _unusedCurriculum,
     teaser,
     thumbnailUrl,
+    imageDetail,
+    imageTwitter,
+    endDate,
     recommended,
     notRecommended,
     isNonPublic,
@@ -161,6 +167,9 @@ export async function createCourse(data: {
       // Handle optional fields that may be null
       ...(teaser !== undefined ? { teaser } : {}),
       ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
+      ...(imageDetail !== undefined ? { imageDetail } : {}),
+      ...(imageTwitter !== undefined ? { imageTwitter } : {}),
+      ...(endDate !== undefined ? { endDate } : {}),
       ...(validatedCurriculum !== undefined
         ? { curriculum: validatedCurriculum }
         : {}),
@@ -193,12 +202,17 @@ export async function updateCourse(
     description?: string;
     teaser?: string | null;
     price?: number;
+    startDate?: Date;
+    endDate?: Date | null;
     startTime?: Date;
-    duration?: number;
+    endTime?: Date;
     instructor?: string;
     level?: CourseLevel;
     thumbnailUrl?: string | null;
+    imageDetail?: string | null;
+    imageTwitter?: string | null;
     capacity?: number;
+    isPublished?: boolean;
     locationId?: string | null;
     curriculum?: Prisma.InputJsonValue | null;
     updatedAt: Date;
@@ -217,6 +231,10 @@ export async function updateCourse(
     curriculum: _unusedCurriculum,
     teaser,
     thumbnailUrl,
+    imageDetail,
+    imageTwitter,
+    endDate,
+    isPublished,
     recommended,
     notRecommended,
     isNonPublic,
@@ -255,6 +273,10 @@ export async function updateCourse(
     ...updateData,
     ...(teaser !== undefined ? { teaser } : {}),
     ...(thumbnailUrl !== undefined ? { thumbnailUrl } : {}),
+    ...(imageDetail !== undefined ? { imageDetail } : {}),
+    ...(imageTwitter !== undefined ? { imageTwitter } : {}),
+    ...(endDate !== undefined ? { endDate } : {}),
+    ...(isPublished !== undefined ? { isPublished } : {}),
     ...(validatedCurriculum !== undefined
       ? { curriculum: validatedCurriculum }
       : {}),

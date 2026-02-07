@@ -5,8 +5,17 @@ import type { ReactNode } from 'react';
 
 // Expose the Stripe promise and shared appearance config so pages can
 // instantiate <Elements> with the correct clientSecret when it becomes available.
-export const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-export const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
+export const publishableKey =
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
+
+// Safely load Stripe only if publishable key is configured
+export const stripePromise =
+  publishableKey && publishableKey.length > 0
+    ? loadStripe(publishableKey).catch(() => {
+        // Silently handle Stripe loading errors
+        return null;
+      })
+    : null;
 
 export const stripeAppearance = {
   theme: 'stripe' as const,

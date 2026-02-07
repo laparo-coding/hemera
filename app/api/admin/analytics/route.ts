@@ -13,17 +13,14 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '../../../../lib/utils/api-response';
+import { getCorsHeaders } from '../../../../lib/utils/cors';
 import {
   createRequestContext,
   getOrCreateRequestId,
 } from '../../../../lib/utils/request-id';
 
-// CORS headers for external app access
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+// CORS headers for admin API access (origin restricted via getCorsHeaders)
+const corsHeaders = getCorsHeaders();
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });

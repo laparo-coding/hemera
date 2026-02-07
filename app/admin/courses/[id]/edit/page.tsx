@@ -16,8 +16,8 @@ import { listLocations } from '@/lib/services/location';
 import EditCourseForm from './EditCourseForm';
 
 export const metadata: Metadata = {
-  title: 'Kurs bearbeiten | Admin',
-  description: 'Kurs bearbeiten',
+  title: 'SEMINAR bearbeiten | Admin',
+  description: 'Seminar bearbeiten',
 };
 
 export const dynamic = 'force-dynamic';
@@ -57,6 +57,7 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
     teaser: course.teaser,
     price: course.price,
     startDate: course.startDate?.toISOString() ?? new Date().toISOString(),
+    endDate: course.endDate?.toISOString() ?? null,
     startTime: course.startTime?.toISOString() ?? new Date().toISOString(),
     endTime: course.endTime?.toISOString() ?? new Date().toISOString(),
     instructor: course.instructor,

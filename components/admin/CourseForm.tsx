@@ -69,6 +69,7 @@ export default function CourseForm({
       teaser: initialData?.teaser || '',
       price: initialData?.price ? initialData.price / 100 : 0, // Convert Cents to Euro for display
       startDate: initialData?.startDate || new Date(),
+      endDate: initialData?.endDate || null,
       startTime: initialData?.startTime || new Date(),
       endTime:
         initialData?.endTime || new Date(Date.now() + 4 * 60 * 60 * 1000),
@@ -313,6 +314,63 @@ export default function CourseForm({
                 ) {
                   const date = new Date(year, month - 1, day);
                   // Verify the date is valid (not Invalid Date)
+                  if (!Number.isNaN(date.getTime())) {
+                    field.onChange(date);
+                  } else {
+                    field.onChange(null);
+                  }
+                } else {
+                  field.onChange(null);
+                }
+              } else {
+                field.onChange(null);
+              }
+            }}
+          />
+        )}
+      />
+
+      <Controller
+        name='endDate'
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            type='date'
+            label={TERMS.endDateLabel}
+            error={!!errors.endDate}
+            helperText={
+              errors.endDate?.message || 'Optional – für mehrtägige Seminare'
+            }
+            InputLabelProps={{ shrink: true }}
+            disabled={isLoading || isSubmitting}
+            value={
+              field.value instanceof Date
+                ? field.value.toISOString().split('T')[0]
+                : field.value || ''
+            }
+            onChange={e => {
+              const dateStr = e.target.value;
+              if (dateStr) {
+                const parts = dateStr.split('-').map(Number);
+                const year = parts[0];
+                const month = parts[1];
+                const day = parts[2];
+
+                if (
+                  year !== undefined &&
+                  !Number.isNaN(year) &&
+                  year > 0 &&
+                  month !== undefined &&
+                  !Number.isNaN(month) &&
+                  month >= 1 &&
+                  month <= 12 &&
+                  day !== undefined &&
+                  !Number.isNaN(day) &&
+                  day >= 1 &&
+                  day <= 31
+                ) {
+                  const date = new Date(year, month - 1, day);
                   if (!Number.isNaN(date.getTime())) {
                     field.onChange(date);
                   } else {

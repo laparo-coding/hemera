@@ -52,7 +52,7 @@ export function formatDate(
 }
 
 /**
- * Format a short date for display (e.g., "Jun 20, 2026")
+ * Format a short date for display (e.g., "20. Jun. 2026")
  */
 export function formatShortDate(
   date: Date | string | null | undefined
@@ -60,7 +60,7 @@ export function formatShortDate(
   if (!date) return undefined;
   const dateObj = date instanceof Date ? date : new Date(date);
   if (!Number.isFinite(dateObj.getTime())) return undefined;
-  return dateObj.toLocaleDateString('en-US', {
+  return dateObj.toLocaleDateString('de-DE', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

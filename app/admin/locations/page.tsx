@@ -4,10 +4,10 @@
  * Task: T036
  */
 
-import { Add as AddIcon } from '@mui/icons-material';
-import { Box, Button, Container, Skeleton, Typography } from '@mui/material';
-import Link from 'next/link';
+import { Box, Skeleton } from '@mui/material';
 import { Suspense } from 'react';
+import { AdminPageContainer } from '@/components/admin/AdminPageContainer';
+import { ADMIN_LABELS } from '@/lib/constants/admin';
 import { listLocations } from '@/lib/services/location';
 import LocationsTableClient from './LocationsTableClient';
 
@@ -44,33 +44,17 @@ function LocationsSkeleton() {
  */
 export default async function AdminLocationsPage() {
   return (
-    <Container maxWidth='lg' sx={{ py: 4 }}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 4,
-        }}
-      >
-        <Box>
-          <Typography variant='h4' component='h1' gutterBottom>
-            Locations
-          </Typography>
-          <Typography variant='body1' color='text.secondary'>
-            Verwalte Kursstandorte und Veranstaltungsorte
-          </Typography>
-        </Box>
-        <Link href='/admin/locations/new'>
-          <Button variant='contained' startIcon={<AddIcon />}>
-            Neue Location
-          </Button>
-        </Link>
-      </Box>
-
+    <AdminPageContainer
+      title={ADMIN_LABELS.locations}
+      subtitle='Verwalte Kursstandorte und Veranstaltungsorte'
+      breadcrumbs={[
+        { label: ADMIN_LABELS.locations, href: '/admin/locations' },
+      ]}
+      titleProps={{ 'data-testid': 'admin-locations-page' }}
+    >
       <Suspense fallback={<LocationsSkeleton />}>
         <LocationsContent />
       </Suspense>
-    </Container>
+    </AdminPageContainer>
   );
 }

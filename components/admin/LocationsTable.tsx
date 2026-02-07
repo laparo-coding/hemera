@@ -7,6 +7,7 @@
  */
 
 import {
+  Add as AddIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
   Map as MapIcon,
@@ -16,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import {
   Box,
+  Button,
   Chip,
   IconButton,
   InputAdornment,
@@ -34,6 +36,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { LocationResponse } from '@/lib/schemas/location-schema';
+import { normalizeForSearch } from '@/lib/utils/searchNormalization';
 import { TERMS } from '../../lib/constants';
 
 interface LocationsTableProps {
@@ -54,11 +57,11 @@ export default function LocationsTable({
 
   // Filter locations based on search
   const filteredLocations = locations.filter(location => {
-    const searchLower = searchQuery.toLowerCase();
+    const searchLower = normalizeForSearch(searchQuery);
     return (
-      location.name.toLowerCase().includes(searchLower) ||
-      location.city.toLowerCase().includes(searchLower) ||
-      location.address.toLowerCase().includes(searchLower)
+      normalizeForSearch(location.name).includes(searchLower) ||
+      normalizeForSearch(location.city).includes(searchLower) ||
+      normalizeForSearch(location.address).includes(searchLower)
     );
   });
 
@@ -84,9 +87,19 @@ export default function LocationsTable({
   };
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      {/* Search Bar */}
-      <Box sx={{ p: 2 }}>
+    <Paper
+      sx={{ width: '100%', overflow: 'hidden', bgcolor: 'background.paper' }}
+    >
+      {/* Search and Actions Bar */}
+      <Box
+        sx={{
+          p: 2,
+          display: 'flex',
+          gap: 2,
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
         <TextField
           fullWidth
           size='small'
@@ -96,6 +109,7 @@ export default function LocationsTable({
             setSearchQuery(e.target.value);
             setPage(0);
           }}
+          sx={{ minWidth: 280, flex: 1 }}
           InputProps={{
             startAdornment: (
               <InputAdornment position='start'>
@@ -104,12 +118,24 @@ export default function LocationsTable({
             ),
           }}
         />
+        <Button
+          variant='contained'
+          startIcon={<AddIcon />}
+          onClick={() => router.push('/admin/locations/new')}
+        >
+          Neuer Veranstaltungsort
+        </Button>
       </Box>
 
       <TableContainer>
         <Table stickyHeader aria-label='Locations Tabelle'>
           <TableHead>
-            <TableRow>
+            <TableRow
+              sx={{
+                bgcolor: 'background.paper',
+                '& th': { backgroundColor: 'background.paper' },
+              }}
+            >
               <TableCell>Name</TableCell>
               <TableCell>Adresse</TableCell>
               <TableCell>Stadt</TableCell>

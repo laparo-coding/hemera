@@ -1,6 +1,6 @@
 /**
  * User Admin Schemas - Zod validation schemas for user admin actions
- * Feature: 021-learning-path
+ * Feature: 021-learning-path, 024-admin-dashboard
  */
 
 import { z } from 'zod';
@@ -14,12 +14,37 @@ export const userOutperformerUpdateSchema = z.object({
 });
 
 /**
+ * Schema for updating user role via admin
+ * Used by PATCH /api/admin/users/{id}
+ */
+export const userRoleUpdateSchema = z.object({
+  role: z.enum(['admin', 'user']),
+});
+
+/**
+ * Combined schema for PATCH /api/admin/users/{id}
+ * Accepts either role update or outperformer update (or both)
+ */
+export const userPatchSchema = z
+  .object({
+    role: z.enum(['admin', 'user']).optional(),
+    isOutperformer: z.boolean().optional(),
+  })
+  .refine(
+    data => data.role !== undefined || data.isOutperformer !== undefined,
+    {
+      message:
+        'Mindestens ein Feld (role oder isOutperformer) muss angegeben werden',
+    }
+  );
+
+/**
  * Schema for general user admin updates
  * Extensible for future admin user modifications
  */
 export const userAdminUpdateSchema = z.object({
   isOutperformer: z.boolean().optional(),
-  // Future fields can be added here
+  role: z.enum(['admin', 'user']).optional(),
 });
 
 /**
@@ -43,6 +68,8 @@ export const userAdminUpdateResponseSchema = z.object({
 export type UserOutperformerUpdateInput = z.infer<
   typeof userOutperformerUpdateSchema
 >;
+export type UserRoleUpdateInput = z.infer<typeof userRoleUpdateSchema>;
+export type UserPatchInput = z.infer<typeof userPatchSchema>;
 export type UserAdminUpdateInput = z.infer<typeof userAdminUpdateSchema>;
 export type UserAdminUpdateResponse = z.infer<
   typeof userAdminUpdateResponseSchema

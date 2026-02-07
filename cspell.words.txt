@@ -39,6 +39,7 @@ Detekt
 Deutsch
 Dockerfiles
 Duplikatsschutz
+Durchschn
 ECONNREFUSED
 ENOTFOUND
 EOCDR
@@ -147,6 +148,7 @@ Paginierung
 Participations
 Partytown
 Pexels
+Plattformverwaltung
 Platzhalterinhalte
 Playfair
 Plätze
@@ -194,6 +196,7 @@ Suchfilter
 Supabase
 Svix
 TKTK
+TRUNC
 TTFB
 Teamdynamik
 Teilnahme
@@ -229,6 +232,7 @@ Verhandlungskompetenzen
 Verhandlungssituationen
 Verhandlungsstrategien
 Verhandlungsziel
+Veröffentlich
 Videocam
 Voraussetzungs
 Voraussetzungsnachweis
@@ -237,6 +241,7 @@ Vorbereitungs
 WCAG
 Warteschlangen
 Warteschlisten
+Willkommensnachricht
 Workerzahl
 Zauberflocke
 Zeilenendenungen
@@ -348,6 +353,7 @@ foto
 gatekeeping
 gecacht
 gefunden
+gehalt
 gelöscht
 gemergten
 gemini
@@ -397,6 +403,7 @@ keyof
 kilocode
 klauspost
 klickbar
+klickbaren
 koln
 konzept
 kurs
@@ -428,6 +435,7 @@ monday
 mozu
 mqtt
 munchen
+müller
 müssen
 nachbereitung
 nachvollziehbar
@@ -468,6 +476,7 @@ participations
 passwordless
 phpstan
 pipefail
+pkill
 planetscale
 playfair
 pmezard
@@ -535,6 +544,7 @@ stdr
 storyselling
 stretchr
 subheadline
+subpages
 subsetting
 supabase
 superadmin

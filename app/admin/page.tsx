@@ -1,213 +1,36 @@
-import { currentUser } from '@clerk/nextjs/server';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Paper,
-  Typography,
-} from '@mui/material';
-import Grid from '@mui/material/GridLegacy';
+/**
+ * Admin Dashboard Page
+ * Feature: 024-admin-dashboard
+ *
+ * Main dashboard with 6 navigation cards in a 3-column grid.
+ * Admin authentication is handled by the parent layout.
+ */
+
+import { Box, Typography } from '@mui/material';
 import type { Metadata } from 'next';
+import { AdminPageContainer } from '@/components/admin/AdminPageContainer';
+import { DashboardGrid } from '@/components/admin/DashboardGrid';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard - Hemera Academy',
-  description: 'Administrative dashboard for managing the platform',
+  description: 'Administrative Dashboard für die Plattformverwaltung',
 };
 
-/**
- * Admin Dashboard Page
- *
- * Note: Admin authentication is handled by the parent layout.
- */
 export default async function AdminPage() {
-  // Get user for display purposes (auth is handled by layout)
-  const adminUser = await currentUser();
-
   return (
-    <Box data-testid='admin-page'>
-      <Typography variant='h4' component='h1' gutterBottom>
-        Admin Dashboard
-      </Typography>
+    <AdminPageContainer
+      title='Admin Dashboard'
+      breadcrumbs={[]}
+      titleProps={{ 'data-testid': 'admin-page' }}
+    >
+      <Box sx={{ mb: 4 }}>
+        <Typography variant='body1' color='text.secondary'>
+          Willkommen im Administrationsbereich. Wähle einen Bereich zur
+          Verwaltung.
+        </Typography>
+      </Box>
 
-      <Alert severity='info' sx={{ mb: 3 }}>
-        Welcome to the administrative area. You have full access to platform
-        management features.
-      </Alert>
-
-      <Grid container spacing={3}>
-        {/* Platform Stats */}
-        <Grid item xs={12} lg={8}>
-          <Card>
-            <CardContent>
-              <Typography variant='h6' gutterBottom>
-                Platform Statistics
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={6} md={3}>
-                  <Paper sx={{ p: 2, textAlign: 'center' }}>
-                    <Typography variant='h4' color='primary'>
-                      1
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      Total Users
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={6} md={3}>
-                  <Paper sx={{ p: 2, textAlign: 'center' }}>
-                    <Typography variant='h4' color='primary'>
-                      3
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      Total Courses
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={6} md={3}>
-                  <Paper sx={{ p: 2, textAlign: 'center' }}>
-                    <Typography variant='h4' color='primary'>
-                      0
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      Active Enrollments
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={6} md={3}>
-                  <Paper sx={{ p: 2, textAlign: 'center' }}>
-                    <Typography variant='h4' color='success.main'>
-                      Online
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      System Status
-                    </Typography>
-                  </Paper>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Admin Info */}
-        <Grid item xs={12} lg={4}>
-          <Card>
-            <CardContent>
-              <Typography variant='h6' gutterBottom>
-                Admin Information
-              </Typography>
-              <Typography variant='body2' paragraph>
-                <strong>Admin:</strong>{' '}
-                {adminUser?.emailAddresses[0]?.emailAddress || 'Unknown'}
-              </Typography>
-              <Typography variant='body2' paragraph>
-                <strong>Role:</strong> Administrator
-              </Typography>
-              <Typography variant='body2' suppressHydrationWarning>
-                <strong>Last Login:</strong> {new Date().toLocaleDateString()}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Quick Actions */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant='h6' gutterBottom>
-                User Management
-              </Typography>
-              <Typography variant='body2' color='text.secondary' paragraph>
-                Manage user accounts, roles, and permissions.
-              </Typography>
-              <Button variant='outlined' disabled fullWidth>
-                Manage Users (Coming Soon)
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant='h6' gutterBottom>
-                Course Management
-              </Typography>
-              <Typography variant='body2' color='text.secondary' paragraph>
-                Create, edit, and manage course content.
-              </Typography>
-              <Button variant='contained' fullWidth href='/admin/courses'>
-                Manage Courses
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant='h6' gutterBottom>
-                Location Management
-              </Typography>
-              <Typography variant='body2' color='text.secondary' paragraph>
-                Manage course locations and venues.
-              </Typography>
-              <Button variant='contained' fullWidth href='/admin/locations'>
-                Manage Locations
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant='h6' gutterBottom>
-                Erfahrungsberichte
-              </Typography>
-              <Typography variant='body2' color='text.secondary' paragraph>
-                Prüfe und gib Erfahrungsberichte von Teilnehmern frei.
-              </Typography>
-              <Button variant='contained' fullWidth href='/admin/testimonials'>
-                Erfahrungsberichte verwalten
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant='h6' gutterBottom>
-                System Settings
-              </Typography>
-              <Typography variant='body2' color='text.secondary' paragraph>
-                Configure platform settings and preferences.
-              </Typography>
-              <Button variant='outlined' disabled fullWidth>
-                System Settings (Coming Soon)
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant='h6' gutterBottom>
-                Reports & Analytics
-              </Typography>
-              <Typography variant='body2' color='text.secondary' paragraph>
-                View detailed reports and platform analytics.
-              </Typography>
-              <Button variant='outlined' disabled fullWidth>
-                View Reports (Coming Soon)
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
+      <DashboardGrid />
+    </AdminPageContainer>
   );
 }

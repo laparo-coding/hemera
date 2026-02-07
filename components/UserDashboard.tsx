@@ -21,7 +21,7 @@ import {
   type BookingForCategorization,
   categorizeBookings as categorizeBookingsUtil,
 } from '@/lib/utils/booking-categorization';
-import { CourseCard, DashboardSection } from './dashboard';
+import { CourseCard, DashboardSection, UserPageContainer } from './dashboard';
 
 // Design tokens from Hemera spec (matching landing page and auth pages)
 const colors = {
@@ -157,31 +157,8 @@ const UserDashboardE2E: React.FC = () => {
   }, []);
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        bgcolor: colors.cream,
-        pt: { xs: 12, md: 16 },
-        px: { xs: 2, sm: 3, md: 4 },
-        pb: { xs: 2, sm: 3, md: 4 },
-      }}
-    >
-      <Box sx={{ maxWidth: 1200, mx: 'auto' }} data-testid='user-dashboard'>
-        <Box sx={{ mb: 4 }}>
-          <Typography
-            component='h1'
-            data-testid='dashboard-title'
-            sx={{
-              fontFamily: '"Playfair Display", serif',
-              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
-              fontWeight: 700,
-              color: colors.petrol,
-              mb: 1,
-            }}
-          >
-            Dashboard Overview
-          </Typography>
-        </Box>
+    <UserPageContainer title='Dashboard-Übersicht' breadcrumbs={[]}>
+      <Box data-testid='user-dashboard'>
         {/* Marker for auth-service errors/disabled in E2E so tests can detect a fallback */}
         <span style={{ display: 'none' }} data-testid='auth-service-error'>
           Service temporarily unavailable
@@ -265,7 +242,7 @@ const UserDashboardE2E: React.FC = () => {
           </CardContent>
         </Paper>
       </Box>
-    </Box>
+    </UserPageContainer>
   );
 };
 
@@ -378,93 +355,69 @@ const UserDashboardClerk: React.FC = () => {
   // Loading state with skeleton
   if (!userLoaded || loading) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          bgcolor: colors.cream,
-          pt: { xs: 12, md: 16 },
-          px: { xs: 2, sm: 3, md: 4 },
-          pb: { xs: 2, sm: 3, md: 4 },
-        }}
-      >
-        <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-          {/* Title skeleton */}
-          <Skeleton
-            variant='text'
-            width={300}
-            height={48}
-            sx={{ mb: 1, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-          />
-          <Skeleton
-            variant='text'
-            width={400}
-            height={24}
-            sx={{ mb: 4, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-          />
-
-          {/* Section skeletons */}
-          {[1, 2].map(item => (
+      <UserPageContainer title='Wird geladen...' breadcrumbs={[]}>
+        {/* Section skeletons */}
+        {[1, 2].map(item => (
+          <Paper
+            key={item}
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 3, md: 4 },
+              mb: 3,
+              borderRadius: '16px',
+              border: '1px solid rgba(22, 64, 77, 0.1)',
+              boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+            }}
+          >
+            <Skeleton
+              variant='text'
+              width={200}
+              height={32}
+              sx={{ mb: 3, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+            />
             <Paper
-              key={item}
               elevation={0}
               sx={{
-                p: { xs: 2, sm: 3, md: 4 },
-                mb: 3,
-                borderRadius: '16px',
+                p: { xs: 2, sm: 3 },
+                borderRadius: '12px',
                 border: '1px solid rgba(22, 64, 77, 0.1)',
-                boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
               }}
             >
-              <Skeleton
-                variant='text'
-                width={200}
-                height={32}
-                sx={{ mb: 3, bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-              />
-              <Paper
-                elevation={0}
-                sx={{
-                  p: { xs: 2, sm: 3 },
-                  borderRadius: '12px',
-                  border: '1px solid rgba(22, 64, 77, 0.1)',
-                }}
-              >
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Skeleton
+                  variant='circular'
+                  width={24}
+                  height={24}
+                  sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
+                />
+                <Box sx={{ flex: 1 }}>
                   <Skeleton
-                    variant='circular'
-                    width={24}
-                    height={24}
+                    variant='text'
+                    width='40%'
+                    height={20}
                     sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
                   />
-                  <Box sx={{ flex: 1 }}>
-                    <Skeleton
-                      variant='text'
-                      width='40%'
-                      height={20}
-                      sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-                    />
-                    <Skeleton
-                      variant='text'
-                      width='60%'
-                      height={16}
-                      sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
-                    />
-                  </Box>
                   <Skeleton
-                    variant='rounded'
-                    width={120}
-                    height={36}
-                    sx={{
-                      bgcolor: 'rgba(166, 205, 198, 0.2)',
-                      borderRadius: '8px',
-                    }}
+                    variant='text'
+                    width='60%'
+                    height={16}
+                    sx={{ bgcolor: 'rgba(166, 205, 198, 0.2)' }}
                   />
                 </Box>
-              </Paper>
+                <Skeleton
+                  variant='rounded'
+                  width={120}
+                  height={36}
+                  sx={{
+                    bgcolor: 'rgba(166, 205, 198, 0.2)',
+                    borderRadius: '8px',
+                  }}
+                />
+              </Box>
             </Paper>
-          ))}
-        </Box>
-      </Box>
+          </Paper>
+        ))}
+      </UserPageContainer>
     );
   }
 
@@ -475,44 +428,15 @@ const UserDashboardClerk: React.FC = () => {
     categorized.noShow.length > 0;
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        bgcolor: colors.cream,
-        pt: { xs: 12, md: 16 },
-        px: { xs: 2, sm: 3, md: 4 },
-        pb: { xs: 2, sm: 3, md: 4 },
-      }}
+    <UserPageContainer
+      title={`Willkommen zurück, ${user?.firstName || 'Benutzer'}!`}
+      subtitle={`Hier findest du eine Übersicht über deine ${TERMS.courses}.`}
+      breadcrumbs={[]}
     >
-      <Box sx={{ maxWidth: 1200, mx: 'auto' }} data-testid='user-dashboard'>
-        <Box sx={{ mb: 4 }}>
-          <Typography
-            component='h1'
-            data-testid='dashboard-title'
-            sx={{
-              fontFamily: '"Playfair Display", serif',
-              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
-              fontWeight: 700,
-              color: colors.petrol,
-              mb: 1,
-            }}
-          >
-            Willkommen zurück, {user?.firstName || 'User'}!
-          </Typography>
-          <span style={{ display: 'none' }} data-testid='user-role'>
-            {(user?.publicMetadata?.role as string) || 'user'}
-          </span>
-          <Typography
-            sx={{
-              fontFamily: '"Inter", sans-serif',
-              fontSize: '1rem',
-              color: colors.petrol,
-              opacity: 0.8,
-            }}
-          >
-            Hier findest du eine Übersicht über deine {TERMS.courses}.
-          </Typography>
-        </Box>
+      <Box data-testid='user-dashboard'>
+        <span style={{ display: 'none' }} data-testid='user-role'>
+          {(user?.publicMetadata?.role as string) || 'user'}
+        </span>
 
         {error && (
           <Alert
@@ -655,7 +579,7 @@ const UserDashboardClerk: React.FC = () => {
           </DashboardSection>
         )}
       </Box>
-    </Box>
+    </UserPageContainer>
   );
 };
 
