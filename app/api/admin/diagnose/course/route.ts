@@ -1,22 +1,25 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { createAdminHandler } from '@/lib/api/admin-route-handler';
-import { getCorsHeaders } from '@/lib/utils/cors';
+import type { NextRequest } from 'next/server';
+import {
+  adminOptions,
+  createAdminHandler,
+} from '@/lib/api/admin-route-handler';
 import { prisma } from '@/lib/db/prisma';
 
 /**
  * Admin endpoint to diagnose and fix course visibility issues
  * GET /api/admin/diagnose/course?slug=grundkurs
  */
-const getDiagnosis = async (request: NextRequest) => {
-  const slug = request.nextUrl.searchParams.get('slug');
+const getDiagnosis = async (
+  requestId: string,
+  request?: NextRequest
+): Promise<unknown> => {
+  const slug = request?.nextUrl.searchParams.get('slug');
   if (!slug) {
-    return NextResponse.json(
-      {
-        error: 'Der Slug-Parameter ist erforderlich',
-        code: 'SLUG_MISSING',
-      },
-      { status: 400, headers: getCorsHeaders() }
-    );
+    return {
+      error: 'Der Slug-Parameter ist erforderlich',
+      code: 'SLUG_MISSING',
+      requestId,
+    };
   }
 
   // Find course by slug (including non-public)
@@ -28,18 +31,16 @@ const getDiagnosis = async (request: NextRequest) => {
   });
 
   if (!course) {
-    return NextResponse.json(
-      {
-        status: 'not_found',
-        slug,
-        message: `Kurs mit slug "${slug}" existiert nicht in der Datenbank`,
-      },
-      { status: 404, headers: getCorsHeaders() }
-    );
+    return {
+      status: 'not_found',
+      slug,
+      message: `Kurs mit slug "${slug}" existiert nicht in der Datenbank`,
+      requestId,
+    };
   }
 
   // Diagnose visibility
-  const diagnosis = {
+  return {
     courseId: course.id,
     slug: course.slug,
     title: course.title,
@@ -56,18 +57,13 @@ const getDiagnosis = async (request: NextRequest) => {
             ? 'VISIBLE (public & published)'
             : 'HIDDEN (unpublished)',
     canCheckout: !course.isNonPublic || course.isPublished, // After fix in create-intent
+    requestId,
   };
-
-  return NextResponse.json(diagnosis, {
-    headers: getCorsHeaders(),
-  });
 };
 
-export const GET = createAdminHandler(getDiagnosis);
+export const GET = createAdminHandler(getDiagnosis, {
+  context: 'AdminDiagnose.Course.GET',
+  errorMessage: 'Fehler beim Abrufen der Kurs-Diagnose',
+});
 
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: getCorsHeaders(),
-  });
-}
+export const OPTIONS = adminOptions;
