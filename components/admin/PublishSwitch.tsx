@@ -15,7 +15,7 @@ import {
   Switch,
   Tooltip,
 } from '@mui/material';
-import { useCallback, useState, useTransition } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import { ADMIN_LABELS } from '@/lib/constants/admin';
 
 interface PublishSwitchProps {
@@ -42,6 +42,11 @@ export function PublishSwitch({
   const [optimisticPublished, setOptimisticPublished] = useState(isPublished);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  // Sync with parent prop when it changes (e.g., after server refetch)
+  useEffect(() => {
+    setOptimisticPublished(isPublished);
+  }, [isPublished]);
 
   const handleToggle = useCallback(async () => {
     const newValue = !optimisticPublished;

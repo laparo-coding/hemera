@@ -118,12 +118,17 @@ export async function getAdminUsers(
       users = users.filter(user => outperformerSet.has(user.id));
     }
 
-    // Transform to AdminUserListItem
+    // Transform to AdminUserListItem (using Maps for O(1) lookups)
+    const bookingCountMap = new Map(
+      bookingCounts.map(b => [b.userId, b._count])
+    );
+    const completedCountMap = new Map(
+      completedParticipations.map(p => [p.userId, p._count])
+    );
+
     const transformedUsers: AdminUserListItem[] = users.map(user => {
-      const bookingCount =
-        bookingCounts.find(b => b.userId === user.id)?._count ?? 0;
-      const completedCount =
-        completedParticipations.find(p => p.userId === user.id)?._count ?? 0;
+      const bookingCount = bookingCountMap.get(user.id) ?? 0;
+      const completedCount = completedCountMap.get(user.id) ?? 0;
 
       return {
         id: user.id,

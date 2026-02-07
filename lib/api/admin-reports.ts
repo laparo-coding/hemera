@@ -42,15 +42,21 @@ async function getAllClerkUsers() {
   return allUsers;
 }
 
+/** Type alias for Clerk user list (avoids repeated Awaited<ReturnType<...>>) */
+type ClerkUserList = Awaited<ReturnType<typeof getAllClerkUsers>>;
+
 /**
  * Get dashboard statistics
+ * @param prefetchedUsers - Optional pre-fetched Clerk users to avoid duplicate API calls
  */
-export async function getDashboardStats(): Promise<DashboardStats> {
+export async function getDashboardStats(
+  prefetchedUsers?: ClerkUserList
+): Promise<DashboardStats> {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  // Get user counts from Clerk (iterative fetch)
-  const allClerkUsers = await getAllClerkUsers();
+  // Use pre-fetched users or fetch from Clerk
+  const allClerkUsers = prefetchedUsers ?? (await getAllClerkUsers());
   const totalUsers = allClerkUsers.length;
   const newUsersLast30Days = allClerkUsers.filter(
     user => new Date(user.createdAt) >= thirtyDaysAgo
@@ -235,10 +241,13 @@ export async function getCourseUtilization(): Promise<
 
 /**
  * Get user growth statistics
+ * @param prefetchedUsers - Optional pre-fetched Clerk users to avoid duplicate API calls
  */
-export async function getUserGrowthStats(): Promise<UserGrowthStats> {
-  // Get all users from Clerk (iterative fetch)
-  const allClerkUsers = await getAllClerkUsers();
+export async function getUserGrowthStats(
+  prefetchedUsers?: ClerkUserList
+): Promise<UserGrowthStats> {
+  // Use pre-fetched users or fetch from Clerk
+  const allClerkUsers = prefetchedUsers ?? (await getAllClerkUsers());
 
   // Count admins
   const admins = allClerkUsers.filter(
@@ -290,13 +299,17 @@ export async function getUserGrowthStats(): Promise<UserGrowthStats> {
 
 /**
  * Get full reports response
+ * Fetches Clerk users once and shares across stats functions to avoid duplicate API calls.
  */
 export async function getAdminReports(): Promise<AdminReportsResponse> {
+  // Fetch Clerk users once, share across functions that need them
+  const allClerkUsers = await getAllClerkUsers();
+
   const [stats, bookings, courseUtilization, userGrowth] = await Promise.all([
-    getDashboardStats(),
+    getDashboardStats(allClerkUsers),
     getBookingStats(),
     getCourseUtilization(),
-    getUserGrowthStats(),
+    getUserGrowthStats(allClerkUsers),
   ]);
 
   return {

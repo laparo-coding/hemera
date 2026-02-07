@@ -104,6 +104,7 @@ test.describe('Course Publish Toggle - List View', () => {
     await page.route('**/api/admin/courses/**', route =>
       route.fulfill({
         status: 500,
+        contentType: 'application/json',
         body: JSON.stringify({ error: 'Internal error' }),
       })
     );

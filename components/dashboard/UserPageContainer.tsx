@@ -10,13 +10,8 @@
 
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { colors } from '@/lib/design-tokens';
 import { UserBreadcrumb, type UserBreadcrumbItem } from './UserBreadcrumb';
-
-// Design tokens from Hemera spec (matching landing page and auth pages)
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-} as const;
 
 /** Head space for user dashboard pages (MUI spacing units) */
 const USER_HEAD_SPACE = {

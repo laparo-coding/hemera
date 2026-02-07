@@ -15,17 +15,14 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
+import { getCorsHeaders } from '@/lib/utils/cors';
 import { getOrCreateRequestId } from '@/lib/utils/request-id';
 
-// CORS headers
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+// CORS headers restricted to same origin (not wildcard)
+const corsHeaders = getCorsHeaders();
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+  return NextResponse.json({}, { headers: getCorsHeaders() });
 }
 
 export async function GET(request: NextRequest) {

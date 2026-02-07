@@ -24,7 +24,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { AdminTableFilter, AdminTableSearchConfig } from './types';
 
 interface AdminTableToolbarProps {
@@ -63,6 +63,11 @@ export default function AdminTableToolbar({
   toolbarActions,
 }: AdminTableToolbarProps) {
   const [localSearchValue, setLocalSearchValue] = useState(searchValue);
+
+  // Sync local search value when external searchValue prop changes
+  useEffect(() => {
+    setLocalSearchValue(searchValue);
+  }, [searchValue]);
 
   const handleSearchChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,8 +154,8 @@ export default function AdminTableToolbar({
                 <InputLabel>{filter.label}</InputLabel>
                 <Select
                   value={
-                    (filterValues[filter.id] as string) ||
-                    filter.defaultValue ||
+                    (filterValues[filter.id] as string) ??
+                    filter.defaultValue ??
                     ''
                   }
                   label={filter.label}

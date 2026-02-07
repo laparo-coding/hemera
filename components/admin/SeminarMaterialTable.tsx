@@ -53,13 +53,15 @@ interface SeminarMaterialTableProps {
 }
 
 /**
- * Format date for display (German locale)
+ * Format date for table display (German locale, short format)
+ * Uses Europe/Berlin timezone for consistent display.
  */
-function formatDate(dateString: string): string {
+function formatTableDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('de-DE', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+    timeZone: 'Europe/Berlin',
   });
 }
 
@@ -318,12 +320,12 @@ export default function SeminarMaterialTable({
                     </TableCell>
                     <TableCell>
                       <Typography variant='body2'>
-                        {formatDate(material.createdAt)}
+                        {formatTableDate(material.createdAt)}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant='body2'>
-                        {formatDate(material.updatedAt)}
+                        {formatTableDate(material.updatedAt)}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>

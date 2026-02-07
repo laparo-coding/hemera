@@ -22,7 +22,7 @@ export async function GET(_request: NextRequest) {
 
     if (!course) {
       return NextResponse.json(
-        { error: 'No upcoming course found' },
+        { error: 'Kein anstehender Kurs gefunden' },
         { status: 404 }
       );
     }
@@ -45,7 +45,7 @@ export async function GET(_request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
     return NextResponse.json(
-      { error: 'Failed to fetch next course' },
+      { error: 'Fehler beim Laden des nächsten Kurses' },
       { status: 500 }
     );
   }

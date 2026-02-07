@@ -59,10 +59,11 @@ export default function CourseList({
 
   // Filter courses based on search
   const filteredCourses = courses.filter(course => {
-    const searchLower = normalizeForSearch(searchQuery);
+    if (!searchQuery) return true;
+    const normalizedQuery = normalizeForSearch(searchQuery);
     return (
-      normalizeForSearch(course.title).includes(searchLower) ||
-      normalizeForSearch(course.instructor).includes(searchLower)
+      normalizeForSearch(course.title).includes(normalizedQuery) ||
+      normalizeForSearch(course.instructor).includes(normalizedQuery)
     );
   });
 
@@ -189,15 +190,18 @@ export default function CourseList({
                   </TableCell>
                   <TableCell>
                     <Typography variant='body2'>
-                      {formatShortDate(course.startDate) ?? 'TBD'}
+                      {formatShortDate(course.startDate) ?? 'Noch offen'}
                     </Typography>
                     <Typography variant='caption' color='text.secondary'>
                       {formatTimeRange(course.startTime, course.endTime) ??
-                        'TBD'}
+                        'Noch offen'}
                     </Typography>
                   </TableCell>
                   <TableCell align='right'>
-                    {(course.price / 100).toFixed(2)} €
+                    {new Intl.NumberFormat('de-DE', {
+                      style: 'currency',
+                      currency: 'EUR',
+                    }).format(course.price / 100)}
                   </TableCell>
                   <TableCell align='center'>
                     <Chip

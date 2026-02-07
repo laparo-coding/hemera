@@ -157,9 +157,8 @@ test.describe('Admin User Management - Outperformer Badge', () => {
     const badgeCount = await badges.count();
 
     // When filtering by outperformer, each row should have a badge
-    if (rowCount > 0) {
-      expect(badgeCount).toBe(rowCount);
-    }
+    expect(rowCount).toBeGreaterThan(0);
+    expect(badgeCount).toBe(rowCount);
   });
 });
 

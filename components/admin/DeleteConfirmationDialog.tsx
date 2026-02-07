@@ -48,7 +48,13 @@ export function DeleteConfirmationDialog({
   cancelText = 'Abbrechen',
 }: DeleteConfirmationDialogProps) {
   return (
-    <Dialog open={open} onClose={onCancel} maxWidth='sm' fullWidth>
+    <Dialog
+      open={open}
+      onClose={loading ? undefined : onCancel}
+      disableEscapeKeyDown={loading}
+      maxWidth='sm'
+      fullWidth
+    >
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <WarningIcon color='error' />
         {title}
