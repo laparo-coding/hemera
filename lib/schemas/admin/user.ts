@@ -68,6 +68,8 @@ export const userAdminUpdateResponseSchema = z.object({
 export type UserOutperformerUpdateInput = z.infer<
   typeof userOutperformerUpdateSchema
 >;
+export type UserRoleUpdateInput = z.infer<typeof userRoleUpdateSchema>;
+export type UserPatchInput = z.infer<typeof userPatchSchema>;
 export type UserAdminUpdateInput = z.infer<typeof userAdminUpdateSchema>;
 export type UserAdminUpdateResponse = z.infer<
   typeof userAdminUpdateResponseSchema

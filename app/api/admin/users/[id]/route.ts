@@ -254,9 +254,25 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     const { role, isOutperformer } = parseResult.data;
 
+    // Prevent self-demotion: admin cannot remove their own admin role
+    if (role !== undefined && userId === targetUserId && role !== 'admin') {
+      const errorResponse = createErrorResponse(
+        'Du kannst deine eigene Admin-Rolle nicht entfernen',
+        ErrorCodes.FORBIDDEN,
+        requestId,
+        403
+      );
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
+      });
+      return errorResponse;
+    }
+
+    let updatedUser: unknown = null;
+
     // Handle role update via Clerk
     if (role !== undefined) {
-      const updatedUser = await updateUserRole(targetUserId, role === 'admin');
+      updatedUser = await updateUserRole(targetUserId, role === 'admin');
 
       // Audit log: record role change
       serverInstance.info('Benutzerrolle durch Admin geändert', {
@@ -266,18 +282,13 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         newRole: role,
         requestId,
       });
-
-      const successResponse = createSuccessResponse(updatedUser, requestId);
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        successResponse.headers.set(key, value);
-      });
-      return successResponse;
     }
 
     // Handle outperformer status update via Prisma
     if (isOutperformer !== undefined) {
       const existingUser = await prisma.user.findUnique({
         where: { id: targetUserId },
+        select: { id: true },
       });
 
       if (!existingUser) {
@@ -293,7 +304,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         return errorResponse;
       }
 
-      const updatedUser = await prisma.user.update({
+      updatedUser = await prisma.user.update({
         where: { id: targetUserId },
         data: { isOutperformer },
         select: {
@@ -313,7 +324,9 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         isOutperformer,
         requestId,
       });
+    }
 
+    if (updatedUser) {
       const successResponse = createSuccessResponse(updatedUser, requestId);
       Object.entries(corsHeaders).forEach(([key, value]) => {
         successResponse.headers.set(key, value);

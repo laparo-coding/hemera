@@ -3,6 +3,7 @@
  * Feature: 024-admin-dashboard
  *
  * Dialog for assigning admin/user role to a user.
+ * Uses local state with explicit confirmation button to prevent accidental changes.
  */
 
 'use client';
@@ -18,6 +19,7 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 interface RoleAssignmentDialogProps {
   /** Whether the dialog is open */
@@ -42,6 +44,13 @@ export function RoleAssignmentDialog({
   onCancel,
   loading = false,
 }: RoleAssignmentDialogProps) {
+  const [localIsAdmin, setLocalIsAdmin] = useState(isAdmin);
+
+  // Reset local state when dialog opens
+  useEffect(() => {
+    if (open) setLocalIsAdmin(isAdmin);
+  }, [open, isAdmin]);
+
   return (
     <Dialog
       open={open}
@@ -61,19 +70,27 @@ export function RoleAssignmentDialog({
         <FormControlLabel
           control={
             <Switch
-              checked={isAdmin}
-              onChange={e => onConfirm(e.target.checked)}
+              checked={localIsAdmin}
+              onChange={e => setLocalIsAdmin(e.target.checked)}
               disabled={loading}
               data-testid='admin-role-toggle'
             />
           }
-          label={isAdmin ? 'Admin' : 'Benutzer'}
+          label={localIsAdmin ? 'Admin' : 'Benutzer'}
         />
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onCancel} disabled={loading}>
-          Schließen
+          Abbrechen
+        </Button>
+        <Button
+          onClick={() => onConfirm(localIsAdmin)}
+          disabled={loading || localIsAdmin === isAdmin}
+          variant='contained'
+          data-testid='role-confirm-button'
+        >
+          Speichern
         </Button>
         {loading && <CircularProgress size={20} />}
       </DialogActions>
