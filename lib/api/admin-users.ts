@@ -207,51 +207,60 @@ export async function updateUserRole(
   userId: string,
   isAdmin: boolean
 ): Promise<AdminUserListItem> {
-  const clerk = await clerkClient();
+  try {
+    const clerk = await clerkClient();
 
-  await clerk.users.updateUserMetadata(userId, {
-    publicMetadata: {
-      role: isAdmin ? 'admin' : 'user',
-    },
-  });
-
-  const user = await clerk.users.getUser(userId);
-
-  // Fetch actual DB data for bookingsCount and isOutperformer
-  const [bookingCount, completedCount, outperformerStatus] = await Promise.all([
-    prisma.booking.count({ where: { userId } }),
-    prisma.courseParticipation.count({
-      where: { userId, summaryCompletedAt: { not: null } },
-    }),
-    prisma.courseParticipation.findFirst({
-      where: {
-        userId,
-        summaryCompletedAt: { not: null },
-        booking: { course: { level: 'ADVANCED' } },
+    await clerk.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        role: isAdmin ? 'admin' : 'user',
       },
-      select: { id: true },
-    }),
-  ]);
+    });
 
-  return {
-    id: user.id,
-    email: user.emailAddresses[0]?.emailAddress ?? '',
-    fullName:
-      user.firstName && user.lastName
-        ? `${user.firstName} ${user.lastName}`
-        : user.firstName || user.lastName || null,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    imageUrl: user.imageUrl,
-    isAdmin: user.publicMetadata?.role === 'admin',
-    isOutperformer: !!outperformerStatus,
-    lastSignInAt: user.lastSignInAt
-      ? new Date(user.lastSignInAt).toISOString()
-      : null,
-    createdAt: new Date(user.createdAt).toISOString(),
-    bookingsCount: bookingCount,
-    completedCoursesCount: completedCount,
-  };
+    const user = await clerk.users.getUser(userId);
+
+    // Fetch actual DB data for bookingsCount and isOutperformer
+    const [bookingCount, completedCount, outperformerStatus] =
+      await Promise.all([
+        prisma.booking.count({ where: { userId } }),
+        prisma.courseParticipation.count({
+          where: { userId, summaryCompletedAt: { not: null } },
+        }),
+        prisma.courseParticipation.findFirst({
+          where: {
+            userId,
+            summaryCompletedAt: { not: null },
+            booking: { course: { level: 'ADVANCED' } },
+          },
+          select: { id: true },
+        }),
+      ]);
+
+    return {
+      id: user.id,
+      email: user.emailAddresses[0]?.emailAddress ?? '',
+      fullName:
+        user.firstName && user.lastName
+          ? `${user.firstName} ${user.lastName}`
+          : user.firstName || user.lastName || null,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      imageUrl: user.imageUrl,
+      isAdmin: user.publicMetadata?.role === 'admin',
+      isOutperformer: !!outperformerStatus,
+      lastSignInAt: user.lastSignInAt
+        ? new Date(user.lastSignInAt).toISOString()
+        : null,
+      createdAt: new Date(user.createdAt).toISOString(),
+      bookingsCount: bookingCount,
+      completedCoursesCount: completedCount,
+    };
+  } catch (error) {
+    throw new Error(
+      `Fehler beim Aktualisieren der Benutzerrolle: ${
+        error instanceof Error ? error.message : 'Unbekannter Fehler'
+      }`
+    );
+  }
 }
 
 /**

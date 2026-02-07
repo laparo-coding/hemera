@@ -53,11 +53,11 @@ async function main() {
   // Seed Location (matching production data)
   // --------------------------------------------
   console.log('📍 Seeding Location...');
-  const locationId = 'seed-location-gartenhotel';
+  const seedLocationId = 'seed-location-gartenhotel';
   await prisma.$executeRaw`
     INSERT INTO locations (id, slug, name, description, address, zip_code, city, email, phone, website, image_url, room_image_url, latitude, longitude, created_at, updated_at)
     VALUES (
-      ${locationId},
+      ${seedLocationId},
       'gartenhotel-fette-henne',
       'Gartenhotel Fette Henne',
       'Von einem besonderen Ort, der den unterschiedlichen Persönlichkeiten unserer Gäste vollständig gerecht wird. Durch echtes und persönliches Interesse an Dir und Deinem Wohlergehen machen wir unser Zuhause zu Deinem zweiten Zuhause.',
@@ -91,6 +91,12 @@ async function main() {
   `;
   console.log('   ✔ Location "Gartenhotel Fette Henne" seeded');
 
+  // Retrieve actual location ID after upsert (may differ from seed ID if location already existed)
+  const locationRows = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT id FROM locations WHERE slug = 'gartenhotel-fette-henne'
+  `;
+  const locationId = locationRows[0]?.id ?? 'seed-location-gartenhotel';
+
   const seedCourses = [
     {
       title: 'Gehe zielsicher durch dein Gehaltsgespräch',
@@ -104,7 +110,7 @@ async function main() {
       capacity: 6,
       startDate: new Date('2026-06-19T22:00:00.000Z'),
       startTime: new Date('2025-12-28T08:00:00.000Z'),
-      endTime: new Date('2026-01-12T17:15:00.000Z'),
+      endTime: new Date('2026-01-12T18:15:00.000Z'),
       isPublished: true,
       instructor: 'Andreas',
       level: 'BEGINNER' as const,

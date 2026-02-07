@@ -16,7 +16,7 @@ import { getOrCreateRequestId } from '../../../../../lib/utils/request-id';
 const corsHeaders = getCorsHeaders();
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: getCorsHeaders() });
+  return NextResponse.json({}, { headers: corsHeaders });
 }
 
 interface RouteContext {

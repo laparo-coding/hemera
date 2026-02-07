@@ -34,7 +34,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TERMS } from '../../lib/constants';
 import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
 import { getLevelLabel } from '../../lib/utils/course-level';
@@ -56,6 +56,12 @@ export default function CourseList({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Reset page when courses change (e.g., after delete)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: courses.length is intentionally used as trigger to reset pagination
+  useEffect(() => {
+    setPage(0);
+  }, [courses.length]);
 
   // Filter courses based on search
   const filteredCourses = courses.filter(course => {

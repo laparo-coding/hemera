@@ -147,8 +147,9 @@ test.describe('Admin User Management - Outperformer Badge', () => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users?outperformerOnly=true');
 
-    // Wait for filtered list
-    await page.waitForSelector('[data-testid^="user-row-"]');
+    // Wait for filtered list with shorter timeout for better error messages
+    const firstRow = page.locator('[data-testid^="user-row-"]').first();
+    await expect(firstRow).toBeVisible({ timeout: 10_000 });
 
     // All visible rows should have Outperformer badge
     const rows = page.locator('[data-testid^="user-row-"]');

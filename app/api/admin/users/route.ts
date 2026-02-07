@@ -14,7 +14,7 @@ import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
 const corsHeaders = getCorsHeaders();
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: getCorsHeaders() });
+  return NextResponse.json({}, { headers: corsHeaders });
 }
 
 export async function GET(request: NextRequest) {
@@ -88,6 +88,7 @@ export async function GET(request: NextRequest) {
     const search = url.searchParams.get('search') || undefined;
     const outperformerOnly =
       url.searchParams.get('outperformerOnly') === 'true';
+    const adminOnly = url.searchParams.get('adminOnly') === 'true';
     const rawSortBy = url.searchParams.get('sortBy') || 'createdAt';
     const rawSortOrder = url.searchParams.get('sortOrder') || 'desc';
     const validSortFields = ['name', 'email', 'createdAt', 'lastSignInAt'];
@@ -108,6 +109,7 @@ export async function GET(request: NextRequest) {
         limit,
         search,
         outperformerOnly,
+        adminOnly,
         sortBy: sortBy as 'name' | 'email' | 'createdAt' | 'lastSignInAt',
         sortOrder: sortOrder as 'asc' | 'desc',
       });

@@ -27,9 +27,11 @@ async function getAllClerkUsers() {
     [];
   let offset = 0;
   const limit = 100;
+  const maxPages = 100; // Safety limit: max 10,000 users
   let hasMore = true;
+  let page = 0;
 
-  while (hasMore) {
+  while (hasMore && page < maxPages) {
     const response = await clerk.users.getUserList({
       limit,
       offset,
@@ -37,6 +39,7 @@ async function getAllClerkUsers() {
     allUsers = allUsers.concat(response.data);
     offset += limit;
     hasMore = response.data.length === limit;
+    page++;
   }
 
   return allUsers;

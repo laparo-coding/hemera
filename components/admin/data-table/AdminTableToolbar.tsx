@@ -132,12 +132,14 @@ export default function AdminTableToolbar({
             placeholder={searchConfig?.placeholder || 'Suchen...'}
             value={localSearchValue}
             onChange={handleSearchChange}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position='start'>
-                  <SearchIcon color='action' />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SearchIcon color='action' />
+                  </InputAdornment>
+                ),
+              },
             }}
             sx={{
               minWidth: { xs: '100%', sm: 220 },
