@@ -126,6 +126,7 @@ export default function CourseList({
           fullWidth
           size='small'
           placeholder='Suchen nach Titel oder Dozent/in...'
+          aria-label='Kurse durchsuchen'
           value={searchQuery}
           onChange={e => {
             setSearchQuery(e.target.value);

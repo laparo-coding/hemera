@@ -6,6 +6,7 @@
  */
 
 import { clerkClient } from '@clerk/nextjs/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import type {
   AdminUserListItem,
@@ -294,8 +295,10 @@ export async function deleteUser(userId: string): Promise<void> {
   } catch (prismaError) {
     // User may not exist in Prisma (Clerk-only user) — continue with Clerk deletion
     if (
-      prismaError instanceof Error &&
-      !prismaError.message.includes('Record to update not found')
+      !(
+        prismaError instanceof Prisma.PrismaClientKnownRequestError &&
+        prismaError.code === 'P2025'
+      )
     ) {
       throw prismaError;
     }
