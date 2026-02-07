@@ -47,7 +47,9 @@ export default function StripeCheckoutForm({
   >(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [stripeTimedOut, setStripeTimedOut] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // Stripe loading timeout — Safari ITP can block Stripe.js entirely
   useEffect(() => {
@@ -65,7 +67,8 @@ export default function StripeCheckoutForm({
       setMessage(
         'Das Zahlungsformular konnte nicht geladen werden. ' +
           'Falls du Safari verwendest, deaktiviere bitte unter ' +
-          'Einstellungen → Datenschutz die Option „Cross-Site-Tracking verhindern" ' +
+          'Einstellungen → Datenschutz die Option ' +
+          '"Cross-Site-Tracking verhindern" ' +
           'oder verwende einen anderen Browser (Chrome/Firefox).'
       );
       setMessageType('error');
