@@ -54,6 +54,7 @@ export function DeleteConfirmationDialog({
       disableEscapeKeyDown={loading}
       maxWidth='sm'
       fullWidth
+      data-testid='delete-confirmation-dialog'
     >
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <WarningIcon color='error' />

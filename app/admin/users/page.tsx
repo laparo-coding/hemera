@@ -12,6 +12,8 @@ import { Alert, Box, CircularProgress } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { AdminPageContainer } from '@/components/admin/AdminPageContainer';
+import { DeleteConfirmationDialog } from '@/components/admin/DeleteConfirmationDialog';
+import { RoleAssignmentDialog } from '@/components/admin/RoleAssignmentDialog';
 import { UserList } from '@/components/admin/UserList';
 import { ADMIN_LABELS } from '@/lib/constants/admin';
 import type {
@@ -57,6 +59,15 @@ export default function UsersPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Dialog states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [roleDialogOpen, setRoleDialogOpen] = useState(false);
+  const [roleTargetUser, setRoleTargetUser] =
+    useState<AdminUserListItem | null>(null);
+  const [roleLoading, setRoleLoading] = useState(false);
 
   const queryParams: AdminUsersQueryParams = {
     page,
@@ -124,45 +135,64 @@ export default function UsersPage() {
   }, []);
 
   const handleAssignRole = useCallback(
-    async (userId: string) => {
-      // Toggle admin role
+    (userId: string) => {
       const user = users.find(u => u.id === userId);
       if (!user) return;
+      setRoleTargetUser(user);
+      setRoleDialogOpen(true);
+    },
+    [users]
+  );
 
+  const handleRoleConfirm = useCallback(
+    async (newIsAdmin: boolean) => {
+      if (!roleTargetUser) return;
+      setRoleLoading(true);
       try {
-        const response = await fetch(`/api/admin/users/${userId}`, {
+        const response = await fetch(`/api/admin/users/${roleTargetUser.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role: user.isAdmin ? 'user' : 'admin' }),
+          body: JSON.stringify({
+            role: newIsAdmin ? 'admin' : 'user',
+          }),
         });
 
         if (!response.ok) throw new Error('Fehler beim Ändern der Rolle');
+        setRoleDialogOpen(false);
+        setRoleTargetUser(null);
         fetchUsers();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+      } finally {
+        setRoleLoading(false);
       }
     },
-    [users, fetchUsers]
+    [roleTargetUser, fetchUsers]
   );
 
-  const handleDeleteUser = useCallback(
-    async (userId: string) => {
-      if (!confirm('Bist du sicher, dass du diesen Benutzer löschen möchtest?'))
-        return;
+  const handleDeleteUser = useCallback((userId: string) => {
+    setDeleteTargetId(userId);
+    setDeleteDialogOpen(true);
+  }, []);
 
-      try {
-        const response = await fetch(`/api/admin/users/${userId}`, {
-          method: 'DELETE',
-        });
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTargetId) return;
+    setDeleteLoading(true);
+    try {
+      const response = await fetch(`/api/admin/users/${deleteTargetId}`, {
+        method: 'DELETE',
+      });
 
-        if (!response.ok) throw new Error('Fehler beim Löschen des Benutzers');
-        fetchUsers();
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
-      }
-    },
-    [fetchUsers]
-  );
+      if (!response.ok) throw new Error('Fehler beim Löschen des Benutzers');
+      setDeleteDialogOpen(false);
+      setDeleteTargetId(null);
+      fetchUsers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+    } finally {
+      setDeleteLoading(false);
+    }
+  }, [deleteTargetId, fetchUsers]);
 
   return (
     <AdminPageContainer
@@ -192,6 +222,32 @@ export default function UsersPage() {
           onDeleteUser={handleDeleteUser}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        title='Benutzer löschen'
+        message='Bist du sicher, dass du diesen Benutzer löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.'
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          setDeleteDialogOpen(false);
+          setDeleteTargetId(null);
+        }}
+        loading={deleteLoading}
+      />
+
+      {/* Role Assignment Dialog */}
+      <RoleAssignmentDialog
+        open={roleDialogOpen}
+        userName={roleTargetUser?.fullName ?? roleTargetUser?.email ?? null}
+        isAdmin={roleTargetUser?.isAdmin ?? false}
+        onConfirm={handleRoleConfirm}
+        onCancel={() => {
+          setRoleDialogOpen(false);
+          setRoleTargetUser(null);
+        }}
+        loading={roleLoading}
+      />
     </AdminPageContainer>
   );
 }
