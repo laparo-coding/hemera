@@ -256,17 +256,21 @@ export async function getUserGrowthStats(): Promise<UserGrowthStats> {
 
   for (let i = 5; i >= 0; i--) {
     const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+    const nextMonthStart = new Date(
+      now.getFullYear(),
+      now.getMonth() - i + 1,
+      1
+    );
     const month = monthDate.toISOString().slice(0, 7); // YYYY-MM
 
     const newUsersInMonth = allClerkUsers.filter(user => {
       const createdAt = new Date(user.createdAt);
-      return createdAt >= monthDate && createdAt <= monthEnd;
+      return createdAt >= monthDate && createdAt < nextMonthStart;
     }).length;
 
     const cumulativeTotal = allClerkUsers.filter(user => {
       const createdAt = new Date(user.createdAt);
-      return createdAt <= monthEnd;
+      return createdAt < nextMonthStart;
     }).length;
 
     monthlyGrowth.push({
@@ -309,11 +313,18 @@ export async function getAdminReports(): Promise<AdminReportsResponse> {
 export async function getHealthStatus(): Promise<HealthStatus> {
   const now = new Date().toISOString();
 
+  const [database, clerk, stripe, rollbar] = await Promise.all([
+    checkDatabaseHealth(),
+    checkClerkHealth(),
+    checkStripeHealth(),
+    checkRollbarHealth(),
+  ]);
+
   const services: HealthStatus['services'] = {
-    database: await checkDatabaseHealth(),
-    clerk: await checkClerkHealth(),
-    stripe: await checkStripeHealth(),
-    rollbar: await checkRollbarHealth(),
+    database,
+    clerk,
+    stripe,
+    rollbar,
   };
 
   // Calculate overall status

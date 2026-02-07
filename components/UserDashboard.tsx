@@ -157,7 +157,7 @@ const UserDashboardE2E: React.FC = () => {
   }, []);
 
   return (
-    <UserPageContainer title='Dashboard Overview' breadcrumbs={[]}>
+    <UserPageContainer title='Dashboard-Übersicht' breadcrumbs={[]}>
       <Box data-testid='user-dashboard'>
         {/* Marker for auth-service errors/disabled in E2E so tests can detect a fallback */}
         <span style={{ display: 'none' }} data-testid='auth-service-error'>
@@ -429,7 +429,7 @@ const UserDashboardClerk: React.FC = () => {
 
   return (
     <UserPageContainer
-      title={`Willkommen zurück, ${user?.firstName || 'User'}!`}
+      title={`Willkommen zurück, ${user?.firstName || 'Benutzer'}!`}
       subtitle={`Hier findest du eine Übersicht über deine ${TERMS.courses}.`}
       breadcrumbs={[]}
     >

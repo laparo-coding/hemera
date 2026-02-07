@@ -25,10 +25,14 @@ test.describe('Course Publish Toggle - List View', () => {
     const headers = page.locator('[data-testid="course-list-header"]');
     await expect(headers).not.toContainText('Status');
 
-    // Publish toggle should be visible
-    const toggles = page.locator('[data-testid^="publish-toggle-"]');
-    const count = await toggles.count();
-    expect(count).toBeGreaterThanOrEqual(0);
+    // Publish toggles should be present for each course row
+    const rows = page.locator('[data-testid^="course-row-"]');
+    const rowCount = await rows.count();
+    if (rowCount > 0) {
+      const toggles = page.locator('[data-testid^="publish-toggle-"]');
+      const toggleCount = await toggles.count();
+      expect(toggleCount).toBe(rowCount);
+    }
   });
 
   test('should show toggle with correct states', async ({ page }) => {
@@ -131,7 +135,12 @@ test.describe('Course Publish Toggle - Accessibility', () => {
     await expect(input).toBeFocused();
 
     // Press space to toggle
+    const checkedBefore = await input.isChecked();
     await page.keyboard.press('Space');
+
+    // Toggle state should change
+    const checkedAfter = await input.isChecked();
+    expect(checkedAfter).toBe(!checkedBefore);
   });
 
   test('should have proper ARIA attributes', async ({ page }) => {
@@ -163,9 +172,8 @@ test.describe('Course Publish Toggle - Visual States', () => {
     const checkedToggle = page.locator('[data-testid^="publish-toggle-"] input:checked').first();
 
     if (await checkedToggle.isVisible()) {
-      // Parent should have published styling
-      const toggleContainer = checkedToggle.locator('..');
-      // Visual verification would depend on actual implementation
+      // Published toggle should be checked
+      await expect(checkedToggle).toBeChecked();
     }
   });
 
@@ -179,7 +187,8 @@ test.describe('Course Publish Toggle - Visual States', () => {
     const uncheckedToggle = page.locator('[data-testid^="publish-toggle-"] input:not(:checked)').first();
 
     if (await uncheckedToggle.isVisible()) {
-      // Should show draft/unpublished state
+      // Draft toggle should not be checked
+      await expect(uncheckedToggle).not.toBeChecked();
     }
   });
 });

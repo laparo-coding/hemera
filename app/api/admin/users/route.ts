@@ -82,13 +82,25 @@ export async function GET(request: NextRequest) {
 
     // Parse query parameters for enhanced filtering (024-admin-dashboard)
     const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get('page') || '1', 10);
-    const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+    const rawPage = parseInt(url.searchParams.get('page') || '1', 10);
+    const rawLimit = parseInt(url.searchParams.get('limit') || '20', 10);
+    const page = Number.isNaN(rawPage) ? 1 : Math.max(1, rawPage);
+    const limit = Number.isNaN(rawLimit)
+      ? 20
+      : Math.min(Math.max(1, rawLimit), 100);
     const search = url.searchParams.get('search') || undefined;
     const outperformerOnly =
       url.searchParams.get('outperformerOnly') === 'true';
-    const sortBy = url.searchParams.get('sortBy') || 'createdAt';
-    const sortOrder = url.searchParams.get('sortOrder') || 'desc';
+    const rawSortBy = url.searchParams.get('sortBy') || 'createdAt';
+    const rawSortOrder = url.searchParams.get('sortOrder') || 'desc';
+    const validSortFields = ['name', 'email', 'createdAt', 'lastSignInAt'];
+    const validSortOrders = ['asc', 'desc'];
+    const sortBy = validSortFields.includes(rawSortBy)
+      ? rawSortBy
+      : 'createdAt';
+    const sortOrder = validSortOrders.includes(rawSortOrder)
+      ? rawSortOrder
+      : 'desc';
 
     // If enhanced mode requested (has pagination params), use new API
     if (url.searchParams.has('page') || url.searchParams.has('limit')) {

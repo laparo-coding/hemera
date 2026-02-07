@@ -1,4 +1,4 @@
-import { expect, type Page, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Admin Dashboard E2E Tests
@@ -15,16 +15,9 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
   test('should display dashboard with 6 cards in 3-column grid', async ({
     page,
   }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     // Navigate to admin dashboard (will be redirected if not auth'd in non-CI)
     await page.goto('/admin');
-
-    if (process.env.CI) {
-      // In CI, we expect redirect to sign-in or mock
-      const url = page.url();
-      // Either on admin page or redirected
-      expect(url).toMatch(/\/(admin|sign-in)/);
-      return;
-    }
 
     // Check for dashboard layout
     const dashboardGrid = page.locator('[data-testid="admin-dashboard-grid"]');

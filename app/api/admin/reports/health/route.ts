@@ -9,6 +9,7 @@ import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getHealthStatus } from '@/lib/api/admin-reports';
 import { checkUserAdminStatus } from '@/lib/auth/helpers';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -86,8 +87,11 @@ export async function GET(request: NextRequest) {
     });
     return response;
   } catch (error) {
-    // biome-ignore lint/suspicious/noConsole: Error logging for API debugging
-    console.error('Failed to fetch health status:', error);
+    serverInstance.error('Failed to fetch health status', {
+      context: 'AdminReports.Health.GET',
+      requestId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     const errorResponse = createErrorResponse(
       'Failed to fetch health status',
       ErrorCodes.INTERNAL_ERROR,

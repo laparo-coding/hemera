@@ -13,14 +13,8 @@ test.describe('Admin User Management - List View', () => {
   });
 
   test('should display user list with correct columns', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/users');
-
-    if (process.env.CI) {
-      // Check redirect or mock
-      const url = page.url();
-      expect(url).toMatch(/\/(admin|sign-in)/);
-      return;
-    }
 
     // Verify table headers (German)
     const headers = page.locator('[data-testid="user-list-header"]');
@@ -79,6 +73,10 @@ test.describe('Admin User Management - List View', () => {
 });
 
 test.describe('Admin User Management - Actions', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+  });
+
   test('should show action menu with view, role assign, delete options', async ({
     page,
   }) => {
@@ -153,12 +151,14 @@ test.describe('Admin User Management - Outperformer Badge', () => {
     await page.waitForSelector('[data-testid^="user-row-"]');
 
     // All visible rows should have Outperformer badge
+    const rows = page.locator('[data-testid^="user-row-"]');
+    const rowCount = await rows.count();
     const badges = page.locator('[data-testid="outperformer-badge"]');
-    const count = await badges.count();
+    const badgeCount = await badges.count();
 
-    // If there are rows, they should all have badges
-    if (count > 0) {
-      expect(count).toBeGreaterThan(0);
+    // When filtering by outperformer, each row should have a badge
+    if (rowCount > 0) {
+      expect(badgeCount).toBe(rowCount);
     }
   });
 });

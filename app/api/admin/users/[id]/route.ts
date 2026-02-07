@@ -409,6 +409,14 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     const { deleteUser } = await import('@/lib/api/admin-users');
     await deleteUser(targetUserId);
 
+    // Audit log: record user deletion
+    serverInstance.info('User deleted by admin', {
+      context: 'AdminUsers.DELETE',
+      deletedUserId: targetUserId,
+      adminUserId: userId,
+      requestId,
+    });
+
     // Return 204 No Content
     return new NextResponse(null, {
       status: 204,

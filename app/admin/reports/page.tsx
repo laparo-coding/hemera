@@ -31,13 +31,14 @@ import type {
   ServiceHealth,
 } from '@/lib/types/admin';
 
+const STATUS_LABELS: Record<string, string> = {
+  healthy: ADMIN_LABELS.healthy,
+  degraded: ADMIN_LABELS.degraded,
+  unhealthy: ADMIN_LABELS.unhealthy,
+};
+
 function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    healthy: ADMIN_LABELS.healthy,
-    degraded: ADMIN_LABELS.degraded,
-    unhealthy: ADMIN_LABELS.unhealthy,
-  };
-  return labels[status] ?? status;
+  return STATUS_LABELS[status] ?? status;
 }
 
 function ServiceHealthChip({ service }: { service: ServiceHealth }) {
@@ -50,6 +51,7 @@ function ServiceHealthChip({ service }: { service: ServiceHealth }) {
 
   return (
     <Chip
+      data-testid={`health-status-${service.name}`}
       label={`${service.nameDe}: ${getStatusLabel(service.status)}`}
       color={statusColor}
       size='small'
@@ -97,6 +99,7 @@ export default function ReportsPage() {
       if (!response.ok) throw new Error('Fehler beim Laden der Statistiken');
       const data = await response.json();
       setReports(data.data);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
     }
@@ -109,6 +112,7 @@ export default function ReportsPage() {
       if (!response.ok) throw new Error('Fehler beim Laden des Health-Status');
       const data = await response.json();
       setHealth(data.data);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
     } finally {
@@ -312,7 +316,7 @@ export default function ReportsPage() {
             alignItems='center'
             sx={{ mb: 2 }}
           >
-            <Typography variant='h6'>Systemzustand</Typography>
+            <Typography variant='h6'>{ADMIN_LABELS.systemStatus}</Typography>
             <Button
               variant='outlined'
               size='small'
@@ -355,7 +359,7 @@ export default function ReportsPage() {
               </Box>
 
               <Typography variant='body2' component='span' sx={{ mr: 1 }}>
-                Services:
+                Dienste:
               </Typography>
               <Box sx={{ mb: 2 }}>
                 {Object.values(health.services).map(service => (

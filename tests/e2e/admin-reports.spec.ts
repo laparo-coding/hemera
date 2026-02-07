@@ -13,13 +13,8 @@ test.describe('Admin Reports - Dashboard Stats', () => {
   });
 
   test('should display reports page with all sections', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/reports');
-
-    if (process.env.CI) {
-      const url = page.url();
-      expect(url).toMatch(/\/(admin|sign-in)/);
-      return;
-    }
 
     // Main sections should be visible
     await expect(page.locator('[data-testid="reports-health-section"]')).toBeVisible();
@@ -92,10 +87,13 @@ test.describe('Admin Reports - Health Status', () => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.goto('/admin/reports');
 
-    // At least one status indicator should be visible
-    const healthIndicators = page.locator('[data-testid^="health-status-"]');
-    const count = await healthIndicators.count();
-    expect(count).toBeGreaterThan(0);
+    // Health status chips should be visible (data-testid="health-status-{service}")
+    const healthSection = page.locator('[data-testid="reports-health-section"]');
+    await expect(healthSection).toBeVisible();
+
+    // At least one service status chip should exist
+    const healthIndicators = healthSection.locator('[data-testid^="health-status-"]');
+    await expect(healthIndicators.first()).toBeVisible();
   });
 
   test('should have manual refresh button', async ({ page }) => {

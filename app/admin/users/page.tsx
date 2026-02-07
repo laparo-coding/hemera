@@ -27,14 +27,24 @@ export default function UsersPage() {
   // Parse query params
   const page = Number(searchParams.get('page')) || 1;
   const search = searchParams.get('search') || '';
-  const outperformerOnly = searchParams.get('outperformer') === 'true';
-  const sortBy =
-    (searchParams.get('sort') as
-      | 'name'
-      | 'email'
-      | 'createdAt'
-      | 'lastSignInAt') || 'createdAt';
-  const sortOrder = (searchParams.get('order') as 'asc' | 'desc') || 'desc';
+  const outperformerOnly = searchParams.get('outperformerOnly') === 'true';
+
+  const validSortFields = [
+    'name',
+    'email',
+    'createdAt',
+    'lastSignInAt',
+  ] as const;
+  const rawSort = searchParams.get('sort');
+  const sortBy = validSortFields.includes(
+    rawSort as (typeof validSortFields)[number]
+  )
+    ? (rawSort as (typeof validSortFields)[number])
+    : 'createdAt';
+
+  const rawOrder = searchParams.get('order');
+  const sortOrder: 'asc' | 'desc' =
+    rawOrder === 'asc' || rawOrder === 'desc' ? rawOrder : 'desc';
 
   const [users, setUsers] = useState<AdminUserListItem[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta>({
@@ -95,7 +105,7 @@ export default function UsersPage() {
       if (params.page && params.page > 1)
         newParams.set('page', params.page.toString());
       if (params.search) newParams.set('search', params.search);
-      if (params.outperformerOnly) newParams.set('outperformer', 'true');
+      if (params.outperformerOnly) newParams.set('outperformerOnly', 'true');
       if (params.sortBy && params.sortBy !== 'createdAt')
         newParams.set('sort', params.sortBy);
       if (params.sortOrder && params.sortOrder !== 'desc')
