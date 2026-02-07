@@ -1,5 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
+import { deleteUser } from '../../../../../lib/api/admin-users';
 import { checkUserAdminStatus } from '../../../../../lib/auth/helpers';
 import { prisma } from '../../../../../lib/db/prisma';
 import { serverInstance } from '../../../../../lib/monitoring/rollbar-official';
@@ -403,7 +404,6 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     }
 
     // Delete user via Clerk
-    const { deleteUser } = await import('@/lib/api/admin-users');
     await deleteUser(targetUserId);
 
     // Audit log: record user deletion
@@ -427,7 +427,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     const errorResponse = createErrorResponse(
-      'Failed to delete user',
+      'Benutzer konnte nicht gelöscht werden',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

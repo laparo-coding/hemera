@@ -130,6 +130,7 @@ export default function AdminTableToolbar({
           <TextField
             size='small'
             placeholder={searchConfig?.placeholder || 'Suchen...'}
+            aria-label={searchConfig?.placeholder || 'Suchen...'}
             value={localSearchValue}
             onChange={handleSearchChange}
             slotProps={{
@@ -184,7 +185,7 @@ export default function AdminTableToolbar({
                 key={filter.id}
                 control={
                   <Checkbox
-                    checked={(filterValues[filter.id] as boolean) || false}
+                    checked={(filterValues[filter.id] as boolean) ?? false}
                     onChange={e =>
                       handleFilterChange(filter.id, e.target.checked)
                     }

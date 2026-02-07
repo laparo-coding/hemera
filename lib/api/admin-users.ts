@@ -44,8 +44,10 @@ export async function getAdminUsers(
     let clerkOffset = 0;
     const clerkLimit = 100;
     let hasMore = true;
+    const maxPages = 100;
+    let pagesFetched = 0;
 
-    while (hasMore) {
+    while (hasMore && pagesFetched < maxPages) {
       const clerkResponse = await clerk.users.getUserList({
         limit: clerkLimit,
         offset: clerkOffset,
@@ -54,6 +56,7 @@ export async function getAdminUsers(
       allClerkUsers = allClerkUsers.concat(clerkResponse.data);
       clerkOffset += clerkLimit;
       hasMore = clerkResponse.data.length === clerkLimit;
+      pagesFetched++;
     }
 
     let users = allClerkUsers;
@@ -79,24 +82,7 @@ export async function getAdminUsers(
     // Get booking counts and outperformer status from database
     const userIds = users.map(u => u.id);
 
-    const bookingCounts = await prisma.booking.groupBy({
-      by: ['userId'],
-      where: {
-        userId: { in: userIds },
-      },
-      _count: true,
-    });
-
-    const completedParticipations = await prisma.courseParticipation.groupBy({
-      by: ['userId'],
-      where: {
-        userId: { in: userIds },
-        summaryCompletedAt: { not: null },
-      },
-      _count: true,
-    });
-
-    // Check for Outperformer status (completed advanced course)
+    // Outperformer query needed before filtering — runs on all filtered userIds
     const outperformerUserIds = await prisma.courseParticipation.findMany({
       where: {
         userId: { in: userIds },
@@ -118,41 +104,27 @@ export async function getAdminUsers(
       users = users.filter(user => outperformerSet.has(user.id));
     }
 
-    // Transform to AdminUserListItem (using Maps for O(1) lookups)
-    const bookingCountMap = new Map(
-      bookingCounts.map(b => [b.userId, b._count])
-    );
-    const completedCountMap = new Map(
-      completedParticipations.map(p => [p.userId, p._count])
-    );
-
-    const transformedUsers: AdminUserListItem[] = users.map(user => {
-      const bookingCount = bookingCountMap.get(user.id) ?? 0;
-      const completedCount = completedCountMap.get(user.id) ?? 0;
-
-      return {
-        id: user.id,
-        email: user.emailAddresses[0]?.emailAddress ?? '',
-        fullName:
-          user.firstName && user.lastName
-            ? `${user.firstName} ${user.lastName}`
-            : user.firstName || user.lastName || null,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        imageUrl: user.imageUrl,
-        isAdmin: user.publicMetadata?.role === 'admin',
-        isOutperformer: outperformerSet.has(user.id),
-        lastSignInAt: user.lastSignInAt
-          ? new Date(user.lastSignInAt).toISOString()
-          : null,
-        createdAt: new Date(user.createdAt).toISOString(),
-        bookingsCount: bookingCount,
-        completedCoursesCount: completedCount,
-      };
-    });
+    // Build basic user list (without DB counts) for sorting and pagination
+    const basicUsers = users.map(user => ({
+      id: user.id,
+      email: user.emailAddresses[0]?.emailAddress ?? '',
+      fullName:
+        user.firstName && user.lastName
+          ? `${user.firstName} ${user.lastName}`
+          : user.firstName || user.lastName || null,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      imageUrl: user.imageUrl,
+      isAdmin: user.publicMetadata?.role === 'admin',
+      isOutperformer: outperformerSet.has(user.id),
+      lastSignInAt: user.lastSignInAt
+        ? new Date(user.lastSignInAt).toISOString()
+        : null,
+      createdAt: new Date(user.createdAt).toISOString(),
+    }));
 
     // Sort
-    transformedUsers.sort((a, b) => {
+    basicUsers.sort((a, b) => {
       let comparison = 0;
       switch (sortBy) {
         case 'name':
@@ -173,10 +145,47 @@ export async function getAdminUsers(
       return sortOrder === 'desc' ? -comparison : comparison;
     });
 
-    // Paginate
-    const totalItems = transformedUsers.length;
+    // Paginate first, then fetch DB counts only for the current page
+    const totalItems = basicUsers.length;
     const totalPages = Math.ceil(totalItems / safeLimit);
-    const paginatedUsers = transformedUsers.slice(offset, offset + safeLimit);
+    const paginatedBasicUsers = basicUsers.slice(offset, offset + safeLimit);
+
+    // Fetch booking/completion counts only for paginated user IDs (bounded IN clause)
+    const pageUserIds = paginatedBasicUsers.map(u => u.id);
+
+    const [bookingCounts, completedParticipations] = await Promise.all([
+      prisma.booking.groupBy({
+        by: ['userId'],
+        where: {
+          userId: { in: pageUserIds },
+        },
+        _count: true,
+      }),
+      prisma.courseParticipation.groupBy({
+        by: ['userId'],
+        where: {
+          userId: { in: pageUserIds },
+          summaryCompletedAt: { not: null },
+        },
+        _count: true,
+      }),
+    ]);
+
+    // Transform to AdminUserListItem (using Maps for O(1) lookups)
+    const bookingCountMap = new Map(
+      bookingCounts.map(b => [b.userId, b._count])
+    );
+    const completedCountMap = new Map(
+      completedParticipations.map(p => [p.userId, p._count])
+    );
+
+    const paginatedUsers: AdminUserListItem[] = paginatedBasicUsers.map(
+      user => ({
+        ...user,
+        bookingsCount: bookingCountMap.get(user.id) ?? 0,
+        completedCoursesCount: completedCountMap.get(user.id) ?? 0,
+      })
+    );
 
     const pagination: PaginationMeta = {
       page: safePage,

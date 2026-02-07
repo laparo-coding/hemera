@@ -95,7 +95,12 @@ async function main() {
   const locationRows = await prisma.$queryRaw<{ id: string }[]>`
     SELECT id FROM locations WHERE slug = 'gartenhotel-fette-henne'
   `;
-  const locationId = locationRows[0]?.id ?? 'seed-location-gartenhotel';
+  if (!locationRows[0]?.id) {
+    throw new Error(
+      'Location upsert fehlgeschlagen: Keine Location mit slug "gartenhotel-fette-henne" gefunden.'
+    );
+  }
+  const locationId = locationRows[0].id;
 
   const seedCourses = [
     {

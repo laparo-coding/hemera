@@ -42,6 +42,11 @@ import { formatShortDate, formatTimeRange } from '../../lib/utils/date-format';
 import { normalizeForSearch } from '../../lib/utils/searchNormalization';
 import { PublishSwitch } from './PublishSwitch';
 
+const eurFormatter = new Intl.NumberFormat('de-DE', {
+  style: 'currency',
+  currency: 'EUR',
+});
+
 interface CourseListProps {
   courses: CourseWithEnrollmentCount[];
   onDeleteClick?: (course: CourseWithEnrollmentCount) => void;
@@ -127,12 +132,14 @@ export default function CourseList({
             setPage(0);
           }}
           sx={{ minWidth: 280, flex: 1 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <SearchIcon color='action' />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <SearchIcon color='action' />
+                </InputAdornment>
+              ),
+            },
           }}
         />
         <Link href='/admin/courses/new' style={{ textDecoration: 'none' }}>
@@ -204,10 +211,7 @@ export default function CourseList({
                     </Typography>
                   </TableCell>
                   <TableCell align='right'>
-                    {new Intl.NumberFormat('de-DE', {
-                      style: 'currency',
-                      currency: 'EUR',
-                    }).format(course.price / 100)}
+                    {eurFormatter.format(course.price / 100)}
                   </TableCell>
                   <TableCell align='center'>
                     <Chip

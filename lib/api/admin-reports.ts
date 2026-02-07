@@ -262,9 +262,15 @@ export async function getUserGrowthStats(
     where: { isOutperformer: true },
   });
 
-  // Calculate monthly growth (last 6 months)
+  // Calculate monthly growth (last 6 months) — O(n + m) with cumulative counter
   const monthlyGrowth: UserGrowthStats['monthlyGrowth'] = [];
   const now = new Date();
+
+  // Count users created before the 6-month window
+  const windowStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+  let cumulative = allClerkUsers.filter(
+    user => new Date(user.createdAt) < windowStart
+  ).length;
 
   for (let i = 5; i >= 0; i--) {
     const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -280,15 +286,12 @@ export async function getUserGrowthStats(
       return createdAt >= monthDate && createdAt < nextMonthStart;
     }).length;
 
-    const cumulativeTotal = allClerkUsers.filter(user => {
-      const createdAt = new Date(user.createdAt);
-      return createdAt < nextMonthStart;
-    }).length;
+    cumulative += newUsersInMonth;
 
     monthlyGrowth.push({
       month,
       newUsers: newUsersInMonth,
-      cumulativeTotal,
+      cumulativeTotal: cumulative,
     });
   }
 
