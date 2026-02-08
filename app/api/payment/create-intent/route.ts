@@ -1,11 +1,16 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getCurrentUserWithSync } from '../../../../lib/api/users';
+import { prisma } from '../../../../lib/db/prisma';
 import { StripeConfigurationError } from '../../../../lib/errors';
 import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
 import { handleBookingWithPrerequisites } from '../../../../lib/services/booking-orchestrator';
-import { getCourseByIdOrSlug } from '../../../../lib/services/course';
 import {
+  getCourseByIdOrSlug,
+  PaymentStatus,
+} from '../../../../lib/services/course';
+import {
+  cancelPaymentIntent,
   createPaymentIntent,
   isStripeConfigured,
 } from '../../../../lib/services/stripe';
@@ -82,6 +87,119 @@ export async function POST(request: NextRequest) {
     }
 
     // Learning Path (021): Orchestrator handles prerequisite check + booking creation
+    // But first: check if the user already has a PENDING booking for this course.
+    // If so, resume by creating a fresh payment intent for the existing booking.
+    const existingBooking = await prisma.booking.findUnique({
+      where: {
+        userId_courseId: {
+          userId: syncedUser.id,
+          courseId: course.id,
+        },
+      },
+    });
+
+    if (
+      existingBooking &&
+      existingBooking.paymentStatus === PaymentStatus.PENDING
+    ) {
+      serverInstance.info('Resuming checkout for existing PENDING booking', {
+        bookingId: existingBooking.id,
+        userId: syncedUser.id,
+        courseId: course.id,
+      });
+
+      // Cancel previous Stripe PaymentIntent if present (best-effort)
+      if (existingBooking.stripePaymentIntentId) {
+        try {
+          await cancelPaymentIntent(existingBooking.stripePaymentIntentId);
+        } catch (cancelError) {
+          // Non-blocking: old PI may already be expired/cancelled
+          serverInstance.info('Could not cancel previous payment intent', {
+            previousPiId: existingBooking.stripePaymentIntentId,
+            error:
+              cancelError instanceof Error
+                ? cancelError.message
+                : String(cancelError),
+          });
+        }
+      }
+
+      // Use persisted booking amount/currency (not current course price)
+      let paymentIntent;
+      try {
+        paymentIntent = await createPaymentIntent({
+          amount: existingBooking.amount,
+          currency: existingBooking.currency.toLowerCase(),
+          courseId: course.id,
+          userId: syncedUser.id,
+          metadata: {
+            courseId: course.id,
+            userId: syncedUser.id,
+            bookingId: existingBooking.id,
+            courseName: course.title,
+          },
+        });
+      } catch (stripeError) {
+        serverInstance.error('Stripe payment intent failed (resume)', {
+          error:
+            stripeError instanceof Error
+              ? stripeError.message
+              : String(stripeError),
+          userId: syncedUser.id,
+          courseId: course.id,
+          bookingId: existingBooking.id,
+        });
+        return NextResponse.json(
+          { error: 'Zahlungsabwicklung fehlgeschlagen' },
+          { status: 500 }
+        );
+      }
+
+      // Update booking with the new payment intent ID
+      try {
+        await prisma.booking.update({
+          where: { id: existingBooking.id },
+          data: { stripePaymentIntentId: paymentIntent.id },
+        });
+      } catch (updateError) {
+        serverInstance.error(
+          'Failed to update booking with new payment intent',
+          {
+            error:
+              updateError instanceof Error
+                ? updateError.message
+                : String(updateError),
+            bookingId: existingBooking.id,
+            paymentIntentId: paymentIntent.id,
+            userId: syncedUser.id,
+          }
+        );
+        // Attempt to cancel the orphaned payment intent
+        try {
+          await cancelPaymentIntent(paymentIntent.id);
+        } catch (_) {
+          // Best-effort cleanup
+        }
+        return NextResponse.json(
+          {
+            error:
+              'Buchung konnte nicht aktualisiert werden. ' +
+              'Bitte versuche es erneut.',
+          },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
+        amount: existingBooking.amount,
+        currency: existingBooking.currency,
+        courseName: course.title,
+        bookingId: existingBooking.id,
+      });
+    }
+
     const orchestratorResult = await handleBookingWithPrerequisites({
       userId: syncedUser.id,
       userEmail: syncedUser.email,
@@ -91,8 +209,17 @@ export async function POST(request: NextRequest) {
 
     // Handle orchestrator errors
     if (!orchestratorResult.success) {
+      const errorMsg = orchestratorResult.error || '';
+      // TODO: Refactor orchestrator to return structured errorCode
+      // instead of relying on string matching (see booking-orchestrator.ts)
+      const isDuplicate = errorMsg.includes('gebucht');
+      const isReview = errorMsg.includes('geprüft');
       return NextResponse.json(
-        { error: orchestratorResult.error },
+        {
+          error: errorMsg,
+          ...(isDuplicate && { errorCode: 'DUPLICATE_BOOKING' }),
+          ...(isReview && { errorCode: 'BOOKING_UNDER_REVIEW' }),
+        },
         { status: 500 }
       );
     }
