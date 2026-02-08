@@ -46,13 +46,24 @@ interface AdminHandlerOptions {
  * Usage:
  * ```ts
  * export const GET = createAdminHandler(
- *   async (_requestId) => getHealthStatus(),
+ *   async (requestId) => getHealthStatus(),
  *   { context: 'AdminReports.Health.GET', errorMessage: 'Fehler beim Abrufen des Systemstatus' }
+ * );
+ * ```
+ *
+ * With request parameter access:
+ * ```ts
+ * export const GET = createAdminHandler(
+ *   async (requestId, request) => {
+ *     const param = request.nextUrl.searchParams.get('slug');
+ *     return getDiagnosis(param, requestId);
+ *   },
+ *   { context: 'AdminDiagnose.Course.GET', errorMessage: 'Diagnose fehlgeschlagen' }
  * );
  * ```
  */
 export function createAdminHandler(
-  handler: (requestId: string) => Promise<unknown>,
+  handler: (requestId: string, request?: NextRequest) => Promise<unknown>,
   options: AdminHandlerOptions
 ) {
   return async (request: NextRequest): Promise<Response> => {
@@ -99,8 +110,8 @@ export function createAdminHandler(
         );
       }
 
-      // Execute service logic
-      const data = await handler(requestId);
+      // Execute service logic - pass request if needed
+      const data = await handler(requestId, request);
       return withCors(createSuccessResponse(data, requestId));
     } catch (error) {
       serverInstance.error(options.errorMessage, {
