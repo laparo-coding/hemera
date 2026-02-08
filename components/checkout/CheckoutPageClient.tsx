@@ -57,6 +57,7 @@ function CheckoutContent() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const stripeEnabled = STRIPE_ENABLED;
 
   // Handle authentication redirect
@@ -108,6 +109,9 @@ function CheckoutContent() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+          if (errorData.errorCode) {
+            setErrorCode(errorData.errorCode);
+          }
           throw new Error(
             errorData.error || `Fehler beim Laden: ${response.status}`
           );
@@ -211,7 +215,10 @@ function CheckoutContent() {
           sx={{ mb: 3 }}
           data-testid='checkout-error'
           action={
-            error.includes('bereits gebucht') || error.includes('geprüft') ? (
+            errorCode === 'DUPLICATE_BOOKING' ||
+            errorCode === 'BOOKING_UNDER_REVIEW' ||
+            error.includes('bereits gebucht') ||
+            error.includes('geprüft') ? (
               <Button
                 component={Link}
                 href='/dashboard'

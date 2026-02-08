@@ -5,8 +5,12 @@ import { prisma } from '../../../../lib/db/prisma';
 import { StripeConfigurationError } from '../../../../lib/errors';
 import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
 import { handleBookingWithPrerequisites } from '../../../../lib/services/booking-orchestrator';
-import { getCourseByIdOrSlug } from '../../../../lib/services/course';
 import {
+  getCourseByIdOrSlug,
+  PaymentStatus,
+} from '../../../../lib/services/course';
+import {
+  cancelPaymentIntent,
   createPaymentIntent,
   isStripeConfigured,
 } from '../../../../lib/services/stripe';
@@ -94,18 +98,38 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (existingBooking && existingBooking.paymentStatus === 'PENDING') {
+    if (
+      existingBooking &&
+      existingBooking.paymentStatus === PaymentStatus.PENDING
+    ) {
       serverInstance.info('Resuming checkout for existing PENDING booking', {
         bookingId: existingBooking.id,
         userId: syncedUser.id,
         courseId: course.id,
       });
 
+      // Cancel previous Stripe PaymentIntent if present (best-effort)
+      if (existingBooking.stripePaymentIntentId) {
+        try {
+          await cancelPaymentIntent(existingBooking.stripePaymentIntentId);
+        } catch (cancelError) {
+          // Non-blocking: old PI may already be expired/cancelled
+          serverInstance.info('Could not cancel previous payment intent', {
+            previousPiId: existingBooking.stripePaymentIntentId,
+            error:
+              cancelError instanceof Error
+                ? cancelError.message
+                : String(cancelError),
+          });
+        }
+      }
+
+      // Use persisted booking amount/currency (not current course price)
       let paymentIntent;
       try {
         paymentIntent = await createPaymentIntent({
-          amount: course.price,
-          currency: course.currency.toLowerCase(),
+          amount: existingBooking.amount,
+          currency: existingBooking.currency.toLowerCase(),
           courseId: course.id,
           userId: syncedUser.id,
           metadata: {
@@ -132,16 +156,45 @@ export async function POST(request: NextRequest) {
       }
 
       // Update booking with the new payment intent ID
-      await prisma.booking.update({
-        where: { id: existingBooking.id },
-        data: { stripePaymentIntentId: paymentIntent.id },
-      });
+      try {
+        await prisma.booking.update({
+          where: { id: existingBooking.id },
+          data: { stripePaymentIntentId: paymentIntent.id },
+        });
+      } catch (updateError) {
+        serverInstance.error(
+          'Failed to update booking with new payment intent',
+          {
+            error:
+              updateError instanceof Error
+                ? updateError.message
+                : String(updateError),
+            bookingId: existingBooking.id,
+            paymentIntentId: paymentIntent.id,
+            userId: syncedUser.id,
+          }
+        );
+        // Attempt to cancel the orphaned payment intent
+        try {
+          await cancelPaymentIntent(paymentIntent.id);
+        } catch (_) {
+          // Best-effort cleanup
+        }
+        return NextResponse.json(
+          {
+            error:
+              'Buchung konnte nicht aktualisiert werden. ' +
+              'Bitte versuche es erneut.',
+          },
+          { status: 500 }
+        );
+      }
 
       return NextResponse.json({
         clientSecret: paymentIntent.client_secret,
         paymentIntentId: paymentIntent.id,
-        amount: course.price,
-        currency: course.currency,
+        amount: existingBooking.amount,
+        currency: existingBooking.currency,
         courseName: course.title,
         bookingId: existingBooking.id,
       });
@@ -156,8 +209,15 @@ export async function POST(request: NextRequest) {
 
     // Handle orchestrator errors
     if (!orchestratorResult.success) {
+      const errorMsg = orchestratorResult.error || '';
+      const isDuplicate = errorMsg.includes('gebucht');
+      const isReview = errorMsg.includes('geprüft');
       return NextResponse.json(
-        { error: orchestratorResult.error },
+        {
+          error: errorMsg,
+          ...(isDuplicate && { errorCode: 'DUPLICATE_BOOKING' }),
+          ...(isReview && { errorCode: 'BOOKING_UNDER_REVIEW' }),
+        },
         { status: 500 }
       );
     }
