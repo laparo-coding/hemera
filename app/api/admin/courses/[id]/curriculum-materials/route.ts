@@ -1,6 +1,6 @@
 /**
- * GET /api/admin/courses/[courseId]/curriculum-materials
- * POST /api/admin/courses/[courseId]/curriculum-materials
+ * GET /api/admin/courses/[id]/curriculum-materials
+ * POST /api/admin/courses/[id]/curriculum-materials
  *
  * Admin endpoints for managing curriculum–material links.
  */
@@ -17,14 +17,21 @@ import {
 
 export const OPTIONS = adminOptions;
 
+/** Extract the course ID from a URL like /api/admin/courses/{id}/curriculum-materials */
+function extractCourseId(url: string): string {
+  const segments = new URL(url).pathname.split('/');
+  const idx = segments.indexOf('courses');
+  const courseId = idx >= 0 ? segments[idx + 1] : undefined;
+  if (!courseId) throw new Error('Missing courseId');
+  return courseId;
+}
+
 /**
  * GET – Fetch all material links for a course
  */
 export const GET = createAdminHandler(
   async (_requestId: string, request?: NextRequest) => {
-    const url = new URL(request!.url);
-    const courseId = url.pathname.split('/').at(-2);
-    if (!courseId) throw new Error('Missing courseId');
+    const courseId = extractCourseId(request!.url);
     return getMaterialLinksForCourse(courseId);
   },
   {
@@ -39,10 +46,7 @@ export const GET = createAdminHandler(
  */
 export const POST = createAdminHandler(
   async (_requestId: string, request?: NextRequest) => {
-    const url = new URL(request!.url);
-    const courseId = url.pathname.split('/').at(-2);
-    if (!courseId) throw new Error('Missing courseId');
-
+    const courseId = extractCourseId(request!.url);
     const body = await request!.json();
     const { topicId, materialId, sortOrder } = body;
 

@@ -1,5 +1,5 @@
 /**
- * DELETE /api/admin/courses/[courseId]/curriculum-materials/[linkId]
+ * DELETE /api/admin/courses/[id]/curriculum-materials/[linkId]
  *
  * Remove a single curriculum–material link.
  */
@@ -18,9 +18,8 @@ export const OPTIONS = adminOptions;
  */
 export const DELETE = createAdminHandler(
   async (_requestId: string, request?: NextRequest) => {
-    const url = new URL(request!.url);
-    const linkId = url.pathname.split('/').pop();
-    if (!linkId) throw new Error('Missing linkId');
+    const segments = new URL(request!.url).pathname.split('/');
+    const linkId = segments.pop();
     await removeMaterialLink(linkId);
     return { deleted: true };
   },
