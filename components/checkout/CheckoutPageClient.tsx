@@ -4,12 +4,14 @@ import { useUser } from '@clerk/nextjs';
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
   Container,
   Stack,
   Typography,
 } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { TERMS } from '../../lib/constants/terminology';
@@ -204,7 +206,24 @@ function CheckoutContent() {
   return (
     <Container maxWidth='md' sx={{ py: 4 }} data-testid='checkout-page'>
       {error && (
-        <Alert severity='error' sx={{ mb: 3 }} data-testid='checkout-error'>
+        <Alert
+          severity='error'
+          sx={{ mb: 3 }}
+          data-testid='checkout-error'
+          action={
+            error.includes('bereits gebucht') || error.includes('geprüft') ? (
+              <Button
+                component={Link}
+                href='/dashboard'
+                color='inherit'
+                size='small'
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                Meine Seminare
+              </Button>
+            ) : undefined
+          }
+        >
           {error}
         </Alert>
       )}

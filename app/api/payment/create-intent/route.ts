@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getCurrentUserWithSync } from '../../../../lib/api/users';
+import { prisma } from '../../../../lib/db/prisma';
 import { StripeConfigurationError } from '../../../../lib/errors';
 import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
 import { handleBookingWithPrerequisites } from '../../../../lib/services/booking-orchestrator';
@@ -82,6 +83,70 @@ export async function POST(request: NextRequest) {
     }
 
     // Learning Path (021): Orchestrator handles prerequisite check + booking creation
+    // But first: check if the user already has a PENDING booking for this course.
+    // If so, resume by creating a fresh payment intent for the existing booking.
+    const existingBooking = await prisma.booking.findUnique({
+      where: {
+        userId_courseId: {
+          userId: syncedUser.id,
+          courseId: course.id,
+        },
+      },
+    });
+
+    if (existingBooking && existingBooking.paymentStatus === 'PENDING') {
+      serverInstance.info('Resuming checkout for existing PENDING booking', {
+        bookingId: existingBooking.id,
+        userId: syncedUser.id,
+        courseId: course.id,
+      });
+
+      let paymentIntent;
+      try {
+        paymentIntent = await createPaymentIntent({
+          amount: course.price,
+          currency: course.currency.toLowerCase(),
+          courseId: course.id,
+          userId: syncedUser.id,
+          metadata: {
+            courseId: course.id,
+            userId: syncedUser.id,
+            bookingId: existingBooking.id,
+            courseName: course.title,
+          },
+        });
+      } catch (stripeError) {
+        serverInstance.error('Stripe payment intent failed (resume)', {
+          error:
+            stripeError instanceof Error
+              ? stripeError.message
+              : String(stripeError),
+          userId: syncedUser.id,
+          courseId: course.id,
+          bookingId: existingBooking.id,
+        });
+        return NextResponse.json(
+          { error: 'Zahlungsabwicklung fehlgeschlagen' },
+          { status: 500 }
+        );
+      }
+
+      // Update booking with the new payment intent ID
+      await prisma.booking.update({
+        where: { id: existingBooking.id },
+        data: { stripePaymentIntentId: paymentIntent.id },
+      });
+
+      return NextResponse.json({
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
+        amount: course.price,
+        currency: course.currency,
+        courseName: course.title,
+        bookingId: existingBooking.id,
+      });
+    }
+
     const orchestratorResult = await handleBookingWithPrerequisites({
       userId: syncedUser.id,
       userEmail: syncedUser.email,
