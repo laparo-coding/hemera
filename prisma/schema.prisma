@@ -288,5 +288,25 @@ model SeminarMaterial {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
+  curriculumLinks CurriculumTopicMaterial[]
+
   @@map("seminar_materials")
+}
+
+// CURRICULUM–MATERIAL LINK (curriculum JSON topic → seminar material)
+// Links a curriculum topic (identified by courseId + topicId from JSON)
+// to one or more SeminarMaterials. sortOrder controls display sequence.
+model CurriculumTopicMaterial {
+  id         String   @id @default(cuid())
+  courseId   String   @map("course_id")
+  topicId    String   @map("topic_id")
+  materialId String   @map("material_id")
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  material   SeminarMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, topicId, materialId])
+  @@index([courseId, topicId])
+  @@map("curriculum_topic_materials")
 }

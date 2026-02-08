@@ -45,6 +45,8 @@ interface CourseFormProps {
   onCancel?: () => void;
   submitLabel?: string;
   isLoading?: boolean;
+  /** Course ID – enables material linking in CurriculumEditor (edit mode only) */
+  courseId?: string;
 }
 
 export default function CourseForm({
@@ -53,6 +55,7 @@ export default function CourseForm({
   onSubmit,
   onCancel,
   submitLabel = 'Seminar speichern',
+  courseId,
   isLoading = false,
 }: CourseFormProps) {
   const {
@@ -562,6 +565,7 @@ export default function CourseForm({
             value={field.value as CurriculumModule[] | null | undefined}
             onChange={field.onChange}
             disabled={isLoading || isSubmitting}
+            courseId={courseId}
           />
         )}
       />
