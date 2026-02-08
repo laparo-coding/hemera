@@ -560,7 +560,9 @@ export class StripeService {
   }
 
   /**
-   * Cancel a payment intent by ID (non-blocking best-effort)
+   * Cancel a payment intent by ID.
+   * Throws PaymentProcessingError on failure — callers should
+   * wrap in try/catch for best-effort cancellation.
    */
   async cancelPaymentIntent(
     paymentIntentId: string

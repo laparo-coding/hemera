@@ -210,6 +210,8 @@ export async function POST(request: NextRequest) {
     // Handle orchestrator errors
     if (!orchestratorResult.success) {
       const errorMsg = orchestratorResult.error || '';
+      // TODO: Refactor orchestrator to return structured errorCode
+      // instead of relying on string matching (see booking-orchestrator.ts)
       const isDuplicate = errorMsg.includes('gebucht');
       const isReview = errorMsg.includes('geprüft');
       return NextResponse.json(
