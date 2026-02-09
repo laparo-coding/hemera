@@ -7,6 +7,7 @@ import {
   Container,
   IconButton,
   Link,
+  Paper,
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -86,7 +87,9 @@ export default function NewCourseMaterialPage() {
         </Typography>
       </Box>
 
-      <MaterialForm onSubmit={handleSubmit} />
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <MaterialForm onSubmit={handleSubmit} />
+      </Paper>
     </Container>
   );
 }
