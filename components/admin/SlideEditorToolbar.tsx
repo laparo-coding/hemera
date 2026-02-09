@@ -48,7 +48,7 @@ function ToolbarButton({
   title,
   children,
 }: {
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLElement>) => void;
   isActive?: boolean;
   disabled?: boolean;
   title: string;
