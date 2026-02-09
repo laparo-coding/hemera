@@ -1,7 +1,7 @@
 /**
  * GET /api/courses/[id]/curriculum
  *
- * Public endpoint to fetch a course's curriculum with linked seminar materials.
+ * Public endpoint to fetch a course's curriculum with linked course materials.
  * Returns the full curriculum structure enriched with material metadata.
  */
 

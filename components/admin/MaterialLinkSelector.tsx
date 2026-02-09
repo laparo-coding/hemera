@@ -2,7 +2,7 @@
  * MaterialLinkSelector Component
  *
  * Renders a "+" button next to each curriculum topic.
- * On click, shows a dropdown of available seminar materials.
+ * On click, shows a dropdown of available course materials.
  * Selecting a material links it to the topic via the API.
  * Linked materials are shown as chips below the topic row.
  */
@@ -32,7 +32,7 @@ interface MaterialInfo {
   sortOrder: number;
 }
 
-interface SeminarMaterial {
+interface CourseMaterial {
   id: string;
   title: string;
   identifier: string;
@@ -51,7 +51,7 @@ export default function MaterialLinkSelector({
 }: MaterialLinkSelectorProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [linkedMaterials, setLinkedMaterials] = useState<MaterialInfo[]>([]);
-  const [allMaterials, setAllMaterials] = useState<SeminarMaterial[]>([]);
+  const [allMaterials, setAllMaterials] = useState<CourseMaterial[]>([]);
   const [loading, setLoading] = useState(false);
   const [materialsLoaded, setMaterialsLoaded] = useState(false);
 

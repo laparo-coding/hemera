@@ -1,10 +1,10 @@
 'use client';
 
 /**
- * SeminarMaterialTable Component - Admin data table for seminar materials
+ * CourseMaterialTable Component - Admin data table for course materials
  * Feature: 024-admin-dashboard
  *
- * Displays all seminar materials in a searchable, paginated table
+ * Displays all course materials in a searchable, paginated table
  * with actions for viewing, editing, and deleting.
  */
 
@@ -40,7 +40,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { normalizeForSearch } from '@/lib/utils/searchNormalization';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
-interface SeminarMaterial {
+interface CourseMaterial {
   id: string;
   identifier: string;
   title: string;
@@ -48,7 +48,7 @@ interface SeminarMaterial {
   updatedAt: string;
 }
 
-interface SeminarMaterialTableProps {
+interface CourseMaterialTableProps {
   onRefresh?: () => void;
 }
 
@@ -65,11 +65,11 @@ function formatTableDate(dateString: string): string {
   });
 }
 
-export default function SeminarMaterialTable({
+export default function CourseMaterialTable({
   onRefresh,
-}: SeminarMaterialTableProps) {
+}: CourseMaterialTableProps) {
   const router = useRouter();
-  const [materials, setMaterials] = useState<SeminarMaterial[]>([]);
+  const [materials, setMaterials] = useState<CourseMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,7 +83,7 @@ export default function SeminarMaterialTable({
   // Delete dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [materialToDelete, setMaterialToDelete] =
-    useState<SeminarMaterial | null>(null);
+    useState<CourseMaterial | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchMaterials = useCallback(async (signal?: AbortSignal) => {
@@ -152,7 +152,7 @@ export default function SeminarMaterialTable({
     router.push(`/admin/course-material/${id}/edit`);
   };
 
-  const handleDeleteClick = (material: SeminarMaterial) => {
+  const handleDeleteClick = (material: CourseMaterial) => {
     setMaterialToDelete(material);
     setDeleteDialogOpen(true);
   };

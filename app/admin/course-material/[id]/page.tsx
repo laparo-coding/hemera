@@ -1,10 +1,10 @@
 'use client';
 
 /**
- * Seminarmaterial Detail Page
+ * Course Material Detail Page
  * Feature: 023-slide-editor
  *
- * Displays a single seminar material with its metadata and content preview.
+ * Displays a single course material with its metadata and content preview.
  */
 
 import {
@@ -48,7 +48,7 @@ function formatDate(dateString: string): string {
   });
 }
 
-export default function SeminarmaterialDetailPage() {
+export default function CourseMaterialDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;

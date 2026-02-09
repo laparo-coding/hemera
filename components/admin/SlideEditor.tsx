@@ -2,7 +2,7 @@
  * SlideEditor Component
  * Feature: 023-slide-editor
  *
- * Tiptap WYSIWYG editor for seminar material HTML content.
+ * Tiptap WYSIWYG editor for course material HTML content.
  * Uses StarterKit, Image, Table, Link, Underline, Highlight extensions.
  * Supports image upload via Vercel Blob API.
  */

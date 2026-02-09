@@ -1,12 +1,12 @@
 /**
- * Unit Tests for Seminarmaterial Schemas
+ * Unit Tests for Course Material Schemas
  * Feature: 023-slide-editor
  */
 
 import {
-  seminarMaterialCreateSchema,
-  seminarMaterialUpdateSchema,
-  seminarMaterialResponseSchema,
+  courseMaterialCreateSchema,
+  courseMaterialUpdateSchema,
+  courseMaterialResponseSchema,
   identifierSchema,
   htmlContentSchema,
   generateSlug,
@@ -65,9 +65,9 @@ describe('htmlContentSchema', () => {
   });
 });
 
-describe('seminarMaterialCreateSchema', () => {
+describe('courseMaterialCreateSchema', () => {
   it('accepts valid create payload', () => {
-    const result = seminarMaterialCreateSchema.safeParse({
+    const result = courseMaterialCreateSchema.safeParse({
       title: 'Test Material',
       htmlContent: '<p>Content</p>',
     });
@@ -75,7 +75,7 @@ describe('seminarMaterialCreateSchema', () => {
   });
 
   it('accepts payload with custom identifier', () => {
-    const result = seminarMaterialCreateSchema.safeParse({
+    const result = courseMaterialCreateSchema.safeParse({
       title: 'Test Material',
       identifier: 'custom-id',
       htmlContent: '<p>Content</p>',
@@ -84,21 +84,21 @@ describe('seminarMaterialCreateSchema', () => {
   });
 
   it('rejects missing title', () => {
-    const result = seminarMaterialCreateSchema.safeParse({
+    const result = courseMaterialCreateSchema.safeParse({
       htmlContent: '<p>Content</p>',
     });
     expect(result.success).toBe(false);
   });
 
   it('rejects missing htmlContent', () => {
-    const result = seminarMaterialCreateSchema.safeParse({
+    const result = courseMaterialCreateSchema.safeParse({
       title: 'Test',
     });
     expect(result.success).toBe(false);
   });
 
   it('rejects empty title', () => {
-    const result = seminarMaterialCreateSchema.safeParse({
+    const result = courseMaterialCreateSchema.safeParse({
       title: '',
       htmlContent: '<p>Content</p>',
     });
@@ -106,7 +106,7 @@ describe('seminarMaterialCreateSchema', () => {
   });
 
   it('rejects title exceeding 200 characters', () => {
-    const result = seminarMaterialCreateSchema.safeParse({
+    const result = courseMaterialCreateSchema.safeParse({
       title: 'a'.repeat(201),
       htmlContent: '<p>Content</p>',
     });
@@ -114,35 +114,35 @@ describe('seminarMaterialCreateSchema', () => {
   });
 });
 
-describe('seminarMaterialUpdateSchema', () => {
+describe('courseMaterialUpdateSchema', () => {
   it('accepts partial update with only title', () => {
-    const result = seminarMaterialUpdateSchema.safeParse({
+    const result = courseMaterialUpdateSchema.safeParse({
       title: 'New Title',
     });
     expect(result.success).toBe(true);
   });
 
   it('accepts partial update with only identifier', () => {
-    const result = seminarMaterialUpdateSchema.safeParse({
+    const result = courseMaterialUpdateSchema.safeParse({
       identifier: 'new-id',
     });
     expect(result.success).toBe(true);
   });
 
   it('accepts partial update with only htmlContent', () => {
-    const result = seminarMaterialUpdateSchema.safeParse({
+    const result = courseMaterialUpdateSchema.safeParse({
       htmlContent: '<p>New content</p>',
     });
     expect(result.success).toBe(true);
   });
 
   it('accepts empty object', () => {
-    const result = seminarMaterialUpdateSchema.safeParse({});
+    const result = courseMaterialUpdateSchema.safeParse({});
     expect(result.success).toBe(true);
   });
 
   it('accepts full update', () => {
-    const result = seminarMaterialUpdateSchema.safeParse({
+    const result = courseMaterialUpdateSchema.safeParse({
       title: 'New Title',
       identifier: 'new-id',
       htmlContent: '<p>New content</p>',
@@ -151,9 +151,9 @@ describe('seminarMaterialUpdateSchema', () => {
   });
 });
 
-describe('seminarMaterialResponseSchema', () => {
+describe('courseMaterialResponseSchema', () => {
   it('validates complete response', () => {
-    const result = seminarMaterialResponseSchema.safeParse({
+    const result = courseMaterialResponseSchema.safeParse({
       id: 'mat_123',
       identifier: 'test-material',
       title: 'Test Material',
@@ -166,7 +166,7 @@ describe('seminarMaterialResponseSchema', () => {
   });
 
   it('rejects invalid URL', () => {
-    const result = seminarMaterialResponseSchema.safeParse({
+    const result = courseMaterialResponseSchema.safeParse({
       id: 'mat_123',
       identifier: 'test-material',
       title: 'Test Material',
@@ -179,7 +179,7 @@ describe('seminarMaterialResponseSchema', () => {
   });
 
   it('rejects invalid datetime', () => {
-    const result = seminarMaterialResponseSchema.safeParse({
+    const result = courseMaterialResponseSchema.safeParse({
       id: 'mat_123',
       identifier: 'test-material',
       title: 'Test Material',

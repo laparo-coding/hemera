@@ -278,8 +278,8 @@ model Testimonial {
   @@map("testimonials")
 }
 
-// SEMINAR MATERIALS (023-slide-editor)
-model SeminarMaterial {
+// COURSE MATERIALS (023-slide-editor)
+model CourseMaterial {
   id           String   @id @default(cuid())
   identifier   String   @unique
   title        String
@@ -293,9 +293,9 @@ model SeminarMaterial {
   @@map("seminar_materials")
 }
 
-// CURRICULUM–MATERIAL LINK (curriculum JSON topic → seminar material)
+// CURRICULUM–MATERIAL LINK (curriculum JSON topic → course material)
 // Links a curriculum topic (identified by courseId + topicId from JSON)
-// to one or more SeminarMaterials. sortOrder controls display sequence.
+// to one or more CourseMaterials. sortOrder controls display sequence.
 model CurriculumTopicMaterial {
   id         String   @id @default(cuid())
   courseId   String   @map("course_id")
@@ -304,7 +304,7 @@ model CurriculumTopicMaterial {
   sortOrder  Int      @default(0) @map("sort_order")
   createdAt  DateTime @default(now()) @map("created_at")
 
-  material   SeminarMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  material   CourseMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
 
   @@unique([courseId, topicId, materialId])
   @@index([courseId, topicId])

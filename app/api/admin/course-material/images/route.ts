@@ -2,7 +2,7 @@
  * Image Upload Route
  * Feature: 023-slide-editor
  *
- * Handles image uploads for use in seminar materials
+ * Handles image uploads for use in course materials
  * Uploads to Vercel Blob and returns public CDN URL
  */
 

@@ -14,12 +14,12 @@ import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
 import {
   generateSlug,
-  seminarMaterialCreateSchema,
+  courseMaterialCreateSchema,
 } from '@/lib/schemas/admin/course-material';
 
 /**
  * GET /api/admin/course-material
- * List all seminar materials
+ * List all course materials
  */
 export async function GET() {
   try {
@@ -52,7 +52,7 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    serverInstance.error('Failed to list seminar materials', {
+    serverInstance.error('Failed to list course materials', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(
@@ -66,8 +66,8 @@ export async function GET() {
 }
 
 /**
- * POST /api/admin/seminarmaterial
- * Create a new seminar material
+ * POST /api/admin/course-material
+ * Create a new course material
  */
 export async function POST(request: NextRequest) {
   try {
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const parsed = seminarMaterialCreateSchema.safeParse(body);
+    const parsed = courseMaterialCreateSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
         error: error instanceof Error ? error.message : 'Unknown error',
       }
     );
-    serverInstance.error('Failed to create seminar material', {
+    serverInstance.error('Failed to create course material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(

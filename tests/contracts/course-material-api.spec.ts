@@ -1,13 +1,13 @@
 /**
- * Seminarmaterial API Contract Tests
+ * Course Material API Contract Tests
  * Feature: 023-slide-editor
  *
- * Contract tests for seminarmaterial API endpoints
+ * Contract tests for course material API endpoints
  */
 
 // Mock Prisma
 const mockPrisma = {
-  seminarMaterial: {
+  courseMaterial: {
     findMany: jest.fn(),
     findUnique: jest.fn(),
     findFirst: jest.fn(),
@@ -76,7 +76,7 @@ describe('GET /api/admin/course-material', () => {
 
   it('returns materials list for authenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findMany.mockResolvedValue([
+    mockPrisma.courseMaterial.findMany.mockResolvedValue([
       {
         id: 'mat_1',
         identifier: 'test-material',
@@ -99,7 +99,7 @@ describe('GET /api/admin/course-material', () => {
 
   it('returns empty list when no materials exist', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findMany.mockResolvedValue([]);
+    mockPrisma.courseMaterial.findMany.mockResolvedValue([]);
 
     const request = new NextRequest('http://localhost/api/admin/course-material');
     const response = await GET();
@@ -146,12 +146,12 @@ describe('POST /api/admin/course-material', () => {
   it('creates material and uploads to blob', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     // isIdentifierTaken uses findUnique - return null for "not taken"
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue(null);
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
     mockPut.mockResolvedValue({
       url: 'https://blob.vercel-storage.com/course-material/test-material.html',
       pathname: 'course-material/test-material.html',
     });
-    mockPrisma.seminarMaterial.create.mockResolvedValue({
+    mockPrisma.courseMaterial.create.mockResolvedValue({
       id: 'mat_new',
       identifier: 'test-material',
       title: 'Test Material',
@@ -183,7 +183,7 @@ describe('POST /api/admin/course-material', () => {
   it('returns 409 for duplicate identifier', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     // isIdentifierTaken uses findUnique with { where: { identifier } }
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue({
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'existing',
       identifier: 'test-material',
     });
@@ -222,7 +222,7 @@ describe('GET /api/admin/course-material/[id]', () => {
 
   it('returns 404 for non-existent material', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue(null);
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest('http://localhost/api/admin/course-material/mat_999');
     const response = await GET_SINGLE(request, { params: createParams('mat_999') });
@@ -234,7 +234,7 @@ describe('GET /api/admin/course-material/[id]', () => {
 
   it('returns material for valid id', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue({
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
       title: 'Test Material',
@@ -275,7 +275,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
 
   it('returns 404 for non-existent material', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue(null);
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest('http://localhost/api/admin/course-material/mat_999', {
       method: 'PUT',
@@ -290,7 +290,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
 
   it('updates material title', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue({
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
       title: 'Old Title',
@@ -299,7 +299,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    mockPrisma.seminarMaterial.update.mockResolvedValue({
+    mockPrisma.courseMaterial.update.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
       title: 'New Title',
@@ -322,7 +322,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
 
   it('uploads new content when htmlContent provided', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue({
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
       title: 'Test',
@@ -335,7 +335,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
       url: 'https://blob.vercel-storage.com/new.html',
       pathname: 'course-material/test-material.html',
     });
-    mockPrisma.seminarMaterial.update.mockResolvedValue({
+    mockPrisma.courseMaterial.update.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
       title: 'Test',
@@ -357,7 +357,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
 
   it('returns 400 for empty update payload', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue({
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
       title: 'Test',
@@ -400,7 +400,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
 
   it('returns 404 for non-existent material', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue(null);
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest('http://localhost/api/admin/course-material/mat_999', {
       method: 'DELETE',
@@ -414,7 +414,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
 
   it('deletes material and blob file', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue({
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
       title: 'Test',
@@ -424,7 +424,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
       updatedAt: new Date(),
     });
     mockDel.mockResolvedValue(undefined);
-    mockPrisma.seminarMaterial.delete.mockResolvedValue({});
+    mockPrisma.courseMaterial.delete.mockResolvedValue({});
 
     const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
       method: 'DELETE',
@@ -433,7 +433,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
 
     expect(response.status).toBe(204);
     expect(mockDel).toHaveBeenCalledWith('https://blob.vercel-storage.com/test.html');
-    expect(mockPrisma.seminarMaterial.delete).toHaveBeenCalledWith({
+    expect(mockPrisma.courseMaterial.delete).toHaveBeenCalledWith({
       where: { id: 'mat_1' },
     });
   });
@@ -459,7 +459,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
 
   it('returns 404 for non-existent material', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue(null);
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest(
       'http://localhost/api/admin/course-material/mat_999/content'
@@ -473,7 +473,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
 
   it('fetches and returns HTML content from blob', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
-    mockPrisma.seminarMaterial.findUnique.mockResolvedValue({
+    mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
       title: 'Test',

@@ -12,7 +12,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { MaterialForm } from '@/components/admin/MaterialForm';
 
-export default function NeuSeminarmaterialPage() {
+export default function NewCourseMaterialPage() {
   const router = useRouter();
 
   const handleSubmit = async (data: {

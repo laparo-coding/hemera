@@ -1,10 +1,10 @@
 'use client';
 
 /**
- * Seminarmaterial Edit Page
+ * Course Material Edit Page
  * Feature: 023-slide-editor
  *
- * Edit an existing seminar material (title, identifier, HTML content).
+ * Edit an existing course material (title, identifier, HTML content).
  */
 
 import {
@@ -26,7 +26,7 @@ interface MaterialDetail {
   updatedAt: string;
 }
 
-export default function EditSeminarmaterialPage() {
+export default function EditCourseMaterialPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;

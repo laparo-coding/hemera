@@ -2,7 +2,7 @@
  * Curriculum–Material Link API Functions
  *
  * Server-side functions for managing links between
- * curriculum topics (JSON) and SeminarMaterial records.
+ * curriculum topics (JSON) and CourseMaterial records.
  */
 
 import { prisma } from '../db/prisma';
