@@ -458,7 +458,12 @@ async function checkStripeHealth(): Promise<ServiceHealth> {
 
 async function checkRollbarHealth(): Promise<ServiceHealth> {
   const rollbarEnabled = process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '1';
-  const rollbarToken = process.env.ROLLBAR_SERVER_TOKEN;
+  // Check both legacy token name and Vercel-Rollbar integration token names
+  const rollbarToken =
+    process.env.ROLLBAR_SERVER_TOKEN ||
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1769717269 ||
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1769716944 ||
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885;
 
   if (!rollbarEnabled) {
     return {
