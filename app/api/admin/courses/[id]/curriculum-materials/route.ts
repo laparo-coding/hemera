@@ -57,7 +57,8 @@ export const POST = createAdminHandler(
     if (!request) throw new Error('Request fehlt');
     const courseId = extractCourseId(request.url);
     const body = await request.json();
-    const { topicId, materialId, sortOrder } = curriculumMaterialLinkSchema.parse(body);
+    const { topicId, materialId, sortOrder } =
+      curriculumMaterialLinkSchema.parse(body);
 
     return addMaterialLink({ courseId, topicId, materialId, sortOrder });
   },

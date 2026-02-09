@@ -127,6 +127,7 @@ export function SlideEditorToolbar({
         const url = await onImageUpload(file);
         editor.chain().focus().setImage({ src: url, alt: file.name }).run();
       } catch (error) {
+        // biome-ignore lint/suspicious/noConsole: Bild-Upload-Fehler müssen sichtbar sein
         console.error('Bild-Upload fehlgeschlagen:', error);
       }
 
@@ -151,12 +152,7 @@ export function SlideEditorToolbar({
       return;
     }
 
-    editor
-      .chain()
-      .focus()
-      .extendMarkRange('link')
-      .setLink({ href: url })
-      .run();
+    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   }, [editor]);
 
   const insertTable = useCallback(() => {
@@ -367,22 +363,13 @@ export function SlideEditorToolbar({
         onClose={handleTableClose}
       >
         <MenuItem onClick={insertTable}>Tabelle einfügen (3×3)</MenuItem>
-        <MenuItem
-          onClick={addTableRow}
-          disabled={!editor.isActive('table')}
-        >
+        <MenuItem onClick={addTableRow} disabled={!editor.isActive('table')}>
           Zeile hinzufügen
         </MenuItem>
-        <MenuItem
-          onClick={addTableColumn}
-          disabled={!editor.isActive('table')}
-        >
+        <MenuItem onClick={addTableColumn} disabled={!editor.isActive('table')}>
           Spalte hinzufügen
         </MenuItem>
-        <MenuItem
-          onClick={deleteTable}
-          disabled={!editor.isActive('table')}
-        >
+        <MenuItem onClick={deleteTable} disabled={!editor.isActive('table')}>
           Tabelle löschen
         </MenuItem>
       </Menu>

@@ -8,13 +8,7 @@
 
 'use client';
 
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Stack,
-  TextField,
-} from '@mui/material';
+import { Box, Button, CircularProgress, Stack, TextField } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { SlideEditor } from './SlideEditor';
 
@@ -32,7 +26,11 @@ interface MaterialFormProps {
   };
 }
 
-export function MaterialForm({ onSubmit, onCancel, initialData }: MaterialFormProps) {
+export function MaterialForm({
+  onSubmit,
+  onCancel,
+  initialData,
+}: MaterialFormProps) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [identifier, setIdentifier] = useState(initialData?.identifier || '');
   const [htmlContent, setHtmlContent] = useState(

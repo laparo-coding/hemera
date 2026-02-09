@@ -7,13 +7,7 @@
  * Edit an existing course material (title, identifier, HTML content).
  */
 
-import {
-  Alert,
-  Box,
-  CircularProgress,
-  Paper,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, CircularProgress, Paper, Typography } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { MaterialForm } from '@/components/admin/MaterialForm';
@@ -113,9 +107,7 @@ export default function EditCourseMaterialPage() {
   }
 
   if (error || !material) {
-    return (
-      <Alert severity='error'>{error || 'Material nicht gefunden'}</Alert>
-    );
+    return <Alert severity='error'>{error || 'Material nicht gefunden'}</Alert>;
   }
 
   return (

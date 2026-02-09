@@ -71,6 +71,7 @@
     "@clerk/nextjs": "^6.36.9",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@floating-ui/dom": "^1.7.5",
     "@hookform/resolvers": "^5.2.2",
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.4",

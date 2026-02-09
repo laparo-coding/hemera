@@ -9,8 +9,8 @@ import {
   adminOptions,
   createAdminHandler,
 } from '@/lib/api/admin-route-handler';
-import { prisma } from '@/lib/db/prisma';
 import { removeMaterialLink } from '@/lib/api/curriculum-material';
+import { prisma } from '@/lib/db/prisma';
 
 export const OPTIONS = adminOptions;
 
