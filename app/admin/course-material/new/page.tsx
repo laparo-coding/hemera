@@ -42,7 +42,7 @@ export default function NewCourseMaterialPage() {
       if (!result || typeof result.id !== 'string') {
         throw new Error('Ungültige Serverantwort');
       }
-      router.push(`/admin/course-material/${result.id}`);
+      router.push('/admin/course-material');
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Erstellen fehlgeschlagen';

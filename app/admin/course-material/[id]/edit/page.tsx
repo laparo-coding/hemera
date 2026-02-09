@@ -96,7 +96,7 @@ export default function EditCourseMaterialPage() {
         throw new Error(errorMessage);
       }
 
-      router.push(`/admin/course-material/${id}`);
+      router.push('/admin/course-material');
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Aktualisieren fehlgeschlagen';
@@ -127,7 +127,7 @@ export default function EditCourseMaterialPage() {
       <Paper elevation={2} sx={{ p: 3 }}>
         <MaterialForm
           onSubmit={handleSubmit}
-          onCancel={() => router.push(`/admin/course-material/${id}`)}
+          onCancel={() => router.push('/admin/course-material')}
           initialData={{
             title: material.title,
             identifier: material.identifier,
