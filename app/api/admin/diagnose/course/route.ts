@@ -15,7 +15,11 @@ const getDiagnosis = async (
 ): Promise<unknown> => {
   const slug = request?.nextUrl.searchParams.get('slug');
   if (!slug) {
-    throw new Error('Der Slug-Parameter ist erforderlich');
+    return {
+      error: 'Der Slug-Parameter ist erforderlich',
+      code: 'SLUG_MISSING',
+      requestId,
+    };
   }
 
   // Find course by slug (including non-public)
@@ -27,7 +31,12 @@ const getDiagnosis = async (
   });
 
   if (!course) {
-    throw new Error(`Kurs mit slug "${slug}" existiert nicht in der Datenbank`);
+    return {
+      status: 'not_found',
+      slug,
+      message: `Kurs mit slug "${slug}" existiert nicht in der Datenbank`,
+      requestId,
+    };
   }
 
   // Diagnose visibility

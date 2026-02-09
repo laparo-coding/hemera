@@ -4,12 +4,14 @@ import { useUser } from '@clerk/nextjs';
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
   Container,
   Stack,
   Typography,
 } from '@mui/material';
 import { Elements } from '@stripe/react-stripe-js';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { TERMS } from '../../lib/constants/terminology';
@@ -55,6 +57,7 @@ function CheckoutContent() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const stripeEnabled = STRIPE_ENABLED;
 
   // Handle authentication redirect
@@ -106,6 +109,9 @@ function CheckoutContent() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+          if (errorData.errorCode) {
+            setErrorCode(errorData.errorCode);
+          }
           throw new Error(
             errorData.error || `Fehler beim Laden: ${response.status}`
           );
@@ -204,7 +210,27 @@ function CheckoutContent() {
   return (
     <Container maxWidth='md' sx={{ py: 4 }} data-testid='checkout-page'>
       {error && (
-        <Alert severity='error' sx={{ mb: 3 }} data-testid='checkout-error'>
+        <Alert
+          severity='error'
+          sx={{ mb: 3 }}
+          data-testid='checkout-error'
+          action={
+            errorCode === 'DUPLICATE_BOOKING' ||
+            errorCode === 'BOOKING_UNDER_REVIEW' ||
+            error.includes('bereits gebucht') ||
+            error.includes('geprüft') ? (
+              <Button
+                component={Link}
+                href='/dashboard'
+                color='inherit'
+                size='small'
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                Meine Seminare
+              </Button>
+            ) : undefined
+          }
+        >
           {error}
         </Alert>
       )}

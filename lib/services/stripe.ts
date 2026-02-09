@@ -560,6 +560,31 @@ export class StripeService {
   }
 
   /**
+   * Cancel a payment intent by ID.
+   * Throws PaymentProcessingError on failure — callers should
+   * wrap in try/catch for best-effort cancellation.
+   */
+  async cancelPaymentIntent(
+    paymentIntentId: string
+  ): Promise<Stripe.PaymentIntent> {
+    try {
+      return await this.ensureStripe().paymentIntents.cancel(paymentIntentId);
+    } catch (error) {
+      if (error instanceof StripeConfigurationError) {
+        throw error;
+      }
+      logError(
+        'Payment intent cancellation failed',
+        error as Record<string, unknown>
+      );
+      throw new PaymentProcessingError(
+        'Failed to cancel payment intent',
+        error as string
+      );
+    }
+  }
+
+  /**
    * Retrieve a payment intent by ID
    */
   async retrievePaymentIntent(
@@ -624,5 +649,8 @@ export const createPaymentIntent = (
 
 export const retrievePaymentIntent = (paymentIntentId: string) =>
   stripeService.retrievePaymentIntent(paymentIntentId);
+
+export const cancelPaymentIntent = (paymentIntentId: string) =>
+  stripeService.cancelPaymentIntent(paymentIntentId);
 
 export const isStripeConfigured = () => stripeService.isReady();
