@@ -2,21 +2,24 @@ import fs from 'node:fs';
 import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
+const { Pool } = pg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Lade DATABASE_URL aus .env.local falls nicht gesetzt
-if (!process.env.DATABASE_URL) {
-  const envPath = path.join(__dirname, '..', '.env.local');
-  if (fs.existsSync(envPath)) {
-    const envContent = fs.readFileSync(envPath, 'utf-8');
-    const dbUrlMatch = envContent.match(/^DATABASE_URL=(.*)$/m);
-    if (dbUrlMatch) {
-      process.env.DATABASE_URL = dbUrlMatch[1].replace(/^["']|["']$/g, '');
-      console.log('✅ DATABASE_URL geladen aus .env.local');
+// Lade .env.local Variablen
+const envPath = path.join(__dirname, '..', '.env.local');
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  for (const line of envContent.split('\n')) {
+    const match = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+    if (match && !process.env[match[1]]) {
+      process.env[match[1]] = match[2].replace(/^["']|["']$/g, '');
     }
   }
+  console.log('✅ Umgebungsvariablen geladen aus .env.local');
 }
 
 if (!process.env.DATABASE_URL) {
@@ -25,7 +28,22 @@ if (!process.env.DATABASE_URL) {
 }
 
 console.log('🔗 Verbinde mit Datenbank...');
-const prisma = new PrismaClient();
+
+// Prisma 7: Use accelerateUrl if available, otherwise PG adapter
+let prisma;
+if (process.env.PRISMA_ACCELERATE_URL) {
+  prisma = new PrismaClient({
+    accelerateUrl: process.env.PRISMA_ACCELERATE_URL,
+    log: ['error', 'warn'],
+  });
+} else {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const adapter = new PrismaPg(pool);
+  prisma = new PrismaClient({
+    adapter,
+    log: ['error', 'warn'],
+  });
+}
 const backupDir = process.argv[2];
 
 if (!backupDir) {

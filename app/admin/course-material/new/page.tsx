@@ -7,12 +7,13 @@ import {
   Container,
   IconButton,
   Link,
+  Paper,
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { MaterialForm } from '@/components/admin/MaterialForm';
 
-export default function NeuSeminarmaterialPage() {
+export default function NewCourseMaterialPage() {
   const router = useRouter();
 
   const handleSubmit = async (data: {
@@ -42,7 +43,7 @@ export default function NeuSeminarmaterialPage() {
       if (!result || typeof result.id !== 'string') {
         throw new Error('Ungültige Serverantwort');
       }
-      router.push(`/admin/course-material/${result.id}`);
+      router.push('/admin/course-material');
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Erstellen fehlgeschlagen';
@@ -86,7 +87,9 @@ export default function NeuSeminarmaterialPage() {
         </Typography>
       </Box>
 
-      <MaterialForm onSubmit={handleSubmit} />
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <MaterialForm onSubmit={handleSubmit} />
+      </Paper>
     </Container>
   );
 }

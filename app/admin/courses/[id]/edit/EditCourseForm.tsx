@@ -100,6 +100,7 @@ export default function EditCourseForm({
 
       <Paper elevation={2} sx={{ p: 3 }}>
         <CourseForm
+          courseId={course.id}
           initialData={{
             title: course.title,
             description: course.description ?? '',

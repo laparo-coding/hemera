@@ -16,6 +16,7 @@ import {
   AccordionSummary,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -25,8 +26,15 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import dynamic from 'next/dynamic';
 import { useCallback, useState } from 'react';
 import { TERMS } from '../../lib/constants/terminology';
+
+const MaterialLinkSelector = dynamic(() => import('./MaterialLinkSelector'), {
+  ssr: false,
+  loading: () => <CircularProgress size={16} />,
+});
+
 import type {
   CurriculumModule,
   CurriculumTopic,
@@ -36,6 +44,7 @@ interface CurriculumEditorProps {
   value: CurriculumModule[] | null | undefined;
   onChange: (curriculum: CurriculumModule[] | null) => void;
   disabled?: boolean;
+  courseId?: string;
 }
 
 const generateId = () =>
@@ -58,6 +67,7 @@ export default function CurriculumEditor({
   value,
   onChange,
   disabled = false,
+  courseId,
 }: CurriculumEditorProps) {
   // Normalize value to empty array if null/undefined
   const modules: CurriculumModule[] = value ?? [];
@@ -309,8 +319,8 @@ export default function CurriculumEditor({
                     key={topic.id}
                     sx={{
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
+                      flexDirection: 'column',
+                      gap: 0.5,
                       p: 1,
                       bgcolor: 'white',
                       borderRadius: 1,
@@ -318,59 +328,78 @@ export default function CurriculumEditor({
                       borderColor: 'grey.200',
                     }}
                   >
-                    <Typography
-                      variant='caption'
-                      sx={{ minWidth: 24, color: 'text.secondary' }}
+                    {/* Topic controls row */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                      }}
                     >
-                      {topicIndex + 1}.
-                    </Typography>
-                    <TextField
-                      size='small'
-                      value={topic.timeRange}
-                      onChange={e =>
-                        updateTopic(
-                          module.id,
-                          topic.id,
-                          'timeRange',
-                          e.target.value
-                        )
-                      }
-                      onBlur={() => trimTopic(module.id, topic.id, 'timeRange')}
-                      disabled={disabled}
-                      placeholder='09:00 - 09:30'
-                      sx={{ width: 140, bgcolor: 'white' }}
-                    />
-                    <TextField
-                      size='small'
-                      value={topic.title}
-                      onChange={e =>
-                        updateTopic(
-                          module.id,
-                          topic.id,
-                          'title',
-                          e.target.value
-                        )
-                      }
-                      onBlur={() => trimTopic(module.id, topic.id, 'title')}
-                      disabled={disabled}
-                      placeholder='Thema / Aktivität'
-                      sx={{ flexGrow: 1, bgcolor: 'white' }}
-                    />
-                    <IconButton
-                      size='small'
-                      color='error'
-                      onClick={e =>
-                        handleTopicDeleteClick(
-                          e,
-                          module.id,
-                          topic.id,
-                          topic.title
-                        )
-                      }
-                      disabled={disabled || module.topics.length <= 1}
-                    >
-                      <DeleteIcon fontSize='small' />
-                    </IconButton>
+                      <Typography
+                        variant='caption'
+                        sx={{ minWidth: 24, color: 'text.secondary' }}
+                      >
+                        {topicIndex + 1}.
+                      </Typography>
+                      <TextField
+                        size='small'
+                        value={topic.timeRange}
+                        onChange={e =>
+                          updateTopic(
+                            module.id,
+                            topic.id,
+                            'timeRange',
+                            e.target.value
+                          )
+                        }
+                        onBlur={() =>
+                          trimTopic(module.id, topic.id, 'timeRange')
+                        }
+                        disabled={disabled}
+                        placeholder='09:00 - 09:30'
+                        sx={{ width: 140, bgcolor: 'white' }}
+                      />
+                      <TextField
+                        size='small'
+                        value={topic.title}
+                        onChange={e =>
+                          updateTopic(
+                            module.id,
+                            topic.id,
+                            'title',
+                            e.target.value
+                          )
+                        }
+                        onBlur={() => trimTopic(module.id, topic.id, 'title')}
+                        disabled={disabled}
+                        placeholder='Thema / Aktivität'
+                        sx={{ flexGrow: 1, bgcolor: 'white' }}
+                      />
+                      <IconButton
+                        size='small'
+                        color='error'
+                        onClick={e =>
+                          handleTopicDeleteClick(
+                            e,
+                            module.id,
+                            topic.id,
+                            topic.title
+                          )
+                        }
+                        disabled={disabled || module.topics.length <= 1}
+                      >
+                        <DeleteIcon fontSize='small' />
+                      </IconButton>
+                    </Box>
+                    {/* Material links for this topic */}
+                    {courseId && (
+                      <MaterialLinkSelector
+                        courseId={courseId}
+                        topicId={topic.id}
+                        disabled={disabled}
+                      />
+                    )}
                   </Box>
                 ))}
                 <Button

@@ -1,15 +1,16 @@
 'use client';
 
 /**
- * SeminarMaterialTable Component - Admin data table for seminar materials
+ * CourseMaterialTable Component - Admin data table for course materials
  * Feature: 024-admin-dashboard
  *
- * Displays all seminar materials in a searchable, paginated table
+ * Displays all course materials in a searchable, paginated table
  * with actions for viewing, editing, and deleting.
  */
 
 import {
   Add as AddIcon,
+  Close as CloseIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
   Refresh as RefreshIcon,
@@ -21,9 +22,13 @@ import {
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   IconButton,
   InputAdornment,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -40,7 +45,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { normalizeForSearch } from '@/lib/utils/searchNormalization';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
-interface SeminarMaterial {
+interface CourseMaterial {
   id: string;
   identifier: string;
   title: string;
@@ -48,7 +53,7 @@ interface SeminarMaterial {
   updatedAt: string;
 }
 
-interface SeminarMaterialTableProps {
+interface CourseMaterialTableProps {
   onRefresh?: () => void;
 }
 
@@ -65,11 +70,11 @@ function formatTableDate(dateString: string): string {
   });
 }
 
-export default function SeminarMaterialTable({
+export default function CourseMaterialTable({
   onRefresh,
-}: SeminarMaterialTableProps) {
+}: CourseMaterialTableProps) {
   const router = useRouter();
-  const [materials, setMaterials] = useState<SeminarMaterial[]>([]);
+  const [materials, setMaterials] = useState<CourseMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,8 +88,14 @@ export default function SeminarMaterialTable({
   // Delete dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [materialToDelete, setMaterialToDelete] =
-    useState<SeminarMaterial | null>(null);
+    useState<CourseMaterial | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // View dialog
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [viewMaterial, setViewMaterial] = useState<CourseMaterial | null>(null);
+  const [viewHtmlContent, setViewHtmlContent] = useState<string>('');
+  const [viewLoading, setViewLoading] = useState(false);
 
   const fetchMaterials = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
@@ -144,15 +155,41 @@ export default function SeminarMaterialTable({
     onRefresh?.();
   };
 
-  const handleView = (id: string) => {
-    router.push(`/admin/course-material/${id}`);
+  const handleView = async (material: CourseMaterial) => {
+    setViewMaterial(material);
+    setViewDialogOpen(true);
+    setViewLoading(true);
+    setViewHtmlContent('');
+
+    try {
+      const response = await fetch(
+        `/api/admin/course-material/${material.id}/content`
+      );
+      if (!response.ok) {
+        throw new Error('Fehler beim Laden des Inhalts');
+      }
+      const data = await response.json();
+      setViewHtmlContent(data.htmlContent || '');
+    } catch (err) {
+      setViewHtmlContent(
+        `<p style="color:red">${err instanceof Error ? err.message : 'Fehler beim Laden'}</p>`
+      );
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
+  const handleViewClose = () => {
+    setViewDialogOpen(false);
+    setViewMaterial(null);
+    setViewHtmlContent('');
   };
 
   const handleEdit = (id: string) => {
     router.push(`/admin/course-material/${id}/edit`);
   };
 
-  const handleDeleteClick = (material: SeminarMaterial) => {
+  const handleDeleteClick = (material: CourseMaterial) => {
     setMaterialToDelete(material);
     setDeleteDialogOpen(true);
   };
@@ -332,7 +369,7 @@ export default function SeminarMaterialTable({
                       <Tooltip title='Ansehen'>
                         <IconButton
                           size='small'
-                          onClick={() => handleView(material.id)}
+                          onClick={() => handleView(material)}
                           aria-label={`${material.title} ansehen`}
                         >
                           <ViewIcon fontSize='small' />
@@ -389,6 +426,67 @@ export default function SeminarMaterialTable({
         onCancel={handleDeleteCancel}
         loading={deleteLoading}
       />
+
+      {/* View Material Dialog */}
+      <Dialog
+        open={viewDialogOpen}
+        onClose={handleViewClose}
+        maxWidth='md'
+        fullWidth
+        scroll='paper'
+      >
+        <DialogTitle>
+          <Stack
+            direction='row'
+            justifyContent='space-between'
+            alignItems='center'
+          >
+            <Typography variant='h6' component='span'>
+              {viewMaterial?.title ?? 'Seminarmaterial'}
+            </Typography>
+            <IconButton
+              onClick={handleViewClose}
+              aria-label='Schließen'
+              size='small'
+            >
+              <CloseIcon />
+            </IconButton>
+          </Stack>
+          {viewMaterial && (
+            <Stack direction='row' spacing={3} sx={{ mt: 1 }}>
+              <Typography variant='body2' color='text.secondary'>
+                Kennung:{' '}
+                <Box component='span' sx={{ fontFamily: 'monospace' }}>
+                  {viewMaterial.identifier}
+                </Box>
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Erstellt: {formatTableDate(viewMaterial.createdAt)}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Aktualisiert: {formatTableDate(viewMaterial.updatedAt)}
+              </Typography>
+            </Stack>
+          )}
+        </DialogTitle>
+        <DialogContent dividers>
+          {viewLoading ? (
+            <Box display='flex' justifyContent='center' py={4}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                '& img': { maxWidth: '100%', height: 'auto' },
+                '& h1, & h2, & h3': { mt: 2, mb: 1 },
+                '& p': { mb: 1 },
+                '& ul, & ol': { pl: 3, mb: 1 },
+              }}
+              dangerouslySetInnerHTML={{ __html: viewHtmlContent }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

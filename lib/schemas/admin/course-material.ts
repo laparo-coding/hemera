@@ -1,12 +1,12 @@
 /**
- * Seminar Material Validation Schemas
+ * Course Material Validation Schemas
  * Feature: 023-slide-editor
  */
 
 import { z } from 'zod';
 
 /**
- * Identifier schema for seminar materials
+ * Identifier schema for course materials
  * - lowercase, hyphens, alphanumeric
  * - 2-100 characters
  */
@@ -32,9 +32,9 @@ export const htmlContentSchema = z
   );
 
 /**
- * Schema for creating a new seminar material
+ * Schema for creating a new course material
  */
-export const seminarMaterialCreateSchema = z.object({
+export const courseMaterialCreateSchema = z.object({
   title: z
     .string()
     .min(1, 'Titel ist erforderlich')
@@ -44,9 +44,9 @@ export const seminarMaterialCreateSchema = z.object({
 });
 
 /**
- * Schema for updating a seminar material
+ * Schema for updating a course material
  */
-export const seminarMaterialUpdateSchema = z.object({
+export const courseMaterialUpdateSchema = z.object({
   title: z
     .string()
     .min(1, 'Titel ist erforderlich')
@@ -57,9 +57,9 @@ export const seminarMaterialUpdateSchema = z.object({
 });
 
 /**
- * Schema for seminar material response (from API)
+ * Schema for course material response (from API)
  */
-export const seminarMaterialResponseSchema = z.object({
+export const courseMaterialResponseSchema = z.object({
   id: z.string(),
   identifier: z.string(),
   title: z.string(),

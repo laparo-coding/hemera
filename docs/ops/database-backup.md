@@ -79,24 +79,36 @@ tar -xzf hemera_backup_2025-01-04_03-00-00.tar.gz
 
 ## Einrichtung
 
-### 1. Secret hinzufügen
+### 1. Secrets hinzufügen
 
-Die `DATABASE_URL` muss als GitHub Secret konfiguriert sein:
+Zwei GitHub Secrets müssen konfiguriert sein (eines pro Umgebung):
 
 1. Gehe zu **Settings → Secrets and variables → Actions**
 2. Klicke **New repository secret**
-3. Name: `DATABASE_URL`
-4. Value: Die vollständige Prisma Postgres Verbindungs-URL
+
+| Secret | Umgebung | Beschreibung |
+|--------|----------|-------------|
+| `DATABASE_URL` | **Production** | Prisma Postgres Verbindungs-URL (Produktion) |
+| `DEV_DATABASE_URL` | **Development** | Prisma Postgres Verbindungs-URL (Development) |
+
+Falls nur ein Secret konfiguriert ist, wird die andere Umgebung übersprungen (kein Fehler).
 
 ### 2. Workflow aktivieren
 
 Der Workflow wird automatisch aktiviert, sobald die Datei `.github/workflows/daily-backup.yml` im `main` Branch liegt.
 
+### 3. Manueller Trigger mit Umgebungs-Auswahl
+
+Beim manuellen Trigger kann gewählt werden:
+- **both** (Standard): Beide Umgebungen sichern
+- **production**: Nur Produktion
+- **development**: Nur Development
+
 ## Troubleshooting
 
 ### Backup schlägt fehl
 
-1. Prüfe, ob `DATABASE_URL` als Secret gesetzt ist
+1. Prüfe, ob `DATABASE_URL` und/oder `DEV_DATABASE_URL` als Secrets gesetzt sind
 2. Prüfe die Workflow-Logs in GitHub Actions
 3. Stelle sicher, dass die Datenbank erreichbar ist
 4. Prüfe, ob alle Prisma-Modelle korrekt sind

@@ -13,7 +13,7 @@ import { isAdmin } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
-import { seminarMaterialUpdateSchema } from '@/lib/schemas/admin/course-material';
+import { courseMaterialUpdateSchema } from '@/lib/schemas/admin/course-material';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -21,7 +21,7 @@ type RouteParams = {
 
 /**
  * GET /api/admin/course-material/[id]
- * Get a single seminar material
+ * Get a single course material
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
@@ -63,7 +63,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       updatedAt: material.updatedAt.toISOString(),
     });
   } catch (error) {
-    serverInstance.error('Failed to get seminar material', {
+    serverInstance.error('Failed to get course material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(
@@ -75,7 +75,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
 /**
  * PUT /api/admin/course-material/[id]
- * Update a seminar material
+ * Update a course material
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   // Extract id before try block so it's available in catch for logging
@@ -124,7 +124,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const parsed = seminarMaterialUpdateSchema.safeParse(body);
+    const parsed = courseMaterialUpdateSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -279,7 +279,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         error: error instanceof Error ? error.message : 'Unknown error',
       }
     );
-    serverInstance.error('Failed to update seminar material', {
+    serverInstance.error('Failed to update course material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(
@@ -294,7 +294,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 /**
  * DELETE /api/admin/course-material/[id]
- * Delete a seminar material
+ * Delete a course material
  */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   // Extract id before try block so it's available in catch for logging
@@ -371,7 +371,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
         error: error instanceof Error ? error.message : 'Unknown error',
       }
     );
-    serverInstance.error('Failed to delete seminar material', {
+    serverInstance.error('Failed to delete course material', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(

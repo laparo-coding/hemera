@@ -11,7 +11,7 @@ type RouteParams = {
 
 /**
  * GET /api/admin/course-material/[id]/content
- * Get the HTML content of a seminar material
+ * Get the HTML content of a course material
  * Fetches the content from Vercel Blob
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
@@ -70,7 +70,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       updatedAt: material.updatedAt.toISOString(),
     });
   } catch (error) {
-    serverInstance.error('Failed to get seminar material content', {
+    serverInstance.error('Failed to get course material content', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(
