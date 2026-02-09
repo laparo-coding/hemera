@@ -188,3 +188,15 @@ export class UserValidationError extends ValidationError {
     super(`User validation error: ${message}`);
   }
 }
+
+export class UnexpectedDatabaseError extends InfrastructureError {
+  readonly errorCode = 'UNEXPECTED_DATABASE_ERROR';
+
+  constructor(operation: string, cause?: Error) {
+    super(
+      `Unexpected database error during: ${operation}`,
+      { operation },
+      cause
+    );
+  }
+}

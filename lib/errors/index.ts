@@ -28,6 +28,7 @@ export {
   SessionExpiredError,
   StripeConfigurationError,
   UnauthorizedError,
+  UnexpectedDatabaseError,
   UserEmailAlreadyExistsError,
   UserNotFoundError,
   UserValidationError,
@@ -40,3 +41,6 @@ export {
   toHttpError,
   withErrorHandling,
 } from './http';
+
+// Translation layer
+export { type ErrorMessageKey, errorMessage } from './messages';
