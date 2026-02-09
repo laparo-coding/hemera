@@ -37,26 +37,37 @@ jobs:
           - env_name: development
             secret_key: DEV_DATABASE_URL
 
-    # Bei manuellem Trigger: nur gewählte Umgebung (oder beide)
-    if: >-
-      github.event_name != 'workflow_dispatch' ||
-      github.event.inputs.environment == 'both' ||
-      github.event.inputs.environment == matrix.env_name
-
+    # Filterung per Step-Level if, da matrix im Job-Level if nicht verfügbar ist
     steps:
+      - name: Check Environment Filter
+        id: filter
+        run: |
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" ]] || \
+             [[ "${{ github.event.inputs.environment }}" == "both" ]] || \
+             [[ "${{ github.event.inputs.environment }}" == "${{ matrix.env_name }}" ]]; then
+            echo "run=true" >> $GITHUB_OUTPUT
+          else
+            echo "⏭️ ${{ matrix.env_name }} übersprungen (nur ${{ github.event.inputs.environment }} gewählt)"
+            echo "run=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout Repository
+        if: steps.filter.outputs.run == 'true'
         uses: actions/checkout@v6
 
       - name: Setup Node.js
+        if: steps.filter.outputs.run == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Install Dependencies
+        if: steps.filter.outputs.run == 'true'
         run: npm ci
 
       - name: Check Database URL
+        if: steps.filter.outputs.run == 'true'
         id: check_db
         env:
           DB_URL: ${{ secrets[matrix.secret_key] }}
@@ -69,7 +80,7 @@ jobs:
           fi
 
       - name: Create Database Backup with Prisma
-        if: steps.check_db.outputs.skip != 'true'
+        if: steps.filter.outputs.run == 'true' && steps.check_db.outputs.skip != 'true'
         env:
           DATABASE_URL: ${{ secrets[matrix.secret_key] }}
           BACKUP_REASON: ${{ github.event.inputs.reason || 'Geplantes tägliches Backup' }}
@@ -103,7 +114,7 @@ jobs:
           echo "📋 Trigger: ${{ github.event_name }}"
 
       - name: Upload Backup as Artifact
-        if: steps.check_db.outputs.skip != 'true'
+        if: steps.filter.outputs.run == 'true' && steps.check_db.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: db-backup-${{ matrix.env_name }}-${{ github.run_number }}-${{ github.run_id }}
@@ -112,7 +123,7 @@ jobs:
           compression-level: 0  # Bereits komprimiert
 
       - name: Backup Summary
-        if: steps.check_db.outputs.skip != 'true'
+        if: steps.filter.outputs.run == 'true' && steps.check_db.outputs.skip != 'true'
         run: |
           echo "## 🗄️ ${{ matrix.env_name }} Datenbank Backup" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
