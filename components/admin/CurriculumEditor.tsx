@@ -16,6 +16,7 @@ import {
   AccordionSummary,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -31,6 +32,7 @@ import { TERMS } from '../../lib/constants/terminology';
 
 const MaterialLinkSelector = dynamic(() => import('./MaterialLinkSelector'), {
   ssr: false,
+  loading: () => <CircularProgress size={16} />,
 });
 
 import type {

@@ -72,19 +72,20 @@ jobs:
         if: steps.check_db.outputs.skip != 'true'
         env:
           DATABASE_URL: ${{ secrets[matrix.secret_key] }}
+          BACKUP_REASON: ${{ github.event.inputs.reason || 'Geplantes tägliches Backup' }}
         run: |
           DATE=$(date +%Y-%m-%d_%H-%M-%S)
           ENV_NAME="${{ matrix.env_name }}"
           BACKUP_DIR="backup_${ENV_NAME}_${DATE}"
 
           echo "🔄 Starte ${ENV_NAME} Backup für ${DATE}..."
-          echo "📋 Backup-Grund: ${{ github.event.inputs.reason || 'Geplantes tägliches Backup' }}"
+          echo "📋 Backup-Grund: ${BACKUP_REASON}"
 
           # Run external backup script
           BACKUP_DIR="$BACKUP_DIR" node scripts/ops/backup-db.mjs
 
           # Create summary file
-          echo "{\"date\": \"${DATE}\", \"environment\": \"${ENV_NAME}\", \"reason\": \"${{ github.event.inputs.reason || 'Scheduled daily backup' }}\"}" > "$BACKUP_DIR/metadata.json"
+          echo "{\"date\": \"${DATE}\", \"environment\": \"${ENV_NAME}\", \"reason\": \"${BACKUP_REASON}\"}" > "$BACKUP_DIR/metadata.json"
 
           # Compress backup
           ARCHIVE_NAME="hemera_backup_${ENV_NAME}_${DATE}.tar.gz"

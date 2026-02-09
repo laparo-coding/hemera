@@ -6,6 +6,7 @@
  */
 
 import type { NextRequest } from 'next/server';
+import { z } from 'zod';
 import {
   adminOptions,
   createAdminHandler,
@@ -16,6 +17,12 @@ import {
 } from '@/lib/api/curriculum-material';
 
 export const OPTIONS = adminOptions;
+
+const curriculumMaterialLinkSchema = z.object({
+  topicId: z.string().min(1, 'topicId ist erforderlich'),
+  materialId: z.string().min(1, 'materialId ist erforderlich'),
+  sortOrder: z.number().int().nonnegative().optional(),
+});
 
 /** Extract the course ID from a URL like /api/admin/courses/{id}/curriculum-materials */
 function extractCourseId(url: string): string {
@@ -31,7 +38,8 @@ function extractCourseId(url: string): string {
  */
 export const GET = createAdminHandler(
   async (_requestId: string, request?: NextRequest) => {
-    const courseId = extractCourseId(request!.url);
+    if (!request) throw new Error('Request fehlt');
+    const courseId = extractCourseId(request.url);
     return getMaterialLinksForCourse(courseId);
   },
   {
@@ -46,13 +54,10 @@ export const GET = createAdminHandler(
  */
 export const POST = createAdminHandler(
   async (_requestId: string, request?: NextRequest) => {
-    const courseId = extractCourseId(request!.url);
-    const body = await request!.json();
-    const { topicId, materialId, sortOrder } = body;
-
-    if (!topicId || !materialId) {
-      throw new Error('topicId und materialId sind erforderlich');
-    }
+    if (!request) throw new Error('Request fehlt');
+    const courseId = extractCourseId(request.url);
+    const body = await request.json();
+    const { topicId, materialId, sortOrder } = curriculumMaterialLinkSchema.parse(body);
 
     return addMaterialLink({ courseId, topicId, materialId, sortOrder });
   },

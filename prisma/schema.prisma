@@ -64,6 +64,7 @@ model Course {
   bookings            Booking[]
   summaryAssets       CourseSummaryAsset[]
   testimonials        Testimonial[]
+  curriculumTopicMaterials CurriculumTopicMaterial[]
 
   @@index([startDate])
   @@map("courses")
@@ -303,7 +304,9 @@ model CurriculumTopicMaterial {
   materialId String   @map("material_id")
   sortOrder  Int      @default(0) @map("sort_order")
   createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
+  course     Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   material   CourseMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
 
   @@unique([courseId, topicId, materialId])

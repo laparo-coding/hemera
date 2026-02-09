@@ -41,6 +41,41 @@ interface SlideEditorToolbarProps {
   onImageUpload?: (file: File) => Promise<string>;
 }
 
+function ToolbarButton({
+  onClick,
+  isActive = false,
+  disabled = false,
+  title,
+  children,
+}: {
+  onClick: () => void;
+  isActive?: boolean;
+  disabled?: boolean;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Tooltip title={title}>
+      <span>
+        <IconButton
+          size='small'
+          onClick={onClick}
+          disabled={disabled}
+          sx={{
+            color: isActive ? 'primary.main' : 'text.secondary',
+            bgcolor: isActive ? 'action.selected' : 'transparent',
+            '&:hover': {
+              bgcolor: isActive ? 'action.selected' : 'action.hover',
+            },
+          }}
+        >
+          {children}
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+}
+
 export function SlideEditorToolbar({
   editor,
   onImageUpload,
@@ -149,39 +184,6 @@ export function SlideEditorToolbar({
   }, [editor, handleTableClose]);
 
   if (!editor) return null;
-
-  const ToolbarButton = ({
-    onClick,
-    isActive = false,
-    disabled = false,
-    title,
-    children,
-  }: {
-    onClick: () => void;
-    isActive?: boolean;
-    disabled?: boolean;
-    title: string;
-    children: React.ReactNode;
-  }) => (
-    <Tooltip title={title}>
-      <span>
-        <IconButton
-          size='small'
-          onClick={onClick}
-          disabled={disabled}
-          sx={{
-            color: isActive ? 'primary.main' : 'text.secondary',
-            bgcolor: isActive ? 'action.selected' : 'transparent',
-            '&:hover': {
-              bgcolor: isActive ? 'action.selected' : 'action.hover',
-            },
-          }}
-        >
-          {children}
-        </IconButton>
-      </span>
-    </Tooltip>
-  );
 
   return (
     <Box

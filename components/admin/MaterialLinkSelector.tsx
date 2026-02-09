@@ -70,8 +70,9 @@ export default function MaterialLinkSelector({
         if (!cancelled) {
           setLinkedMaterials(topicLinks);
         }
-      } catch {
-        // Silently fail for UX
+      } catch (err) {
+        // biome-ignore lint/suspicious/noConsole: Error feedback for debugging
+        console.error('Fehler beim Laden der Material-Links:', err);
       }
     }
 
@@ -98,8 +99,9 @@ export default function MaterialLinkSelector({
             setAllMaterials(materials);
             setMaterialsLoaded(true);
           }
-        } catch {
-          // Silently fail
+        } catch (err) {
+          // biome-ignore lint/suspicious/noConsole: Error feedback for debugging
+          console.error('Fehler beim Laden der Materialien:', err);
         } finally {
           setLoading(false);
         }
@@ -144,8 +146,9 @@ export default function MaterialLinkSelector({
             },
           ]);
         }
-      } catch {
-        // Silently fail
+      } catch (err) {
+        // biome-ignore lint/suspicious/noConsole: Error feedback for debugging
+        console.error('Fehler beim Verknüpfen des Materials:', err);
       }
     },
     [courseId, topicId, linkedMaterials.length, handleCloseMenu]
@@ -162,8 +165,9 @@ export default function MaterialLinkSelector({
         if (res.ok) {
           setLinkedMaterials(prev => prev.filter(m => m.id !== linkId));
         }
-      } catch {
-        // Silently fail
+      } catch (err) {
+        // biome-ignore lint/suspicious/noConsole: Error feedback for debugging
+        console.error('Fehler beim Entfernen des Materials:', err);
       }
     },
     [courseId]
@@ -204,6 +208,7 @@ export default function MaterialLinkSelector({
             color='primary'
             onClick={handleOpenMenu}
             disabled={disabled}
+            aria-label='Seminarmaterial verknüpfen'
             sx={{ alignSelf: 'flex-start' }}
           >
             <AddCircleOutlineIcon fontSize='small' />
