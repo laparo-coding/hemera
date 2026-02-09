@@ -2,25 +2,25 @@
  * Course Material API Functions
  * Feature: 023-slide-editor
  *
- * Server-side functions for managing seminarmaterial CRUD operations
+ * Server-side functions for managing course material CRUD operations
  */
 
 import { prisma } from '../db/prisma';
 
 /**
- * Get all seminar materials
+ * Get all course materials
  */
 export async function getAllMaterials() {
-  return prisma.seminarMaterial.findMany({
+  return prisma.courseMaterial.findMany({
     orderBy: { createdAt: 'desc' },
   });
 }
 
 /**
- * Get a single seminar material by ID
+ * Get a single course material by ID
  */
 export async function getMaterialById(id: string) {
-  return prisma.seminarMaterial.findUnique({
+  return prisma.courseMaterial.findUnique({
     where: { id },
   });
 }
@@ -33,7 +33,7 @@ export async function isIdentifierTaken(
   identifier: string,
   excludeId?: string
 ) {
-  const material = await prisma.seminarMaterial.findUnique({
+  const material = await prisma.courseMaterial.findUnique({
     where: { identifier },
   });
 
@@ -43,7 +43,7 @@ export async function isIdentifierTaken(
 }
 
 /**
- * Create a new seminar material
+ * Create a new course material
  */
 export async function createMaterial(data: {
   identifier: string;
@@ -51,13 +51,13 @@ export async function createMaterial(data: {
   blobUrl: string;
   blobPathname: string;
 }) {
-  return prisma.seminarMaterial.create({
+  return prisma.courseMaterial.create({
     data,
   });
 }
 
 /**
- * Update an existing seminar material
+ * Update an existing course material
  */
 export async function updateMaterial(
   id: string,
@@ -68,17 +68,17 @@ export async function updateMaterial(
     blobPathname?: string;
   }
 ) {
-  return prisma.seminarMaterial.update({
+  return prisma.courseMaterial.update({
     where: { id },
     data,
   });
 }
 
 /**
- * Delete a seminar material
+ * Delete a course material
  */
 export async function deleteMaterial(id: string) {
-  return prisma.seminarMaterial.delete({
+  return prisma.courseMaterial.delete({
     where: { id },
   });
 }
