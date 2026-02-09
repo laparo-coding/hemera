@@ -33,6 +33,8 @@ const nextConfig = {
   // Feature: 012-performance-improvement (FR-009, NFR-005)
   experimental: {
     webpackMemoryOptimizations: true,
+    // Deaktiviere Turbopack persistent cache wegen lokalen Panics
+    turbopackFileSystemCacheForDev: false,
   },
 
   webpack: (config, { _isServer, dev }) => {

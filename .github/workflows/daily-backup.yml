@@ -11,6 +11,15 @@ on:
         description: 'Grund für manuelles Backup'
         required: false
         default: 'Manuelles Backup'
+      environment:
+        description: 'Welche Umgebung sichern?'
+        required: false
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - production
+          - development
 
 jobs:
   backup:
@@ -18,6 +27,21 @@ jobs:
     permissions:
       contents: read
       actions: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - env_name: production
+            secret_key: DATABASE_URL
+          - env_name: development
+            secret_key: DEV_DATABASE_URL
+
+    # Bei manuellem Trigger: nur gewählte Umgebung (oder beide)
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      github.event.inputs.environment == 'both' ||
+      github.event.inputs.environment == matrix.env_name
 
     steps:
       - name: Checkout Repository
@@ -32,50 +56,68 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Create Database Backup with Prisma
+      - name: Check Database URL
+        id: check_db
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DB_URL: ${{ secrets[matrix.secret_key] }}
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "⚠️ Secret ${{ matrix.secret_key }} ist nicht konfiguriert — ${{ matrix.env_name }} Backup übersprungen"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Database Backup with Prisma
+        if: steps.check_db.outputs.skip != 'true'
+        env:
+          DATABASE_URL: ${{ secrets[matrix.secret_key] }}
         run: |
           DATE=$(date +%Y-%m-%d_%H-%M-%S)
-          BACKUP_DIR="backup_${DATE}"
+          ENV_NAME="${{ matrix.env_name }}"
+          BACKUP_DIR="backup_${ENV_NAME}_${DATE}"
 
-          echo "🔄 Starte Backup für ${DATE}..."
+          echo "🔄 Starte ${ENV_NAME} Backup für ${DATE}..."
           echo "📋 Backup-Grund: ${{ github.event.inputs.reason || 'Geplantes tägliches Backup' }}"
 
           # Run external backup script
           BACKUP_DIR="$BACKUP_DIR" node scripts/ops/backup-db.mjs
 
           # Create summary file
-          echo "{\"date\": \"${DATE}\", \"reason\": \"${{ github.event.inputs.reason || 'Scheduled daily backup' }}\"}" > "$BACKUP_DIR/metadata.json"
+          echo "{\"date\": \"${DATE}\", \"environment\": \"${ENV_NAME}\", \"reason\": \"${{ github.event.inputs.reason || 'Scheduled daily backup' }}\"}" > "$BACKUP_DIR/metadata.json"
 
           # Compress backup
-          tar -czf "hemera_backup_${DATE}.tar.gz" "$BACKUP_DIR"
+          ARCHIVE_NAME="hemera_backup_${ENV_NAME}_${DATE}.tar.gz"
+          tar -czf "$ARCHIVE_NAME" "$BACKUP_DIR"
 
           # Statistiken ausgeben
-          BACKUP_SIZE=$(ls -lh "hemera_backup_${DATE}.tar.gz" | awk '{print $5}')
+          BACKUP_SIZE=$(ls -lh "$ARCHIVE_NAME" | awk '{print $5}')
           FILE_COUNT=$(ls -1 "$BACKUP_DIR"/*.json 2>/dev/null | wc -l)
 
           echo ""
-          echo "✅ Backup erfolgreich erstellt!"
-          echo "📦 Datei: hemera_backup_${DATE}.tar.gz"
+          echo "✅ ${ENV_NAME} Backup erfolgreich erstellt!"
+          echo "📦 Datei: ${ARCHIVE_NAME}"
           echo "📊 Größe: ${BACKUP_SIZE}"
           echo "📁 Tabellen: ${FILE_COUNT}"
           echo "📋 Trigger: ${{ github.event_name }}"
 
       - name: Upload Backup as Artifact
+        if: steps.check_db.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: db-backup-${{ github.run_number }}-${{ github.run_id }}
+          name: db-backup-${{ matrix.env_name }}-${{ github.run_number }}-${{ github.run_id }}
           path: hemera_backup_*.tar.gz
           retention-days: 30
           compression-level: 0  # Bereits komprimiert
 
       - name: Backup Summary
+        if: steps.check_db.outputs.skip != 'true'
         run: |
-          echo "## 🗄️ Datenbank Backup Zusammenfassung" >> $GITHUB_STEP_SUMMARY
+          echo "## 🗄️ ${{ matrix.env_name }} Datenbank Backup" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Eigenschaft | Wert |" >> $GITHUB_STEP_SUMMARY
           echo "|-------------|------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌐 Umgebung | **${{ matrix.env_name }}** |" >> $GITHUB_STEP_SUMMARY
           echo "| 📅 Datum | $(date '+%d.%m.%Y %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
           echo "| 🔢 Run | #${{ github.run_number }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 📋 Trigger | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY

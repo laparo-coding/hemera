@@ -3,7 +3,7 @@
  * Feature: 023-slide-editor
  *
  * Form for creating/editing seminar materials
- * Collects title, identifier (optional), and HTML content
+ * Collects title, identifier (optional), and HTML content via WYSIWYG editor
  */
 
 'use client';
@@ -14,9 +14,9 @@ import {
   CircularProgress,
   Stack,
   TextField,
-  Typography,
 } from '@mui/material';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { SlideEditor } from './SlideEditor';
 
 interface MaterialFormProps {
   onSubmit: (data: {
@@ -40,6 +40,10 @@ export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleEditorChange = useCallback((html: string) => {
+    setHtmlContent(html);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -61,7 +65,7 @@ export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
   };
 
   return (
-    <Box component='form' onSubmit={handleSubmit} sx={{ maxWidth: 800 }}>
+    <Box component='form' onSubmit={handleSubmit}>
       <Stack spacing={3}>
         {error && (
           <Box
@@ -100,24 +104,13 @@ export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
         />
 
         <Box>
-          <TextField
-            id='html-content'
-            label='HTML-Inhalt'
-            value={htmlContent}
-            onChange={e => setHtmlContent(e.target.value)}
-            fullWidth
-            multiline
-            rows={10}
-            placeholder='<h1>Titel</h1><p>Inhalt...</p>'
-            required
+          <SlideEditor
+            content={initialData?.htmlContent || ''}
+            onChange={handleEditorChange}
+            placeholder='Beginne mit der Eingabe des Seminarinhalts...'
             disabled={isSubmitting}
-            InputProps={{
-              sx: { fontFamily: 'monospace', fontSize: '0.875rem' },
-            }}
+            minHeight={400}
           />
-          <Typography variant='caption' sx={{ mt: 1, display: 'block' }}>
-            HTML wird später im WYSIWYG-Editor editierbar sein
-          </Typography>
         </Box>
 
         <Button
