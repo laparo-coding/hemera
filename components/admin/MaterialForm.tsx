@@ -24,6 +24,7 @@ interface MaterialFormProps {
     identifier?: string;
     htmlContent: string;
   }) => Promise<void>;
+  onCancel?: () => void;
   initialData?: {
     title?: string;
     identifier?: string;
@@ -31,7 +32,7 @@ interface MaterialFormProps {
   };
 }
 
-export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
+export function MaterialForm({ onSubmit, onCancel, initialData }: MaterialFormProps) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [identifier, setIdentifier] = useState(initialData?.identifier || '');
   const [htmlContent, setHtmlContent] = useState(
@@ -113,22 +114,36 @@ export function MaterialForm({ onSubmit, initialData }: MaterialFormProps) {
           />
         </Box>
 
-        <Button
-          type='submit'
-          variant='contained'
-          disabled={isSubmitting || !title || !htmlContent}
-          aria-busy={isSubmitting}
-          sx={{ alignSelf: 'flex-start' }}
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            mt: 2,
+          }}
         >
-          {isSubmitting ? (
-            <>
-              <CircularProgress size={20} sx={{ mr: 1 }} />
-              Wird gespeichert...
-            </>
-          ) : (
-            'Speichern'
+          {onCancel && (
+            <Button
+              variant='outlined'
+              color='primary'
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
+              Abbrechen
+            </Button>
           )}
-        </Button>
+          <Button
+            type='submit'
+            variant='contained'
+            color='primary'
+            disabled={isSubmitting || !title || !htmlContent}
+            aria-busy={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+          >
+            {isSubmitting ? 'Wird gespeichert...' : 'Speichern'}
+          </Button>
+        </Box>
       </Stack>
     </Box>
   );

@@ -7,15 +7,11 @@
  * Edit an existing seminar material (title, identifier, HTML content).
  */
 
-import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import {
   Alert,
   Box,
-  Breadcrumbs,
   CircularProgress,
-  Container,
-  IconButton,
-  Link,
+  Paper,
   Typography,
 } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
@@ -110,74 +106,35 @@ export default function EditSeminarmaterialPage() {
 
   if (loading) {
     return (
-      <Container maxWidth='lg' sx={{ py: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
-        </Box>
-      </Container>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error || !material) {
     return (
-      <Container maxWidth='lg' sx={{ py: 4 }}>
-        <Alert severity='error'>{error || 'Material nicht gefunden'}</Alert>
-      </Container>
+      <Alert severity='error'>{error || 'Material nicht gefunden'}</Alert>
     );
   }
 
   return (
-    <Container maxWidth='lg' sx={{ py: 4 }}>
-      <Box sx={{ mb: 3 }}>
-        <Breadcrumbs>
-          <Link
-            href='/admin'
-            underline='hover'
-            color='inherit'
-            sx={{ cursor: 'pointer' }}
-          >
-            Admin
-          </Link>
-          <Link
-            href='/admin/course-material'
-            underline='hover'
-            color='inherit'
-            sx={{ cursor: 'pointer' }}
-          >
-            Seminarmaterial
-          </Link>
-          <Link
-            href={`/admin/course-material/${id}`}
-            underline='hover'
-            color='inherit'
-            sx={{ cursor: 'pointer' }}
-          >
-            {material.title}
-          </Link>
-          <Typography color='text.primary'>Bearbeiten</Typography>
-        </Breadcrumbs>
-      </Box>
+    <Box>
+      <Typography variant='h4' component='h1' gutterBottom>
+        Seminarmaterial bearbeiten
+      </Typography>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <IconButton
-          onClick={() => router.push(`/admin/course-material/${id}`)}
-          aria-label='Zurück zum Material'
-        >
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant='h4' component='h1'>
-          Seminarmaterial bearbeiten
-        </Typography>
-      </Box>
-
-      <MaterialForm
-        onSubmit={handleSubmit}
-        initialData={{
-          title: material.title,
-          identifier: material.identifier,
-          htmlContent,
-        }}
-      />
-    </Container>
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <MaterialForm
+          onSubmit={handleSubmit}
+          onCancel={() => router.push(`/admin/course-material/${id}`)}
+          initialData={{
+            title: material.title,
+            identifier: material.identifier,
+            htmlContent,
+          }}
+        />
+      </Paper>
+    </Box>
   );
 }
