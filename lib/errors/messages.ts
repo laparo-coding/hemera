@@ -60,7 +60,7 @@ export type ErrorMessageKey = keyof typeof ERROR_MESSAGES;
  * Falls back to INTERNAL_ERROR if the key is unknown.
  */
 export function errorMessage(key: string): string {
-  if (key in ERROR_MESSAGES) {
+  if (Object.hasOwn(ERROR_MESSAGES, key)) {
     return ERROR_MESSAGES[key as ErrorMessageKey];
   }
   return ERROR_MESSAGES.INTERNAL_ERROR;

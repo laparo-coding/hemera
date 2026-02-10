@@ -193,7 +193,7 @@ Geocodierung
 geolocation
 gepoolte
 gespeichert
-Gesprächsanlayse
+Gesprächsanalyse
 Getenv
 gfkc
 GITHUB

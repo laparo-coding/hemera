@@ -45,7 +45,7 @@ export function mapPrismaError(
     }
     return new UnexpectedDatabaseError(
       'unknown operation',
-      error instanceof Error ? error : new Error(String(error))
+      new Error(String(error))
     );
   }
 

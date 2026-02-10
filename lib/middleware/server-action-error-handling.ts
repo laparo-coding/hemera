@@ -240,7 +240,10 @@ export function withOptimisticUpdate<T = unknown>(
         optimisticValue,
       };
     } catch (error) {
-      const mappedError = mapPrismaError(error);
+      // If the error is already a domain error, use it directly.
+      // Only call mapPrismaError for actual Prisma errors (not plain Error instances).
+      const mappedError =
+        error instanceof BaseError ? error : mapPrismaError(error);
 
       // Report to Rollbar if not a BaseError (unexpected error)
       if (!(mappedError instanceof BaseError)) {
