@@ -108,8 +108,8 @@ export async function getCurrentUserWithSync(): Promise<User> {
           data: { userId: clerkId },
         });
 
-        // 3. Delete old user
-        await tx.user.delete({
+        // 3. Delete old user (use deleteMany to avoid P2025 if already deleted)
+        await tx.user.deleteMany({
           where: { id: existingByEmail.id },
         });
 
@@ -217,8 +217,8 @@ export async function syncClerkUserToDatabase(
             data: { userId: clerkId },
           });
 
-          // 3. Delete old user
-          await tx.user.delete({
+          // 3. Delete old user (use deleteMany to avoid P2025 if already deleted)
+          await tx.user.deleteMany({
             where: { id: existingByEmail.id },
           });
 
@@ -656,40 +656,56 @@ export async function syncUserFromClerk(clerkUser: ClerkUser): Promise<User> {
         // Migration logged via Rollbar monitoring in production
 
         // Use transaction: First create/upsert new user, then update bookings, then delete old
-        return await prisma.$transaction(async tx => {
-          // 1. Upsert user with Clerk ID (handles race conditions)
-          const _newUser = await tx.user.upsert({
-            where: { id: clerkId },
-            update: {
-              name,
-              image,
-              // Keep temp email during migration
-            },
-            create: {
-              id: clerkId,
-              name,
-              image,
-              email: `migrating-${clerkId}@example.invalid`,
-            },
-          });
+        try {
+          return await prisma.$transaction(async tx => {
+            // 1. Upsert user with Clerk ID (handles race conditions)
+            const _newUser = await tx.user.upsert({
+              where: { id: clerkId },
+              update: {
+                name,
+                image,
+                // Keep temp email during migration
+              },
+              create: {
+                id: clerkId,
+                name,
+                image,
+                email: `migrating-${clerkId}@example.invalid`,
+              },
+            });
 
-          // 2. Update all bookings to use Clerk ID
-          await tx.booking.updateMany({
-            where: { userId: existingByEmail.id },
-            data: { userId: clerkId },
-          });
+            // 2. Update all bookings to use Clerk ID
+            await tx.booking.updateMany({
+              where: { userId: existingByEmail.id },
+              data: { userId: clerkId },
+            });
 
-          // 3. Delete old user
-          await tx.user.delete({
-            where: { id: existingByEmail.id },
-          });
+            // 3. Delete old user (use deleteMany to avoid P2025 if already deleted)
+            await tx.user.deleteMany({
+              where: { id: existingByEmail.id },
+            });
 
-          // 4. Update new user with correct email
-          return await tx.user.update({
-            where: { id: clerkId },
-            data: { email },
+            // 4. Update new user with correct email
+            return await tx.user.update({
+              where: { id: clerkId },
+              data: { email },
+            });
           });
-        });
+        } catch (migrationError) {
+          // Handle race condition: another request may have already migrated this user
+          if (
+            migrationError instanceof Prisma.PrismaClientKnownRequestError &&
+            (migrationError.code === 'P2002' || migrationError.code === 'P2025')
+          ) {
+            // Use upsert for atomic operation — avoids TOCTOU race between find and update
+            return await prisma.user.upsert({
+              where: { id: clerkId },
+              update: { name, email, image },
+              create: { id: clerkId, name, email, image },
+            });
+          }
+          throw migrationError;
+        }
       }
     }
 

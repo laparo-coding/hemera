@@ -53,8 +53,10 @@ export function withServerActionErrorHandling<T = unknown>(
         requestId: requestContext.id,
       };
     } catch (error) {
-      // Try to map Prisma errors to domain errors first
-      const mappedError = mapPrismaError(error);
+      // If the error is already a domain error, use it directly.
+      // Only call mapPrismaError for actual Prisma errors (not plain Error instances).
+      const mappedError =
+        error instanceof BaseError ? error : mapPrismaError(error);
 
       // Report to Rollbar if not a BaseError (unexpected error)
       if (!(mappedError instanceof BaseError)) {
@@ -117,7 +119,10 @@ export function withParameterizedServerAction<TParam, TResult = unknown>(
         requestId: requestContext.id,
       };
     } catch (error) {
-      const mappedError = mapPrismaError(error);
+      // If the error is already a domain error, use it directly.
+      // Only call mapPrismaError for actual Prisma errors (not plain Error instances).
+      const mappedError =
+        error instanceof BaseError ? error : mapPrismaError(error);
 
       if (!(mappedError instanceof BaseError)) {
         const errorContext = createErrorContext(
@@ -235,7 +240,10 @@ export function withOptimisticUpdate<T = unknown>(
         optimisticValue,
       };
     } catch (error) {
-      const mappedError = mapPrismaError(error);
+      // If the error is already a domain error, use it directly.
+      // Only call mapPrismaError for actual Prisma errors (not plain Error instances).
+      const mappedError =
+        error instanceof BaseError ? error : mapPrismaError(error);
 
       // Report to Rollbar if not a BaseError (unexpected error)
       if (!(mappedError instanceof BaseError)) {

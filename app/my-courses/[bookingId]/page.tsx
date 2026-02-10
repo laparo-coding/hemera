@@ -46,54 +46,96 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
   const { bookingId } = await params;
   const user = await requireAuthenticatedUser();
 
-  // Fetch booking with related data - use explicit select to minimize exposure
-  const booking = await prisma.booking.findFirst({
-    where: {
-      id: bookingId,
-      userId: user.id, // User.id is the Clerk ID
-    },
-    select: {
-      id: true,
-      paymentStatus: true,
-      course: {
-        select: {
-          id: true,
-          title: true,
-          startDate: true,
-          endDate: true,
-          startTime: true,
-          endTime: true,
-          location: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              address: true,
-              city: true,
-              zipCode: true,
+  let booking = null;
+  let debugError: unknown = null;
+  try {
+    // Fetch booking with related data - use explicit select to minimize exposure
+    booking = await prisma.booking.findFirst({
+      where: {
+        id: bookingId,
+        userId: user.id, // User.id is the Clerk ID
+      },
+      select: {
+        id: true,
+        paymentStatus: true,
+        course: {
+          select: {
+            id: true,
+            title: true,
+            startDate: true,
+            endDate: true,
+            startTime: true,
+            endTime: true,
+            location: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                address: true,
+                city: true,
+                zipCode: true,
+              },
             },
           },
         },
-      },
-      participation: {
-        select: {
-          id: true,
-          status: true,
-          preparationIntent: true,
-          desiredResults: true,
-          lineManagerProfile: true,
-          preparationCompletedAt: true,
-          debriefingPlan: true,
-          salaryDiscussionMonth: true,
-          resultOutcome: true,
-          resultNotes: true,
-          resultCompletedAt: true,
+        participation: {
+          select: {
+            id: true,
+            status: true,
+            preparationIntent: true,
+            desiredResults: true,
+            lineManagerProfile: true,
+            preparationCompletedAt: true,
+            debriefingPlan: true,
+            salaryDiscussionMonth: true,
+            resultOutcome: true,
+            resultNotes: true,
+            resultCompletedAt: true,
+          },
         },
       },
-    },
-  });
+    });
+  } catch (err) {
+    debugError = err;
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Debug logging for development only
+      console.error('Prisma-Fehler bei Buchungsabfrage:', err);
+    } else {
+      // biome-ignore lint/suspicious/noConsole: Production error logging for monitoring
+      console.error(
+        `[my-courses/${bookingId}] Booking query failed for user ${user.id}:`,
+        err instanceof Error ? err.message : 'Unknown error'
+      );
+    }
+  }
 
   if (!booking) {
+    // Im Development-Modus Debug-Info anzeigen
+    if (process.env.NODE_ENV === 'development' && debugError) {
+      const errMessage =
+        debugError instanceof Error ? debugError.message : String(debugError);
+      const errStack =
+        debugError instanceof Error
+          ? debugError.stack
+          : JSON.stringify(debugError, null, 2);
+      return (
+        <Box sx={{ p: 4 }}>
+          <Alert severity='error' sx={{ mb: 2 }}>
+            <strong>Fehler bei Datenbankabfrage:</strong> {errMessage}
+          </Alert>
+          <pre
+            style={{
+              background: '#eee',
+              padding: 16,
+              borderRadius: 8,
+              fontSize: 13,
+            }}
+          >
+            {errStack}
+          </pre>
+        </Box>
+      );
+    }
     notFound();
   }
 

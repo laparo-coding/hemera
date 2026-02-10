@@ -18,7 +18,7 @@ export const BRAND_MESSAGES = {
 export const SITE_CONFIG = {
   name: 'Hemera Academy',
   description:
-    'Gehaltsgespräche sind notwendig, um Arbeitsleitung und finanzielle Anerkennung immer wieder in Einklang zu bringen. In solchen Gesprächen erfolgreich zu sein, lässt sich trainieren. Wir üben in kleinen Gruppe mit Videoaufzeichnung und Gesprächsanlayse wie sich individuelle Stärken kooperativ aufbauen lassen.',
+    'Gehaltsgespräche sind notwendig, um Arbeitsleitung und finanzielle Anerkennung immer wieder in Einklang zu bringen. In solchen Gesprächen erfolgreich zu sein, lässt sich trainieren. Wir üben in kleinen Gruppe mit Videoaufzeichnung und Gesprächsanalyse wie sich individuelle Stärken kooperativ aufbauen lassen.',
   tagline: BRAND_MESSAGES.taglineWithContext,
   url: 'https://hemera.academy',
   domain: 'hemera.academy',
