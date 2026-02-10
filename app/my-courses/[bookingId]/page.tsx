@@ -47,7 +47,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
   const user = await requireAuthenticatedUser();
 
   let booking = null;
-  let debugError: any = null;
+  let debugError: unknown = null;
   try {
     // Fetch booking with related data - use explicit select to minimize exposure
     booking = await prisma.booking.findFirst({
@@ -112,11 +112,16 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
   if (!booking) {
     // Im Development-Modus Debug-Info anzeigen
     if (process.env.NODE_ENV === 'development' && debugError) {
+      const errMessage =
+        debugError instanceof Error ? debugError.message : String(debugError);
+      const errStack =
+        debugError instanceof Error
+          ? debugError.stack
+          : JSON.stringify(debugError, null, 2);
       return (
         <Box sx={{ p: 4 }}>
           <Alert severity='error' sx={{ mb: 2 }}>
-            <strong>Fehler bei Datenbankabfrage:</strong>{' '}
-            {debugError.message || String(debugError)}
+            <strong>Fehler bei Datenbankabfrage:</strong> {errMessage}
           </Alert>
           <pre
             style={{
@@ -126,7 +131,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
               fontSize: 13,
             }}
           >
-            {debugError.stack || JSON.stringify(debugError, null, 2)}
+            {errStack}
           </pre>
         </Box>
       );

@@ -217,8 +217,8 @@ export async function syncClerkUserToDatabase(
             data: { userId: clerkId },
           });
 
-          // 3. Delete old user
-          await tx.user.delete({
+          // 3. Delete old user (use deleteMany to avoid P2025 if already deleted)
+          await tx.user.deleteMany({
             where: { id: existingByEmail.id },
           });
 
