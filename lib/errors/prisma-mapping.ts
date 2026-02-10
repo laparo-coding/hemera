@@ -37,7 +37,11 @@ export function mapPrismaError(
       );
     }
 
-    // Return generic database error for other cases
+    // Non-Prisma errors: return as-is instead of wrapping in DatabaseConnectionError
+    // This prevents plain Error('Nicht authentifiziert') etc. from becoming DB errors
+    if (error instanceof Error) {
+      return error;
+    }
     return new DatabaseConnectionError(
       'Unexpected database error',
       error as Error

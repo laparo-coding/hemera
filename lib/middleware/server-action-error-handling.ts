@@ -119,7 +119,10 @@ export function withParameterizedServerAction<TParam, TResult = unknown>(
         requestId: requestContext.id,
       };
     } catch (error) {
-      const mappedError = mapPrismaError(error);
+      // If the error is already a domain error, use it directly.
+      // Only call mapPrismaError for actual Prisma errors (not plain Error instances).
+      const mappedError =
+        error instanceof BaseError ? error : mapPrismaError(error);
 
       if (!(mappedError instanceof BaseError)) {
         const errorContext = createErrorContext(
