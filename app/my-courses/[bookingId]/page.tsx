@@ -100,6 +100,12 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
     if (process.env.NODE_ENV === 'development') {
       // biome-ignore lint/suspicious/noConsole: Debug logging for development only
       console.error('Prisma-Fehler bei Buchungsabfrage:', err);
+    } else {
+      // biome-ignore lint/suspicious/noConsole: Production error logging for monitoring
+      console.error(
+        `[my-courses/${bookingId}] Booking query failed for user ${user.id}:`,
+        err instanceof Error ? err.message : 'Unknown error'
+      );
     }
   }
 

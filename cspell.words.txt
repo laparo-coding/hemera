@@ -516,6 +516,7 @@ Timestamptz
 tjkztv
 TKTK
 tktk
+TOCTOU
 toggleable
 Tracke
 tracken

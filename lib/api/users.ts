@@ -697,15 +697,12 @@ export async function syncUserFromClerk(clerkUser: ClerkUser): Promise<User> {
             migrationError instanceof Prisma.PrismaClientKnownRequestError &&
             (migrationError.code === 'P2002' || migrationError.code === 'P2025')
           ) {
-            const migratedUser = await prisma.user.findUnique({
+            // Use upsert for atomic operation — avoids TOCTOU race between find and update
+            return await prisma.user.upsert({
               where: { id: clerkId },
+              update: { name, email, image },
+              create: { id: clerkId, name, email, image },
             });
-            if (migratedUser) {
-              return await prisma.user.update({
-                where: { id: clerkId },
-                data: { name, email, image },
-              });
-            }
           }
           throw migrationError;
         }

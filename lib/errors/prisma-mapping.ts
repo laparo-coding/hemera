@@ -12,6 +12,7 @@ import {
   DatabaseConstraintError,
   DatabaseValidationError,
   FieldValidationError,
+  UnexpectedDatabaseError,
   UserEmailAlreadyExistsError,
 } from './';
 
@@ -42,9 +43,9 @@ export function mapPrismaError(
     if (error instanceof Error) {
       return error;
     }
-    return new DatabaseConnectionError(
-      'Unexpected database error',
-      error as Error
+    return new UnexpectedDatabaseError(
+      'unknown operation',
+      error instanceof Error ? error : new Error(String(error))
     );
   }
 
