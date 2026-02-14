@@ -193,6 +193,30 @@ export async function PUT(
       responseTime: Date.now() - startTime,
     });
 
+    /**
+     * Response shape note:
+     * - Default: return no `data`, but include a success `message`.
+     * - Legacy fallback: some consumers expect the message inside `data`.
+     *   When `FEATURE_SERVICE_RESPONSE_LEGACY=true` return `{ message }` as `data`
+     *   instead of using the `message` field.
+     */
+    const useLegacyResponse =
+      String(process.env.FEATURE_SERVICE_RESPONSE_LEGACY).toLowerCase() ===
+      'true';
+
+    const legacyPayload = {
+      message: 'Participation result updated successfully',
+    };
+
+    if (useLegacyResponse) {
+      return createServiceApiSuccessResponse(
+        requestId,
+        userId,
+        role,
+        legacyPayload
+      );
+    }
+
     return createServiceApiSuccessResponse(
       requestId,
       userId,

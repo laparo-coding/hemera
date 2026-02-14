@@ -75,7 +75,11 @@ export async function GET(
       );
     }
 
-    logger.info('Service API request authorized', { userId, role, courseId: id });
+    logger.info('Service API request authorized', {
+      userId,
+      role,
+      courseId: id,
+    });
 
     // Rate limiting check
     const rateLimitResponse = await checkRateLimit(userId, role, requestId);
@@ -156,7 +160,22 @@ export async function GET(
       responseTime: Date.now() - startTime,
     });
 
-    return createServiceApiSuccessResponse(requestId, userId, role, data);
+    /**
+     * Response shape note:
+     * - Default: return the course object directly in `data` to satisfy tests and
+     *   standard consumers (`data: { ... }`).
+     * - Legacy fallback: some downstream consumers expect a wrapped shape
+     *   (e.g. `{ course: { ... } }`). To avoid breaking them, support the
+     *   feature flag `FEATURE_SERVICE_RESPONSE_LEGACY=true` which returns that
+     *   wrapped shape as `data`.
+     */
+    const useLegacyResponse =
+      String(process.env.FEATURE_SERVICE_RESPONSE_LEGACY).toLowerCase() ===
+      'true';
+
+    const payload = useLegacyResponse ? { course: data } : data;
+
+    return createServiceApiSuccessResponse(requestId, userId, role, payload);
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error('Failed to retrieve course', err);

@@ -48,7 +48,7 @@ export async function GET(
   const logger = createApiLogger(context);
   const startTime = Date.now();
 
-  try{
+  try {
     // Auth check
     const { userId } = await auth();
     if (!userId) {
@@ -150,7 +150,19 @@ export async function GET(
       responseTime: Date.now() - startTime,
     });
 
-    return createServiceApiSuccessResponse(requestId, userId, role, data);
+    /**
+     * Response shape note:
+     * - Default: return the participation object directly in `data`.
+     * - Legacy fallback: when `FEATURE_SERVICE_RESPONSE_LEGACY=true` return
+     *   `{ participation: { ... } }` as `data` to support older consumers.
+     */
+    const useLegacyResponse =
+      String(process.env.FEATURE_SERVICE_RESPONSE_LEGACY).toLowerCase() ===
+      'true';
+
+    const payload = useLegacyResponse ? { participation: data } : data;
+
+    return createServiceApiSuccessResponse(requestId, userId, role, payload);
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error('Failed to retrieve participation', err);
