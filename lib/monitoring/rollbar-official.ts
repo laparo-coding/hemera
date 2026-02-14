@@ -191,6 +191,24 @@ export function reportError(
       Math.random() < Math.max(0, Math.min(1, rate)) && Math.random() < rateAll;
 
     const includePII = isTelemetryConsentGranted();
+
+    // Sanitize additionalData to avoid leaking raw error messages or PII
+    const rawAdditional = context?.additionalData ?? {};
+    const sanitizedAdditional: Record<string, unknown> = { ...rawAdditional };
+
+    // Redact commonly abused keys that may contain raw error text or PII
+    const keysToRedact = [
+      /originalError/i,
+      /^error$/i,
+      /errorMessage/i,
+      /message$/i,
+    ];
+    for (const k of Object.keys(sanitizedAdditional)) {
+      if (keysToRedact.some(rx => rx.test(k))) {
+        sanitizedAdditional[k] = '[redacted]';
+      }
+    }
+
     const rollbarContext: Record<string, unknown> = {
       person:
         includePII && context?.userId
@@ -205,7 +223,7 @@ export function reportError(
       },
       custom: {
         timestamp: context?.timestamp?.toISOString(),
-        ...context?.additionalData,
+        ...sanitizedAdditional,
       },
     };
 
