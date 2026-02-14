@@ -133,6 +133,42 @@ describe('Permissions Helpers', () => {
       expect(role).toBe('api-client');
     });
 
+    describe('with userId parameter', () => {
+      it('should return role from clerkClient when provided', async () => {
+        const getUser = jest.fn().mockResolvedValue({ publicMetadata: { role: 'api-client' } });
+        mockClerkClient.mockResolvedValue({ users: { getUser } } as any);
+        // ensure currentUser would not be used
+        mockCurrentUser.mockResolvedValue({ publicMetadata: { role: 'user' } } as unknown as User);
+
+        const role = await getUserRole('svc-1');
+
+        expect(getUser).toHaveBeenCalledWith('svc-1');
+        expect(role).toBe('api-client');
+        expect(mockCurrentUser).not.toHaveBeenCalled();
+      });
+
+      it('should fallback to currentUser when clerkClient returns no role', async () => {
+        const getUser = jest.fn().mockResolvedValue({ publicMetadata: {} });
+        mockClerkClient.mockResolvedValue({ users: { getUser } } as any);
+        mockCurrentUser.mockResolvedValue({ publicMetadata: { role: 'admin' } } as unknown as User);
+
+        const role = await getUserRole('svc-2');
+
+        expect(getUser).toHaveBeenCalledWith('svc-2');
+        expect(role).toBe('admin');
+      });
+
+      it('should normalize and trim role from clerkClient', async () => {
+        const getUser = jest.fn().mockResolvedValue({ publicMetadata: { role: '  API-CLIENT  ' } });
+        mockClerkClient.mockResolvedValue({ users: { getUser } } as any);
+        mockCurrentUser.mockResolvedValue(null);
+
+        const role = await getUserRole('svc-3');
+
+        expect(role).toBe('api-client');
+      });
+    });
+
     describe('Error Handling', () => {
       it('should fallback to user role when clerkClient throws error', async () => {
         mockClerkClient.mockResolvedValue({
