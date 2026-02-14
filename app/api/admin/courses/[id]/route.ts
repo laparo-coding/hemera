@@ -5,10 +5,12 @@
  * DELETE /api/admin/courses/[id] - Delete course
  */
 
-import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import { checkUserAdminStatus, getCurrentUser } from '../../../../../lib/auth/helpers';
+import {
+  checkUserAdminStatus,
+  getCurrentUser,
+} from '../../../../../lib/auth/helpers';
 import { prisma } from '../../../../../lib/db/prisma';
 import { serverInstance as rollbar } from '../../../../../lib/monitoring/rollbar-official';
 import { curriculumSchema } from '../../../../../lib/schemas/admin/course';

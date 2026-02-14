@@ -1,10 +1,11 @@
-import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkUserAdminStatus, getCurrentUser } from '../../../../lib/auth/helpers';
+import {
+  checkUserAdminStatus,
+  getCurrentUser,
+} from '../../../../lib/auth/helpers';
 import { prisma } from '../../../../lib/db/prisma';
 import {
   createErrorResponse,
-  createSuccessResponse,
   ErrorCodes,
 } from '../../../../lib/utils/api-response';
 import { getCorsHeaders } from '../../../../lib/utils/cors';
@@ -84,13 +85,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
-      // Historically this endpoint returned a plain array for contract tests.
-      // Return the courses array directly to preserve contract expectations.
-      const res = NextResponse.json(courses, { status: 200 });
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        res.headers.set(key, value);
-      });
-      return res;
+    // Historically this endpoint returned a plain array for contract tests.
+    // Return the courses array directly to preserve contract expectations.
+    const res = NextResponse.json(courses, { status: 200 });
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      res.headers.set(key, value);
+    });
+    return res;
   } catch (_error) {
     const errorResponse = createErrorResponse(
       'Failed to fetch courses',
@@ -149,7 +150,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Basic validation - accept `startTime` (ISO) + optional `duration` (hours)
-    if (!body.title || !body.description || body.price === undefined || !body.startTime) {
+    if (
+      !body.title ||
+      !body.description ||
+      body.price === undefined ||
+      !body.startTime
+    ) {
       return createErrorResponse(
         'Missing required fields',
         'VALIDATION_FAILED',
@@ -159,7 +165,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Title length (3-200)
-    if (typeof body.title !== 'string' || body.title.trim().length < 3 || body.title.trim().length > 200) {
+    if (
+      typeof body.title !== 'string' ||
+      body.title.trim().length < 3 ||
+      body.title.trim().length > 200
+    ) {
       return createErrorResponse(
         'Title must be between 3 and 200 characters',
         'VALIDATION_FAILED',
@@ -181,7 +191,7 @@ export async function POST(request: NextRequest) {
 
     // Parse startTime and compute endTime using duration (hours)
     const startTimeDate = new Date(body.startTime);
-    if (isNaN(startTimeDate.getTime())) {
+    if (Number.isNaN(startTimeDate.getTime())) {
       return createErrorResponse(
         'Invalid startTime',
         'VALIDATION_FAILED',
@@ -201,7 +211,7 @@ export async function POST(request: NextRequest) {
     }
 
     const durationHours = Number(body.duration ?? 4);
-    if (isNaN(durationHours) || durationHours <= 0) {
+    if (Number.isNaN(durationHours) || durationHours <= 0) {
       return createErrorResponse(
         'Invalid duration',
         'VALIDATION_FAILED',
@@ -210,7 +220,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const endTimeDate = new Date(startTimeDate.getTime() + durationHours * 3600 * 1000);
+    const endTimeDate = new Date(
+      startTimeDate.getTime() + durationHours * 3600 * 1000
+    );
 
     // Generate slug (keep deterministic but append timestamp to avoid unique collisions in tests)
     const baseSlug = body.title

@@ -3,8 +3,8 @@
  * Tracks all service API calls for security and compliance
  */
 
-import { serverInstance } from './rollbar-official';
 import { persistServiceApiLog } from '@/lib/logging/audit';
+import { reportError, serverInstance } from './rollbar-official';
 
 export interface ServiceApiAuditLog {
   userId: string;
@@ -70,8 +70,13 @@ export function logServiceApiCall(log: ServiceApiAuditLog): void {
     });
   } catch (err) {
     // swallow errors from audit persistence to avoid impacting request flow
-    // eslint-disable-next-line no-console
-    console.error('persistServiceApiLog error', err);
+    try {
+      reportError(err as Error, {
+        additionalData: { context: 'serviceApiLogger.persist' },
+      });
+    } catch {
+      // swallow
+    }
   }
 }
 

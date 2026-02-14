@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db/prisma';
+import { reportError } from '@/lib/monitoring/rollbar-official';
 
 export interface PersistedApiLog {
   serviceUserId: string;
@@ -22,8 +23,13 @@ export async function persistServiceApiLog(log: PersistedApiLog) {
       },
     });
   } catch (err) {
-    // Don't throw from audit persistence - log and continue
-    // eslint-disable-next-line no-console
-    console.error('Failed to persist ApiLog', err);
+    // Don't throw from audit persistence - report and continue
+    try {
+      reportError(err as Error, {
+        additionalData: { context: 'persistServiceApiLog' },
+      });
+    } catch {
+      // swallow
+    }
   }
 }

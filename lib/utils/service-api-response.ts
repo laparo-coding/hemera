@@ -6,7 +6,6 @@
 import { NextResponse } from 'next/server';
 import type { UserRole } from '../auth/permissions';
 import { getRateLimitHeaders } from '../middleware/rate-limit';
-import { ErrorCodes } from './api-response';
 
 /**
  * CORS configuration for Service API

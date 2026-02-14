@@ -1,6 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 import { getUserRole } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
