@@ -6,11 +6,11 @@ Enable secure API access for the Aither application to read course and participa
 
 ## Context
 
-The Aither application (Next.js + Clerk) needs to:
+The **Aither** and **Gaia** applications (both Next.js + Clerk) need to:
 1. Read course and participation data from Hemera
 2. Write participant-specific results to `CourseParticipation` fields (`resultOutcome`, `resultNotes`)
 
-Both applications use Clerk as their authentication provider.
+All three applications (Hemera, Aither, Gaia) use Clerk as their authentication provider.
 
 ## User Requirements
 
@@ -28,8 +28,9 @@ Introduce a new user role `api-client` with restricted permissions:
 | `manage:users` | ❌ |
 
 **Implementation:**
-- Create Clerk service user: `aither-service@hemera-academy.com`
-- Set `publicMetadata`: `{ "role": "api-client", "service": "aither" }`
+- Create Clerk service users:
+  - `aither-service@hemera-academy.com` with `publicMetadata`: `{ "role": "api-client", "service": "aither" }`
+  - `gaia-service@hemera-academy.com` with `publicMetadata`: `{ "role": "api-client", "service": "gaia" }`
 - Extend `lib/auth/permissions.ts` to support `api-client` role
 
 ### 2. Service API Endpoints
