@@ -16,7 +16,6 @@
 
 import { NextResponse } from 'next/server';
 import type { UserRole } from '../auth/permissions';
-import type { UserRole } from '../auth/permissions';
 
 // ============================================================================
 // Upstash Redis Configuration (DISABLED - packages not installed)
