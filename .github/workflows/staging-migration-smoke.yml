@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Sanity: print env keys (no secrets)
+      - name: "Sanity: print env keys (no secrets)"
         run: |
           echo "STAGING_URL=${STAGING_URL:+set}"
           echo "STAGING_DATABASE_URL=${STAGING_DATABASE_URL:+set}"
