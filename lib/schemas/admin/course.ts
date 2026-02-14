@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-// Small buffer to allow for clock skew and short persistence delays when
-// validating start times. Values within this buffer (ms) are considered valid.
-export const VALIDATION_TIME_BUFFER_MS = 60_000; // 1 minute
-
 /**
  * Course Level Enum
  */
@@ -70,12 +66,7 @@ export const courseCreateSchema = z.object({
     .number()
     .nonnegative('Price must be non-negative')
     .multipleOf(0.01, 'Price must have at most 2 decimal places')
-    .transform(val => {
-      // Accept either: a euro value (e.g. 99.99) or already-cent integer (e.g. 9999).
-      // Heuristic: treat large integers as cents to avoid double-scaling in tests
-      if (Number.isInteger(val) && val > 1000) return Math.round(val);
-      return Math.round(val * 100);
-    }), // Convert Euro to Cents for Stripe
+    .transform(val => Math.round(val * 100)), // Convert Euro to Cents for Stripe
   startDate: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
@@ -88,10 +79,8 @@ export const courseCreateSchema = z.object({
     .nullable(),
   startTime: z
     .union([z.string(), z.date()])
-    .transform(
-      (val): Date => (typeof val === 'string' ? new Date(val) : (val as Date))
-    )
-    .refine(date => date.getTime() > Date.now() + VALIDATION_TIME_BUFFER_MS, {
+    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .refine(date => (date as Date).getTime() > Date.now(), {
       message: 'Startzeit muss in der Zukunft liegen',
     }),
   endTime: z
@@ -133,8 +122,8 @@ export const courseCreateSchema = z.object({
     .nullable(),
   capacity: z
     .number()
-    .int('Kapazität muss eine ganze Zahl sein')
-    .min(0, 'Kapazität darf nicht negativ sein'),
+    .int('Capacity must be an integer')
+    .min(0, 'Capacity must be non-negative'),
   isPublished: z.boolean().default(false),
   locationId: z
     .string()
@@ -142,12 +131,6 @@ export const courseCreateSchema = z.object({
     .optional()
     .nullable(),
   curriculum: curriculumSchema,
-  duration: z
-    .number()
-    .int('Dauer muss eine ganze Zahl in Stunden sein')
-    .positive('Dauer muss positiv sein')
-    .optional()
-    .default(4),
   // Learning Path fields (021)
   recommended: z
     .string()
@@ -197,12 +180,7 @@ export const courseUpdateSchema = z.object({
     .number()
     .nonnegative('Price must be non-negative')
     .multipleOf(0.01, 'Price must have at most 2 decimal places')
-    .optional()
-    .transform(val => {
-      if (val === undefined) return undefined;
-      if (Number.isInteger(val) && val > 1000) return Math.round(val);
-      return Math.round(val * 100);
-    }),
+    .optional(),
   startDate: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
@@ -214,9 +192,7 @@ export const courseUpdateSchema = z.object({
     .nullable(),
   startTime: z
     .union([z.string(), z.date()])
-    .transform(
-      (val): Date => (typeof val === 'string' ? new Date(val) : (val as Date))
-    )
+    .transform(val => (typeof val === 'string' ? new Date(val) : val))
     .optional(),
   endTime: z
     .union([z.string(), z.date()])
@@ -257,8 +233,8 @@ export const courseUpdateSchema = z.object({
     .nullable(),
   capacity: z
     .number()
-    .int('Kapazität muss eine ganze Zahl sein')
-    .nonnegative('Kapazität darf nicht negativ sein')
+    .int('Capacity must be an integer')
+    .nonnegative('Capacity must be non-negative')
     .optional(),
   isPublished: z.boolean().optional(),
   locationId: z

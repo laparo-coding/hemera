@@ -7,10 +7,6 @@ on:
         description: 'Use manual SQL (manual) or prisma migrate deploy (prisma)'
         required: true
         default: 'prisma'
-      deploy_method:
-        description: 'Deploy method (repository_dispatch, post-to-cd, or script)'
-        required: false
-        default: 'repository_dispatch'
 
 concurrency:
   group: staging-migrate-smoke
@@ -40,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Sanity check - print env keys (no secrets)
+      - name: Sanity: print env keys (no secrets)
         run: |
           echo "STAGING_URL=${STAGING_URL:+set}"
           echo "STAGING_DATABASE_URL=${STAGING_DATABASE_URL:+set}"
@@ -60,11 +56,9 @@ jobs:
 
       - name: Apply migration
         id: migrate
-        env:
-          MIGRATION_MODE: ${{ github.event.inputs.migration_mode || 'prisma' }}
         run: |
-          echo "Applying migration via mode: ${MIGRATION_MODE}"
-          if [ "${MIGRATION_MODE}" = 'manual' ]; then
+          echo "Applying migration via mode: ${{ github.event.inputs.migration_mode }}"
+          if [ "${{ github.event.inputs.migration_mode }}" = 'manual' ]; then
             if [ -z "${STAGING_DATABASE_URL}" ]; then
               echo "STAGING_DATABASE_URL not set; aborting"; exit 1
             fi
@@ -79,11 +73,10 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEPLOY_ENDPOINT: ${{ secrets.DEPLOY_ENDPOINT }}
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-          DEPLOY_METHOD: ${{ github.event.inputs.deploy_method || 'repository_dispatch' }}
+          DEPLOY_ENDPOINT: ${{ secrets.CD_DEPLOY_ENDPOINT }}
+          DEPLOY_TOKEN: ${{ secrets.CD_DEPLOY_TOKEN }}
         run: |
-          method="${DEPLOY_METHOD}"
+          method="${{ github.event.inputs.deploy_method || 'repository_dispatch' }}"
           echo "Selected deploy method: $method"
 
           if [ "$method" = 'repository_dispatch' ]; then
@@ -96,9 +89,9 @@ jobs:
               -d '{"event_type":"staging-deploy","client_payload":{"ref":"'${GITHUB_REF##*/}'","actor":"'${GITHUB_ACTOR}'"}}'
           elif [ "$method" = 'post-to-cd' ]; then
             if [ -z "$DEPLOY_ENDPOINT" ]; then
-              echo "DEPLOY_ENDPOINT is not set; aborting"; exit 1
+              echo "CD_DEPLOY_ENDPOINT is not set; aborting"; exit 1
             fi
-            echo "Calling DEPLOY endpoint $DEPLOY_ENDPOINT"
+            echo "Calling CD endpoint $DEPLOY_ENDPOINT"
             curl -sSf -X POST "$DEPLOY_ENDPOINT" \
               -H "Authorization: Bearer $DEPLOY_TOKEN" \
               -H "Content-Type: application/json" \

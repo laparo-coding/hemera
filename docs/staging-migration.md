@@ -40,30 +40,6 @@ git push origin feat/025-service-user-endpoints
 # oder: GH Action / CI trigger
 ```
 
-Optional: If your CD platform accepts an HTTP endpoint, set `DEPLOY_ENDPOINT` and the secret
-`DEPLOY_TOKEN` securely (do not echo it). Example with improved safety: use `--max-time` to
-avoid hanging requests, read token from environment (CI secret) and use `$USER` or
-`git config user.name` for the actor. Capture the response and check the exit status.
-
-```bash
-# Do NOT echo DEPLOY_TOKEN. Provide it via CI secret or read from a protected file.
-export DEPLOY_ENDPOINT="https://cd.example.com/api/deploy"
-# DEPLOY_TOKEN should come from CI secrets or a protected environment variable
-
-RESPONSE=$(curl --max-time 30 -sS -w "%{http_code}" -o /tmp/deploy_response.txt -X POST "$DEPLOY_ENDPOINT" \
-  -H "Authorization: Bearer $DEPLOY_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"ref":"feat/025-service-user-endpoints","actor":"'${GIT_ACTOR:-${USER:-$(git config user.name || echo unknown)}}'"}')
-
-if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 300 ]; then
-  echo "Deploy triggered successfully (HTTP $RESPONSE)"
-else
-  echo "Deploy failed with status $RESPONSE"
-  echo "Response body:" && cat /tmp/deploy_response.txt
-  exit 1
-fi
-```
-
 4) Smoke-Tests ausführen
 - Setze benötigte Tokens in Deiner Shell:
 ```bash

@@ -63,7 +63,10 @@ export async function GET(
     // Role check
     const role = await getUserRole();
     if (role !== 'api-client' && role !== 'admin') {
-      logger.warn('Forbidden: insufficient permissions', { userId, role });
+      logger.warn('Forbidden: insufficient permissions', {
+        userId,
+        role,
+      });
       return createServiceApiErrorResponse(
         'Forbidden: api-client or admin role required',
         ErrorCodes.FORBIDDEN,
@@ -83,7 +86,10 @@ export async function GET(
     // Rate limiting check
     const rateLimitResponse = await checkRateLimit(userId, role, requestId);
     if (rateLimitResponse) {
-      logger.warn('Rate limit exceeded', { userId, role });
+      logger.warn('Rate limit exceeded', {
+        userId,
+        role,
+      });
       return rateLimitResponse;
     }
 
@@ -115,7 +121,9 @@ export async function GET(
     });
 
     if (!course) {
-      logger.warn('Course not found', { courseId: id });
+      logger.warn('Course not found', {
+        courseId: id,
+      });
       return createServiceApiErrorResponse(
         'Course not found',
         ErrorCodes.NOT_FOUND,

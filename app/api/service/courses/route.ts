@@ -72,7 +72,10 @@ export async function GET(request: NextRequest) {
     // Role check
     const role = await getUserRole();
     if (role !== 'api-client' && role !== 'admin') {
-      logger.warn('Forbidden: insufficient permissions', { userId, role });
+      logger.warn('Forbidden: insufficient permissions', {
+        userId,
+        role,
+      });
       return createServiceApiErrorResponse(
         'Forbidden: api-client or admin role required',
         ErrorCodes.FORBIDDEN,
@@ -83,12 +86,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    logger.info('Service API request authorized', { userId, role });
+    logger.info('Service API request authorized', {
+      userId,
+      role,
+    });
 
     // Rate limiting check
     const rateLimitResponse = await checkRateLimit(userId, role, requestId);
     if (rateLimitResponse) {
-      logger.warn('Rate limit exceeded', { userId, role });
+      logger.warn('Rate limit exceeded', {
+        userId,
+        role,
+      });
       return rateLimitResponse;
     }
 
@@ -100,7 +109,10 @@ export async function GET(request: NextRequest) {
     try {
       validatedParams = CourseQuerySchema.parse(queryParams);
     } catch (error) {
-      logger.warn('Invalid query parameters', { queryParams, error });
+      logger.warn('Invalid query parameters', {
+        queryParams,
+        error,
+      });
       return createServiceApiErrorResponse(
         'Invalid query parameters',
         ErrorCodes.VALIDATION_ERROR,

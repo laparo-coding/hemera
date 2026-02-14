@@ -13,7 +13,10 @@ import {
 } from '../../../../../lib/auth/helpers';
 import { prisma } from '../../../../../lib/db/prisma';
 import { serverInstance as rollbar } from '../../../../../lib/monitoring/rollbar-official';
-import { curriculumSchema } from '../../../../../lib/schemas/admin/course';
+import {
+  courseUpdateSchema,
+  curriculumSchema,
+} from '../../../../../lib/schemas/admin/course';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -37,7 +40,7 @@ async function checkAdminAuth(requestId: string) {
   if (!userId) {
     return {
       error: createErrorResponse(
-        'Unauthorized access',
+        'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -50,7 +53,7 @@ async function checkAdminAuth(requestId: string) {
   if (!isAdmin) {
     return {
       error: createErrorResponse(
-        'Admin privileges required',
+        'Du brauchst Admin-Rechte',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -89,7 +92,7 @@ export async function GET(
 
     if (!course) {
       return createErrorResponse(
-        `Course with ID ${id} does not exist`,
+        `Kurs mit der ID ${id} wurde nicht gefunden`,
         'COURSE_NOT_FOUND',
         requestId,
         404
@@ -112,7 +115,7 @@ export async function GET(
     });
 
     return createErrorResponse(
-      'Failed to fetch course',
+      'Konnte Kurs nicht laden',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
@@ -137,14 +140,29 @@ export async function PATCH(
 
     const body = await request.json();
 
-    // Check for optimistic locking
-    if (!body.updatedAt) {
-      return createErrorResponse(
-        'updatedAt field required for optimistic locking',
-        ErrorCodes.VALIDATION_ERROR,
-        requestId,
-        400
-      );
+    // Validate update body using Zod (includes updatedAt coercion)
+    let parsedUpdate;
+    try {
+      parsedUpdate = await courseUpdateSchema.parseAsync(body);
+    } catch (zErr) {
+      if (zErr instanceof ZodError) {
+        rollbar.warning('Invalid course update payload', {
+          requestId,
+          issues: zErr.issues,
+          courseId: id,
+        });
+
+        // Validation failure noted (details sent to Rollbar above).
+
+        return createErrorResponse(
+          'Ungültige Eingaben beim Aktualisieren des Kurses',
+          ErrorCodes.VALIDATION_ERROR,
+          requestId,
+          400,
+          { issues: zErr.issues }
+        );
+      }
+      throw zErr;
     }
 
     // Verify course exists and check updatedAt
@@ -163,7 +181,7 @@ export async function PATCH(
     }
 
     // Check for concurrent edit
-    const providedUpdatedAt = new Date(body.updatedAt);
+    const providedUpdatedAt = new Date(parsedUpdate.updatedAt as Date);
     if (existing.updatedAt.getTime() !== providedUpdatedAt.getTime()) {
       rollbar.warning('Concurrent edit conflict detected', {
         requestId,
@@ -174,7 +192,7 @@ export async function PATCH(
       });
 
       return createErrorResponse(
-        'Course was modified by another admin. Please refresh and try again.',
+        'Der Kurs wurde zwischenzeitlich von einem anderen Admin geändert. Bitte aktualisiere die Seite und versuche es erneut.',
         'CONCURRENT_EDIT_CONFLICT',
         requestId,
         409,
@@ -184,31 +202,34 @@ export async function PATCH(
 
     // Check capacity constraint
     if (
-      body.capacity !== undefined &&
-      body.capacity < existing._count.bookings
+      parsedUpdate.capacity !== undefined &&
+      parsedUpdate.capacity < existing._count.bookings
     ) {
       rollbar.warning('Capacity below enrollment count', {
         requestId,
         courseId: id,
-        requestedCapacity: body.capacity,
+        requestedCapacity: parsedUpdate.capacity,
         currentEnrollments: existing._count.bookings,
         route: '/api/admin/courses/[id]',
       });
 
       return createErrorResponse(
-        'Capacity cannot be less than current enrollment count',
+        'Die maximale Teilnehmerzahl darf nicht kleiner sein als die bereits angemeldeten Teilnehmer.',
         'CAPACITY_BELOW_ENROLLMENTS',
         requestId,
         400,
         {
           currentEnrollmentCount: existing._count.bookings,
-          requestedCapacity: body.capacity,
+          requestedCapacity: parsedUpdate.capacity,
         }
       );
     }
 
     // Update course
-    const { updatedAt: _, ...updateData } = body;
+    const { updatedAt: _, ...updateData } = parsedUpdate as Record<
+      string,
+      unknown
+    >;
 
     // Validate curriculum if provided
     if (updateData.curriculum !== undefined) {
@@ -222,7 +243,7 @@ export async function PATCH(
             issues: zodError.issues,
           });
           return createErrorResponse(
-            'Invalid curriculum structure',
+            'Ungültige Struktur für das Curriculum',
             ErrorCodes.VALIDATION_ERROR,
             requestId,
             400
@@ -230,6 +251,23 @@ export async function PATCH(
         }
         throw zodError;
       }
+    }
+
+    // Ensure price is stored as integer cents
+    if (updateData.price !== undefined) {
+      const priceNum = Number(updateData.price as unknown as number);
+      if (!Number.isFinite(priceNum) || priceNum <= 0) {
+        return createErrorResponse(
+          'Ungültiger Preis',
+          ErrorCodes.VALIDATION_ERROR,
+          requestId,
+          400
+        );
+      }
+
+      updateData.price = Number.isInteger(priceNum)
+        ? priceNum
+        : Math.round(priceNum * 100);
     }
 
     const updated = await prisma.course.update({
@@ -265,9 +303,8 @@ export async function PATCH(
       route: '/api/admin/courses/[id]',
       method: 'PATCH',
     });
-
     return createErrorResponse(
-      'Failed to update course',
+      'Konnte Kurs nicht aktualisieren',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
@@ -333,7 +370,7 @@ export async function DELETE(
       });
 
       return createErrorResponse(
-        'Cannot delete course with active enrollments. Transfer students first.',
+        'Der Kurs kann nicht gelöscht werden, solange Teilnehmer angemeldet sind. Bitte Teilnehmer übertragen.',
         'ACTIVE_ENROLLMENTS_EXIST',
         requestId,
         409,
@@ -371,7 +408,7 @@ export async function DELETE(
     });
 
     return createErrorResponse(
-      'Failed to delete course',
+      'Konnte Kurs nicht löschen',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

@@ -1,9 +1,13 @@
+import { randomBytes } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
+import { ZodError } from 'zod';
 import {
   checkUserAdminStatus,
   getCurrentUser,
 } from '../../../../lib/auth/helpers';
 import { prisma } from '../../../../lib/db/prisma';
+import { serverInstance as rollbar } from '../../../../lib/monitoring/rollbar-official';
+import { courseCreateSchema } from '../../../../lib/schemas/admin/course';
 import {
   createErrorResponse,
   ErrorCodes,
@@ -33,7 +37,7 @@ export async function GET(request: NextRequest) {
 
     if (!userId) {
       const errorResponse = createErrorResponse(
-        'Unauthorized access',
+        'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -51,7 +55,7 @@ export async function GET(request: NextRequest) {
     const isAdmin = await checkUserAdminStatus(userId);
     if (!isAdmin) {
       const errorResponse = createErrorResponse(
-        'Admin privileges required',
+        'Du brauchst Admin-Rechte',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -128,7 +132,7 @@ export async function POST(request: NextRequest) {
 
     if (!userId) {
       return createErrorResponse(
-        'Unauthorized access',
+        'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -139,7 +143,7 @@ export async function POST(request: NextRequest) {
     const isAdmin = await checkUserAdminStatus(userId);
     if (!isAdmin) {
       return createErrorResponse(
-        'Admin privileges required',
+        'Du brauchst Admin-Rechte',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -149,123 +153,127 @@ export async function POST(request: NextRequest) {
     // Parse and validate body
     const body = await request.json();
 
-    // Basic validation - accept `startTime` (ISO) + optional `duration` (hours)
-    if (
-      !body.title ||
-      !body.description ||
-      body.price === undefined ||
-      !body.startTime
-    ) {
-      return createErrorResponse(
-        'Missing required fields',
-        'VALIDATION_FAILED',
-        requestId,
-        400
-      );
+    let parsed;
+    try {
+      parsed = await courseCreateSchema.parseAsync(body);
+    } catch (zErr) {
+      if (zErr instanceof ZodError) {
+        rollbar.warning('Validation failed creating course', {
+          requestId,
+          issues: zErr.issues,
+          route: '/api/admin/courses',
+          input: body,
+        });
+
+        // Validation failure noted (details sent to Rollbar above).
+
+        return createErrorResponse(
+          'Ungültige Eingaben beim Erstellen des Kurses',
+          ErrorCodes.VALIDATION_ERROR,
+          requestId,
+          400,
+          { issues: zErr.issues }
+        );
+      }
+      throw zErr;
     }
 
-    // Title length (3-200)
-    if (
-      typeof body.title !== 'string' ||
-      body.title.trim().length < 3 ||
-      body.title.trim().length > 200
-    ) {
-      return createErrorResponse(
-        'Title must be between 3 and 200 characters',
-        'VALIDATION_FAILED',
-        requestId,
-        400
-      );
-    }
-
-    // Price must be a positive integer (cents)
-    const priceVal = Number(body.price);
-    if (!Number.isFinite(priceVal) || priceVal <= 0) {
-      return createErrorResponse(
-        'Price must be a positive number',
-        'VALIDATION_FAILED',
-        requestId,
-        400
-      );
-    }
-
-    // Parse startTime and compute endTime using duration (hours)
-    const startTimeDate = new Date(body.startTime);
-    if (Number.isNaN(startTimeDate.getTime())) {
-      return createErrorResponse(
-        'Invalid startTime',
-        'VALIDATION_FAILED',
-        requestId,
-        400
-      );
-    }
-
-    // startTime must be in the future
-    if (startTimeDate.getTime() <= Date.now()) {
-      return createErrorResponse(
-        'startTime must be a future date',
-        'VALIDATION_FAILED',
-        requestId,
-        400
-      );
-    }
-
+    // Compute endTime if not provided using duration (default 4h)
     const durationHours = Number(body.duration ?? 4);
-    if (Number.isNaN(durationHours) || durationHours <= 0) {
-      return createErrorResponse(
-        'Invalid duration',
-        'VALIDATION_FAILED',
-        requestId,
-        400
-      );
-    }
+    const startTimeDate = parsed.startTime as Date;
+    const endTimeDate =
+      parsed.endTime ??
+      new Date(startTimeDate.getTime() + durationHours * 3600 * 1000);
 
-    const endTimeDate = new Date(
-      startTimeDate.getTime() + durationHours * 3600 * 1000
-    );
-
-    // Generate slug (keep deterministic but append timestamp to avoid unique collisions in tests)
-    const baseSlug = body.title
+    // Generate slug base and append random hex fragment
+    const baseSlug = parsed.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .substring(0, 40)
       .replace(/(^-|-$)/g, '');
-    const slug = `${baseSlug}-${Date.now().toString().slice(-6)}`;
 
-    // Create course using our database helper
-    const course = await prisma.course.create({
-      data: {
-        title: body.title,
-        description: body.description,
-        slug,
-        price: body.price,
-        startDate: startTimeDate,
-        startTime: startTimeDate,
-        endTime: endTimeDate,
-        instructor: body.instructor || 'TBD',
-        level: body.level || 'BEGINNER',
-        thumbnailUrl: body.thumbnailUrl || null,
-        capacity: body.capacity || 20,
-        currency: 'EUR',
-        isPublished: false,
-      },
-    });
+    let createdCourse = null;
+    let lastError: unknown = null;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const suffix = randomBytes(3).toString('hex');
+      const slug = `${baseSlug}-${suffix}`;
+
+      try {
+        createdCourse = await prisma.course.create({
+          data: {
+            title: parsed.title,
+            description: parsed.description,
+            slug,
+            price: parsed.price as number,
+            startDate: parsed.startDate as Date,
+            startTime: startTimeDate,
+            endTime: endTimeDate,
+            instructor: parsed.instructor,
+            level: parsed.level,
+            thumbnailUrl: parsed.thumbnailUrl ?? null,
+            capacity: parsed.capacity ?? 20,
+            currency: 'EUR',
+            isPublished: parsed.isPublished ?? false,
+            curriculum: parsed.curriculum ?? undefined,
+            locationId: parsed.locationId ?? undefined,
+          },
+        });
+
+        break;
+      } catch (createErr: any) {
+        lastError = createErr;
+        // Prisma unique constraint on slug (P2002) -> retry
+        if (
+          createErr?.code === 'P2002' &&
+          createErr?.meta?.target?.includes('slug')
+        ) {
+          // try again with a new suffix
+          continue;
+        }
+
+        throw createErr;
+      }
+    }
+
+    if (!createdCourse) {
+      rollbar.error(
+        'Failed to create course after retries',
+        lastError as Error,
+        {
+          requestId,
+          route: '/api/admin/courses',
+        }
+      );
+
+      return createErrorResponse(
+        'Konnte Kurs nicht erstellen',
+        ErrorCodes.INTERNAL_ERROR,
+        requestId,
+        500
+      );
+    }
 
     const enrollmentCount = await prisma.booking.count({
-      where: { courseId: course.id },
+      where: { courseId: createdCourse.id },
     });
 
     return NextResponse.json(
       {
-        ...course,
+        ...createdCourse,
         enrollmentCount,
         requestId,
       },
       { status: 201 }
     );
   } catch (_error) {
+    rollbar.error('Failed to create course (unexpected)', _error as Error, {
+      requestId,
+      route: '/api/admin/courses',
+    });
+
     return createErrorResponse(
-      'Failed to create course',
+      'Konnte Kurs nicht erstellen',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
