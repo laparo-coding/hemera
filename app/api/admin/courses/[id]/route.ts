@@ -14,6 +14,7 @@ import {
 import { prisma } from '../../../../../lib/db/prisma';
 import { serverInstance as rollbar } from '../../../../../lib/monitoring/rollbar-official';
 import {
+  type CourseUpdateInput,
   courseUpdateSchema,
   curriculumSchema,
 } from '../../../../../lib/schemas/admin/course';
@@ -141,7 +142,7 @@ export async function PATCH(
     const body = await request.json();
 
     // Validate update body using Zod (includes updatedAt coercion)
-    let parsedUpdate;
+    let parsedUpdate: CourseUpdateInput;
     try {
       parsedUpdate = await courseUpdateSchema.parseAsync(body);
     } catch (zErr) {
@@ -151,8 +152,6 @@ export async function PATCH(
           issues: zErr.issues,
           courseId: id,
         });
-
-        // Validation failure noted (details sent to Rollbar above).
 
         return createErrorResponse(
           'Ungültige Eingaben beim Aktualisieren des Kurses',
@@ -225,11 +224,8 @@ export async function PATCH(
       );
     }
 
-    // Update course
-    const { updatedAt: _, ...updateData } = parsedUpdate as Record<
-      string,
-      unknown
-    >;
+    // Update course (use typed update shape inferred from Zod schema)
+    const { updatedAt: _, ...updateData } = parsedUpdate;
 
     // Validate curriculum if provided
     if (updateData.curriculum !== undefined) {

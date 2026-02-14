@@ -209,30 +209,6 @@ export function reportError(
       },
     };
 
-    // In test mode we bypass sampling so tests can assert payloads deterministically
-    if (isTestMode) {
-      switch (severity) {
-        case ErrorSeverity.CRITICAL:
-          serverInstance.critical(error, rollbarContext);
-          break;
-        case ErrorSeverity.ERROR:
-          serverInstance.error(error, rollbarContext);
-          break;
-        case ErrorSeverity.WARNING:
-          serverInstance.warning(error, rollbarContext);
-          break;
-        case ErrorSeverity.INFO:
-          serverInstance.info(error, rollbarContext);
-          break;
-        case ErrorSeverity.DEBUG:
-          serverInstance.debug?.(error, rollbarContext);
-          break;
-        default:
-          serverInstance.error(error, rollbarContext);
-      }
-      return;
-    }
-
     switch (severity) {
       case ErrorSeverity.CRITICAL:
         if (pick(rateCritical)) serverInstance.critical(error, rollbarContext);

@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+// Small buffer to allow for clock skew and short persistence delays when
+// validating start times. Values within this buffer (ms) are considered valid.
+export const VALIDATION_TIME_BUFFER_MS = 60_000; // 1 minute
+
 /**
  * Course Level Enum
  */
@@ -79,8 +83,10 @@ export const courseCreateSchema = z.object({
     .nullable(),
   startTime: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val))
-    .refine(date => (date as Date).getTime() > Date.now(), {
+    .transform(
+      (val): Date => (typeof val === 'string' ? new Date(val) : (val as Date))
+    )
+    .refine(date => date.getTime() > Date.now() + VALIDATION_TIME_BUFFER_MS, {
       message: 'Startzeit muss in der Zukunft liegen',
     }),
   endTime: z
@@ -122,8 +128,8 @@ export const courseCreateSchema = z.object({
     .nullable(),
   capacity: z
     .number()
-    .int('Capacity must be an integer')
-    .min(0, 'Capacity must be non-negative'),
+    .int('Kapazität muss eine ganze Zahl sein')
+    .min(0, 'Kapazität darf nicht negativ sein'),
   isPublished: z.boolean().default(false),
   locationId: z
     .string()
@@ -192,7 +198,9 @@ export const courseUpdateSchema = z.object({
     .nullable(),
   startTime: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .transform(
+      (val): Date => (typeof val === 'string' ? new Date(val) : (val as Date))
+    )
     .optional(),
   endTime: z
     .union([z.string(), z.date()])
@@ -233,8 +241,8 @@ export const courseUpdateSchema = z.object({
     .nullable(),
   capacity: z
     .number()
-    .int('Capacity must be an integer')
-    .nonnegative('Capacity must be non-negative')
+    .int('Kapazität muss eine ganze Zahl sein')
+    .nonnegative('Kapazität darf nicht negativ sein')
     .optional(),
   isPublished: z.boolean().optional(),
   locationId: z

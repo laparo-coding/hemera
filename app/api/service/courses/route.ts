@@ -109,9 +109,18 @@ export async function GET(request: NextRequest) {
     try {
       validatedParams = CourseQuerySchema.parse(queryParams);
     } catch (error) {
+      // Sanitize Zod errors and avoid logging raw query values (may contain sensitive info)
+      const sanitizedError =
+        error instanceof z.ZodError
+          ? { issues: error.issues }
+          : { message: String(error) };
+      const querySummary = {
+        keys: Object.keys(queryParams),
+        count: Object.keys(queryParams).length,
+      };
       logger.warn('Invalid query parameters', {
-        queryParams,
-        error,
+        querySummary,
+        error: sanitizedError,
       });
       return createServiceApiErrorResponse(
         'Invalid query parameters',
