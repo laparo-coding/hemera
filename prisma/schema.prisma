@@ -313,3 +313,19 @@ model CurriculumTopicMaterial {
   @@index([courseId, topicId])
   @@map("curriculum_topic_materials")
 }
+
+// Audit logs for service API calls (Spec 025)
+model ApiLog {
+  id             String   @id @default(cuid())
+  serviceUserId  String   @map("service_user_id")
+  endpoint       String
+  method         String
+  timestamp      DateTime @default(now())
+  responseStatus Int      @map("response_status")
+  ipAddress      String?  @map("ip_address")
+  metadata       Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([serviceUserId, timestamp])
+  @@map("api_logs")
+}

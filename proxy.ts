@@ -18,12 +18,28 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.redirect(new URL('/dashboard', request.url), 308);
   }
 
-  // In E2E mode bypass Clerk to reduce flakiness
+  // Service API routes must always go through Clerk auth (even in E2E mode)
+  if (/^\/api\/service(\/|$)/.test(pathname)) {
+    // Require an Authorization header (Bearer) or Clerk session cookie; fail fast if missing
+    const hasAuthHeader = !!request.headers.get('authorization');
+    const hasCookie = !!request.headers.get('cookie');
+    if (!hasAuthHeader && !hasCookie) {
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Missing authentication token' }
+      }), { status: 401, headers: { 'content-type': 'application/json' } });
+    }
+
+    // Delegate to Clerk middleware for auth handling
+    return clerkMw(request, event);
+  }
+
+  // In E2E mode bypass Clerk to reduce flakiness for non-service routes
   if (isE2EMode) {
     return NextResponse.next();
   }
 
-  // Delegate to Clerk middleware for auth handling
+  // Delegate to Clerk middleware for auth handling for all other matched routes
   return clerkMw(request, event);
 }
 

@@ -8,7 +8,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import { checkUserAdminStatus } from '../../../../../lib/auth/helpers';
+import { checkUserAdminStatus, getCurrentUser } from '../../../../../lib/auth/helpers';
 import { prisma } from '../../../../../lib/db/prisma';
 import { serverInstance as rollbar } from '../../../../../lib/monitoring/rollbar-official';
 import { curriculumSchema } from '../../../../../lib/schemas/admin/course';
@@ -23,20 +23,13 @@ import { getOrCreateRequestId } from '../../../../../lib/utils/request-id';
  * Check admin authentication
  */
 async function checkAdminAuth(requestId: string) {
+  // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
   let userId: string | null = null;
   try {
-    const authResult = await auth();
-    userId = authResult.userId;
-  } catch (_authError) {
-    return {
-      error: createErrorResponse(
-        'Unauthorized access',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      ),
-      userId: null,
-    };
+    const user = await getCurrentUser();
+    userId = user?.id ?? null;
+  } catch (_e) {
+    userId = null;
   }
 
   if (!userId) {
@@ -178,16 +171,12 @@ export async function PATCH(
         route: '/api/admin/courses/[id]',
       });
 
-      return NextResponse.json(
-        {
-          error: 'Conflict',
-          message:
-            'Course was modified by another admin. Please refresh and try again.',
-          code: 'CONCURRENT_EDIT_CONFLICT',
-          latestUpdatedAt: existing.updatedAt.toISOString(),
-          requestId,
-        },
-        { status: 409 }
+      return createErrorResponse(
+        'Course was modified by another admin. Please refresh and try again.',
+        'CONCURRENT_EDIT_CONFLICT',
+        requestId,
+        409,
+        { latestUpdatedAt: existing.updatedAt.toISOString() }
       );
     }
 
@@ -204,16 +193,15 @@ export async function PATCH(
         route: '/api/admin/courses/[id]',
       });
 
-      return NextResponse.json(
+      return createErrorResponse(
+        'Capacity cannot be less than current enrollment count',
+        'CAPACITY_BELOW_ENROLLMENTS',
+        requestId,
+        400,
         {
-          error: 'Validation Error',
-          message: 'Capacity cannot be less than current enrollment count',
-          code: 'CAPACITY_BELOW_ENROLLMENTS',
           currentEnrollmentCount: existing._count.bookings,
           requestedCapacity: body.capacity,
-          requestId,
-        },
-        { status: 400 }
+        }
       );
     }
 
@@ -342,21 +330,19 @@ export async function DELETE(
         route: '/api/admin/courses/[id]',
       });
 
-      return NextResponse.json(
+      return createErrorResponse(
+        'Cannot delete course with active enrollments. Transfer students first.',
+        'ACTIVE_ENROLLMENTS_EXIST',
+        requestId,
+        409,
         {
-          error: 'Conflict',
-          message:
-            'Cannot delete course with active enrollments. Transfer students first.',
-          code: 'ACTIVE_ENROLLMENTS_EXIST',
           enrollmentCount: course._count.bookings,
           enrolledStudents: course.bookings.map(b => ({
             userId: b.user.id,
             name: b.user.name,
             enrolledAt: b.createdAt,
           })),
-          requestId,
-        },
-        { status: 409 }
+        }
       );
     }
 

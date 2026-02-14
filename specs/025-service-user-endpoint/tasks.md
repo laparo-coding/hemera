@@ -23,30 +23,20 @@
 
 ---
 
-### Task 1.2: Create Clerk Service Users
-- [ ] Log into Clerk Dashboard (production)
-- [ ] Create new user: `aither-service@hemera-academy.com`
-  - Set `publicMetadata`: `{ "role": "api-client", "service": "aither" }`
-- [ ] Create new user: `gaia-service@hemera-academy.com`
-  - Set `publicMetadata`: `{ "role": "api-client", "service": "gaia" }`
-- [ ] Generate and securely store service user credentials for both
-- [ ] Document service user IDs in `.env.example` (as comments)
+### Task 1.2: Create Clerk Service Users (Automated)
+- [ ] Implement idempotent setup script `scripts/create-clerk-service-users.ts` that uses the Clerk backend API to create or update the following service users and set `publicMetadata`:
+  - `aither-service@hemera-academy.com` → `{ "role": "api-client", "service": "aither" }`
+  - `gaia-service@hemera-academy.com` → `{ "role": "api-client", "service": "gaia" }`
+- [ ] Script should be safe to run multiple times (create or update) and print created/updated user IDs for CI verification
+- [ ] Store service user credentials securely in the deployment secret store and DO NOT commit real IDs to `.env.example` (only include commented placeholders)
 
-**Manual Steps:**
-1. Navigate to Clerk Dashboard → Users
-2. Click "Create User"
-3. For Aither:
-   - Email: `aither-service@hemera-academy.com`
-   - Public Metadata: `{ "role": "api-client", "service": "aither" }`
-4. For Gaia:
-   - Email: `gaia-service@hemera-academy.com`
-   - Public Metadata: `{ "role": "api-client", "service": "gaia" }`
-5. Save user IDs for testing
+**Files:**
+- `scripts/create-clerk-service-users.ts` (new)
 
 **Acceptance:**
-- Both service users exist in Clerk
+- Script runs idempotently and creates/updates both service users
 - `publicMetadata.role` is `"api-client"` for both
-- Both service users can authenticate via Clerk SDK
+- CI/Deployment can call the script to ensure users exist
 
 ---
 
@@ -131,11 +121,11 @@
 
 ## Phase 3: Security & Monitoring
 
-### Task 3.1: Implement Rate Limiting
+### Task 3.1: Implement Rate Limiting (Distributed)
 - [ ] Create `lib/middleware/rate-limit.ts`
-- [ ] Implement in-memory rate limiter with `Map<userId, RateLimitState>`
+- [ ] Implement distributed rate limiter using Upstash Redis / Vercel KV / Redis with atomic ops
 - [ ] Configure limits: 100 req/min for `api-client`, 500 req/min for `admin`
-- [ ] Add rate limit headers: `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+- [ ] Add rate limit headers: `X-RateLimit-Remaining`, `X-RateLimit-Reset` (use Unix timestamp UTC for reset)
 - [ ] Return 429 when limit exceeded
 - [ ] Apply middleware to all `/api/service/*` routes
 
@@ -148,27 +138,32 @@
 - 429 response returned when limit exceeded
 - Rate limit headers present in responses
 
+**Implementation Notes:**
+- Use `@upstash/ratelimit` for Upstash or implement atomic INCR/EXPIRE logic in Redis; for Vercel KV use the KV atomic operations if available.
+- X-RateLimit-Reset should be a Unix timestamp (UTC) indicating when the window resets.
+
 ---
 
 ### Task 3.2: Add Audit Logging
-- [ ] Create `lib/monitoring/service-api-logger.ts`
+- [ ] Create `prisma/migrations/*` and `prisma/schema.prisma` model `ApiLog` (id, serviceUserId, endpoint, timestamp, responseStatus, ipAddress, metadata)
+- [ ] Create `lib/logging/audit.ts` or `lib/monitoring/service-api-logger.ts` to persist audit logs via Prisma
 - [ ] Log all service API calls with:
   - User ID
   - Endpoint
   - Timestamp
   - Response status
   - IP address (if available)
-- [ ] Integrate with Rollbar for error tracking
-- [ ] Add success logging for audit trail
+  - Metadata (request id, payload summary)
+- [ ] Integrate error paths with Rollbar for exceptions only; keep audit logs in the DB for compliance and analytics
 
 **Files:**
-- `lib/monitoring/service-api-logger.ts` (new)
+- `prisma/schema.prisma` (migration: add `ApiLog` model)
+- `lib/logging/audit.ts` (new)
 - `app/api/service/*/route.ts` (modify to add logging)
 
 **Acceptance:**
-- All service API calls are logged
-- Errors are tracked in Rollbar
-- Logs include user ID and endpoint
+- All service API calls are persisted to `ApiLog` table
+- Rollbar receives error reports; routine calls are stored in DB
 
 ---
 
@@ -262,7 +257,7 @@
 
 ## Summary
 
-**Total Tasks:** 15
+**Total Tasks:** 13
 **Estimated Effort:** 3-4 days
 
 **Critical Path:**

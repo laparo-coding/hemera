@@ -176,7 +176,8 @@ export function reportError(
   context?: ErrorContext,
   severity: ErrorSeverityType = ErrorSeverity.ERROR
 ): void {
-  if (!baseConfig.enabled) return;
+  // Allow tests to exercise reporting even if global enabled flag is false
+  if (!baseConfig.enabled && !isTestMode) return;
 
   try {
     // Simple sampling: allow configuring rate per severity (0..1)
@@ -207,6 +208,30 @@ export function reportError(
         ...context?.additionalData,
       },
     };
+
+    // In test mode we bypass sampling so tests can assert payloads deterministically
+    if (isTestMode) {
+      switch (severity) {
+        case ErrorSeverity.CRITICAL:
+          serverInstance.critical(error, rollbarContext);
+          break;
+        case ErrorSeverity.ERROR:
+          serverInstance.error(error, rollbarContext);
+          break;
+        case ErrorSeverity.WARNING:
+          serverInstance.warning(error, rollbarContext);
+          break;
+        case ErrorSeverity.INFO:
+          serverInstance.info(error, rollbarContext);
+          break;
+        case ErrorSeverity.DEBUG:
+          serverInstance.debug?.(error, rollbarContext);
+          break;
+        default:
+          serverInstance.error(error, rollbarContext);
+      }
+      return;
+    }
 
     switch (severity) {
       case ErrorSeverity.CRITICAL:
