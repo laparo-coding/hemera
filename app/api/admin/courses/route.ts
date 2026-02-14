@@ -1,18 +1,10 @@
-import { randomBytes } from 'node:crypto';
+import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
-import {
-  checkUserAdminStatus,
-  getCurrentUser,
-} from '../../../../lib/auth/helpers';
+import { checkUserAdminStatus, getCurrentUser } from '../../../../lib/auth/helpers';
 import { prisma } from '../../../../lib/db/prisma';
-import { serverInstance as rollbar } from '../../../../lib/monitoring/rollbar-official';
-import {
-  type CourseCreateInput,
-  courseCreateSchema,
-} from '../../../../lib/schemas/admin/course';
 import {
   createErrorResponse,
+  createSuccessResponse,
   ErrorCodes,
 } from '../../../../lib/utils/api-response';
 import { getCorsHeaders } from '../../../../lib/utils/cors';
@@ -40,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     if (!userId) {
       const errorResponse = createErrorResponse(
-        'Du bist nicht autorisiert',
+        'Unauthorized access',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -58,7 +50,7 @@ export async function GET(request: NextRequest) {
     const isAdmin = await checkUserAdminStatus(userId);
     if (!isAdmin) {
       const errorResponse = createErrorResponse(
-        'Du brauchst Admin-Rechte',
+        'Admin privileges required',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -92,13 +84,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Historically this endpoint returned a plain array for contract tests.
-    // Return the courses array directly to preserve contract expectations.
-    const res = NextResponse.json(courses, { status: 200 });
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      res.headers.set(key, value);
-    });
-    return res;
+      // Historically this endpoint returned a plain array for contract tests.
+      // Return the courses array directly to preserve contract expectations.
+      const res = NextResponse.json(courses, { status: 200 });
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        res.headers.set(key, value);
+      });
+      return res;
   } catch (_error) {
     const errorResponse = createErrorResponse(
       'Failed to fetch courses',
@@ -135,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     if (!userId) {
       return createErrorResponse(
-        'Du bist nicht autorisiert',
+        'Unauthorized access',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -146,7 +138,7 @@ export async function POST(request: NextRequest) {
     const isAdmin = await checkUserAdminStatus(userId);
     if (!isAdmin) {
       return createErrorResponse(
-        'Du brauchst Admin-Rechte',
+        'Admin privileges required',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -154,153 +146,114 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse and validate body
-    let body: unknown;
-    try {
-      body = await request.json();
-    } catch (_err) {
-      const errorResponse = createErrorResponse(
-        'Ungültiges JSON im Request Body',
-        ErrorCodes.VALIDATION_ERROR,
+    const body = await request.json();
+
+    // Basic validation - accept `startTime` (ISO) + optional `duration` (hours)
+    if (!body.title || !body.description || body.price === undefined || !body.startTime) {
+      return createErrorResponse(
+        'Missing required fields',
+        'VALIDATION_FAILED',
         requestId,
         400
       );
-
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-
-      return errorResponse;
     }
 
-    let parsed: CourseCreateInput;
-    try {
-      parsed = await courseCreateSchema.parseAsync(body);
-    } catch (zErr) {
-      if (zErr instanceof ZodError) {
-        rollbar.warning('Validation failed creating course', {
-          requestId,
-          issues: zErr.issues,
-          route: '/api/admin/courses',
-          // Do not include raw input to avoid logging PII
-          inputSummary: {
-            keys: Object.keys(body || {}),
-            count: Object.keys(body || {}).length,
-          },
-        });
-
-        return createErrorResponse(
-          'Ungültige Eingaben beim Erstellen des Kurses',
-          ErrorCodes.VALIDATION_ERROR,
-          requestId,
-          400,
-          { issues: zErr.issues }
-        );
-      }
-      throw zErr;
+    // Title length (3-200)
+    if (typeof body.title !== 'string' || body.title.trim().length < 3 || body.title.trim().length > 200) {
+      return createErrorResponse(
+        'Title must be between 3 and 200 characters',
+        'VALIDATION_FAILED',
+        requestId,
+        400
+      );
     }
 
-    // `courseCreateSchema` provides a validated `duration` default (4 hours)
-    // and `price` is already transformed into integer cents. Use values
-    // directly from `parsed` to preserve types/units from the schema.
-    const durationHours = parsed.duration; // validated number (hours)
-    const startTimeDate = parsed.startTime;
-    const endTimeDate =
-      parsed.endTime ??
-      new Date(startTimeDate.getTime() + durationHours * 3600 * 1000);
+    // Price must be a positive integer (cents)
+    const priceVal = Number(body.price);
+    if (!Number.isFinite(priceVal) || priceVal <= 0) {
+      return createErrorResponse(
+        'Price must be a positive number',
+        'VALIDATION_FAILED',
+        requestId,
+        400
+      );
+    }
 
-    // Generate slug base and append random hex fragment
-    const baseSlug = parsed.title
+    // Parse startTime and compute endTime using duration (hours)
+    const startTimeDate = new Date(body.startTime);
+    if (isNaN(startTimeDate.getTime())) {
+      return createErrorResponse(
+        'Invalid startTime',
+        'VALIDATION_FAILED',
+        requestId,
+        400
+      );
+    }
+
+    // startTime must be in the future
+    if (startTimeDate.getTime() <= Date.now()) {
+      return createErrorResponse(
+        'startTime must be a future date',
+        'VALIDATION_FAILED',
+        requestId,
+        400
+      );
+    }
+
+    const durationHours = Number(body.duration ?? 4);
+    if (isNaN(durationHours) || durationHours <= 0) {
+      return createErrorResponse(
+        'Invalid duration',
+        'VALIDATION_FAILED',
+        requestId,
+        400
+      );
+    }
+
+    const endTimeDate = new Date(startTimeDate.getTime() + durationHours * 3600 * 1000);
+
+    // Generate slug (keep deterministic but append timestamp to avoid unique collisions in tests)
+    const baseSlug = body.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .substring(0, 40)
       .replace(/(^-|-$)/g, '');
+    const slug = `${baseSlug}-${Date.now().toString().slice(-6)}`;
 
-    let createdCourse = null;
-    let lastError: unknown = null;
+    // Create course using our database helper
+    const course = await prisma.course.create({
+      data: {
+        title: body.title,
+        description: body.description,
+        slug,
+        price: body.price,
+        startDate: startTimeDate,
+        startTime: startTimeDate,
+        endTime: endTimeDate,
+        instructor: body.instructor || 'TBD',
+        level: body.level || 'BEGINNER',
+        thumbnailUrl: body.thumbnailUrl || null,
+        capacity: body.capacity || 20,
+        currency: 'EUR',
+        isPublished: false,
+      },
+    });
 
-    for (let attempt = 0; attempt < 3; attempt++) {
-      const suffix = randomBytes(3).toString('hex');
-      const slug = `${baseSlug}-${suffix}`;
-
-      try {
-        // `courseCreateSchema` transforms a Euro decimal into integer cents
-        // (e.g. 19.99 -> 1999). Use the transformed value directly so units
-        // are explicit and consistent.
-        const priceToPersist = parsed.price;
-
-        createdCourse = await prisma.course.create({
-          data: {
-            title: parsed.title,
-            description: parsed.description,
-            slug,
-            price: priceToPersist,
-            startDate: parsed.startDate as Date,
-            startTime: startTimeDate,
-            endTime: endTimeDate,
-            instructor: parsed.instructor,
-            level: parsed.level,
-            thumbnailUrl: parsed.thumbnailUrl ?? null,
-            capacity: parsed.capacity ?? 20,
-            currency: 'EUR',
-            isPublished: parsed.isPublished ?? false,
-            curriculum: parsed.curriculum ?? undefined,
-            locationId: parsed.locationId ?? undefined,
-          },
-        });
-
-        break;
-      } catch (createErr: any) {
-        lastError = createErr;
-        // Prisma unique constraint on slug (P2002) -> retry
-        if (
-          createErr?.code === 'P2002' &&
-          createErr?.meta?.target?.includes('slug')
-        ) {
-          // try again with a new suffix
-          continue;
-        }
-
-        throw createErr;
-      }
-    }
-
-    if (!createdCourse) {
-      rollbar.error(
-        'Failed to create course after retries',
-        lastError as Error,
-        {
-          requestId,
-          route: '/api/admin/courses',
-        }
-      );
-
-      return createErrorResponse(
-        'Konnte Kurs nicht erstellen',
-        ErrorCodes.INTERNAL_ERROR,
-        requestId,
-        500
-      );
-    }
-
-    // New course has zero enrollments immediately after creation — avoid extra DB roundtrip
-    const enrollmentCount = 0;
+    const enrollmentCount = await prisma.booking.count({
+      where: { courseId: course.id },
+    });
 
     return NextResponse.json(
       {
-        ...createdCourse,
+        ...course,
         enrollmentCount,
         requestId,
       },
       { status: 201 }
     );
   } catch (_error) {
-    rollbar.error('Failed to create course (unexpected)', _error as Error, {
-      requestId,
-      route: '/api/admin/courses',
-    });
-
     return createErrorResponse(
-      'Konnte Kurs nicht erstellen',
+      'Failed to create course',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

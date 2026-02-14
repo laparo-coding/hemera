@@ -320,12 +320,12 @@ model ApiLog {
   serviceUserId  String   @map("service_user_id")
   endpoint       String
   method         String
+  timestamp      DateTime @default(now())
   responseStatus Int      @map("response_status")
   ipAddress      String?  @map("ip_address")
   metadata       Json?
   createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  @@index([serviceUserId, createdAt])
+  @@index([serviceUserId, timestamp])
   @@map("api_logs")
 }

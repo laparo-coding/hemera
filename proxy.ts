@@ -20,20 +20,14 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
 
   // Service API routes must always go through Clerk auth (even in E2E mode)
   if (/^\/api\/service(\/|$)/.test(pathname)) {
-    // Fail fast if request has no auth header and no cookies at all
+    // Require an Authorization header (Bearer) or Clerk session cookie; fail fast if missing
     const hasAuthHeader = !!request.headers.get('authorization');
     const hasCookie = !!request.headers.get('cookie');
     if (!hasAuthHeader && !hasCookie) {
-      return new NextResponse(
-        JSON.stringify({
-          success: false,
-          error: {
-            code: 'UNAUTHORIZED',
-            message: 'Missing authentication token',
-          },
-        }),
-        { status: 401, headers: { 'content-type': 'application/json' } }
-      );
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Missing authentication token' }
+      }), { status: 401, headers: { 'content-type': 'application/json' } });
     }
 
     // Delegate to Clerk middleware for auth handling

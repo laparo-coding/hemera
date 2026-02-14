@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { CourseLevel } from '@prisma/client';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getUserRole } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
@@ -48,11 +49,7 @@ export async function OPTIONS(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);
-  const context = createRequestContext(
-    requestId,
-    'GET',
-    '/api/service/courses'
-  );
+  const context = createRequestContext(requestId, 'GET', '/api/service/courses');
   const logger = createApiLogger(context);
   const startTime = Date.now();
 
@@ -61,7 +58,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
     if (!userId) {
       logger.warn('Unauthenticated request');
-      return await createServiceApiErrorResponse(
+      return createServiceApiErrorResponse(
         'Not authenticated',
         ErrorCodes.UNAUTHORIZED,
         requestId,
@@ -72,11 +69,8 @@ export async function GET(request: NextRequest) {
     // Role check
     const role = await getUserRole();
     if (role !== 'api-client' && role !== 'admin') {
-      logger.warn('Forbidden: insufficient permissions', {
-        userId,
-        role,
-      });
-      return await createServiceApiErrorResponse(
+      logger.warn('Forbidden: insufficient permissions', { userId, role });
+      return createServiceApiErrorResponse(
         'Forbidden: api-client or admin role required',
         ErrorCodes.FORBIDDEN,
         requestId,
@@ -86,18 +80,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    logger.info('Service API request authorized', {
-      userId,
-      role,
-    });
+    logger.info('Service API request authorized', { userId, role });
 
     // Rate limiting check
     const rateLimitResponse = await checkRateLimit(userId, role, requestId);
     if (rateLimitResponse) {
-      logger.warn('Rate limit exceeded', {
-        userId,
-        role,
-      });
+      logger.warn('Rate limit exceeded', { userId, role });
       return rateLimitResponse;
     }
 
@@ -109,20 +97,8 @@ export async function GET(request: NextRequest) {
     try {
       validatedParams = CourseQuerySchema.parse(queryParams);
     } catch (error) {
-      // Sanitize Zod errors and avoid logging raw query values (may contain sensitive info)
-      const sanitizedError =
-        error instanceof z.ZodError
-          ? { issues: error.issues }
-          : { message: String(error) };
-      const querySummary = {
-        keys: Object.keys(queryParams),
-        count: Object.keys(queryParams).length,
-      };
-      logger.warn('Invalid query parameters', {
-        querySummary,
-        error: sanitizedError,
-      });
-      return await createServiceApiErrorResponse(
+      logger.warn('Invalid query parameters', { queryParams, error });
+      return createServiceApiErrorResponse(
         'Invalid query parameters',
         ErrorCodes.VALIDATION_ERROR,
         requestId,
@@ -206,35 +182,23 @@ export async function GET(request: NextRequest) {
       responseTime: Date.now() - startTime,
     });
 
-    /**
-     * Response shape note:
-     * - Tests currently expect the endpoint to return the raw courses array in the
-     *   `data` field (i.e. `{ success: true, data: [ ... ] }`). To avoid breaking
-     *   downstream consumers which still expect the legacy shape `{ courses, total }`,
-     *   we provide a feature-flagged fallback.
-     *
-     * Feature flag:
-     * - `FEATURE_SERVICE_RESPONSE_LEGACY=true`  -> returns `{ courses: [...], total }` as `data`
-     * - otherwise (default)                    -> returns the courses array directly as `data`
-     *
-     * This keeps tests green while allowing consumers to opt into the legacy payload.
-     */
-    const useLegacyResponse =
-      String(process.env.FEATURE_SERVICE_RESPONSE_LEGACY).toLowerCase() ===
-      'true';
-
-    const payload = useLegacyResponse ? { courses: data, total } : data; // array returned in `data` by default to satisfy tests
-
-    return await createServiceApiSuccessResponse(
+    return createServiceApiSuccessResponse(
       requestId,
       userId,
       role,
-      payload
+      {
+        data,
+        pagination: {
+          total,
+          limit,
+          offset,
+        },
+      }
     );
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error('Failed to retrieve courses', err);
-    return await createServiceApiErrorResponse(
+    return createServiceApiErrorResponse(
       err.message,
       ErrorCodes.INTERNAL_ERROR,
       requestId,

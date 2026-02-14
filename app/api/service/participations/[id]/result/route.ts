@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { ParticipationStatus } from '@prisma/client';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getUserRole } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
@@ -61,7 +62,7 @@ export async function PUT(
     const { userId } = await auth();
     if (!userId) {
       logger.warn('Unauthenticated request');
-      return await createServiceApiErrorResponse(
+      return createServiceApiErrorResponse(
         'Not authenticated',
         ErrorCodes.UNAUTHORIZED,
         requestId,
@@ -72,11 +73,8 @@ export async function PUT(
     // Role check
     const role = await getUserRole();
     if (role !== 'api-client' && role !== 'admin') {
-      logger.warn('Forbidden: insufficient permissions', {
-        userId,
-        role,
-      });
-      return await createServiceApiErrorResponse(
+      logger.warn('Forbidden: insufficient permissions', { userId, role });
+      return createServiceApiErrorResponse(
         'Forbidden: api-client or admin role required',
         ErrorCodes.FORBIDDEN,
         requestId,
@@ -95,10 +93,7 @@ export async function PUT(
     // Rate limiting check
     const rateLimitResponse = await checkRateLimit(userId, role, requestId);
     if (rateLimitResponse) {
-      logger.warn('Rate limit exceeded', {
-        userId,
-        role,
-      });
+      logger.warn('Rate limit exceeded', { userId, role });
       return rateLimitResponse;
     }
 
@@ -107,14 +102,8 @@ export async function PUT(
     try {
       body = await request.json();
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      const errorStack = error instanceof Error ? error.stack : undefined;
-      logger.warn('Invalid JSON body', {
-        errorMessage,
-        errorStack,
-      });
-      return await createServiceApiErrorResponse(
+      logger.warn('Invalid JSON body', { error });
+      return createServiceApiErrorResponse(
         'Invalid JSON body',
         ErrorCodes.INVALID_INPUT,
         requestId,
@@ -129,21 +118,8 @@ export async function PUT(
     try {
       validatedData = UpdateResultSchema.parse(body);
     } catch (error) {
-      // Avoid logging full request body (may contain PII). Log a summary and sanitized error info.
-      const logError =
-        error instanceof z.ZodError
-          ? { issues: error.issues }
-          : { message: String(error) };
-      const bodySummary = {
-        keys: body && typeof body === 'object' ? Object.keys(body) : [],
-        keyCount:
-          body && typeof body === 'object' ? Object.keys(body).length : 0,
-      };
-      logger.warn('Invalid request body', {
-        bodySummary,
-        error: logError,
-      });
-      return await createServiceApiErrorResponse(
+      logger.warn('Invalid request body', { body, error });
+      return createServiceApiErrorResponse(
         'Invalid request body',
         ErrorCodes.VALIDATION_ERROR,
         requestId,
@@ -160,10 +136,8 @@ export async function PUT(
     });
 
     if (!participation) {
-      logger.warn('Participation not found', {
-        participationId: id,
-      });
-      return await createServiceApiErrorResponse(
+      logger.warn('Participation not found', { participationId: id });
+      return createServiceApiErrorResponse(
         'Participation not found',
         ErrorCodes.NOT_FOUND,
         requestId,
@@ -219,31 +193,7 @@ export async function PUT(
       responseTime: Date.now() - startTime,
     });
 
-    /**
-     * Response shape note:
-     * - Default: return no `data`, but include a success `message`.
-     * - Legacy fallback: some consumers expect the message inside `data`.
-     *   When `FEATURE_SERVICE_RESPONSE_LEGACY=true` return `{ message }` as `data`
-     *   instead of using the `message` field.
-     */
-    const useLegacyResponse =
-      String(process.env.FEATURE_SERVICE_RESPONSE_LEGACY).toLowerCase() ===
-      'true';
-
-    const legacyPayload = {
-      message: 'Participation result updated successfully',
-    };
-
-    if (useLegacyResponse) {
-      return await createServiceApiSuccessResponse(
-        requestId,
-        userId,
-        role,
-        legacyPayload
-      );
-    }
-
-    return await createServiceApiSuccessResponse(
+    return createServiceApiSuccessResponse(
       requestId,
       userId,
       role,
@@ -253,7 +203,7 @@ export async function PUT(
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error('Failed to update participation result', err);
-    return await createServiceApiErrorResponse(
+    return createServiceApiErrorResponse(
       err.message,
       ErrorCodes.INTERNAL_ERROR,
       requestId,

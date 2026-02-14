@@ -5,20 +5,13 @@
  * DELETE /api/admin/courses/[id] - Delete course
  */
 
-import type { Prisma } from '@prisma/client';
+import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import {
-  checkUserAdminStatus,
-  getCurrentUser,
-} from '../../../../../lib/auth/helpers';
+import { checkUserAdminStatus, getCurrentUser } from '../../../../../lib/auth/helpers';
 import { prisma } from '../../../../../lib/db/prisma';
 import { serverInstance as rollbar } from '../../../../../lib/monitoring/rollbar-official';
-import {
-  type CourseUpdateInput,
-  courseUpdateSchema,
-  curriculumSchema,
-} from '../../../../../lib/schemas/admin/course';
+import { curriculumSchema } from '../../../../../lib/schemas/admin/course';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -42,7 +35,7 @@ async function checkAdminAuth(requestId: string) {
   if (!userId) {
     return {
       error: createErrorResponse(
-        'Du bist nicht autorisiert',
+        'Unauthorized access',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -55,7 +48,7 @@ async function checkAdminAuth(requestId: string) {
   if (!isAdmin) {
     return {
       error: createErrorResponse(
-        'Du brauchst Admin-Rechte',
+        'Admin privileges required',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -94,7 +87,7 @@ export async function GET(
 
     if (!course) {
       return createErrorResponse(
-        `Kurs mit der ID ${id} wurde nicht gefunden`,
+        `Course with ID ${id} does not exist`,
         'COURSE_NOT_FOUND',
         requestId,
         404
@@ -117,7 +110,7 @@ export async function GET(
     });
 
     return createErrorResponse(
-      'Konnte Kurs nicht laden',
+      'Failed to fetch course',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
@@ -142,27 +135,14 @@ export async function PATCH(
 
     const body = await request.json();
 
-    // Validate update body using Zod (includes updatedAt coercion)
-    let parsedUpdate: CourseUpdateInput;
-    try {
-      parsedUpdate = await courseUpdateSchema.parseAsync(body);
-    } catch (zErr) {
-      if (zErr instanceof ZodError) {
-        rollbar.warning('Invalid course update payload', {
-          requestId,
-          issues: zErr.issues,
-          courseId: id,
-        });
-
-        return createErrorResponse(
-          'Ungültige Eingaben beim Aktualisieren des Kurses',
-          ErrorCodes.VALIDATION_ERROR,
-          requestId,
-          400,
-          { issues: zErr.issues }
-        );
-      }
-      throw zErr;
+    // Check for optimistic locking
+    if (!body.updatedAt) {
+      return createErrorResponse(
+        'updatedAt field required for optimistic locking',
+        ErrorCodes.VALIDATION_ERROR,
+        requestId,
+        400
+      );
     }
 
     // Verify course exists and check updatedAt
@@ -181,7 +161,7 @@ export async function PATCH(
     }
 
     // Check for concurrent edit
-    const providedUpdatedAt = new Date(parsedUpdate.updatedAt as Date);
+    const providedUpdatedAt = new Date(body.updatedAt);
     if (existing.updatedAt.getTime() !== providedUpdatedAt.getTime()) {
       rollbar.warning('Concurrent edit conflict detected', {
         requestId,
@@ -192,7 +172,7 @@ export async function PATCH(
       });
 
       return createErrorResponse(
-        'Der Kurs wurde zwischenzeitlich von einem anderen Admin geändert. Bitte aktualisiere die Seite und versuche es erneut.',
+        'Course was modified by another admin. Please refresh and try again.',
         'CONCURRENT_EDIT_CONFLICT',
         requestId,
         409,
@@ -202,103 +182,31 @@ export async function PATCH(
 
     // Check capacity constraint
     if (
-      parsedUpdate.capacity !== undefined &&
-      parsedUpdate.capacity < existing._count.bookings
+      body.capacity !== undefined &&
+      body.capacity < existing._count.bookings
     ) {
       rollbar.warning('Capacity below enrollment count', {
         requestId,
         courseId: id,
-        requestedCapacity: parsedUpdate.capacity,
+        requestedCapacity: body.capacity,
         currentEnrollments: existing._count.bookings,
         route: '/api/admin/courses/[id]',
       });
 
       return createErrorResponse(
-        'Die maximale Teilnehmerzahl darf nicht kleiner sein als die bereits angemeldeten Teilnehmer.',
+        'Capacity cannot be less than current enrollment count',
         'CAPACITY_BELOW_ENROLLMENTS',
         requestId,
         400,
         {
           currentEnrollmentCount: existing._count.bookings,
-          requestedCapacity: parsedUpdate.capacity,
+          requestedCapacity: body.capacity,
         }
       );
     }
 
-    // Update course (use typed update shape inferred from Zod schema)
-    const { updatedAt: _, ...updateData } = parsedUpdate;
-
-    // Prisma update inputs must not contain `null` for optional fields that
-    // are typed as `string | undefined` — strip explicit nulls so the typing
-    // matches Prisma's generated types. If the admin intentionally wants to
-    // unset a nullable relation/field we would need an explicit handling
-    // (e.g. set to Prisma.Null), but for safety we omit nulls here.
-    // Build a strictly-typed partial update object using Prisma types.
-    type AllowedKeys =
-      | 'title'
-      | 'description'
-      | 'teaser'
-      | 'curriculum'
-      | 'slug'
-      | 'price'
-      | 'currency'
-      | 'capacity'
-      | 'startDate'
-      | 'endDate'
-      | 'startTime'
-      | 'endTime'
-      | 'isPublished'
-      | 'instructor'
-      | 'level'
-      | 'thumbnailUrl'
-      | 'imageDetail'
-      | 'imageTwitter'
-      | 'heroVideoPlaybackId'
-      | 'location'
-      | 'recommended'
-      | 'notRecommended'
-      | 'isNonPublic';
-
-    type AllowedUpdate = Partial<Pick<Prisma.CourseUpdateInput, AllowedKeys>>;
-
-    const prismaUpdateData: AllowedUpdate = {};
-    for (const k of Object.keys(updateData) as Array<keyof typeof updateData>) {
-      const v = (updateData as Record<string, unknown>)[k as string];
-      if (
-        v !== null &&
-        v !== undefined &&
-        (
-          [
-            'title',
-            'description',
-            'teaser',
-            'curriculum',
-            'slug',
-            'price',
-            'currency',
-            'capacity',
-            'startDate',
-            'endDate',
-            'startTime',
-            'endTime',
-            'isPublished',
-            'instructor',
-            'level',
-            'thumbnailUrl',
-            'imageDetail',
-            'imageTwitter',
-            'heroVideoPlaybackId',
-            'locationId',
-            'recommended',
-            'notRecommended',
-            'isNonPublic',
-          ] as string[]
-        ).includes(k as string)
-      ) {
-        // Type assertion is safe because AllowedUpdate restricts keys
-        (prismaUpdateData as any)[k] = v;
-      }
-    }
+    // Update course
+    const { updatedAt: _, ...updateData } = body;
 
     // Validate curriculum if provided
     if (updateData.curriculum !== undefined) {
@@ -312,7 +220,7 @@ export async function PATCH(
             issues: zodError.issues,
           });
           return createErrorResponse(
-            'Ungültige Struktur für das Curriculum',
+            'Invalid curriculum structure',
             ErrorCodes.VALIDATION_ERROR,
             requestId,
             400
@@ -322,28 +230,9 @@ export async function PATCH(
       }
     }
 
-    // Ensure price is stored as integer cents. `courseUpdateSchema` now
-    // transforms decimal Euro amounts into integer cents when present.
-    if (updateData.price !== undefined) {
-      const priceCents = updateData.price as number;
-      if (!Number.isInteger(priceCents) || priceCents < 0) {
-        return createErrorResponse(
-          'Ungültiger Preis',
-          ErrorCodes.VALIDATION_ERROR,
-          requestId,
-          400
-        );
-      }
-
-      // Ensure the computed prisma update payload contains the integer cents
-      prismaUpdateData.price = priceCents;
-    }
-
     const updated = await prisma.course.update({
       where: { id },
-      data: prismaUpdateData as Parameters<
-        typeof prisma.course.update
-      >[0]['data'],
+      data: updateData,
       include: {
         _count: {
           select: {
@@ -374,8 +263,9 @@ export async function PATCH(
       route: '/api/admin/courses/[id]',
       method: 'PATCH',
     });
+
     return createErrorResponse(
-      'Konnte Kurs nicht aktualisieren',
+      'Failed to update course',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
@@ -441,7 +331,7 @@ export async function DELETE(
       });
 
       return createErrorResponse(
-        'Der Kurs kann nicht gelöscht werden, solange Teilnehmer angemeldet sind. Bitte Teilnehmer übertragen.',
+        'Cannot delete course with active enrollments. Transfer students first.',
         'ACTIVE_ENROLLMENTS_EXIST',
         requestId,
         409,
@@ -479,7 +369,7 @@ export async function DELETE(
     });
 
     return createErrorResponse(
-      'Konnte Kurs nicht löschen',
+      'Failed to delete course',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

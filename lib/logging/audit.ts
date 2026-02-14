@@ -1,6 +1,4 @@
-import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
-import { reportError } from '@/lib/monitoring/rollbar-official';
 
 export interface PersistedApiLog {
   serviceUserId: string;
@@ -8,7 +6,7 @@ export interface PersistedApiLog {
   method: string;
   responseStatus: number;
   ipAddress?: string | null;
-  metadata?: Record<string, unknown> | null;
+  metadata?: any;
 }
 
 export async function persistServiceApiLog(log: PersistedApiLog) {
@@ -20,17 +18,12 @@ export async function persistServiceApiLog(log: PersistedApiLog) {
         method: log.method,
         responseStatus: log.responseStatus,
         ipAddress: log.ipAddress ?? null,
-        metadata: (log.metadata as Prisma.InputJsonValue) ?? Prisma.DbNull,
+        metadata: log.metadata ?? null,
       },
     });
   } catch (err) {
-    // Don't throw from audit persistence - report and continue
-    try {
-      reportError(err as Error, {
-        additionalData: { context: 'persistServiceApiLog' },
-      });
-    } catch {
-      // swallow
-    }
+    // Don't throw from audit persistence - log and continue
+    // eslint-disable-next-line no-console
+    console.error('Failed to persist ApiLog', err);
   }
 }

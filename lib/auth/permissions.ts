@@ -38,13 +38,8 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
       const clerk = await clerkClient();
       const user = await clerk.users.getUser(userId);
       role = user?.publicMetadata?.role;
-      // Wenn User gefunden, aber keine Rolle gesetzt, sichere Default role
-      if (user && !role) {
-        return 'user';
-      }
-    } catch (err: any) {
-      // Log Clerk API error but continue with fallback. Do NOT include raw
-      // backend messages — provide non-sensitive metadata instead.
+    } catch (err) {
+      // Log Clerk API error but continue with fallback
       reportError(
         new Error('Failed to fetch user role from Clerk by userId'),
         {
@@ -52,13 +47,12 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
             userId,
             operation: 'getUserRole',
             errorType: 'clerk_api_error',
-            hasOriginalError: Boolean(err?.message),
-            errorName: err?.name,
+            originalError: err instanceof Error ? err.message : String(err),
           },
         },
         ErrorSeverity.WARNING
       );
-      return 'user';
+      role = null;
     }
   }
 
@@ -67,17 +61,15 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
     try {
       const user = await currentUser();
       role = user?.publicMetadata?.role;
-    } catch (err: any) {
-      // Log currentUser() error and fall back to safe default. Avoid leaking
-      // error messages; include non-sensitive metadata.
+    } catch (err) {
+      // Log currentUser() error and fall back to safe default
       reportError(
         new Error('Failed to fetch current user from Clerk'),
         {
           additionalData: {
             operation: 'getUserRole',
             errorType: 'clerk_current_user_error',
-            hasOriginalError: Boolean(err?.message),
-            errorName: err?.name,
+            originalError: err instanceof Error ? err.message : String(err),
           },
         },
         ErrorSeverity.WARNING
@@ -111,24 +103,16 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
 export async function hasPermission(permission: string): Promise<boolean> {
   try {
     const user = await currentUser();
+    const userRole = await getUserRole();
+
     if (!user) return false;
 
-    // Rolle direkt aus User-Objekt lesen; falls ungueltig: sichere Default role
-    let role: UserRole = 'user';
-    const rawRole = user.publicMetadata?.role;
-    if (typeof rawRole === 'string') {
-      const normalizedRole = rawRole.toLowerCase().trim();
-      role = (VALID_ROLES as readonly string[]).includes(normalizedRole)
-        ? (normalizedRole as UserRole)
-        : 'user';
-    }
+    // Admin has all permissions
+    if (userRole === 'admin') return true;
 
-    // Admin hat alle Rechte
-    if (role === 'admin') return true;
-
-    // Rollenbasierte Berechtigungen
+    // Define role-based permissions
     const rolePermissions: Record<UserRole, string[]> = {
-      admin: ['*'],
+      admin: ['*'], // All permissions
       moderator: ['read:courses', 'manage:courses'],
       user: ['read:courses'],
       'api-client': [
@@ -138,9 +122,10 @@ export async function hasPermission(permission: string): Promise<boolean> {
       ],
     };
 
-    const permissions = rolePermissions[role] || [];
+    const permissions = rolePermissions[userRole] || [];
     return permissions.includes('*') || permissions.includes(permission);
-  } catch (err: any) {
+  } catch (err) {
+    // Log error and deny access by default (safe fallback)
     reportError(
       new Error('Failed to check user permission'),
       {
@@ -148,8 +133,7 @@ export async function hasPermission(permission: string): Promise<boolean> {
           permission,
           operation: 'hasPermission',
           errorType: 'permission_check_error',
-          hasOriginalError: Boolean(err?.message),
-          errorName: err?.name,
+          originalError: err instanceof Error ? err.message : String(err),
         },
       },
       ErrorSeverity.WARNING
@@ -178,17 +162,15 @@ export async function isAdmin(): Promise<boolean> {
   try {
     const role = await getUserRole();
     return role === 'admin';
-  } catch (err: any) {
-    // Log error and deny admin access by default (safe fallback). Avoid leaking
-    // backend error messages; provide non-sensitive metadata.
+  } catch (err) {
+    // Log error and deny admin access by default (safe fallback)
     reportError(
       new Error('Failed to check admin status'),
       {
         additionalData: {
           operation: 'isAdmin',
           errorType: 'admin_check_error',
-          hasOriginalError: Boolean(err?.message),
-          errorName: err?.name,
+          originalError: err instanceof Error ? err.message : String(err),
         },
       },
       ErrorSeverity.WARNING
