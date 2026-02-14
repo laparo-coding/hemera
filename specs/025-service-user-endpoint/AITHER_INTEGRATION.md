@@ -314,3 +314,32 @@ For issues or questions:
 - Check [`specs/025-service-user-endpoint/quickstart.md`](quickstart.md)
 - Review [`specs/025-service-user-endpoint/openapi-service-endpoints.yaml`](openapi-service-endpoints.yaml)
 - Contact Hemera team
+
+---
+
+## Staging Deploy Notes
+
+When deploying these service endpoints to Staging, follow these steps:
+
+1. Deploy the application branch `feat/025-service-user-endpoints` to the Staging environment.
+2. Apply the new database migration `prisma/migrations/20260215140000_add_api_log/migration.sql` to the staging DB (do not run destructive resets).
+3. Feature-flag guidance:
+  - By default the service API returns the modern shapes (arrays/objects) in `data`.
+  - To enable legacy response compatibility for downstream consumers temporarily, set:
+
+```bash
+FEATURE_SERVICE_RESPONSE_LEGACY=true
+```
+
+  - Verify consumers using the legacy shape can parse responses correctly.
+4. Run smoke tests against Staging:
+
+```bash
+# example smoke test commands
+curl -H "Authorization: Bearer $TOKEN" "$HEMERA_API_URL/api/service/courses" | jq .
+curl -H "Authorization: Bearer $TOKEN" "$HEMERA_API_URL/api/service/courses/<id>" | jq .
+```
+
+5. After validation, if no legacy compatibility is required, unset `FEATURE_SERVICE_RESPONSE_LEGACY` and proceed to production rollout.
+
+If you want, I can prepare a staging PR checklist or run these steps for you (requires staging credentials). 
