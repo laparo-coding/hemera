@@ -3,11 +3,11 @@
  * In-memory implementation for MVP (can be upgraded to Redis later)
  */
 
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import type { UserRole } from '../auth/permissions';
-import Redis from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
+import Redis from '@upstash/redis';
+import { NextResponse } from 'next/server';
+import { reportError } from '@/lib/monitoring/rollbar-official';
+import type { UserRole } from '../auth/permissions';
 
 interface RateLimitState {
   count: number;
@@ -18,27 +18,31 @@ interface RateLimitState {
 const rateLimitStore = new Map<string, RateLimitState>();
 
 // transient store to hold last Upstash response for header generation
-const lastRateLimitStates = new Map<string, { limit: number; remaining: number; resetAtSeconds: number }>();
+const lastRateLimitStates = new Map<
+  string,
+  { limit: number; remaining: number; resetAtSeconds: number }
+>();
 
 // Rate limit configuration per role
-const RATE_LIMITS: Record<UserRole, { windowMs: number; maxRequests: number }> = {
-  'api-client': {
-    windowMs: 60 * 1000, // 1 minute
-    maxRequests: 100,
-  },
-  admin: {
-    windowMs: 60 * 1000, // 1 minute
-    maxRequests: 500,
-  },
-  moderator: {
-    windowMs: 60 * 1000,
-    maxRequests: 200,
-  },
-  user: {
-    windowMs: 60 * 1000,
-    maxRequests: 50,
-  },
-};
+const RATE_LIMITS: Record<UserRole, { windowMs: number; maxRequests: number }> =
+  {
+    'api-client': {
+      windowMs: 60 * 1000, // 1 minute
+      maxRequests: 100,
+    },
+    admin: {
+      windowMs: 60 * 1000, // 1 minute
+      maxRequests: 500,
+    },
+    moderator: {
+      windowMs: 60 * 1000,
+      maxRequests: 200,
+    },
+    user: {
+      windowMs: 60 * 1000,
+      maxRequests: 50,
+    },
+  };
 
 /**
  * Check rate limit for a user
@@ -54,12 +58,18 @@ export async function checkRateLimit(
   const config = RATE_LIMITS[role];
 
   // If Upstash env is configured, use distributed limiter
-  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  if (
+    process.env.UPSTASH_REDIS_REST_URL &&
+    process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
     try {
       const redis = Redis.fromEnv();
       const limiter = new Ratelimit({
         redis,
-        limiter: Ratelimit.slidingWindow(config.maxRequests, `${Math.ceil(config.windowMs / 1000)} s`),
+        limiter: Ratelimit.slidingWindow(
+          config.maxRequests,
+          `${Math.ceil(config.windowMs / 1000)} s`
+        ),
       });
 
       const res = await limiter.limit(key);
@@ -71,7 +81,6 @@ export async function checkRateLimit(
       });
 
       if (!res.success) {
-        const retryAfter = res.reset ?? Math.ceil(config.windowMs / 1000);
         return NextResponse.json(
           {
             success: false,
@@ -89,8 +98,12 @@ export async function checkRateLimit(
             headers: {
               'X-RateLimit-Limit': String(res.limit),
               'X-RateLimit-Remaining': String(res.remaining ?? 0),
-              'X-RateLimit-Reset': String(Math.ceil((Date.now() + (res.reset ?? 0)) / 1000)),
-              'Retry-After': String(res.reset ?? Math.ceil(config.windowMs / 1000)),
+              'X-RateLimit-Reset': String(
+                Math.ceil((Date.now() + (res.reset ?? 0)) / 1000)
+              ),
+              'Retry-After': String(
+                res.reset ?? Math.ceil(config.windowMs / 1000)
+              ),
               'X-Request-ID': requestId,
             },
           }
@@ -100,8 +113,13 @@ export async function checkRateLimit(
       return null;
     } catch (err) {
       // On errors, fall back to in-memory (do not block requests)
-      // eslint-disable-next-line no-console
-      console.error('Upstash rate limit error, falling back to memory limiter', err);
+      try {
+        reportError(err as Error, {
+          additionalData: { context: 'rateLimit:upstash' },
+        });
+      } catch {
+        // swallow
+      }
     }
   }
 
@@ -123,7 +141,10 @@ export async function checkRateLimit(
   // Calculate remaining requests
   const remaining = Math.max(0, config.maxRequests - state.count);
   const resetTimestampSeconds = Math.ceil(state.resetAt / 1000); // Unix timestamp (seconds UTC)
-  const retryAfterSeconds = Math.max(0, Math.ceil((state.resetAt - now) / 1000));
+  const retryAfterSeconds = Math.max(
+    0,
+    Math.ceil((state.resetAt - now) / 1000)
+  );
 
   // store transient state
   lastRateLimitStates.set(key, {

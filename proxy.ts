@@ -24,10 +24,16 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     const hasAuthHeader = !!request.headers.get('authorization');
     const hasCookie = !!request.headers.get('cookie');
     if (!hasAuthHeader && !hasCookie) {
-      return new NextResponse(JSON.stringify({
-        success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Missing authentication token' }
-      }), { status: 401, headers: { 'content-type': 'application/json' } });
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Missing authentication token',
+          },
+        }),
+        { status: 401, headers: { 'content-type': 'application/json' } }
+      );
     }
 
     // Delegate to Clerk middleware for auth handling

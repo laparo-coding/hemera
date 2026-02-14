@@ -224,9 +224,23 @@ paths:
                 type: boolean
                 example: true
               data:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ServiceCourse'
+                description: |
+                  Either the raw array of courses (default), or a legacy wrapped
+                  object when `FEATURE_SERVICE_RESPONSE_LEGACY=true` is enabled.
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/ServiceCourse'
+                  - type: object
+                    properties:
+                      courses:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ServiceCourse'
+                      total:
+                        type: integer
+                        minimum: 0
+                        example: 25
               pagination:
                 $ref: '#/components/schemas/Pagination'
 
@@ -238,7 +252,16 @@ paths:
                 type: boolean
                 example: true
               data:
-                $ref: '#/components/schemas/ServiceCourseDetail'
+                description: |
+                  Either the course detail object (default) or the
+                  legacy wrapped object `{ course: { ... } }` when
+                  `FEATURE_SERVICE_RESPONSE_LEGACY=true`.
+                oneOf:
+                  - $ref: '#/components/schemas/ServiceCourseDetail'
+                  - type: object
+                    properties:
+                      course:
+                        $ref: '#/components/schemas/ServiceCourseDetail'
 
           ParticipationResponse:
             type: object
@@ -248,18 +271,45 @@ paths:
                 type: boolean
                 example: true
               data:
-                $ref: '#/components/schemas/ServiceParticipation'
+                description: |
+                  Either the participation object (default) or the
+                  legacy wrapped object `{ participation: { ... } }` when
+                  `FEATURE_SERVICE_RESPONSE_LEGACY=true`.
+                oneOf:
+                  - $ref: '#/components/schemas/ServiceParticipation'
+                  - type: object
+                    properties:
+                      participation:
+                        $ref: '#/components/schemas/ServiceParticipation'
 
           UpdateResultResponse:
-            type: object
-            required: [success, message]
-            properties:
-              success:
-                type: boolean
-                example: true
-              message:
-                type: string
-                example: Participation result updated successfully
+            description: |
+              Success response for updating participation result. By default the
+              endpoint returns a top-level `message` field. When the legacy
+              feature flag is enabled the same message is returned inside `data`
+              as `{ message: string }` to support older consumers.
+            oneOf:
+              - type: object
+                required: [success, message]
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Participation result updated successfully
+              - type: object
+                required: [success, data]
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Participation result updated successfully
 
           ErrorResponse:
             type: object
