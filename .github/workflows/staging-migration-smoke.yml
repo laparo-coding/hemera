@@ -1,0 +1,118 @@
+name: Staging — Migration & Smoke Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      migration_mode:
+        description: 'Use manual SQL (manual) or prisma migrate deploy (prisma)'
+        required: true
+        default: 'prisma'
+
+concurrency:
+  group: staging-migrate-smoke
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    name: Run migration → deploy → smoke-tests
+    runs-on: ubuntu-latest
+    env:
+      STAGING_URL: ${{ secrets.STAGING_URL }}
+      STAGING_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      SERVICE_USER_TOKEN: ${{ secrets.SERVICE_USER_TOKEN }}
+      ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sanity: print env keys (no secrets)
+        run: |
+          echo "STAGING_URL=${STAGING_URL:+set}"
+          echo "STAGING_DATABASE_URL=${STAGING_DATABASE_URL:+set}"
+
+      - name: Run DB backup (optional)
+        if: always()
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: |
+          echo "Starting optional DB dump (requires psql access)."
+          if command -v pg_dump >/dev/null 2>&1; then
+            mkdir -p /tmp/hemera-backups
+            pg_dump "$DATABASE_URL" -Fc -f /tmp/hemera-backups/hemera-staging-$(date +%Y%m%d%H%M).dump || true
+          else
+            echo "pg_dump not available on runner; skipping dump."
+          fi
+
+      - name: Apply migration
+        id: migrate
+        run: |
+          echo "Applying migration via mode: ${{ github.event.inputs.migration_mode }}"
+          if [ "${{ github.event.inputs.migration_mode }}" = 'manual' ]; then
+            if [ -z "${STAGING_DATABASE_URL}" ]; then
+              echo "STAGING_DATABASE_URL not set; aborting"; exit 1
+            fi
+            psql "$STAGING_DATABASE_URL" -f prisma/migrations/20260215140000_add_api_log/migration.sql
+          else
+            # prisma migrate deploy will apply migrations known to Prisma
+            npx prisma migrate deploy --schema=prisma/schema.prisma
+          fi
+
+      - name: Deploy branch to staging (CD trigger)
+        if: always()
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPLOY_ENDPOINT: ${{ secrets.CD_DEPLOY_ENDPOINT }}
+          DEPLOY_TOKEN: ${{ secrets.CD_DEPLOY_TOKEN }}
+        run: |
+          method="${{ github.event.inputs.deploy_method || 'repository_dispatch' }}"
+          echo "Selected deploy method: $method"
+
+          if [ "$method" = 'repository_dispatch' ]; then
+            # Trigger repository_dispatch on the same repo with event_type 'staging-deploy'
+            echo "Triggering repository_dispatch event 'staging-deploy'"
+            curl -sSf -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              https://api.github.com/repos/${GITHUB_REPOSITORY}/dispatches \
+              -d '{"event_type":"staging-deploy","client_payload":{"ref":"'${GITHUB_REF##*/}'","actor":"'${GITHUB_ACTOR}'"}}'
+          elif [ "$method" = 'post-to-cd' ]; then
+            if [ -z "$DEPLOY_ENDPOINT" ]; then
+              echo "CD_DEPLOY_ENDPOINT is not set; aborting"; exit 1
+            fi
+            echo "Calling CD endpoint $DEPLOY_ENDPOINT"
+            curl -sSf -X POST "$DEPLOY_ENDPOINT" \
+              -H "Authorization: Bearer $DEPLOY_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d '{"ref":"'${GITHUB_REF##*/}'","actor":"'${GITHUB_ACTOR}'"}'
+          else
+            # Fallback to local script if present
+            if [ -x ./scripts/deploy-to-staging.sh ]; then
+              ./scripts/deploy-to-staging.sh ${GITHUB_REF##*/}
+            else
+              echo "No deploy action available for method: $method"; exit 1
+            fi
+          fi
+
+      - name: Run smoke tests
+        env:
+          STAGING_URL: ${{ secrets.STAGING_URL }}
+          SERVICE_USER_TOKEN: ${{ secrets.SERVICE_USER_TOKEN }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          chmod +x ./scripts/staging-smoke.sh || true
+          ./scripts/staging-smoke.sh
+
+      - name: Report completion
+        run: echo "Staging migration+smoke workflow finished"

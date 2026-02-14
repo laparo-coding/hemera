@@ -72,7 +72,10 @@ export async function PUT(
     // Role check
     const role = await getUserRole();
     if (role !== 'api-client' && role !== 'admin') {
-      logger.warn('Forbidden: insufficient permissions', { userId, role });
+      logger.warn('Forbidden: insufficient permissions', {
+        userId,
+        role,
+      });
       return createServiceApiErrorResponse(
         'Forbidden: api-client or admin role required',
         ErrorCodes.FORBIDDEN,
@@ -92,7 +95,10 @@ export async function PUT(
     // Rate limiting check
     const rateLimitResponse = await checkRateLimit(userId, role, requestId);
     if (rateLimitResponse) {
-      logger.warn('Rate limit exceeded', { userId, role });
+      logger.warn('Rate limit exceeded', {
+        userId,
+        role,
+      });
       return rateLimitResponse;
     }
 
@@ -101,7 +107,9 @@ export async function PUT(
     try {
       body = await request.json();
     } catch (error) {
-      logger.warn('Invalid JSON body', { error });
+      logger.warn('Invalid JSON body', {
+        error,
+      });
       return createServiceApiErrorResponse(
         'Invalid JSON body',
         ErrorCodes.INVALID_INPUT,
@@ -117,7 +125,10 @@ export async function PUT(
     try {
       validatedData = UpdateResultSchema.parse(body);
     } catch (error) {
-      logger.warn('Invalid request body', { body, error });
+      logger.warn('Invalid request body', {
+        body,
+        error,
+      });
       return createServiceApiErrorResponse(
         'Invalid request body',
         ErrorCodes.VALIDATION_ERROR,
@@ -135,7 +146,9 @@ export async function PUT(
     });
 
     if (!participation) {
-      logger.warn('Participation not found', { participationId: id });
+      logger.warn('Participation not found', {
+        participationId: id,
+      });
       return createServiceApiErrorResponse(
         'Participation not found',
         ErrorCodes.NOT_FOUND,

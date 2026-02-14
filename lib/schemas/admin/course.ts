@@ -69,7 +69,9 @@ export const courseCreateSchema = z.object({
     .transform(val => Math.round(val * 100)), // Convert Euro to Cents for Stripe
   startDate: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val)),
+    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .optional()
+    .nullable(),
   endDate: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
@@ -77,10 +79,15 @@ export const courseCreateSchema = z.object({
     .nullable(),
   startTime: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val)),
+    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .refine(date => (date as Date).getTime() > Date.now(), {
+      message: 'Startzeit muss in der Zukunft liegen',
+    }),
   endTime: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val)),
+    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .optional()
+    .nullable(),
   instructor: z
     .string()
     .min(2, 'Instructor name must be at least 2 characters')
@@ -116,7 +123,7 @@ export const courseCreateSchema = z.object({
   capacity: z
     .number()
     .int('Capacity must be an integer')
-    .positive('Capacity must be positive'),
+    .min(0, 'Capacity must be non-negative'),
   isPublished: z.boolean().default(false),
   locationId: z
     .string()
@@ -227,7 +234,7 @@ export const courseUpdateSchema = z.object({
   capacity: z
     .number()
     .int('Capacity must be an integer')
-    .positive('Capacity must be positive')
+    .nonnegative('Capacity must be non-negative')
     .optional(),
   isPublished: z.boolean().optional(),
   locationId: z
