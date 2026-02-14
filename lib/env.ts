@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { reportError } from './monitoring/rollbar-official';
 
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -65,9 +66,15 @@ function buildEnvFromProcess(): Record<string, unknown> {
 const parseResult = EnvSchema.safeParse(buildEnvFromProcess());
 
 if (!parseResult.success) {
-  // Fail fast with a clear error during startup — helps catch misconfiguration early.
-  console.error('\n❌ Environment validation failed:');
-  console.error(parseResult.error.format());
+  // Fail fast with a clear error during startup — report via Rollbar if available.
+  try {
+    reportError(new Error('Environment validation failed'), {
+      additionalData: parseResult.error.format(),
+    });
+  } catch {
+    // swallow reporting errors
+  }
+
   throw new Error('Environment validation failed; aborting startup');
 }
 

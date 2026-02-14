@@ -1,13 +1,99 @@
 /**
  * Rate limiting middleware for service API endpoints
- * In-memory implementation for MVP (can be upgraded to Redis later)
+ * In-memory implementation for MVP
+ *
+ * UPSTASH REDIS INTEGRATION (Optional):
+ * To enable distributed rate limiting with Upstash Redis:
+ * 1. Install packages: npm install @upstash/redis @upstash/ratelimit
+ * 2. Set environment variables:
+ *    - UPSTASH_ENABLED=1 (explicit opt-in to prevent accidental initialization)
+ *    - UPSTASH_REDIS_REST_URL=https://... (must be valid HTTPS URL)
+ *    - UPSTASH_REDIS_REST_TOKEN=... (must be non-empty)
+ * 3. Uncomment the Upstash integration code below
+ *
+ * Without these steps, the middleware falls back to in-memory rate limiting.
  */
 
+import { NextResponse } from 'next/server';
+import type { UserRole } from '../auth/permissions';
+import type { UserRole } from '../auth/permissions';
+
+// ============================================================================
+// Upstash Redis Configuration (DISABLED - packages not installed)
+// ============================================================================
+
+// Uncomment this section after installing @upstash/redis and @upstash/ratelimit:
+/*
 import { Ratelimit } from '@upstash/ratelimit';
 import Redis from '@upstash/redis';
-import { NextResponse } from 'next/server';
-import { reportError } from '@/lib/monitoring/rollbar-official';
-import type { UserRole } from '../auth/permissions';
+
+function isUpstashEnabled(): boolean {
+  const enabled = process.env.UPSTASH_ENABLED === '1';
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (!enabled) {
+    return false;
+  }
+
+  // Validate URL format
+  if (!url || !url.startsWith('https://')) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        '[rate-limit] UPSTASH_ENABLED=1 but UPSTASH_REDIS_REST_URL is invalid or missing. Falling back to in-memory rate limiting.'
+      );
+    }
+    return false;
+  }
+
+  // Validate token presence
+  if (!token || token.trim().length === 0) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        '[rate-limit] UPSTASH_ENABLED=1 but UPSTASH_REDIS_REST_TOKEN is missing. Falling back to in-memory rate limiting.'
+      );
+    }
+    return false;
+  }
+
+  return true;
+}
+
+let redisClient: Redis | null = null;
+
+function getRedisClient(): Redis | null {
+  if (!isUpstashEnabled()) {
+    return null;
+  }
+
+  if (!redisClient) {
+    try {
+      redisClient = Redis.fromEnv();
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[rate-limit] Upstash Redis client initialized successfully');
+      }
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[rate-limit] Failed to initialize Upstash Redis:', err);
+      }
+      try {
+        reportError(err as Error, {
+          additionalData: { context: 'rateLimit:redisInit' },
+        });
+      } catch {
+        // swallow
+      }
+      return null;
+    }
+  }
+
+  return redisClient;
+}
+*/
+
+// ============================================================================
+// In-Memory Rate Limiting
+// ============================================================================
 
 interface RateLimitState {
   count: number;
@@ -17,7 +103,7 @@ interface RateLimitState {
 // In-memory store for rate limiting
 const rateLimitStore = new Map<string, RateLimitState>();
 
-// transient store to hold last Upstash response for header generation
+// transient store to hold last rate limit state for header generation
 const lastRateLimitStates = new Map<
   string,
   { limit: number; remaining: number; resetAtSeconds: number }
@@ -57,13 +143,12 @@ export async function checkRateLimit(
   const key = `${role}:${userId}`;
   const config = RATE_LIMITS[role];
 
-  // If Upstash env is configured, use distributed limiter
-  if (
-    process.env.UPSTASH_REDIS_REST_URL &&
-    process.env.UPSTASH_REDIS_REST_TOKEN
-  ) {
+  // Upstash integration disabled (packages not installed)
+  // Uncomment this section after installing @upstash/redis and @upstash/ratelimit:
+  /*
+  const redis = getRedisClient();
+  if (redis) {
     try {
-      const redis = Redis.fromEnv();
       const limiter = new Ratelimit({
         redis,
         limiter: Ratelimit.slidingWindow(
@@ -73,7 +158,6 @@ export async function checkRateLimit(
       });
 
       const res = await limiter.limit(key);
-      // store transient info for headers
       lastRateLimitStates.set(key, {
         limit: res.limit,
         remaining: res.remaining ?? 0,
@@ -112,7 +196,6 @@ export async function checkRateLimit(
 
       return null;
     } catch (err) {
-      // On errors, fall back to in-memory (do not block requests)
       try {
         reportError(err as Error, {
           additionalData: { context: 'rateLimit:upstash' },
@@ -122,8 +205,9 @@ export async function checkRateLimit(
       }
     }
   }
+  */
 
-  // In-memory fallback (existing behavior)
+  // In-memory fallback (default behavior)
   let state = rateLimitStore.get(key);
 
   // Reset if window has passed
@@ -194,7 +278,7 @@ export async function getRateLimitHeaders(
   const key = `${role}:${userId}`;
   const config = RATE_LIMITS[role];
 
-  // If we have an Upstash transient state saved from checkRateLimit, use it
+  // If we have a transient state saved from checkRateLimit, use it
   const transient = lastRateLimitStates.get(key);
   if (transient) {
     return {
@@ -237,7 +321,14 @@ export function cleanupExpiredRateLimits(): void {
   }
 }
 
-// Cleanup every 5 minutes
-if (typeof setInterval !== 'undefined') {
+// Cleanup every 5 minutes (only in Node.js environments, not in edge/serverless)
+// Disabled in test mode and serverless environments (Vercel, AWS Lambda)
+if (
+  typeof setInterval !== 'undefined' &&
+  typeof process !== 'undefined' &&
+  process.env.NODE_ENV !== 'test' &&
+  process.env.VERCEL !== '1' &&
+  process.env.AWS_LAMBDA_FUNCTION_NAME === undefined
+) {
   setInterval(cleanupExpiredRateLimits, 5 * 60 * 1000);
 }
