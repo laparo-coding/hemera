@@ -133,18 +133,17 @@ export async function POST(
     const availableSlots = targetCourse.capacity - targetEnrollmentCount;
 
     if (availableSlots < sourceEnrollmentCount) {
-      return NextResponse.json(
+      return createErrorResponse(
+        'Der Ziel-Kurs hat nicht genug freie Plätze',
+        'INSUFFICIENT_CAPACITY',
+        requestId,
+        400,
         {
-          error: 'Validation Error',
-          message: 'Der Ziel-Kurs hat nicht genug freie Plätze',
-          code: 'INSUFFICIENT_CAPACITY',
           targetCapacity: targetCourse.capacity,
           targetEnrollmentCount,
           transferCount: sourceEnrollmentCount,
           availableSlots,
-          requestId,
-        },
-        { status: 400 }
+        }
       );
     }
 

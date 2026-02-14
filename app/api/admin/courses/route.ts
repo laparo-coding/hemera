@@ -162,10 +162,12 @@ export async function POST(request: NextRequest) {
           requestId,
           issues: zErr.issues,
           route: '/api/admin/courses',
-          input: body,
+          // Do not include raw input to avoid logging PII
+          inputSummary: {
+            keys: Object.keys(body || {}),
+            count: Object.keys(body || {}).length,
+          },
         });
-
-        // Validation failure noted (details sent to Rollbar above).
 
         return createErrorResponse(
           'Ungültige Eingaben beim Erstellen des Kurses',
@@ -178,8 +180,9 @@ export async function POST(request: NextRequest) {
       throw zErr;
     }
 
-    // Compute endTime if not provided using duration (default 4h)
-    const durationHours = Number(body.duration ?? 4);
+    // Compute endTime if not provided using validated duration (default 4h).
+    // Use `parsed` so any validated/transformed `duration` is preferred; fall back to 4.
+    const durationHours = Number((parsed as any).duration ?? 4);
     const startTimeDate = parsed.startTime as Date;
     const endTimeDate =
       parsed.endTime ??
@@ -254,9 +257,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const enrollmentCount = await prisma.booking.count({
-      where: { courseId: createdCourse.id },
-    });
+    // New course has zero enrollments immediately after creation — avoid extra DB roundtrip
+    const enrollmentCount = 0;
 
     return NextResponse.json(
       {

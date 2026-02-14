@@ -107,8 +107,12 @@ export async function PUT(
     try {
       body = await request.json();
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
       logger.warn('Invalid JSON body', {
-        error,
+        errorMessage,
+        errorStack,
       });
       return createServiceApiErrorResponse(
         'Invalid JSON body',
@@ -125,9 +129,19 @@ export async function PUT(
     try {
       validatedData = UpdateResultSchema.parse(body);
     } catch (error) {
+      // Avoid logging full request body (may contain PII). Log a summary and sanitized error info.
+      const logError =
+        error instanceof z.ZodError
+          ? { issues: error.issues }
+          : { message: String(error) };
+      const bodySummary = {
+        keys: body && typeof body === 'object' ? Object.keys(body) : [],
+        keyCount:
+          body && typeof body === 'object' ? Object.keys(body).length : 0,
+      };
       logger.warn('Invalid request body', {
-        body,
-        error,
+        bodySummary,
+        error: logError,
       });
       return createServiceApiErrorResponse(
         'Invalid request body',
