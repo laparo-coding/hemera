@@ -2,15 +2,23 @@ import { z } from 'zod';
 import { reportError } from './monitoring/rollbar-official';
 
 const EnvSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'test', 'production'])
+    .default('development'),
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   DATABASE_URL: z.string().optional(),
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
   CLERK_SECRET_KEY: z.string().optional(),
   NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().optional().default('/sign-in'),
   NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().optional().default('/sign-up'),
-  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().optional().default('/dashboard'),
-  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().optional().default('/dashboard'),
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z
+    .string()
+    .optional()
+    .default('/dashboard'),
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z
+    .string()
+    .optional()
+    .default('/dashboard'),
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   STRIPE_SECRET_KEY: z.string().optional(),
@@ -39,21 +47,27 @@ function buildEnvFromProcess(): Record<string, unknown> {
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     DATABASE_URL: process.env.DATABASE_URL,
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
     NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
     NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
-    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
-    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL:
+      process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL:
+      process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     // Context7
     CONTEXT7_ENABLED: process.env.CONTEXT7_ENABLED,
     CONTEXT7_API_KEY: process.env.CONTEXT7_API_KEY,
     // Rollbar
-    ROLLBAR_HEMERA_SERVER_TOKEN_1766674885: process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885,
-    NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885: process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885,
+    ROLLBAR_HEMERA_SERVER_TOKEN_1766674885:
+      process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885,
+    NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885:
+      process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885,
     ROLLBAR_ENABLED: process.env.ROLLBAR_ENABLED,
     NEXT_PUBLIC_ROLLBAR_ENABLED: process.env.NEXT_PUBLIC_ROLLBAR_ENABLED,
     // Upstash
