@@ -23,24 +23,30 @@
 
 ---
 
-### Task 1.2: Create Clerk Service User
+### Task 1.2: Create Clerk Service Users
 - [ ] Log into Clerk Dashboard (production)
 - [ ] Create new user: `aither-service@hemera-academy.com`
-- [ ] Set `publicMetadata`: `{ "role": "api-client", "service": "aither" }`
-- [ ] Generate and securely store service user credentials
-- [ ] Document service user ID in `.env.example` (as comment)
+  - Set `publicMetadata`: `{ "role": "api-client", "service": "aither" }`
+- [ ] Create new user: `gaia-service@hemera-academy.com`
+  - Set `publicMetadata`: `{ "role": "api-client", "service": "gaia" }`
+- [ ] Generate and securely store service user credentials for both
+- [ ] Document service user IDs in `.env.example` (as comments)
 
 **Manual Steps:**
 1. Navigate to Clerk Dashboard → Users
 2. Click "Create User"
-3. Email: `aither-service@hemera-academy.com`
-4. Set metadata in "Public Metadata" section
-5. Save user ID for testing
+3. For Aither:
+   - Email: `aither-service@hemera-academy.com`
+   - Public Metadata: `{ "role": "api-client", "service": "aither" }`
+4. For Gaia:
+   - Email: `gaia-service@hemera-academy.com`
+   - Public Metadata: `{ "role": "api-client", "service": "gaia" }`
+5. Save user IDs for testing
 
 **Acceptance:**
-- Service user exists in Clerk
-- `publicMetadata.role` is `"api-client"`
-- Service user can authenticate via Clerk SDK
+- Both service users exist in Clerk
+- `publicMetadata.role` is `"api-client"` for both
+- Both service users can authenticate via Clerk SDK
 
 ---
 
@@ -225,30 +231,32 @@
 ## Deployment Tasks
 
 ### Task 5.1: Production Deployment
-- [ ] Create Clerk service user in production dashboard
+- [ ] Create both Clerk service users in production dashboard (Aither + Gaia)
 - [ ] Deploy code to Vercel
 - [ ] Verify service endpoints are accessible
-- [ ] Test with real service user credentials
+- [ ] Test with both service user credentials
 - [ ] Monitor Rollbar for errors
 - [ ] Update production documentation
 
 **Acceptance:**
 - Service endpoints work in production
 - No errors in Rollbar
-- Service user can authenticate successfully
+- Both service users can authenticate successfully
 
 ---
 
-### Task 5.2: Share Credentials with Aither Team
-- [ ] Securely share service user credentials (use 1Password or similar)
-- [ ] Provide API documentation link
-- [ ] Schedule sync meeting to answer questions
-- [ ] Document integration in Aither project
+### Task 5.2: Share Credentials with Client Teams
+- [ ] Securely share Aither service user credentials (use 1Password or similar)
+- [ ] Securely share Gaia service user credentials
+- [ ] Provide API documentation link to both teams
+- [ ] Schedule sync meetings to answer questions
+- [ ] Document integration in both Aither and Gaia projects
 
 **Acceptance:**
-- Aither team has credentials
-- Aither team can access service endpoints
-- Integration is documented
+- Aither team has their service user credentials
+- Gaia team has their service user credentials
+- Both teams can access service endpoints
+- Integration is documented in both projects
 
 ---
 
