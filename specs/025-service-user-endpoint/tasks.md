@@ -23,20 +23,24 @@
 
 ---
 
-### Task 1.2: Create Clerk Service Users (Automated)
-- [ ] Implement idempotent setup script `scripts/create-clerk-service-users.ts` that uses the Clerk backend API to create or update the following service users and set `publicMetadata`:
-  - `aither-service@hemera-academy.com` → `{ "role": "api-client", "service": "aither" }`
-  - `gaia-service@hemera-academy.com` → `{ "role": "api-client", "service": "gaia" }`
-- [ ] Script should be safe to run multiple times (create or update) and print created/updated user IDs for CI verification
-- [ ] Store service user credentials securely in the deployment secret store and DO NOT commit real IDs to `.env.example` (only include commented placeholders)
+### Task 1.2: Create Clerk Service User
+- [ ] Log into Clerk Dashboard (production)
+- [ ] Create new user: `aither-service@hemera-academy.com`
+- [ ] Set `publicMetadata`: `{ "role": "api-client", "service": "aither" }`
+- [ ] Generate and securely store service user credentials
+- [ ] Document service user ID in `.env.example` (as comment)
 
-**Files:**
-- `scripts/create-clerk-service-users.ts` (new)
+**Manual Steps:**
+1. Navigate to Clerk Dashboard → Users
+2. Click "Create User"
+3. Email: `aither-service@hemera-academy.com`
+4. Set metadata in "Public Metadata" section
+5. Save user ID for testing
 
 **Acceptance:**
-- Script runs idempotently and creates/updates both service users
-- `publicMetadata.role` is `"api-client"` for both
-- CI/Deployment can call the script to ensure users exist
+- Service user exists in Clerk
+- `publicMetadata.role` is `"api-client"`
+- Service user can authenticate via Clerk SDK
 
 ---
 
@@ -121,11 +125,11 @@
 
 ## Phase 3: Security & Monitoring
 
-### Task 3.1: Implement Rate Limiting (Distributed)
+### Task 3.1: Implement Rate Limiting
 - [ ] Create `lib/middleware/rate-limit.ts`
-- [ ] Implement distributed rate limiter using Upstash Redis / Vercel KV / Redis with atomic ops
+- [ ] Implement in-memory rate limiter with `Map<userId, RateLimitState>`
 - [ ] Configure limits: 100 req/min for `api-client`, 500 req/min for `admin`
-- [ ] Add rate limit headers: `X-RateLimit-Remaining`, `X-RateLimit-Reset` (use Unix timestamp UTC for reset)
+- [ ] Add rate limit headers: `X-RateLimit-Remaining`, `X-RateLimit-Reset`
 - [ ] Return 429 when limit exceeded
 - [ ] Apply middleware to all `/api/service/*` routes
 
@@ -138,32 +142,27 @@
 - 429 response returned when limit exceeded
 - Rate limit headers present in responses
 
-**Implementation Notes:**
-- Use `@upstash/ratelimit` for Upstash or implement atomic INCR/EXPIRE logic in Redis; for Vercel KV use the KV atomic operations if available.
-- X-RateLimit-Reset should be a Unix timestamp (UTC) indicating when the window resets.
-
 ---
 
 ### Task 3.2: Add Audit Logging
-- [ ] Create `prisma/migrations/*` and `prisma/schema.prisma` model `ApiLog` (id, serviceUserId, endpoint, timestamp, responseStatus, ipAddress, metadata)
-- [ ] Create `lib/logging/audit.ts` or `lib/monitoring/service-api-logger.ts` to persist audit logs via Prisma
+- [ ] Create `lib/monitoring/service-api-logger.ts`
 - [ ] Log all service API calls with:
   - User ID
   - Endpoint
   - Timestamp
   - Response status
   - IP address (if available)
-  - Metadata (request id, payload summary)
-- [ ] Integrate error paths with Rollbar for exceptions only; keep audit logs in the DB for compliance and analytics
+- [ ] Integrate with Rollbar for error tracking
+- [ ] Add success logging for audit trail
 
 **Files:**
-- `prisma/schema.prisma` (migration: add `ApiLog` model)
-- `lib/logging/audit.ts` (new)
+- `lib/monitoring/service-api-logger.ts` (new)
 - `app/api/service/*/route.ts` (modify to add logging)
 
 **Acceptance:**
-- All service API calls are persisted to `ApiLog` table
-- Rollbar receives error reports; routine calls are stored in DB
+- All service API calls are logged
+- Errors are tracked in Rollbar
+- Logs include user ID and endpoint
 
 ---
 
@@ -226,38 +225,36 @@
 ## Deployment Tasks
 
 ### Task 5.1: Production Deployment
-- [ ] Create both Clerk service users in production dashboard (Aither + Gaia)
+- [ ] Create Clerk service user in production dashboard
 - [ ] Deploy code to Vercel
 - [ ] Verify service endpoints are accessible
-- [ ] Test with both service user credentials
+- [ ] Test with real service user credentials
 - [ ] Monitor Rollbar for errors
 - [ ] Update production documentation
 
 **Acceptance:**
 - Service endpoints work in production
 - No errors in Rollbar
-- Both service users can authenticate successfully
+- Service user can authenticate successfully
 
 ---
 
-### Task 5.2: Share Credentials with Client Teams
-- [ ] Securely share Aither service user credentials (use 1Password or similar)
-- [ ] Securely share Gaia service user credentials
-- [ ] Provide API documentation link to both teams
-- [ ] Schedule sync meetings to answer questions
-- [ ] Document integration in both Aither and Gaia projects
+### Task 5.2: Share Credentials with Aither Team
+- [ ] Securely share service user credentials (use 1Password or similar)
+- [ ] Provide API documentation link
+- [ ] Schedule sync meeting to answer questions
+- [ ] Document integration in Aither project
 
 **Acceptance:**
-- Aither team has their service user credentials
-- Gaia team has their service user credentials
-- Both teams can access service endpoints
-- Integration is documented in both projects
+- Aither team has credentials
+- Aither team can access service endpoints
+- Integration is documented
 
 ---
 
 ## Summary
 
-**Total Tasks:** 13
+**Total Tasks:** 15
 **Estimated Effort:** 3-4 days
 
 **Critical Path:**
