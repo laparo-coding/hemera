@@ -227,6 +227,18 @@ export async function PATCH(
     // Update course (use typed update shape inferred from Zod schema)
     const { updatedAt: _, ...updateData } = parsedUpdate;
 
+    // Prisma update inputs must not contain `null` for optional fields that
+    // are typed as `string | undefined` — strip explicit nulls so the typing
+    // matches Prisma's generated types. If the admin intentionally wants to
+    // unset a nullable relation/field we would need an explicit handling
+    // (e.g. set to Prisma.Null), but for safety we omit nulls here.
+    const prismaUpdateData: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(updateData as Record<string, unknown>)) {
+      if (v !== null) {
+        prismaUpdateData[k] = v;
+      }
+    }
+
     // Validate curriculum if provided
     if (updateData.curriculum !== undefined) {
       try {
@@ -268,7 +280,7 @@ export async function PATCH(
 
     const updated = await prisma.course.update({
       where: { id },
-      data: updateData,
+      data: prismaUpdateData,
       include: {
         _count: {
           select: {
