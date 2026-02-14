@@ -203,12 +203,19 @@ export async function POST(request: NextRequest) {
       const slug = `${baseSlug}-${suffix}`;
 
       try {
+        // Ensure price is persisted as integer cents (defensive: schema.transform should
+        // already convert Euros -> cents, but enforce here to avoid regressions).
+        const rawPrice = Number((parsed as any).price);
+        const priceToPersist = Number.isInteger(rawPrice)
+          ? rawPrice
+          : Math.round(rawPrice);
+
         createdCourse = await prisma.course.create({
           data: {
             title: parsed.title,
             description: parsed.description,
             slug,
-            price: parsed.price as number,
+            price: priceToPersist,
             startDate: parsed.startDate as Date,
             startTime: startTimeDate,
             endTime: endTimeDate,
