@@ -16,6 +16,9 @@ describe('Unit: Rollbar sampling logic', () => {
     delete process.env.ROLLBAR_SAMPLE_RATE_WARN;
     delete process.env.ROLLBAR_SAMPLE_RATE_ERROR;
     delete process.env.ROLLBAR_SAMPLE_RATE_CRITICAL;
+    // Ensure Rollbar is not explicitly disabled for sampling tests
+    delete process.env.NEXT_PUBLIC_ROLLBAR_ENABLED;
+    delete process.env.ROLLBAR_ENABLED;
     jest.resetModules();
   });
 
