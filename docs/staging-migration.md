@@ -40,6 +40,18 @@ git push origin feat/025-service-user-endpoints
 # oder: GH Action / CI trigger
 ```
 
+Optional: Falls Eure CD-Plattform einen HTTP-Endpoint akzeptiert, setze `DEPLOY_ENDPOINT` und
+`DEPLOY_TOKEN` (Secrets) und rufe den Endpoint an:
+
+```bash
+export DEPLOY_ENDPOINT="https://cd.example.com/api/deploy"
+export DEPLOY_TOKEN="<bearer-token>"
+curl -sSf -X POST "$DEPLOY_ENDPOINT" \
+	-H "Authorization: Bearer $DEPLOY_TOKEN" \
+	-H "Content-Type: application/json" \
+	-d '{"ref":"feat/025-service-user-endpoints","actor":"your-username"}'
+```
+
 4) Smoke-Tests ausführen
 - Setze benötigte Tokens in Deiner Shell:
 ```bash

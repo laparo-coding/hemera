@@ -2,40 +2,31 @@
 import process from 'process';
 import fs from 'fs';
 import path from 'path';
-import dotenv from 'dotenv';
 
 function loadEnvFile(filePath) {
   try {
-    if (!fs.existsSync(filePath)) {
-      console.warn(`Env file not found: ${filePath}`);
-      return;
-    }
     const content = fs.readFileSync(filePath, 'utf8');
-    const parsed = dotenv.parse(content);
-    for (const [k, v] of Object.entries(parsed)) {
-      if (process.env[k] === undefined) process.env[k] = String(v);
+    for (const line of content.split(/\r?\n/)) {
+      const m = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*)$/);
+      if (!m) continue;
+      let [, k, v] = m;
+      if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+        v = v.slice(1, -1);
+      }
+      if (!process.env[k]) process.env[k] = v;
     }
     console.log(`Loaded env from ${filePath}`);
   } catch (err) {
-    console.error(`Failed to load env from ${filePath}:`, err.message || err);
-    throw err;
+    // ignore missing
   }
 }
 
 const cwd = process.cwd();
 loadEnvFile(path.join(cwd, '.env'));
 loadEnvFile(path.join(cwd, '.env.local'));
-
-// Try sibling aither path; make configurable via SIBLING_AITHER_PATH env var
-const siblingAither = process.env.SIBLING_AITHER_PATH || path.join(cwd, '..', 'aither');
-const aitherEnv = path.join(siblingAither, '.env');
-const aitherEnvLocal = path.join(siblingAither, '.env.local');
-if (fs.existsSync(siblingAither)) {
-  loadEnvFile(aitherEnv);
-  loadEnvFile(aitherEnvLocal);
-} else {
-  console.warn(`Sibling path for aither not found: ${siblingAither}`);
-}
+// try sibling aither
+loadEnvFile(path.join(cwd, '..', 'aither', '.env'));
+loadEnvFile(path.join(cwd, '..', 'aither', '.env.local'));
 
 const key = process.env.CONTEXT7_API_KEY;
 if (!key || key.startsWith('ctx7sk_your')) {
@@ -64,23 +55,7 @@ try {
     console.log('No context returned');
     process.exit(0);
   }
-
-  let text = '';
-  if (typeof ctx === 'string') {
-    text = ctx;
-  } else if (Array.isArray(ctx) && ctx.length > 0 && typeof ctx[0]?.content === 'string') {
-    text = ctx[0].content;
-  } else if (ctx && typeof ctx.content === 'string') {
-    text = ctx.content;
-  } else {
-    try {
-      text = JSON.stringify(ctx).slice(0, 200);
-    } catch (e) {
-      text = String(ctx).slice(0, 200);
-    }
-  }
-
-  if (typeof text !== 'string') text = String(text || '');
+  const text = typeof ctx === 'string' ? ctx : (ctx[0]?.content || JSON.stringify(ctx).slice(0,200));
   console.log(text.substring(0, 200) + (text.length > 200 ? '...' : ''));
   console.log('Test completed successfully.');
 } catch (err) {

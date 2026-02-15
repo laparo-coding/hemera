@@ -1,6 +1,13 @@
 /**
  * Rollbar Configuration following official Next.js documentation
  * https://docs.rollbar.com/docs/nextjs
+ *
+ * SECURITY: Rollbar SDK is only initialized when:
+ * 1. Not in test/E2E mode
+ * 2. Not explicitly disabled via env flags
+ * 3. Valid access token is present (prevents accidental initialization)
+ *
+ * This prevents secret misuse and unexpected network calls in serverless/edge contexts.
  */
 
 import Rollbar from 'rollbar';
@@ -17,6 +24,10 @@ interface RollbarTestInstance {
   wait: (cb?: () => void) => void;
 }
 
+// ============================================================================
+// Runtime Validation & Configuration
+// ============================================================================
+
 // Enablement rules unify various legacy flags used across the repo/scripts
 const isE2EMode = process.env.E2E_TEST === '1';
 const isTestMode =
@@ -27,6 +38,86 @@ const isExplicitlyDisabled =
   process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
   process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0' ||
   process.env.ROLLBAR_ENABLED === '0';
+
+/**
+ * Validate that Rollbar access token is present and non-empty
+ * Returns true if token is valid, false otherwise
+ */
+function hasValidServerToken(): boolean {
+  const token =
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 ||
+    process.env.ROLLBAR_SERVER_TOKEN;
+
+  if (!token || token.trim().length === 0) {
+    return false;
+  }
+
+  // Basic format validation (Rollbar tokens are typically 32+ chars)
+  if (token.length < 20) {
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint: Configuration warning in development
+      console.warn(
+        '[rollbar] Server token is too short (expected 20+ chars). Rollbar will be disabled.'
+      );
+    }
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Validate that Rollbar client token is present and non-empty
+ */
+function hasValidClientToken(): boolean {
+  const token =
+    process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885 ||
+    process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN;
+
+  if (!token || token.trim().length === 0) {
+    return false;
+  }
+
+  if (token.length < 20) {
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint: Configuration warning in development
+      console.warn(
+        '[rollbar] Client token is too short (expected 20+ chars). Rollbar will be disabled.'
+      );
+    }
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Check if Rollbar should be enabled based on environment and configuration
+ */
+function shouldEnableRollbar(): boolean {
+  // Never enable in test/E2E mode
+  if (isTestMode || isE2EMode) {
+    return false;
+  }
+
+  // Respect explicit disable flags
+  if (isExplicitlyDisabled) {
+    return false;
+  }
+
+  // Require valid server token (prevents accidental initialization without credentials)
+  if (!hasValidServerToken()) {
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint: Configuration info in development
+      console.info(
+        '[rollbar] No valid server token found. Rollbar error tracking is disabled. Set ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 to enable.'
+      );
+    }
+    return false;
+  }
+
+  return true;
+}
 
 function readNumberEnv(name: string, fallback: number): number {
   const v = process.env[name];
@@ -52,11 +143,13 @@ function getRollbarEnvironment(): string {
   );
 }
 
+const rollbarEnabled = shouldEnableRollbar();
+
 const baseConfig = {
   captureUncaught: true,
   captureUnhandledRejections: true,
   environment: getRollbarEnvironment(),
-  enabled: !isE2EMode && !isExplicitlyDisabled,
+  enabled: rollbarEnabled,
   // Sampling defaults: 100% errors, ~5% non-errors (overridable)
   // Rollbar's server SDK supports 'reportLevel' and custom filtering via payload handlers,
   // we emulate simple sampling by filtering in our helpers (see below).
@@ -64,48 +157,57 @@ const baseConfig = {
 
 // Client-side configuration (for React components)
 // Uses Vercel-Rollbar integration token name
+// Only include token if validation passes
 export const clientConfig = {
-  accessToken: process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885,
+  accessToken: hasValidClientToken()
+    ? process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885
+    : undefined,
   ...baseConfig,
+  enabled: rollbarEnabled && hasValidClientToken(),
+};
+
+// ============================================================================
+// Server-side Instance (Lazy Initialization)
+// ============================================================================
+
+// No-op instance for test mode or when Rollbar is disabled
+const noOpInstance: RollbarTestInstance = {
+  critical: () => {
+    /* no-op */
+  },
+  error: () => {
+    /* no-op */
+  },
+  warning: () => {
+    /* no-op */
+  },
+  warn: () => {
+    /* no-op */
+  },
+  info: () => {
+    /* no-op */
+  },
+  debug: () => {
+    /* no-op */
+  },
+  log: () => {
+    /* no-op */
+  },
+  wait: (cb?: () => void) => {
+    if (typeof cb === 'function') cb();
+  },
 };
 
 // Server-side instance (for API routes and server components)
-// In test mode, export a no-op instance to avoid network calls.
-export const serverInstance: Rollbar | RollbarTestInstance = isTestMode
-  ? {
-      critical: () => {
-        /* no-op in test mode */
-      },
-      error: () => {
-        /* no-op in test mode */
-      },
-      warning: () => {
-        /* no-op in test mode */
-      },
-      warn: () => {
-        /* no-op in test mode */
-      },
-      info: () => {
-        /* no-op in test mode */
-      },
-      debug: () => {
-        /* no-op in test mode */
-      },
-      log: () => {
-        /* no-op in test mode */
-      },
-      wait: (cb?: () => void) => {
-        if (typeof cb === 'function') cb();
-      },
-    }
-  : new Rollbar({
-      // In E2E mode, use a dummy token to prevent initialization errors
-      // Uses Vercel-Rollbar integration token name
-      accessToken: isE2EMode
-        ? 'dummy-token-for-e2e'
-        : process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885,
+// Only initialize Rollbar if enabled and token is valid
+export const serverInstance: Rollbar | RollbarTestInstance = rollbarEnabled
+  ? new Rollbar({
+      accessToken:
+        process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 ||
+        process.env.ROLLBAR_SERVER_TOKEN,
       ...baseConfig,
-    });
+    })
+  : noOpInstance;
 
 // Legacy compatibility - keeping old configuration exports
 // Uses Vercel-Rollbar integration token name with fallback

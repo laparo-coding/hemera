@@ -233,7 +233,9 @@ export async function PATCH(
     // unset a nullable relation/field we would need an explicit handling
     // (e.g. set to Prisma.Null), but for safety we omit nulls here.
     const prismaUpdateData: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(updateData as Record<string, unknown>)) {
+    for (const [k, v] of Object.entries(
+      updateData as Record<string, unknown>
+    )) {
       if (v !== null) {
         prismaUpdateData[k] = v;
       }
@@ -261,10 +263,11 @@ export async function PATCH(
       }
     }
 
-    // Ensure price is stored as integer cents
+    // Ensure price is stored as integer cents. `courseUpdateSchema` now
+    // transforms decimal Euro amounts into integer cents when present.
     if (updateData.price !== undefined) {
-      const priceNum = Number(updateData.price as unknown as number);
-      if (!Number.isFinite(priceNum) || priceNum <= 0) {
+      const priceCents = updateData.price as number;
+      if (!Number.isInteger(priceCents) || priceCents < 0) {
         return createErrorResponse(
           'Ungültiger Preis',
           ErrorCodes.VALIDATION_ERROR,
@@ -273,9 +276,8 @@ export async function PATCH(
         );
       }
 
-      updateData.price = Number.isInteger(priceNum)
-        ? priceNum
-        : Math.round(priceNum * 100);
+      // Ensure the computed prisma update payload contains the integer cents
+      prismaUpdateData.price = priceCents;
     }
 
     const updated = await prisma.course.update({
