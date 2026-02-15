@@ -341,7 +341,9 @@ export async function PATCH(
 
     const updated = await prisma.course.update({
       where: { id },
-      data: prismaUpdateData as Parameters<typeof prisma.course.update>[0]['data'],
+      data: prismaUpdateData as Parameters<
+        typeof prisma.course.update
+      >[0]['data'],
       include: {
         _count: {
           select: {
