@@ -20,7 +20,8 @@
       "!**/package-lock.json",
       "!**/scripts",
       "!**/prisma/seed.ts",
-      "!**/tests"
+      "!**/tests/e2e",
+      "!**/tests/unit"
     ]
   },
   "formatter": {
