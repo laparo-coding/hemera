@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { reportError } from '@/lib/monitoring/rollbar-official';
 
@@ -7,7 +8,7 @@ export interface PersistedApiLog {
   method: string;
   responseStatus: number;
   ipAddress?: string | null;
-  metadata?: any;
+  metadata?: Record<string, unknown> | null;
 }
 
 export async function persistServiceApiLog(log: PersistedApiLog) {
@@ -19,7 +20,7 @@ export async function persistServiceApiLog(log: PersistedApiLog) {
         method: log.method,
         responseStatus: log.responseStatus,
         ipAddress: log.ipAddress ?? null,
-        metadata: log.metadata ?? null,
+        metadata: (log.metadata as Prisma.InputJsonValue) ?? Prisma.DbNull,
       },
     });
   } catch (err) {

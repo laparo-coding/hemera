@@ -10,6 +10,9 @@ describe('Contract: Privacy/Consent default OFF (no PII)', () => {
     delete process.env.TELEMETRY_CONSENT;
     delete process.env.ROLLBAR_ALLOW_PII;
     process.env.NEXT_PUBLIC_ROLLBAR_ENABLED = '1'; // explizit Rollbar aktivieren
+    // Provide a valid server token so shouldEnableRollbar() returns true
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
+      'valid-token-with-sufficient-length-12345';
     // No module mocking; we reload module by dynamic import when needed
   });
 
