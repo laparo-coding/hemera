@@ -1,0 +1,1 @@
+SELECT id, title, slug, created_at FROM courses WHERE title LIKE '%[CONTRACT-TEST]%' ORDER BY created_at DESC;

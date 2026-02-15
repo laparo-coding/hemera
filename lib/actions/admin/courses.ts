@@ -56,8 +56,20 @@ export async function createCourseAction(
     // Validate input
     const validatedData = courseCreateSchema.parse(formData);
 
+    // Ensure required database shape: `createCourse` expects a non-null
+    // `startDate` (Date). The Zod schema allows `startDate` optional/null;
+    // if missing we default it to the `startTime` date so the DB has a valid
+    // start date component. Use the exact parameter type expected by
+    // `courseDb.createCourse` to avoid `any` assertions.
+    type CreateCoursePayload = Parameters<typeof courseDb.createCourse>[0];
+    const createPayload: CreateCoursePayload = {
+      ...validatedData,
+      startDate: validatedData.startDate ?? validatedData.startTime,
+      endTime: validatedData.endTime ?? validatedData.startTime,
+    };
+
     // Create course
-    const course = await courseDb.createCourse(validatedData);
+    const course = await courseDb.createCourse(createPayload);
 
     // Log success
     rollbar.info('Course created by admin', {

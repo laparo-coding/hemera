@@ -39,5 +39,6 @@ and tests.
 
 ## Security
 
-- Never commit secrets or real API keys.
-- Use GitHub Secrets and environment management workflows.
+- Never commit secrets or real API keys. Real secret-bearing `.env*` files (e.g. `.env.local`, `.env.production`) must not be committed.
+- Committed example files that contain only placeholders and explanatory comments (for example `.env.example` or `.env.local.example`) are allowed and recommended to document required variables and formats.
+- Use GitHub Secrets and environment management workflows to store runtime secrets.

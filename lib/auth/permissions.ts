@@ -1,12 +1,14 @@
 // Clerk-based permissions helpers
-import { currentUser } from '@clerk/nextjs/server';
+import { clerkClient, currentUser } from '@clerk/nextjs/server';
+import { ErrorSeverity, reportError } from '@/lib/monitoring/rollbar-official';
 
-export type UserRole = 'user' | 'admin' | 'moderator';
+export type UserRole = 'user' | 'admin' | 'moderator' | 'api-client';
 
 const VALID_ROLES: readonly UserRole[] = [
   'user',
   'admin',
   'moderator',
+  'api-client',
 ] as const;
 
 export interface NavigationItem {
@@ -16,13 +18,74 @@ export interface NavigationItem {
 }
 
 /**
- * Get user role from Clerk metadata
- * Falls back to 'user' if role is missing, undefined, or invalid
- * Normalizes role to lowercase to handle casing variations
+ * Get user role from Clerk metadata with comprehensive error handling
+ * If `userId` is provided, fetch the Clerk user via `clerkClient.users.getUser`.
+ * Otherwise, fall back to `currentUser()` (server-side request context).
+ *
+ * Error handling:
+ * - Wraps all Clerk API calls in try-catch
+ * - Normalizes errors (no backend details leaked)
+ * - Falls back to 'user' role on any error (safe default)
+ * - Logs errors to Rollbar for monitoring
+ * - Never throws exceptions in production
  */
-export async function getUserRole(): Promise<UserRole> {
-  const user = await currentUser();
-  const role = user?.publicMetadata?.role;
+export async function getUserRole(userId?: string): Promise<UserRole> {
+  let role: unknown = null;
+
+  // Try to fetch role from specific user ID
+  if (userId) {
+    try {
+      const clerk = await clerkClient();
+      const user = await clerk.users.getUser(userId);
+      role = user?.publicMetadata?.role;
+      // Wenn User gefunden, aber keine Rolle gesetzt, sichere Default role
+      if (user && !role) {
+        return 'user';
+      }
+    } catch (err: any) {
+      // Log Clerk API error but continue with fallback. Do NOT include raw
+      // backend messages — provide non-sensitive metadata instead.
+      reportError(
+        new Error('Failed to fetch user role from Clerk by userId'),
+        {
+          additionalData: {
+            userId,
+            operation: 'getUserRole',
+            errorType: 'clerk_api_error',
+            hasOriginalError: Boolean(err?.message),
+            errorName: err?.name,
+          },
+        },
+        ErrorSeverity.WARNING
+      );
+      return 'user';
+    }
+  }
+
+  // Fallback to current user context if no role yet
+  if (!role) {
+    try {
+      const user = await currentUser();
+      role = user?.publicMetadata?.role;
+    } catch (err: any) {
+      // Log currentUser() error and fall back to safe default. Avoid leaking
+      // error messages; include non-sensitive metadata.
+      reportError(
+        new Error('Failed to fetch current user from Clerk'),
+        {
+          additionalData: {
+            operation: 'getUserRole',
+            errorType: 'clerk_current_user_error',
+            hasOriginalError: Boolean(err?.message),
+            errorName: err?.name,
+          },
+        },
+        ErrorSeverity.WARNING
+      );
+      // Return safe default role
+      return 'user';
+    }
+  }
 
   // Normalize to lowercase string and validate against known roles
   if (typeof role === 'string') {
@@ -32,30 +95,67 @@ export async function getUserRole(): Promise<UserRole> {
     }
   }
 
+  // Safe default fallback
   return 'user';
 }
 
 /**
- * Check if user has specific permission
+ * Check if user has specific permission with error handling
+ *
+ * Error handling:
+ * - Wraps currentUser() call in try-catch
+ * - Falls back to false (deny access) on errors
+ * - Logs errors to Rollbar for monitoring
+ * - Never throws exceptions in production
  */
 export async function hasPermission(permission: string): Promise<boolean> {
-  const user = await currentUser();
-  const userRole = await getUserRole();
+  try {
+    const user = await currentUser();
+    if (!user) return false;
 
-  if (!user) return false;
+    // Rolle direkt aus User-Objekt lesen; falls ungueltig: sichere Default role
+    let role: UserRole = 'user';
+    const rawRole = user.publicMetadata?.role;
+    if (typeof rawRole === 'string') {
+      const normalizedRole = rawRole.toLowerCase().trim();
+      role = (VALID_ROLES as readonly string[]).includes(normalizedRole)
+        ? (normalizedRole as UserRole)
+        : 'user';
+    }
 
-  // Admin has all permissions
-  if (userRole === 'admin') return true;
+    // Admin hat alle Rechte
+    if (role === 'admin') return true;
 
-  // Define role-based permissions
-  const rolePermissions: Record<UserRole, string[]> = {
-    admin: ['*'], // All permissions
-    moderator: ['read:courses', 'manage:courses'],
-    user: ['read:courses'],
-  };
+    // Rollenbasierte Berechtigungen
+    const rolePermissions: Record<UserRole, string[]> = {
+      admin: ['*'],
+      moderator: ['read:courses', 'manage:courses'],
+      user: ['read:courses'],
+      'api-client': [
+        'read:courses',
+        'read:participations',
+        'write:participation-results',
+      ],
+    };
 
-  const permissions = rolePermissions[userRole] || [];
-  return permissions.includes('*') || permissions.includes(permission);
+    const permissions = rolePermissions[role] || [];
+    return permissions.includes('*') || permissions.includes(permission);
+  } catch (err: any) {
+    reportError(
+      new Error('Failed to check user permission'),
+      {
+        additionalData: {
+          permission,
+          operation: 'hasPermission',
+          errorType: 'permission_check_error',
+          hasOriginalError: Boolean(err?.message),
+          errorName: err?.name,
+        },
+      },
+      ErrorSeverity.WARNING
+    );
+    return false;
+  }
 }
 
 /**
@@ -66,11 +166,35 @@ export async function canManageCourses(): Promise<boolean> {
 }
 
 /**
- * Check if user is admin
+ * Check if user is admin with error handling
+ *
+ * Error handling:
+ * - Wraps getUserRole() call in try-catch
+ * - Falls back to false (deny admin access) on errors
+ * - Logs errors to Rollbar for monitoring
+ * - Never throws exceptions in production
  */
 export async function isAdmin(): Promise<boolean> {
-  const role = await getUserRole();
-  return role === 'admin';
+  try {
+    const role = await getUserRole();
+    return role === 'admin';
+  } catch (err: any) {
+    // Log error and deny admin access by default (safe fallback). Avoid leaking
+    // backend error messages; provide non-sensitive metadata.
+    reportError(
+      new Error('Failed to check admin status'),
+      {
+        additionalData: {
+          operation: 'isAdmin',
+          errorType: 'admin_check_error',
+          hasOriginalError: Boolean(err?.message),
+          errorName: err?.name,
+        },
+      },
+      ErrorSeverity.WARNING
+    );
+    return false;
+  }
 }
 
 /**

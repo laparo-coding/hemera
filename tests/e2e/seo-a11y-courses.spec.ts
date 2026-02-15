@@ -52,10 +52,8 @@ test.describe('Courses SEO & A11y', () => {
       v => v.impact === 'critical'
     );
     if (critical.length) {
-      console.error(
-        'Critical A11y violations:',
-        critical.map(v => v.id)
-      );
+      // console.error entfernt (Lint-Regel):
+      // Critical A11y violations: critical.map(v => v.id)
     }
     expect(critical.length).toBe(0);
   });

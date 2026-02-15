@@ -936,6 +936,7 @@ paths:
                 price:
                   type: integer
                   minimum: 0
+                  description: "Price in cents (EUR). Integer number of cents. e.g. 9999 = €99.99"
                 startDate:
                   type: string
                   format: date-time
@@ -1620,6 +1621,7 @@ components:
         price:
           type: integer
           minimum: 0
+          description: "Price in cents (EUR). Integer number of cents. e.g. 9999 = €99.99"
         currency:
           type: string
           enum: [EUR]

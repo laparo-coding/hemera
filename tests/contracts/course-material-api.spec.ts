@@ -47,14 +47,14 @@ jest.mock('@/lib/monitoring/rollbar-official', () => ({
 }));
 
 import { NextRequest } from 'next/server';
-import { GET, POST } from '@/app/api/admin/course-material/route';
+import { GET as GET_CONTENT } from '@/app/api/admin/course-material/[id]/content/route';
 import {
+  DELETE,
   GET as GET_SINGLE,
   PUT,
-  DELETE,
 } from '@/app/api/admin/course-material/[id]/route';
-import { GET as GET_CONTENT } from '@/app/api/admin/course-material/[id]/content/route';
 import { POST as POST_IMAGE } from '@/app/api/admin/course-material/images/route';
+import { GET, POST } from '@/app/api/admin/course-material/route';
 
 // Shared helper for creating params promise (Next.js 15 dynamic route params)
 const createParams = (id: string) => Promise.resolve({ id });
@@ -88,7 +88,9 @@ describe('GET /api/admin/course-material', () => {
       },
     ]);
 
-    const request = new NextRequest('http://localhost/api/admin/course-material');
+    const _request = new NextRequest(
+      'http://localhost/api/admin/course-material'
+    );
     const response = await GET();
     const json = await response.json();
 
@@ -101,7 +103,9 @@ describe('GET /api/admin/course-material', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.courseMaterial.findMany.mockResolvedValue([]);
 
-    const request = new NextRequest('http://localhost/api/admin/course-material');
+    const _request = new NextRequest(
+      'http://localhost/api/admin/course-material'
+    );
     const response = await GET();
     const json = await response.json();
 
@@ -118,10 +122,13 @@ describe('POST /api/admin/course-material', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material', {
-      method: 'POST',
-      body: JSON.stringify({ title: 'Test', htmlContent: '<p>Test</p>' }),
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material',
+      {
+        method: 'POST',
+        body: JSON.stringify({ title: 'Test', htmlContent: '<p>Test</p>' }),
+      }
+    );
     const response = await POST(request);
     const json = await response.json();
 
@@ -132,10 +139,13 @@ describe('POST /api/admin/course-material', () => {
   it('returns 400 for missing required fields', async () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material', {
-      method: 'POST',
-      body: JSON.stringify({ title: '' }),
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material',
+      {
+        method: 'POST',
+        body: JSON.stringify({ title: '' }),
+      }
+    );
     const response = await POST(request);
     const json = await response.json();
 
@@ -155,19 +165,23 @@ describe('POST /api/admin/course-material', () => {
       id: 'mat_new',
       identifier: 'test-material',
       title: 'Test Material',
-      blobUrl: 'https://blob.vercel-storage.com/course-material/test-material.html',
+      blobUrl:
+        'https://blob.vercel-storage.com/course-material/test-material.html',
       blobPathname: 'course-material/test-material.html',
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: 'Test Material',
-        htmlContent: '<p>Test content</p>',
-      }),
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          title: 'Test Material',
+          htmlContent: '<p>Test content</p>',
+        }),
+      }
+    );
     const response = await POST(request);
     const json = await response.json();
 
@@ -188,14 +202,17 @@ describe('POST /api/admin/course-material', () => {
       identifier: 'test-material',
     });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: 'Test Material',
-        identifier: 'test-material',
-        htmlContent: '<p>Test</p>',
-      }),
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          title: 'Test Material',
+          identifier: 'test-material',
+          htmlContent: '<p>Test</p>',
+        }),
+      }
+    );
     const response = await POST(request);
     const json = await response.json();
 
@@ -212,8 +229,12 @@ describe('GET /api/admin/course-material/[id]', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1');
-    const response = await GET_SINGLE(request, { params: createParams('mat_1') });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_1'
+    );
+    const response = await GET_SINGLE(request, {
+      params: createParams('mat_1'),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(401);
@@ -224,8 +245,12 @@ describe('GET /api/admin/course-material/[id]', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_999');
-    const response = await GET_SINGLE(request, { params: createParams('mat_999') });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_999'
+    );
+    const response = await GET_SINGLE(request, {
+      params: createParams('mat_999'),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(404);
@@ -244,8 +269,12 @@ describe('GET /api/admin/course-material/[id]', () => {
       updatedAt: new Date('2025-01-01'),
     });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1');
-    const response = await GET_SINGLE(request, { params: createParams('mat_1') });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_1'
+    );
+    const response = await GET_SINGLE(request, {
+      params: createParams('mat_1'),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -262,10 +291,13 @@ describe('PUT /api/admin/course-material/[id]', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
-      method: 'PUT',
-      body: JSON.stringify({ title: 'Updated' }),
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_1',
+      {
+        method: 'PUT',
+        body: JSON.stringify({ title: 'Updated' }),
+      }
+    );
     const response = await PUT(request, { params: createParams('mat_1') });
     const json = await response.json();
 
@@ -277,10 +309,13 @@ describe('PUT /api/admin/course-material/[id]', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_999', {
-      method: 'PUT',
-      body: JSON.stringify({ title: 'Updated' }),
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_999',
+      {
+        method: 'PUT',
+        body: JSON.stringify({ title: 'Updated' }),
+      }
+    );
     const response = await PUT(request, { params: createParams('mat_999') });
     const json = await response.json();
 
@@ -309,10 +344,13 @@ describe('PUT /api/admin/course-material/[id]', () => {
       updatedAt: new Date(),
     });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
-      method: 'PUT',
-      body: JSON.stringify({ title: 'New Title' }),
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_1',
+      {
+        method: 'PUT',
+        body: JSON.stringify({ title: 'New Title' }),
+      }
+    );
     const response = await PUT(request, { params: createParams('mat_1') });
     const json = await response.json();
 
@@ -345,10 +383,13 @@ describe('PUT /api/admin/course-material/[id]', () => {
       updatedAt: new Date(),
     });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
-      method: 'PUT',
-      body: JSON.stringify({ htmlContent: '<p>New content</p>' }),
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_1',
+      {
+        method: 'PUT',
+        body: JSON.stringify({ htmlContent: '<p>New content</p>' }),
+      }
+    );
     const response = await PUT(request, { params: createParams('mat_1') });
 
     expect(response.status).toBe(200);
@@ -367,10 +408,13 @@ describe('PUT /api/admin/course-material/[id]', () => {
       updatedAt: new Date(),
     });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
-      method: 'PUT',
-      body: JSON.stringify({}),
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_1',
+      {
+        method: 'PUT',
+        body: JSON.stringify({}),
+      }
+    );
     const response = await PUT(request, { params: createParams('mat_1') });
     const json = await response.json();
 
@@ -388,9 +432,12 @@ describe('DELETE /api/admin/course-material/[id]', () => {
   it('returns 401 for unauthenticated request', async () => {
     mockAuth.mockResolvedValue({ userId: null });
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
-      method: 'DELETE',
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_1',
+      {
+        method: 'DELETE',
+      }
+    );
     const response = await DELETE(request, { params: createParams('mat_1') });
     const json = await response.json();
 
@@ -402,9 +449,12 @@ describe('DELETE /api/admin/course-material/[id]', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_999', {
-      method: 'DELETE',
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_999',
+      {
+        method: 'DELETE',
+      }
+    );
     const response = await DELETE(request, { params: createParams('mat_999') });
     const json = await response.json();
 
@@ -426,13 +476,18 @@ describe('DELETE /api/admin/course-material/[id]', () => {
     mockDel.mockResolvedValue(undefined);
     mockPrisma.courseMaterial.delete.mockResolvedValue({});
 
-    const request = new NextRequest('http://localhost/api/admin/course-material/mat_1', {
-      method: 'DELETE',
-    });
+    const request = new NextRequest(
+      'http://localhost/api/admin/course-material/mat_1',
+      {
+        method: 'DELETE',
+      }
+    );
     const response = await DELETE(request, { params: createParams('mat_1') });
 
     expect(response.status).toBe(204);
-    expect(mockDel).toHaveBeenCalledWith('https://blob.vercel-storage.com/test.html');
+    expect(mockDel).toHaveBeenCalledWith(
+      'https://blob.vercel-storage.com/test.html'
+    );
     expect(mockPrisma.courseMaterial.delete).toHaveBeenCalledWith({
       where: { id: 'mat_1' },
     });
@@ -450,7 +505,9 @@ describe('GET /api/admin/course-material/[id]/content', () => {
     const request = new NextRequest(
       'http://localhost/api/admin/course-material/mat_1/content'
     );
-    const response = await GET_CONTENT(request, { params: createParams('mat_1') });
+    const response = await GET_CONTENT(request, {
+      params: createParams('mat_1'),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(401);
@@ -464,7 +521,9 @@ describe('GET /api/admin/course-material/[id]/content', () => {
     const request = new NextRequest(
       'http://localhost/api/admin/course-material/mat_999/content'
     );
-    const response = await GET_CONTENT(request, { params: createParams('mat_999') });
+    const response = await GET_CONTENT(request, {
+      params: createParams('mat_999'),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(404);
@@ -494,7 +553,9 @@ describe('GET /api/admin/course-material/[id]/content', () => {
       const request = new NextRequest(
         'http://localhost/api/admin/course-material/mat_1/content'
       );
-      const response = await GET_CONTENT(request, { params: createParams('mat_1') });
+      const response = await GET_CONTENT(request, {
+        params: createParams('mat_1'),
+      });
       const json = await response.json();
 
       expect(response.status).toBe(200);
@@ -515,7 +576,11 @@ describe('POST /api/admin/course-material/images', () => {
     mockAuth.mockResolvedValue({ userId: null });
 
     const formData = new FormData();
-    formData.append('file', new Blob(['test'], { type: 'image/jpeg' }), 'test.jpg');
+    formData.append(
+      'file',
+      new Blob(['test'], { type: 'image/jpeg' }),
+      'test.jpg'
+    );
 
     const request = new NextRequest(
       'http://localhost/api/admin/course-material/images',

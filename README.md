@@ -4,6 +4,8 @@ This repository is currently in a planning/documentation phase. Features are def
 under `specs/` using a specs-first workflow. Implementation follows a structured approach with
 automated code review and quality assurance through Qodo PR Agent integration.
 
+Hinweis: Das API-Feld `price` verwendet in dieser Codebasis Cent als Integer (EUR). Beispiel: `9999` entspricht `€99.99`.
+
 ## Prerequisites
 
 - **Node.js**: >= 20.0.0 (see `engines` in package.json, `.nvmrc` for pinned version)

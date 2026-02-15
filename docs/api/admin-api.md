@@ -46,6 +46,8 @@ All endpoints use:
 - **Development**: `http://localhost:3000`
 - **Production**: Your deployed application URL
 
+**Hinweis:** In allen API-Anfragen und -Antworten wird das Feld `price` als Integer in Cent (EUR) verwendet. Beispiel: `9999` entspricht `€99.99`.
+
 ## Authentication
 
 Authentication requirements vary by endpoint type:
@@ -166,8 +168,8 @@ curl "https://your-app.vercel.app/api/courses?search=react&minPrice=50&sortBy=pr
         "title": "Introduction to React",
         "description": "Learn React basics",
         "slug": "intro-to-react",
-        "price": 99.99,
-        "currency": "USD",
+        "price": 9999,
+        "currency": "EUR",
         "capacity": 30,
         "date": "2025-02-01T10:00:00.000Z",
         "isPublished": true,
@@ -234,8 +236,8 @@ curl -X GET "https://your-app.vercel.app/api/bookings?status=PAID&page=1&limit=1
         "id": "booking_123",
         "courseId": "course_456",
         "courseTitle": "Introduction to React",
-        "coursePrice": 99.99,
-        "currency": "USD",
+        "coursePrice": 9999,
+        "currency": "EUR",
         "paymentStatus": "PAID",
         "createdAt": "2025-01-10T15:30:00.000Z"
       }
@@ -289,7 +291,7 @@ curl -X POST "https://your-app.vercel.app/api/bookings" \
       "id": "booking_789",
       "courseId": "course_456",
       "courseTitle": "Introduction to React",
-      "price": 99.99,
+      "price": 9999,
       "paymentStatus": "PENDING",
       "createdAt": "2025-01-15T10:30:00.000Z"
     }
@@ -367,30 +369,32 @@ authentication, use `/api/courses` instead.
 **Response**:
 
 ```json
-{
-  "success": true,
-  "data": {
-    "courses": [
-      {
-        "id": 1,
-        "title": "Introduction to React",
-        "description": "Learn React basics",
-        "price": 99.99,
-        "duration": 8,
-        "createdAt": "2025-01-01T00:00:00.000Z",
-        "_count": {
-          "bookings": 25
+        {
+          "success": true,
+          "data": {
+            "courses": [
+              {
+                "id": 1,
+                "title": "Introduction to React",
+                "description": "Learn React basics",
+                "price": 9999,
+                "duration": 8,
+                "createdAt": "2025-01-01T00:00:00.000Z",
+                "_count": {
+                  "bookings": 25
+                }
+              }
+            ],
+            "total": 5
+          },
+          "meta": {
+            "requestId": "req_def456",
+            "timestamp": "2025-01-15T10:30:00.000Z",
+            "version": "1.0"
+          }
         }
-      }
-    ],
-    "total": 5
-  },
-  "meta": {
-    "requestId": "req_def456",
-    "timestamp": "2025-01-15T10:30:00.000Z",
-    "version": "1.0"
-  }
-}
+
+**Hinweis:** In der Admin-API wird das Feld `price` als Integer in Cent (EUR) übergeben und zurückgegeben. Beispiel: `9999` entspricht `€99.99`.
 ```
 
 **Error Responses**:

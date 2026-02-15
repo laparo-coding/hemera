@@ -9,17 +9,24 @@ describe('Contract: Privacy/Consent default OFF (no PII)', () => {
     delete process.env.NEXT_PUBLIC_TELEMETRY_CONSENT;
     delete process.env.TELEMETRY_CONSENT;
     delete process.env.ROLLBAR_ALLOW_PII;
+    process.env.NEXT_PUBLIC_ROLLBAR_ENABLED = '1'; // explizit Rollbar aktivieren
+    // Provide a valid server token so shouldEnableRollbar() returns true
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
+      'valid-token-with-sufficient-length-12345';
     // No module mocking; we reload module by dynamic import when needed
   });
 
   it('does not include person when consent is not granted', async () => {
     const mod = await import('../../lib/monitoring/rollbar-official');
-    // Monkey patch serverInstance.error to capture payload
+    // Monkey patch alle Methoden von serverInstance, um alle Severity-Fälle zu erfassen
     const calls: any[] = [];
-    const originalError = mod.serverInstance.error.bind(mod.serverInstance);
-    (mod.serverInstance as any).error = (msg: any, payload: any) => {
-      calls.push([msg, payload]);
-    };
+    const orig: Record<string, any> = {};
+    for (const method of ['error', 'warning', 'info', 'critical', 'debug']) {
+      orig[method] = (mod.serverInstance as any)[method];
+      (mod.serverInstance as any)[method] = (msg: any, payload: any) => {
+        calls.push([msg, payload]);
+      };
+    }
 
     mod.reportError('Test Error', {
       userId: 'user-123',
@@ -34,6 +41,8 @@ describe('Contract: Privacy/Consent default OFF (no PII)', () => {
     expect(payload.person).toBeUndefined();
 
     // restore
-    (mod.serverInstance as any).error = originalError;
+    for (const method of ['error', 'warning', 'info', 'critical', 'debug']) {
+      (mod.serverInstance as any)[method] = orig[method];
+    }
   });
 });

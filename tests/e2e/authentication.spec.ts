@@ -65,10 +65,12 @@ test.describe('Authentication Flow', () => {
     } catch (error) {
       // Debug: Show current URL and page content
       const currentUrl = page.url();
-      console.log('❌ Authentication failed. Current URL:', currentUrl);
+      // console.log entfernt (Lint-Regel):
+      // ❌ Authentication failed. Current URL: currentUrl
 
       await page.screenshot({ path: 'debug-auth-failure.png' });
-      console.log('📸 Debug screenshot saved as debug-auth-failure.png');
+      // console.log entfernt (Lint-Regel):
+      // 📸 Debug screenshot saved as debug-auth-failure.png
 
       throw error;
     }

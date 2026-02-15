@@ -79,7 +79,8 @@ test.describe('Dashboard Performance', () => {
 
     // Check load time
     expect(loadTime).toBeLessThan(THRESHOLDS.DASHBOARD_LOAD_MS);
-    console.log(`Dashboard load time: ${loadTime}ms`);
+      // console.log entfernt (Lint-Regel):
+      // Dashboard load time: ${loadTime}ms
   });
 
   test('should render first content quickly', async ({ page }) => {
@@ -99,9 +100,8 @@ test.describe('Dashboard Performance', () => {
     await page.waitForLoadState('domcontentloaded');
     const domContentLoaded = Date.now() - startTime;
 
-    console.log(
-      `First commit: ${commitTime}ms, DOM loaded: ${domContentLoaded}ms`
-    );
+      // console.log entfernt (Lint-Regel):
+      // First commit: ${commitTime}ms, DOM loaded: ${domContentLoaded}ms
 
     // First paint should happen quickly
     expect(domContentLoaded).toBeLessThan(THRESHOLDS.FIRST_PAINT_MS);
@@ -123,7 +123,8 @@ test.describe('Dashboard Performance', () => {
       const clickTime = Date.now() - clickStart;
 
       expect(clickTime).toBeLessThan(200); // Click should be fast
-      console.log(`Click response time: ${clickTime}ms`);
+        // console.log entfernt (Lint-Regel):
+        // Click response time: ${clickTime}ms
       return;
     }
 
@@ -135,7 +136,8 @@ test.describe('Dashboard Performance', () => {
     await expect(dashboard).toBeVisible();
 
     expect(loadTime).toBeLessThan(THRESHOLDS.INTERACTIVE_MS);
-    console.log(`Time to interactive: ${loadTime}ms`);
+      // console.log entfernt (Lint-Regel):
+      // Time to interactive: ${loadTime}ms
   });
 
   test('should not have layout shifts after load', async ({ page }) => {
@@ -165,7 +167,8 @@ test.describe('Dashboard Performance', () => {
       expect(heightShift).toBeLessThan(50);
       expect(topShift).toBeLessThan(20);
 
-      console.log(`Height shift: ${heightShift}px, Top shift: ${topShift}px`);
+        // console.log entfernt (Lint-Regel):
+        // Height shift: ${heightShift}px, Top shift: ${topShift}px
     }
   });
 });
@@ -205,7 +208,8 @@ test.describe('Bookings API Performance', () => {
 
       // Mock response should be nearly instant
       expect(responseTime).toBeLessThan(THRESHOLDS.API_RESPONSE_MS);
-      console.log('Mock API response time validated');
+        // console.log entfernt (Lint-Regel):
+        // Mock API response time validated
       return;
     }
 
@@ -224,11 +228,13 @@ test.describe('Bookings API Performance', () => {
       await apiPromise;
       const responseTime = Date.now() - startTime;
 
-      console.log(`API response time: ${responseTime}ms`);
+        // console.log entfernt (Lint-Regel):
+        // API response time: ${responseTime}ms
       expect(responseTime).toBeLessThan(THRESHOLDS.API_RESPONSE_MS);
     } catch {
       // API might not be called if user is not authenticated
-      console.log('API request not captured (user may not be authenticated)');
+        // console.log entfernt (Lint-Regel):
+        // API request not captured (user may not be authenticated)
     }
   });
 });
@@ -305,6 +311,7 @@ test.describe('Course Detail Performance', () => {
     await expect(content.first()).toBeVisible();
 
     expect(loadTime).toBeLessThan(THRESHOLDS.DASHBOARD_LOAD_MS);
-    console.log(`Course detail load time: ${loadTime}ms`);
+      // console.log entfernt (Lint-Regel):
+      // Course detail load time: ${loadTime}ms
   });
 });

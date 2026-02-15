@@ -8,7 +8,6 @@ process.env.E2E_TEST = 'true';
 
 // Optional: Add any global setup logic here
 export default async function globalSetup() {
-  console.log(
-    '🔧 E2E Global Setup: Environment variables loaded, NODE_ENV set to test'
-  );
+  // console.log entfernt (Lint-Regel):
+  // 🔧 E2E Global Setup: Environment variables loaded, NODE_ENV set to test
 }
