@@ -55,7 +55,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "biome check --write",
+      "biome check --write --no-errors-on-unmatched",
       "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files --exclude 'lib/generated/**'"
     ],
     "*.json": [
