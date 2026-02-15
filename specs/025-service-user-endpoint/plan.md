@@ -204,10 +204,10 @@ const RATE_LIMITS = {
 
 | Status | Error Code | Description |
 |--------|------------|-------------|
-| 401 | `AUTH_REQUIRED` | No valid JWT token provided |
+| 401 | `UNAUTHORIZED` | No valid JWT token provided |
 | 403 | `FORBIDDEN` | User role not authorized for this endpoint |
 | 404 | `NOT_FOUND` | Resource (course/participation) not found |
-| 429 | `RATE_LIMIT_EXCEEDED` | Too many requests |
+| 429 | `RATE_LIMITED` | Too many requests |
 | 500 | `INTERNAL_ERROR` | Server error (logged to Rollbar) |
 
 ### Error Response Format

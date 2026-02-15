@@ -62,7 +62,6 @@
       "biome format --write"
     ],
     "*.{md,mdx}": [
-      "biome format --write",
       "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files"
     ]
   },

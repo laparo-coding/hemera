@@ -154,7 +154,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse and validate body
-    const body = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch (_err) {
+      const errorResponse = createErrorResponse(
+        'Ungültiges JSON im Request Body',
+        ErrorCodes.VALIDATION_ERROR,
+        requestId,
+        400
+      );
+
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
+      });
+
+      return errorResponse;
+    }
 
     let parsed: CourseCreateInput;
     try {
