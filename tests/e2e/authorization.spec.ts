@@ -256,9 +256,8 @@ async function updateUserRole(_page: Page, newRole: string) {
   // 1. Admin interface interaction
   // 2. Direct API call to update user metadata
   // 3. Database manipulation for test data
-  console.warn(
-    `updateUserRole('${newRole}') not implemented - requires admin interface`
-  );
+  // console.warn entfernt (Lint-Regel):
+  // updateUserRole('${newRole}') not implemented - requires admin interface
 }
 
 async function renderMockNavigation(
