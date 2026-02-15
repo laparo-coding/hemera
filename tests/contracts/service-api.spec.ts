@@ -139,15 +139,15 @@ describe('Service API - Contract Tests', () => {
           'X-RateLimit-Reset': '45',
         };
 
-        expect(Number.parseInt(headers['X-RateLimit-Limit'])).toBeGreaterThan(
-          0
-        );
         expect(
-          Number.parseInt(headers['X-RateLimit-Remaining'])
+          Number.parseInt(headers['X-RateLimit-Limit'], 10)
+        ).toBeGreaterThan(0);
+        expect(
+          Number.parseInt(headers['X-RateLimit-Remaining'], 10)
         ).toBeGreaterThanOrEqual(0);
-        expect(Number.parseInt(headers['X-RateLimit-Reset'])).toBeGreaterThan(
-          0
-        );
+        expect(
+          Number.parseInt(headers['X-RateLimit-Reset'], 10)
+        ).toBeGreaterThan(0);
       });
 
       it('should return 429 when rate limit exceeded', () => {
