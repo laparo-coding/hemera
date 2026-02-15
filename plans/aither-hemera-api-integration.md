@@ -52,7 +52,6 @@ export async function getUserRole(userId: string): Promise<string | null> {
 
 Endpoint‑Änderung: Stelle sicher, dass `auth()` ein `userId` liefert, bevor `getUserRole(userId)` aufgerufen wird; wenn `userId` fehlt -> return 401; wenn `getUserRole` einen nicht erlaubten Wert liefert -> return 403. Später kann die einfache Rollenprüfung durch feinere Berechtigungsprüfungen ersetzt werden.
 
-
 ### Architektur-Optionen
 
 #### Option A: Clerk Service-User mit eigener Rolle ⭐ Empfohlen

@@ -6,7 +6,7 @@ version: 1.0
 effective: 2025-01-15
 ---
 
-# `reportError` — `additionalData` keys
+# reportError — additionalData keys
 
 Kurzreferenz der `additionalData`-Schlüssel, die beim Aufruf von `reportError(...)` im Codebase verwendet werden. Ziel: Konsistente Telemetrie, PII-Redaktion und automatische Prüfungen.
 
