@@ -52,7 +52,7 @@ export async function GET(
     const { userId } = await auth();
     if (!userId) {
       logger.warn('Unauthenticated request');
-      return createServiceApiErrorResponse(
+      return await createServiceApiErrorResponse(
         'Not authenticated',
         ErrorCodes.UNAUTHORIZED,
         requestId,
@@ -67,7 +67,7 @@ export async function GET(
         userId,
         role,
       });
-      return createServiceApiErrorResponse(
+      return await createServiceApiErrorResponse(
         'Forbidden: api-client or admin role required',
         ErrorCodes.FORBIDDEN,
         requestId,
@@ -124,7 +124,7 @@ export async function GET(
       logger.warn('Course not found', {
         courseId: id,
       });
-      return createServiceApiErrorResponse(
+      return await createServiceApiErrorResponse(
         'Course not found',
         ErrorCodes.NOT_FOUND,
         requestId,
@@ -182,11 +182,16 @@ export async function GET(
 
     const payload = useLegacyResponse ? { course: data } : data;
 
-    return createServiceApiSuccessResponse(requestId, userId, role, payload);
+    return await createServiceApiSuccessResponse(
+      requestId,
+      userId,
+      role,
+      payload
+    );
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error('Failed to retrieve course', err);
-    return createServiceApiErrorResponse(
+    return await createServiceApiErrorResponse(
       err.message,
       ErrorCodes.INTERNAL_ERROR,
       requestId,

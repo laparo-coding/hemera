@@ -38,6 +38,10 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
       const clerk = await clerkClient();
       const user = await clerk.users.getUser(userId);
       role = user?.publicMetadata?.role;
+      // If user found but has no role, return safe default and do not fall back
+      if (user && !role) {
+        return 'user';
+      }
     } catch (err: any) {
       // Log Clerk API error but continue with fallback. Do NOT include raw
       // backend messages — provide non-sensitive metadata instead.
@@ -54,7 +58,7 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
         },
         ErrorSeverity.WARNING
       );
-      role = null;
+      return 'user';
     }
   }
 
@@ -107,9 +111,10 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
 export async function hasPermission(permission: string): Promise<boolean> {
   try {
     const user = await currentUser();
-    const userRole = await getUserRole();
-
     if (!user) return false;
+
+    // Only call getUserRole if user exists
+    const userRole = await getUserRole(user.id);
 
     // Admin has all permissions
     if (userRole === 'admin') return true;

@@ -61,7 +61,7 @@ export async function PUT(
     const { userId } = await auth();
     if (!userId) {
       logger.warn('Unauthenticated request');
-      return createServiceApiErrorResponse(
+      return await createServiceApiErrorResponse(
         'Not authenticated',
         ErrorCodes.UNAUTHORIZED,
         requestId,
@@ -76,7 +76,7 @@ export async function PUT(
         userId,
         role,
       });
-      return createServiceApiErrorResponse(
+      return await createServiceApiErrorResponse(
         'Forbidden: api-client or admin role required',
         ErrorCodes.FORBIDDEN,
         requestId,
@@ -114,7 +114,7 @@ export async function PUT(
         errorMessage,
         errorStack,
       });
-      return createServiceApiErrorResponse(
+      return await createServiceApiErrorResponse(
         'Invalid JSON body',
         ErrorCodes.INVALID_INPUT,
         requestId,
@@ -143,7 +143,7 @@ export async function PUT(
         bodySummary,
         error: logError,
       });
-      return createServiceApiErrorResponse(
+      return await createServiceApiErrorResponse(
         'Invalid request body',
         ErrorCodes.VALIDATION_ERROR,
         requestId,
@@ -163,7 +163,7 @@ export async function PUT(
       logger.warn('Participation not found', {
         participationId: id,
       });
-      return createServiceApiErrorResponse(
+      return await createServiceApiErrorResponse(
         'Participation not found',
         ErrorCodes.NOT_FOUND,
         requestId,
@@ -235,7 +235,7 @@ export async function PUT(
     };
 
     if (useLegacyResponse) {
-      return createServiceApiSuccessResponse(
+      return await createServiceApiSuccessResponse(
         requestId,
         userId,
         role,
@@ -243,7 +243,7 @@ export async function PUT(
       );
     }
 
-    return createServiceApiSuccessResponse(
+    return await createServiceApiSuccessResponse(
       requestId,
       userId,
       role,
@@ -253,7 +253,7 @@ export async function PUT(
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error('Failed to update participation result', err);
-    return createServiceApiErrorResponse(
+    return await createServiceApiErrorResponse(
       err.message,
       ErrorCodes.INTERNAL_ERROR,
       requestId,
