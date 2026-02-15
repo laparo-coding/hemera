@@ -183,9 +183,10 @@ export async function POST(request: NextRequest) {
       throw zErr;
     }
 
-    // Compute endTime if not provided using validated duration (default 4h).
-    // Use `parsed` so any validated/transformed `duration` is preferred; fall back to 4.
-    const durationHours = Number(parsed.duration ?? 4);
+    // `courseCreateSchema` provides a validated `duration` default (4 hours)
+    // and `price` is already transformed into integer cents. Use values
+    // directly from `parsed` to preserve types/units from the schema.
+    const durationHours = parsed.duration; // validated number (hours)
     const startTimeDate = parsed.startTime;
     const endTimeDate =
       parsed.endTime ??
@@ -206,10 +207,10 @@ export async function POST(request: NextRequest) {
       const slug = `${baseSlug}-${suffix}`;
 
       try {
-        // Ensure price is persisted as integer cents.
-        const priceToPersist = Number.isInteger(parsed.price)
-          ? parsed.price
-          : Math.round(parsed.price);
+        // `courseCreateSchema` transforms a Euro decimal into integer cents
+        // (e.g. 19.99 -> 1999). Use the transformed value directly so units
+        // are explicit and consistent.
+        const priceToPersist = parsed.price;
 
         createdCourse = await prisma.course.create({
           data: {

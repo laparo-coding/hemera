@@ -5,6 +5,7 @@
  * DELETE /api/admin/courses/[id] - Delete course
  */
 
+import type { Prisma } from '@prisma/client';
 import { type NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import {
@@ -232,12 +233,70 @@ export async function PATCH(
     // matches Prisma's generated types. If the admin intentionally wants to
     // unset a nullable relation/field we would need an explicit handling
     // (e.g. set to Prisma.Null), but for safety we omit nulls here.
-    const prismaUpdateData: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(
-      updateData as Record<string, unknown>
-    )) {
-      if (v !== null) {
-        prismaUpdateData[k] = v;
+    // Build a strictly-typed partial update object using Prisma types.
+    type AllowedKeys =
+      | 'title'
+      | 'description'
+      | 'teaser'
+      | 'curriculum'
+      | 'slug'
+      | 'price'
+      | 'currency'
+      | 'capacity'
+      | 'startDate'
+      | 'endDate'
+      | 'startTime'
+      | 'endTime'
+      | 'isPublished'
+      | 'instructor'
+      | 'level'
+      | 'thumbnailUrl'
+      | 'imageDetail'
+      | 'imageTwitter'
+      | 'heroVideoPlaybackId'
+      | 'locationId'
+      | 'recommended'
+      | 'notRecommended'
+      | 'isNonPublic';
+
+    type AllowedUpdate = Partial<Pick<Prisma.CourseUpdateInput, AllowedKeys>>;
+
+    const prismaUpdateData: AllowedUpdate = {};
+    for (const k of Object.keys(updateData) as Array<keyof typeof updateData>) {
+      const v = (updateData as Record<string, unknown>)[k as string];
+      if (
+        v !== null &&
+        v !== undefined &&
+        (
+          [
+            'title',
+            'description',
+            'teaser',
+            'curriculum',
+            'slug',
+            'price',
+            'currency',
+            'capacity',
+            'startDate',
+            'endDate',
+            'startTime',
+            'endTime',
+            'isPublished',
+            'instructor',
+            'level',
+            'thumbnailUrl',
+            'imageDetail',
+            'imageTwitter',
+            'heroVideoPlaybackId',
+            'locationId',
+            'recommended',
+            'notRecommended',
+            'isNonPublic',
+          ] as string[]
+        ).includes(k as string)
+      ) {
+        // Type assertion is safe because AllowedUpdate restricts keys
+        (prismaUpdateData as any)[k] = v;
       }
     }
 

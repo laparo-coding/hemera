@@ -28,8 +28,8 @@ const EnvSchema = z.object({
   CONTEXT7_API_KEY: z.string().optional(),
 
   // Rollbar monitoring (opt-in via token presence)
-  ROLLBAR_HEMERA_SERVER_TOKEN_1766674885: z.string().optional(),
-  NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885: z.string().optional(),
+  ROLLBAR_HEMERA_SERVER_TOKEN: z.string().optional(),
+  NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN: z.string().optional(),
   ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
   NEXT_PUBLIC_ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
 
@@ -64,10 +64,9 @@ function buildEnvFromProcess(): Record<string, unknown> {
     CONTEXT7_ENABLED: process.env.CONTEXT7_ENABLED,
     CONTEXT7_API_KEY: process.env.CONTEXT7_API_KEY,
     // Rollbar
-    ROLLBAR_HEMERA_SERVER_TOKEN_1766674885:
-      process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885,
-    NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885:
-      process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885,
+    ROLLBAR_HEMERA_SERVER_TOKEN: process.env.ROLLBAR_HEMERA_SERVER_TOKEN,
+    NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN:
+      process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN,
     ROLLBAR_ENABLED: process.env.ROLLBAR_ENABLED,
     NEXT_PUBLIC_ROLLBAR_ENABLED: process.env.NEXT_PUBLIC_ROLLBAR_ENABLED,
     // Upstash
