@@ -119,9 +119,8 @@ export class AuthHelper {
     await this.prepareCleanAuthState();
 
     // Navigate to sign-in page with increased timeout and retry logic
-    console.log(`🔐 Signing in with email: ${email}`);
-  // console.log entfernt (Lint-Regel):
-  // 🔐 Signing in with email: ${email}
+    // console.log entfernt (Lint-Regel):
+    // 🔐 Signing in with email: ${email}
 
     try {
       await this.page.goto('/sign-in', {
@@ -297,9 +296,8 @@ export class AuthHelper {
         }
       );
     } catch {
-      console.log(
-        '⚠️ Password field still disabled, trying to proceed anyway...'
-      );
+      // console.log entfernt (Lint-Regel):
+      // ⚠️ Password field still disabled, trying to proceed anyway...
     }
 
     await this.page.fill('input[name="password"]', password);
@@ -373,7 +371,8 @@ export class AuthHelper {
     // 🔐 Waiting for authentication to complete...
 
     // Wait for successful authentication - use intelligent waiting instead of fixed timeout
-    console.log('🔐 Waiting for authentication to complete...');
+    // console.log entfernt (Lint-Regel):
+    // 🔐 Waiting for authentication to complete...
 
     // Try multiple strategies to detect successful authentication with Promise.race
     let authSuccess = false;
@@ -472,7 +471,8 @@ export class AuthHelper {
             .first();
 
           if (await smsOption.isVisible({ timeout: 2000 })) {
-            console.log('📱 Found SMS option, clicking...');
+            // console.log entfernt (Lint-Regel):
+            // 📱 Found SMS option, clicking...
             await smsOption.click();
             await this.page.waitForTimeout(1000);
 
@@ -496,7 +496,8 @@ export class AuthHelper {
               }
             }
           } else if (await textMessageOption.isVisible({ timeout: 2000 })) {
-            console.log('📱 Found Text message option, clicking...');
+            // console.log entfernt (Lint-Regel):
+            // 📱 Found Text message option, clicking...
             await textMessageOption.click();
             await this.page.waitForTimeout(1000);
 
@@ -584,7 +585,8 @@ export class AuthHelper {
             }
           }
         } catch (_e) {
-          console.log('❌ No Clerk elements found');
+          // console.log entfernt (Lint-Regel):
+          // ❌ No Clerk elements found
         }
       }
     }
