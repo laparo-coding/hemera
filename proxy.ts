@@ -20,7 +20,7 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
 
   // Service API routes must always go through Clerk auth (even in E2E mode)
   if (/^\/api\/service(\/|$)/.test(pathname)) {
-    // Require an Authorization header (Bearer) or Clerk session cookie; fail fast if missing
+    // Fail fast if request has no auth header and no cookies at all
     const hasAuthHeader = !!request.headers.get('authorization');
     const hasCookie = !!request.headers.get('cookie');
     if (!hasAuthHeader && !hasCookie) {

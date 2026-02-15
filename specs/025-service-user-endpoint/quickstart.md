@@ -283,8 +283,8 @@ class HemeraServiceClient {
     const params = new URLSearchParams();
     if (filters?.level) params.append('level', filters.level);
     if (filters?.published !== undefined) params.append('published', String(filters.published));
-    if (filters?.limit) params.append('limit', String(filters.limit));
-    if (filters?.offset) params.append('offset', String(filters.offset));
+    if (filters?.limit !== undefined) params.append('limit', String(filters.limit));
+    if (filters?.offset !== undefined) params.append('offset', String(filters.offset));
 
     const response = await fetch(
       `${this.baseUrl}/api/service/courses?${params}`,

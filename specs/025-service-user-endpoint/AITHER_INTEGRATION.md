@@ -243,10 +243,10 @@ All Hemera API errors follow this schema:
 ```
 
 Common error codes:
-- `AUTH_REQUIRED` (401): Missing or invalid JWT token
+- `UNAUTHORIZED` (401): Missing or invalid JWT token
 - `FORBIDDEN` (403): Insufficient permissions (not api-client or admin)
 - `NOT_FOUND` (404): Resource not found
-- `RATE_LIMIT_EXCEEDED` (429): Too many requests
+- `RATE_LIMITED` (429): Too many requests
 - `INTERNAL_ERROR` (500): Server error
 
 ---
