@@ -3,8 +3,8 @@
  * Tests for /api/service/* endpoints (Spec 025)
  */
 
-import { CourseLevel, ParticipationStatus } from '@prisma/client';
 import { describe, expect, it } from '@jest/globals';
+import type { CourseLevel, ParticipationStatus } from '@prisma/client';
 
 describe('Service API - Contract Tests', () => {
   describe('GET /api/service/courses', () => {
