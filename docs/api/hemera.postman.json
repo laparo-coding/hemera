@@ -3760,7 +3760,7 @@
                 "method": "POST",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"title\": \"<string>\",\n  \"price\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"description\": \"<string>\",\n  \"endDate\": \"<dateTime>\",\n  \"locationId\": \"<string>\",\n  \"maxParticipants\": \"<integer>\",\n  \"isPublished\": false\n}",
+                  "raw": "{\n  \"title\": \"<string>\",\n  \"price\": 9999,\n  \"startDate\": \"<dateTime>\",\n  \"description\": \"<string>\",\n  \"endDate\": \"<dateTime>\",\n  \"locationId\": \"<string>\",\n  \"maxParticipants\": \"<integer>\",\n  \"isPublished\": false\n}",
                   "options": {
                     "raw": {
                       "headerFamily": "json",
@@ -3793,7 +3793,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"title\": \"<string>\",\n  \"price\": \"<integer>\",\n  \"startDate\": \"<dateTime>\",\n  \"description\": \"<string>\",\n  \"endDate\": \"<dateTime>\",\n  \"locationId\": \"<string>\",\n  \"maxParticipants\": \"<integer>\",\n  \"isPublished\": false\n}",
+                      "raw": "{\n  \"title\": \"<string>\",\n  \"price\": 9999,\n  \"startDate\": \"<dateTime>\",\n  \"description\": \"<string>\",\n  \"endDate\": \"<dateTime>\",\n  \"locationId\": \"<string>\",\n  \"maxParticipants\": \"<integer>\",\n  \"isPublished\": false\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -3810,7 +3810,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": \"<integer>\",\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
+                  "body": "{\n  \"success\": true,\n  \"requestId\": \"<uuid>\",\n  \"data\": {\n    \"id\": \"<string>\",\n    \"title\": \"<string>\",\n    \"slug\": \"ea\",\n    \"price\": 9999,\n    \"currency\": \"EUR\",\n    \"startDate\": \"<dateTime>\",\n    \"isPublished\": \"<boolean>\",\n    \"description\": \"<string>\",\n    \"endDate\": \"<dateTime>\",\n    \"locationId\": \"<string>\",\n    \"maxParticipants\": \"<integer>\",\n    \"thumbnailUrl\": \"<uri>\",\n    \"createdAt\": \"<dateTime>\",\n    \"updatedAt\": \"<dateTime>\"\n  }\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
