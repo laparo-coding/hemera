@@ -934,9 +934,9 @@ paths:
                   maxLength: 200
                 description: { type: string }
                 price:
-                  type: integer
-                  minimum: 0
-                  description: "Price in cents (EUR). Integer number of cents. e.g. 9999 = €99.99"
+                          type: integer
+                          minimum: 0
+                          description: "Price in cents (EUR). Integer number of cents. e.g. 9999 = €99.99"
                 startDate:
                   type: string
                   format: date-time
