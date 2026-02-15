@@ -88,7 +88,7 @@ describe('GET /api/admin/course-material', () => {
       },
     ]);
 
-    const _request = new NextRequest(
+    const request = new NextRequest(
       'http://localhost/api/admin/course-material'
     );
     const response = await GET();
@@ -103,7 +103,7 @@ describe('GET /api/admin/course-material', () => {
     mockAuth.mockResolvedValue({ userId: 'admin_123' });
     mockPrisma.courseMaterial.findMany.mockResolvedValue([]);
 
-    const _request = new NextRequest(
+    const request = new NextRequest(
       'http://localhost/api/admin/course-material'
     );
     const response = await GET();
