@@ -290,10 +290,8 @@ export function reportError(
   if (isExplicitlyDisabled) return;
 
   // Dynamically check if Rollbar should be enabled at runtime
-  const currentlyEnabled = isTestMode
-    ? shouldEnableRollbar()
-    : baseConfig.enabled;
-  if (!currentlyEnabled && !isTestMode) return;
+  const currentlyEnabled = shouldEnableRollbar();
+  if (!currentlyEnabled) return;
 
   try {
     // Simple sampling: allow configuring rate per severity (0..1)

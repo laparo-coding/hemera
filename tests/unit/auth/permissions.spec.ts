@@ -147,7 +147,7 @@ describe('Permissions Helpers', () => {
         expect(mockCurrentUser).not.toHaveBeenCalled();
       });
 
-      it('should fallback to currentUser when clerkClient returns no role', async () => {
+      it('should fallback to user when clerkClient returns no role', async () => {
         const getUser = jest.fn().mockResolvedValue({ publicMetadata: {} });
         mockClerkClient.mockResolvedValue({ users: { getUser } } as any);
         mockCurrentUser.mockResolvedValue({ publicMetadata: { role: 'admin' } } as unknown as User);
@@ -155,7 +155,8 @@ describe('Permissions Helpers', () => {
         const role = await getUserRole('svc-2');
 
         expect(getUser).toHaveBeenCalledWith('svc-2');
-        expect(role).toBe('admin');
+        expect(role).toBe('user');
+        expect(mockCurrentUser).not.toHaveBeenCalled();
       });
 
       it('should normalize and trim role from clerkClient', async () => {
