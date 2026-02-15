@@ -134,7 +134,7 @@ export async function hasPermission(permission: string): Promise<boolean> {
     let role = user.publicMetadata?.role;
     if (typeof role === 'string') {
       role = role.toLowerCase().trim();
-      if (!(VALID_ROLES as readonly string[]).includes(role)) {
+      if (!(VALID_ROLES as readonly string[]).includes(role as string)) {
         role = 'user';
       }
     } else {
