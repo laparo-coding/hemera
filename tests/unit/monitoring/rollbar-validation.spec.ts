@@ -20,9 +20,15 @@ describe('Rollbar SDK Initialization', () => {
 
   describe('Token Validation', () => {
     it('should not initialize Rollbar without server token', async () => {
-      // Remove all Rollbar tokens
-        delete process.env.ROLLBAR_HEMERA_SERVER_TOKEN;
-      delete process.env.ROLLBAR_SERVER_TOKEN;
+      // Remove all Rollbar tokens (including Vercel-Rollbar integration suffixed keys)
+      for (const key of Object.keys(process.env)) {
+        if (
+          key.startsWith('ROLLBAR_HEMERA_SERVER_TOKEN') ||
+          key.startsWith('ROLLBAR_SERVER_TOKEN')
+        ) {
+          delete process.env[key];
+        }
+      }
       // @ts-expect-error - Mutating NODE_ENV for test purposes
       process.env.NODE_ENV = 'production';
 

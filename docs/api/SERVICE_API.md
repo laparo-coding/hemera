@@ -32,11 +32,11 @@ Wichtig: Service-to-Service JWTs müssen eine eingeschränkte Audience/Scope hab
 
 ### Berechtigungen
 
-The `api-client` role has the following permissions (defined in [`lib/auth/permissions.ts`](../../lib/auth/permissions.ts)):
+Die `api-client` Rolle hat folgende Berechtigungen (definiert in [`lib/auth/permissions.ts`](../../lib/auth/permissions.ts)):
 
-- `read:courses` - Kurse lesen
-- `read:participations` - Teilnahmen lesen
-- `write:participation-results` - Ergebnisse schreiben
+- `read:courses` — Kurse lesen
+- `read:participations` — Teilnahmen lesen
+- `write:participation-results` — Ergebnisse schreiben
 
 ## Endpunkte
 
@@ -258,7 +258,7 @@ curl -X PUT "https://[YOUR_HEMERA_DOMAIN]/api/service/participations/clp456.../r
 Die Service API implementiert Rate Limiting pro User/Role:
 
 - **api-client**: 100 Requests pro Minute
-- **admin**: 200 Requests pro Minute
+- **admin**: 500 Requests pro Minute
 
 Bei Überschreitung wird `429 Too Many Requests` zurückgegeben mit `Retry-After` Header.
 

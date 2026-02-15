@@ -68,12 +68,11 @@ export const courseCreateSchema = z.object({
     .nullable(),
   price: z
     .number()
-    .nonnegative('Price must be non-negative')
-    .multipleOf(0.01, 'Price must have at most 2 decimal places')
+    .nonnegative('Preis darf nicht negativ sein')
+    .multipleOf(0.01, 'Preis darf maximal 2 Dezimalstellen haben')
     .transform(val => {
-      // Accept either: a euro value (e.g. 99.99) or already-cent integer (e.g. 9999).
-      // Heuristic: treat large integers as cents to avoid double-scaling in tests
-      if (Number.isInteger(val) && val > 1000) return Math.round(val);
+      // Always treat input as Euro value and convert to cents.
+      // Callers must always pass euro decimals (e.g. 99.99 → 9999 cents).
       return Math.round(val * 100);
     }), // Convert Euro to Cents for Stripe
   startDate: z
@@ -88,9 +87,7 @@ export const courseCreateSchema = z.object({
     .nullable(),
   startTime: z
     .union([z.string(), z.date()])
-    .transform(
-      (val): Date => (typeof val === 'string' ? new Date(val) : (val as Date))
-    )
+    .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
     .refine(date => date.getTime() > Date.now() + VALIDATION_TIME_BUFFER_MS, {
       message: 'Startzeit muss in der Zukunft liegen',
     }),
@@ -101,7 +98,7 @@ export const courseCreateSchema = z.object({
     .nullable(),
   instructor: z
     .string()
-    .min(2, 'Instructor name must be at least 2 characters')
+    .min(2, 'Kursleiter-Name muss mindestens 2 Zeichen haben')
     .trim(),
   level: CourseLevelEnum,
   thumbnailUrl: z
@@ -177,30 +174,29 @@ export const courseCreateSchema = z.object({
 export const courseUpdateSchema = z.object({
   title: z
     .string()
-    .min(3, 'Title must be at least 3 characters')
-    .max(50, 'Title must not exceed 50 characters')
+    .min(3, 'Titel muss mindestens 3 Zeichen haben')
+    .max(50, 'Titel darf maximal 50 Zeichen haben')
     .trim()
     .optional(),
   description: z
     .string()
-    .min(10, 'Description must be at least 10 characters')
-    .max(900, 'Description must not exceed 900 characters')
+    .min(10, 'Beschreibung muss mindestens 10 Zeichen haben')
+    .max(900, 'Beschreibung darf maximal 900 Zeichen haben')
     .trim()
     .optional(),
   teaser: z
     .string()
-    .max(200, 'Teaser must not exceed 200 characters')
+    .max(200, 'Teaser darf maximal 200 Zeichen haben')
     .trim()
     .optional()
     .nullable(),
   price: z
     .number()
-    .nonnegative('Price must be non-negative')
-    .multipleOf(0.01, 'Price must have at most 2 decimal places')
+    .nonnegative('Preis darf nicht negativ sein')
+    .multipleOf(0.01, 'Preis darf maximal 2 Dezimalstellen haben')
     .optional()
     .transform(val => {
       if (val === undefined) return undefined;
-      if (Number.isInteger(val) && val > 1000) return Math.round(val);
       return Math.round(val * 100);
     }),
   startDate: z
@@ -214,9 +210,7 @@ export const courseUpdateSchema = z.object({
     .nullable(),
   startTime: z
     .union([z.string(), z.date()])
-    .transform(
-      (val): Date => (typeof val === 'string' ? new Date(val) : (val as Date))
-    )
+    .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
     .optional(),
   endTime: z
     .union([z.string(), z.date()])
@@ -224,7 +218,7 @@ export const courseUpdateSchema = z.object({
     .optional(),
   instructor: z
     .string()
-    .min(2, 'Instructor name must be at least 2 characters')
+    .min(2, 'Kursleiter-Name muss mindestens 2 Zeichen haben')
     .trim()
     .optional(),
   level: CourseLevelEnum.optional(),
@@ -258,7 +252,7 @@ export const courseUpdateSchema = z.object({
   capacity: z
     .number()
     .int('Kapazität muss eine ganze Zahl sein')
-    .nonnegative('Kapazität darf nicht negativ sein')
+    .min(0, 'Kapazität darf nicht negativ sein')
     .optional(),
   isPublished: z.boolean().optional(),
   locationId: z

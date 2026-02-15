@@ -28,6 +28,36 @@ interface RollbarTestInstance {
 // Runtime Validation & Configuration
 // ============================================================================
 
+/**
+ * Find an environment variable by prefix.
+ * The Vercel-Rollbar integration creates env vars with timestamp suffixes
+ * (e.g. ROLLBAR_HEMERA_SERVER_TOKEN_1769716944). This helper resolves the
+ * exact name first, then falls back to any key starting with the prefix.
+ */
+function findEnvByPrefix(...prefixes: string[]): string | undefined {
+  // 1) Check exact matches first (fastest path)
+  for (const prefix of prefixes) {
+    const exact = process.env[prefix];
+    if (exact && exact.trim().length > 0) return exact;
+  }
+
+  // 2) Search for Vercel-Rollbar integration keys (PREFIX_<timestamp>)
+  const allKeys = Object.keys(process.env);
+  for (const prefix of prefixes) {
+    const pattern = `${prefix}_`;
+    for (const key of allKeys) {
+      // Skip deleted variables (Vercel marks them with "(DELETED)_" prefix)
+      if (key.startsWith('(DELETED)')) continue;
+      if (key.startsWith(pattern) && key !== prefix) {
+        const val = process.env[key];
+        if (val && val.trim().length > 0) return val;
+      }
+    }
+  }
+
+  return undefined;
+}
+
 // Enablement rules unify various legacy flags used across the repo/scripts
 const isE2EMode = process.env.E2E_TEST === '1';
 const isTestMode =
@@ -39,55 +69,49 @@ const isExplicitlyDisabled =
   process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0' ||
   process.env.ROLLBAR_ENABLED === '0';
 
+/** Minimum length for Rollbar tokens to be considered valid */
+const MIN_TOKEN_LENGTH = 20;
+
+/**
+ * Validate that a Rollbar token is present, non-empty, and meets minimum length
+ */
+function isValidToken(token: string | undefined, label: string): boolean {
+  if (!token || token.trim().length === 0) {
+    return false;
+  }
+  if (token.length < MIN_TOKEN_LENGTH) {
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint: Configuration warning in development
+      console.warn(
+        `[rollbar] ${label} is too short (expected ${MIN_TOKEN_LENGTH}+ chars). Rollbar will be disabled.`
+      );
+    }
+    return false;
+  }
+  return true;
+}
+
 /**
  * Validate that Rollbar access token is present and non-empty
  * Returns true if token is valid, false otherwise
  */
 function hasValidServerToken(): boolean {
-  const token =
-    process.env.ROLLBAR_HEMERA_SERVER_TOKEN || process.env.ROLLBAR_SERVER_TOKEN;
-
-  if (!token || token.trim().length === 0) {
-    return false;
-  }
-
-  // Basic format validation (Rollbar tokens are typically 32+ chars)
-  if (token.length < 20) {
-    if (process.env.NODE_ENV === 'development') {
-      // biome-ignore lint: Configuration warning in development
-      console.warn(
-        '[rollbar] Server token is too short (expected 20+ chars). Rollbar will be disabled.'
-      );
-    }
-    return false;
-  }
-
-  return true;
+  const token = findEnvByPrefix(
+    'ROLLBAR_HEMERA_SERVER_TOKEN',
+    'ROLLBAR_SERVER_TOKEN'
+  );
+  return isValidToken(token, 'Server token');
 }
 
 /**
  * Validate that Rollbar client token is present and non-empty
  */
 function hasValidClientToken(): boolean {
-  const token =
-    process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN ||
-    process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN;
-
-  if (!token || token.trim().length === 0) {
-    return false;
-  }
-
-  if (token.length < 20) {
-    if (process.env.NODE_ENV === 'development') {
-      // biome-ignore lint: Configuration warning in development
-      console.warn(
-        '[rollbar] Client token is too short (expected 20+ chars). Rollbar will be disabled.'
-      );
-    }
-    return false;
-  }
-
-  return true;
+  const token = findEnvByPrefix(
+    'NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN',
+    'NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN'
+  );
+  return isValidToken(token, 'Client token');
 }
 
 /**
@@ -163,7 +187,10 @@ const baseConfig = {
 // Only include token if validation passes
 export const clientConfig = {
   accessToken: hasValidClientToken()
-    ? process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN
+    ? findEnvByPrefix(
+        'NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN',
+        'NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN'
+      )
     : undefined,
   ...baseConfig,
   enabled: rollbarEnabled && hasValidClientToken(),
@@ -207,9 +234,10 @@ const noOpInstance: RollbarTestInstance = {
 const instanceEnabled = isTestMode ? effectiveEnabled : rollbarEnabled;
 export const serverInstance: Rollbar | RollbarTestInstance = instanceEnabled
   ? new Rollbar({
-      accessToken:
-        process.env.ROLLBAR_HEMERA_SERVER_TOKEN ||
-        process.env.ROLLBAR_SERVER_TOKEN,
+      accessToken: findEnvByPrefix(
+        'ROLLBAR_HEMERA_SERVER_TOKEN',
+        'ROLLBAR_SERVER_TOKEN'
+      ),
       ...baseConfig,
     })
   : noOpInstance;
@@ -217,8 +245,10 @@ export const serverInstance: Rollbar | RollbarTestInstance = instanceEnabled
 // Legacy compatibility - keeping old configuration exports
 // Uses Vercel-Rollbar integration token name with fallback
 export const rollbarConfig = {
-  accessToken:
-    process.env.ROLLBAR_HEMERA_SERVER_TOKEN || process.env.ROLLBAR_SERVER_TOKEN,
+  accessToken: findEnvByPrefix(
+    'ROLLBAR_HEMERA_SERVER_TOKEN',
+    'ROLLBAR_SERVER_TOKEN'
+  ),
   ...baseConfig,
 };
 
@@ -227,9 +257,10 @@ export const rollbar = serverInstance;
 // Client-side configuration with legacy fallback
 // Uses Vercel-Rollbar integration token name with fallback
 export const clientRollbarConfig = {
-  accessToken:
-    process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN ||
-    process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN,
+  accessToken: findEnvByPrefix(
+    'NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN',
+    'NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN'
+  ),
   ...baseConfig,
 };
 
@@ -311,12 +342,7 @@ export function reportError(
     const sanitizedAdditional: Record<string, unknown> = { ...rawAdditional };
 
     // Redact commonly abused keys that may contain raw error text or PII
-    const keysToRedact = [
-      /originalError/i,
-      /^error$/i,
-      /errorMessage/i,
-      /message$/i,
-    ];
+    const keysToRedact = [/originalError/i, /^error$/i, /^errorMessage$/i];
     for (const k of Object.keys(sanitizedAdditional)) {
       if (keysToRedact.some(rx => rx.test(k))) {
         sanitizedAdditional[k] = '[redacted]';

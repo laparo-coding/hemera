@@ -13,7 +13,7 @@ console.log('=== Rollbar Integration Test ===\n');
 console.log('Token found:', token ? `Yes (${token.substring(0, 8)}...)` : 'No');
 
 if (!token) {
-  console.error('\n❌ ROLLBAR_HEMERA_SERVER_TOKEN not found in .env.local!');
+  console.error('\n❌ ROLLBAR_HEMERA_SERVER_TOKEN or ROLLBAR_SERVER_TOKEN not found in .env.local!');
   process.exit(1);
 }
 

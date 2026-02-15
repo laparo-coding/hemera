@@ -451,7 +451,7 @@ describe('Service API - Contract Tests', () => {
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: 'Internal server error',
+          message: 'Interner Serverfehler',
         },
         meta: {
           requestId: 'req_abc123',
@@ -487,7 +487,7 @@ describe('Service API - Contract Tests', () => {
 
     it('should not leak implementation details in error messages', () => {
       const safeErrorMessages = [
-        'Internal server error',
+        'Interner Serverfehler',
         'Not authenticated',
         'Forbidden',
         'Resource not found',

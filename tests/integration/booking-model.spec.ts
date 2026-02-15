@@ -37,7 +37,7 @@ describe('Booking Model Validations', () => {
         description: 'Test Description',
         slug: `test-course-${timestamp}-${randomSuffix}`,
         price: 9999, // Price in cents
-        currency: 'USD',
+        currency: 'EUR',
         isPublished: true,
       },
     });
@@ -117,7 +117,7 @@ describe('Booking Model Validations', () => {
         userId: testUser.id,
         courseId: testCourse.id,
         amount: testCourse.price,
-        currency: 'USD',
+        currency: 'EUR',
       };
 
       const booking = await prisma.booking.create({
@@ -131,7 +131,7 @@ describe('Booking Model Validations', () => {
       expect(booking.userId).toBe(testUser.id);
       expect(booking.courseId).toBe(testCourse.id);
       expect(booking.amount).toBe(testCourse.price);
-      expect(booking.currency).toBe('USD');
+      expect(booking.currency).toBe('EUR');
       expect(booking.paymentStatus).toBe(PaymentStatus.PENDING); // default
       expect(booking.stripePaymentIntentId).toBeNull();
       expect(booking.stripeSessionId).toBeNull();
@@ -396,7 +396,7 @@ describe('Booking Model Validations', () => {
       expect(booking.amount).toBe(8500);
     });
 
-    it('should default to USD currency', async () => {
+    it('should default to EUR currency', async () => {
       const booking = await prisma.booking.create({
         data: {
           userId: testUser.id,

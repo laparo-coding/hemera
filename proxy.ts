@@ -22,7 +22,8 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
   if (/^\/api\/service(\/|$)/.test(pathname)) {
     // Fail fast if request has no auth header and no cookies at all
     const hasAuthHeader = !!request.headers.get('authorization');
-    const hasCookie = !!request.headers.get('cookie');
+    const cookieValue = request.headers.get('cookie');
+    const hasCookie = !!cookieValue && cookieValue.trim().length > 0;
     if (!hasAuthHeader && !hasCookie) {
       return new NextResponse(
         JSON.stringify({

@@ -14,7 +14,7 @@ Vorbereitung
 
 ```bash
 export DATABASE_URL="$STAGING_DATABASE_URL"
-pmkdir -p /tmp/hemera-backups
+mkdir -p /tmp/hemera-backups
 pg_dump "$DATABASE_URL" -Fc -f /tmp/hemera-backups/hemera-staging-$(date +%Y%m%d%H%M).dump
 ```
 
@@ -82,7 +82,7 @@ Erwartetes Ergebnis
 Rollback (falls Migration Probleme macht)
 - Falls die Migration nicht rückgängig ist, verwende das Dump, um DB wiederherzustellen:
 ```bash
-pg_restore -d "$STAGING_DATABASE_URL" /tmp/hemera-backups/hemera-staging-YYYYMMDDHHMM.dump
+pg_restore --no-owner --clean --if-exists -d "$STAGING_DATABASE_URL" /tmp/hemera-backups/hemera-staging-YYYYMMDDHHMM.dump
 ```
 
 Zusätzliche Hinweise

@@ -108,6 +108,9 @@ const lastRateLimitStates = new Map<
   { limit: number; remaining: number; resetAtSeconds: number }
 >();
 
+// Maximum entries to prevent memory leaks in long-running processes
+const MAX_RATE_LIMIT_ENTRIES = 10_000;
+
 // Rate limit configuration per role
 const RATE_LIMITS: Record<UserRole, { windowMs: number; maxRequests: number }> =
   {
@@ -211,6 +214,10 @@ export async function checkRateLimit(
 
   // Reset if window has passed
   if (!state || now >= state.resetAt) {
+    // Prevent unbounded growth: cleanup oldest entries if store is too large
+    if (rateLimitStore.size >= MAX_RATE_LIMIT_ENTRIES) {
+      cleanupExpiredRateLimits();
+    }
     state = {
       count: 0,
       resetAt: now + config.windowMs,
@@ -243,7 +250,7 @@ export async function checkRateLimit(
         success: false,
         error: {
           code: 'RATE_LIMITED',
-          message: 'Too many requests. Please try again later.',
+          message: 'Zu viele Anfragen. Bitte versuche es später erneut.',
         },
         meta: {
           requestId,
@@ -269,10 +276,10 @@ export async function checkRateLimit(
 /**
  * Get rate limit headers for successful responses
  */
-export async function getRateLimitHeaders(
+export function getRateLimitHeaders(
   userId: string,
   role: UserRole
-): Promise<Record<string, string>> {
+): Record<string, string> {
   const now = Date.now();
   const key = `${role}:${userId}`;
   const config = RATE_LIMITS[role];
@@ -316,6 +323,7 @@ export function cleanupExpiredRateLimits(): void {
   for (const [key, state] of rateLimitStore.entries()) {
     if (now >= state.resetAt) {
       rateLimitStore.delete(key);
+      lastRateLimitStates.delete(key);
     }
   }
 }

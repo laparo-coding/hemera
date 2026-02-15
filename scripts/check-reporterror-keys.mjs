@@ -25,6 +25,17 @@ const WHITELIST = new Set([
   'performanceIssue',
   'slowApiCall',
   'timestamp',
+  'serviceUserId',
+  'endpoint',
+  'method',
+  'statusCode',
+  'action',
+  'adminId',
+  'enrollmentCount',
+  'requestedCapacity',
+  'transferredCount',
+  'sourceCourseId',
+  'targetCourseId',
 ]);
 
 function walk(dir) {
@@ -84,6 +95,11 @@ function scanFile(file) {
 }
 
 console.log('Scanning repository for reportError additionalData keys...');
-walk(ROOT);
+try {
+  walk(ROOT);
+} catch (walkErr) {
+  console.error('Error during scan:', walkErr.message);
+  process.exit(1);
+}
 console.log('\nScan complete. See above for any unlisted keys.');
 process.exit(0);

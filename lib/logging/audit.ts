@@ -7,11 +7,14 @@ export interface PersistedApiLog {
   endpoint: string;
   method: string;
   responseStatus: number;
+  requestId?: string;
   ipAddress?: string | null;
   metadata?: Record<string, unknown> | null;
 }
 
-export async function persistServiceApiLog(log: PersistedApiLog) {
+export async function persistServiceApiLog(
+  log: PersistedApiLog
+): Promise<void> {
   try {
     await prisma.apiLog.create({
       data: {
@@ -20,13 +23,17 @@ export async function persistServiceApiLog(log: PersistedApiLog) {
         method: log.method,
         responseStatus: log.responseStatus,
         ipAddress: log.ipAddress ?? null,
-        metadata: (log.metadata as Prisma.InputJsonValue) ?? Prisma.DbNull,
+        metadata:
+          log.metadata != null
+            ? (log.metadata as Prisma.InputJsonValue)
+            : Prisma.DbNull,
       },
     });
   } catch (err) {
     // Don't throw from audit persistence - report and continue
+    const error = err instanceof Error ? err : new Error(String(err));
     try {
-      reportError(err as Error, {
+      reportError(error, {
         additionalData: { context: 'persistServiceApiLog' },
       });
     } catch {

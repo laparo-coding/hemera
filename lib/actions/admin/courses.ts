@@ -24,6 +24,11 @@ import {
 } from '../../schemas/admin/course';
 import type { AdminOperationResult } from '../../types/admin';
 
+/** Default course duration in hours when none is specified */
+const DEFAULT_DURATION_HOURS = 4;
+/** Milliseconds per hour */
+const MS_PER_HOUR = 3_600_000;
+
 /**
  * Check if current user has admin role
  */
@@ -65,7 +70,14 @@ export async function createCourseAction(
     const createPayload: CreateCoursePayload = {
       ...validatedData,
       startDate: validatedData.startDate ?? validatedData.startTime,
-      endTime: validatedData.endTime ?? validatedData.startTime,
+      // Default endTime: startTime + duration hours (guard against zero duration)
+      endTime:
+        validatedData.endTime ??
+        new Date(
+          validatedData.startTime.getTime() +
+            Math.max(validatedData.duration ?? DEFAULT_DURATION_HOURS, 1) *
+              MS_PER_HOUR
+        ),
     };
 
     // Create course

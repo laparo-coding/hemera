@@ -9,10 +9,23 @@ import { getRateLimitHeaders } from '../middleware/rate-limit';
 
 /**
  * CORS configuration for Service API
- * Allows cross-origin requests from trusted domains
+ * Uses environment-configured origins in production, falls back to wildcard in development only
  */
+const CORS_ORIGIN = (() => {
+  const origin =
+    process.env.SERVICE_API_CORS_ORIGIN || process.env.NEXT_PUBLIC_APP_URL;
+  if (origin) return origin;
+  if (process.env.NODE_ENV === 'production') {
+    console.warn(
+      '[service-api] No CORS origin configured in production. Defaulting to empty string.'
+    );
+    return '';
+  }
+  return '*';
+})();
+
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*', // TODO: Configure specific origins in production
+  'Access-Control-Allow-Origin': CORS_ORIGIN,
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-ID',
   'Access-Control-Max-Age': '86400', // 24 hours
@@ -66,7 +79,7 @@ export async function getServiceApiHeaders(
 
   // Add rate limit headers if user context is available
   if (userId && role) {
-    const rateLimitHeaders = await getRateLimitHeaders(userId, role);
+    const rateLimitHeaders = getRateLimitHeaders(userId, role);
     Object.assign(headers, rateLimitHeaders);
   }
 
@@ -148,7 +161,7 @@ export async function createServiceApiSuccessResponse<T>(
 function sanitizeErrorMessage(message: string, httpStatus: number): string {
   // For 5xx errors, always return generic message
   if (httpStatus >= 500) {
-    return 'Internal server error';
+    return 'Interner Serverfehler';
   }
 
   // For 4xx errors, check if message contains sensitive patterns
@@ -165,6 +178,12 @@ function sanitizeErrorMessage(message: string, httpStatus: number): string {
     /\.ts:/i,
     /\.js:/i,
     /at \w+\./i, // Stack trace patterns
+    /ECONNREFUSED/i,
+    /ENOTFOUND/i,
+    /password/i,
+    /token/i,
+    /secret/i,
+    /credential/i,
   ];
 
   const containsSensitiveInfo = sensitivePatterns.some(pattern =>
@@ -175,17 +194,17 @@ function sanitizeErrorMessage(message: string, httpStatus: number): string {
     // Map to appropriate generic message based on status code
     switch (httpStatus) {
       case 400:
-        return 'Invalid request';
+        return 'Ungültige Anfrage';
       case 401:
-        return 'Not authenticated';
+        return 'Nicht authentifiziert';
       case 403:
-        return 'Forbidden';
+        return 'Zugriff verweigert';
       case 404:
-        return 'Resource not found';
+        return 'Ressource nicht gefunden';
       case 429:
-        return 'Too many requests. Please try again later.';
+        return 'Zu viele Anfragen. Bitte versuche es später erneut.';
       default:
-        return 'Request failed';
+        return 'Anfrage fehlgeschlagen';
     }
   }
 

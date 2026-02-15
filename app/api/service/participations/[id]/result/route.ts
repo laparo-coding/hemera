@@ -5,7 +5,10 @@ import { z } from 'zod';
 import { getUserRole } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
-import { logServiceApiCall } from '@/lib/monitoring/service-api-logger';
+import {
+  extractIpAddress,
+  logServiceApiCall,
+} from '@/lib/monitoring/service-api-logger';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import { ErrorCodes } from '@/lib/utils/api-response';
 import {
@@ -22,11 +25,24 @@ import {
 export const dynamic = 'force-dynamic';
 
 // Schema for request body
-const UpdateResultSchema = z.object({
-  resultOutcome: z.string().max(2000).optional(),
-  resultNotes: z.string().max(2000).optional(),
-  complete: z.boolean().optional(),
-});
+const UpdateResultSchema = z
+  .object({
+    resultOutcome: z.string().max(2000).optional(),
+    resultNotes: z.string().max(2000).optional(),
+    complete: z.boolean().optional(),
+  })
+  .refine(
+    data =>
+      data.resultOutcome !== undefined ||
+      data.resultNotes !== undefined ||
+      data.complete !== undefined,
+    {
+      message:
+        'At least one field (resultOutcome, resultNotes, complete) must be provided',
+    }
+  );
+
+const IdParamSchema = z.string().cuid('Invalid participation ID format');
 
 /**
  * OPTIONS /api/service/participations/[id]/result
@@ -46,8 +62,21 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { id: rawId } = await params;
   const requestId = getOrCreateRequestId(request);
+
+  // Validate ID format
+  const idResult = IdParamSchema.safeParse(rawId);
+  if (!idResult.success) {
+    return await createServiceApiErrorResponse(
+      'Invalid participation ID format',
+      ErrorCodes.VALIDATION_ERROR,
+      requestId,
+      400
+    );
+  }
+  const id = idResult.data;
+
   const context = createRequestContext(
     requestId,
     'PUT',
@@ -153,26 +182,6 @@ export async function PUT(
       );
     }
 
-    // Check if participation exists
-    const participation = await prisma.courseParticipation.findUnique({
-      where: { id },
-      select: { id: true, status: true },
-    });
-
-    if (!participation) {
-      logger.warn('Participation not found', {
-        participationId: id,
-      });
-      return await createServiceApiErrorResponse(
-        'Participation not found',
-        ErrorCodes.NOT_FOUND,
-        requestId,
-        404,
-        userId,
-        role
-      );
-    }
-
     // Build update data
     const updateData: {
       resultOutcome?: string;
@@ -194,11 +203,36 @@ export async function PUT(
       updateData.resultCompletedAt = new Date();
     }
 
-    // Update participation
-    await prisma.courseParticipation.update({
-      where: { id },
-      data: updateData,
+    // Atomic check-and-update to avoid TOCTOU race condition
+    const updated = await prisma.$transaction(async tx => {
+      const participation = await tx.courseParticipation.findUnique({
+        where: { id },
+        select: { id: true, status: true },
+      });
+
+      if (!participation) {
+        return null;
+      }
+
+      return await tx.courseParticipation.update({
+        where: { id },
+        data: updateData,
+      });
     });
+
+    if (!updated) {
+      logger.warn('Participation not found', {
+        participationId: id,
+      });
+      return await createServiceApiErrorResponse(
+        'Participation not found',
+        ErrorCodes.NOT_FOUND,
+        requestId,
+        404,
+        userId,
+        role
+      );
+    }
 
     logger.info('Participation result updated successfully', {
       participationId: id,
@@ -216,6 +250,7 @@ export async function PUT(
       statusCode: 200,
       requestId,
       timestamp: new Date().toISOString(),
+      ipAddress: extractIpAddress(request.headers),
       responseTime: Date.now() - startTime,
     });
 
@@ -254,7 +289,7 @@ export async function PUT(
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error('Failed to update participation result', err);
     return await createServiceApiErrorResponse(
-      err.message,
+      'Internal server error',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

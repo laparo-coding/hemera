@@ -55,29 +55,28 @@ export function logServiceApiCall(log: ServiceApiAuditLog): void {
   }
 
   // Persist a compact audit record in the database (non-blocking)
-  try {
-    void persistServiceApiLog({
-      serviceUserId: log.userId,
-      endpoint: log.endpoint,
-      method: log.method,
-      responseStatus: log.statusCode,
-      ipAddress: log.ipAddress ?? null,
-      metadata: {
-        requestId: log.requestId,
-        userRole: log.userRole,
-        responseTime: log.responseTime,
-      },
-    });
-  } catch (err) {
+  void persistServiceApiLog({
+    serviceUserId: log.userId,
+    endpoint: log.endpoint,
+    method: log.method,
+    responseStatus: log.statusCode,
+    ipAddress: log.ipAddress ?? null,
+    metadata: {
+      requestId: log.requestId,
+      userRole: log.userRole,
+      responseTime: log.responseTime,
+    },
+  }).catch((err: unknown) => {
     // swallow errors from audit persistence to avoid impacting request flow
     try {
-      reportError(err as Error, {
+      const error = err instanceof Error ? err : new Error(String(err));
+      reportError(error, {
         additionalData: { context: 'serviceApiLogger.persist' },
       });
     } catch {
       // swallow
     }
-  }
+  });
 }
 
 /**

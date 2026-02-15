@@ -118,12 +118,13 @@ beforeAll(async () => {
       env: { ...process.env, DATABASE_URL: connectionUri },
     });
   } catch (_seedErr) {
-    // Log warning but don't fail - unit tests can run without seed data
-    // This is a known Prisma 7.2.0 issue that will be fixed in a future release
-    // console.warn entfernt (Lint-Regel). Hinweis:
-    // ⚠️ Database seeding failed (Prisma 7.2.0 @map() bug).
-    //    Unit tests will run with empty tables.
-    //    See: https://github.com/prisma/prisma/issues/27357
+    // Don't fail - unit tests can run without seed data
+    // Known Prisma 7.2.0 issue with @map() and driver adapters
+    // See: https://github.com/prisma/prisma/issues/27357
+    // biome-ignore lint/suspicious/noConsole: intentional warning in test setup
+    console.warn(
+      '⚠️ Database seeding failed (Prisma @map() bug). Unit tests will run with empty tables.'
+    );
   }
 });
 

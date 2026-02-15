@@ -27,6 +27,24 @@ import {
 import { getOrCreateRequestId } from '../../../../../lib/utils/request-id';
 
 /**
+ * Pick only defined (non-null, non-undefined) fields from an object
+ * that are in the allowed set.
+ */
+function pickDefinedFields<T extends Record<string, unknown>>(
+  source: Record<string, unknown>,
+  allowedFields: ReadonlySet<string>
+): Partial<T> {
+  const result: Record<string, unknown> = {};
+  for (const key of Object.keys(source)) {
+    const value = source[key];
+    if (value !== null && value !== undefined && allowedFields.has(key)) {
+      result[key] = value;
+    }
+  }
+  return result as Partial<T>;
+}
+
+/**
  * Check admin authentication
  */
 async function checkAdminAuth(requestId: string) {
@@ -181,7 +199,10 @@ export async function PATCH(
     }
 
     // Check for concurrent edit
-    const providedUpdatedAt = new Date(parsedUpdate.updatedAt as Date);
+    const providedUpdatedAt =
+      parsedUpdate.updatedAt instanceof Date
+        ? parsedUpdate.updatedAt
+        : new Date(parsedUpdate.updatedAt as string);
     if (existing.updatedAt.getTime() !== providedUpdatedAt.getTime()) {
       rollbar.warning('Concurrent edit conflict detected', {
         requestId,
@@ -254,51 +275,45 @@ export async function PATCH(
       | 'imageDetail'
       | 'imageTwitter'
       | 'heroVideoPlaybackId'
-      | 'location'
+      | 'locationId'
       | 'recommended'
       | 'notRecommended'
       | 'isNonPublic';
 
-    type AllowedUpdate = Partial<Pick<Prisma.CourseUpdateInput, AllowedKeys>>;
+    type AllowedUpdate = Partial<
+      Pick<Prisma.CourseUncheckedUpdateInput, AllowedKeys>
+    >;
 
-    const prismaUpdateData: AllowedUpdate = {};
-    for (const k of Object.keys(updateData) as Array<keyof typeof updateData>) {
-      const v = (updateData as Record<string, unknown>)[k as string];
-      if (
-        v !== null &&
-        v !== undefined &&
-        (
-          [
-            'title',
-            'description',
-            'teaser',
-            'curriculum',
-            'slug',
-            'price',
-            'currency',
-            'capacity',
-            'startDate',
-            'endDate',
-            'startTime',
-            'endTime',
-            'isPublished',
-            'instructor',
-            'level',
-            'thumbnailUrl',
-            'imageDetail',
-            'imageTwitter',
-            'heroVideoPlaybackId',
-            'locationId',
-            'recommended',
-            'notRecommended',
-            'isNonPublic',
-          ] as string[]
-        ).includes(k as string)
-      ) {
-        // Type assertion is safe because AllowedUpdate restricts keys
-        (prismaUpdateData as any)[k] = v;
-      }
-    }
+    const allowedFields: ReadonlySet<string> = new Set<AllowedKeys>([
+      'title',
+      'description',
+      'teaser',
+      'curriculum',
+      'slug',
+      'price',
+      'currency',
+      'capacity',
+      'startDate',
+      'endDate',
+      'startTime',
+      'endTime',
+      'isPublished',
+      'instructor',
+      'level',
+      'thumbnailUrl',
+      'imageDetail',
+      'imageTwitter',
+      'heroVideoPlaybackId',
+      'locationId',
+      'recommended',
+      'notRecommended',
+      'isNonPublic',
+    ]);
+
+    const prismaUpdateData: AllowedUpdate = pickDefinedFields<AllowedUpdate>(
+      updateData as Record<string, unknown>,
+      allowedFields
+    );
 
     // Validate curriculum if provided
     if (updateData.curriculum !== undefined) {
@@ -409,14 +424,9 @@ export async function DELETE(
         },
         bookings: {
           take: 10,
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
+          select: {
+            userId: true,
+            createdAt: true,
           },
         },
       },
@@ -448,8 +458,7 @@ export async function DELETE(
         {
           enrollmentCount: course._count.bookings,
           enrolledStudents: course.bookings.map(b => ({
-            userId: b.user.id,
-            name: b.user.name,
+            userId: b.userId,
             enrolledAt: b.createdAt,
           })),
         }
