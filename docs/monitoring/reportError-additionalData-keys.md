@@ -6,8 +6,6 @@ version: 1.0
 effective: 2025-01-15
 ---
 
-# reportError — additionalData keys
-
 Kurzreferenz der `additionalData`-Schlüssel, die beim Aufruf von `reportError(...)` im Codebase verwendet werden. Ziel: Konsistente Telemetrie, PII-Redaktion und automatische Prüfungen.
 
 Hinweis: Diese Liste basiert auf einer initialen Sammlung aus wichtigen `reportError`-Aufrufen. Die verbindliche Quelle ist `docs/monitoring/reporting-policy.md` (siehe `policy` oben). Änderungen an erlaubten Schlüsseln müssen in der Policy dokumentiert und im Changelog aufgeführt werden.
