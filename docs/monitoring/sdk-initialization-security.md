@@ -9,6 +9,22 @@ This document describes the security measures implemented to prevent accidental 
 - Upstash Redis/Ratelimit (distributed rate limiting)
 - Context7 (AI context retrieval)
 
+### Context7 (AI context retrieval)
+
+Context7 is an optional SDK used for AI-powered context retrieval. Security measures for Context7 mirror other external SDKs:
+
+- Explicit opt-in via `CONTEXT7_ENABLED=1`.
+- API key validation (non-empty, expected prefix `ctx7sk_` or similar).
+- Disabled in `NODE_ENV=test` and E2E modes.
+- Lazy initialization via factory function; no module-level `new Context7()` calls.
+- Rate-limited calls and sanitized results before persisting or logging.
+
+Configuration example:
+```bash
+CONTEXT7_ENABLED=1
+CONTEXT7_API_KEY=ctx7sk_...
+```
+
 ## Problem Statement
 
 External SDKs can accidentally initialize in serverless/edge contexts if:
@@ -48,7 +64,7 @@ This can lead to:
 **Configuration:**
 ```bash
 # Required for Rollbar to initialize
-ROLLBAR_HEMERA_SERVER_TOKEN_1766674885=<valid-token-20+-chars>
+ROLLBAR_HEMERA_SERVER_TOKEN=<valid-token-20+-chars>
 
 # Optional: Explicit disable (overrides token presence)
 ROLLBAR_ENABLED=0
@@ -128,8 +144,8 @@ function isUpstashEnabled(): boolean {
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `ROLLBAR_HEMERA_SERVER_TOKEN_1766674885` | Yes (for init) | - | Server-side token (20+ chars) |
-| `NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885` | No | - | Client-side token (20+ chars) |
+| `ROLLBAR_HEMERA_SERVER_TOKEN` | Yes (for init) | - | Server-side token (20+ chars) |
+| `NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN` | No | - | Client-side token (20+ chars) |
 | `ROLLBAR_ENABLED` | No | `1` | Explicit disable: `0` |
 | `NEXT_PUBLIC_ROLLBAR_ENABLED` | No | `1` | Client-side disable: `0` |
 
@@ -155,7 +171,7 @@ npm run test tests/unit/monitoring/rollbar-validation.spec.ts
 **Test 1: Rollbar without token**
 ```bash
 # Remove token
-unset ROLLBAR_HEMERA_SERVER_TOKEN_1766674885
+unset ROLLBAR_HEMERA_SERVER_TOKEN
 
 # Start dev server
 npm run dev
@@ -271,8 +287,8 @@ export function getNewSdkInstance() {
 **Symptom:** No errors logged to Rollbar dashboard
 
 **Checks:**
-1. Verify token is set: `echo $ROLLBAR_HEMERA_SERVER_TOKEN_1766674885`
-2. Verify token length: `echo $ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 | wc -c` (should be 20+)
+1. Verify token is set: `echo $ROLLBAR_HEMERA_SERVER_TOKEN`
+2. Verify token length: `echo $ROLLBAR_HEMERA_SERVER_TOKEN | wc -c` (should be 20+)
 3. Check disable flags: `echo $ROLLBAR_ENABLED` (should not be `0`)
 4. Check environment: `echo $NODE_ENV` (should not be `test`)
 
@@ -295,15 +311,20 @@ export function getNewSdkInstance() {
 2. Check Jest worker: `echo $JEST_WORKER_ID` (should be set during tests)
 3. Review SDK initialization logs in test output
 
-## Related Documentation
+### Related Resources
 
+**Documentation**
 - [Rollbar Integration](./rollbar-integration.md)
 - [Telemetry Reporting Policy](./reporting-policy.md) — PII guardrails and `additionalData` whitelist for `reportError()` calls
 - [reportError additionalData Keys](./reportError-additionalData-keys.md)
-- [Rate Limiting](../../lib/middleware/rate-limit.ts)
-- [Environment Variables](../../.env.local.example)
-- [Testing Guidelines](../tests/e2e.md)
+
+**Code References**
+- [Rate Limiting implementation](../../lib/middleware/rate-limit.ts)
 - [check-reporterror-keys.mjs](../../scripts/check-reporterror-keys.mjs) — Automated whitelist enforcement script
+
+**Configuration**
+- [Environment Variables example](../../.env.local.example)
+- [Testing Guidelines](../tests/e2e.md)
 
 ## Changelog
 

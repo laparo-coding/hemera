@@ -1,7 +1,7 @@
 ---
 title: "reportError — additionalData keys"
 maintained-by: Monitoring Team <monitoring@hemera.local>
-policy: ./reporting-policy.md
+policy: docs/monitoring/reporting-policy.md
 version: 1.0
 effective: 2025-01-15
 ---

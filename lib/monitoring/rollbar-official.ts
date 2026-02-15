@@ -45,8 +45,7 @@ const isExplicitlyDisabled =
  */
 function hasValidServerToken(): boolean {
   const token =
-    process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 ||
-    process.env.ROLLBAR_SERVER_TOKEN;
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN || process.env.ROLLBAR_SERVER_TOKEN;
 
   if (!token || token.trim().length === 0) {
     return false;
@@ -71,7 +70,7 @@ function hasValidServerToken(): boolean {
  */
 function hasValidClientToken(): boolean {
   const token =
-    process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885 ||
+    process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN ||
     process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN;
 
   if (!token || token.trim().length === 0) {
@@ -110,7 +109,7 @@ function shouldEnableRollbar(): boolean {
     if (process.env.NODE_ENV === 'development') {
       // biome-ignore lint: Configuration info in development
       console.info(
-        '[rollbar] No valid server token found. Rollbar error tracking is disabled. Set ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 to enable.'
+        '[rollbar] No valid server token found. Rollbar error tracking is disabled. Set ROLLBAR_HEMERA_SERVER_TOKEN to enable.'
       );
     }
     return false;
@@ -160,7 +159,7 @@ const baseConfig = {
 // Only include token if validation passes
 export const clientConfig = {
   accessToken: hasValidClientToken()
-    ? process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885
+    ? process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN
     : undefined,
   ...baseConfig,
   enabled: rollbarEnabled && hasValidClientToken(),
@@ -203,7 +202,7 @@ const noOpInstance: RollbarTestInstance = {
 export const serverInstance: Rollbar | RollbarTestInstance = rollbarEnabled
   ? new Rollbar({
       accessToken:
-        process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 ||
+        process.env.ROLLBAR_HEMERA_SERVER_TOKEN ||
         process.env.ROLLBAR_SERVER_TOKEN,
       ...baseConfig,
     })
@@ -213,8 +212,7 @@ export const serverInstance: Rollbar | RollbarTestInstance = rollbarEnabled
 // Uses Vercel-Rollbar integration token name with fallback
 export const rollbarConfig = {
   accessToken:
-    process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 ||
-    process.env.ROLLBAR_SERVER_TOKEN,
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN || process.env.ROLLBAR_SERVER_TOKEN,
   ...baseConfig,
 };
 
@@ -224,7 +222,7 @@ export const rollbar = serverInstance;
 // Uses Vercel-Rollbar integration token name with fallback
 export const clientRollbarConfig = {
   accessToken:
-    process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885 ||
+    process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN ||
     process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN,
   ...baseConfig,
 };
