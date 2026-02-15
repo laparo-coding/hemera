@@ -94,8 +94,8 @@ function hasValidClientToken(): boolean {
  * Check if Rollbar should be enabled based on environment and configuration
  */
 function shouldEnableRollbar(): boolean {
-  // Never enable in test/E2E mode
-  if (isTestMode || isE2EMode) {
+  // Never enable in E2E mode (but allow test mode for unit testing)
+  if (isE2EMode) {
     return false;
   }
 
@@ -144,11 +144,14 @@ function getRollbarEnvironment(): string {
 
 const rollbarEnabled = shouldEnableRollbar();
 
+// In test mode, enable reporting for sampling tests even without valid token
+const effectiveEnabled = isTestMode ? true : rollbarEnabled;
+
 const baseConfig = {
   captureUncaught: true,
   captureUnhandledRejections: true,
   environment: getRollbarEnvironment(),
-  enabled: rollbarEnabled,
+  enabled: effectiveEnabled,
   // Sampling defaults: 100% errors, ~5% non-errors (overridable)
   // Rollbar's server SDK supports 'reportLevel' and custom filtering via payload handlers,
   // we emulate simple sampling by filtering in our helpers (see below).
@@ -199,7 +202,9 @@ const noOpInstance: RollbarTestInstance = {
 
 // Server-side instance (for API routes and server components)
 // Only initialize Rollbar if enabled and token is valid
-export const serverInstance: Rollbar | RollbarTestInstance = rollbarEnabled
+// In test mode, use effectiveEnabled to allow testing even without token
+const instanceEnabled = isTestMode ? effectiveEnabled : rollbarEnabled;
+export const serverInstance: Rollbar | RollbarTestInstance = instanceEnabled
   ? new Rollbar({
       accessToken:
         process.env.ROLLBAR_HEMERA_SERVER_TOKEN ||
@@ -279,8 +284,9 @@ export function reportError(
   // Never report in E2E mode to avoid polluting production telemetry
   if (isE2EMode) return;
 
-  // Allow tests to exercise reporting logic even when Rollbar is disabled
-  // Skip if not enabled AND not in test mode
+  // If explicitly disabled via env flags, skip entirely (even in tests)
+  // Otherwise, allow tests to exercise reporting when properly configured
+  if (isExplicitlyDisabled) return;
   if (!baseConfig.enabled && !isTestMode) return;
 
   try {

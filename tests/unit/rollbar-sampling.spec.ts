@@ -19,8 +19,6 @@ describe('Unit: Rollbar sampling logic', () => {
     // Ensure Rollbar is not explicitly disabled for sampling tests
     delete process.env.NEXT_PUBLIC_ROLLBAR_ENABLED;
     delete process.env.ROLLBAR_ENABLED;
-    process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
-      'valid-token-with-sufficient-length-12345';
     jest.resetModules();
   });
 
