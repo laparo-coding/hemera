@@ -107,6 +107,7 @@ Endpoint‑Änderung: Stelle sicher, dass `auth()` ein `userId` liefert, bevor `
 ### Schritt-für-Schritt Plan
 
 #### 1. Clerk: Service-User anlegen
+
 - Neuen User in Clerk Dashboard erstellen: `aither-service@hemera-academy.com`
 - `publicMetadata` setzen: `{ "role": "api-client", "service": "aither" }`
 
