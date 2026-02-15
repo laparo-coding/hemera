@@ -7,6 +7,8 @@ absolut
 Achtsamkeitsbasierte
 actionlint
 adminpassword
+aither
+Aither
 aktualisieren
 alignable
 Anfrageparameter
@@ -170,6 +172,7 @@ formattedDate
 Fortge
 Fortgeschrittene
 foto
+gaia
 FOUC
 FOUT
 Funktion
@@ -224,6 +227,8 @@ hier
 Homeoffice
 homeoffice
 hosten
+idempotently
+Implementierungs
 hostet
 hrsstatic
 htmlreport
@@ -234,6 +239,7 @@ imageTwitter
 Informationen
 Inhalte
 initialised
+Integrationen
 Initialmigration
 inkl
 innen
@@ -427,7 +433,18 @@ queryability
 QWEN
 Qwen
 qwen
+apilogs
+deployen
+gehasht
+pmkdir
+ratelimit
+Ratelimit
 realen
+redis
+reporterror
+sanitisiert
+upstash
+YYYYMMDDHHMM
 rechnung
 Redocly
 responsiv
@@ -473,6 +490,7 @@ SLXVDP
 soldout
 Solopreneure
 solopreneure
+soqt
 Sortierung
 spezifische
 sqlfluff
@@ -579,8 +597,10 @@ waitlist
 Warteschlangen
 Warteschlisten
 WCAG
+wehxy
 weiterbringt
 whsec
+wighem
 Willkommensnachricht
 wjaou
 wordprocessingml

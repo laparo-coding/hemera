@@ -137,6 +137,12 @@ export const courseCreateSchema = z.object({
     .optional()
     .nullable(),
   curriculum: curriculumSchema,
+  duration: z
+    .number()
+    .int('Dauer muss eine ganze Zahl in Stunden sein')
+    .positive('Dauer muss positiv sein')
+    .optional()
+    .default(4),
   // Learning Path fields (021)
   recommended: z
     .string()
@@ -186,7 +192,8 @@ export const courseUpdateSchema = z.object({
     .number()
     .nonnegative('Price must be non-negative')
     .multipleOf(0.01, 'Price must have at most 2 decimal places')
-    .optional(),
+    .optional()
+    .transform(val => (val === undefined ? undefined : Math.round(val * 100))),
   startDate: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))

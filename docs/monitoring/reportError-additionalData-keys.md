@@ -1,14 +1,22 @@
+---
+title: "reportError — additionalData keys"
+maintained-by: Monitoring Team <monitoring@hemera.local>
+policy: ./reporting-policy.md
+version: 1.0
+effective: 2025-01-15
+---
+
 # `reportError` — `additionalData` keys
 
-Kurzübersicht der `additionalData`-Schlüssel, die beim Aufruf von `reportError(...)` im Codebase verwendet werden. Ziel: Konsistente Telemetrie und PII-Redaktion.
+Kurzreferenz der `additionalData`-Schlüssel, die beim Aufruf von `reportError(...)` im Codebase verwendet werden. Ziel: Konsistente Telemetrie, PII-Redaktion und automatische Prüfungen.
 
-Hinweis: Diese Liste wurde automatisch aus den wichtigsten `reportError`-Aufrufen zusammengestellt (Produktionstest- und Dev-Mocks ausgeschlossen). Falls Du möchtest, kann ich die Liste rekursiv erweitern oder eine Policy-Datei (Whitelist/Blacklist) erzeugen.
+Hinweis: Diese Liste basiert auf einer initialen Sammlung aus wichtigen `reportError`-Aufrufen. Die verbindliche Quelle ist `docs/monitoring/reporting-policy.md` (siehe `policy` oben). Änderungen an erlaubten Schlüsseln müssen in der Policy dokumentiert und im Changelog aufgeführt werden.
 
 - **lib/auth/permissions.ts**
   - `userId` — betroffene Clerk/User-ID
   - `operation` — Operation/Handler-Label (z. B. `getUserRole`)
   - `errorType` — normalisierter Fehler-Typ (z. B. `clerk_api_error`)
-  - `originalError` — bereits redigiert: `"[redacted]"`
+  - `originalError` — DARF NICHT enthalten werden; stattdessen nutze nicht-sensitive Metadaten wie `hasOriginalError` und `errorName`.
 
 - **lib/middleware/rate-limit.ts**
   - `context: 'rateLimit:upstash'`

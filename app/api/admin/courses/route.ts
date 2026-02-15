@@ -7,7 +7,10 @@ import {
 } from '../../../../lib/auth/helpers';
 import { prisma } from '../../../../lib/db/prisma';
 import { serverInstance as rollbar } from '../../../../lib/monitoring/rollbar-official';
-import { courseCreateSchema } from '../../../../lib/schemas/admin/course';
+import {
+  type CourseCreateInput,
+  courseCreateSchema,
+} from '../../../../lib/schemas/admin/course';
 import {
   createErrorResponse,
   ErrorCodes,
@@ -153,7 +156,7 @@ export async function POST(request: NextRequest) {
     // Parse and validate body
     const body = await request.json();
 
-    let parsed;
+    let parsed: CourseCreateInput;
     try {
       parsed = await courseCreateSchema.parseAsync(body);
     } catch (zErr) {
@@ -182,8 +185,8 @@ export async function POST(request: NextRequest) {
 
     // Compute endTime if not provided using validated duration (default 4h).
     // Use `parsed` so any validated/transformed `duration` is preferred; fall back to 4.
-    const durationHours = Number((parsed as any).duration ?? 4);
-    const startTimeDate = parsed.startTime as Date;
+    const durationHours = Number(parsed.duration ?? 4);
+    const startTimeDate = parsed.startTime;
     const endTimeDate =
       parsed.endTime ??
       new Date(startTimeDate.getTime() + durationHours * 3600 * 1000);
@@ -203,12 +206,10 @@ export async function POST(request: NextRequest) {
       const slug = `${baseSlug}-${suffix}`;
 
       try {
-        // Ensure price is persisted as integer cents (defensive: schema.transform should
-        // already convert Euros -> cents, but enforce here to avoid regressions).
-        const rawPrice = Number((parsed as any).price);
-        const priceToPersist = Number.isInteger(rawPrice)
-          ? rawPrice
-          : Math.round(rawPrice);
+        // Ensure price is persisted as integer cents.
+        const priceToPersist = Number.isInteger(parsed.price)
+          ? parsed.price
+          : Math.round(parsed.price);
 
         createdCourse = await prisma.course.create({
           data: {
