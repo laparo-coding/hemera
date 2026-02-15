@@ -276,16 +276,12 @@ export function reportError(
   context?: ErrorContext,
   severity: ErrorSeverityType = ErrorSeverity.ERROR
 ): void {
-  // Never report if Rollbar is globally disabled
-  if (!baseConfig.enabled) return;
+  // Never report in E2E mode to avoid polluting production telemetry
+  if (isE2EMode) return;
 
-  // Allow tests to exercise reporting when explicitly enabled for testing
-  if (isTestMode) {
-    // In test mode, still honor sampling - but don't skip entirely
-  } else if (isE2EMode) {
-    // Never report in E2E mode to avoid polluting production telemetry
-    return;
-  }
+  // Allow tests to exercise reporting logic even when Rollbar is disabled
+  // Skip if not enabled AND not in test mode
+  if (!baseConfig.enabled && !isTestMode) return;
 
   try {
     // Simple sampling: allow configuring rate per severity (0..1)
