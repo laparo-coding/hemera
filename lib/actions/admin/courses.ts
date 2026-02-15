@@ -65,6 +65,7 @@ export async function createCourseAction(
     const createPayload: CreateCoursePayload = {
       ...validatedData,
       startDate: validatedData.startDate ?? validatedData.startTime,
+      endTime: validatedData.endTime ?? validatedData.startTime,
     };
 
     // Create course

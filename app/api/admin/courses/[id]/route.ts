@@ -254,7 +254,7 @@ export async function PATCH(
       | 'imageDetail'
       | 'imageTwitter'
       | 'heroVideoPlaybackId'
-      | 'locationId'
+      | 'location'
       | 'recommended'
       | 'notRecommended'
       | 'isNonPublic';
@@ -341,7 +341,7 @@ export async function PATCH(
 
     const updated = await prisma.course.update({
       where: { id },
-      data: prismaUpdateData,
+      data: prismaUpdateData as Parameters<typeof prisma.course.update>[0]['data'],
       include: {
         _count: {
           select: {
