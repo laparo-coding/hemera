@@ -38,26 +38,9 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
       const clerk = await clerkClient();
       const user = await clerk.users.getUser(userId);
       role = user?.publicMetadata?.role;
-      // Wenn User gefunden, aber keine Rolle gesetzt, dann auf currentUser() zurückgreifen
+      // Wenn User gefunden, aber keine Rolle gesetzt, sichere Default role
       if (user && !role) {
-        // Fallback auf aktuellen User-Kontext
-        try {
-          const current = await currentUser();
-          role = current?.publicMetadata?.role;
-        } catch (err: any) {
-          reportError(
-            new Error('Failed to fetch current user from Clerk (fallback)'),
-            {
-              additionalData: {
-                operation: 'getUserRole',
-                errorType: 'clerk_current_user_error',
-                hasOriginalError: Boolean(err?.message),
-                errorName: err?.name,
-              },
-            },
-            ErrorSeverity.WARNING
-          );
-        }
+        return 'user';
       }
     } catch (err: any) {
       // Log Clerk API error but continue with fallback. Do NOT include raw
@@ -130,16 +113,14 @@ export async function hasPermission(permission: string): Promise<boolean> {
     const user = await currentUser();
     if (!user) return false;
 
-    // Rolle direkt aus User-Objekt lesen, falls vorhanden
-    let role = user.publicMetadata?.role;
-    if (typeof role === 'string') {
-      role = role.toLowerCase().trim();
-      if (!(VALID_ROLES as readonly string[]).includes(role as string)) {
-        role = 'user';
-      }
-    } else {
-      // Fallback: Hole Rolle über getUserRole
-      role = await getUserRole(user.id);
+    // Rolle direkt aus User-Objekt lesen; falls ungueltig: sichere Default role
+    let role: UserRole = 'user';
+    const rawRole = user.publicMetadata?.role;
+    if (typeof rawRole === 'string') {
+      const normalizedRole = rawRole.toLowerCase().trim();
+      role = (VALID_ROLES as readonly string[]).includes(normalizedRole)
+        ? (normalizedRole as UserRole)
+        : 'user';
     }
 
     // Admin hat alle Rechte
@@ -157,7 +138,7 @@ export async function hasPermission(permission: string): Promise<boolean> {
       ],
     };
 
-    const permissions = rolePermissions[role as UserRole] || [];
+    const permissions = rolePermissions[role] || [];
     return permissions.includes('*') || permissions.includes(permission);
   } catch (err: any) {
     reportError(
