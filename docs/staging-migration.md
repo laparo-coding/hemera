@@ -51,16 +51,16 @@ export DEPLOY_ENDPOINT="https://cd.example.com/api/deploy"
 # DEPLOY_TOKEN should come from CI secrets or a protected environment variable
 
 RESPONSE=$(curl --max-time 30 -sS -w "%{http_code}" -o /tmp/deploy_response.txt -X POST "$DEPLOY_ENDPOINT" \
-	-H "Authorization: Bearer $DEPLOY_TOKEN" \
-	-H "Content-Type: application/json" \
-	-d '{"ref":"feat/025-service-user-endpoints","actor":"'${GIT_ACTOR:-${USER:-$(git config user.name || echo unknown)}}'"}')
+  -H "Authorization: Bearer $DEPLOY_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"ref":"feat/025-service-user-endpoints","actor":"'${GIT_ACTOR:-${USER:-$(git config user.name || echo unknown)}}'"}')
 
 if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 300 ]; then
-	echo "Deploy triggered successfully (HTTP $RESPONSE)"
+  echo "Deploy triggered successfully (HTTP $RESPONSE)"
 else
-	echo "Deploy failed with status $RESPONSE"
-	echo "Response body:" && cat /tmp/deploy_response.txt
-	exit 1
+  echo "Deploy failed with status $RESPONSE"
+  echo "Response body:" && cat /tmp/deploy_response.txt
+  exit 1
 fi
 ```
 
