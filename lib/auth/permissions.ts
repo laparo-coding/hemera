@@ -38,9 +38,26 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
       const clerk = await clerkClient();
       const user = await clerk.users.getUser(userId);
       role = user?.publicMetadata?.role;
-      // If user found but has no role, return safe default and do not fall back
+      // Wenn User gefunden, aber keine Rolle gesetzt, dann auf currentUser() zurückgreifen
       if (user && !role) {
-        return 'user';
+        // Fallback auf aktuellen User-Kontext
+        try {
+          const current = await currentUser();
+          role = current?.publicMetadata?.role;
+        } catch (err: any) {
+          reportError(
+            new Error('Failed to fetch current user from Clerk (fallback)'),
+            {
+              additionalData: {
+                operation: 'getUserRole',
+                errorType: 'clerk_current_user_error',
+                hasOriginalError: Boolean(err?.message),
+                errorName: err?.name,
+              },
+            },
+            ErrorSeverity.WARNING
+          );
+        }
       }
     } catch (err: any) {
       // Log Clerk API error but continue with fallback. Do NOT include raw
@@ -113,15 +130,24 @@ export async function hasPermission(permission: string): Promise<boolean> {
     const user = await currentUser();
     if (!user) return false;
 
-    // Only call getUserRole if user exists
-    const userRole = await getUserRole(user.id);
+    // Rolle direkt aus User-Objekt lesen, falls vorhanden
+    let role = user.publicMetadata?.role;
+    if (typeof role === 'string') {
+      role = role.toLowerCase().trim();
+      if (!(VALID_ROLES as readonly string[]).includes(role)) {
+        role = 'user';
+      }
+    } else {
+      // Fallback: Hole Rolle über getUserRole
+      role = await getUserRole(user.id);
+    }
 
-    // Admin has all permissions
-    if (userRole === 'admin') return true;
+    // Admin hat alle Rechte
+    if (role === 'admin') return true;
 
-    // Define role-based permissions
+    // Rollenbasierte Berechtigungen
     const rolePermissions: Record<UserRole, string[]> = {
-      admin: ['*'], // All permissions
+      admin: ['*'],
       moderator: ['read:courses', 'manage:courses'],
       user: ['read:courses'],
       'api-client': [
@@ -131,11 +157,9 @@ export async function hasPermission(permission: string): Promise<boolean> {
       ],
     };
 
-    const permissions = rolePermissions[userRole] || [];
+    const permissions = rolePermissions[role as UserRole] || [];
     return permissions.includes('*') || permissions.includes(permission);
   } catch (err: any) {
-    // Log error and deny access by default (safe fallback). Avoid leaking
-    // backend error messages; provide non-sensitive metadata.
     reportError(
       new Error('Failed to check user permission'),
       {
