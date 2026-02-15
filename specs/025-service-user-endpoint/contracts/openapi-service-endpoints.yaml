@@ -727,3 +727,4 @@ paths:
       scheme: bearer
       bearerFormat: JWT
       description: Clerk JWT authentication token
+
