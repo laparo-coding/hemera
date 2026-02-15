@@ -144,10 +144,9 @@ function getRollbarEnvironment(): string {
 
 const rollbarEnabled = shouldEnableRollbar();
 
-// In test mode, enable reporting for sampling tests - but respect explicit disable flags
-// This allows tests to exercise reporting logic without needing actual tokens
-const effectiveEnabled =
-  isTestMode && !isExplicitlyDisabled ? true : rollbarEnabled;
+// In test mode, only enable if we have a valid token - this allows sampling tests
+// to run when tokens exist, while validation tests (that delete tokens) still work
+const effectiveEnabled = isTestMode && rollbarEnabled ? true : rollbarEnabled;
 
 const baseConfig = {
   captureUncaught: true,
