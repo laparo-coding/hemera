@@ -9,7 +9,7 @@
  * This prevents accidental initialization in serverless/edge contexts.
  */
 
-import { Context7, Context7Error } from '@upstash/context7-sdk';
+import { Context7 } from '@upstash/context7-sdk';
 import { env } from './env';
 
 // ============================================================================
@@ -42,7 +42,8 @@ function isContext7Enabled(): boolean {
 }
 
 /**
- * Singleton Context7 client instance (lazy initialization)
+ * Singleton Context7 client instance (lazy initialization).
+ * Node.js is single-threaded so the synchronous constructor cannot race.
  */
 let context7Client: Context7 | null = null;
 
@@ -51,22 +52,24 @@ function getContext7Client(): Context7 | null {
     return null;
   }
 
-  if (!context7Client) {
-    try {
-      context7Client = new Context7({
-        apiKey: env.CONTEXT7_API_KEY!,
-      });
-      if (process.env.NODE_ENV === 'development') {
-        // biome-ignore lint: Configuration info in development
-        console.log('[context7] Context7 SDK initialized successfully');
-      }
-    } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-        // biome-ignore lint: Configuration error in development
-        console.error('[context7] Failed to initialize Context7 SDK:', err);
-      }
-      return null;
+  if (context7Client) {
+    return context7Client;
+  }
+
+  try {
+    context7Client = new Context7({
+      apiKey: env.CONTEXT7_API_KEY!,
+    });
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint: Configuration info in development
+      console.log('[context7] Context7 SDK initialized successfully');
     }
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint: Configuration error in development
+      console.error('[context7] Failed to initialize Context7 SDK:', err);
+    }
+    return null;
   }
 
   return context7Client;
@@ -78,7 +81,7 @@ function getContext7Client(): Context7 | null {
 
 /**
  * Create Context7 client (deprecated - use getContext7Client instead)
- * @deprecated Use getContext7Client() for singleton pattern
+ * @deprecated Use getContext7Client() for singleton pattern. Scheduled for removal in v2.0.
  */
 export function createContext7Client(): Context7 {
   const client = getContext7Client();
@@ -92,12 +95,12 @@ export function createContext7Client(): Context7 {
 
 /**
  * Search library with Context7
- * Returns null if Context7 is not enabled
+ * Returns null if Context7 is not enabled or on error
  */
 export async function searchLibrary(
   query: string,
   libraryName: string
-): Promise<any | null> {
+): Promise<unknown> {
   const client = getContext7Client();
   if (!client) {
     if (process.env.NODE_ENV === 'development') {
@@ -112,20 +115,24 @@ export async function searchLibrary(
   try {
     return await client.searchLibrary(query, libraryName);
   } catch (err) {
-    if (err instanceof Context7Error) throw err;
-    throw err;
+    // biome-ignore lint: Error logging for SDK failures
+    console.error(
+      '[context7] searchLibrary failed:',
+      err instanceof Error ? err.message : err
+    );
+    return null;
   }
 }
 
 /**
  * Get context from Context7
- * Returns null if Context7 is not enabled
+ * Returns null if Context7 is not enabled or on error
  */
 export async function getContext(
   libraryId: string,
   question: string,
-  opts?: any
-): Promise<any | null> {
+  opts?: Record<string, unknown>
+): Promise<unknown> {
   const client = getContext7Client();
   if (!client) {
     if (process.env.NODE_ENV === 'development') {
@@ -137,7 +144,18 @@ export async function getContext(
     return null;
   }
 
-  return client.getContext(question, libraryId, opts || { type: 'txt' });
+  try {
+    return await client.getContext(
+      question,
+      libraryId,
+      opts || { type: 'txt' }
+    );
+  } catch (err) {
+    // biome-ignore lint: Error logging for SDK failures
+    console.error(
+      '[context7] getContext failed:',
+      err instanceof Error ? err.message : err
+    );
+    return null;
+  }
 }
-
-export default { createContext7Client, searchLibrary, getContext };

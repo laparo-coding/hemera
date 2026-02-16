@@ -1,11 +1,14 @@
 import { auth } from '@clerk/nextjs/server';
-import { CourseLevel } from '@prisma/client';
+import { CourseLevel, type Prisma } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { getUserRole } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
-import { logServiceApiCall } from '@/lib/monitoring/service-api-logger';
+import {
+  extractIpAddress,
+  logServiceApiCall,
+} from '@/lib/monitoring/service-api-logger';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import { ErrorCodes } from '@/lib/utils/api-response';
 import {
@@ -27,7 +30,7 @@ const CourseQuerySchema = z.object({
   published: z
     .string()
     .optional()
-    .transform(val => val === 'true' || val === undefined),
+    .transform(val => (val === undefined ? undefined : val === 'true')),
   limit: z.coerce.number().min(1).max(500).optional().default(100),
   offset: z.coerce.number().min(0).optional().default(0),
 });
@@ -135,10 +138,7 @@ export async function GET(request: NextRequest) {
     const { level, published, limit, offset } = validatedParams;
 
     // Build where clause
-    const where: {
-      level?: CourseLevel;
-      isPublished?: boolean;
-    } = {};
+    const where: Prisma.CourseWhereInput = {};
 
     if (level) {
       where.level = level;
@@ -162,10 +162,8 @@ export async function GET(request: NextRequest) {
           level: true,
           startDate: true,
           endDate: true,
-          bookings: {
-            select: {
-              id: true,
-            },
+          _count: {
+            select: { bookings: true },
           },
         },
         orderBy: {
@@ -185,7 +183,7 @@ export async function GET(request: NextRequest) {
       level: course.level,
       startDate: course.startDate?.toISOString() ?? null,
       endDate: course.endDate?.toISOString() ?? null,
-      participantCount: course.bookings.length,
+      participantCount: course._count.bookings,
     }));
 
     logger.info('Courses retrieved successfully', {
@@ -203,6 +201,7 @@ export async function GET(request: NextRequest) {
       statusCode: 200,
       requestId,
       timestamp: new Date().toISOString(),
+      ipAddress: extractIpAddress(request.headers),
       responseTime: Date.now() - startTime,
     });
 
@@ -235,10 +234,12 @@ export async function GET(request: NextRequest) {
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error('Failed to retrieve courses', err);
     return await createServiceApiErrorResponse(
-      err.message,
+      'Internal server error',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
-      500
+      500,
+      undefined,
+      undefined
     );
   }
 }

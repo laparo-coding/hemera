@@ -1,9 +1,13 @@
 import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
+import { z } from 'zod';
 import { getUserRole } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
-import { logServiceApiCall } from '@/lib/monitoring/service-api-logger';
+import {
+  extractIpAddress,
+  logServiceApiCall,
+} from '@/lib/monitoring/service-api-logger';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import { ErrorCodes } from '@/lib/utils/api-response';
 import {
@@ -18,6 +22,8 @@ import {
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
+
+const IdParamSchema = z.string().cuid('Invalid participation ID format');
 
 /**
  * OPTIONS /api/service/participations/[id]
@@ -37,8 +43,21 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { id: rawId } = await params;
   const requestId = getOrCreateRequestId(request);
+
+  // Validate ID format
+  const idResult = IdParamSchema.safeParse(rawId);
+  if (!idResult.success) {
+    return await createServiceApiErrorResponse(
+      'Invalid participation ID format',
+      ErrorCodes.VALIDATION_ERROR,
+      requestId,
+      400
+    );
+  }
+  const id = idResult.data;
+
   const context = createRequestContext(
     requestId,
     'GET',
@@ -154,6 +173,7 @@ export async function GET(
       statusCode: 200,
       requestId,
       timestamp: new Date().toISOString(),
+      ipAddress: extractIpAddress(request.headers),
       responseTime: Date.now() - startTime,
     });
 
@@ -179,7 +199,7 @@ export async function GET(
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error('Failed to retrieve participation', err);
     return await createServiceApiErrorResponse(
-      err.message,
+      'Internal server error',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

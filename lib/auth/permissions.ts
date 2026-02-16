@@ -42,9 +42,10 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
       if (user && !role) {
         return 'user';
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Log Clerk API error but continue with fallback. Do NOT include raw
       // backend messages — provide non-sensitive metadata instead.
+      const errorName = err instanceof Error ? err.name : undefined;
       reportError(
         new Error('Failed to fetch user role from Clerk by userId'),
         {
@@ -52,8 +53,8 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
             userId,
             operation: 'getUserRole',
             errorType: 'clerk_api_error',
-            hasOriginalError: Boolean(err?.message),
-            errorName: err?.name,
+            hasOriginalError: err instanceof Error,
+            errorName,
           },
         },
         ErrorSeverity.WARNING
@@ -67,17 +68,18 @@ export async function getUserRole(userId?: string): Promise<UserRole> {
     try {
       const user = await currentUser();
       role = user?.publicMetadata?.role;
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Log currentUser() error and fall back to safe default. Avoid leaking
       // error messages; include non-sensitive metadata.
+      const errorName = err instanceof Error ? err.name : undefined;
       reportError(
         new Error('Failed to fetch current user from Clerk'),
         {
           additionalData: {
             operation: 'getUserRole',
             errorType: 'clerk_current_user_error',
-            hasOriginalError: Boolean(err?.message),
-            errorName: err?.name,
+            hasOriginalError: err instanceof Error,
+            errorName,
           },
         },
         ErrorSeverity.WARNING
@@ -135,12 +137,13 @@ export async function hasPermission(permission: string): Promise<boolean> {
         'read:courses',
         'read:participations',
         'write:participation-results',
+        'read:bookings',
       ],
     };
 
     const permissions = rolePermissions[role] || [];
     return permissions.includes('*') || permissions.includes(permission);
-  } catch (err: any) {
+  } catch (err: unknown) {
     reportError(
       new Error('Failed to check user permission'),
       {
@@ -148,8 +151,8 @@ export async function hasPermission(permission: string): Promise<boolean> {
           permission,
           operation: 'hasPermission',
           errorType: 'permission_check_error',
-          hasOriginalError: Boolean(err?.message),
-          errorName: err?.name,
+          hasOriginalError: err instanceof Error,
+          errorName: err instanceof Error ? err.name : undefined,
         },
       },
       ErrorSeverity.WARNING
@@ -178,7 +181,7 @@ export async function isAdmin(): Promise<boolean> {
   try {
     const role = await getUserRole();
     return role === 'admin';
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Log error and deny admin access by default (safe fallback). Avoid leaking
     // backend error messages; provide non-sensitive metadata.
     reportError(
@@ -187,8 +190,8 @@ export async function isAdmin(): Promise<boolean> {
         additionalData: {
           operation: 'isAdmin',
           errorType: 'admin_check_error',
-          hasOriginalError: Boolean(err?.message),
-          errorName: err?.name,
+          hasOriginalError: err instanceof Error,
+          errorName: err instanceof Error ? err.name : undefined,
         },
       },
       ErrorSeverity.WARNING

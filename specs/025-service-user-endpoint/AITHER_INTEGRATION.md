@@ -2,11 +2,11 @@
 
 ## Service User Credentials
 
-**Email:** `service-user@laparo.biz`  
-**Password:** `soqtAg-wighem-wehxy0`  
+**Email:** _(stored in password manager – ask admin)_  
+**Password:** _(stored in password manager – ask admin)_  
 **Role:** `api-client`
 
-⚠️ **Security Note:** These credentials should be stored securely in Aither's environment variables, never committed to git.
+⚠️ **Security Note:** Credentials must NEVER be committed to git. Obtain them from the team password manager or Clerk Dashboard.
 
 ---
 
@@ -19,8 +19,8 @@ Add to Aither's `.env.local`:
 ```bash
 # Hemera Service API
 HEMERA_API_URL=https://hemera-academy.vercel.app
-HEMERA_SERVICE_USER_EMAIL=service-user@laparo.biz
-HEMERA_SERVICE_USER_PASSWORD=soqtAg-wighem-wehxy0
+HEMERA_SERVICE_USER_EMAIL=<from-password-manager>
+HEMERA_SERVICE_USER_PASSWORD=<from-password-manager>
 
 # Clerk (for JWT generation)
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your-clerk-publishable-key>

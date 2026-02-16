@@ -17,7 +17,7 @@ Anonymization
 anwenden
 apilogs
 approven
-Arbeisleistung
+Arbeitsleistung
 Arbeitsleitung
 Aufgaben
 aufgetreten
@@ -27,6 +27,7 @@ Ausgewählte
 authentifiziert
 Authentifizierung
 Authentifizierungsbasierte
+Authentifizierungsflows
 autoincrement
 autoplay
 Autoplay
@@ -158,9 +159,10 @@ failen
 Faketown
 Fatalf
 Fcourses
+fedcba
 fehler
 Fehler
-finazielle
+finanzielle
 firefox
 fkey
 Foderungen
@@ -420,6 +422,7 @@ Prisma
 prnum
 Produktentwicklung
 produktionsbereit
+produktionsähnlicher
 produktionstauglicher
 profil
 prometheus
@@ -487,7 +490,6 @@ SLXVDP
 soldout
 solopreneure
 Solopreneure
-soqt
 Sortierung
 Speckit
 spezifische
@@ -600,10 +602,8 @@ waitlist
 Warteschlangen
 Warteschlisten
 WCAG
-wehxy
 weiterbringt
 whsec
-wighem
 Willkommensnachricht
 wjaou
 wordprocessingml

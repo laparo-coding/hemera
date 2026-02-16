@@ -134,23 +134,31 @@ export async function POST(request: NextRequest) {
     }
 
     if (!userId) {
-      return createErrorResponse(
+      const errorResponse = createErrorResponse(
         'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
       );
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
+      });
+      return errorResponse;
     }
 
     // Admin authorization check
     const isAdmin = await checkUserAdminStatus(userId);
     if (!isAdmin) {
-      return createErrorResponse(
+      const errorResponse = createErrorResponse(
         'Du brauchst Admin-Rechte',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
       );
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
+      });
+      return errorResponse;
     }
 
     // Parse and validate body
@@ -188,13 +196,17 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        return createErrorResponse(
+        const validationError = createErrorResponse(
           'Ungültige Eingaben beim Erstellen des Kurses',
           ErrorCodes.VALIDATION_ERROR,
           requestId,
           400,
           { issues: zErr.issues }
         );
+        Object.entries(corsHeaders).forEach(([key, value]) => {
+          validationError.headers.set(key, value);
+        });
+        return validationError;
       }
       throw zErr;
     }
@@ -234,7 +246,7 @@ export async function POST(request: NextRequest) {
             description: parsed.description,
             slug,
             price: priceToPersist,
-            startDate: parsed.startDate as Date,
+            startDate: parsed.startDate ?? undefined,
             startTime: startTimeDate,
             endTime: endTimeDate,
             instructor: parsed.instructor,
@@ -249,12 +261,19 @@ export async function POST(request: NextRequest) {
         });
 
         break;
-      } catch (createErr: any) {
+      } catch (createErr: unknown) {
         lastError = createErr;
         // Prisma unique constraint on slug (P2002) -> retry
+        const isPrismaError =
+          createErr != null &&
+          typeof createErr === 'object' &&
+          'code' in createErr;
         if (
-          createErr?.code === 'P2002' &&
-          createErr?.meta?.target?.includes('slug')
+          isPrismaError &&
+          (createErr as { code: string }).code === 'P2002' &&
+          (
+            createErr as { meta?: { target?: string[] } }
+          ).meta?.target?.includes('slug')
         ) {
           // try again with a new suffix
           continue;
@@ -274,18 +293,22 @@ export async function POST(request: NextRequest) {
         }
       );
 
-      return createErrorResponse(
+      const retryError = createErrorResponse(
         'Konnte Kurs nicht erstellen',
         ErrorCodes.INTERNAL_ERROR,
         requestId,
         500
       );
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        retryError.headers.set(key, value);
+      });
+      return retryError;
     }
 
     // New course has zero enrollments immediately after creation — avoid extra DB roundtrip
     const enrollmentCount = 0;
 
-    return NextResponse.json(
+    const successResponse = NextResponse.json(
       {
         ...createdCourse,
         enrollmentCount,
@@ -293,17 +316,25 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      successResponse.headers.set(key, value);
+    });
+    return successResponse;
   } catch (_error) {
     rollbar.error('Failed to create course (unexpected)', _error as Error, {
       requestId,
       route: '/api/admin/courses',
     });
 
-    return createErrorResponse(
+    const catchError = createErrorResponse(
       'Konnte Kurs nicht erstellen',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500
     );
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      catchError.headers.set(key, value);
+    });
+    return catchError;
   }
 }

@@ -35,49 +35,41 @@ export function logServiceApiCall(log: ServiceApiAuditLog): void {
     });
   }
 
-  // Log to Rollbar for production monitoring
+  // Log errors to Rollbar for production monitoring (skip success events to reduce noise/cost)
   if (log.statusCode >= 400) {
-    // Error responses
+    // Redact PII fields before sending to external telemetry
+    const { ipAddress: _ip, userAgent: _ua, ...safeLog } = log;
     serverInstance.error(logMessage, {
       custom: {
         type: 'service_api_audit',
-        ...log,
-      },
-    });
-  } else {
-    // Success responses (info level)
-    serverInstance.info(logMessage, {
-      custom: {
-        type: 'service_api_audit',
-        ...log,
+        ...safeLog,
       },
     });
   }
 
   // Persist a compact audit record in the database (non-blocking)
-  try {
-    void persistServiceApiLog({
-      serviceUserId: log.userId,
-      endpoint: log.endpoint,
-      method: log.method,
-      responseStatus: log.statusCode,
-      ipAddress: log.ipAddress ?? null,
-      metadata: {
-        requestId: log.requestId,
-        userRole: log.userRole,
-        responseTime: log.responseTime,
-      },
-    });
-  } catch (err) {
+  void persistServiceApiLog({
+    serviceUserId: log.userId,
+    endpoint: log.endpoint,
+    method: log.method,
+    responseStatus: log.statusCode,
+    ipAddress: log.ipAddress ?? null,
+    metadata: {
+      requestId: log.requestId,
+      userRole: log.userRole,
+      responseTime: log.responseTime,
+    },
+  }).catch((err: unknown) => {
     // swallow errors from audit persistence to avoid impacting request flow
     try {
-      reportError(err as Error, {
+      const error = err instanceof Error ? err : new Error(String(err));
+      reportError(error, {
         additionalData: { context: 'serviceApiLogger.persist' },
       });
     } catch {
       // swallow
     }
-  }
+  });
 }
 
 /**

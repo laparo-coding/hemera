@@ -34,7 +34,7 @@ Whitelist (erlaubte top-level keys)
 - `timestamp` (string)
 
 Redaction rules
-- Keys matching `/originalError/i`, `/errorMessage/i`, `/message$/i` müssen vor Reporting redigiert ("[redacted]") werden.
+- Keys matching `/originalError/i`, `/^errorMessage$/i` müssen vor Reporting redigiert ("[redacted]") werden.
 - Bei Unsicherheit: lieber redigieren.
 
 Automatisierung
@@ -46,4 +46,4 @@ Durchsetzung
 - Die CI-Pipeline kann optional das Prüfskript ausführen und Warnungen (oder Errors) melden.
 
 Kontakt
-- Für Fragen zu dieser Policy wende dich an das Observability-Team oder den Autor der Änderung.
+- Für Fragen zu dieser Policy wende dich an das Observability-Team (Kanal #observability in Slack) oder den Autor der Änderung.

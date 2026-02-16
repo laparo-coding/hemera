@@ -82,14 +82,11 @@ Authorization: Bearer <clerk-session-token>
 
 ## CORS Configuration
 
-⚠️ **Security Warning**: The current configuration uses wildcard CORS (`*`) for development and
-testing purposes. For production environments, you should restrict origins to specific trusted
-domains.
-
 **CORS is enabled only on admin endpoints** (`/api/admin/*`) to allow external applications to
 access administrative data:
 
-- **Allowed Origins**: `*` (all origins) - **⚠️ Change this in production!**
+- **Development/Preview**: Allowed origin is derived from `NEXT_PUBLIC_APP_URL` or the request's `Origin` header
+- **Production**: Only the configured `NEXT_PUBLIC_APP_URL` origin is allowed — wildcard `*` is **never** used in production. If no origin can be determined, CORS headers are omitted and a warning is logged.
 - **Allowed Methods**: Vary by endpoint (GET, POST, OPTIONS)
 - **Allowed Headers**: `Content-Type`, `Authorization`
 
@@ -642,95 +639,48 @@ async function getAnalytics(timeframe = '24h', type = 'summary') {
 
 ## Security Considerations
 
-⚠️ **Important Security Warnings for Production**
+**Implementierte Sicherheitsmaßnahmen:**
 
-1. **Wildcard CORS**: Current implementation uses `*` for CORS origin, allowing any domain to access
-   admin endpoints. **You MUST restrict this to specific trusted domains in production.**
+1. **CORS**: In Produktion wird nur die konfigurierte `NEXT_PUBLIC_APP_URL` Origin erlaubt — kein Wildcard `*`. In der Entwicklung/Preview wird die Origin aus der Request-URL oder `NEXT_PUBLIC_APP_URL` abgeleitet.
 
-2. **No Rate Limiting**: No rate limiting is currently implemented. **You MUST add rate limiting
-   before deploying to production** to prevent abuse and DoS attacks.
+2. **Rate Limiting**: In-Memory Rate Limiting ist implementiert (`lib/middleware/rate-limit.ts`) mit konfigurierbaren Limits pro Rolle. Optional kann Upstash Redis für verteiltes Rate Limiting aktiviert werden.
 
-3. **Authentication Required**: All endpoints require valid Clerk authentication
+3. **Authentication Required**: Alle Endpoints erfordern eine gültige Clerk-Authentifizierung.
 
-4. **Admin Role Required**: All endpoints require admin role in user metadata
+4. **Admin Role Required**: Alle Endpoints erfordern die Admin-Rolle in den User-Metadaten.
 
-5. **CORS Enabled**: Endpoints are accessible from external origins (see warning #1)
+5. **Request Tracking**: Alle Requests enthalten eine eindeutige Request-ID für Tracing.
 
-6. **Request Tracking**: All requests include a unique request ID for tracing
-
-7. **Error Monitoring**: All errors are logged to Rollbar (constitutional requirement)
+6. **Error Monitoring**: Alle Fehler werden in Rollbar geloggt (Constitutional Requirement).
 
 ### Production Deployment Checklist
 
-Before deploying to production, ensure you:
+Vor dem Deployment in Produktion sicherstellen:
 
-- [ ] Restrict CORS origins to specific trusted domains
-- [ ] Implement rate limiting on all admin endpoints
-- [ ] Set up proper monitoring and alerting for admin API usage
-- [ ] Review and test authentication flows
-- [ ] Verify admin role assignment process is secure
-- [ ] Enable API usage logging and auditing
-- [ ] Consider implementing API key authentication for machine-to-machine access
-- [ ] Test with production-like load and traffic patterns
+- [x] CORS Origins auf vertrauenswürdige Domains eingeschränkt
+- [x] Rate Limiting auf allen Endpoints implementiert
+- [ ] Monitoring und Alerting für Admin-API-Nutzung einrichten
+- [ ] Authentifizierungsflows überprüfen und testen
+- [ ] Admin-Rollenvergabe-Prozess absichern
+- [ ] API-Nutzungs-Logging und Auditing aktivieren
+- [ ] API-Key-Authentifizierung für Machine-to-Machine in Betracht ziehen
+- [ ] Mit produktionsähnlicher Last und Traffic-Mustern testen
 
 ## Rate Limiting
 
-⚠️ **Security Warning**: Currently, no rate limiting is implemented on these endpoints. This poses a
-security risk for production use, especially with wildcard CORS enabled.
+Rate Limiting ist über `lib/middleware/rate-limit.ts` implementiert:
 
-### Recommended Implementation
+- **In-Memory** (Standard): Automatisch aktiv, kein Setup nötig. Max 10.000 Einträge mit automatischer Bereinigung.
+- **Upstash Redis** (optional): Für verteiltes Rate Limiting über `UPSTASH_ENABLED=1` aktivierbar.
 
-For production, implement rate limiting using one of these approaches:
+### Konfigurierte Rate Limits
 
-**Option 1: Use existing middleware**
+| Rolle | Limit | Fenster |
+|-------|-------|---------|
+| `api-client` | 100 Requests | 1 Minute |
+| `admin` | 500 Requests | 1 Minute |
 
-The project already has a `withRateLimit` middleware in `lib/middleware/api-error-handling.ts`.
-Apply it to admin routes:
-
-```typescript
-import { withRateLimit } from '@/lib/middleware/api-error-handling';
-
-export const GET = withRateLimit(
-  100,
-  15 * 60 * 1000
-)(async (request: NextRequest) => {
-  // Your handler code
-});
-```
-
-**Option 2: Use Vercel Rate Limiting**
-
-Configure rate limiting in `vercel.json`:
-
-```json
-{
-  "functions": {
-    "app/api/admin/**/*.ts": {
-      "maxDuration": 10,
-      "rateLimit": {
-        "requests": 100,
-        "window": "1m"
-      }
-    }
-  }
-}
-```
-
-**Option 3: Use a third-party service**
-
-Consider using services like:
-
-- [Upstash Rate Limiting](https://upstash.com/docs/redis/sdks/ratelimit-ts/overview)
-- [Unkey](https://www.unkey.com/)
-- [Redis-based rate limiting](https://github.com/tj/node-ratelimiter)
-
-### Recommended Rate Limits for Admin Endpoints
-
-- **Users/Courses**: 100 requests per 15 minutes
-- **Analytics**: 50 requests per 15 minutes
-- **Error Management**: 200 requests per 15 minutes
-
-Adjust these based on your production usage patterns and monitoring data.
+Bei Überschreitung wird `429 Too Many Requests` mit `Retry-After` Header zurückgegeben.
 
 ## Support
 
@@ -743,10 +693,12 @@ For issues or questions:
 
 ## Constitution Compliance
 
-This API implementation follows the project constitution requirements:
+Diese API-Implementierung erfüllt die Anforderungen der Projekt-Verfassung:
 
-- ✅ Authentication & Security (Section IV)
-- ✅ Error Monitoring with Rollbar (Section VI)
-- ✅ Test-First Development (11 E2E tests)
-- ✅ Code Quality & Formatting (Prettier, ESLint)
-- ✅ Standardized API responses with error handling
+- ✅ Authentifizierung & Sicherheit (Section IV)
+- ✅ Error Monitoring mit Rollbar (Section VI)
+- ✅ Test-First Development (E2E + Contract Tests)
+- ✅ Code Quality & Formatting (Biome)
+- ✅ Standardisierte API-Responses mit Error Handling
+- ✅ Rate Limiting implementiert
+- ✅ CORS Origin-Beschränkung in Produktion

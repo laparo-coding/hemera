@@ -11,13 +11,18 @@ on:
         description: 'Deploy method (repository_dispatch, post-to-cd, or script)'
         required: false
         default: 'repository_dispatch'
+      migration_file:
+        description: 'Path to SQL migration file (only used when migration_mode=manual)'
+        required: false
+        default: 'prisma/migrations/20260215140000_add_api_log/migration.sql'
 
 concurrency:
   group: staging-migrate-smoke
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   run:
@@ -26,8 +31,6 @@ jobs:
     env:
       STAGING_URL: ${{ secrets.STAGING_URL }}
       STAGING_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
-      SERVICE_USER_TOKEN: ${{ secrets.SERVICE_USER_TOKEN }}
-      ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,9 +49,9 @@ jobs:
           echo "STAGING_DATABASE_URL=${STAGING_DATABASE_URL:+set}"
 
       - name: Run DB backup (optional)
-        if: always()
+        if: success()
         env:
-          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          DATABASE_URL: ${{ env.STAGING_DATABASE_URL }}
         run: |
           echo "Starting optional DB dump (requires psql access)."
           if command -v pg_dump >/dev/null 2>&1; then
@@ -68,14 +71,18 @@ jobs:
             if [ -z "${STAGING_DATABASE_URL}" ]; then
               echo "STAGING_DATABASE_URL not set; aborting"; exit 1
             fi
-            psql "$STAGING_DATABASE_URL" -f prisma/migrations/20260215140000_add_api_log/migration.sql
+            MIGRATION_FILE="${{ github.event.inputs.migration_file || 'prisma/migrations/20260215140000_add_api_log/migration.sql' }}"
+            if [ ! -f "$MIGRATION_FILE" ]; then
+              echo "Migration file not found: $MIGRATION_FILE"; exit 1
+            fi
+            psql "$STAGING_DATABASE_URL" -f "$MIGRATION_FILE"
           else
             # prisma migrate deploy will apply migrations known to Prisma
-            npx prisma migrate deploy --schema=prisma/schema.prisma
+            DATABASE_URL="$STAGING_DATABASE_URL" npx prisma migrate deploy --schema=prisma/schema.prisma
           fi
 
       - name: Deploy branch to staging (CD trigger)
-        if: always()
+        if: success()
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -93,7 +100,7 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: token $GITHUB_TOKEN" \
               https://api.github.com/repos/${GITHUB_REPOSITORY}/dispatches \
-              -d '{"event_type":"staging-deploy","client_payload":{"ref":"'${GITHUB_REF##*/}'","actor":"'${GITHUB_ACTOR}'"}}'
+              -d "$(jq -n --arg ref "${GITHUB_REF##*/}" --arg actor "${GITHUB_ACTOR}" '{"event_type":"staging-deploy","client_payload":{"ref":$ref,"actor":$actor}}')"
           elif [ "$method" = 'post-to-cd' ]; then
             if [ -z "$DEPLOY_ENDPOINT" ]; then
               echo "DEPLOY_ENDPOINT is not set; aborting"; exit 1
@@ -102,19 +109,41 @@ jobs:
             curl -sSf -X POST "$DEPLOY_ENDPOINT" \
               -H "Authorization: Bearer $DEPLOY_TOKEN" \
               -H "Content-Type: application/json" \
-              -d '{"ref":"'${GITHUB_REF##*/}'","actor":"'${GITHUB_ACTOR}'"}'
+              -d "$(jq -n --arg ref "${GITHUB_REF##*/}" --arg actor "${GITHUB_ACTOR}" '{"ref":$ref,"actor":$actor}')"
           else
             # Fallback to local script if present
             if [ -x ./scripts/deploy-to-staging.sh ]; then
-              ./scripts/deploy-to-staging.sh ${GITHUB_REF##*/}
+              ./scripts/deploy-to-staging.sh "${GITHUB_REF##*/}"
             else
               echo "No deploy action available for method: $method"; exit 1
             fi
           fi
 
+      - name: Upload DB backup artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hemera-staging-backup
+          path: /tmp/hemera-backups/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Wait for staging health check
+        run: |
+          echo "Waiting for staging to become healthy..."
+          for i in $(seq 1 30); do
+            if curl -sSf "${STAGING_URL}/api/health" > /dev/null 2>&1; then
+              echo "Staging is healthy after $i attempts"
+              exit 0
+            fi
+            echo "Attempt $i/30 - waiting 10s..."
+            sleep 10
+          done
+          echo "Staging health check timed out after 30 attempts"
+          exit 1
+
       - name: Run smoke tests
         env:
-          STAGING_URL: ${{ secrets.STAGING_URL }}
           SERVICE_USER_TOKEN: ${{ secrets.SERVICE_USER_TOKEN }}
           ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |

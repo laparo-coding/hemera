@@ -16,8 +16,10 @@ Context7 is an optional SDK used for AI-powered context retrieval. Security meas
 - Explicit opt-in via `CONTEXT7_ENABLED=1`.
 - API key validation (non-empty, expected prefix `ctx7sk_` or similar).
 - Disabled in `NODE_ENV=test` and E2E modes.
-- Lazy initialization via factory function; no module-level `new Context7()` calls.
+- Lazy initialization via singleton pattern (Node.js single-threaded execution makes a simple null-check sufficient).
+- Try-catch error handling in `searchLibrary()` and `getContext()` — SDK failures return `null` instead of throwing.
 - Rate-limited calls and sanitized results before persisting or logging.
+- Named exports only (no default export) for tree-shaking and explicit imports.
 
 Configuration example:
 ```bash

@@ -31,6 +31,8 @@ tags:
     description: External webhook receivers
   - name: Monitoring
     description: Application health and metrics
+  - name: Service
+    description: Service API endpoints for external integrations (Aither, Gaia)
 paths:
   /health:
     get:
@@ -1561,6 +1563,186 @@ paths:
           $ref: '#/components/responses/RateLimited'
       security:
         - clerkAuth: []
+  # --- Service API Endpoints (025-service-user-endpoint) ---
+  /service/courses:
+    get:
+      tags: [Service]
+      operationId: listServiceCourses
+      summary: List courses with participant counts
+      description: |
+        Returns a paginated list of courses with participant counts.
+        Requires `api-client` or `admin` role.
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: level
+          in: query
+          schema:
+            type: string
+            enum: [BEGINNER, INTERMEDIATE, ADVANCED]
+        - name: published
+          in: query
+          schema:
+            type: boolean
+            default: true
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Course list
+          headers:
+            X-RateLimit-Limit:
+              schema: { type: integer }
+            X-RateLimit-Remaining:
+              schema: { type: integer }
+            X-RateLimit-Reset:
+              schema: { type: integer }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ServiceCourse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /service/courses/{id}:
+    get:
+      tags: [Service]
+      operationId: getServiceCourse
+      summary: Get course details with participations
+      description: |
+        Returns course details including participant list.
+        Requires `api-client` or `admin` role.
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Course details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ServiceCourseDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /service/participations/{id}:
+    get:
+      tags: [Service]
+      operationId: getServiceParticipation
+      summary: Get participation details
+      description: |
+        Returns full participation details including result data.
+        Requires `api-client` or `admin` role.
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Participation details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ServiceParticipation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /service/participations/{id}/result:
+    put:
+      tags: [Service]
+      operationId: updateServiceParticipationResult
+      summary: Update participation result
+      description: |
+        Update result outcome and notes for a participation.
+        Set `complete: true` to mark as COMPLETE with timestamp.
+        Requires `api-client` or `admin` role.
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateParticipationResult'
+      responses:
+        '200':
+          description: Result updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Participation result updated successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
 components:
   securitySchemes:
     clerkAuth:
@@ -1918,6 +2100,112 @@ components:
           type: string
           enum: [connected, disconnected]
       required: [status, timestamp]
+    ServiceCourse:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        level:
+          type: string
+          enum: [BEGINNER, INTERMEDIATE, ADVANCED]
+        startDate:
+          type: string
+          format: date-time
+          nullable: true
+        endDate:
+          type: string
+          format: date-time
+          nullable: true
+        participantCount:
+          type: integer
+      required: [id, title, slug, level, participantCount]
+    ServiceCourseDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        level:
+          type: string
+          enum: [BEGINNER, INTERMEDIATE, ADVANCED]
+        startDate:
+          type: string
+          format: date-time
+          nullable: true
+        endDate:
+          type: string
+          format: date-time
+          nullable: true
+        participations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                nullable: true
+              userId:
+                type: string
+              status:
+                type: string
+                nullable: true
+              createdAt:
+                type: string
+                format: date-time
+      required: [id, title, slug, level, participations]
+    ServiceParticipation:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        courseId:
+          type: string
+        status:
+          type: string
+        preparationIntent:
+          type: string
+          nullable: true
+        desiredResults:
+          type: string
+          nullable: true
+        resultOutcome:
+          type: string
+          nullable: true
+        resultNotes:
+          type: string
+          nullable: true
+        resultCompletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, userId, courseId, status, createdAt, updatedAt]
+    UpdateParticipationResult:
+      type: object
+      properties:
+        resultOutcome:
+          type: string
+          maxLength: 2000
+        resultNotes:
+          type: string
+          maxLength: 2000
+        complete:
+          type: boolean
+          description: Set to true to mark participation as COMPLETE
   responses:
     BadRequest:
       description: Validation error

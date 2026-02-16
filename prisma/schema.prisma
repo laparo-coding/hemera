@@ -327,5 +327,6 @@ model ApiLog {
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   @@index([serviceUserId, createdAt])
+  @@index([createdAt])
   @@map("api_logs")
 }

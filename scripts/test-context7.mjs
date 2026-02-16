@@ -18,7 +18,7 @@ function loadEnvFile(filePath) {
     console.log(`Loaded env from ${filePath}`);
   } catch (err) {
     console.error(`Failed to load env from ${filePath}:`, err.message || err);
-    throw err;
+    // Non-critical: continue without this env file
   }
 }
 
