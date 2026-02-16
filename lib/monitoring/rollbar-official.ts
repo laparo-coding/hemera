@@ -11,6 +11,7 @@
  */
 
 import Rollbar from 'rollbar';
+import { findEnvByPrefix } from '@/lib/utils/env-prefix';
 import { isTelemetryConsentGranted } from './privacy';
 
 interface RollbarTestInstance {
@@ -30,35 +31,7 @@ interface RollbarTestInstance {
 
 /** Keys whose values should be redacted before forwarding to Rollbar */
 const KEYS_TO_REDACT = [/originalError/i, /^error$/i, /^errorMessage$/i];
-/**
- * Find an environment variable by prefix.
- * The Vercel-Rollbar integration creates env vars with timestamp suffixes
- * (e.g. ROLLBAR_HEMERA_SERVER_TOKEN_1769716944). This helper resolves the
- * exact name first, then falls back to any key starting with the prefix.
- */
-function findEnvByPrefix(...prefixes: string[]): string | undefined {
-  // 1) Check exact matches first (fastest path)
-  for (const prefix of prefixes) {
-    const exact = process.env[prefix];
-    if (exact && exact.trim().length > 0) return exact;
-  }
-
-  // 2) Search for Vercel-Rollbar integration keys (PREFIX_<timestamp>)
-  const allKeys = Object.keys(process.env);
-  for (const prefix of prefixes) {
-    const pattern = `${prefix}_`;
-    for (const key of allKeys) {
-      // Skip deleted variables (Vercel marks them with "(DELETED)_" prefix)
-      if (key.startsWith('(DELETED)')) continue;
-      if (key.startsWith(pattern) && key !== prefix) {
-        const val = process.env[key];
-        if (val && val.trim().length > 0) return val;
-      }
-    }
-  }
-
-  return undefined;
-}
+// findEnvByPrefix imported from @/lib/utils/env-prefix
 
 // Enablement rules unify various legacy flags used across the repo/scripts
 const isE2EMode = process.env.E2E_TEST === '1';

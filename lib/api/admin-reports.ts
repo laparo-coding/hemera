@@ -17,6 +17,7 @@ import type {
   ServiceHealth,
   UserGrowthStats,
 } from '@/lib/types/admin';
+import { findEnvByPrefix } from '@/lib/utils/env-prefix';
 
 /**
  * Helper: Fetch all users from Clerk via pagination
@@ -491,26 +492,4 @@ async function checkRollbarHealth(): Promise<ServiceHealth> {
   };
 }
 
-/**
- * Find an environment variable by prefix.
- * Mirrors the resolution logic from rollbar-official.ts to support
- * Vercel-Rollbar integration tokens with timestamp suffixes.
- */
-function findEnvByPrefix(...prefixes: string[]): string | undefined {
-  for (const prefix of prefixes) {
-    const exact = process.env[prefix];
-    if (exact && exact.trim().length > 0) return exact;
-  }
-  const allKeys = Object.keys(process.env);
-  for (const prefix of prefixes) {
-    const pattern = `${prefix}_`;
-    for (const key of allKeys) {
-      if (key.startsWith('(DELETED)')) continue;
-      if (key.startsWith(pattern) && key !== prefix) {
-        const val = process.env[key];
-        if (val && val.trim().length > 0) return val;
-      }
-    }
-  }
-  return undefined;
-}
+// findEnvByPrefix imported from @/lib/utils/env-prefix
