@@ -30,6 +30,16 @@ const EnvSchema = z.object({
   UPSTASH_ENABLED: z.enum(['0', '1']).optional(),
   UPSTASH_REDIS_REST_URL: z.string().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+
+  // Service API (M2M) auth — API-Key-basierte Authentifizierung für aither
+  HEMERA_SERVICE_API_KEY: z.string().min(32).optional(),
+  HEMERA_SERVICE_USER_ID: z
+    .string()
+    .startsWith('user_', {
+      message:
+        'HEMERA_SERVICE_USER_ID must start with "user_" (Clerk user ID format)',
+    })
+    .optional(),
 });
 
 type Env = z.infer<typeof EnvSchema>;

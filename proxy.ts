@@ -18,10 +18,39 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.redirect(new URL('/dashboard', request.url), 308);
   }
 
-  // Service API routes must always go through Clerk auth (even in E2E mode)
+  // Service-API-Routen: Duale Authentifizierung
+  // 1. API-Key (X-API-Key Header) → überspringt Clerk-Middleware, detaillierte
+  //    Validierung im Route-Handler (lib/auth/service-auth.ts)
+  // 2. Clerk Session JWT → wird über clerkMw() geprüft
+  // Beide Pfade gelten auch im E2E-/Dev-Modus.
   if (/^\/api\/service(\/|$)/.test(pathname)) {
     // Allow CORS preflight (OPTIONS) requests through without auth
     if (request.method === 'OPTIONS') {
+      return NextResponse.next();
+    }
+
+    // API-Key-basierte M2M-Authentifizierung: wenn ein X-API-Key Header
+    // vorhanden ist und ein gültiges Format hat, Clerk-Middleware überspringen.
+    // Die vollständige kryptografische Validierung erfolgt im Route-Handler.
+    const apiKey = request.headers.get('x-api-key');
+    if (apiKey) {
+      // Basisvalidierung: Key muss mindestens 32 Zeichen lang sein
+      if (apiKey.length < 32) {
+        // biome-ignore lint/suspicious/noConsole: security log for invalid API key attempts
+        console.warn(
+          `[proxy] Rejected API key with invalid format (length: ${apiKey.length}) for ${pathname}`
+        );
+        return new NextResponse(
+          JSON.stringify({
+            success: false,
+            error: {
+              code: 'UNAUTHORIZED',
+              message: 'Invalid API key format',
+            },
+          }),
+          { status: 401, headers: { 'content-type': 'application/json' } }
+        );
+      }
       return NextResponse.next();
     }
 

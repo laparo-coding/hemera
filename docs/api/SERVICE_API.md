@@ -32,11 +32,11 @@ Wichtig: Service-to-Service JWTs müssen eine eingeschränkte Audience/Scope hab
 
 ### Berechtigungen
 
-Die `api-client` Rolle hat folgende Berechtigungen (definiert in [`lib/auth/permissions.ts`](../../lib/auth/permissions.ts)):
+Die `api-client` Rolle hat folgende Berechtigungen (definiert in [`lib/auth/permissions.ts`](../../lib/auth/permissions.ts:120)):
 
-- `read:courses` — Kurse lesen
-- `read:participations` — Teilnahmen lesen
-- `write:participation-results` — Ergebnisse schreiben
+- `read:courses` - Kurse lesen
+- `read:participations` - Teilnahmen lesen
+- `write:participation-results` - Ergebnisse schreiben
 
 ## Endpunkte
 
@@ -53,11 +53,11 @@ Listet alle Kurse mit Teilnehmerzahlen auf.
 | `limit` | `number` | Maximale Anzahl Ergebnisse (1-500) | `100` |
 | `offset` | `number` | Offset für Pagination | `0` |
 
-**Example request:**
+**Beispiel-Request:**
 
 ```bash
-# Replace with your environment's base URL, e.g. $HEMERA_BASE_URL
-curl -X GET "https://[YOUR_HEMERA_DOMAIN]/api/service/courses?level=BASIC&limit=10" \
+# ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
+curl -X GET "https://<your-hemera-instance>.vercel.app/api/service/courses?level=BASIC&limit=10" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -102,10 +102,10 @@ Ruft Details eines einzelnen Kurses mit allen Participations ab.
 |-----------|-----|--------------|
 | `id` | `string` | Kurs-ID |
 
-**Example request:**
+**Beispiel-Request:**
 
 ```bash
-curl -X GET "https://[YOUR_HEMERA_DOMAIN]/api/service/courses/clx123..." \
+curl -X GET "https://hemera-academy.vercel.app/api/service/courses/clx123..." \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -159,7 +159,7 @@ Ruft Details einer Participation ab.
 **Beispiel-Request:**
 
 ```bash
-curl -X GET "https://[YOUR_HEMERA_DOMAIN]/api/service/participations/clp456..." \
+curl -X GET "https://hemera-academy.vercel.app/api/service/participations/clp456..." \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -220,7 +220,7 @@ Aktualisiert die Ergebnis-Daten einer Participation.
 **Beispiel-Request:**
 
 ```bash
-curl -X PUT "https://[YOUR_HEMERA_DOMAIN]/api/service/participations/clp456.../result" \
+curl -X PUT "https://hemera-academy.vercel.app/api/service/participations/clp456.../result" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -258,7 +258,7 @@ curl -X PUT "https://[YOUR_HEMERA_DOMAIN]/api/service/participations/clp456.../r
 Die Service API implementiert Rate Limiting pro User/Role:
 
 - **api-client**: 100 Requests pro Minute
-- **admin**: 500 Requests pro Minute
+- **admin**: 200 Requests pro Minute
 
 Bei Überschreitung wird `429 Too Many Requests` zurückgegeben mit `Retry-After` Header.
 
@@ -330,9 +330,9 @@ Contract-Tests für die Service API befinden sich in:
 
 ## Beispiel-Integration (Aither)
 
-See the [Aither Service User Integration plan](../../plans/aither-hemera-api-integration.md) for integration guidance.
+Siehe [Aither Service User Setup Guide](../../../aither/docs/SERVICE_USER_SETUP.md) für eine vollständige Integration-Anleitung.
 
-### Client Implementation
+### Client-Implementierung
 
 ```typescript
 import { HemeraClient } from '@/lib/hemera/client';
@@ -340,7 +340,7 @@ import { getTokenManager } from '@/lib/hemera/token-manager';
 
 const tokenManager = getTokenManager();
 const client = new HemeraClient({
-  baseUrl: process.env.HEMERA_BASE_URL || 'https://[YOUR_HEMERA_DOMAIN]',
+  baseUrl: 'https://hemera-academy.vercel.app',
   getToken: () => tokenManager.getToken(),
 });
 
