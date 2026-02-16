@@ -34,7 +34,7 @@ jest.mock('@/lib/db/prisma', () => ({
 
 jest.mock('@/lib/middleware/rate-limit', () => ({
   checkRateLimit: jest.fn().mockResolvedValue(null),
-  getRateLimitHeaders: jest.fn().mockResolvedValue({}),
+  getRateLimitHeaders: jest.fn().mockReturnValue({}),
 }));
 
 jest.mock('@/lib/monitoring/service-api-logger', () => ({
@@ -68,6 +68,26 @@ jest.mock('@/lib/analytics/request-analytics', () => ({
     trackRequest: jest.fn(),
     trackEvent: jest.fn(),
     trackPerformance: jest.fn(),
+  },
+}));
+
+// Mock api-logger to prevent transitive ESM import issues in CI
+// (api-logger imports analytics + rollbar-official; ESM module mocking
+//  may not propagate to transitive deps in all environments)
+jest.mock('@/lib/utils/api-logger', () => ({
+  createApiLogger: jest.fn().mockReturnValue({
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+    trackRequestCompletion: jest.fn(),
+    trackBusinessEvent: jest.fn(),
+  }),
+  LogLevel: {
+    ERROR: 'error',
+    WARN: 'warn',
+    INFO: 'info',
+    DEBUG: 'debug',
   },
 }));
 
