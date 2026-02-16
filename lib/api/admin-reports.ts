@@ -17,6 +17,7 @@ import type {
   ServiceHealth,
   UserGrowthStats,
 } from '@/lib/types/admin';
+import { findEnvByPrefix } from '@/lib/utils/env-prefix';
 
 /**
  * Helper: Fetch all users from Clerk via pagination
@@ -457,20 +458,30 @@ async function checkStripeHealth(): Promise<ServiceHealth> {
 }
 
 async function checkRollbarHealth(): Promise<ServiceHealth> {
-  const rollbarEnabled = process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '1';
-  // Check both legacy token name and Vercel-Rollbar integration token names
-  const rollbarToken =
-    process.env.ROLLBAR_SERVER_TOKEN || process.env.ROLLBAR_HEMERA_SERVER_TOKEN;
+  // Rollbar uses opt-out: it is enabled unless explicitly disabled
+  const isExplicitlyDisabled =
+    process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
+    process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0' ||
+    process.env.ROLLBAR_ENABLED === '0';
 
-  if (!rollbarEnabled) {
+  if (isExplicitlyDisabled) {
     return {
       name: 'rollbar',
       nameDe: 'Fehlerüberwachung',
       status: 'degraded',
-      message: 'Deaktiviert',
+      message: 'Explizit deaktiviert',
       lastChecked: new Date().toISOString(),
     };
   }
+
+  // Resolve server token using the same prefix-search logic as rollbar-official.ts
+  // The Vercel-Rollbar integration creates env vars with timestamp suffixes
+  // (e.g. ROLLBAR_HEMERA_SERVER_TOKEN_1769716944)
+  const rollbarToken = findEnvByPrefix(
+    'ROLLBAR_SERVER_TOKEN',
+    'ROLLBAR_HEMERA_SERVER_TOKEN',
+    'ROLLBAR_AITHER_SERVER_TOKEN'
+  );
 
   return {
     name: 'rollbar',
@@ -480,3 +491,5 @@ async function checkRollbarHealth(): Promise<ServiceHealth> {
     lastChecked: new Date().toISOString(),
   };
 }
+
+// findEnvByPrefix imported from @/lib/utils/env-prefix
