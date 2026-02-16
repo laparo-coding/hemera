@@ -337,5 +337,9 @@ if (
   process.env.VERCEL !== '1' &&
   process.env.AWS_LAMBDA_FUNCTION_NAME === undefined
 ) {
-  setInterval(cleanupExpiredRateLimits, 5 * 60 * 1000);
+  const timer = setInterval(cleanupExpiredRateLimits, 5 * 60 * 1000);
+  // Prevent the timer from keeping the Node.js process alive
+  if (typeof timer === 'object' && 'unref' in timer) {
+    timer.unref();
+  }
 }

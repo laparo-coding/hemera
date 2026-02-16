@@ -490,7 +490,6 @@ SLXVDP
 soldout
 solopreneure
 Solopreneure
-soqt
 Sortierung
 Speckit
 spezifische
@@ -603,10 +602,8 @@ waitlist
 Warteschlangen
 Warteschlisten
 WCAG
-wehxy
 weiterbringt
 whsec
-wighem
 Willkommensnachricht
 wjaou
 wordprocessingml

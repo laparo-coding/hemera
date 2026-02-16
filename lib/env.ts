@@ -52,16 +52,18 @@ if (!parseResult.success) {
   // Fail fast with a clear error during startup — report via Rollbar if available.
   // Use lazy dynamic import to avoid circular dependency (env.ts ← rollbar-official.ts ← env.ts).
   try {
+    // Log only the field names that failed validation, never the values themselves
+    const fieldErrors = Object.keys(parseResult.error.format()).filter(k => k !== '_errors');
     // biome-ignore lint/suspicious/noConsole: intentional fallback when Rollbar is not yet available
     console.error(
-      '[env] Environment validation failed:',
-      parseResult.error.format()
+      '[env] Environment validation failed for fields:',
+      fieldErrors
     );
     // Attempt async Rollbar report (non-blocking)
     import('./monitoring/rollbar-official')
       .then(({ reportError }) => {
         reportError(new Error('Environment validation failed'), {
-          additionalData: parseResult.error.format(),
+          additionalData: { failedFields: fieldErrors },
         });
       })
       .catch(() => {

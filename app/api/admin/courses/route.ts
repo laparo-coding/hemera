@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
             description: parsed.description,
             slug,
             price: priceToPersist,
-            startDate: parsed.startDate as Date,
+            startDate: parsed.startDate ?? undefined,
             startTime: startTimeDate,
             endTime: endTimeDate,
             instructor: parsed.instructor,

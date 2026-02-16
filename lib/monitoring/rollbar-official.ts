@@ -28,6 +28,8 @@ interface RollbarTestInstance {
 // Runtime Validation & Configuration
 // ============================================================================
 
+/** Keys whose values should be redacted before forwarding to Rollbar */
+const KEYS_TO_REDACT = [/originalError/i, /^error$/i, /^errorMessage$/i];
 /**
  * Find an environment variable by prefix.
  * The Vercel-Rollbar integration creates env vars with timestamp suffixes
@@ -79,7 +81,7 @@ function isValidToken(token: string | undefined, label: string): boolean {
   if (!token || token.trim().length === 0) {
     return false;
   }
-  if (token.length < MIN_TOKEN_LENGTH) {
+  if (token.trim().length < MIN_TOKEN_LENGTH) {
     if (process.env.NODE_ENV === 'development') {
       // biome-ignore lint: Configuration warning in development
       console.warn(
@@ -342,9 +344,8 @@ export function reportError(
     const sanitizedAdditional: Record<string, unknown> = { ...rawAdditional };
 
     // Redact commonly abused keys that may contain raw error text or PII
-    const keysToRedact = [/originalError/i, /^error$/i, /^errorMessage$/i];
     for (const k of Object.keys(sanitizedAdditional)) {
-      if (keysToRedact.some(rx => rx.test(k))) {
+      if (KEYS_TO_REDACT.some(rx => rx.test(k))) {
         sanitizedAdditional[k] = '[redacted]';
       }
     }

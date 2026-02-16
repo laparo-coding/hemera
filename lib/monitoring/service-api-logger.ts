@@ -35,21 +35,14 @@ export function logServiceApiCall(log: ServiceApiAuditLog): void {
     });
   }
 
-  // Log to Rollbar for production monitoring
+  // Log errors to Rollbar for production monitoring (skip success events to reduce noise/cost)
   if (log.statusCode >= 400) {
-    // Error responses
+    // Redact PII fields before sending to external telemetry
+    const { ipAddress: _ip, userAgent: _ua, ...safeLog } = log;
     serverInstance.error(logMessage, {
       custom: {
         type: 'service_api_audit',
-        ...log,
-      },
-    });
-  } else {
-    // Success responses (info level)
-    serverInstance.info(logMessage, {
-      custom: {
-        type: 'service_api_audit',
-        ...log,
+        ...safeLog,
       },
     });
   }

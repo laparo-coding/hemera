@@ -16,20 +16,22 @@ const CORS_ORIGIN = (() => {
     process.env.SERVICE_API_CORS_ORIGIN || process.env.NEXT_PUBLIC_APP_URL;
   if (origin) return origin;
   if (process.env.NODE_ENV === 'production') {
+    // In production without a configured origin, omit the CORS header entirely
+    // rather than setting an invalid empty string.
     console.warn(
-      '[service-api] No CORS origin configured in production. Defaulting to empty string.'
+      '[service-api] No CORS origin configured in production. CORS header will be omitted.'
     );
-    return '';
+    return undefined;
   }
   return '*';
 })();
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': CORS_ORIGIN,
+const CORS_HEADERS: Record<string, string> = {
+  ...(CORS_ORIGIN ? { 'Access-Control-Allow-Origin': CORS_ORIGIN } : {}),
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-ID',
   'Access-Control-Max-Age': '86400', // 24 hours
-} as const;
+};
 
 /**
  * Standard error response structure for Service API
