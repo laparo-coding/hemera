@@ -18,6 +18,7 @@ const CORS_ORIGIN = (() => {
   if (process.env.NODE_ENV === 'production') {
     // In production without a configured origin, omit the CORS header entirely
     // rather than setting an invalid empty string.
+    // biome-ignore lint/suspicious/noConsole: intentional warning for missing CORS config
     console.warn(
       '[service-api] No CORS origin configured in production. CORS header will be omitted.'
     );

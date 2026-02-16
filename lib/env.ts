@@ -53,7 +53,9 @@ if (!parseResult.success) {
   // Use lazy dynamic import to avoid circular dependency (env.ts ← rollbar-official.ts ← env.ts).
   try {
     // Log only the field names that failed validation, never the values themselves
-    const fieldErrors = Object.keys(parseResult.error.format()).filter(k => k !== '_errors');
+    const fieldErrors = Object.keys(parseResult.error.format()).filter(
+      k => k !== '_errors'
+    );
     // biome-ignore lint/suspicious/noConsole: intentional fallback when Rollbar is not yet available
     console.error(
       '[env] Environment validation failed for fields:',
