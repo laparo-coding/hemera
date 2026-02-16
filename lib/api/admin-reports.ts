@@ -457,20 +457,30 @@ async function checkStripeHealth(): Promise<ServiceHealth> {
 }
 
 async function checkRollbarHealth(): Promise<ServiceHealth> {
-  const rollbarEnabled = process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '1';
-  // Check both legacy token name and Vercel-Rollbar integration token names
-  const rollbarToken =
-    process.env.ROLLBAR_SERVER_TOKEN || process.env.ROLLBAR_HEMERA_SERVER_TOKEN;
+  // Rollbar uses opt-out: it is enabled unless explicitly disabled
+  const isExplicitlyDisabled =
+    process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
+    process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0' ||
+    process.env.ROLLBAR_ENABLED === '0';
 
-  if (!rollbarEnabled) {
+  if (isExplicitlyDisabled) {
     return {
       name: 'rollbar',
       nameDe: 'Fehlerüberwachung',
       status: 'degraded',
-      message: 'Deaktiviert',
+      message: 'Explizit deaktiviert',
       lastChecked: new Date().toISOString(),
     };
   }
+
+  // Resolve server token using the same prefix-search logic as rollbar-official.ts
+  // The Vercel-Rollbar integration creates env vars with timestamp suffixes
+  // (e.g. ROLLBAR_HEMERA_SERVER_TOKEN_1769716944)
+  const rollbarToken = findEnvByPrefix(
+    'ROLLBAR_SERVER_TOKEN',
+    'ROLLBAR_HEMERA_SERVER_TOKEN',
+    'ROLLBAR_AITHER_SERVER_TOKEN'
+  );
 
   return {
     name: 'rollbar',
@@ -479,4 +489,28 @@ async function checkRollbarHealth(): Promise<ServiceHealth> {
     message: rollbarToken ? undefined : 'Server-Token nicht konfiguriert',
     lastChecked: new Date().toISOString(),
   };
+}
+
+/**
+ * Find an environment variable by prefix.
+ * Mirrors the resolution logic from rollbar-official.ts to support
+ * Vercel-Rollbar integration tokens with timestamp suffixes.
+ */
+function findEnvByPrefix(...prefixes: string[]): string | undefined {
+  for (const prefix of prefixes) {
+    const exact = process.env[prefix];
+    if (exact && exact.trim().length > 0) return exact;
+  }
+  const allKeys = Object.keys(process.env);
+  for (const prefix of prefixes) {
+    const pattern = `${prefix}_`;
+    for (const key of allKeys) {
+      if (key.startsWith('(DELETED)')) continue;
+      if (key.startsWith(pattern) && key !== prefix) {
+        const val = process.env[key];
+        if (val && val.trim().length > 0) return val;
+      }
+    }
+  }
+  return undefined;
 }
