@@ -22,6 +22,10 @@ export const ALLOWED_SERVICE_ROLES: ReadonlyArray<UserRole> = [
   'admin',
 ];
 
+export type ServiceAuthError =
+  | { error: 'unauthenticated' }
+  | { error: 'forbidden'; userId: string; role: UserRole };
+
 export interface ServiceAuthResult {
   userId: string;
   role: UserRole;
@@ -34,22 +38,22 @@ export interface ServiceAuthResult {
  * Ablauf:
  * 1. Prüfe auf X-API-Key Header → API-Key-Auth
  * 2. Wenn kein API Key, versuche Clerk `auth()` → Session-Auth
- * 3. Wenn beides fehlschlägt → null (unauthenticated)
+ * 3. Wenn beides fehlschlägt → { error: 'unauthenticated' }
  *
  * Autorisierung (Rolle api-client oder admin) wird hier gleichzeitig geprüft.
  */
 export async function authenticateServiceRequest(
   request: NextRequest
-): Promise<
-  | ServiceAuthResult
-  | { error: 'unauthenticated' }
-  | { error: 'forbidden'; userId: string; role: UserRole }
-> {
+): Promise<ServiceAuthResult | ServiceAuthError> {
   // --- Pfad 1: API Key Auth ---
   const apiKey = extractApiKey(request.headers);
   if (apiKey) {
     const result = validateServiceApiKey(apiKey);
     if (result) {
+      // Rollenprüfung auch für API-Key-Auth (Defense-in-Depth)
+      if (!ALLOWED_SERVICE_ROLES.includes(result.role)) {
+        return { error: 'forbidden', userId: result.userId, role: result.role };
+      }
       return {
         userId: result.userId,
         role: result.role,

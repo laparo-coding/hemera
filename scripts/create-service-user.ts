@@ -33,9 +33,9 @@ const SERVICE_METADATA = {
   role: 'api-client',
   service: 'aither',
   description: 'Service user for Aither-Hemera API integration',
-};
+} as const;
 
-async function main() {
+async function main(): Promise<void> {
   const secretKey = process.env.CLERK_SECRET_KEY;
 
   if (!secretKey) {
@@ -136,7 +136,7 @@ async function main() {
   }
 }
 
-function printNextSteps(userId: string) {
+function printNextSteps(userId: string): void {
   console.log('\n' + '═'.repeat(60));
   console.log('📋 Nächste Schritte für Aither-Konfiguration:');
   console.log('═'.repeat(60));

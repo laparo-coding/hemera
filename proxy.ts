@@ -34,8 +34,10 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     // Die vollständige kryptografische Validierung erfolgt im Route-Handler.
     const apiKey = request.headers.get('x-api-key');
     if (apiKey) {
-      // Basisvalidierung: Key muss mindestens 32 Zeichen lang sein
-      if (apiKey.length < 32) {
+      // Basisvalidierung: Key muss mindestens 32 Zeichen lang sein und
+      // darf nur druckbare ASCII-Zeichen enthalten (keine Steuerzeichen/Whitespace).
+      // Die vollständige kryptografische Validierung erfolgt im Route-Handler.
+      if (apiKey.length < 32 || !/^[\x21-\x7e]+$/.test(apiKey)) {
         // biome-ignore lint/suspicious/noConsole: security log for invalid API key attempts
         console.warn(
           `[proxy] Rejected API key with invalid format (length: ${apiKey.length}) for ${pathname}`

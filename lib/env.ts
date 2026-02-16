@@ -1,46 +1,61 @@
 import { z } from 'zod';
 
-const EnvSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default('development'),
-  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
-  DATABASE_URL: z.string().optional(),
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
-  CLERK_SECRET_KEY: z.string().optional(),
-  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default('/sign-in'),
-  NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default('/sign-up'),
-  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().default('/dashboard'),
-  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().default('/dashboard'),
-  BLOB_READ_WRITE_TOKEN: z.string().optional(),
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-  STRIPE_SECRET_KEY: z.string().optional(),
+const EnvSchema = z
+  .object({
+    NODE_ENV: z
+      .enum(['development', 'test', 'production'])
+      .default('development'),
+    NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+    DATABASE_URL: z.string().optional(),
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
+    CLERK_SECRET_KEY: z.string().optional(),
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default('/sign-in'),
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default('/sign-up'),
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().default('/dashboard'),
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().default('/dashboard'),
+    BLOB_READ_WRITE_TOKEN: z.string().optional(),
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+    STRIPE_SECRET_KEY: z.string().optional(),
 
-  // Context7 / Upstash
-  CONTEXT7_ENABLED: z.enum(['0', '1']).optional(),
-  CONTEXT7_API_KEY: z.string().optional(),
+    // Context7 / Upstash
+    CONTEXT7_ENABLED: z.enum(['0', '1']).optional(),
+    CONTEXT7_API_KEY: z.string().optional(),
 
-  // Rollbar monitoring (opt-in via token presence)
-  ROLLBAR_HEMERA_SERVER_TOKEN: z.string().optional(),
-  NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN: z.string().optional(),
-  ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
-  NEXT_PUBLIC_ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
+    // Rollbar monitoring (opt-in via token presence)
+    ROLLBAR_HEMERA_SERVER_TOKEN: z.string().optional(),
+    NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN: z.string().optional(),
+    ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
+    NEXT_PUBLIC_ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
 
-  // Upstash Redis rate limiting (opt-in via UPSTASH_ENABLED=1)
-  UPSTASH_ENABLED: z.enum(['0', '1']).optional(),
-  UPSTASH_REDIS_REST_URL: z.string().optional(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+    // Upstash Redis rate limiting (opt-in via UPSTASH_ENABLED=1)
+    UPSTASH_ENABLED: z.enum(['0', '1']).optional(),
+    UPSTASH_REDIS_REST_URL: z.string().optional(),
+    UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
 
-  // Service API (M2M) auth — API-Key-basierte Authentifizierung für aither
-  HEMERA_SERVICE_API_KEY: z.string().min(32).optional(),
-  HEMERA_SERVICE_USER_ID: z
-    .string()
-    .startsWith('user_', {
-      message:
-        'HEMERA_SERVICE_USER_ID must start with "user_" (Clerk user ID format)',
-    })
-    .optional(),
-});
+    // Service API (M2M) auth — API-Key-basierte Authentifizierung für aither
+    HEMERA_SERVICE_API_KEY: z.string().min(32).optional(),
+    HEMERA_SERVICE_USER_ID: z
+      .string()
+      .startsWith('user_', {
+        message:
+          'HEMERA_SERVICE_USER_ID must start with "user_" (Clerk user ID format)',
+      })
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    const hasKey = !!data.HEMERA_SERVICE_API_KEY;
+    const hasUser = !!data.HEMERA_SERVICE_USER_ID;
+    if (hasKey !== hasUser) {
+      const missing = hasKey
+        ? 'HEMERA_SERVICE_USER_ID'
+        : 'HEMERA_SERVICE_API_KEY';
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `HEMERA_SERVICE_API_KEY und HEMERA_SERVICE_USER_ID müssen beide gesetzt oder beide leer sein (fehlt: ${missing})`,
+        path: [missing],
+      });
+    }
+  });
 
 type Env = z.infer<typeof EnvSchema>;
 

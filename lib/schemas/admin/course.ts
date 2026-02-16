@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-// Small buffer to allow for clock skew and short persistence delays when
-// validating start times. Values within this buffer (ms) are considered valid.
-export const VALIDATION_TIME_BUFFER_MS = 60_000; // 1 minute
-
 /**
  * Course Level Enum
  */
@@ -87,10 +83,7 @@ export const courseCreateSchema = z.object({
     .nullable(),
   startTime: z
     .union([z.string(), z.date()])
-    .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
-    .refine(date => date.getTime() > Date.now() + VALIDATION_TIME_BUFFER_MS, {
-      message: 'Startzeit muss in der Zukunft liegen',
-    }),
+    .transform((val): Date => (typeof val === 'string' ? new Date(val) : val)),
   endTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))

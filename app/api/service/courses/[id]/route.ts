@@ -93,9 +93,10 @@ export async function GET(
           authResult.role
         );
       }
-      // Unexpected error variant — log and return generic error
+      // Exhaustive check — should be unreachable
+      const _exhaustive: never = authResult;
       logger.warn('Unexpected auth error variant', {
-        authError: (authResult as { error: string }).error,
+        authError: String(_exhaustive),
       });
       return await createServiceApiErrorResponse(
         'Service authentication error',

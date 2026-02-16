@@ -105,7 +105,8 @@ Ruft Details eines einzelnen Kurses mit allen Participations ab.
 **Beispiel-Request:**
 
 ```bash
-curl -X GET "https://hemera-academy.vercel.app/api/service/courses/clx123..." \
+# ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
+curl -X GET "https://<your-hemera-instance>/api/service/courses/clx123..." \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -159,7 +160,8 @@ Ruft Details einer Participation ab.
 **Beispiel-Request:**
 
 ```bash
-curl -X GET "https://hemera-academy.vercel.app/api/service/participations/clp456..." \
+# ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
+curl -X GET "https://<your-hemera-instance>/api/service/participations/clp456..." \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -220,7 +222,8 @@ Aktualisiert die Ergebnis-Daten einer Participation.
 **Beispiel-Request:**
 
 ```bash
-curl -X PUT "https://hemera-academy.vercel.app/api/service/participations/clp456.../result" \
+# ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
+curl -X PUT "https://<your-hemera-instance>/api/service/participations/clp456.../result" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -330,7 +333,7 @@ Contract-Tests für die Service API befinden sich in:
 
 ## Beispiel-Integration (Aither)
 
-Siehe [Aither Service User Setup Guide](../../../aither/docs/SERVICE_USER_SETUP.md) für eine vollständige Integration-Anleitung.
+Siehe [Aither Service User Setup Guide](https://github.com/Laparo/aither/blob/main/docs/SERVICE_USER_SETUP.md) für eine vollständige Integration-Anleitung.
 
 ### Client-Implementierung
 
@@ -340,7 +343,8 @@ import { getTokenManager } from '@/lib/hemera/token-manager';
 
 const tokenManager = getTokenManager();
 const client = new HemeraClient({
-  baseUrl: 'https://hemera-academy.vercel.app',
+  // baseUrl aus Umgebungsvariable oder Platzhalter
+  baseUrl: process.env.HEMERA_BASE_URL ?? 'https://<your-hemera-instance>',
   getToken: () => tokenManager.getToken(),
 });
 

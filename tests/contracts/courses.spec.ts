@@ -348,7 +348,7 @@ describeWithServer('Admin Course API - Contract Tests', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should validate future date for startTime', async () => {
+    it('should allow past date for startTime (admin can set any date)', async () => {
       const pastDate = {
         ...validCourseData,
         startTime: new Date(Date.now() - 86400000).toISOString(), // Past date
@@ -359,7 +359,8 @@ describeWithServer('Admin Course API - Contract Tests', () => {
         body: JSON.stringify(pastDate),
       });
 
-      expect(response.status).toBe(400);
+      // Past dates are allowed for admin course management
+      expect(response.status).not.toBe(400);
     });
 
     it.skip('should return 409 warning for duplicate title (non-blocking)', async () => {

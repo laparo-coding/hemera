@@ -58,7 +58,7 @@ export function validateServiceApiKey(
 
   return {
     userId: serviceUserId,
-    role: 'api-client' as UserRole,
+    role: 'api-client' satisfies UserRole,
   };
 }
 
