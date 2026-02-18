@@ -44,13 +44,14 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // createClerkClient innerhalb des try-Blocks, damit auch Runtime-Fehler
-  // (z.B. ungültiger Secret Key) korrekt gefangen und mit Exit-Code 2 beendet werden.
-  const clerk = createClerkClient({ secretKey });
-
   console.log(`🔍 Suche existierenden Service-User: ${SERVICE_EMAIL}\n`);
 
   try {
+    // createClerkClient innerhalb des try-Blocks, damit auch Runtime-Fehler
+    // (z.B. ungültiger Secret Key) korrekt gefangen und mit Exit-Code 2
+    // beendet werden.
+    const clerk = createClerkClient({ secretKey });
+
     // Check if user already exists
     const { data: existingUsers } = await clerk.users.getUserList({
       emailAddress: [SERVICE_EMAIL],
@@ -130,8 +131,11 @@ async function main(): Promise<void> {
       console.error(`\n   HTTP Status: ${error.status}`);
       console.error('\n   Clerk API Fehler:');
       for (const err of error.errors) {
-        console.error(`   - Code: ${err.code ?? 'unbekannt'}`);
-        console.error(`     Details: ${err.longMessage ?? err.message ?? 'keine Details'}`);
+        const codeLabel = err.code ?? 'unbekannt';
+        const detailsLabel =
+          err.longMessage ?? err.message ?? 'keine Details';
+        console.error(`   - Code: ${codeLabel}`);
+        console.error(`     Details: ${detailsLabel}`);
       }
     }
 

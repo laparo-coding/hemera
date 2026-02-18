@@ -81,6 +81,9 @@ export const courseCreateSchema = z.object({
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
     .optional()
     .nullable(),
+  // Hinweis: Die frühere Zukunftsprüfung (d.getTime() > Date.now() - BUFFER)
+  // wurde bewusst entfernt – Admins müssen ggf. vergangene Kursdaten erfassen
+  // (z.B. nachträgliche Dokumentation). Nur Datumsvalidität wird geprüft.
   startTime: z
     .union([z.string(), z.date()])
     .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
@@ -210,10 +213,16 @@ export const courseUpdateSchema = z.object({
   startTime: z
     .union([z.string(), z.date()])
     .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültiges Startdatum',
+    })
     .optional(),
   endTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültiges Enddatum',
+    })
     .optional(),
   instructor: z
     .string()

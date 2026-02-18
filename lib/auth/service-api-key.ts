@@ -13,12 +13,11 @@
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { env } from '@/lib/env';
+import { reportError } from '@/lib/monitoring/rollbar-official';
+import type { UserRole } from './permissions';
 
 /** HMAC-Schlüssel für timing-sichere API-Key-Vergleiche. */
 const SERVICE_API_HMAC_KEY = 'hemera-service-api';
-
-import { reportError } from '@/lib/monitoring/rollbar-official';
-import type { UserRole } from './permissions';
 
 export interface ServiceApiKeyResult {
   userId: string;

@@ -24,7 +24,8 @@ export const ALLOWED_SERVICE_ROLES: ReadonlyArray<UserRole> = [
 
 export type ServiceAuthError =
   | { error: 'unauthenticated' }
-  | { error: 'forbidden'; userId: string; role: UserRole };
+  | { error: 'forbidden'; userId: string; role: UserRole }
+  | { error: 'internal_error'; userId: string };
 
 export interface ServiceAuthResult {
   userId: string;
@@ -100,11 +101,13 @@ export async function authenticateServiceRequest(
         additionalData: {
           operation: 'authenticateServiceRequest',
           step: 'getUserRole',
+          failureType: 'getUserRole',
+          authenticatedUser: true,
           userId,
         },
       }
     );
-    return { error: 'unauthenticated' };
+    return { error: 'internal_error', userId };
   }
 
   if (!ALLOWED_SERVICE_ROLES.includes(role)) {

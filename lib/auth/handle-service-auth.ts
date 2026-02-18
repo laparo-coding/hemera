@@ -49,11 +49,31 @@ export function handleServiceAuthError(
     );
   }
 
+  if (authResult.error === 'internal_error') {
+    logger.error(
+      'Internal auth error: getUserRole failed for authenticated user',
+      undefined,
+      { userId: authResult.userId }
+    );
+    return createServiceApiErrorResponse(
+      'Internal server error',
+      ErrorCodes.INTERNAL_ERROR,
+      requestId,
+      500
+    );
+  }
+
   // Exhaustive check — wird zur Compile-Zeit fehlschlagen, wenn
   // ServiceAuthError um neue Varianten erweitert wird ohne Behandlung hier.
   const _exhaustive: never = authResult;
-  logger.warn('Unexpected auth error variant', {
-    authError: String(_exhaustive),
+  let serialized: string;
+  try {
+    serialized = JSON.stringify(_exhaustive);
+  } catch {
+    serialized = '[nicht serialisierbar]';
+  }
+  logger.error('Unexpected auth error variant', undefined, {
+    authError: serialized,
   });
   return createServiceApiErrorResponse(
     'Service authentication error',

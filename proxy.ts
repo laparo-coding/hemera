@@ -49,8 +49,16 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
               pathname,
             });
           })
-          .catch(() => {
-            // Rollbar nicht verfügbar — kein throw im Request-Pfad
+          .catch((rollbarErr: unknown) => {
+            // Rollbar nicht verfügbar — kein throw im Request-Pfad.
+            // Im Dev-Modus kurze Warnung für einfacheres Debugging.
+            if (process.env.NODE_ENV !== 'production') {
+              // biome-ignore lint/suspicious/noConsole: Dev-only Rollbar diagnostic
+              console.warn(
+                '[proxy] Rollbar fire-and-forget import failed:',
+                rollbarErr
+              );
+            }
           });
         return new NextResponse(
           JSON.stringify({

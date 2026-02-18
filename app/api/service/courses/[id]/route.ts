@@ -71,7 +71,7 @@ export async function GET(
     const authResult = await authenticateServiceRequest(request);
 
     if ('error' in authResult) {
-      return handleServiceAuthError(authResult, logger, requestId);
+      return await handleServiceAuthError(authResult, logger, requestId);
     }
 
     const { userId, role, authMethod } = authResult;
