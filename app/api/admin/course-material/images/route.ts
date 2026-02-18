@@ -9,11 +9,7 @@
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
 
-import {
-  checkUserAdminStatus,
-  getCurrentUser,
-  type User,
-} from '@/lib/auth/helpers';
+import { requireAdminUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { validateImageFile } from '@/lib/utils/file-validator';
@@ -29,38 +25,24 @@ const MAX_FILE_SIZE = 4.4 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
   let userId: string | null = null;
-  let authUser: User | null = null;
   try {
-    try {
-      authUser = await getCurrentUser();
-      userId = authUser?.id ?? null;
-    } catch (authError) {
-      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
-        error: authError instanceof Error ? authError.message : 'Unknown error',
-      });
-      userId = null;
+    const auth = await requireAdminUser();
+    if (!auth.authorized) {
+      if (auth.userId) {
+        logAuditEvent(
+          'IMAGE_UPLOAD',
+          auth.userId,
+          undefined,
+          'image',
+          'failure',
+          {
+            error: 'Insufficient permissions',
+          }
+        );
+      }
+      return auth.response;
     }
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          error: 'unauthorized',
-          message: 'Authentifizierung erforderlich',
-        },
-        { status: 401 }
-      );
-    }
-
-    const adminCheck = await checkUserAdminStatus(userId, authUser);
-    if (!adminCheck) {
-      logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
-        error: 'Insufficient permissions',
-      });
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
+    userId = auth.userId;
 
     let formData: FormData;
     try {

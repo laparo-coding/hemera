@@ -1,10 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getMaterialById } from '@/lib/api/course-material';
-import {
-  checkUserAdminStatus,
-  getCurrentUser,
-  type User,
-} from '@/lib/auth/helpers';
+import { requireAdminUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 type RouteParams = {
@@ -18,37 +14,10 @@ type RouteParams = {
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
-    let userId: string | null = null;
-    let authUser: User | null = null;
-    try {
-      authUser = await getCurrentUser();
-      userId = authUser?.id ?? null;
-    } catch (authError) {
-      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
-        error: authError instanceof Error ? authError.message : 'Unknown error',
-      });
-      userId = null;
-    }
+    const auth = await requireAdminUser();
+    if (!auth.authorized) return auth.response;
 
     const { id } = await params;
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          error: 'unauthorized',
-          message: 'Authentifizierung erforderlich',
-        },
-        { status: 401 }
-      );
-    }
-
-    const adminCheck = await checkUserAdminStatus(userId, authUser);
-    if (!adminCheck) {
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
 
     const material = await getMaterialById(id);
 
@@ -59,11 +28,44 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Fetch HTML content from Vercel Blob
-    const response = await fetch(material.blobUrl);
+    // Fetch HTML content from Vercel Blob with timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
+    let response: Response;
+    try {
+      response = await fetch(material.blobUrl, { signal: controller.signal });
+    } catch (fetchError) {
+      clearTimeout(timeout);
+      if (
+        fetchError instanceof DOMException &&
+        fetchError.name === 'AbortError'
+      ) {
+        serverInstance.error('Blob fetch timed out', {
+          blobUrl: material.blobUrl,
+        });
+        return NextResponse.json(
+          {
+            error: 'gateway_timeout',
+            message: 'Zeitüberschreitung beim Laden des Inhalts',
+          },
+          { status: 504 }
+        );
+      }
+      serverInstance.error('Failed to fetch blob content', {
+        blobUrl: material.blobUrl,
+        error:
+          fetchError instanceof Error ? fetchError.message : 'Unknown error',
+      });
+      return NextResponse.json(
+        { error: 'blob_error', message: 'Inhalt konnte nicht geladen werden' },
+        { status: 502 }
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
-      serverInstance.error('Failed to fetch blob content', {
+      serverInstance.error('Blob returned non-OK status', {
         blobUrl: material.blobUrl,
         status: response.status,
       });

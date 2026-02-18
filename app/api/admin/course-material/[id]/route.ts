@@ -7,11 +7,7 @@ import {
   isIdentifierTaken,
   updateMaterial,
 } from '@/lib/api/course-material';
-import {
-  checkUserAdminStatus,
-  getCurrentUser,
-  type User,
-} from '@/lib/auth/helpers';
+import { requireAdminUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { courseMaterialUpdateSchema } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
@@ -26,38 +22,11 @@ type RouteParams = {
  * Get a single course material
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
-  let userId: string | null = null;
-  let authUser: User | null = null;
   try {
-    try {
-      authUser = await getCurrentUser();
-      userId = authUser?.id ?? null;
-    } catch (authError) {
-      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
-        error: authError instanceof Error ? authError.message : 'Unknown error',
-      });
-      userId = null;
-    }
+    const auth = await requireAdminUser();
+    if (!auth.authorized) return auth.response;
 
     const { id } = await params;
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          error: 'unauthorized',
-          message: 'Authentifizierung erforderlich',
-        },
-        { status: 401 }
-      );
-    }
-
-    const adminCheckGet = await checkUserAdminStatus(userId, authUser);
-    if (!adminCheckGet) {
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
 
     const material = await getMaterialById(id);
 
@@ -95,35 +64,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
   let userId: string | null = null;
-  let authUser: User | null = null;
   try {
-    try {
-      authUser = await getCurrentUser();
-      userId = authUser?.id ?? null;
-    } catch (authError) {
-      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
-        error: authError instanceof Error ? authError.message : 'Unknown error',
-      });
-      userId = null;
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          error: 'unauthorized',
-          message: 'Authentifizierung erforderlich',
-        },
-        { status: 401 }
-      );
-    }
-
-    const adminCheck = await checkUserAdminStatus(userId, authUser);
-    if (!adminCheck) {
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
+    const auth = await requireAdminUser();
+    if (!auth.authorized) return auth.response;
+    userId = auth.userId;
 
     const existingMaterial = await getMaterialById(id);
 
@@ -213,21 +157,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       // Sanitize HTML
       const sanitizedHtml = sanitizeHtml(htmlContent);
 
-      // Always delete old blob before uploading new content
-      try {
-        await del(existingMaterial.blobUrl);
-      } catch (deleteError) {
-        // Log but don't fail - blob might not exist
-        serverInstance.warning('Failed to delete old blob during update', {
-          blobUrl: existingMaterial.blobUrl,
-          error:
-            deleteError instanceof Error
-              ? deleteError.message
-              : 'Unknown error',
-        });
-      }
-
-      // Upload new content
+      // Upload new content first, then delete old blob (prevents data loss on upload failure)
       const blobPathname = `course-material/${newIdentifier}.html`;
       let blob;
       try {
@@ -258,6 +188,20 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           },
           { status: 502 }
         );
+      }
+
+      // Delete old blob only after successful upload
+      try {
+        await del(existingMaterial.blobUrl);
+      } catch (deleteError) {
+        // Log but don't fail - old blob will be orphaned but new content is safe
+        serverInstance.warning('Failed to delete old blob during update', {
+          blobUrl: existingMaterial.blobUrl,
+          error:
+            deleteError instanceof Error
+              ? deleteError.message
+              : 'Unknown error',
+        });
       }
 
       updateData.blobUrl = blob.url;
@@ -324,35 +268,10 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
   let userId: string | null = null;
-  let authUser: User | null = null;
   try {
-    try {
-      authUser = await getCurrentUser();
-      userId = authUser?.id ?? null;
-    } catch (authError) {
-      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
-        error: authError instanceof Error ? authError.message : 'Unknown error',
-      });
-      userId = null;
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          error: 'unauthorized',
-          message: 'Authentifizierung erforderlich',
-        },
-        { status: 401 }
-      );
-    }
-
-    const adminCheckDelete = await checkUserAdminStatus(userId, authUser);
-    if (!adminCheckDelete) {
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
+    const auth = await requireAdminUser();
+    if (!auth.authorized) return auth.response;
+    userId = auth.userId;
 
     const material = await getMaterialById(id);
 

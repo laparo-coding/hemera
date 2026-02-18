@@ -119,8 +119,9 @@ async function upsertServiceUser(
   }
 
   // Create new user
-  // Generate a secure random password (service users authenticate via Clerk
-  // backend tokens, not password-based login in most setups)
+  // Clerk API requires a password for user creation, but this password is
+  // intentionally disposable — service users authenticate exclusively via
+  // backend API tokens, never via password-based login.
   const password = generateSecurePassword();
 
   const newUser = await clerk.users.createUser({
@@ -134,7 +135,7 @@ async function upsertServiceUser(
 
   console.log(`✨ ${config.email} created (ID: ${newUser.id})`);
   console.log(
-    `   ⚠️  Store the generated password securely. It will NOT be shown again.`
+    `   ℹ️  Password is a Clerk API requirement only — service users authenticate via backend tokens.`
   );
 }
 

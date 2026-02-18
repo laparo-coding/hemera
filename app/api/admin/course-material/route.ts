@@ -6,11 +6,7 @@ import {
   getAllMaterials,
   isIdentifierTaken,
 } from '@/lib/api/course-material';
-import {
-  checkUserAdminStatus,
-  getCurrentUser,
-  type User,
-} from '@/lib/auth/helpers';
+import { requireAdminUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   courseMaterialCreateSchema,
@@ -24,33 +20,9 @@ import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
  * List all course materials
  */
 export async function GET() {
-  let userId: string | null = null;
-  let authUser: User | null = null;
   try {
-    try {
-      authUser = await getCurrentUser();
-      userId = authUser?.id ?? null;
-    } catch (authError) {
-      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
-        error: authError instanceof Error ? authError.message : 'Unknown error',
-      });
-      userId = null;
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
-        { status: 401 }
-      );
-    }
-
-    const adminCheck = await checkUserAdminStatus(userId, authUser);
-    if (!adminCheck) {
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
+    const auth = await requireAdminUser();
+    if (!auth.authorized) return auth.response;
 
     const materials = await getAllMaterials();
 
@@ -83,35 +55,10 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   let userId: string | null = null;
-  let authUser: User | null = null;
   try {
-    try {
-      authUser = await getCurrentUser();
-      userId = authUser?.id ?? null;
-    } catch (authError) {
-      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
-        error: authError instanceof Error ? authError.message : 'Unknown error',
-      });
-      userId = null;
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          error: 'unauthorized',
-          message: 'Authentifizierung erforderlich',
-        },
-        { status: 401 }
-      );
-    }
-
-    const adminCheck = await checkUserAdminStatus(userId, authUser);
-    if (!adminCheck) {
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
+    const auth = await requireAdminUser();
+    if (!auth.authorized) return auth.response;
+    userId = auth.userId;
 
     let body;
     try {
