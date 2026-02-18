@@ -172,6 +172,7 @@ export async function requireAdminUser(): Promise<AdminAuthResult> {
 
   const isAdminUser = await checkUserAdminStatus(userId, user);
   if (!isAdminUser) {
+    serverInstance.warning('Admin-Zugriff verweigert', { userId });
     return {
       authorized: false,
       userId,
