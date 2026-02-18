@@ -90,15 +90,15 @@ export async function PUT(
     const authResult = await authenticateServiceRequest(request);
 
     if ('error' in authResult) {
-      return handleServiceAuthError(authResult, logger, requestId);
+      return await handleServiceAuthError(authResult, logger, requestId);
     }
 
-    const { userId, role } = authResult;
+    const { userId, role, authMethod } = authResult;
 
     logger.info('Service API request authorized', {
       userId,
       role,
-      authMethod: authResult.authMethod,
+      authMethod,
       participationId: id,
     });
 
