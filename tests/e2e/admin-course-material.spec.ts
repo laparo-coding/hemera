@@ -151,13 +151,15 @@ test.describe('Admin Course Material Page', () => {
       const editButton = firstDataRow.locator('button[aria-label*="bearbeiten"]');
       const viewButton = firstDataRow.locator('button[aria-label*="ansehen"]');
 
-      if (await editButton.isVisible()) {
-        // Verify edit button is present and clickable
+      // Mindestens ein Action-Button sollte vorhanden sein
+      const hasEdit = await editButton.isVisible();
+      const hasView = await viewButton.isVisible();
+      expect(hasEdit || hasView).toBe(true);
+
+      if (hasEdit) {
         expect(await editButton.isEnabled()).toBe(true);
       }
-
-      if (await viewButton.isVisible()) {
-        // Verify view button is present and clickable
+      if (hasView) {
         expect(await viewButton.isEnabled()).toBe(true);
       }
     }
@@ -171,9 +173,8 @@ test.describe('Admin Course Material Page', () => {
 
     // Check for breadcrumb containing "Seminarmaterial"
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
-    if (await breadcrumb.isVisible()) {
-      await expect(page.getByText('Seminarmaterial')).toBeVisible();
-    }
+    await expect(breadcrumb).toBeVisible();
+    await expect(page.getByText('Seminarmaterial')).toBeVisible();
   });
 
   test('should validate table pagination controls', async ({ page }) => {
@@ -208,8 +209,12 @@ test.describe('Admin Course Material Page', () => {
     await page.locator('[data-testid="admin-course-material-page"]').waitFor();
 
     // Check that no critical errors occurred
-    const criticalErrors = consoleErrors.filter((msg) =>
-      msg.includes('TypeError') || msg.includes('ReferenceError')
+    const criticalErrors = consoleErrors.filter(
+      (msg) =>
+        msg.includes('TypeError') ||
+        msg.includes('ReferenceError') ||
+        msg.includes('SyntaxError') ||
+        msg.includes('RangeError'),
     );
     expect(criticalErrors).toHaveLength(0);
 
