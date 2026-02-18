@@ -225,6 +225,8 @@ hemera
 Hemera's
 hemeraacademy
 heroku
+HMAC
+hmac
 hier
 Homeoffice
 homeoffice

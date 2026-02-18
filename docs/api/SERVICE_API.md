@@ -6,13 +6,42 @@ Die Hemera Service API ermöglicht autorisierten Service-Clients (wie Aither) de
 
 ## Authentifizierung
 
-### Clerk JWT-basierte Authentifizierung
+Die Service API unterstützt zwei Authentifizierungsmethoden — Clerk JWT für Browser-basierte Zugriffe und API-Key für M2M (Machine-to-Machine) Kommunikation.
 
-Alle Service-API-Endpunkte erfordern einen gültigen Clerk Session Token im `Authorization` Header:
+### Methode 1: Clerk JWT-basierte Authentifizierung
+
+Für Browser-basierte oder interaktive Zugriffe: gültigen Clerk Session Token im `Authorization` Header senden:
 
 ```
 Authorization: Bearer <clerk-session-jwt>
 ```
+
+### Methode 2: API-Key-basierte Authentifizierung (M2M)
+
+Für Service-to-Service-Kommunikation (z.B. Aither → Hemera) kann statt eines Clerk JWTs ein statischer API-Key verwendet werden:
+
+```
+X-API-Key: <hemera-service-api-key>
+```
+
+**Konfiguration:**
+
+| Umgebungsvariable | Beschreibung |
+|-------------------|--------------|
+| `HEMERA_SERVICE_API_KEY` | API-Key (mind. 32 Zeichen, nur druckbare ASCII-Zeichen) |
+| `HEMERA_SERVICE_USER_ID` | Clerk User-ID des Service-Accounts (Format: `user_...`) |
+
+> **Wichtig:** Beide Variablen müssen entweder beide gesetzt oder beide leer sein (Zod-Validierung erzwingt dies beim Start).
+
+**Key generieren:**
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+```
+
+**Sicherheitshinweise:**
+- Der Key wird über HMAC-SHA256 timing-sicher verglichen
+- API-Keys mit Leerzeichen oder Steuerzeichen werden abgelehnt
+- Bei ungültigem Key-Format antwortet der Proxy bereits mit 401 (kein Fallback auf Clerk)
 
 ### Erforderliche Rolle
 
@@ -32,7 +61,7 @@ Wichtig: Service-to-Service JWTs müssen eine eingeschränkte Audience/Scope hab
 
 ### Berechtigungen
 
-Die `api-client` Rolle hat folgende Berechtigungen (definiert in [`lib/auth/permissions.ts`](../../lib/auth/permissions.ts:120)):
+Die `api-client` Rolle hat folgende Berechtigungen (definiert in [`lib/auth/permissions.ts`](../../lib/auth/permissions.ts)):
 
 - `read:courses` - Kurse lesen
 - `read:participations` - Teilnahmen lesen
@@ -57,7 +86,7 @@ Listet alle Kurse mit Teilnehmerzahlen auf.
 
 ```bash
 # ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
-curl -X GET "https://<your-hemera-instance>.vercel.app/api/service/courses?level=BASIC&limit=10" \
+curl -X GET "https://<your-hemera-instance>/api/service/courses?level=BASIC&limit=10" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -333,7 +362,7 @@ Contract-Tests für die Service API befinden sich in:
 
 ## Beispiel-Integration (Aither)
 
-Siehe [Aither Service User Setup Guide](https://github.com/Laparo/aither/blob/main/docs/SERVICE_USER_SETUP.md) für eine vollständige Integration-Anleitung.
+Siehe [Aither Service User Setup Guide](https://github.com/Laparo/aither/blob/main/docs/SERVICE_USER_SETUP.md) für eine vollständige Integrationsanleitung.
 
 ### Client-Implementierung
 

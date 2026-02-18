@@ -359,8 +359,8 @@ describeWithServer('Admin Course API - Contract Tests', () => {
         body: JSON.stringify(pastDate),
       });
 
-      // Past dates are allowed for admin course management
-      expect(response.status).not.toBe(400);
+      // Past dates are allowed for admin course management (201 = Created)
+      expect(response.status).toBe(201);
     });
 
     it.skip('should return 409 warning for duplicate title (non-blocking)', async () => {

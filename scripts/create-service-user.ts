@@ -57,7 +57,10 @@ async function main(): Promise<void> {
 
     if (existingUsers.length > 0) {
       const user = existingUsers[0]!;
-      const currentRole = (user.publicMetadata?.role as string) || '(keine)';
+      const currentRole =
+        typeof user.publicMetadata?.role === 'string'
+          ? user.publicMetadata.role
+          : '(keine)';
 
       console.log('✅ Service-User existiert bereits:');
       console.log(`   ID:    ${user.id}`);
@@ -65,7 +68,10 @@ async function main(): Promise<void> {
       console.log(`   Aktuelle Rolle: ${currentRole}`);
 
       // Check if metadata update is needed
-      const currentService = (user.publicMetadata?.service as string) || '';
+      const currentService =
+        typeof user.publicMetadata?.service === 'string'
+          ? user.publicMetadata.service
+          : '';
       const needsUpdate =
         currentRole !== 'api-client' || currentService !== 'aither';
 
@@ -150,7 +156,8 @@ function printNextSteps(userId: string): void {
   console.log(`   Hemera (.env.local): HEMERA_SERVICE_USER_ID=${userId}`);
   console.log('   Aither (.env.local): HEMERA_API_KEY=<dein-api-key>');
   console.log('\n4️⃣  Teste die Verbindung:');
-  console.log('   curl -X GET https://www.hemera.academy/api/service/courses \\');
+  const baseUrl = process.env.HEMERA_BASE_URL ?? 'https://<your-hemera-instance>';
+  console.log(`   curl -X GET ${baseUrl}/api/service/courses \\`);
   console.log('     -H "X-API-Key: <dein-api-key>"');
   console.log('\n' + '═'.repeat(60));
 }

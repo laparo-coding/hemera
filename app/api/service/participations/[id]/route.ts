@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
+import { handleServiceAuthError } from '@/lib/auth/handle-service-auth';
 import { authenticateServiceRequest } from '@/lib/auth/service-auth';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
@@ -70,40 +71,7 @@ export async function GET(
     const authResult = await authenticateServiceRequest(request);
 
     if ('error' in authResult) {
-      if (authResult.error === 'unauthenticated') {
-        logger.warn('Unauthenticated request');
-        return await createServiceApiErrorResponse(
-          'Not authenticated',
-          ErrorCodes.UNAUTHORIZED,
-          requestId,
-          401
-        );
-      }
-      if (authResult.error === 'forbidden') {
-        logger.warn('Forbidden: insufficient permissions', {
-          userId: authResult.userId,
-          role: authResult.role,
-        });
-        return await createServiceApiErrorResponse(
-          'Forbidden: api-client or admin role required',
-          ErrorCodes.FORBIDDEN,
-          requestId,
-          403,
-          authResult.userId,
-          authResult.role
-        );
-      }
-      // Exhaustive check — should be unreachable
-      const _exhaustive: never = authResult;
-      logger.warn('Unexpected auth error variant', {
-        authError: String(_exhaustive),
-      });
-      return await createServiceApiErrorResponse(
-        'Service authentication error',
-        ErrorCodes.INTERNAL_ERROR,
-        requestId,
-        500
-      );
+      return handleServiceAuthError(authResult, logger, requestId);
     }
 
     const { userId, role } = authResult;

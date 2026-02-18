@@ -37,11 +37,14 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
       // Basisvalidierung: Key muss mindestens 32 Zeichen lang sein und
       // darf nur druckbare ASCII-Zeichen enthalten (keine Steuerzeichen/Whitespace).
       // Die vollständige kryptografische Validierung erfolgt im Route-Handler.
+      // Leerzeichen (\x20) sind im Regex bewusst ausgeschlossen: API-Keys mit
+      // Spaces würden Copy-&-Paste-Fehler und Header-Parsing-Probleme erzeugen.
       if (apiKey.length < 32 || !/^[\x21-\x7e]+$/.test(apiKey)) {
         // biome-ignore lint/suspicious/noConsole: security log for invalid API key attempts
-        console.warn(
-          `[proxy] Rejected API key with invalid format (length: ${apiKey.length}) for ${pathname}`
-        );
+        console.warn('[proxy] Invalid API key format rejected', {
+          length: apiKey.length,
+          pathname,
+        });
         return new NextResponse(
           JSON.stringify({
             success: false,

@@ -12,6 +12,7 @@
  */
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { env } from '@/lib/env';
 import { reportError } from '@/lib/monitoring/rollbar-official';
 import type { UserRole } from './permissions';
 
@@ -29,15 +30,17 @@ export function validateServiceApiKey(
 ): ServiceApiKeyResult | null {
   if (!apiKey) return null;
 
-  const expectedKey = process.env.HEMERA_SERVICE_API_KEY;
-  const serviceUserId = process.env.HEMERA_SERVICE_USER_ID;
+  // Use the validated env object so the Zod cross-field constraint (both-or-neither)
+  // is enforced and avoids direct process.env bypassing the validation.
+  const expectedKey = env.HEMERA_SERVICE_API_KEY;
+  const serviceUserId = env.HEMERA_SERVICE_USER_ID;
 
   if (!expectedKey || !serviceUserId) {
     reportError(new Error('Service API key configuration missing'), {
       additionalData: {
         hasExpectedKey: !!expectedKey,
         hasServiceUserId: !!serviceUserId,
-        nodeEnv: process.env.NODE_ENV,
+        nodeEnv: env.NODE_ENV,
       },
     });
     return null;
