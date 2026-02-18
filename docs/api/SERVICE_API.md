@@ -32,6 +32,13 @@ X-API-Key: <hemera-service-api-key>
 | `HEMERA_SERVICE_USER_ID` | Clerk User-ID des Service-Accounts (Format: `user_...`) |
 
 > **Wichtig:** Beide Variablen müssen entweder beide gesetzt oder beide leer sein (Zod-Validierung erzwingt dies beim Start).
+>
+> **Startup-Verhalten bei Validierungsfehler:** Fehlen oder stimmen die Variablen nicht überein, bricht die Anwendung mit Exit-Code 1 ab. Der Fehler wird auf `stderr` protokolliert, z.B.:
+> ```
+> [env] Environment validation failed for fields: [ 'HEMERA_SERVICE_USER_ID' ]
+> Error: Environment validation failed; aborting startup
+> ```
+> **Fehlerbehebung:** Prüfe, ob `HEMERA_SERVICE_API_KEY` (mind. 32 Zeichen) und `HEMERA_SERVICE_USER_ID` (Format `user_...`) in `.env.local` bzw. den Vercel-Umgebungsvariablen gesetzt sind. Beide Variablen müssen immer gemeinsam gesetzt oder entfernt werden.
 
 **Key generieren:**
 ```bash
@@ -41,7 +48,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 **Sicherheitshinweise:**
 - Der Key wird über HMAC-SHA256 timing-sicher verglichen
 - API-Keys mit Leerzeichen oder Steuerzeichen werden abgelehnt
-- Bei ungültigem Key-Format antwortet der Proxy bereits mit 401 (kein Fallback auf Clerk)
+- Bei ungültigem Key-Format antwortet der Next.js-Middleware-Proxy bereits mit 401, **bevor** die Clerk-Authentifizierung stattfindet (kein Fallback auf Clerk-Validierung)
 
 ### Erforderliche Rolle
 
@@ -290,7 +297,7 @@ curl -X PUT "https://<your-hemera-instance>/api/service/participations/clp456...
 Die Service API implementiert Rate Limiting pro User/Role:
 
 - **api-client**: 100 Requests pro Minute
-- **admin**: 200 Requests pro Minute
+- **admin**: 200 Requests pro Minute *(reduziert von 500 auf 200 für mehr Stabilität und gleichmäßige Lastverteilung, wirksam seit Februar 2026 — bei Bedarf bitte das Hemera-Team kontaktieren)*
 
 Bei Überschreitung wird `429 Too Many Requests` zurückgegeben mit `Retry-After` Header.
 

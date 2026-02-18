@@ -13,6 +13,10 @@
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { env } from '@/lib/env';
+
+/** HMAC-Schlüssel für timing-sichere API-Key-Vergleiche. */
+const SERVICE_API_HMAC_KEY = 'hemera-service-api';
+
 import { reportError } from '@/lib/monitoring/rollbar-official';
 import type { UserRole } from './permissions';
 
@@ -48,10 +52,10 @@ export function validateServiceApiKey(
 
   // Timing-sichere Prüfung: beide Keys werden gehasht und dann verglichen,
   // um Timing-Angriffe + Length-Leaks zu vermeiden
-  const hashA = createHmac('sha256', 'hemera-service-api')
+  const hashA = createHmac('sha256', SERVICE_API_HMAC_KEY)
     .update(apiKey)
     .digest();
-  const hashB = createHmac('sha256', 'hemera-service-api')
+  const hashB = createHmac('sha256', SERVICE_API_HMAC_KEY)
     .update(expectedKey)
     .digest();
 

@@ -19,7 +19,7 @@ type Logger = ReturnType<typeof createApiLogger>;
  * dabei passende Warnungen. Enthält ein exhaustive `never`-Check für
  * Typsicherheit bei zukünftigen Erweiterungen von `ServiceAuthError`.
  */
-export async function handleServiceAuthError(
+export function handleServiceAuthError(
   authResult: ServiceAuthError,
   logger: Logger,
   requestId: string

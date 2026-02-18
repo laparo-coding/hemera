@@ -40,17 +40,24 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
       // Leerzeichen (\x20) sind im Regex bewusst ausgeschlossen: API-Keys mit
       // Spaces würden Copy-&-Paste-Fehler und Header-Parsing-Probleme erzeugen.
       if (apiKey.length < 32 || !/^[\x21-\x7e]+$/.test(apiKey)) {
-        // biome-ignore lint/suspicious/noConsole: security log for invalid API key attempts
-        console.warn('[proxy] Invalid API key format rejected', {
-          length: apiKey.length,
-          pathname,
-        });
+        // Security-Log via Rollbar (fire-and-forget, da proxy nicht async);
+        // generische Fehlermeldung nach außen (kein Leak des Format-Requirements).
+        void import('./lib/monitoring/rollbar-official')
+          .then(({ rollbar }) => {
+            rollbar.warning('[proxy] Invalid API key format rejected', {
+              length: apiKey.length,
+              pathname,
+            });
+          })
+          .catch(() => {
+            // Rollbar nicht verfügbar — kein throw im Request-Pfad
+          });
         return new NextResponse(
           JSON.stringify({
             success: false,
             error: {
               code: 'UNAUTHORIZED',
-              message: 'Invalid API key format',
+              message: 'Unauthorized',
             },
           }),
           { status: 401, headers: { 'content-type': 'application/json' } }

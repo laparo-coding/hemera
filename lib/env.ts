@@ -39,7 +39,7 @@ const EnvSchemaBase = z.object({
     .string()
     .startsWith('user_', {
       message:
-        'HEMERA_SERVICE_USER_ID must start with "user_" (Clerk user ID format)',
+        'HEMERA_SERVICE_USER_ID muss mit "user_" beginnen (Clerk User-ID-Format)',
     })
     .optional(),
 });

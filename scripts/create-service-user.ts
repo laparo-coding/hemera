@@ -44,6 +44,8 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  // createClerkClient innerhalb des try-Blocks, damit auch Runtime-Fehler
+  // (z.B. ungültiger Secret Key) korrekt gefangen und mit Exit-Code 2 beendet werden.
   const clerk = createClerkClient({ secretKey });
 
   console.log(`🔍 Suche existierenden Service-User: ${SERVICE_EMAIL}\n`);
@@ -164,5 +166,6 @@ function printNextSteps(userId: string): void {
 
 main().catch((err: unknown) => {
   console.error('Unbehandelter Fehler:', err);
-  process.exit(1);
+  // Exit-Code 2 für unbehandelte Runtime-/Promise-Fehler (Config-Fehler verwenden 1)
+  process.exit(2);
 });

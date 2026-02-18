@@ -74,12 +74,12 @@ export async function GET(
       return handleServiceAuthError(authResult, logger, requestId);
     }
 
-    const { userId, role } = authResult;
+    const { userId, role, authMethod } = authResult;
 
     logger.info('Service API request authorized', {
       userId,
       role,
-      authMethod: authResult.authMethod,
+      authMethod,
       courseId: id,
     });
 
