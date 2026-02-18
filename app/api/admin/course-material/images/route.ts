@@ -27,21 +27,7 @@ export async function POST(request: NextRequest) {
   let userId: string | null = null;
   try {
     const auth = await requireAdminUser();
-    if (!auth.authorized) {
-      if (auth.userId) {
-        logAuditEvent(
-          'IMAGE_UPLOAD',
-          auth.userId,
-          undefined,
-          'image',
-          'failure',
-          {
-            error: 'Insufficient permissions',
-          }
-        );
-      }
-      return auth.response;
-    }
+    if (!auth.authorized) return auth.response;
     userId = auth.userId;
 
     let formData: FormData;
