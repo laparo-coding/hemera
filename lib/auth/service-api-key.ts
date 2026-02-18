@@ -11,13 +11,10 @@
  * - Der zugehörige Service-User-ID wird über `HEMERA_SERVICE_USER_ID` aufgelöst
  */
 
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { env } from '@/lib/env';
 import { reportError } from '@/lib/monitoring/rollbar-official';
 import type { UserRole } from './permissions';
-
-/** HMAC-Schlüssel für timing-sichere API-Key-Vergleiche. */
-const SERVICE_API_HMAC_KEY = 'hemera-service-api';
 
 export interface ServiceApiKeyResult {
   userId: string;
@@ -49,14 +46,10 @@ export function validateServiceApiKey(
     return null;
   }
 
-  // Timing-sichere Prüfung: beide Keys werden gehasht und dann verglichen,
-  // um Timing-Angriffe + Length-Leaks zu vermeiden
-  const hashA = createHmac('sha256', SERVICE_API_HMAC_KEY)
-    .update(apiKey)
-    .digest();
-  const hashB = createHmac('sha256', SERVICE_API_HMAC_KEY)
-    .update(expectedKey)
-    .digest();
+  // Timing-sichere Prüfung: beide Keys werden zu SHA-256-Hashes normalisiert
+  // und dann verglichen, um Timing-Angriffe + Length-Leaks zu vermeiden.
+  const hashA = createHash('sha256').update(apiKey).digest();
+  const hashB = createHash('sha256').update(expectedKey).digest();
 
   if (!timingSafeEqual(hashA, hashB)) {
     return null;

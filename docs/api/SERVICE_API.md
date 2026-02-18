@@ -84,7 +84,7 @@ Listet alle Kurse mit Teilnehmerzahlen auf.
 
 | Parameter | Typ | Beschreibung | Default |
 |-----------|-----|--------------|---------|
-| `level` | `CourseLevel` | Filter nach Kurslevel (BASIC, INTERMEDIATE, ADVANCED) | - |
+| `level` | `CourseLevel` | Filter nach Kurslevel (BEGINNER, INTERMEDIATE, ADVANCED) | - |
 | `published` | `boolean` | Filter nach Veröffentlichungsstatus | `true` |
 | `limit` | `number` | Maximale Anzahl Ergebnisse (1-500) | `100` |
 | `offset` | `number` | Offset für Pagination | `0` |
@@ -93,7 +93,7 @@ Listet alle Kurse mit Teilnehmerzahlen auf.
 
 ```bash
 # ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
-curl -X GET "https://<your-hemera-instance>/api/service/courses?level=BASIC&limit=10" \
+curl -X GET "https://<your-hemera-instance>/api/service/courses?level=BEGINNER&limit=10" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -107,7 +107,7 @@ curl -X GET "https://<your-hemera-instance>/api/service/courses?level=BASIC&limi
       "id": "clx123...",
       "title": "Laparoskopie Basiskurs",
       "slug": "laparoskopie-basiskurs",
-      "level": "BASIC",
+      "level": "BEGINNER",
       "startDate": "2026-03-15T00:00:00.000Z",
       "endDate": "2026-03-16T00:00:00.000Z",
       "participantCount": 12
