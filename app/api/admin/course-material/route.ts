@@ -1,5 +1,4 @@
 // biome-ignore assist/source/organizeImports: Clerk auth must be imported first for proper Next.js initialization
-import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -8,7 +7,7 @@ import {
   getAllMaterials,
   isIdentifierTaken,
 } from '@/lib/api/course-material';
-import { isAdmin } from '@/lib/auth/helpers';
+import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
@@ -23,7 +22,14 @@ import {
  */
 export async function GET() {
   try {
-    const { userId } = await auth();
+    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
+    let userId: string | null = null;
+    try {
+      const user = await getCurrentUser();
+      userId = user?.id ?? null;
+    } catch (_e) {
+      userId = null;
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -32,7 +38,7 @@ export async function GET() {
       );
     }
 
-    const adminCheck = await isAdmin();
+    const adminCheck = await checkUserAdminStatus(userId);
     if (!adminCheck) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
@@ -71,7 +77,14 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
+    let userId: string | null = null;
+    try {
+      const user = await getCurrentUser();
+      userId = user?.id ?? null;
+    } catch (_e) {
+      userId = null;
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -83,7 +96,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const adminCheck = await isAdmin();
+    const adminCheck = await checkUserAdminStatus(userId);
     if (!adminCheck) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
@@ -231,8 +244,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     let auditUserId = 'unknown';
     try {
-      const { userId } = await auth();
-      if (userId) auditUserId = userId;
+      const user = await getCurrentUser();
+      if (user?.id) auditUserId = user.id;
     } catch {
       // Auth failed, use 'unknown'
     }

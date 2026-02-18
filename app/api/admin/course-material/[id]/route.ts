@@ -1,5 +1,4 @@
 // biome-ignore assist/source/organizeImports: Clerk auth must be imported first for proper Next.js initialization
-import { auth } from '@clerk/nextjs/server';
 import { del, put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -9,7 +8,7 @@ import {
   isIdentifierTaken,
   updateMaterial,
 } from '@/lib/api/course-material';
-import { isAdmin } from '@/lib/auth/helpers';
+import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
@@ -25,7 +24,15 @@ type RouteParams = {
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
-    const { userId } = await auth();
+    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
+    let userId: string | null = null;
+    try {
+      const user = await getCurrentUser();
+      userId = user?.id ?? null;
+    } catch (_e) {
+      userId = null;
+    }
+
     const { id } = await params;
 
     if (!userId) {
@@ -38,7 +45,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const adminCheckGet = await isAdmin();
+    const adminCheckGet = await checkUserAdminStatus(userId);
     if (!adminCheckGet) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
@@ -82,7 +89,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
   try {
-    const { userId } = await auth();
+    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
+    let userId: string | null = null;
+    try {
+      const user = await getCurrentUser();
+      userId = user?.id ?? null;
+    } catch (_e) {
+      userId = null;
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -94,7 +108,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const adminCheck = await isAdmin();
+    const adminCheck = await checkUserAdminStatus(userId);
     if (!adminCheck) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
@@ -268,10 +282,16 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       updatedAt: material.updatedAt.toISOString(),
     });
   } catch (error) {
-    const userId2 = (await auth()).userId;
+    let auditUserId = 'unknown';
+    try {
+      const user = await getCurrentUser();
+      if (user?.id) auditUserId = user.id;
+    } catch {
+      // Auth failed, use 'unknown'
+    }
     logAuditEvent(
       'COURSE_MATERIAL_UPDATE',
-      userId2 || 'unknown',
+      auditUserId,
       id,
       'course-material',
       'failure',
@@ -301,7 +321,14 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
   try {
-    const { userId } = await auth();
+    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
+    let userId: string | null = null;
+    try {
+      const user = await getCurrentUser();
+      userId = user?.id ?? null;
+    } catch (_e) {
+      userId = null;
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -313,7 +340,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const adminCheckDelete = await isAdmin();
+    const adminCheckDelete = await checkUserAdminStatus(userId);
     if (!adminCheckDelete) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
@@ -360,10 +387,16 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    const userId2 = (await auth()).userId;
+    let auditUserId = 'unknown';
+    try {
+      const user = await getCurrentUser();
+      if (user?.id) auditUserId = user.id;
+    } catch {
+      // Auth failed, use 'unknown'
+    }
     logAuditEvent(
       'COURSE_MATERIAL_DELETE',
-      userId2 || 'unknown',
+      auditUserId,
       id,
       'course-material',
       'failure',
