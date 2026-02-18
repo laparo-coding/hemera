@@ -6,7 +6,11 @@ import {
   getAllMaterials,
   isIdentifierTaken,
 } from '@/lib/api/course-material';
-import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
+import {
+  checkUserAdminStatus,
+  getCurrentUser,
+  type User,
+} from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   courseMaterialCreateSchema,
@@ -21,10 +25,11 @@ import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
  */
 export async function GET() {
   let userId: string | null = null;
+  let authUser: User | null = null;
   try {
     try {
-      const user = await getCurrentUser();
-      userId = user?.id ?? null;
+      authUser = await getCurrentUser();
+      userId = authUser?.id ?? null;
     } catch (authError) {
       serverInstance.warning('getCurrentUser() fehlgeschlagen', {
         error: authError instanceof Error ? authError.message : 'Unknown error',
@@ -39,7 +44,7 @@ export async function GET() {
       );
     }
 
-    const adminCheck = await checkUserAdminStatus(userId);
+    const adminCheck = await checkUserAdminStatus(userId, authUser);
     if (!adminCheck) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
@@ -78,10 +83,11 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   let userId: string | null = null;
+  let authUser: User | null = null;
   try {
     try {
-      const user = await getCurrentUser();
-      userId = user?.id ?? null;
+      authUser = await getCurrentUser();
+      userId = authUser?.id ?? null;
     } catch (authError) {
       serverInstance.warning('getCurrentUser() fehlgeschlagen', {
         error: authError instanceof Error ? authError.message : 'Unknown error',
@@ -99,7 +105,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const adminCheck = await checkUserAdminStatus(userId);
+    const adminCheck = await checkUserAdminStatus(userId, authUser);
     if (!adminCheck) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },

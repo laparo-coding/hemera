@@ -1,6 +1,9 @@
 // Clerk-based auth helpers
 import type { User } from '@clerk/nextjs/server';
 import { currentUser } from '@clerk/nextjs/server';
+
+export type { User };
+
 import { redirect } from 'next/navigation';
 
 /**
@@ -89,13 +92,15 @@ export async function isAdmin() {
 }
 
 /**
- * Check if a specific user has admin role by ID
+ * Check if a specific user has admin role by ID.
+ * Pass an already-loaded User object as second argument to avoid a redundant currentUser() call.
  */
-export async function checkUserAdminStatus(_userId: string): Promise<boolean> {
+export async function checkUserAdminStatus(
+  _userId: string,
+  loadedUser?: User | null
+): Promise<boolean> {
   if (isMockAuthEnvironment()) return true;
-  const user = await currentUser();
-  // Check if the current authenticated user is an admin
-  // The userId parameter is the user being checked, but we validate the current user's admin status
+  const user = loadedUser ?? (await currentUser());
   return user?.publicMetadata?.role === 'admin';
 }
 

@@ -7,7 +7,11 @@ import {
   isIdentifierTaken,
   updateMaterial,
 } from '@/lib/api/course-material';
-import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
+import {
+  checkUserAdminStatus,
+  getCurrentUser,
+  type User,
+} from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { courseMaterialUpdateSchema } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
@@ -23,10 +27,11 @@ type RouteParams = {
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   let userId: string | null = null;
+  let authUser: User | null = null;
   try {
     try {
-      const user = await getCurrentUser();
-      userId = user?.id ?? null;
+      authUser = await getCurrentUser();
+      userId = authUser?.id ?? null;
     } catch (authError) {
       serverInstance.warning('getCurrentUser() fehlgeschlagen', {
         error: authError instanceof Error ? authError.message : 'Unknown error',
@@ -46,7 +51,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const adminCheckGet = await checkUserAdminStatus(userId);
+    const adminCheckGet = await checkUserAdminStatus(userId, authUser);
     if (!adminCheckGet) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
@@ -90,10 +95,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
   let userId: string | null = null;
+  let authUser: User | null = null;
   try {
     try {
-      const user = await getCurrentUser();
-      userId = user?.id ?? null;
+      authUser = await getCurrentUser();
+      userId = authUser?.id ?? null;
     } catch (authError) {
       serverInstance.warning('getCurrentUser() fehlgeschlagen', {
         error: authError instanceof Error ? authError.message : 'Unknown error',
@@ -111,7 +117,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const adminCheck = await checkUserAdminStatus(userId);
+    const adminCheck = await checkUserAdminStatus(userId, authUser);
     if (!adminCheck) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
@@ -318,10 +324,11 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
   let userId: string | null = null;
+  let authUser: User | null = null;
   try {
     try {
-      const user = await getCurrentUser();
-      userId = user?.id ?? null;
+      authUser = await getCurrentUser();
+      userId = authUser?.id ?? null;
     } catch (authError) {
       serverInstance.warning('getCurrentUser() fehlgeschlagen', {
         error: authError instanceof Error ? authError.message : 'Unknown error',
@@ -339,7 +346,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const adminCheckDelete = await checkUserAdminStatus(userId);
+    const adminCheckDelete = await checkUserAdminStatus(userId, authUser);
     if (!adminCheckDelete) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },

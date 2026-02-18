@@ -9,7 +9,11 @@
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
+import {
+  checkUserAdminStatus,
+  getCurrentUser,
+  type User,
+} from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { validateImageFile } from '@/lib/utils/file-validator';
@@ -25,10 +29,11 @@ const MAX_FILE_SIZE = 4.4 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
   let userId: string | null = null;
+  let authUser: User | null = null;
   try {
     try {
-      const user = await getCurrentUser();
-      userId = user?.id ?? null;
+      authUser = await getCurrentUser();
+      userId = authUser?.id ?? null;
     } catch (authError) {
       serverInstance.warning('getCurrentUser() fehlgeschlagen', {
         error: authError instanceof Error ? authError.message : 'Unknown error',
@@ -46,7 +51,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const adminCheck = await checkUserAdminStatus(userId);
+    const adminCheck = await checkUserAdminStatus(userId, authUser);
     if (!adminCheck) {
       logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
         error: 'Insufficient permissions',

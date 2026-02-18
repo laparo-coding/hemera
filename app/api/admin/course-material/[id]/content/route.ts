@@ -1,6 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getMaterialById } from '@/lib/api/course-material';
-import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
+import {
+  checkUserAdminStatus,
+  getCurrentUser,
+  type User,
+} from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 type RouteParams = {
@@ -15,9 +19,10 @@ type RouteParams = {
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     let userId: string | null = null;
+    let authUser: User | null = null;
     try {
-      const user = await getCurrentUser();
-      userId = user?.id ?? null;
+      authUser = await getCurrentUser();
+      userId = authUser?.id ?? null;
     } catch (authError) {
       serverInstance.warning('getCurrentUser() fehlgeschlagen', {
         error: authError instanceof Error ? authError.message : 'Unknown error',
@@ -37,7 +42,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const adminCheck = await checkUserAdminStatus(userId);
+    const adminCheck = await checkUserAdminStatus(userId, authUser);
     if (!adminCheck) {
       return NextResponse.json(
         { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
