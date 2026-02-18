@@ -1,4 +1,3 @@
-// biome-ignore assist/source/organizeImports: Clerk auth must be imported first for proper Next.js initialization
 import { del, put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -10,9 +9,9 @@ import {
 } from '@/lib/api/course-material';
 import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { courseMaterialUpdateSchema } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
-import { courseMaterialUpdateSchema } from '@/lib/schemas/admin/course-material';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -23,13 +22,15 @@ type RouteParams = {
  * Get a single course material
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
+  let userId: string | null = null;
   try {
-    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
-    let userId: string | null = null;
     try {
       const user = await getCurrentUser();
       userId = user?.id ?? null;
-    } catch (_e) {
+    } catch (authError) {
+      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
+        error: authError instanceof Error ? authError.message : 'Unknown error',
+      });
       userId = null;
     }
 
@@ -88,13 +89,15 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   // Extract id before try block so it's available in catch for logging
   const { id } = await params;
 
+  let userId: string | null = null;
   try {
-    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
-    let userId: string | null = null;
     try {
       const user = await getCurrentUser();
       userId = user?.id ?? null;
-    } catch (_e) {
+    } catch (authError) {
+      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
+        error: authError instanceof Error ? authError.message : 'Unknown error',
+      });
       userId = null;
     }
 
@@ -282,13 +285,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       updatedAt: material.updatedAt.toISOString(),
     });
   } catch (error) {
-    let auditUserId = 'unknown';
-    try {
-      const user = await getCurrentUser();
-      if (user?.id) auditUserId = user.id;
-    } catch {
-      // Auth failed, use 'unknown'
-    }
+    const auditUserId = userId ?? 'unknown';
     logAuditEvent(
       'COURSE_MATERIAL_UPDATE',
       auditUserId,
@@ -320,13 +317,15 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   // Extract id before try block so it's available in catch for logging
   const { id } = await params;
 
+  let userId: string | null = null;
   try {
-    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
-    let userId: string | null = null;
     try {
       const user = await getCurrentUser();
       userId = user?.id ?? null;
-    } catch (_e) {
+    } catch (authError) {
+      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
+        error: authError instanceof Error ? authError.message : 'Unknown error',
+      });
       userId = null;
     }
 
@@ -387,13 +386,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    let auditUserId = 'unknown';
-    try {
-      const user = await getCurrentUser();
-      if (user?.id) auditUserId = user.id;
-    } catch {
-      // Auth failed, use 'unknown'
-    }
+    const auditUserId = userId ?? 'unknown';
     logAuditEvent(
       'COURSE_MATERIAL_DELETE',
       auditUserId,

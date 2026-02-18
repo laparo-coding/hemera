@@ -16,6 +16,11 @@ test.describe('Admin Course Material Page', () => {
   test('GET /api/admin/course-material - should require authentication', async ({
     request,
   }) => {
+    test.skip(
+      !!process.env.E2E_TEST || !!process.env.NEXT_PUBLIC_DISABLE_CLERK,
+      'Mock-Auth-Umgebung — alle Requests sind authentifiziert'
+    );
+
     const response = await request.get('/api/admin/course-material');
 
     // Should return 401 Unauthorized
@@ -33,7 +38,7 @@ test.describe('Admin Course Material Page', () => {
     await page.goto('/admin/course-material');
 
     // Wait for page to load
-    await page.waitForLoadState('networkidle');
+    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
 
     // Check that no error alert is visible
     const errorAlert = page.locator('[role="alert"]').filter({ hasText: /Fehler|error/i });
@@ -58,7 +63,7 @@ test.describe('Admin Course Material Page', () => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
     await page.goto('/admin/course-material');
-    await page.waitForLoadState('networkidle');
+    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
 
     // Check for search input field
     const searchInput = page.getByPlaceholder('Suchen nach Titel oder Kennung...');
@@ -77,42 +82,43 @@ test.describe('Admin Course Material Page', () => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
     await page.goto('/admin/course-material');
-    await page.waitForLoadState('networkidle');
+    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
 
     // Check if the table displays either empty message or has materials
     const emptyMessage = page.getByText(/Noch keine Seminarmaterialien vorhanden|Keine Materialien gefunden/);
     const tableRows = page.locator('table tbody tr');
 
-    // Either show empty message or have table rows
+    // Exactly one of empty message or table rows should be visible
     const isEmpty = await emptyMessage.isVisible();
     const rowCount = await tableRows.count();
 
-    expect(isEmpty || rowCount > 0).toBe(true);
+    if (isEmpty) {
+      expect(rowCount).toBe(0);
+    } else {
+      expect(rowCount).toBeGreaterThan(0);
+    }
   });
 
   test('API /api/admin/course-material should return correct structure', async ({
     request,
   }) => {
-    // Create authenticated request with proper headers
-    // This test validates the API structure even without full auth
+    const isMockAuth =
+      !!process.env.E2E_TEST || !!process.env.NEXT_PUBLIC_DISABLE_CLERK;
+
     const response = await request.get('/api/admin/course-material', {
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 
-    // Should return 401 (unauthenticated) or 200 (authenticated)
-    const isValid = [200, 401].includes(response.status());
-    expect(isValid).toBe(true);
+    if (isMockAuth) {
+      // Mock-Auth: Request ist automatisch authentifiziert
+      expect(response.status()).toBe(200);
 
-    if (response.status() === 200) {
       const body = await response.json();
-
-      // Validate response structure
       expect(body).toHaveProperty('materials');
       expect(Array.isArray(body.materials)).toBe(true);
 
-      // If materials exist, validate their structure
       if (body.materials.length > 0) {
         const material = body.materials[0];
         expect(material).toHaveProperty('id');
@@ -121,6 +127,9 @@ test.describe('Admin Course Material Page', () => {
         expect(material).toHaveProperty('createdAt');
         expect(material).toHaveProperty('updatedAt');
       }
+    } else {
+      // Echte Auth: Request ohne Auth wird abgelehnt
+      expect(response.status()).toBe(401);
     }
   });
 
@@ -128,7 +137,7 @@ test.describe('Admin Course Material Page', () => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
     await page.goto('/admin/course-material');
-    await page.waitForLoadState('networkidle');
+    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
 
     // Check if there are any materials in the table
     const tableRows = page.locator('table tbody tr');
@@ -158,7 +167,7 @@ test.describe('Admin Course Material Page', () => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
     await page.goto('/admin/course-material');
-    await page.waitForLoadState('networkidle');
+    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
 
     // Check for breadcrumb containing "Seminarmaterial"
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
@@ -171,7 +180,7 @@ test.describe('Admin Course Material Page', () => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
     await page.goto('/admin/course-material');
-    await page.waitForLoadState('networkidle');
+    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
 
     // Check for pagination controls
     const pagination = page.locator('[role="navigation"]').filter({ hasText: /Zeilen pro Seite|page/ });
@@ -196,7 +205,7 @@ test.describe('Admin Course Material Page', () => {
     });
 
     await page.goto('/admin/course-material');
-    await page.waitForLoadState('networkidle');
+    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
 
     // Check that no critical errors occurred
     const criticalErrors = consoleErrors.filter((msg) =>

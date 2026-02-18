@@ -1,7 +1,6 @@
-// biome-ignore assist/source/organizeImports: Clerk auth must be imported first
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
 import { getMaterialById } from '@/lib/api/course-material';
+import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 type RouteParams = {
@@ -15,12 +14,14 @@ type RouteParams = {
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
-    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
     let userId: string | null = null;
     try {
       const user = await getCurrentUser();
       userId = user?.id ?? null;
-    } catch (_e) {
+    } catch (authError) {
+      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
+        error: authError instanceof Error ? authError.message : 'Unknown error',
+      });
       userId = null;
     }
 

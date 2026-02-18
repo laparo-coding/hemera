@@ -24,13 +24,15 @@ const ALLOWED_IMAGE_TYPES = [
 const MAX_FILE_SIZE = 4.4 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
+  let userId: string | null = null;
   try {
-    // Use test-friendly getCurrentUser to avoid Clerk middleware failures in Jest
-    let userId: string | null = null;
     try {
       const user = await getCurrentUser();
       userId = user?.id ?? null;
-    } catch (_e) {
+    } catch (authError) {
+      serverInstance.warning('getCurrentUser() fehlgeschlagen', {
+        error: authError instanceof Error ? authError.message : 'Unknown error',
+      });
       userId = null;
     }
 
@@ -148,13 +150,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: blob.url }, { status: 200 });
   } catch (error) {
-    let auditUserId = 'unknown';
-    try {
-      const user = await getCurrentUser();
-      if (user?.id) auditUserId = user.id;
-    } catch {
-      // Auth failed, use 'unknown'
-    }
+    const auditUserId = userId ?? 'unknown';
     logAuditEvent('IMAGE_UPLOAD', auditUserId, undefined, 'image', 'failure', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
