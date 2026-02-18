@@ -51,12 +51,15 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
           })
           .catch((rollbarErr: unknown) => {
             // Rollbar nicht verfügbar — kein throw im Request-Pfad.
-            // Im Dev-Modus kurze Warnung für einfacheres Debugging.
+            // Im Dev-Modus strukturierte Warnung für einfacheres Debugging.
             if (process.env.NODE_ENV !== 'production') {
               // biome-ignore lint/suspicious/noConsole: Dev-only Rollbar diagnostic
               console.warn(
-                '[proxy] Rollbar fire-and-forget import failed:',
-                rollbarErr
+                JSON.stringify({
+                  context: 'proxy',
+                  msg: '[proxy] Rollbar fire-and-forget import failed',
+                  error: String(rollbarErr),
+                })
               );
             }
           });
@@ -66,6 +69,11 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
             error: {
               code: 'UNAUTHORIZED',
               message: 'Unauthorized',
+            },
+            meta: {
+              requestId: crypto.randomUUID(),
+              timestamp: new Date().toISOString(),
+              version: '1.0',
             },
           }),
           { status: 401, headers: { 'content-type': 'application/json' } }
@@ -85,6 +93,11 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
           error: {
             code: 'UNAUTHORIZED',
             message: 'Missing authentication token',
+          },
+          meta: {
+            requestId: crypto.randomUUID(),
+            timestamp: new Date().toISOString(),
+            version: '1.0',
           },
         }),
         { status: 401, headers: { 'content-type': 'application/json' } }
