@@ -6,7 +6,7 @@ Die Hemera Service API ermöglicht autorisierten Service-Clients (wie Aither) de
 
 ## Authentifizierung
 
-Die Service API unterstützt zwei Authentifizierungsmethoden — Clerk JWT für Browser-basierte Zugriffe und API-Key für M2M (Machine-to-Machine) Kommunikation.
+Die Service API unterstützt zwei Authentifizierungsmethoden – Clerk JWT für Browser-basierte Zugriffe und API-Key für M2M (Machine-to-Machine) Kommunikation.
 
 ### Methode 1: Clerk JWT-basierte Authentifizierung
 
@@ -297,7 +297,7 @@ curl -X PUT "https://<your-hemera-instance>/api/service/participations/clp456...
 Die Service API implementiert Rate Limiting pro User/Role:
 
 - **api-client**: 100 Requests pro Minute
-- **admin**: 200 Requests pro Minute *(reduziert von 500 auf 200 für mehr Stabilität und gleichmäßige Lastverteilung, wirksam seit Februar 2026 — bei Bedarf bitte das Hemera-Team kontaktieren)*
+- **admin**: 200 Requests pro Minute *(reduziert von 500 auf 200 für mehr Stabilität und gleichmäßige Lastverteilung, wirksam seit Februar 2026 – bei Bedarf bitte das Hemera-Team kontaktieren)*
 
 Bei Überschreitung wird `429 Too Many Requests` zurückgegeben mit `Retry-After` Header.
 
