@@ -162,10 +162,10 @@ test.describe('Admin Course Material Page', () => {
       ).toBe(true);
 
       if (hasEdit) {
-        expect(await editButton.isEnabled(), 'Edit button should be enabled').toBe(true);
+        await expect(editButton).toBeEnabled();
       }
       if (hasView) {
-        expect(await viewButton.isEnabled(), 'View button should be enabled').toBe(true);
+        await expect(viewButton).toBeEnabled();
       }
     }
   });

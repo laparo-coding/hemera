@@ -1,16 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import {
-  checkUserAdminStatus,
-  getCurrentUser,
-} from '../../../../lib/auth/helpers';
-import { prisma } from '../../../../lib/db/prisma';
+import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
+import { prisma } from '@/lib/db/prisma';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
-} from '../../../../lib/utils/api-response';
-import { getCorsHeaders } from '../../../../lib/utils/cors';
-import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
+} from '@/lib/utils/api-response';
+import { getCorsHeaders } from '@/lib/utils/cors';
+import { getOrCreateRequestId } from '@/lib/utils/request-id';
 
 // CORS headers restricted to same origin (not wildcard)
 const corsHeaders = getCorsHeaders();

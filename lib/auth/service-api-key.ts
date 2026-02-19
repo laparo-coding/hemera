@@ -13,7 +13,7 @@
 
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { env } from '@/lib/env';
-import { reportError } from '@/lib/monitoring/rollbar-official';
+import { reportError, serverInstance } from '@/lib/monitoring/rollbar-official';
 import type { UserRole } from './permissions';
 
 // Rate-limiting for invalid key error reports to avoid flooding the monitor
@@ -25,11 +25,34 @@ let invalidKeyReportWindowStart = Date.now();
 function shouldReportInvalidKey(): boolean {
   const now = Date.now();
   if (now - invalidKeyReportWindowStart > INVALID_KEY_REPORT_WINDOW_MS) {
+    // Log window reset for observability
+    try {
+      serverInstance.info('Invalid API key report window reset', {
+        previousCount: invalidKeyReportCount,
+        previousWindowStart: invalidKeyReportWindowStart,
+        newWindowStart: now,
+      });
+    } catch (_e) {
+      // fall back silently if logger unavailable
+    }
     invalidKeyReportCount = 0;
     invalidKeyReportWindowStart = now;
   }
   invalidKeyReportCount++;
-  return invalidKeyReportCount <= INVALID_KEY_REPORT_MAX;
+  if (invalidKeyReportCount > INVALID_KEY_REPORT_MAX) {
+    try {
+      serverInstance.info('Invalid API key report suppressed', {
+        count: invalidKeyReportCount,
+        windowStart: invalidKeyReportWindowStart,
+        windowMs: INVALID_KEY_REPORT_WINDOW_MS,
+        max: INVALID_KEY_REPORT_MAX,
+      });
+    } catch (_e) {
+      // noop
+    }
+    return false;
+  }
+  return true;
 }
 
 export interface ServiceApiKeyResult {

@@ -17,8 +17,8 @@ const EnvSchema = z.object({
   STRIPE_SECRET_KEY: z.string().optional(),
 
   // Service-to-service API key used for server-side M2M calls
-  HEMERA_SERVICE_API_KEY: z.string().optional(),
-  HEMERA_SERVICE_USER_ID: z.string().optional(),
+  HEMERA_SERVICE_API_KEY: z.string().min(16).optional(),
+  HEMERA_SERVICE_USER_ID: z.string().uuid().optional(),
 
   // Context7 / Upstash
   CONTEXT7_ENABLED: z.enum(['0', '1']).optional(),
