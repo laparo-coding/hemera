@@ -75,8 +75,14 @@ async function main(): Promise<void> {
         typeof user.publicMetadata?.service === 'string'
           ? user.publicMetadata.service
           : '';
+      const currentDescription =
+        typeof user.publicMetadata?.description === 'string'
+          ? user.publicMetadata.description
+          : '';
       const needsUpdate =
-        currentRole !== 'api-client' || currentService !== 'aither';
+        currentRole !== SERVICE_METADATA.role ||
+        currentService !== SERVICE_METADATA.service ||
+        currentDescription !== SERVICE_METADATA.description;
 
       if (needsUpdate) {
         console.log('\n🔄 Aktualisiere publicMetadata...');

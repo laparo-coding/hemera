@@ -46,7 +46,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 ```
 
 **Sicherheitshinweise:**
-- Der Key wird über HMAC-SHA256 timing-sicher verglichen
+- Der Key wird über SHA-256-Hashing timing-sicher verglichen (`crypto.timingSafeEqual`)
 - API-Keys mit Leerzeichen oder Steuerzeichen werden abgelehnt
 - Bei ungültigem Key-Format antwortet der Next.js-Middleware-Proxy bereits mit 401, **bevor** die Clerk-Authentifizierung stattfindet (kein Fallback auf Clerk-Validierung)
 
