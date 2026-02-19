@@ -4,9 +4,8 @@
  * Tasks: T027, T028, T029
  */
 
-import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
+import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
 import { locationUpdateSchema } from '@/lib/schemas/location-schema';
 import {
   deleteLocation,
@@ -91,8 +90,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   const logger = createApiLogger(context);
 
   try {
-    // Check authentication
-    const { userId } = await auth();
+    // Check authentication — single Clerk call
+    const user = await getCurrentUser();
+    const userId = user?.id ?? null;
 
     if (!userId) {
       logger.warn('Unauthorized attempt to update location');
@@ -105,7 +105,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check admin role
-    const isAdmin = await checkUserAdminStatus();
+    const isAdmin = await checkUserAdminStatus(user);
     if (!isAdmin) {
       logger.warn('Non-admin user attempted to update location', {
         userId,
@@ -190,8 +190,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   const logger = createApiLogger(context);
 
   try {
-    // Check authentication
-    const { userId } = await auth();
+    // Check authentication — single Clerk call
+    const user = await getCurrentUser();
+    const userId = user?.id ?? null;
 
     if (!userId) {
       logger.warn('Unauthorized attempt to delete location');
@@ -204,7 +205,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check admin role
-    const isAdmin = await checkUserAdminStatus();
+    const isAdmin = await checkUserAdminStatus(user);
     if (!isAdmin) {
       logger.warn('Non-admin user attempted to delete location', {
         userId,

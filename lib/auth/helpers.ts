@@ -158,7 +158,7 @@ export async function requireAdminUser(): Promise<AdminAuthResult> {
 
   const userId = user?.id ?? null;
 
-  if (!userId) {
+  if (!userId || !user) {
     return {
       authorized: false,
       userId: null,
@@ -182,7 +182,7 @@ export async function requireAdminUser(): Promise<AdminAuthResult> {
     };
   }
 
-  return { authorized: true, userId, user: user! };
+  return { authorized: true, userId, user };
 }
 
 /**

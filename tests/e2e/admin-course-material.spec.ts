@@ -93,7 +93,8 @@ test.describe('Admin Course Material Page', () => {
     const rowCount = await tableRows.count();
 
     expect(
-      (isEmpty && rowCount === 0) || (!isEmpty && rowCount > 0)
+      (isEmpty && rowCount === 0) || (!isEmpty && rowCount > 0),
+      `Unexpected state: isEmpty=${isEmpty}, rowCount=${rowCount}. Expected empty message with 0 rows or no empty message with rows > 0`,
     ).toBe(true);
   });
 
@@ -155,13 +156,16 @@ test.describe('Admin Course Material Page', () => {
       // Mindestens ein Action-Button sollte vorhanden sein
       const hasEdit = await editButton.isVisible();
       const hasView = await viewButton.isVisible();
-      expect(hasEdit || hasView).toBe(true);
+      expect(
+        hasEdit || hasView,
+        'Expected at least one action button (edit or view) to be visible',
+      ).toBe(true);
 
       if (hasEdit) {
-        expect(await editButton.isEnabled()).toBe(true);
+        expect(await editButton.isEnabled(), 'Edit button should be enabled').toBe(true);
       }
       if (hasView) {
-        expect(await viewButton.isEnabled()).toBe(true);
+        expect(await viewButton.isEnabled(), 'View button should be enabled').toBe(true);
       }
     }
   });
