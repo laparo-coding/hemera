@@ -399,7 +399,6 @@ pmkdir
 Pnpf
 pooled
 
-serialisierbar
 pooler
 poste
 postgres
@@ -475,6 +474,7 @@ sein
 semgrep
 seminare
 Sequenzdiagramm
+serialiserbar
 Serialisierungszeit
 Serverfehler
 sess

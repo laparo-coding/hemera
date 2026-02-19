@@ -25,9 +25,9 @@ let invalidKeyReportWindowStart = Date.now();
 function shouldReportInvalidKey(): boolean {
   const now = Date.now();
   if (now - invalidKeyReportWindowStart > INVALID_KEY_REPORT_WINDOW_MS) {
-    // Log window reset for observability
+    // Reset window; excessive info logging moved to debug level
     try {
-      serverInstance.info('Invalid API key report window reset', {
+      serverInstance.debug('Invalid API key report window reset', {
         previousCount: invalidKeyReportCount,
         previousWindowStart: invalidKeyReportWindowStart,
         newWindowStart: now,
