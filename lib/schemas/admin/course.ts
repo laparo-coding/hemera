@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-// Small buffer to allow for clock skew and short persistence delays when
-// validating start times. Values within this buffer (ms) are considered valid.
-export const VALIDATION_TIME_BUFFER_MS = 60_000; // 1 minute
-
 /**
  * Course Level Enum
  */
@@ -85,15 +81,21 @@ export const courseCreateSchema = z.object({
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
     .optional()
     .nullable(),
+  // Hinweis: Die frühere Zukunftsprüfung (d.getTime() > Date.now() - BUFFER)
+  // wurde bewusst entfernt – Admins müssen ggf. vergangene Kursdaten erfassen
+  // (z.B. nachträgliche Dokumentation). Nur Datumsvalidität wird geprüft.
   startTime: z
     .union([z.string(), z.date()])
     .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
-    .refine(date => date.getTime() > Date.now() + VALIDATION_TIME_BUFFER_MS, {
-      message: 'Startzeit muss in der Zukunft liegen',
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültige Startzeit',
     }),
   endTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültige Endzeit',
+    })
     .optional()
     .nullable(),
   instructor: z
@@ -211,10 +213,16 @@ export const courseUpdateSchema = z.object({
   startTime: z
     .union([z.string(), z.date()])
     .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültige Startzeit',
+    })
     .optional(),
   endTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültige Endzeit',
+    })
     .optional(),
   instructor: z
     .string()

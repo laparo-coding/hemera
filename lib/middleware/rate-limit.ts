@@ -120,7 +120,7 @@ const RATE_LIMITS: Record<UserRole, { windowMs: number; maxRequests: number }> =
     },
     admin: {
       windowMs: 60 * 1000, // 1 minute
-      maxRequests: 500,
+      maxRequests: 200, // Reduziert von 500 — siehe SERVICE_API.md Rate-Limiting-Abschnitt
     },
     moderator: {
       windowMs: 60 * 1000,
