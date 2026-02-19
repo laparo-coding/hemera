@@ -2,6 +2,32 @@ import { clerkMiddleware } from '@clerk/nextjs/server';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+/** Max. erlaubte Länge eines API-Keys (Schutz vor überlangen Headern). */
+const MAX_API_KEY_LENGTH = 256;
+
+/**
+ * Erzeugt eine einheitliche JSON-Error-Response für den Proxy-Layer.
+ * Konsistent mit der ServiceApiErrorResponse-Struktur der Route-Handler.
+ */
+function createProxyErrorResponse(
+  status: number,
+  code: string,
+  message: string
+): NextResponse {
+  return new NextResponse(
+    JSON.stringify({
+      success: false,
+      error: { code, message },
+      meta: {
+        requestId: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        version: '1.0',
+      },
+    }),
+    { status, headers: { 'content-type': 'application/json' } }
+  );
+}
+
 // In E2E test mode, bypass Clerk middleware entirely
 const isE2EMode =
   process.env.E2E_TEST === '1' || process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
@@ -39,7 +65,11 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
       // Die vollständige kryptografische Validierung erfolgt im Route-Handler.
       // Leerzeichen (\x20) sind im Regex bewusst ausgeschlossen: API-Keys mit
       // Spaces würden Copy-&-Paste-Fehler und Header-Parsing-Probleme erzeugen.
-      if (apiKey.length < 32 || !/^[\x21-\x7e]+$/.test(apiKey)) {
+      if (
+        apiKey.length < 32 ||
+        apiKey.length > MAX_API_KEY_LENGTH ||
+        !/^[\x21-\x7e]+$/.test(apiKey)
+      ) {
         // Security-Log via Rollbar (fire-and-forget, da proxy nicht async);
         // generische Fehlermeldung nach außen (kein Leak des Format-Requirements).
         void import('./lib/monitoring/rollbar-official')
@@ -63,21 +93,7 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
               );
             }
           });
-        return new NextResponse(
-          JSON.stringify({
-            success: false,
-            error: {
-              code: 'UNAUTHORIZED',
-              message: 'Unauthorized',
-            },
-            meta: {
-              requestId: crypto.randomUUID(),
-              timestamp: new Date().toISOString(),
-              version: '1.0',
-            },
-          }),
-          { status: 401, headers: { 'content-type': 'application/json' } }
-        );
+        return createProxyErrorResponse(401, 'UNAUTHORIZED', 'Unauthorized');
       }
       return NextResponse.next();
     }
@@ -87,20 +103,10 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     const cookieValue = request.headers.get('cookie');
     const hasCookie = !!cookieValue && cookieValue.trim().length > 0;
     if (!hasAuthHeader && !hasCookie) {
-      return new NextResponse(
-        JSON.stringify({
-          success: false,
-          error: {
-            code: 'UNAUTHORIZED',
-            message: 'Missing authentication token',
-          },
-          meta: {
-            requestId: crypto.randomUUID(),
-            timestamp: new Date().toISOString(),
-            version: '1.0',
-          },
-        }),
-        { status: 401, headers: { 'content-type': 'application/json' } }
+      return createProxyErrorResponse(
+        401,
+        'UNAUTHORIZED',
+        'Missing authentication token'
       );
     }
 

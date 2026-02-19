@@ -49,20 +49,40 @@ export async function authenticateServiceRequest(
   // --- Pfad 1: API Key Auth ---
   const apiKey = extractApiKey(request.headers);
   if (apiKey) {
-    const result = validateServiceApiKey(apiKey);
-    if (result) {
-      // Rollenprüfung auch für API-Key-Auth (Defense-in-Depth)
-      if (!ALLOWED_SERVICE_ROLES.includes(result.role)) {
-        return { error: 'forbidden', userId: result.userId, role: result.role };
+    try {
+      const result = validateServiceApiKey(apiKey);
+      if (result) {
+        // Rollenprüfung auch für API-Key-Auth (Defense-in-Depth)
+        if (!ALLOWED_SERVICE_ROLES.includes(result.role)) {
+          return {
+            error: 'forbidden',
+            userId: result.userId,
+            role: result.role,
+          };
+        }
+        return {
+          userId: result.userId,
+          role: result.role,
+          authMethod: 'api-key',
+        };
       }
-      return {
-        userId: result.userId,
-        role: result.role,
-        authMethod: 'api-key',
-      };
+      // Ungültiger API Key → unauthenticated (kein Fallback auf Clerk)
+      return { error: 'unauthenticated' };
+    } catch (err: unknown) {
+      reportError(
+        err instanceof Error
+          ? err
+          : new Error('API key validation failed in service-auth'),
+        {
+          additionalData: {
+            operation: 'authenticateServiceRequest',
+            step: 'validateServiceApiKey',
+            authAttemptedMethod: 'api-key',
+          },
+        }
+      );
+      return { error: 'unauthenticated' };
     }
-    // Ungültiger API Key → unauthenticated (kein Fallback auf Clerk)
-    return { error: 'unauthenticated' };
   }
 
   // --- Pfad 2: Clerk Session Auth ---
