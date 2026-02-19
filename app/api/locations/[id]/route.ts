@@ -105,7 +105,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check admin role
-    const isAdmin = await checkUserAdminStatus(userId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       logger.warn('Non-admin user attempted to update location', {
         userId,
@@ -204,7 +204,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check admin role
-    const isAdmin = await checkUserAdminStatus(userId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       logger.warn('Non-admin user attempted to delete location', {
         userId,

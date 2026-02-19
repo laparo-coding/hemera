@@ -99,7 +99,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     }
 
     // Admin authorization check
-    const isAdmin = await checkUserAdminStatus(userId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       const errorResponse = createErrorResponse(
         'Admin privileges required',

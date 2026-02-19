@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check admin role
-    const isAdmin = await checkUserAdminStatus(userId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Admin permission required' },

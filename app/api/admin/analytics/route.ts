@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       return errorResponse;
     }
 
-    const isAdmin = await checkUserAdminStatus(userId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       logger.warn('Non-admin user attempted to access analytics', { userId });
       const errorResponse = createErrorResponse(

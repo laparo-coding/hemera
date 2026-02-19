@@ -95,11 +95,10 @@ export async function isAdmin() {
 }
 
 /**
- * Check if a specific user has admin role by ID.
- * Pass an already-loaded User object as second argument to avoid a redundant currentUser() call.
+ * Check if the current user has admin role.
+ * Pass an already-loaded User object to avoid a redundant currentUser() call.
  */
 export async function checkUserAdminStatus(
-  _userId: string,
   loadedUser?: User | null
 ): Promise<boolean> {
   if (isMockAuthEnvironment()) return true;
@@ -170,7 +169,7 @@ export async function requireAdminUser(): Promise<AdminAuthResult> {
     };
   }
 
-  const isAdminUser = await checkUserAdminStatus(userId, user);
+  const isAdminUser = await checkUserAdminStatus(user);
   if (!isAdminUser) {
     serverInstance.warning('Admin-Zugriff verweigert', { userId });
     return {
