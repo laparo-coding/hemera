@@ -155,7 +155,7 @@ curl -X GET "https://<your-hemera-instance>/api/service/courses/clx123..." \
     "id": "clx123...",
     "title": "Laparoskopie Basiskurs",
     "slug": "laparoskopie-basiskurs",
-    "level": "BASIC",
+    "level": "BEGINNER",
     "startDate": "2026-03-15T00:00:00.000Z",
     "endDate": "2026-03-16T00:00:00.000Z",
     "participations": [
