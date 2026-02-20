@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-// EnvSchemaBase is the plain ZodObject — keep a reference so `.shape` remains
-// accessible after the `.superRefine()` wrapper converts it to ZodEffects.
-const EnvSchemaBase = z.object({
+const EnvSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
     .default('development'),
@@ -35,40 +33,15 @@ const EnvSchemaBase = z.object({
 
   // Service API (M2M) auth — API-Key-basierte Authentifizierung für aither
   HEMERA_SERVICE_API_KEY: z.string().min(32).optional(),
-  HEMERA_SERVICE_USER_ID: z
-    .string()
-    .startsWith('user_', {
-      message:
-        'HEMERA_SERVICE_USER_ID muss mit "user_" beginnen (Clerk User-ID-Format)',
-    })
-    .optional(),
-});
-
-// EnvSchema extends the base with a cross-field constraint: both API key vars
-// must be set together (or both absent) — this superRefine returns ZodEffects
-// which has no .shape, hence the separate EnvSchemaBase above.
-const EnvSchema = EnvSchemaBase.superRefine((data, ctx) => {
-  const hasKey = !!data.HEMERA_SERVICE_API_KEY;
-  const hasUser = !!data.HEMERA_SERVICE_USER_ID;
-  if (hasKey !== hasUser) {
-    const missing = hasKey
-      ? 'HEMERA_SERVICE_USER_ID'
-      : 'HEMERA_SERVICE_API_KEY';
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `HEMERA_SERVICE_API_KEY und HEMERA_SERVICE_USER_ID müssen beide gesetzt oder beide leer sein (fehlt: ${missing})`,
-      path: [missing],
-    });
-  }
+  HEMERA_SERVICE_USER_ID: z.string().optional(),
 });
 
 type Env = z.infer<typeof EnvSchema>;
 
 function buildEnvFromProcess(): Record<string, unknown> {
-  // Use EnvSchemaBase.shape (the plain ZodObject) — EnvSchema itself is a
-  // ZodEffects wrapper after .superRefine() and does not expose .shape.
-  const schemaKeys = Object.keys(EnvSchemaBase.shape) as Array<
-    keyof typeof EnvSchemaBase.shape
+  // Pick all keys defined in the schema from process.env automatically.
+  const schemaKeys = Object.keys(EnvSchema.shape) as Array<
+    keyof typeof EnvSchema.shape
   >;
   const result: Record<string, unknown> = {};
   for (const key of schemaKeys) {

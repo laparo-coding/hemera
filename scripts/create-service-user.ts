@@ -1,8 +1,8 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 /**
  * Create Aither Service User Script
  *
- * Usage: npx tsx scripts/create-service-user.ts
+ * Usage: dotenv -e .env.local -- npx tsx scripts/create-service-user.ts
  *
  * Creates a dedicated service user in Clerk for the Aither-Hemera API integration.
  * If the user already exists, updates the publicMetadata to ensure the correct role.
@@ -19,7 +19,6 @@
  */
 
 import { createClerkClient } from '@clerk/backend';
-import { ClerkAPIResponseError } from '@clerk/shared/error';
 import * as dotenv from 'dotenv';
 import * as crypto from 'node:crypto';
 
@@ -33,9 +32,9 @@ const SERVICE_METADATA = {
   role: 'api-client',
   service: 'aither',
   description: 'Service user for Aither-Hemera API integration',
-} as const;
+};
 
-async function main(): Promise<void> {
+async function main() {
   const secretKey = process.env.CLERK_SECRET_KEY;
 
   if (!secretKey) {
@@ -44,14 +43,11 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  const clerk = createClerkClient({ secretKey });
+
   console.log(`🔍 Suche existierenden Service-User: ${SERVICE_EMAIL}\n`);
 
   try {
-    // createClerkClient innerhalb des try-Blocks, damit auch Runtime-Fehler
-    // (z.B. ungültiger Secret Key) korrekt gefangen und mit Exit-Code 2
-    // beendet werden.
-    const clerk = createClerkClient({ secretKey });
-
     // Check if user already exists
     const { data: existingUsers } = await clerk.users.getUserList({
       emailAddress: [SERVICE_EMAIL],
@@ -60,41 +56,38 @@ async function main(): Promise<void> {
 
     if (existingUsers.length > 0) {
       const user = existingUsers[0]!;
-      const currentRole =
-        typeof user.publicMetadata?.role === 'string'
-          ? user.publicMetadata.role
-          : '(keine)';
+      const currentRole = (user.publicMetadata?.role as string) || '(keine)';
 
       console.log('✅ Service-User existiert bereits:');
       console.log(`   ID:    ${user.id}`);
       console.log(`   E-Mail: ${SERVICE_EMAIL}`);
       console.log(`   Aktuelle Rolle: ${currentRole}`);
 
-      // Check if metadata update is needed
-      const currentService =
-        typeof user.publicMetadata?.service === 'string'
-          ? user.publicMetadata.service
-          : '';
-      const currentDescription =
-        typeof user.publicMetadata?.description === 'string'
-          ? user.publicMetadata.description
-          : '';
-      const needsUpdate =
-        currentRole !== SERVICE_METADATA.role ||
-        currentService !== SERVICE_METADATA.service ||
-        currentDescription !== SERVICE_METADATA.description;
-
-      if (needsUpdate) {
-        console.log('\n🔄 Aktualisiere publicMetadata...');
+      // Update metadata if role is not correct
+      if (currentRole !== SERVICE_METADATA.role) {
+        console.log('\n🔄 Aktualisiere publicMetadata auf api-client...');
         await clerk.users.updateUser(user.id, {
           publicMetadata: {
             ...user.publicMetadata,
             ...SERVICE_METADATA,
           },
         });
-        console.log('✅ Metadata aktualisiert!');
+        console.log('✅ Rolle auf api-client aktualisiert!');
       } else {
-        console.log('\n✅ Metadata ist korrekt konfiguriert.');
+        // Ensure all metadata fields are present
+        const currentService = (user.publicMetadata?.service as string) || '';
+        if (currentService !== 'aither') {
+          console.log('\n🔄 Ergänze fehlende Metadata-Felder...');
+          await clerk.users.updateUser(user.id, {
+            publicMetadata: {
+              ...user.publicMetadata,
+              ...SERVICE_METADATA,
+            },
+          });
+          console.log('✅ Metadata aktualisiert!');
+        } else {
+          console.log('\n✅ Metadata ist korrekt konfiguriert.');
+        }
       }
 
       printNextSteps(user.id);
@@ -113,7 +106,7 @@ async function main(): Promise<void> {
       firstName: SERVICE_FIRST_NAME,
       lastName: SERVICE_LAST_NAME,
       publicMetadata: SERVICE_METADATA,
-      // Skip password complexity checks (e.g. min-length rules) for service accounts
+      // Skip email verification for service accounts
       skipPasswordChecks: true,
     });
 
@@ -121,8 +114,8 @@ async function main(): Promise<void> {
     console.log(`   ID:       ${newUser.id}`);
     console.log(`   E-Mail:   ${SERVICE_EMAIL}`);
     console.log(`   Name:     ${SERVICE_FIRST_NAME} ${SERVICE_LAST_NAME}`);
-    console.log(`   Rolle:    ${SERVICE_METADATA.role}`);
-    console.log(`   Service:  ${SERVICE_METADATA.service}`);
+    console.log(`   Rolle:    api-client`);
+    console.log(`   Service:  aither`);
 
     printNextSteps(newUser.id);
   } catch (error: unknown) {
@@ -132,17 +125,32 @@ async function main(): Promise<void> {
       error instanceof Error ? error.message : 'Unbekannter Fehler';
     console.error(`   Nachricht: ${message}`);
 
-    // Handle Clerk API errors using the official error type
-    if (error instanceof ClerkAPIResponseError) {
-      console.error(`\n   HTTP Status: ${error.status}`);
+    // Handle Clerk API errors
+    if (
+      error &&
+      typeof error === 'object' &&
+      'errors' in error &&
+      Array.isArray((error as { errors: unknown[] }).errors)
+    ) {
+      const clerkErrors = (
+        error as { errors: Array<{ message?: string; code?: string; longMessage?: string }> }
+      ).errors;
       console.error('\n   Clerk API Fehler:');
-      for (const err of error.errors) {
-        const codeLabel = err.code ?? 'unbekannt';
-        const detailsLabel =
-          err.longMessage ?? err.message ?? 'keine Details';
-        console.error(`   - Code: ${codeLabel}`);
-        console.error(`     Details: ${detailsLabel}`);
+      for (const err of clerkErrors) {
+        console.error(`   - Code: ${err.code ?? 'unbekannt'}`);
+        console.error(`     Details: ${err.longMessage ?? err.message ?? 'keine Details'}`);
       }
+    }
+
+    if (
+      error &&
+      typeof error === 'object' &&
+      'status' in error &&
+      typeof (error as { status: unknown }).status === 'number'
+    ) {
+      console.error(
+        `\n   HTTP Status: ${(error as { status: number }).status}`
+      );
     }
 
     console.error('\n📝 Mögliche Ursachen:');
@@ -154,7 +162,7 @@ async function main(): Promise<void> {
   }
 }
 
-function printNextSteps(userId: string): void {
+function printNextSteps(userId: string) {
   console.log('\n' + '═'.repeat(60));
   console.log('📋 Nächste Schritte für Aither-Konfiguration:');
   console.log('═'.repeat(60));
@@ -168,14 +176,9 @@ function printNextSteps(userId: string): void {
   console.log(`   Hemera (.env.local): HEMERA_SERVICE_USER_ID=${userId}`);
   console.log('   Aither (.env.local): HEMERA_API_KEY=<dein-api-key>');
   console.log('\n4️⃣  Teste die Verbindung:');
-  const baseUrl = process.env.HEMERA_BASE_URL ?? 'https://<your-hemera-instance>';
-  console.log(`   curl -X GET ${baseUrl}/api/service/courses \\`);
+  console.log('   curl -X GET https://www.hemera.academy/api/service/courses \\');
   console.log('     -H "X-API-Key: <dein-api-key>"');
   console.log('\n' + '═'.repeat(60));
 }
 
-main().catch((err: unknown) => {
-  console.error('Unbehandelter Fehler:', err);
-  // Exit-Code 2 für unbehandelte Runtime-/Promise-Fehler (Config-Fehler verwenden 1)
-  process.exit(2);
-});
+main();
