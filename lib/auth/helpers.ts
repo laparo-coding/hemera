@@ -151,7 +151,7 @@ export async function requireAdminUser(): Promise<AdminAuthResult> {
   try {
     user = await getCurrentUser();
   } catch (authError) {
-    serverInstance.warning('getCurrentUser() fehlgeschlagen', {
+    serverInstance.error('getCurrentUser() fehlgeschlagen', {
       error: authError instanceof Error ? authError.message : 'Unknown error',
     });
   }
