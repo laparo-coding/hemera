@@ -2,7 +2,7 @@
 /**
  * Create Aither Service User Script
  *
- * Usage: dotenv -e .env.local -- npx tsx scripts/create-service-user.ts
+ * Usage: npx tsx scripts/create-service-user.ts
  *
  * Creates a dedicated service user in Clerk for the Aither-Hemera API integration.
  * If the user already exists, updates the publicMetadata to ensure the correct role.
@@ -75,8 +75,14 @@ async function main(): Promise<void> {
         typeof user.publicMetadata?.service === 'string'
           ? user.publicMetadata.service
           : '';
+      const currentDescription =
+        typeof user.publicMetadata?.description === 'string'
+          ? user.publicMetadata.description
+          : '';
       const needsUpdate =
-        currentRole !== 'api-client' || currentService !== 'aither';
+        currentRole !== SERVICE_METADATA.role ||
+        currentService !== SERVICE_METADATA.service ||
+        currentDescription !== SERVICE_METADATA.description;
 
       if (needsUpdate) {
         console.log('\n🔄 Aktualisiere publicMetadata...');
@@ -115,8 +121,8 @@ async function main(): Promise<void> {
     console.log(`   ID:       ${newUser.id}`);
     console.log(`   E-Mail:   ${SERVICE_EMAIL}`);
     console.log(`   Name:     ${SERVICE_FIRST_NAME} ${SERVICE_LAST_NAME}`);
-    console.log(`   Rolle:    api-client`);
-    console.log(`   Service:  aither`);
+    console.log(`   Rolle:    ${SERVICE_METADATA.role}`);
+    console.log(`   Service:  ${SERVICE_METADATA.service}`);
 
     printNextSteps(newUser.id);
   } catch (error: unknown) {

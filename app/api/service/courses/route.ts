@@ -1,8 +1,8 @@
-import { auth } from '@clerk/nextjs/server';
 import { CourseLevel, type Prisma } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { getUserRole } from '@/lib/auth/permissions';
+import { handleServiceAuthError } from '@/lib/auth/handle-service-auth';
+import { authenticateServiceRequest } from '@/lib/auth/service-auth';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
 import {
@@ -60,38 +60,19 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now();
 
   try {
-    // Auth check
-    const { userId } = await auth();
-    if (!userId) {
-      logger.warn('Unauthenticated request');
-      return await createServiceApiErrorResponse(
-        'Not authenticated',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
+    // Unified auth check (Clerk session or API key)
+    const authResult = await authenticateServiceRequest(request);
+
+    if ('error' in authResult) {
+      return await handleServiceAuthError(authResult, logger, requestId);
     }
 
-    // Role check
-    const role = await getUserRole();
-    if (role !== 'api-client' && role !== 'admin') {
-      logger.warn('Forbidden: insufficient permissions', {
-        userId,
-        role,
-      });
-      return await createServiceApiErrorResponse(
-        'Forbidden: api-client or admin role required',
-        ErrorCodes.FORBIDDEN,
-        requestId,
-        403,
-        userId,
-        role
-      );
-    }
+    const { userId, role, authMethod } = authResult;
 
     logger.info('Service API request authorized', {
       userId,
       role,
+      authMethod,
     });
 
     // Rate limiting check

@@ -65,10 +65,10 @@ export function handleServiceAuthError(
 
   // Exhaustive check — wird zur Compile-Zeit fehlschlagen, wenn
   // ServiceAuthError um neue Varianten erweitert wird ohne Behandlung hier.
-  const exhaustiveCheck: never = authResult;
+  const _exhaustive: never = authResult;
   let serialized: string;
   try {
-    serialized = JSON.stringify(exhaustiveCheck);
+    serialized = JSON.stringify(_exhaustive);
   } catch {
     serialized = '[nicht serialisierbar]';
   }

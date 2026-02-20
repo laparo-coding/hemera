@@ -2,6 +2,32 @@ import { clerkMiddleware } from '@clerk/nextjs/server';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+/** Max. erlaubte Länge eines API-Keys (Schutz vor überlangen Headern). */
+const MAX_API_KEY_LENGTH = 256;
+
+/**
+ * Erzeugt eine einheitliche JSON-Error-Response für den Proxy-Layer.
+ * Konsistent mit der ServiceApiErrorResponse-Struktur der Route-Handler.
+ */
+function createProxyErrorResponse(
+  status: number,
+  code: string,
+  message: string
+): NextResponse {
+  return new NextResponse(
+    JSON.stringify({
+      success: false,
+      error: { code, message },
+      meta: {
+        requestId: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        version: '1.0',
+      },
+    }),
+    { status, headers: { 'content-type': 'application/json' } }
+  );
+}
+
 // In E2E test mode, bypass Clerk middleware entirely
 const isE2EMode =
   process.env.E2E_TEST === '1' || process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
@@ -18,10 +44,57 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.redirect(new URL('/dashboard', request.url), 308);
   }
 
-  // Service API routes must always go through Clerk auth (even in E2E mode)
+  // Service-API-Routen: Duale Authentifizierung
+  // 1. API-Key (X-API-Key Header) → überspringt Clerk-Middleware, detaillierte
+  //    Validierung im Route-Handler (lib/auth/service-auth.ts)
+  // 2. Clerk Session JWT → wird über clerkMw() geprüft
+  // Beide Pfade gelten auch im E2E-/Dev-Modus.
   if (/^\/api\/service(\/|$)/.test(pathname)) {
     // Allow CORS preflight (OPTIONS) requests through without auth
     if (request.method === 'OPTIONS') {
+      return NextResponse.next();
+    }
+
+    // API-Key-basierte M2M-Authentifizierung: wenn ein X-API-Key Header
+    // vorhanden ist und ein gültiges Format hat, Clerk-Middleware überspringen.
+    // Die vollständige kryptografische Validierung erfolgt im Route-Handler.
+    const apiKey = request.headers.get('x-api-key');
+    if (apiKey) {
+      // Basisvalidierung: Key muss mindestens 32 Zeichen lang sein und
+      // darf nur druckbare ASCII-Zeichen enthalten (keine Steuerzeichen/Whitespace).
+      // Die vollständige kryptografische Validierung erfolgt im Route-Handler.
+      // Leerzeichen (\x20) sind im Regex bewusst ausgeschlossen: API-Keys mit
+      // Spaces würden Copy-&-Paste-Fehler und Header-Parsing-Probleme erzeugen.
+      if (
+        apiKey.length < 32 ||
+        apiKey.length > MAX_API_KEY_LENGTH ||
+        !/^[\x21-\x7e]+$/.test(apiKey)
+      ) {
+        // Security-Log via Rollbar (fire-and-forget, da proxy nicht async);
+        // generische Fehlermeldung nach außen (kein Leak des Format-Requirements).
+        void import('./lib/monitoring/rollbar-official')
+          .then(({ rollbar }) => {
+            rollbar.warning('[proxy] Invalid API key format rejected', {
+              length: apiKey.length,
+              pathname,
+            });
+          })
+          .catch((rollbarErr: unknown) => {
+            // Rollbar nicht verfügbar — kein throw im Request-Pfad.
+            // Im Dev-Modus strukturierte Warnung für einfacheres Debugging.
+            if (process.env.NODE_ENV !== 'production') {
+              // biome-ignore lint/suspicious/noConsole: Dev-only Rollbar diagnostic
+              console.warn(
+                JSON.stringify({
+                  context: 'proxy',
+                  msg: '[proxy] Rollbar fire-and-forget import failed',
+                  error: String(rollbarErr),
+                })
+              );
+            }
+          });
+        return createProxyErrorResponse(401, 'UNAUTHORIZED', 'Unauthorized');
+      }
       return NextResponse.next();
     }
 
@@ -30,15 +103,10 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     const cookieValue = request.headers.get('cookie');
     const hasCookie = !!cookieValue && cookieValue.trim().length > 0;
     if (!hasAuthHeader && !hasCookie) {
-      return new NextResponse(
-        JSON.stringify({
-          success: false,
-          error: {
-            code: 'UNAUTHORIZED',
-            message: 'Missing authentication token',
-          },
-        }),
-        { status: 401, headers: { 'content-type': 'application/json' } }
+      return createProxyErrorResponse(
+        401,
+        'UNAUTHORIZED',
+        'Missing authentication token'
       );
     }
 

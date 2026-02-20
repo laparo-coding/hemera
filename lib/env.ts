@@ -1,58 +1,74 @@
 import { z } from 'zod';
 
-const EnvSchema = z
-  .object({
-    NODE_ENV: z
-      .enum(['development', 'test', 'production'])
-      .default('development'),
-    NEXT_PUBLIC_APP_URL: z.string().url().optional(),
-    DATABASE_URL: z.string().optional(),
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
-    CLERK_SECRET_KEY: z.string().optional(),
-    NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default('/sign-in'),
-    NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default('/sign-up'),
-    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().default('/dashboard'),
-    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().default('/dashboard'),
-    BLOB_READ_WRITE_TOKEN: z.string().optional(),
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-    STRIPE_SECRET_KEY: z.string().optional(),
+// EnvSchemaBase is the plain ZodObject — keep a reference so `.shape` remains
+// accessible after the `.superRefine()` wrapper converts it to ZodEffects.
+const EnvSchemaBase = z.object({
+  NODE_ENV: z
+    .enum(['development', 'test', 'production'])
+    .default('development'),
+  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+  DATABASE_URL: z.string().optional(),
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
+  CLERK_SECRET_KEY: z.string().optional(),
+  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default('/sign-in'),
+  NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default('/sign-up'),
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().default('/dashboard'),
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().default('/dashboard'),
+  BLOB_READ_WRITE_TOKEN: z.string().optional(),
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+  STRIPE_SECRET_KEY: z.string().optional(),
 
-    // Service-to-service API key used for server-side M2M calls
-    HEMERA_SERVICE_API_KEY: z.string().min(16).optional(),
-    HEMERA_SERVICE_USER_ID: z.string().uuid().optional(),
+  // Context7 / Upstash
+  CONTEXT7_ENABLED: z.enum(['0', '1']).optional(),
+  CONTEXT7_API_KEY: z.string().optional(),
 
-    // Context7 / Upstash
-    CONTEXT7_ENABLED: z.enum(['0', '1']).optional(),
-    CONTEXT7_API_KEY: z.string().optional(),
+  // Rollbar monitoring (opt-in via token presence)
+  ROLLBAR_HEMERA_SERVER_TOKEN: z.string().optional(),
+  NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN: z.string().optional(),
+  ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
+  NEXT_PUBLIC_ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
 
-    // Rollbar monitoring (opt-in via token presence)
-    ROLLBAR_HEMERA_SERVER_TOKEN: z.string().optional(),
-    NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN: z.string().optional(),
-    ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
-    NEXT_PUBLIC_ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
+  // Upstash Redis rate limiting (opt-in via UPSTASH_ENABLED=1)
+  UPSTASH_ENABLED: z.enum(['0', '1']).optional(),
+  UPSTASH_REDIS_REST_URL: z.string().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
 
-    // Upstash Redis rate limiting (opt-in via UPSTASH_ENABLED=1)
-    UPSTASH_ENABLED: z.enum(['0', '1']).optional(),
-    UPSTASH_REDIS_REST_URL: z.string().optional(),
-    UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
-  })
-  .refine(
-    data =>
-      (data.HEMERA_SERVICE_API_KEY && data.HEMERA_SERVICE_USER_ID) ||
-      (!data.HEMERA_SERVICE_API_KEY && !data.HEMERA_SERVICE_USER_ID),
-    {
+  // Service API (M2M) auth — API-Key-basierte Authentifizierung für aither
+  HEMERA_SERVICE_API_KEY: z.string().min(32).optional(),
+  HEMERA_SERVICE_USER_ID: z
+    .string()
+    .startsWith('user_', {
       message:
-        'HEMERA_SERVICE_API_KEY and HEMERA_SERVICE_USER_ID must be both set or both undefined',
-      path: ['HEMERA_SERVICE_API_KEY', 'HEMERA_SERVICE_USER_ID'],
-    }
-  );
+        'HEMERA_SERVICE_USER_ID muss mit "user_" beginnen (Clerk User-ID-Format)',
+    })
+    .optional(),
+});
+
+// EnvSchema extends the base with a cross-field constraint: both API key vars
+// must be set together (or both absent) — this superRefine returns ZodEffects
+// which has no .shape, hence the separate EnvSchemaBase above.
+const EnvSchema = EnvSchemaBase.superRefine((data, ctx) => {
+  const hasKey = !!data.HEMERA_SERVICE_API_KEY;
+  const hasUser = !!data.HEMERA_SERVICE_USER_ID;
+  if (hasKey !== hasUser) {
+    const missing = hasKey
+      ? 'HEMERA_SERVICE_USER_ID'
+      : 'HEMERA_SERVICE_API_KEY';
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `HEMERA_SERVICE_API_KEY und HEMERA_SERVICE_USER_ID müssen beide gesetzt oder beide leer sein (fehlt: ${missing})`,
+      path: [missing],
+    });
+  }
+});
 
 type Env = z.infer<typeof EnvSchema>;
 
 function buildEnvFromProcess(): Record<string, unknown> {
-  // Pick all keys defined in the schema from process.env automatically.
-  const schemaKeys = Object.keys(EnvSchema.shape) as Array<
-    keyof typeof EnvSchema.shape
+  // Use EnvSchemaBase.shape (the plain ZodObject) — EnvSchema itself is a
+  // ZodEffects wrapper after .superRefine() and does not expose .shape.
+  const schemaKeys = Object.keys(EnvSchemaBase.shape) as Array<
+    keyof typeof EnvSchemaBase.shape
   >;
   const result: Record<string, unknown> = {};
   for (const key of schemaKeys) {
