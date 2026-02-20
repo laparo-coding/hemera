@@ -11,9 +11,7 @@
  * - Der zugehörige Service-User-ID wird über `HEMERA_SERVICE_USER_ID` aufgelöst
  */
 
-import { createHash, timingSafeEqual } from 'node:crypto';
-import { env } from '@/lib/env';
-import { reportError } from '@/lib/monitoring/rollbar-official';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { UserRole } from './permissions';
 
 export interface ServiceApiKeyResult {
@@ -28,28 +26,23 @@ export interface ServiceApiKeyResult {
 export function validateServiceApiKey(
   apiKey: string | null
 ): ServiceApiKeyResult | null {
-  if (!apiKey) return null;
+  if (!apiKey || apiKey.length < 32 || apiKey.length > 256) return null;
 
-  // Use the validated env object so the Zod cross-field constraint (both-or-neither)
-  // is enforced and avoids direct process.env bypassing the validation.
-  const expectedKey = env.HEMERA_SERVICE_API_KEY;
-  const serviceUserId = env.HEMERA_SERVICE_USER_ID;
+  const expectedKey = process.env.HEMERA_SERVICE_API_KEY;
+  const serviceUserId = process.env.HEMERA_SERVICE_USER_ID;
 
   if (!expectedKey || !serviceUserId) {
-    reportError(new Error('Service API key configuration missing'), {
-      additionalData: {
-        hasExpectedKey: !!expectedKey,
-        hasServiceUserId: !!serviceUserId,
-        nodeEnv: env.NODE_ENV,
-      },
-    });
     return null;
   }
 
-  // Timing-sichere Prüfung: beide Keys werden zu SHA-256-Hashes normalisiert
-  // und dann verglichen, um Timing-Angriffe + Length-Leaks zu vermeiden.
-  const hashA = createHash('sha256').update(apiKey).digest();
-  const hashB = createHash('sha256').update(expectedKey).digest();
+  // Timing-sichere Prüfung: beide Keys werden gehasht und dann verglichen,
+  // um Timing-Angriffe + Length-Leaks zu vermeiden
+  const hashA = createHmac('sha256', 'hemera-service-api')
+    .update(apiKey)
+    .digest();
+  const hashB = createHmac('sha256', 'hemera-service-api')
+    .update(expectedKey)
+    .digest();
 
   if (!timingSafeEqual(hashA, hashB)) {
     return null;
@@ -57,7 +50,7 @@ export function validateServiceApiKey(
 
   return {
     userId: serviceUserId,
-    role: 'api-client' satisfies UserRole,
+    role: 'api-client' as UserRole,
   };
 }
 
