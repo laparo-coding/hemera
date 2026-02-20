@@ -21,11 +21,31 @@ jest.mock('@/lib/db/prisma', () => ({
   prisma: mockPrisma,
 }));
 
-// Mock Clerk auth
-const mockAuth = jest.fn();
-jest.mock('@clerk/nextjs/server', () => ({
-  auth: () => mockAuth(),
+// Mock Auth helpers — routes use requireAdminUser() from @/lib/auth/helpers
+const mockRequireAdminUser = jest.fn();
+jest.mock('@/lib/auth/helpers', () => ({
+  requireAdminUser: () => mockRequireAdminUser(),
 }));
+
+// Helpers for setting auth mock state
+function mockUnauthenticated() {
+  mockRequireAdminUser.mockResolvedValue({
+    authorized: false,
+    userId: null,
+    response: NextResponse.json(
+      { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
+      { status: 401 }
+    ),
+  });
+}
+
+function mockAuthenticatedAdmin(userId = 'admin_123') {
+  mockRequireAdminUser.mockResolvedValue({
+    authorized: true,
+    userId,
+    user: { id: userId, publicMetadata: { role: 'admin' } },
+  });
+}
 
 // Mock Vercel Blob
 const mockPut = jest.fn();
@@ -46,7 +66,7 @@ jest.mock('@/lib/monitoring/rollbar-official', () => ({
   },
 }));
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { GET as GET_CONTENT } from '@/app/api/admin/course-material/[id]/content/route';
 import {
   DELETE,
@@ -65,7 +85,7 @@ describe('GET /api/admin/course-material', () => {
   });
 
   it('returns 401 for unauthenticated request', async () => {
-    mockAuth.mockResolvedValue({ userId: null });
+    mockUnauthenticated();
 
     const response = await GET();
     const json = await response.json();
@@ -75,7 +95,7 @@ describe('GET /api/admin/course-material', () => {
   });
 
   it('returns materials list for authenticated request', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findMany.mockResolvedValue([
       {
         id: 'mat_1',
@@ -100,7 +120,7 @@ describe('GET /api/admin/course-material', () => {
   });
 
   it('returns empty list when no materials exist', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findMany.mockResolvedValue([]);
 
     const _request = new NextRequest(
@@ -120,7 +140,7 @@ describe('POST /api/admin/course-material', () => {
   });
 
   it('returns 401 for unauthenticated request', async () => {
-    mockAuth.mockResolvedValue({ userId: null });
+    mockUnauthenticated();
 
     const request = new NextRequest(
       'http://localhost/api/admin/course-material',
@@ -137,7 +157,7 @@ describe('POST /api/admin/course-material', () => {
   });
 
   it('returns 400 for missing required fields', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
 
     const request = new NextRequest(
       'http://localhost/api/admin/course-material',
@@ -154,7 +174,7 @@ describe('POST /api/admin/course-material', () => {
   });
 
   it('creates material and uploads to blob', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     // isIdentifierTaken uses findUnique - return null for "not taken"
     mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
     mockPut.mockResolvedValue({
@@ -195,7 +215,7 @@ describe('POST /api/admin/course-material', () => {
   });
 
   it('returns 409 for duplicate identifier', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     // isIdentifierTaken uses findUnique with { where: { identifier } }
     mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'existing',
@@ -227,7 +247,7 @@ describe('GET /api/admin/course-material/[id]', () => {
   });
 
   it('returns 401 for unauthenticated request', async () => {
-    mockAuth.mockResolvedValue({ userId: null });
+    mockUnauthenticated();
 
     const request = new NextRequest(
       'http://localhost/api/admin/course-material/mat_1'
@@ -242,7 +262,7 @@ describe('GET /api/admin/course-material/[id]', () => {
   });
 
   it('returns 404 for non-existent material', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest(
@@ -258,7 +278,7 @@ describe('GET /api/admin/course-material/[id]', () => {
   });
 
   it('returns material for valid id', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
@@ -289,7 +309,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
   });
 
   it('returns 401 for unauthenticated request', async () => {
-    mockAuth.mockResolvedValue({ userId: null });
+    mockUnauthenticated();
 
     const request = new NextRequest(
       'http://localhost/api/admin/course-material/mat_1',
@@ -306,7 +326,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
   });
 
   it('returns 404 for non-existent material', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest(
@@ -324,7 +344,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
   });
 
   it('updates material title', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
@@ -359,7 +379,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
   });
 
   it('uploads new content when htmlContent provided', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
@@ -397,7 +417,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
   });
 
   it('returns 400 for empty update payload', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
@@ -430,7 +450,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
   });
 
   it('returns 401 for unauthenticated request', async () => {
-    mockAuth.mockResolvedValue({ userId: null });
+    mockUnauthenticated();
 
     const request = new NextRequest(
       'http://localhost/api/admin/course-material/mat_1',
@@ -446,7 +466,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
   });
 
   it('returns 404 for non-existent material', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest(
@@ -463,7 +483,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
   });
 
   it('deletes material and blob file', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
@@ -500,7 +520,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
   });
 
   it('returns 401 for unauthenticated request', async () => {
-    mockAuth.mockResolvedValue({ userId: null });
+    mockUnauthenticated();
 
     const request = new NextRequest(
       'http://localhost/api/admin/course-material/mat_1/content'
@@ -515,7 +535,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
   });
 
   it('returns 404 for non-existent material', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue(null);
 
     const request = new NextRequest(
@@ -531,7 +551,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
   });
 
   it('fetches and returns HTML content from blob', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPrisma.courseMaterial.findUnique.mockResolvedValue({
       id: 'mat_1',
       identifier: 'test-material',
@@ -573,7 +593,7 @@ describe('POST /api/admin/course-material/images', () => {
   });
 
   it('returns 401 for unauthenticated request', async () => {
-    mockAuth.mockResolvedValue({ userId: null });
+    mockUnauthenticated();
 
     const formData = new FormData();
     formData.append(
@@ -594,7 +614,7 @@ describe('POST /api/admin/course-material/images', () => {
   });
 
   it('returns 400 for missing file', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
 
     const formData = new FormData();
 
@@ -610,7 +630,7 @@ describe('POST /api/admin/course-material/images', () => {
   });
 
   it('returns 400 for invalid file type', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
 
     const formData = new FormData();
     formData.append(
@@ -631,7 +651,7 @@ describe('POST /api/admin/course-material/images', () => {
   });
 
   it('uploads image and returns URL', async () => {
-    mockAuth.mockResolvedValue({ userId: 'admin_123' });
+    mockAuthenticatedAdmin();
     mockPut.mockResolvedValue({
       url: 'https://blob.vercel-storage.com/course-material/images/123-abc.jpg',
       pathname: 'course-material/images/123-abc.jpg',

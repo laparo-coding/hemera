@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Admin authorization check
-    const isAdmin = await checkUserAdminStatus(userId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       const errorResponse = createErrorResponse(
         'Admin privileges required',

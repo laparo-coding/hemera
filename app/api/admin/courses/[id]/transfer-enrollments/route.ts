@@ -45,7 +45,7 @@ async function checkAdminAuth(requestId: string) {
     };
   }
 
-  const isAdmin = await checkUserAdminStatus(userId);
+  const isAdmin = await checkUserAdminStatus();
   if (!isAdmin) {
     return {
       error: createErrorResponse(

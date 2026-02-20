@@ -1,5 +1,3 @@
-// biome-ignore assist/source/organizeImports: Clerk auth must be imported first for proper Next.js initialization
-import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -8,14 +6,14 @@ import {
   getAllMaterials,
   isIdentifierTaken,
 } from '@/lib/api/course-material';
-import { isAdmin } from '@/lib/auth/helpers';
+import { requireAdminUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import {
+  courseMaterialCreateSchema,
+  generateSlug,
+} from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
-import {
-  generateSlug,
-  courseMaterialCreateSchema,
-} from '@/lib/schemas/admin/course-material';
 
 /**
  * GET /api/admin/course-material
@@ -23,22 +21,8 @@ import {
  */
 export async function GET() {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
-        { status: 401 }
-      );
-    }
-
-    const adminCheck = await isAdmin();
-    if (!adminCheck) {
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
+    const auth = await requireAdminUser();
+    if (!auth.authorized) return auth.response;
 
     const materials = await getAllMaterials();
 
@@ -70,26 +54,11 @@ export async function GET() {
  * Create a new course material
  */
 export async function POST(request: NextRequest) {
+  let userId: string | null = null;
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          error: 'unauthorized',
-          message: 'Authentifizierung erforderlich',
-        },
-        { status: 401 }
-      );
-    }
-
-    const adminCheck = await isAdmin();
-    if (!adminCheck) {
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
+    const auth = await requireAdminUser();
+    if (!auth.authorized) return auth.response;
+    userId = auth.userId;
 
     let body;
     try {
@@ -229,13 +198,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    let auditUserId = 'unknown';
-    try {
-      const { userId } = await auth();
-      if (userId) auditUserId = userId;
-    } catch {
-      // Auth failed, use 'unknown'
-    }
+    const auditUserId = userId ?? 'unknown';
     logAuditEvent(
       'COURSE_MATERIAL_CREATE',
       auditUserId,
