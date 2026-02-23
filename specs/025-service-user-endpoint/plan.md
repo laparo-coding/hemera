@@ -16,9 +16,9 @@ This feature will be implemented in phases to ensure security, testability, and 
 4. Create `/api/service/participations/[id]/result/route.ts` (PUT)
 
 ### Phase 3: Security & Monitoring
-1. Implement distributed rate limiting middleware (Upstash/Vercel KV/Redis)
-2. Add audit logging for service calls (Prisma `ApiLog` model + `lib/logging/audit.ts`)
-3. Update Rollbar error tracking and monitoring alerts
+1. Implement rate limiting middleware
+2. Add audit logging for service calls
+3. Update Rollbar error tracking
 
 ### Phase 4: Testing & Documentation
 1. Write contract tests for all endpoints
@@ -37,11 +37,8 @@ This feature will be implemented in phases to ensure security, testability, and 
 | `app/api/service/courses/[id]/route.ts` | Course details endpoint |
 | `app/api/service/participations/[id]/route.ts` | Participation details endpoint |
 | `app/api/service/participations/[id]/result/route.ts` | Update participation result |
-| `lib/middleware/rate-limit.ts` | Rate limiting middleware (distributed store-backed) |
+| `lib/middleware/rate-limit.ts` | Rate limiting middleware |
 | `tests/contracts/service-api.spec.ts` | Contract tests for service endpoints |
-| `lib/validation/service-api-schemas.ts` | Zod schemas for request/response validation of service APIs |
-| `types/service-api.ts` | Shared TypeScript types for service API contracts |
-| `middleware.ts` | Next.js middleware configuration for CORS / service API policies |
 
 ### Modified Files
 
@@ -171,15 +168,17 @@ This feature will be implemented in phases to ensure security, testability, and 
 
 ### Implementation Options
 
-**Option A: Distributed Rate Limiter (Recommended for Production / Serverless)**
-- Use a distributed store for counters (Vercel KV, Upstash Redis, or self-hosted Redis) instead of an in-memory Map. This ensures correctness across serverless instances and restarts.
-- Use atomic increment/check operations (Redis INCR + EXPIRE or Upstash/RateLimit libraries that support sliding windows) to maintain counters and TTLs.
-- Integration options: `@upstash/ratelimit` with Upstash Redis, `vercel/kv` for Vercel KV, or a Redis client with Lua script for atomic token-bucket semantics.
+**Option A: In-Memory Rate Limiter (Recommended for MVP)**
+- Use `Map<userId, { count: number, resetAt: Date }>`
+- Simple, no external dependencies
+- Resets on server restart (acceptable for MVP)
 
-**Option B: In-Memory Rate Limiter (Local / Development Only)**
-- Use `Map<userId, { count: number, resetAt: Date }>` for local development/testing only. Not suitable for serverless/production.
+**Option B: Redis-based Rate Limiter (Future Enhancement)**
+- Persistent across server restarts
+- Distributed rate limiting for multi-instance deployments
+- Requires Redis setup
 
-**Decision:** Use a distributed rate limiter (Option A). Provide an in-memory fallback for local dev/testing.
+**Decision:** Start with Option A, migrate to Option B if needed.
 
 ### Rate Limit Configuration
 
@@ -204,10 +203,10 @@ const RATE_LIMITS = {
 
 | Status | Error Code | Description |
 |--------|------------|-------------|
-| 401 | `UNAUTHORIZED` | No valid JWT token provided |
+| 401 | `AUTH_REQUIRED` | No valid JWT token provided |
 | 403 | `FORBIDDEN` | User role not authorized for this endpoint |
 | 404 | `NOT_FOUND` | Resource (course/participation) not found |
-| 429 | `RATE_LIMITED` | Too many requests |
+| 429 | `RATE_LIMIT_EXCEEDED` | Too many requests |
 | 500 | `INTERNAL_ERROR` | Server error (logged to Rollbar) |
 
 ### Error Response Format
@@ -253,12 +252,6 @@ const RATE_LIMITS = {
 - [ ] Monitor Rollbar for errors
 - [ ] Update API documentation
 - [ ] Share service user credentials with Aither team (securely)
-
-Security additions:
-- [ ] Define an API key / service credential rotation strategy (e.g., rotate service credentials every 90 days); document the rotation process and CI/deployment steps to roll keys.
-- [ ] Use secure credential sharing tools (1Password, HashiCorp Vault, or platform secrets) and forbid plaintext sharing of credentials in chat/email.
-- [ ] Consider IP whitelisting for MVP (documented as an optional hardening step); reference future enhancement notes for production IP restrictions and Edge Middleware.
-- [ ] Configure Rollbar alerts for unusual API usage patterns and rate-limit breach notifications.
 
 ---
 
