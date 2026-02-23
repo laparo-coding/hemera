@@ -64,7 +64,7 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   }
 
   // Admin authorization check
-  const isAdmin = await checkUserAdminStatus(userId);
+  const isAdmin = await checkUserAdminStatus();
   if (!isAdmin) {
     const errorResponse = createErrorResponse(
       'Admin privileges required',
@@ -161,7 +161,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   }
 
   // Admin authorization check
-  const isAdmin = await checkUserAdminStatus(userId);
+  const isAdmin = await checkUserAdminStatus();
   if (!isAdmin) {
     const errorResponse = createErrorResponse(
       'Admin privileges required',

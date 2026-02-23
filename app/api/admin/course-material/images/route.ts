@@ -6,11 +6,10 @@
  * Uploads to Vercel Blob and returns public CDN URL
  */
 
-import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { isAdmin } from '@/lib/auth/helpers';
+import { requireAdminUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { validateImageFile } from '@/lib/utils/file-validator';
@@ -25,29 +24,12 @@ const ALLOWED_IMAGE_TYPES = [
 const MAX_FILE_SIZE = 4.4 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
+  const requestId = request.headers.get('x-request-id') || crypto.randomUUID();
+  let userId: string | null = null;
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          error: 'unauthorized',
-          message: 'Authentifizierung erforderlich',
-        },
-        { status: 401 }
-      );
-    }
-
-    const adminCheck = await isAdmin();
-    if (!adminCheck) {
-      logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
-        error: 'Insufficient permissions',
-      });
-      return NextResponse.json(
-        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
-        { status: 403 }
-      );
-    }
+    const auth = await requireAdminUser();
+    if (!auth.authorized) return auth.response;
+    userId = auth.userId;
 
     let formData: FormData;
     try {
@@ -71,6 +53,7 @@ export async function POST(request: NextRequest) {
     if (file.size > MAX_FILE_SIZE) {
       logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
         error: `File size ${file.size} exceeds limit ${MAX_FILE_SIZE}`,
+        details: { requestId },
       });
       return NextResponse.json(
         {
@@ -86,6 +69,7 @@ export async function POST(request: NextRequest) {
     if (!validation.valid) {
       logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
         error: validation.error,
+        details: { requestId },
       });
       return NextResponse.json(
         {
@@ -121,8 +105,10 @@ export async function POST(request: NextRequest) {
     } catch (blobError) {
       logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
         error: `Blob upload failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`,
+        details: { requestId },
       });
       serverInstance.error('Image blob upload failed', {
+        requestId,
         filename,
         fileSize: file.size,
         error: blobError instanceof Error ? blobError.message : 'Unknown error',
@@ -137,22 +123,18 @@ export async function POST(request: NextRequest) {
     }
 
     logAuditEvent('IMAGE_UPLOAD', userId, blob.url, 'image', 'success', {
-      details: { filename, sizeBytes: file.size },
+      details: { requestId, filename, sizeBytes: file.size },
     });
 
     return NextResponse.json({ url: blob.url }, { status: 200 });
   } catch (error) {
-    let auditUserId = 'unknown';
-    try {
-      const { userId } = await auth();
-      if (userId) auditUserId = userId;
-    } catch {
-      // Auth failed, use 'unknown'
-    }
+    const auditUserId = userId ?? 'unknown';
     logAuditEvent('IMAGE_UPLOAD', auditUserId, undefined, 'image', 'failure', {
       error: error instanceof Error ? error.message : 'Unknown error',
+      details: { requestId },
     });
     serverInstance.error('Failed to upload image', {
+      requestId,
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(

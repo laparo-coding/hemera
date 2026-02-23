@@ -98,7 +98,7 @@ export function createAdminHandler(
       }
 
       // Admin authorization check
-      const isAdmin = await checkUserAdminStatus(userId);
+      const isAdmin = await checkUserAdminStatus();
       if (!isAdmin) {
         return withCors(
           createErrorResponse(

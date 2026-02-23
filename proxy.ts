@@ -18,12 +18,48 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.redirect(new URL('/dashboard', request.url), 308);
   }
 
-  // In E2E mode bypass Clerk to reduce flakiness
+  // Service API routes must always go through auth (even in E2E mode)
+  if (/^\/api\/service(\/|$)/.test(pathname)) {
+    // Allow CORS preflight (OPTIONS) requests through without auth
+    if (request.method === 'OPTIONS') {
+      return NextResponse.next();
+    }
+
+    // API-Key-basierte M2M-Authentifizierung: wenn ein X-API-Key Header
+    // vorhanden ist, Clerk-Middleware überspringen und den Request direkt
+    // durchlassen. Die Validierung erfolgt im Route-Handler.
+    const hasApiKey = !!request.headers.get('x-api-key');
+    if (hasApiKey) {
+      return NextResponse.next();
+    }
+
+    // Fail fast if request has no auth header and no cookies at all
+    const hasAuthHeader = !!request.headers.get('authorization');
+    const cookieValue = request.headers.get('cookie');
+    const hasCookie = !!cookieValue && cookieValue.trim().length > 0;
+    if (!hasAuthHeader && !hasCookie) {
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Missing authentication token',
+          },
+        }),
+        { status: 401, headers: { 'content-type': 'application/json' } }
+      );
+    }
+
+    // Delegate to Clerk middleware for auth handling
+    return clerkMw(request, event);
+  }
+
+  // In E2E mode bypass Clerk to reduce flakiness for non-service routes
   if (isE2EMode) {
     return NextResponse.next();
   }
 
-  // Delegate to Clerk middleware for auth handling
+  // Delegate to Clerk middleware for auth handling for all other matched routes
   return clerkMw(request, event);
 }
 

@@ -24,6 +24,11 @@ import {
 } from '../../schemas/admin/course';
 import type { AdminOperationResult } from '../../types/admin';
 
+/** Default course duration in hours when none is specified */
+const DEFAULT_DURATION_HOURS = 4;
+/** Milliseconds per hour */
+const MS_PER_HOUR = 3_600_000;
+
 /**
  * Check if current user has admin role
  */
@@ -56,8 +61,27 @@ export async function createCourseAction(
     // Validate input
     const validatedData = courseCreateSchema.parse(formData);
 
+    // Ensure required database shape: `createCourse` expects a non-null
+    // `startDate` (Date). The Zod schema allows `startDate` optional/null;
+    // if missing we default it to the `startTime` date so the DB has a valid
+    // start date component. Use the exact parameter type expected by
+    // `courseDb.createCourse` to avoid `any` assertions.
+    type CreateCoursePayload = Parameters<typeof courseDb.createCourse>[0];
+    const createPayload: CreateCoursePayload = {
+      ...validatedData,
+      startDate: validatedData.startDate ?? validatedData.startTime,
+      // Default endTime: startTime + duration hours (guard against zero duration)
+      endTime:
+        validatedData.endTime ??
+        new Date(
+          validatedData.startTime.getTime() +
+            Math.max(validatedData.duration ?? DEFAULT_DURATION_HOURS, 1) *
+              MS_PER_HOUR
+        ),
+    };
+
     // Create course
-    const course = await courseDb.createCourse(validatedData);
+    const course = await courseDb.createCourse(createPayload);
 
     // Log success
     rollbar.info('Course created by admin', {

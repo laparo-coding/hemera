@@ -394,9 +394,8 @@ test.describe('Checkout Flow E2E', () => {
       });
 
       // DO NOT fill payment form or submit - just verify UI
-      console.log(
-        '✅ Production checkout UI validated - no transaction attempted'
-      );
+      // console.log entfernt (Lint-Regel):
+      // ✅ Production checkout UI validated - no transaction attempted
     });
   });
 });
@@ -480,7 +479,8 @@ async function fillStripeAddressIfVisible(page: Page): Promise<void> {
     }
   } catch {
     // Address element may not be required
-    console.log('Address element not visible or not required');
+    // console.log entfernt (Lint-Regel):
+    // Address element not visible or not required
   }
 }
 

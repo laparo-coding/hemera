@@ -20,7 +20,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const isAdmin = await checkUserAdminStatus(currentUserId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Admin privileges required' },
@@ -73,7 +73,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const isAdmin = await checkUserAdminStatus(currentUserId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Admin privileges required' },
@@ -161,7 +161,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const isAdmin = await checkUserAdminStatus(currentUserId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Admin privileges required' },

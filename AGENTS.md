@@ -256,7 +256,9 @@ E2E_TEST=0|1  # toggles mocks/fixtures for tests
 
 ### 🔒 Security Considerations
 
-- Sensitive env files (`.env*`) are ignored—never commit secrets.
+- Sensitive env files (real secret-bearing files like `.env.local`, `.env.production`, `.env`) are ignored and must never contain real secrets committed to the repository. Example/placeholder files that contain NO real secrets (for example `.env.example` or `.env.local.example`) are allowed to be committed and should contain only placeholder values or explanatory comments.
+  - Do not commit real tokens, private keys, or credentials in any `.env*` file.
+  - Use committed example files to document required variables and formats only (placeholders or commented guidance).
 - Stripe + Clerk secrets must be present before running DB migrations or E2E flows; `scripts/db-*`
   guard destructive commands (`db:reset` disabled by default).
 - Request logging assigns IDs (`lib/utils/request-id.ts`) so correlate API + frontend traces without

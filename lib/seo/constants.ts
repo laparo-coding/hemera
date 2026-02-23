@@ -32,7 +32,7 @@ export const SEO_DEFAULTS = {
   },
   description: {
     default:
-      'Gehaltsgespräche sind notwendig, um Arbeisleistung und finazielle Anerkennung immer wieder in Einklang zu bringen',
+      'Gehaltsgespräche sind notwendig, um Arbeitsleistung und finanzielle Anerkennung immer wieder in Einklang zu bringen',
     maxLength: 160,
   },
   keywords: [

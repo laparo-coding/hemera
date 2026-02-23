@@ -18,7 +18,8 @@ export class AuthHelper {
    * Prepare a clean authentication state by clearing cookies and storage
    */
   async prepareCleanAuthState(): Promise<void> {
-    console.log('🧹 Preparing clean auth state...');
+    // console.log entfernt (Lint-Regel):
+    // 🧹 Preparing clean auth state...
 
     // Clear cookies first
     await this.page.context().clearCookies();
@@ -32,20 +33,17 @@ export class AuthHelper {
             localStorage.clear();
             sessionStorage.clear();
           } catch (e: unknown) {
-            console.warn(
-              'Could not clear storage:',
-              e instanceof Error ? e.message : String(e)
-            );
+            // console.warn entfernt (Lint-Regel):
+            // Could not clear storage: e instanceof Error ? e.message : String(e)
           }
         });
       }
-      console.log('✅ Cookies and storage cleared for clean auth state');
+      // console.log entfernt (Lint-Regel):
+      // ✅ Cookies and storage cleared for clean auth state
     } catch (e: unknown) {
-      console.log(
-        '⚠️ Could not clear local/session storage:',
-        e instanceof Error ? e.message : String(e)
-      );
-      console.log('✅ Cookies cleared successfully');
+      // console.log entfernt (Lint-Regel):
+      // ⚠️ Could not clear local/session storage: e instanceof Error ? e.message : String(e)
+      // ✅ Cookies cleared successfully
     }
   }
 
@@ -67,9 +65,8 @@ export class AuthHelper {
     email: string,
     role: string = 'user'
   ): Promise<void> {
-    console.log(
-      `🎭 Mocking authentication in CI for: ${email} with role: ${role}`
-    );
+    // console.log entfernt (Lint-Regel):
+    // 🎭 Mocking authentication in CI for: ${email} with role: ${role}
 
     // Set mock authentication cookies/localStorage
     await this.page.addInitScript(
@@ -96,8 +93,8 @@ export class AuthHelper {
       },
       { email, role }
     );
-
-    console.log('✅ Mock authentication set up for CI');
+    // console.log entfernt (Lint-Regel):
+    // ✅ Mock authentication set up for CI
   }
 
   /**
@@ -122,27 +119,30 @@ export class AuthHelper {
     await this.prepareCleanAuthState();
 
     // Navigate to sign-in page with increased timeout and retry logic
-    console.log(`🔐 Signing in with email: ${email}`);
+    // console.log entfernt (Lint-Regel):
+    // 🔐 Signing in with email: ${email}
 
     try {
       await this.page.goto('/sign-in', {
         waitUntil: 'domcontentloaded',
         timeout: 30000, // Reduced timeout for faster failure detection
       });
-      console.log(`� Navigated to sign-in page: ${this.page.url()}`);
+      // console.log entfernt (Lint-Regel):
+      // Navigated to sign-in page: ${this.page.url()}
     } catch (_error) {
-      console.log('⚠️ First navigation attempt failed, retrying...');
+      // console.log entfernt (Lint-Regel):
+      // ⚠️ First navigation attempt failed, retrying...
       await this.page.waitForTimeout(2000);
       try {
         await this.page.goto('/sign-in', {
           waitUntil: 'domcontentloaded',
           timeout: 30000, // Reduced timeout
         });
-        console.log(`📍 Retry navigation successful: ${this.page.url()}`);
+        // console.log entfernt (Lint-Regel):
+        // 📍 Retry navigation successful: ${this.page.url()}
       } catch (_retryError) {
-        console.log(
-          '❌ Navigation failed completely, proceeding with current page'
-        );
+        // console.log entfernt (Lint-Regel):
+        // ❌ Navigation failed completely, proceeding with current page
         // Continue with current page state instead of failing
       }
     }
@@ -153,9 +153,8 @@ export class AuthHelper {
       !currentUrl.includes('/sign-in') &&
       !currentUrl.includes('about:blank')
     ) {
-      console.log(
-        `📍 Current page is not sign-in page: ${currentUrl}, proceeding...`
-      );
+      // console.log entfernt (Lint-Regel):
+      // 📍 Current page is not sign-in page: ${currentUrl}, proceeding...
     }
 
     // Wait for Clerk sign-in form to be visible with multiple fallback selectors
@@ -174,16 +173,19 @@ export class AuthHelper {
           state: 'visible',
           timeout: 10000,
         });
-        console.log(`✅ Sign-in form found with selector: ${selector}`);
+        // console.log entfernt (Lint-Regel):
+        // ✅ Sign-in form found with selector: ${selector}
         signInFormFound = true;
         break;
       } catch (_e) {
-        console.log(`⚠️ Selector ${selector} not found, trying next...`);
+        // console.log entfernt (Lint-Regel):
+        // ⚠️ Selector ${selector} not found, trying next...
       }
     }
 
     if (!signInFormFound) {
-      console.log('❌ No sign-in form found, taking screenshot for debugging');
+      // console.log entfernt (Lint-Regel):
+      // ❌ No sign-in form found, taking screenshot for debugging
       await this.page.screenshot({ path: 'debug-signin-form-not-found.png' });
       throw new Error('Sign-in form not found with any selector');
     }
@@ -194,11 +196,11 @@ export class AuthHelper {
         timeout: 10000,
       });
       await this.page.fill('input[name="identifier"]', email);
-      console.log(`📧 Email filled: ${email}`);
+      // console.log entfernt (Lint-Regel):
+      // 📧 Email filled: ${email}
     } catch (_e) {
-      console.log(
-        '⚠️ Standard email field not found, trying alternative selectors...'
-      );
+      // console.log entfernt (Lint-Regel):
+      // ⚠️ Standard email field not found, trying alternative selectors...
       const emailSelectors = [
         'input[type="email"]',
         'input[placeholder*="email" i]',
@@ -211,11 +213,13 @@ export class AuthHelper {
         try {
           await this.page.waitForSelector(selector, { timeout: 5000 });
           await this.page.fill(selector, email);
-          console.log(`📧 Email filled with selector: ${selector}`);
+          // console.log entfernt (Lint-Regel):
+          // 📧 Email filled with selector: ${selector}
           emailFilled = true;
           break;
         } catch (_e) {
-          console.log(`⚠️ Email selector ${selector} failed`);
+          // console.log entfernt (Lint-Regel):
+          // ⚠️ Email selector ${selector} failed
         }
       }
 
@@ -254,7 +258,8 @@ export class AuthHelper {
         const btn = this.page.locator(selector).first();
         if (await btn.isVisible({ timeout: 2000 })) {
           await btn.click();
-          console.log(`🔘 Clicked primary form button with: ${selector}`);
+          // console.log entfernt (Lint-Regel):
+          // 🔘 Clicked primary form button with: ${selector}
           buttonClicked = true;
           break;
         }
@@ -268,10 +273,12 @@ export class AuthHelper {
       try {
         const anySubmit = this.page.locator('button[type="submit"]').first();
         await anySubmit.click({ force: true });
-        console.log('🔘 Forced click on submit button');
+        // console.log entfernt (Lint-Regel):
+        // 🔘 Forced click on submit button
         buttonClicked = true;
       } catch {
-        console.log('❌ No clickable submit button found');
+        // console.log entfernt (Lint-Regel):
+        // ❌ No clickable submit button found
       }
     }
 
@@ -289,13 +296,13 @@ export class AuthHelper {
         }
       );
     } catch {
-      console.log(
-        '⚠️ Password field still disabled, trying to proceed anyway...'
-      );
+      // console.log entfernt (Lint-Regel):
+      // ⚠️ Password field still disabled, trying to proceed anyway...
     }
 
     await this.page.fill('input[name="password"]', password);
-    console.log('🔑 Password filled');
+    // console.log entfernt (Lint-Regel):
+    // 🔑 Password filled
 
     // Click sign in button with improved selector logic
     buttonClicked = false;
@@ -313,7 +320,8 @@ export class AuthHelper {
         const btn = this.page.locator(selector).first();
         if (await btn.isVisible({ timeout: 3000 })) {
           await btn.click();
-          console.log(`🔘 Clicked final submit button with: ${selector}`);
+          // console.log entfernt (Lint-Regel):
+          // 🔘 Clicked final submit button with: ${selector}
           buttonClicked = true;
           break;
         }
@@ -329,7 +337,8 @@ export class AuthHelper {
           'button[data-localization-key="formButtonPrimary"]:not([aria-hidden="true"])'
         );
         buttonClicked = true;
-        console.log('🔘 Clicked primary form button');
+        // console.log entfernt (Lint-Regel):
+        // 🔘 Clicked primary form button
       } catch {
         // Ignore E2E test errors
       }
@@ -344,21 +353,26 @@ export class AuthHelper {
         })
         .first();
       await signInButton.click();
-      console.log('🔘 Clicked continue/next button');
+      // console.log entfernt (Lint-Regel):
+      // 🔘 Clicked continue/next button
     }
 
     // Give the form submission a moment to process
     await this.page.waitForTimeout(2000);
-    console.log('⏳ Allowing form processing time...');
+    // console.log entfernt (Lint-Regel):
+    // ⏳ Allowing form processing time...
 
     // Wait for password field to appear (Clerk might show it in a second step)
-    console.log('⏳ Waiting for password field...');
+    // console.log entfernt (Lint-Regel):
+    // ⏳ Waiting for password field...
 
     // Wait for successful authentication - use intelligent waiting instead of fixed timeout
-    console.log('🔐 Waiting for authentication to complete...');
+    // console.log entfernt (Lint-Regel):
+    // 🔐 Waiting for authentication to complete...
 
     // Wait for successful authentication - use intelligent waiting instead of fixed timeout
-    console.log('🔐 Waiting for authentication to complete...');
+    // console.log entfernt (Lint-Regel):
+    // 🔐 Waiting for authentication to complete...
 
     // Try multiple strategies to detect successful authentication with Promise.race
     let authSuccess = false;
@@ -377,15 +391,13 @@ export class AuthHelper {
               );
             },
             { timeout: 20000 }
-          )
-          .then(() => console.log('✅ Successfully left authentication pages')),
+          ),
 
         // Strategy 2: Clerk UserButton (strong indicator of signed-in state)
         this.page
           .waitForSelector('.cl-userButton, [data-testid="user-button"]', {
             timeout: 20000,
-          })
-          .then(() => console.log('✅ Found Clerk UserButton')),
+          }),
 
         // Strategy 3: Protected layout elements
         this.page
@@ -394,39 +406,37 @@ export class AuthHelper {
             {
               timeout: 20000,
             }
-          )
-          .then(() => console.log('✅ Found protected-layout')),
+          ),
 
         // Strategy 4: Dashboard-specific elements
         this.page
           .waitForSelector('[data-testid="dashboard"], .dashboard-content', {
             timeout: 20000,
-          })
-          .then(() => console.log('✅ Found dashboard content')),
+          }),
       ]);
 
       // If we reach here, one of the strategies succeeded
       authSuccess = true;
     } catch (_error) {
-      console.log(
-        '⏳ Primary auth indicators not found, checking URL manually...'
-      );
+      // console.log entfernt (Lint-Regel):
+      // ⏳ Primary auth indicators not found, checking URL manually...
     }
 
     // Fallback: Manual URL check
     if (!authSuccess) {
       const currentUrl = this.page.url();
-      console.log(`🔍 Checking current URL: ${currentUrl}`);
+      // console.log entfernt (Lint-Regel):
+      // 🔍 Checking current URL: ${currentUrl}
       if (
         currentUrl.includes('/dashboard') ||
         currentUrl.includes('/protected')
       ) {
         authSuccess = true;
-        console.log('✅ URL indicates successful authentication:', currentUrl);
+        // console.log entfernt (Lint-Regel):
+        // ✅ URL indicates successful authentication: currentUrl
       } else if (currentUrl.includes('/factor-one')) {
-        console.log(
-          '🔐 Multi-factor authentication detected, trying to handle...'
-        );
+        // console.log entfernt (Lint-Regel):
+        // 🔐 Multi-factor authentication detected, trying to handle...
 
         try {
           // For E2E tests, we'll try to handle MFA automatically
@@ -443,11 +453,13 @@ export class AuthHelper {
             .first();
 
           if (await bypassOption.isVisible({ timeout: 2000 })) {
-            console.log('🔑 Found MFA bypass option, clicking...');
+            // console.log entfernt (Lint-Regel):
+            // 🔑 Found MFA bypass option, clicking...
             await bypassOption.click();
             await this.page.waitForTimeout(1000);
           } else if (await skipTextOption.isVisible({ timeout: 2000 })) {
-            console.log('🔑 Found text-based MFA bypass option, clicking...');
+            // console.log entfernt (Lint-Regel):
+            // 🔑 Found text-based MFA bypass option, clicking...
             await skipTextOption.click();
             await this.page.waitForTimeout(1000);
           }
@@ -459,7 +471,8 @@ export class AuthHelper {
             .first();
 
           if (await smsOption.isVisible({ timeout: 2000 })) {
-            console.log('📱 Found SMS option, clicking...');
+            // console.log entfernt (Lint-Regel):
+            // 📱 Found SMS option, clicking...
             await smsOption.click();
             await this.page.waitForTimeout(1000);
 
@@ -469,7 +482,8 @@ export class AuthHelper {
               .locator('input[name="code"], input[type="text"]')
               .first();
             if (await otpInput.isVisible({ timeout: 3000 })) {
-              console.log('🔢 Entering test OTP...');
+              // console.log entfernt (Lint-Regel):
+              // 🔢 Entering test OTP...
               await otpInput.fill('123456'); // Common test OTP
 
               const continueBtn = this.page
@@ -482,7 +496,8 @@ export class AuthHelper {
               }
             }
           } else if (await textMessageOption.isVisible({ timeout: 2000 })) {
-            console.log('📱 Found Text message option, clicking...');
+            // console.log entfernt (Lint-Regel):
+            // 📱 Found Text message option, clicking...
             await textMessageOption.click();
             await this.page.waitForTimeout(1000);
 
@@ -492,7 +507,8 @@ export class AuthHelper {
               .locator('input[name="code"], input[type="text"]')
               .first();
             if (await otpInput.isVisible({ timeout: 3000 })) {
-              console.log('🔢 Entering test OTP...');
+              // console.log entfernt (Lint-Regel):
+              // 🔢 Entering test OTP...
               await otpInput.fill('123456'); // Common test OTP
 
               const continueBtn = this.page
@@ -511,9 +527,11 @@ export class AuthHelper {
             timeout: 25000, // Increased from 15000
           });
           authSuccess = true;
-          console.log('✅ MFA handled successfully, authentication complete');
+          // console.log entfernt (Lint-Regel):
+          // ✅ MFA handled successfully, authentication complete
         } catch (mfaError) {
-          console.log('❌ MFA handling failed:', mfaError);
+          // console.log entfernt (Lint-Regel):
+          // ❌ MFA handling failed: mfaError
 
           // Final attempt: Try to continue without MFA or find alternative paths
           try {
@@ -523,49 +541,52 @@ export class AuthHelper {
             const buttonCount = await alternativeButtons.count();
 
             if (buttonCount > 0) {
-              console.log(
-                `🔄 Found ${buttonCount} alternative buttons, trying first one...`
-              );
+              // console.log entfernt (Lint-Regel):
+              // 🔄 Found ${buttonCount} alternative buttons, trying first one...
               await alternativeButtons.first().click();
               await this.page.waitForURL(/.*\/dashboard.*|.*\/protected.*/, {
                 timeout: 12000, // Increased from 8000
               });
               authSuccess = true;
-              console.log('✅ Alternative path successful');
+              // console.log entfernt (Lint-Regel):
+              // ✅ Alternative path successful
             }
           } catch (altError) {
-            console.log('❌ Alternative path also failed:', altError);
+            // console.log entfernt (Lint-Regel):
+            // ❌ Alternative path also failed: altError
           }
         }
       } else {
-        console.log('❌ URL does not indicate authentication success');
+        // console.log entfernt (Lint-Regel):
+        // ❌ URL does not indicate authentication success
 
         // Additional fallback: Check for any Clerk indicators
         try {
           const clerkElements = await this.page
             .locator('[data-clerk-loaded]')
             .count();
-          console.log(`🔍 Found ${clerkElements} Clerk loaded elements`);
+          // console.log entfernt (Lint-Regel):
+          // 🔍 Found ${clerkElements} Clerk loaded elements
 
           if (clerkElements > 0) {
             // Wait longer for authentication to complete
             await this.page.waitForTimeout(3000); // Increased from 1000
             const newUrl = this.page.url();
-            console.log(`🔍 URL after additional wait: ${newUrl}`);
+            // console.log entfernt (Lint-Regel):
+            // 🔍 URL after additional wait: newUrl
 
             if (
               newUrl.includes('/dashboard') ||
               newUrl.includes('/protected')
             ) {
               authSuccess = true;
-              console.log(
-                '✅ URL indicates delayed authentication success:',
-                newUrl
-              );
+              // console.log entfernt (Lint-Regel):
+              // ✅ URL indicates delayed authentication success: newUrl
             }
           }
         } catch (_e) {
-          console.log('❌ No Clerk elements found');
+          // console.log entfernt (Lint-Regel):
+          // ❌ No Clerk elements found
         }
       }
     }
@@ -573,7 +594,8 @@ export class AuthHelper {
     if (!authSuccess) {
       // Enhanced final attempt - check for any authenticated state indicators
       const finalUrl = this.page.url();
-      console.log(`🔍 Final URL check: ${finalUrl}`);
+      // console.log entfernt (Lint-Regel):
+      // 🔍 Final URL check: finalUrl
 
       // Check if we're stuck in a login loop (indicates invalid credentials)
       const isLoginLoop =
@@ -581,8 +603,9 @@ export class AuthHelper {
         (finalUrl.includes('/factor') || finalUrl.includes('redirect_url'));
 
       if (isLoginLoop) {
-        console.log('⚠️  Detected login loop - likely invalid test credentials');
-        console.log('🔄 Attempting fallback authentication strategy...');
+        // console.log entfernt (Lint-Regel):
+        // ⚠️  Detected login loop - likely invalid test credentials
+        // 🔄 Attempting fallback authentication strategy...
 
         // For development/testing: Try to simulate successful auth by navigating directly
         try {
@@ -591,17 +614,16 @@ export class AuthHelper {
 
           const dashboardUrl = this.page.url();
           if (dashboardUrl.includes('/dashboard')) {
-            console.log(
-              '✅ Fallback: Direct navigation to dashboard successful'
-            );
+            // console.log entfernt (Lint-Regel):
+            // ✅ Fallback: Direct navigation to dashboard successful
             authSuccess = true;
           } else {
-            console.log(
-              '❌ Fallback: Direct navigation failed, dashboard protected'
-            );
+            // console.log entfernt (Lint-Regel):
+            // ❌ Fallback: Direct navigation failed, dashboard protected
           }
         } catch (e) {
-          console.log('❌ Fallback strategy failed:', e);
+          // console.log entfernt (Lint-Regel):
+          // ❌ Fallback strategy failed: e
         }
       }
 
@@ -645,9 +667,8 @@ export class AuthHelper {
             isNotOnSignIn,
           ] = authIndicators;
 
-          console.log(
-            `🔍 Enhanced auth indicators - User button: ${hasUserButton}, Course link: ${hasCourseLink}, Welcome: ${hasWelcome}, User logo: ${hasUserLogo}, Not on sign-in: ${isNotOnSignIn}`
-          );
+          // console.log entfernt (Lint-Regel):
+          // 🔍 Enhanced auth indicators - User button: ${hasUserButton}, Course link: ${hasCourseLink}, Welcome: ${hasWelcome}, User logo: ${hasUserLogo}, Not on sign-in: ${isNotOnSignIn}
 
           if (
             hasUserButton ||
@@ -656,22 +677,21 @@ export class AuthHelper {
             hasUserLogo ||
             isNotOnSignIn
           ) {
-            console.log(
-              '✅ Authentication success detected via enhanced indicators'
-            );
+            // console.log entfernt (Lint-Regel):
+            // ✅ Authentication success detected via enhanced indicators
             authSuccess = true;
           }
         } catch (e) {
-          console.log('❌ Error checking enhanced auth indicators:', e);
+          // console.log entfernt (Lint-Regel):
+          // ❌ Error checking enhanced auth indicators: e
 
           // Absolute fallback - if not on sign-in page, consider successful
           if (
             !finalUrl.includes('/sign-in') &&
             !finalUrl.includes('/sign-up')
           ) {
-            console.log(
-              '✅ Fallback: Not on sign-in page - considering as authentication success'
-            );
+            // console.log entfernt (Lint-Regel):
+            // ✅ Fallback: Not on sign-in page - considering as authentication success
             authSuccess = true;
           }
         }
@@ -679,21 +699,17 @@ export class AuthHelper {
 
       if (!authSuccess) {
         // Final fallback for development - warn but don't fail
-        console.log(
-          '⚠️  Authentication failed - this may indicate missing test user accounts'
-        );
-        console.log(
-          '💡 Recommendation: Create test users in Clerk dashboard or use mock authentication'
-        );
+        // console.log entfernt (Lint-Regel):
+        // ⚠️  Authentication failed - this may indicate missing test user accounts
+        // 💡 Recommendation: Create test users in Clerk dashboard or use mock authentication
 
         // For E2E tests in development, we can optionally skip auth and proceed
         if (
           process.env.NODE_ENV === 'development' ||
           process.env.E2E_SKIP_AUTH === 'true'
         ) {
-          console.log(
-            '🔄 Development mode: Attempting to proceed without full authentication'
-          );
+          // console.log entfernt (Lint-Regel):
+          // 🔄 Development mode: Attempting to proceed without full authentication
           authSuccess = true; // Allow tests to continue for UI validation
         } else {
           throw new Error(

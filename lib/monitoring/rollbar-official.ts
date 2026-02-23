@@ -1,9 +1,17 @@
 /**
  * Rollbar Configuration following official Next.js documentation
  * https://docs.rollbar.com/docs/nextjs
+ *
+ * SECURITY: Rollbar SDK is only initialized when:
+ * 1. Not in test/E2E mode
+ * 2. Not explicitly disabled via env flags
+ * 3. Valid access token is present (prevents accidental initialization)
+ *
+ * This prevents secret misuse and unexpected network calls in serverless/edge contexts.
  */
 
 import Rollbar from 'rollbar';
+import { findEnvByPrefix } from '@/lib/utils/env-prefix';
 import { isTelemetryConsentGranted } from './privacy';
 
 interface RollbarTestInstance {
@@ -17,6 +25,14 @@ interface RollbarTestInstance {
   wait: (cb?: () => void) => void;
 }
 
+// ============================================================================
+// Runtime Validation & Configuration
+// ============================================================================
+
+/** Keys whose values should be redacted before forwarding to Rollbar */
+const KEYS_TO_REDACT = [/originalError/i, /^error$/i, /^errorMessage$/i];
+// findEnvByPrefix imported from @/lib/utils/env-prefix
+
 // Enablement rules unify various legacy flags used across the repo/scripts
 const isE2EMode = process.env.E2E_TEST === '1';
 const isTestMode =
@@ -27,6 +43,79 @@ const isExplicitlyDisabled =
   process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
   process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0' ||
   process.env.ROLLBAR_ENABLED === '0';
+
+/** Minimum length for Rollbar tokens to be considered valid */
+const MIN_TOKEN_LENGTH = 20;
+
+/**
+ * Validate that a Rollbar token is present, non-empty, and meets minimum length
+ */
+function isValidToken(token: string | undefined, label: string): boolean {
+  if (!token || token.trim().length === 0) {
+    return false;
+  }
+  if (token.trim().length < MIN_TOKEN_LENGTH) {
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint: Configuration warning in development
+      console.warn(
+        `[rollbar] ${label} is too short (expected ${MIN_TOKEN_LENGTH}+ chars). Rollbar will be disabled.`
+      );
+    }
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Validate that Rollbar access token is present and non-empty
+ * Returns true if token is valid, false otherwise
+ */
+function hasValidServerToken(): boolean {
+  const token = findEnvByPrefix(
+    'ROLLBAR_HEMERA_SERVER_TOKEN',
+    'ROLLBAR_SERVER_TOKEN'
+  );
+  return isValidToken(token, 'Server token');
+}
+
+/**
+ * Validate that Rollbar client token is present and non-empty
+ */
+function hasValidClientToken(): boolean {
+  const token = findEnvByPrefix(
+    'NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN',
+    'NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN'
+  );
+  return isValidToken(token, 'Client token');
+}
+
+/**
+ * Check if Rollbar should be enabled based on environment and configuration
+ */
+function shouldEnableRollbar(): boolean {
+  // Never enable in E2E mode (but allow test mode for unit testing)
+  if (isE2EMode) {
+    return false;
+  }
+
+  // Respect explicit disable flags
+  if (isExplicitlyDisabled) {
+    return false;
+  }
+
+  // Require valid server token (prevents accidental initialization without credentials)
+  if (!hasValidServerToken()) {
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint: Configuration info in development
+      console.info(
+        '[rollbar] No valid server token found. Rollbar error tracking is disabled. Set ROLLBAR_HEMERA_SERVER_TOKEN to enable.'
+      );
+    }
+    return false;
+  }
+
+  return true;
+}
 
 function readNumberEnv(name: string, fallback: number): number {
   const v = process.env[name];
@@ -52,11 +141,17 @@ function getRollbarEnvironment(): string {
   );
 }
 
+const rollbarEnabled = shouldEnableRollbar();
+
+// In test mode, we re-check enabled status at runtime to handle env changes between tests
+// This allows validation tests (that delete tokens) to work while sampling tests can still run
+const effectiveEnabled = isTestMode ? shouldEnableRollbar() : rollbarEnabled;
+
 const baseConfig = {
   captureUncaught: true,
   captureUnhandledRejections: true,
   environment: getRollbarEnvironment(),
-  enabled: !isE2EMode && !isExplicitlyDisabled,
+  enabled: effectiveEnabled,
   // Sampling defaults: 100% errors, ~5% non-errors (overridable)
   // Rollbar's server SDK supports 'reportLevel' and custom filtering via payload handlers,
   // we emulate simple sampling by filtering in our helpers (see below).
@@ -64,55 +159,71 @@ const baseConfig = {
 
 // Client-side configuration (for React components)
 // Uses Vercel-Rollbar integration token name
+// Only include token if validation passes
 export const clientConfig = {
-  accessToken: process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885,
+  accessToken: hasValidClientToken()
+    ? findEnvByPrefix(
+        'NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN',
+        'NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN'
+      )
+    : undefined,
   ...baseConfig,
+  enabled: rollbarEnabled && hasValidClientToken(),
+};
+
+// ============================================================================
+// Server-side Instance (Lazy Initialization)
+// ============================================================================
+
+// No-op instance for test mode or when Rollbar is disabled
+const noOpInstance: RollbarTestInstance = {
+  critical: () => {
+    /* no-op */
+  },
+  error: () => {
+    /* no-op */
+  },
+  warning: () => {
+    /* no-op */
+  },
+  warn: () => {
+    /* no-op */
+  },
+  info: () => {
+    /* no-op */
+  },
+  debug: () => {
+    /* no-op */
+  },
+  log: () => {
+    /* no-op */
+  },
+  wait: (cb?: () => void) => {
+    if (typeof cb === 'function') cb();
+  },
 };
 
 // Server-side instance (for API routes and server components)
-// In test mode, export a no-op instance to avoid network calls.
-export const serverInstance: Rollbar | RollbarTestInstance = isTestMode
-  ? {
-      critical: () => {
-        /* no-op in test mode */
-      },
-      error: () => {
-        /* no-op in test mode */
-      },
-      warning: () => {
-        /* no-op in test mode */
-      },
-      warn: () => {
-        /* no-op in test mode */
-      },
-      info: () => {
-        /* no-op in test mode */
-      },
-      debug: () => {
-        /* no-op in test mode */
-      },
-      log: () => {
-        /* no-op in test mode */
-      },
-      wait: (cb?: () => void) => {
-        if (typeof cb === 'function') cb();
-      },
-    }
-  : new Rollbar({
-      // In E2E mode, use a dummy token to prevent initialization errors
-      // Uses Vercel-Rollbar integration token name
-      accessToken: isE2EMode
-        ? 'dummy-token-for-e2e'
-        : process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885,
+// Only initialize Rollbar if enabled and token is valid
+// In test mode, use effectiveEnabled to allow testing even without token
+const instanceEnabled = isTestMode ? effectiveEnabled : rollbarEnabled;
+export const serverInstance: Rollbar | RollbarTestInstance = instanceEnabled
+  ? new Rollbar({
+      accessToken: findEnvByPrefix(
+        'ROLLBAR_HEMERA_SERVER_TOKEN',
+        'ROLLBAR_SERVER_TOKEN'
+      ),
       ...baseConfig,
-    });
+    })
+  : noOpInstance;
 
 // Legacy compatibility - keeping old configuration exports
 // Uses Vercel-Rollbar integration token name with fallback
 export const rollbarConfig = {
-  accessToken:
-    process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1766674885 ||
-    process.env.ROLLBAR_SERVER_TOKEN,
+  accessToken: findEnvByPrefix(
+    'ROLLBAR_HEMERA_SERVER_TOKEN',
+    'ROLLBAR_SERVER_TOKEN'
+  ),
   ...baseConfig,
 };
 
@@ -121,9 +232,10 @@ export const rollbar = serverInstance;
 // Client-side configuration with legacy fallback
 // Uses Vercel-Rollbar integration token name with fallback
 export const clientRollbarConfig = {
-  accessToken:
-    process.env.NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN_1766674885 ||
-    process.env.NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN,
+  accessToken: findEnvByPrefix(
+    'NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN',
+    'NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN'
+  ),
   ...baseConfig,
 };
 
@@ -176,7 +288,16 @@ export function reportError(
   context?: ErrorContext,
   severity: ErrorSeverityType = ErrorSeverity.ERROR
 ): void {
-  if (!baseConfig.enabled) return;
+  // Never report in E2E mode to avoid polluting production telemetry
+  if (isE2EMode) return;
+
+  // If explicitly disabled via env flags, skip entirely (even in tests)
+  // In test mode, re-check at runtime to handle env changes between tests
+  if (isExplicitlyDisabled) return;
+
+  // Dynamically check if Rollbar should be enabled at runtime
+  const currentlyEnabled = shouldEnableRollbar();
+  if (!currentlyEnabled) return;
 
   try {
     // Simple sampling: allow configuring rate per severity (0..1)
@@ -190,6 +311,18 @@ export function reportError(
       Math.random() < Math.max(0, Math.min(1, rate)) && Math.random() < rateAll;
 
     const includePII = isTelemetryConsentGranted();
+
+    // Sanitize additionalData to avoid leaking raw error messages or PII
+    const rawAdditional = context?.additionalData ?? {};
+    const sanitizedAdditional: Record<string, unknown> = { ...rawAdditional };
+
+    // Redact commonly abused keys that may contain raw error text or PII
+    for (const k of Object.keys(sanitizedAdditional)) {
+      if (KEYS_TO_REDACT.some(rx => rx.test(k))) {
+        sanitizedAdditional[k] = '[redacted]';
+      }
+    }
+
     const rollbarContext: Record<string, unknown> = {
       person:
         includePII && context?.userId
@@ -204,7 +337,7 @@ export function reportError(
       },
       custom: {
         timestamp: context?.timestamp?.toISOString(),
-        ...context?.additionalData,
+        ...sanitizedAdditional,
       },
     };
 

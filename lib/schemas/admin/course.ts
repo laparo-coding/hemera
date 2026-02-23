@@ -64,26 +64,43 @@ export const courseCreateSchema = z.object({
     .nullable(),
   price: z
     .number()
-    .nonnegative('Price must be non-negative')
-    .multipleOf(0.01, 'Price must have at most 2 decimal places')
-    .transform(val => Math.round(val * 100)), // Convert Euro to Cents for Stripe
+    .nonnegative('Preis darf nicht negativ sein')
+    .multipleOf(0.01, 'Preis darf maximal 2 Dezimalstellen haben')
+    .transform(val => {
+      // Always treat input as Euro value and convert to cents.
+      // Callers must always pass euro decimals (e.g. 99.99 → 9999 cents).
+      return Math.round(val * 100);
+    }), // Convert Euro to Cents for Stripe
   startDate: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val)),
+    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .optional()
+    .nullable(),
   endDate: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
     .optional()
     .nullable(),
+  // Hinweis: Die frühere Zukunftsprüfung (d.getTime() > Date.now() - BUFFER)
+  // wurde bewusst entfernt – Admins müssen ggf. vergangene Kursdaten erfassen
+  // (z.B. nachträgliche Dokumentation). Nur Datumsvalidität wird geprüft.
   startTime: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val)),
+    .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültige Startzeit',
+    }),
   endTime: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val)),
+    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültige Endzeit',
+    })
+    .optional()
+    .nullable(),
   instructor: z
     .string()
-    .min(2, 'Instructor name must be at least 2 characters')
+    .min(2, 'Kursleiter-Name muss mindestens 2 Zeichen haben')
     .trim(),
   level: CourseLevelEnum,
   thumbnailUrl: z
@@ -115,8 +132,8 @@ export const courseCreateSchema = z.object({
     .nullable(),
   capacity: z
     .number()
-    .int('Capacity must be an integer')
-    .positive('Capacity must be positive'),
+    .int('Kapazität muss eine ganze Zahl sein')
+    .min(0, 'Kapazität darf nicht negativ sein'),
   isPublished: z.boolean().default(false),
   locationId: z
     .string()
@@ -124,6 +141,12 @@ export const courseCreateSchema = z.object({
     .optional()
     .nullable(),
   curriculum: curriculumSchema,
+  duration: z
+    .number()
+    .int('Dauer muss eine ganze Zahl in Stunden sein')
+    .positive('Dauer muss positiv sein')
+    .optional()
+    .default(4),
   // Learning Path fields (021)
   recommended: z
     .string()
@@ -153,27 +176,31 @@ export const courseCreateSchema = z.object({
 export const courseUpdateSchema = z.object({
   title: z
     .string()
-    .min(3, 'Title must be at least 3 characters')
-    .max(50, 'Title must not exceed 50 characters')
+    .min(3, 'Titel muss mindestens 3 Zeichen haben')
+    .max(50, 'Titel darf maximal 50 Zeichen haben')
     .trim()
     .optional(),
   description: z
     .string()
-    .min(10, 'Description must be at least 10 characters')
-    .max(900, 'Description must not exceed 900 characters')
+    .min(10, 'Beschreibung muss mindestens 10 Zeichen haben')
+    .max(900, 'Beschreibung darf maximal 900 Zeichen haben')
     .trim()
     .optional(),
   teaser: z
     .string()
-    .max(200, 'Teaser must not exceed 200 characters')
+    .max(200, 'Teaser darf maximal 200 Zeichen haben')
     .trim()
     .optional()
     .nullable(),
   price: z
     .number()
-    .nonnegative('Price must be non-negative')
-    .multipleOf(0.01, 'Price must have at most 2 decimal places')
-    .optional(),
+    .nonnegative('Preis darf nicht negativ sein')
+    .multipleOf(0.01, 'Preis darf maximal 2 Dezimalstellen haben')
+    .optional()
+    .transform(val => {
+      if (val === undefined) return undefined;
+      return Math.round(val * 100);
+    }),
   startDate: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
@@ -185,15 +212,21 @@ export const courseUpdateSchema = z.object({
     .nullable(),
   startTime: z
     .union([z.string(), z.date()])
-    .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültige Startzeit',
+    })
     .optional(),
   endTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
+    .refine(d => !Number.isNaN(d.getTime()), {
+      message: 'Ungültige Endzeit',
+    })
     .optional(),
   instructor: z
     .string()
-    .min(2, 'Instructor name must be at least 2 characters')
+    .min(2, 'Kursleiter-Name muss mindestens 2 Zeichen haben')
     .trim()
     .optional(),
   level: CourseLevelEnum.optional(),
@@ -226,8 +259,8 @@ export const courseUpdateSchema = z.object({
     .nullable(),
   capacity: z
     .number()
-    .int('Capacity must be an integer')
-    .positive('Capacity must be positive')
+    .int('Kapazität muss eine ganze Zahl sein')
+    .min(0, 'Kapazität darf nicht negativ sein')
     .optional(),
   isPublished: z.boolean().optional(),
   locationId: z

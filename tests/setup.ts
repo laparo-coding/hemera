@@ -78,64 +78,53 @@ beforeAll(async () => {
   }
 
   // Step 2: Start ephemeral Postgres with Testcontainers
+  // Dynamically import dedicated Postgres module
+  const { PostgreSqlContainer } = await import('@testcontainers/postgresql');
+
+  const pg = new PostgreSqlContainer('postgres:16');
+  container = await pg.start();
+
+  if (!container) {
+    throw new Error('Failed to start container');
+  }
+
+  const host = container.getHost();
+  const port = container.getPort();
+  const username = container.getUsername();
+  const password = container.getPassword();
+  const database = container.getDatabase();
+
+  // Build a connection string without sslmode, the container runs without SSL
+  const connectionUri = `postgresql://${encodeURIComponent(
+    username
+  )}:${encodeURIComponent(password)}@${host}:${port}/${database}`;
+
+  process.env.DATABASE_URL = connectionUri;
+
+  // Apply Prisma migrations to the fresh database
+  execSync('npx prisma migrate deploy', {
+    stdio: 'inherit',
+    env: { ...process.env, DATABASE_URL: connectionUri },
+  });
+
+  // Seed the database (ensure published courses exist for E2E)
+  // Note: Seed may fail due to Prisma 7.2.0 bug with @map() and driver adapters
+  // (see https://github.com/prisma/prisma/issues/27357)
+  // Unit tests should still pass without seed data; only E2E tests require it.
   try {
-    // Dynamically import dedicated Postgres module
-    const { PostgreSqlContainer } = await import('@testcontainers/postgresql');
-
-    const pg = new PostgreSqlContainer('postgres:16');
-    container = await pg.start();
-
-    if (!container) {
-      throw new Error('Failed to start container');
-    }
-
-    const host = container.getHost();
-    const port = container.getPort();
-    const username = container.getUsername();
-    const password = container.getPassword();
-    const database = container.getDatabase();
-
-    // Build a connection string without sslmode, the container runs without SSL
-    const connectionUri = `postgresql://${encodeURIComponent(
-      username
-    )}:${encodeURIComponent(password)}@${host}:${port}/${database}`;
-
-    process.env.DATABASE_URL = connectionUri;
-
-    // Apply Prisma migrations to the fresh database
-    execSync('npx prisma migrate deploy', {
+    // Prefer using the project's db:seed script (which uses ts-node), fallback to prisma db seed
+    execSync('npm run db:seed', {
       stdio: 'inherit',
       env: { ...process.env, DATABASE_URL: connectionUri },
     });
-
-    // Seed the database (ensure published courses exist for E2E)
-    // Note: Seed may fail due to Prisma 7.2.0 bug with @map() and driver adapters
-    // (see https://github.com/prisma/prisma/issues/27357)
-    // Unit tests should still pass without seed data; only E2E tests require it.
-    try {
-      // Prefer using the project's db:seed script (which uses ts-node), fallback to prisma db seed
-      execSync('npm run db:seed', {
-        stdio: 'inherit',
-        env: { ...process.env, DATABASE_URL: connectionUri },
-      });
-    } catch (_seedErr) {
-      // Log warning but don't fail - unit tests can run without seed data
-      // This is a known Prisma 7.2.0 issue that will be fixed in a future release
-      console.warn(
-        '\n⚠️ Database seeding failed (Prisma 7.2.0 @map() bug).\n' +
-          '   Unit tests will run with empty tables.\n' +
-          '   See: https://github.com/prisma/prisma/issues/27357\n'
-      );
-    }
-  } catch (err) {
-    // Provide a helpful error message and rethrow to fail fast
-    console.error(
-      '\nFailed to provision a test Postgres database. Either:\n' +
-        '- Set DATABASE_URL to a reachable Postgres URL, or\n' +
-        '- Provide an .env.test or .env.local with DATABASE_URL, or\n' +
-        '- Install & run Docker, since tests can auto-start Postgres via Testcontainers.\n'
+  } catch (_seedErr) {
+    // Don't fail - unit tests can run without seed data
+    // Known Prisma 7.2.0 issue with @map() and driver adapters
+    // See: https://github.com/prisma/prisma/issues/27357
+    // biome-ignore lint/suspicious/noConsole: intentional warning in test setup
+    console.warn(
+      '⚠️ Database seeding failed (Prisma @map() bug). Unit tests will run with empty tables.'
     );
-    throw err;
   }
 });
 

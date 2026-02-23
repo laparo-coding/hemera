@@ -1,0 +1,668 @@
+# Service API Endpoints - OpenAPI 3.1 Specification
+# To be integrated into docs/api/openapi.yaml
+
+openapi: 3.1.0
+info:
+  title: Hemera Service API (spec)
+  version: '1.0'
+
+paths:
+  /api/service/courses:
+    options:
+      tags: [Service API]
+      operationId: optionsServiceCourses
+      summary: CORS preflight for courses endpoint
+      description: Handle CORS preflight requests
+      responses:
+        '204':
+          description: No Content
+    get:
+      tags: [Service API]
+      operationId: listServiceCourses
+      summary: List courses (Service API)
+      description: |
+        List all courses with participant counts.
+        Requires api-client or admin role.
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: level
+          in: query
+          description: Filter by course level
+          required: false
+          schema:
+            type: string
+            enum: [BEGINNER, INTERMEDIATE, ADVANCED]
+        - name: published
+          in: query
+          description: Filter by published status
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: limit
+          in: query
+          description: Maximum number of results
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: offset
+          in: query
+          description: Pagination offset
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Course list retrieved successfully
+          headers:
+            $ref: '#/components/headers/StandardServiceHeaders'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/service/courses/{id}:
+    get:
+      tags: [Service API]
+      operationId: getServiceCourse
+      summary: Get course details (Service API)
+      description: |
+        Get detailed course information with participations.
+        Requires api-client or admin role.
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Course ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Course details retrieved successfully
+          headers:
+            $ref: '#/components/headers/StandardServiceHeaders'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/service/participations/{id}:
+    get:
+      tags: [Service API]
+      operationId: getServiceParticipation
+      summary: Get participation details (Service API)
+      description: |
+        Get detailed participation information.
+        Requires api-client or admin role.
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Participation ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Participation details retrieved successfully
+          headers:
+            $ref: '#/components/headers/StandardServiceHeaders'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParticipationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/service/participations/{id}/result:
+    put:
+      tags: [Service API]
+      operationId: updateServiceParticipationResult
+      summary: Update participation result (Service API)
+      description: |
+        Update participation result data.
+        Requires api-client or admin role.
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Participation ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateParticipationResult'
+      responses:
+        '200':
+          description: Participation result updated successfully
+          headers:
+            $ref: '#/components/headers/StandardServiceHeaders'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateResultResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  headers:
+    StandardServiceHeaders:
+      description: Standard headers included on service responses
+      schema:
+        type: object
+        properties:
+          X-Request-ID:
+            type: string
+            description: Unique request identifier
+          X-RateLimit-Limit:
+            type: integer
+            description: Rate limit maximum requests
+          X-RateLimit-Remaining:
+            type: integer
+            description: Remaining requests in current window
+          X-RateLimit-Reset:
+            type: integer
+            description: Unix timestamp (seconds since epoch) when rate limit resets
+
+  schemas:
+    CourseListResponse:
+      type: object
+      required: [success, data, pagination]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          description: |
+            Either the raw array of courses (default), or a legacy wrapped
+            object when `FEATURE_SERVICE_RESPONSE_LEGACY=true` is enabled.
+          oneOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/ServiceCourse'
+            - type: object
+              properties:
+                courses:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ServiceCourse'
+                total:
+                  type: integer
+                  minimum: 0
+                  example: 25
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    CourseDetailResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          description: |
+            Either the course detail object (default) or the
+            legacy wrapped object `{ course: { ... } }` when
+            `FEATURE_SERVICE_RESPONSE_LEGACY=true`.
+          oneOf:
+            - $ref: '#/components/schemas/ServiceCourseDetail'
+            - type: object
+              properties:
+                course:
+                  $ref: '#/components/schemas/ServiceCourseDetail'
+
+    ParticipationResponse:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          description: |
+            Either the participation object (default) or the
+            legacy wrapped object `{ participation: { ... } }` when
+            `FEATURE_SERVICE_RESPONSE_LEGACY=true`.
+          oneOf:
+            - $ref: '#/components/schemas/ServiceParticipation'
+            - type: object
+              properties:
+                participation:
+                  $ref: '#/components/schemas/ServiceParticipation'
+
+    UpdateResultResponse:
+      description: |
+        Success response for updating participation result. By default the
+        endpoint returns a top-level `message` field. When the legacy
+        feature flag is enabled the same message is returned inside `data`
+        as `{ message: string }` to support older consumers.
+      oneOf:
+        - type: object
+          required: [success, message]
+          properties:
+            success:
+              type: boolean
+              example: true
+            message:
+              type: string
+              example: Participation result updated successfully
+        - type: object
+          required: [success, data]
+          properties:
+            success:
+              type: boolean
+              example: true
+            data:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Participation result updated successfully
+
+    ErrorResponse:
+      type: object
+      required: [success, error]
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: INTERNAL_ERROR
+            message:
+              type: string
+              example: Internal server error
+            details:
+              type: object
+              additionalProperties: true
+
+    ResponseMeta:
+      type: object
+      required: [requestId, timestamp, version]
+      properties:
+        requestId:
+          type: string
+          example: req_abc123
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-02-14T12:00:00Z'
+        version:
+          type: string
+          example: '1.0'
+
+    ServiceCourse:
+      type: object
+      required: [id, title, slug, level, participantCount]
+      properties:
+        id:
+          type: string
+          example: course_123
+        title:
+          type: string
+          example: Advanced Leadership
+        slug:
+          type: string
+          example: advanced-leadership
+        level:
+          type: string
+          enum: [BEGINNER, INTERMEDIATE, ADVANCED]
+          example: ADVANCED
+        startDate:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-03-15T09:00:00Z'
+        endDate:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-03-17T17:00:00Z'
+        participantCount:
+          type: integer
+          minimum: 0
+          example: 12
+
+    ServiceCourseDetail:
+      type: object
+      required: [id, title, slug, level, participations]
+      properties:
+        id:
+          type: string
+          example: course_123
+        title:
+          type: string
+          example: Advanced Leadership
+        slug:
+          type: string
+          example: advanced-leadership
+        level:
+          type: string
+          enum: [BEGINNER, INTERMEDIATE, ADVANCED]
+          example: ADVANCED
+        startDate:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-03-15T09:00:00Z'
+        endDate:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-03-17T17:00:00Z'
+        participations:
+          type: array
+          items:
+            type: object
+            required: [userId, createdAt]
+            properties:
+              id:
+                type: string
+                nullable: true
+                example: participation_456
+              userId:
+                type: string
+                example: user_789
+              status:
+                type: string
+                enum: [PREPARATION, SUMMARY, DEBRIEFING, RESULT, COMPLETE]
+                nullable: true
+                example: PREPARATION
+              createdAt:
+                type: string
+                format: date-time
+                example: '2026-02-01T10:00:00Z'
+
+    ServiceParticipation:
+      type: object
+      required: [id, userId, courseId, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          example: participation_456
+        userId:
+          type: string
+          example: user_789
+        courseId:
+          type: string
+          example: course_123
+        status:
+          type: string
+          enum: [PREPARATION, SUMMARY, DEBRIEFING, RESULT, COMPLETE]
+          example: RESULT
+        preparationIntent:
+          type: string
+          nullable: true
+          maxLength: 2000
+          example: Improve leadership skills
+        desiredResults:
+          type: string
+          nullable: true
+          maxLength: 2000
+          example: Lead a team of 10+ people
+        resultOutcome:
+          type: string
+          nullable: true
+          maxLength: 2000
+          example: Successfully completed all objectives
+        resultNotes:
+          type: string
+          nullable: true
+          maxLength: 2000
+          example: Excellent performance in group exercises
+        resultCompletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-03-20T14:30:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-02-01T10:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-03-20T14:30:00Z'
+
+    UpdateParticipationResult:
+      type: object
+      properties:
+        resultOutcome:
+          type: string
+          maxLength: 2000
+          example: Successfully completed all objectives
+        resultNotes:
+          type: string
+          maxLength: 2000
+          example: Excellent performance in group exercises
+        complete:
+          type: boolean
+          example: true
+          description: If true, marks participation as COMPLETE and sets resultCompletedAt
+
+    Pagination:
+      type: object
+      required: [total, limit, offset]
+      properties:
+        total:
+          type: integer
+          minimum: 0
+          example: 25
+        limit:
+          type: integer
+          minimum: 1
+          example: 100
+        offset:
+          type: integer
+          minimum: 0
+          example: 0
+
+  responses:
+    CorsPreflightSuccess:
+      description: CORS preflight successful
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+          description: Allowed origins
+        Access-Control-Allow-Methods:
+          schema:
+            type: string
+          description: Allowed HTTP methods
+        Access-Control-Allow-Headers:
+          schema:
+            type: string
+          description: Allowed request headers
+        Access-Control-Max-Age:
+          schema:
+            type: string
+          description: Preflight cache duration in seconds
+
+    Unauthorized:
+      description: Not authenticated
+      headers:
+        $ref: '#/components/headers/StandardServiceHeaders'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  error:
+                    properties:
+                      code:
+                        example: UNAUTHORIZED
+                      message:
+                        example: Not authenticated
+
+    Forbidden:
+      description: Insufficient permissions
+      headers:
+        $ref: '#/components/headers/StandardServiceHeaders'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  error:
+                    properties:
+                      code:
+                        example: FORBIDDEN
+                      message:
+                        example: Forbidden
+
+    NotFound:
+      description: Resource not found
+      headers:
+        $ref: '#/components/headers/StandardServiceHeaders'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  error:
+                    properties:
+                      code:
+                        example: NOT_FOUND
+                      message:
+                        example: Resource not found
+
+    ValidationError:
+      description: Invalid request data
+      headers:
+        $ref: '#/components/headers/StandardServiceHeaders'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  error:
+                    properties:
+                      code:
+                        example: VALIDATION_ERROR
+                      message:
+                        example: Invalid request body
+
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        X-Request-ID:
+          schema:
+            type: string
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          example: 0
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds until rate limit resets
+        Access-Control-Allow-Origin:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  error:
+                    properties:
+                      code:
+                        example: RATE_LIMITED
+                      message:
+                        example: Too many requests. Please try again later.
+
+    InternalError:
+      description: Internal server error
+      headers:
+        $ref: '#/components/headers/StandardServiceHeaders'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  error:
+                    properties:
+                      code:
+                        example: INTERNAL_ERROR
+                      message:
+                        example: Internal server error
+
+  securitySchemes:
+    clerkAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Clerk JWT authentication token

@@ -37,7 +37,7 @@ describe('Booking Model Validations', () => {
         description: 'Test Description',
         slug: `test-course-${timestamp}-${randomSuffix}`,
         price: 9999, // Price in cents
-        currency: 'USD',
+        currency: 'EUR',
         isPublished: true,
       },
     });
@@ -48,23 +48,13 @@ describe('Booking Model Validations', () => {
     });
 
     if (!courseExists) {
-      console.error('❌ COURSE CREATION FAILED');
-      console.error('Expected ID:', testCourse.id);
-      console.error('Course data:', testCourse);
-
-      // List all courses for debugging
-      const allCourses = await prisma.course.findMany();
-      console.error(
-        'All courses in DB:',
-        allCourses.map(c => c.id)
-      );
-
+      // Fehlerfall: Kurs wurde nicht angelegt (Debug-Ausgabe entfernt für Lint)
       throw new Error(
         `❌ Course verification failed: ${testCourse.id} not found in database`
       );
     }
 
-    console.log('✅ Test course created and verified:', testCourse.id);
+    // Test course created und verified (Debug-Ausgabe entfernt für Lint)
 
     // Create test users
     testUser = await prisma.user.create({
@@ -83,7 +73,7 @@ describe('Booking Model Validations', () => {
       },
     });
 
-    console.log('✅ Test users created:', testUser.id, testUser2.id);
+    // Test users created (Debug-Ausgabe entfernt für Lint)
   });
 
   afterEach(async () => {
@@ -92,8 +82,9 @@ describe('Booking Model Validations', () => {
       await prisma.booking.deleteMany();
       await prisma.course.deleteMany();
       await prisma.user.deleteMany();
-    } catch (error) {
-      console.warn('Cleanup warning:', error);
+    } catch (_error) {
+      // console.warn entfernt (Lint-Regel):
+      // Cleanup warning: error
     }
   });
 
@@ -105,28 +96,28 @@ describe('Booking Model Validations', () => {
       });
 
       if (!courseExists) {
-        console.error('❌ TEST COURSE NOT FOUND IN TEST');
-        console.error('Looking for ID:', testCourse.id);
+        // console.error entfernt (Lint-Regel):
+        // ❌ TEST COURSE NOT FOUND IN TEST
+        // Looking for ID: testCourse.id
 
         // Debug: List all courses in database
-        const allCourses = await prisma.course.findMany();
-        console.error(
-          'Available courses:',
-          allCourses.map(c => ({ id: c.id, title: c.title }))
-        );
+        const _allCourses = await prisma.course.findMany();
+        // console.error entfernt (Lint-Regel):
+        // Available courses: allCourses.map(c => ({ id: c.id, title: c.title }))
 
         throw new Error(
           `❌ Test course ${testCourse.id} does not exist in database during test execution`
         );
       }
 
-      console.log('✅ Course verification passed in test:', testCourse.id);
+      // console.log entfernt (Lint-Regel):
+      // ✅ Course verification passed in test: testCourse.id
 
       const bookingData = {
         userId: testUser.id,
         courseId: testCourse.id,
         amount: testCourse.price,
-        currency: 'USD',
+        currency: 'EUR',
       };
 
       const booking = await prisma.booking.create({
@@ -140,7 +131,7 @@ describe('Booking Model Validations', () => {
       expect(booking.userId).toBe(testUser.id);
       expect(booking.courseId).toBe(testCourse.id);
       expect(booking.amount).toBe(testCourse.price);
-      expect(booking.currency).toBe('USD');
+      expect(booking.currency).toBe('EUR');
       expect(booking.paymentStatus).toBe(PaymentStatus.PENDING); // default
       expect(booking.stripePaymentIntentId).toBeNull();
       expect(booking.stripeSessionId).toBeNull();
@@ -405,7 +396,7 @@ describe('Booking Model Validations', () => {
       expect(booking.amount).toBe(8500);
     });
 
-    it('should default to USD currency', async () => {
+    it('should default to EUR currency', async () => {
       const booking = await prisma.booking.create({
         data: {
           userId: testUser.id,

@@ -55,14 +55,13 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "biome check --write",
+      "biome check --write --no-errors-on-unmatched",
       "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files --exclude 'lib/generated/**'"
     ],
     "*.json": [
       "biome format --write"
     ],
     "*.{md,mdx}": [
-      "biome format --write",
       "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files"
     ]
   },
@@ -77,7 +76,7 @@
     "@mui/material": "^7.3.4",
     "@mux/mux-player-react": "^3.10.2",
     "@prisma/adapter-pg": "^7.3.0-integration-prisma6-fix-cloudflare-engine.3",
-    "@prisma/client": "~7.3.0",
+    "@prisma/client": "~7.4.0",
     "@rollbar/react": "^1.0.0",
     "@stripe/react-stripe-js": "^5.6.0",
     "@stripe/stripe-js": "^8.7.0",
@@ -95,6 +94,7 @@
     "@tiptap/pm": "^3.19.0",
     "@tiptap/react": "^3.19.0",
     "@tiptap/starter-kit": "^3.19.0",
+    "@upstash/context7-sdk": "^0.3.0",
     "@vercel/blob": "^2.2.0",
     "date-fns": "^4.1.0",
     "leaflet": "^1.9.4",
@@ -115,7 +115,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
-    "@biomejs/biome": "^2.3.14",
+    "@biomejs/biome": "^2.4.0",
     "@cspell/dict-de-de": "^4.1.2",
     "@jest/globals": "^30.2.0",
     "@lhci/cli": "^0.15.1",
@@ -144,7 +144,7 @@
     "lint-staged": "^16.2.7",
     "openapi-to-postmanv2": "^5.8.0",
     "playwright": "^1.56.1",
-    "prisma": "~7.3.0",
+    "prisma": "~7.4.0",
     "testcontainers": "^11.7.2",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",

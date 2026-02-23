@@ -1,6 +1,10 @@
-# Moved: The authoritative OpenAPI spec lives at specs/001-vercel-postgres-prisma-setup/contracts/openapi.yaml
-openapi: 3.1.0
+openapi: "3.0.0"
 info:
-  title: Hemera Auth & Health API (Spec 001) [MOVED]
-  version: 0.1.0
+  title: Hemera API (Placeholder)
+  version: "0.0.0"
+  description: >
+    MOVED — This file is a historical placeholder.
+    The authoritative OpenAPI spec lives at
+    specs/001-vercel-postgres-prisma-setup/contracts/openapi.yaml.
+    Do NOT add paths or definitions here.
 paths: {}

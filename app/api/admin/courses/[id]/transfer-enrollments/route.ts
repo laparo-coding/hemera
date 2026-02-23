@@ -24,7 +24,7 @@ async function checkAdminAuth(requestId: string) {
   } catch (_authError) {
     return {
       error: createErrorResponse(
-        'Unauthorized access',
+        'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -36,7 +36,7 @@ async function checkAdminAuth(requestId: string) {
   if (!userId) {
     return {
       error: createErrorResponse(
-        'Unauthorized access',
+        'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -45,11 +45,11 @@ async function checkAdminAuth(requestId: string) {
     };
   }
 
-  const isAdmin = await checkUserAdminStatus(userId);
+  const isAdmin = await checkUserAdminStatus();
   if (!isAdmin) {
     return {
       error: createErrorResponse(
-        'Admin privileges required',
+        'Du brauchst Admin-Rechte',
         ErrorCodes.FORBIDDEN,
         requestId,
         403
@@ -80,7 +80,7 @@ export async function POST(
 
     if (!targetCourseId) {
       return createErrorResponse(
-        'targetCourseId is required',
+        'Die Ziel-Kurs-ID ist erforderlich',
         ErrorCodes.VALIDATION_ERROR,
         requestId,
         400
@@ -90,7 +90,7 @@ export async function POST(
     // Prevent self-transfer
     if (id === targetCourseId) {
       return createErrorResponse(
-        'Cannot transfer to the same course',
+        'Die Übertragung in denselben Kurs ist nicht erlaubt',
         'INVALID_TRANSFER_TARGET',
         requestId,
         400
@@ -111,7 +111,7 @@ export async function POST(
 
     if (!sourceCourse) {
       return createErrorResponse(
-        `Course with ID ${id} does not exist`,
+        `Kurs mit der ID ${id} wurde nicht gefunden`,
         'COURSE_NOT_FOUND',
         requestId,
         404
@@ -120,7 +120,7 @@ export async function POST(
 
     if (!targetCourse) {
       return createErrorResponse(
-        `Target course with ID ${targetCourseId} does not exist`,
+        `Ziel-Kurs mit der ID ${targetCourseId} wurde nicht gefunden`,
         'TARGET_COURSE_NOT_FOUND',
         requestId,
         404
@@ -133,18 +133,17 @@ export async function POST(
     const availableSlots = targetCourse.capacity - targetEnrollmentCount;
 
     if (availableSlots < sourceEnrollmentCount) {
-      return NextResponse.json(
+      return createErrorResponse(
+        'Der Ziel-Kurs hat nicht genug freie Plätze',
+        'INSUFFICIENT_CAPACITY',
+        requestId,
+        400,
         {
-          error: 'Validation Error',
-          message: 'Target course has insufficient capacity',
-          code: 'INSUFFICIENT_CAPACITY',
           targetCapacity: targetCourse.capacity,
           targetEnrollmentCount,
           transferCount: sourceEnrollmentCount,
           availableSlots,
-          requestId,
-        },
-        { status: 400 }
+        }
       );
     }
 
@@ -156,7 +155,7 @@ export async function POST(
 
     return NextResponse.json(
       {
-        message: 'Successfully transferred enrollments',
+        message: 'Teilnehmer erfolgreich übertragen',
         transferredCount: result.count,
         sourceCourseId: id,
         targetCourseId,
@@ -166,7 +165,7 @@ export async function POST(
     );
   } catch (_error) {
     return createErrorResponse(
-      'Failed to transfer enrollments',
+      'Konnte Übertragung der Teilnehmer nicht durchführen',
       ErrorCodes.INTERNAL_ERROR,
       requestId,
       500

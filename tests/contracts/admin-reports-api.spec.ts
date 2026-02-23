@@ -316,7 +316,9 @@ describe('GET /api/admin/reports/health - Contract Tests', () => {
 
       expect(typeof mockService.name).toBe('string');
       expect(typeof mockService.nameDe).toBe('string');
-      expect(['healthy', 'degraded', 'unhealthy']).toContain(mockService.status);
+      expect(['healthy', 'degraded', 'unhealthy']).toContain(
+        mockService.status
+      );
       expect(typeof mockService.lastChecked).toBe('string');
 
       // Optional fields
