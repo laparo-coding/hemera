@@ -11,21 +11,9 @@
 
 import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
-import { reportError } from '@/lib/monitoring/rollbar-official';
 import type { UserRole } from './permissions';
 import { getUserRole } from './permissions';
 import { extractApiKey, validateServiceApiKey } from './service-api-key';
-
-/** Rollen, die Zugriff auf Service-API-Endpunkte haben. */
-export const ALLOWED_SERVICE_ROLES: ReadonlyArray<UserRole> = [
-  'api-client',
-  'admin',
-];
-
-export type ServiceAuthError =
-  | { error: 'unauthenticated' }
-  | { error: 'forbidden'; userId: string; role: UserRole }
-  | { error: 'internal_error'; userId: string };
 
 export interface ServiceAuthResult {
   userId: string;
@@ -39,22 +27,22 @@ export interface ServiceAuthResult {
  * Ablauf:
  * 1. Prüfe auf X-API-Key Header → API-Key-Auth
  * 2. Wenn kein API Key, versuche Clerk `auth()` → Session-Auth
- * 3. Wenn beides fehlschlägt → { error: 'unauthenticated' }
+ * 3. Wenn beides fehlschlägt → `{ error: 'unauthenticated' }`
  *
  * Autorisierung (Rolle api-client oder admin) wird hier gleichzeitig geprüft.
  */
 export async function authenticateServiceRequest(
   request: NextRequest
-): Promise<ServiceAuthResult | ServiceAuthError> {
+): Promise<
+  | ServiceAuthResult
+  | { error: 'unauthenticated' }
+  | { error: 'forbidden'; userId: string; role: UserRole }
+> {
   // --- Pfad 1: API Key Auth ---
   const apiKey = extractApiKey(request.headers);
   if (apiKey) {
     const result = validateServiceApiKey(apiKey);
     if (result) {
-      // Rollenprüfung auch für API-Key-Auth (Defense-in-Depth)
-      if (!ALLOWED_SERVICE_ROLES.includes(result.role)) {
-        return { error: 'forbidden', userId: result.userId, role: result.role };
-      }
       return {
         userId: result.userId,
         role: result.role,
@@ -66,51 +54,13 @@ export async function authenticateServiceRequest(
   }
 
   // --- Pfad 2: Clerk Session Auth ---
-  let userId: string | null;
-  try {
-    const authRes = await auth();
-    userId = authRes.userId;
-  } catch (err: unknown) {
-    reportError(
-      err instanceof Error
-        ? err
-        : new Error('Clerk auth() failed in service-auth'),
-      {
-        additionalData: {
-          operation: 'authenticateServiceRequest',
-          step: 'auth',
-        },
-      }
-    );
-    return { error: 'unauthenticated' };
-  }
-
+  const { userId } = await auth();
   if (!userId) {
     return { error: 'unauthenticated' };
   }
 
-  let role: UserRole;
-  try {
-    role = await getUserRole(userId);
-  } catch (err: unknown) {
-    reportError(
-      err instanceof Error
-        ? err
-        : new Error('getUserRole() failed in service-auth'),
-      {
-        additionalData: {
-          operation: 'authenticateServiceRequest',
-          step: 'getUserRole',
-          failureType: 'getUserRole',
-          authenticatedUser: true,
-          userId,
-        },
-      }
-    );
-    return { error: 'internal_error', userId };
-  }
-
-  if (!ALLOWED_SERVICE_ROLES.includes(role)) {
+  const role = await getUserRole();
+  if (role !== 'api-client' && role !== 'admin') {
     return { error: 'forbidden', userId, role };
   }
 

@@ -18,11 +18,7 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     return NextResponse.redirect(new URL('/dashboard', request.url), 308);
   }
 
-  // Service-API-Routen: Duale Authentifizierung
-  // 1. API-Key (X-API-Key Header) → überspringt Clerk-Middleware, detaillierte
-  //    Validierung im Route-Handler (lib/auth/service-auth.ts)
-  // 2. Clerk Session JWT → wird über clerkMw() geprüft
-  // Beide Pfade gelten auch im E2E-/Dev-Modus.
+  // Service API routes must always go through auth (even in E2E mode)
   if (/^\/api\/service(\/|$)/.test(pathname)) {
     // Allow CORS preflight (OPTIONS) requests through without auth
     if (request.method === 'OPTIONS') {
@@ -30,55 +26,10 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
     }
 
     // API-Key-basierte M2M-Authentifizierung: wenn ein X-API-Key Header
-    // vorhanden ist und ein gültiges Format hat, Clerk-Middleware überspringen.
-    // Die vollständige kryptografische Validierung erfolgt im Route-Handler.
-    const apiKey = request.headers.get('x-api-key');
-    if (apiKey) {
-      // Basisvalidierung: Key muss mindestens 32 Zeichen lang sein und
-      // darf nur druckbare ASCII-Zeichen enthalten (keine Steuerzeichen/Whitespace).
-      // Die vollständige kryptografische Validierung erfolgt im Route-Handler.
-      // Leerzeichen (\x20) sind im Regex bewusst ausgeschlossen: API-Keys mit
-      // Spaces würden Copy-&-Paste-Fehler und Header-Parsing-Probleme erzeugen.
-      if (apiKey.length < 32 || !/^[\x21-\x7e]+$/.test(apiKey)) {
-        // Security-Log via Rollbar (fire-and-forget, da proxy nicht async);
-        // generische Fehlermeldung nach außen (kein Leak des Format-Requirements).
-        void import('./lib/monitoring/rollbar-official')
-          .then(({ rollbar }) => {
-            rollbar.warning('[proxy] Invalid API key format rejected', {
-              length: apiKey.length,
-              pathname,
-            });
-          })
-          .catch((rollbarErr: unknown) => {
-            // Rollbar nicht verfügbar — kein throw im Request-Pfad.
-            // Im Dev-Modus strukturierte Warnung für einfacheres Debugging.
-            if (process.env.NODE_ENV !== 'production') {
-              // biome-ignore lint/suspicious/noConsole: Dev-only Rollbar diagnostic
-              console.warn(
-                JSON.stringify({
-                  context: 'proxy',
-                  msg: '[proxy] Rollbar fire-and-forget import failed',
-                  error: String(rollbarErr),
-                })
-              );
-            }
-          });
-        return new NextResponse(
-          JSON.stringify({
-            success: false,
-            error: {
-              code: 'UNAUTHORIZED',
-              message: 'Unauthorized',
-            },
-            meta: {
-              requestId: crypto.randomUUID(),
-              timestamp: new Date().toISOString(),
-              version: '1.0',
-            },
-          }),
-          { status: 401, headers: { 'content-type': 'application/json' } }
-        );
-      }
+    // vorhanden ist, Clerk-Middleware überspringen und den Request direkt
+    // durchlassen. Die Validierung erfolgt im Route-Handler.
+    const hasApiKey = !!request.headers.get('x-api-key');
+    if (hasApiKey) {
       return NextResponse.next();
     }
 
@@ -93,11 +44,6 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
           error: {
             code: 'UNAUTHORIZED',
             message: 'Missing authentication token',
-          },
-          meta: {
-            requestId: crypto.randomUUID(),
-            timestamp: new Date().toISOString(),
-            version: '1.0',
           },
         }),
         { status: 401, headers: { 'content-type': 'application/json' } }

@@ -1,7 +1,6 @@
 import { ParticipationStatus } from '@prisma/client';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { handleServiceAuthError } from '@/lib/auth/handle-service-auth';
 import { authenticateServiceRequest } from '@/lib/auth/service-auth';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
@@ -90,15 +89,35 @@ export async function PUT(
     const authResult = await authenticateServiceRequest(request);
 
     if ('error' in authResult) {
-      return await handleServiceAuthError(authResult, logger, requestId);
+      if (authResult.error === 'unauthenticated') {
+        logger.warn('Unauthenticated request');
+        return await createServiceApiErrorResponse(
+          'Not authenticated',
+          ErrorCodes.UNAUTHORIZED,
+          requestId,
+          401
+        );
+      }
+      logger.warn('Forbidden: insufficient permissions', {
+        userId: authResult.userId,
+        role: authResult.role,
+      });
+      return await createServiceApiErrorResponse(
+        'Forbidden: api-client or admin role required',
+        ErrorCodes.FORBIDDEN,
+        requestId,
+        403,
+        authResult.userId,
+        authResult.role
+      );
     }
 
-    const { userId, role, authMethod } = authResult;
+    const { userId, role } = authResult;
 
     logger.info('Service API request authorized', {
       userId,
       role,
-      authMethod,
+      authMethod: authResult.authMethod,
       participationId: id,
     });
 

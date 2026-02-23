@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const isAdmin = await checkUserAdminStatus(userId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       logger.warn('Non-admin user attempted to access user list', { userId });
       return createErrorResponse(
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isAdmin = await checkUserAdminStatus(userId);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       logger.warn('Non-admin user attempted to create user', { userId });
       return createErrorResponse(

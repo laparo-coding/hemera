@@ -6,49 +6,13 @@ Die Hemera Service API ermöglicht autorisierten Service-Clients (wie Aither) de
 
 ## Authentifizierung
 
-Die Service API unterstützt zwei Authentifizierungsmethoden — Clerk JWT für Browser-basierte Zugriffe und API-Key für M2M (Machine-to-Machine) Kommunikation.
+### Clerk JWT-basierte Authentifizierung
 
-### Methode 1: Clerk JWT-basierte Authentifizierung
-
-Für Browser-basierte oder interaktive Zugriffe: gültigen Clerk Session Token im `Authorization` Header senden:
+Alle Service-API-Endpunkte erfordern einen gültigen Clerk Session Token im `Authorization` Header:
 
 ```
 Authorization: Bearer <clerk-session-jwt>
 ```
-
-### Methode 2: API-Key-basierte Authentifizierung (M2M)
-
-Für Service-to-Service-Kommunikation (z.B. Aither → Hemera) kann statt eines Clerk JWTs ein statischer API-Key verwendet werden:
-
-```
-X-API-Key: <hemera-service-api-key>
-```
-
-**Konfiguration:**
-
-| Umgebungsvariable | Beschreibung |
-|-------------------|--------------|
-| `HEMERA_SERVICE_API_KEY` | API-Key (mind. 32 Zeichen, nur druckbare ASCII-Zeichen) |
-| `HEMERA_SERVICE_USER_ID` | Clerk User-ID des Service-Accounts (Format: `user_...`) |
-
-> **Wichtig:** Beide Variablen müssen entweder beide gesetzt oder beide leer sein (Zod-Validierung erzwingt dies beim Start).
->
-> **Startup-Verhalten bei Validierungsfehler:** Fehlen oder stimmen die Variablen nicht überein, bricht die Anwendung mit Exit-Code 1 ab. Der Fehler wird auf `stderr` protokolliert, z.B.:
-> ```
-> [env] Environment validation failed for fields: [ 'HEMERA_SERVICE_USER_ID' ]
-> Error: Environment validation failed; aborting startup
-> ```
-> **Fehlerbehebung:** Prüfe, ob `HEMERA_SERVICE_API_KEY` (mind. 32 Zeichen) und `HEMERA_SERVICE_USER_ID` (Format `user_...`) in `.env.local` bzw. den Vercel-Umgebungsvariablen gesetzt sind. Beide Variablen müssen immer gemeinsam gesetzt oder entfernt werden.
-
-**Key generieren:**
-```bash
-node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
-```
-
-**Sicherheitshinweise:**
-- Der Key wird über HMAC-SHA256 timing-sicher verglichen
-- API-Keys mit Leerzeichen oder Steuerzeichen werden abgelehnt
-- Bei ungültigem Key-Format antwortet der Next.js-Middleware-Proxy bereits mit 401, **bevor** die Clerk-Authentifizierung stattfindet (kein Fallback auf Clerk-Validierung)
 
 ### Erforderliche Rolle
 
@@ -68,7 +32,7 @@ Wichtig: Service-to-Service JWTs müssen eine eingeschränkte Audience/Scope hab
 
 ### Berechtigungen
 
-Die `api-client` Rolle hat folgende Berechtigungen (definiert in [`lib/auth/permissions.ts`](../../lib/auth/permissions.ts)):
+Die `api-client` Rolle hat folgende Berechtigungen (definiert in [`lib/auth/permissions.ts`](../../lib/auth/permissions.ts#L120)):
 
 - `read:courses` - Kurse lesen
 - `read:participations` - Teilnahmen lesen
@@ -84,7 +48,7 @@ Listet alle Kurse mit Teilnehmerzahlen auf.
 
 | Parameter | Typ | Beschreibung | Default |
 |-----------|-----|--------------|---------|
-| `level` | `CourseLevel` | Filter nach Kurslevel (BEGINNER, INTERMEDIATE, ADVANCED) | - |
+| `level` | `CourseLevel` | Filter nach Kurslevel (BASIC, INTERMEDIATE, ADVANCED) | - |
 | `published` | `boolean` | Filter nach Veröffentlichungsstatus | `true` |
 | `limit` | `number` | Maximale Anzahl Ergebnisse (1-500) | `100` |
 | `offset` | `number` | Offset für Pagination | `0` |
@@ -92,8 +56,7 @@ Listet alle Kurse mit Teilnehmerzahlen auf.
 **Beispiel-Request:**
 
 ```bash
-# ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
-curl -X GET "https://<your-hemera-instance>/api/service/courses?level=BEGINNER&limit=10" \
+curl -X GET "https://hemera-academy.vercel.app/api/service/courses?level=BASIC&limit=10" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -107,7 +70,7 @@ curl -X GET "https://<your-hemera-instance>/api/service/courses?level=BEGINNER&l
       "id": "clx123...",
       "title": "Laparoskopie Basiskurs",
       "slug": "laparoskopie-basiskurs",
-      "level": "BEGINNER",
+      "level": "BASIC",
       "startDate": "2026-03-15T00:00:00.000Z",
       "endDate": "2026-03-16T00:00:00.000Z",
       "participantCount": 12
@@ -141,8 +104,7 @@ Ruft Details eines einzelnen Kurses mit allen Participations ab.
 **Beispiel-Request:**
 
 ```bash
-# ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
-curl -X GET "https://<your-hemera-instance>/api/service/courses/clx123..." \
+curl -X GET "https://hemera-academy.vercel.app/api/service/courses/clx123..." \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -155,7 +117,7 @@ curl -X GET "https://<your-hemera-instance>/api/service/courses/clx123..." \
     "id": "clx123...",
     "title": "Laparoskopie Basiskurs",
     "slug": "laparoskopie-basiskurs",
-    "level": "BEGINNER",
+    "level": "BASIC",
     "startDate": "2026-03-15T00:00:00.000Z",
     "endDate": "2026-03-16T00:00:00.000Z",
     "participations": [
@@ -196,8 +158,7 @@ Ruft Details einer Participation ab.
 **Beispiel-Request:**
 
 ```bash
-# ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
-curl -X GET "https://<your-hemera-instance>/api/service/participations/clp456..." \
+curl -X GET "https://hemera-academy.vercel.app/api/service/participations/clp456..." \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -258,8 +219,7 @@ Aktualisiert die Ergebnis-Daten einer Participation.
 **Beispiel-Request:**
 
 ```bash
-# ⚠️ Ersetze <your-hemera-instance> durch deine tatsächliche Domain (z.B. localhost:3000 oder Staging-URL)
-curl -X PUT "https://<your-hemera-instance>/api/service/participations/clp456.../result" \
+curl -X PUT "https://hemera-academy.vercel.app/api/service/participations/clp456.../result" \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -297,7 +257,7 @@ curl -X PUT "https://<your-hemera-instance>/api/service/participations/clp456...
 Die Service API implementiert Rate Limiting pro User/Role:
 
 - **api-client**: 100 Requests pro Minute
-- **admin**: 200 Requests pro Minute *(reduziert von 500 auf 200 für mehr Stabilität und gleichmäßige Lastverteilung, wirksam seit Februar 2026 — bei Bedarf bitte das Hemera-Team kontaktieren)*
+- **admin**: 200 Requests pro Minute
 
 Bei Überschreitung wird `429 Too Many Requests` zurückgegeben mit `Retry-After` Header.
 
@@ -369,7 +329,7 @@ Contract-Tests für die Service API befinden sich in:
 
 ## Beispiel-Integration (Aither)
 
-Siehe [Aither Service User Setup Guide](https://github.com/Laparo/aither/blob/main/docs/SERVICE_USER_SETUP.md) für eine vollständige Integrationsanleitung.
+Siehe das Aither Service User Setup Guide (`aither/docs/SERVICE_USER_SETUP.md` im Workspace) für eine vollständige Integration-Anleitung.
 
 ### Client-Implementierung
 
@@ -379,8 +339,7 @@ import { getTokenManager } from '@/lib/hemera/token-manager';
 
 const tokenManager = getTokenManager();
 const client = new HemeraClient({
-  // baseUrl aus Umgebungsvariable oder Platzhalter
-  baseUrl: process.env.HEMERA_BASE_URL ?? 'https://<your-hemera-instance>',
+  baseUrl: 'https://hemera-academy.vercel.app',
   getToken: () => tokenManager.getToken(),
 });
 

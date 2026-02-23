@@ -1,7 +1,13 @@
 // Clerk-based auth helpers
 import type { User } from '@clerk/nextjs/server';
 import { currentUser } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+
+export type { User };
+
 import { redirect } from 'next/navigation';
+
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 /**
  * Detects if we are running in a test/E2E or Clerk-disabled environment.
@@ -89,13 +95,14 @@ export async function isAdmin() {
 }
 
 /**
- * Check if a specific user has admin role by ID
+ * Check if the current user has admin role.
+ * Pass an already-loaded User object to avoid a redundant currentUser() call.
  */
-export async function checkUserAdminStatus(_userId: string): Promise<boolean> {
+export async function checkUserAdminStatus(
+  loadedUser?: User | null
+): Promise<boolean> {
   if (isMockAuthEnvironment()) return true;
-  const user = await currentUser();
-  // Check if the current authenticated user is an admin
-  // The userId parameter is the user being checked, but we validate the current user's admin status
+  const user = loadedUser ?? (await currentUser());
   return user?.publicMetadata?.role === 'admin';
 }
 
@@ -117,6 +124,65 @@ export async function requireAdmin() {
   }
 
   return user;
+}
+
+/**
+ * Result type for requireAdminUser — discriminated union.
+ * Routes check `authorized` and return `response` on failure.
+ */
+export type AdminAuthResult =
+  | { authorized: true; userId: string; user: User }
+  | { authorized: false; response: NextResponse; userId: string | null };
+
+/**
+ * Authenticate and authorize an admin user for API route handlers.
+ * Combines getCurrentUser() + null-check + checkUserAdminStatus() in one call.
+ * Returns a discriminated union so the caller can early-return on failure.
+ *
+ * Usage:
+ * ```ts
+ * const auth = await requireAdminUser();
+ * if (!auth.authorized) return auth.response;
+ * // auth.userId and auth.user are now available
+ * ```
+ */
+export async function requireAdminUser(): Promise<AdminAuthResult> {
+  let user: User | null = null;
+  try {
+    user = await getCurrentUser();
+  } catch (authError) {
+    serverInstance.error('getCurrentUser() fehlgeschlagen', {
+      error: authError instanceof Error ? authError.message : 'Unknown error',
+    });
+  }
+
+  const userId = user?.id ?? null;
+
+  if (!userId || !user) {
+    return {
+      authorized: false,
+      userId: null,
+      response: NextResponse.json(
+        { error: 'unauthorized', message: 'Authentifizierung erforderlich' },
+        { status: 401 }
+      ),
+    };
+  }
+
+  const isAdminUser = await checkUserAdminStatus(user);
+  if (!isAdminUser) {
+    serverInstance.warning('Admin-Zugriff verweigert', { userId });
+    return {
+      authorized: false,
+      userId,
+      response: NextResponse.json(
+        { error: 'forbidden', message: 'Admin-Berechtigung erforderlich' },
+        { status: 403 }
+      ),
+    };
+  }
+
+  return { authorized: true, userId, user };
 }
 
 /**

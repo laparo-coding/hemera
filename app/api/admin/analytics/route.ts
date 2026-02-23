@@ -3,10 +3,12 @@
  * Provides analytics data for dashboard and monitoring
  */
 
-import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { analytics } from '../../../../lib/analytics/request-analytics';
-import { checkUserAdminStatus } from '../../../../lib/auth/helpers';
+import {
+  checkUserAdminStatus,
+  getCurrentUser,
+} from '../../../../lib/auth/helpers';
 import { createApiLogger } from '../../../../lib/utils/api-logger';
 import {
   createErrorResponse,
@@ -38,13 +40,13 @@ export async function GET(request: NextRequest) {
   try {
     logger.info('Analytics data request started');
 
-    // Authentication check
+    // Authentication check — single Clerk call avoids redundant auth() + currentUser()
     let userId: string | null = null;
+    let authenticatedUser: Awaited<ReturnType<typeof getCurrentUser>> = null;
     try {
-      const authResult = await auth();
-      userId = authResult.userId;
+      authenticatedUser = await getCurrentUser();
+      userId = authenticatedUser?.id ?? null;
     } catch (authError) {
-      // In E2E test mode, auth() might fail, return 401
       logger.warn('Auth failed', authError);
       const errorResponse = createErrorResponse(
         'Unauthorized access',
@@ -78,7 +80,7 @@ export async function GET(request: NextRequest) {
       return errorResponse;
     }
 
-    const isAdmin = await checkUserAdminStatus(userId);
+    const isAdmin = await checkUserAdminStatus(authenticatedUser);
     if (!isAdmin) {
       logger.warn('Non-admin user attempted to access analytics', { userId });
       const errorResponse = createErrorResponse(

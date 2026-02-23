@@ -88,13 +88,13 @@ export const courseCreateSchema = z.object({
     .union([z.string(), z.date()])
     .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
     .refine(d => !Number.isNaN(d.getTime()), {
-      message: 'Ungültiges Startdatum',
+      message: 'Ungültige Startzeit',
     }),
   endTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
     .refine(d => !Number.isNaN(d.getTime()), {
-      message: 'Ungültiges Enddatum',
+      message: 'Ungültige Endzeit',
     })
     .optional()
     .nullable(),
@@ -214,14 +214,14 @@ export const courseUpdateSchema = z.object({
     .union([z.string(), z.date()])
     .transform((val): Date => (typeof val === 'string' ? new Date(val) : val))
     .refine(d => !Number.isNaN(d.getTime()), {
-      message: 'Ungültiges Startdatum',
+      message: 'Ungültige Startzeit',
     })
     .optional(),
   endTime: z
     .union([z.string(), z.date()])
     .transform(val => (typeof val === 'string' ? new Date(val) : val))
     .refine(d => !Number.isNaN(d.getTime()), {
-      message: 'Ungültiges Enddatum',
+      message: 'Ungültige Endzeit',
     })
     .optional(),
   instructor: z
