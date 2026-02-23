@@ -21,6 +21,11 @@ export interface ServiceAuthResult {
   authMethod: 'clerk' | 'api-key';
 }
 
+export type ServiceAuthError =
+  | { error: 'unauthenticated' }
+  | { error: 'forbidden'; userId: string; role: UserRole }
+  | { error: 'internal_error'; userId: string };
+
 /**
  * Authentifiziert einen Service-API-Request.
  *
@@ -33,11 +38,7 @@ export interface ServiceAuthResult {
  */
 export async function authenticateServiceRequest(
   request: NextRequest
-): Promise<
-  | ServiceAuthResult
-  | { error: 'unauthenticated' }
-  | { error: 'forbidden'; userId: string; role: UserRole }
-> {
+): Promise<ServiceAuthResult | ServiceAuthError> {
   // --- Pfad 1: API Key Auth ---
   const apiKey = extractApiKey(request.headers);
   if (apiKey) {
