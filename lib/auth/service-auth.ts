@@ -72,8 +72,8 @@ export async function authenticateServiceRequest(
         ? err
         : new Error(`getUserRole() failed: ${String(err)}`),
       {
+        userId,
         additionalData: {
-          userId,
           context: 'authenticateServiceRequest',
         },
       }
