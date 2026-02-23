@@ -11,6 +11,7 @@
 
 import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
+import { reportError } from '@/lib/monitoring/rollbar-official';
 import type { UserRole } from './permissions';
 import { getUserRole } from './permissions';
 import { extractApiKey, validateServiceApiKey } from './service-api-key';
@@ -63,9 +64,20 @@ export async function authenticateServiceRequest(
   let role: UserRole;
   try {
     role = await getUserRole();
-  } catch {
+  } catch (err) {
     // getUserRole() Fehler (z. B. DB oder Clerk API Fehler)
     // → internal_error zurückgeben statt Exception durchzureichen
+    reportError(
+      err instanceof Error
+        ? err
+        : new Error(`getUserRole() failed: ${String(err)}`),
+      {
+        additionalData: {
+          userId,
+          context: 'authenticateServiceRequest',
+        },
+      }
+    );
     return { error: 'internal_error', userId };
   }
 
