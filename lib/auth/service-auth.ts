@@ -11,6 +11,7 @@
 
 import { auth } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
+import { reportError } from '@/lib/monitoring/rollbar-official';
 import type { UserRole } from './permissions';
 import { getUserRole } from './permissions';
 import { extractApiKey, validateServiceApiKey } from './service-api-key';
@@ -20,6 +21,15 @@ export interface ServiceAuthResult {
   role: UserRole;
   authMethod: 'clerk' | 'api-key';
 }
+
+export type ServiceAuthError =
+  | { error: 'unauthenticated' }
+  | {
+      error: 'forbidden';
+      userId: string;
+      role: Exclude<UserRole, 'api-client' | 'admin'>;
+    }
+  | { error: 'internal_error'; userId: string };
 
 /**
  * Authentifiziert einen Service-API-Request.
@@ -33,11 +43,7 @@ export interface ServiceAuthResult {
  */
 export async function authenticateServiceRequest(
   request: NextRequest
-): Promise<
-  | ServiceAuthResult
-  | { error: 'unauthenticated' }
-  | { error: 'forbidden'; userId: string; role: UserRole }
-> {
+): Promise<ServiceAuthResult | ServiceAuthError> {
   // --- Pfad 1: API Key Auth ---
   const apiKey = extractApiKey(request.headers);
   if (apiKey) {
@@ -59,7 +65,26 @@ export async function authenticateServiceRequest(
     return { error: 'unauthenticated' };
   }
 
-  const role = await getUserRole();
+  let role: UserRole;
+  try {
+    role = await getUserRole();
+  } catch (err) {
+    // getUserRole() Fehler (z. B. DB oder Clerk API Fehler)
+    // → internal_error zurückgeben statt Exception durchzureichen
+    reportError(
+      err instanceof Error
+        ? err
+        : new Error(`getUserRole() failed: ${String(err)}`),
+      {
+        userId,
+        additionalData: {
+          context: 'authenticateServiceRequest',
+        },
+      }
+    );
+    return { error: 'internal_error', userId };
+  }
+
   if (role !== 'api-client' && role !== 'admin') {
     return { error: 'forbidden', userId, role };
   }
