@@ -24,7 +24,11 @@ export interface ServiceAuthResult {
 
 export type ServiceAuthError =
   | { error: 'unauthenticated' }
-  | { error: 'forbidden'; userId: string; role: UserRole }
+  | {
+      error: 'forbidden';
+      userId: string;
+      role: Exclude<UserRole, 'api-client' | 'admin'>;
+    }
   | { error: 'internal_error'; userId: string };
 
 /**
