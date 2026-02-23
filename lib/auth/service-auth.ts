@@ -60,7 +60,15 @@ export async function authenticateServiceRequest(
     return { error: 'unauthenticated' };
   }
 
-  const role = await getUserRole();
+  let role: UserRole;
+  try {
+    role = await getUserRole();
+  } catch {
+    // getUserRole() Fehler (z. B. DB oder Clerk API Fehler)
+    // → internal_error zurückgeben statt Exception durchzureichen
+    return { error: 'internal_error', userId };
+  }
+
   if (role !== 'api-client' && role !== 'admin') {
     return { error: 'forbidden', userId, role };
   }
