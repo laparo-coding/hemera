@@ -27,7 +27,14 @@ import { prisma } from '../../../lib/db/prisma';
 
 // Check if server is available before running HTTP-based tests
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-const isCI = process.env.CI === 'true';
+
+// More robust CI detection: check multiple common CI environment variables
+const isCI =
+  process.env.CI === 'true' ||
+  process.env.GITHUB_ACTIONS === 'true' ||
+  process.env.CI === '1' ||
+  Boolean(process.env.GITHUB_ACTIONS) ||
+  Boolean(process.env.RUNNER_OS);
 
 // Skip these tests in CI since they require a running server
 const describeWithServer = isCI ? describe.skip : describe;
