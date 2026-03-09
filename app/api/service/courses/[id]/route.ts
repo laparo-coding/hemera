@@ -93,7 +93,7 @@ export async function GET(
       return rateLimitResponse;
     }
 
-    // Query course with participations
+    // Query course with participations and user data
     const course = await prisma.course.findUnique({
       where: { id },
       select: {
@@ -108,10 +108,19 @@ export async function GET(
             id: true,
             userId: true,
             createdAt: true,
+            user: {
+              select: {
+                name: true,
+              },
+            },
             participation: {
               select: {
                 id: true,
                 status: true,
+                preparationIntent: true,
+                desiredResults: true,
+                lineManagerProfile: true,
+                preparationCompletedAt: true,
                 createdAt: true,
               },
             },
@@ -134,7 +143,20 @@ export async function GET(
       );
     }
 
-    // Transform response
+    // Transform response — includes both `participants` (for aither) and
+    // `participations` (legacy consumers) to avoid breaking changes.
+    const participants = course.bookings.map(booking => ({
+      participationId: booking.participation?.id ?? null,
+      userId: booking.userId,
+      name: booking.user?.name ?? null,
+      status: booking.participation?.status ?? 'NONE',
+      preparationIntent: booking.participation?.preparationIntent ?? null,
+      desiredResults: booking.participation?.desiredResults ?? null,
+      lineManagerProfile: booking.participation?.lineManagerProfile ?? null,
+      preparationCompletedAt:
+        booking.participation?.preparationCompletedAt?.toISOString() ?? null,
+    }));
+
     const data = {
       id: course.id,
       title: course.title,
@@ -142,6 +164,7 @@ export async function GET(
       level: course.level,
       startDate: course.startDate?.toISOString() ?? null,
       endDate: course.endDate?.toISOString() ?? null,
+      participants,
       participations: course.bookings.map(booking => ({
         id: booking.participation?.id ?? null,
         userId: booking.userId,
