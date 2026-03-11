@@ -51,6 +51,24 @@ if (typeof globalThis.TransformStream === 'undefined') {
   }
 })();
 
+// Ensure CI environment variables are properly set for contract test skipping
+// Jest's --ci flag and github-actions runner both should trigger CI mode
+// but we need to detect this early for top-level test configuration
+(() => {
+  if (!process.env.CI) {
+    // Detect CI environments
+    const isCIEnv =
+      process.env.GITHUB_ACTIONS === 'true' ||
+      Boolean(process.env.RUNNER_OS) ||
+      Boolean(process.env.CI_COMMIT_SHA) ||
+      Boolean(process.env.GITLAB_CI);
+
+    if (isCIEnv) {
+      process.env.CI = 'true';
+    }
+  }
+})();
+
 // We lazy import testcontainers to avoid requiring Docker when DATABASE_URL is already provided
 interface PostgresContainer {
   getHost: () => string;
