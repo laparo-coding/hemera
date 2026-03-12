@@ -136,7 +136,7 @@ jobs:
           CI: 'true'
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage
@@ -601,7 +601,7 @@ jobs:
           NEXT_PUBLIC_APP_URL: ${{ env.PRODUCTION_ALIAS }}
 
       - name: Upload Playwright Report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report-production

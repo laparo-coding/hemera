@@ -115,7 +115,7 @@ jobs:
 
       - name: Upload Backup as Artifact
         if: steps.filter.outputs.run == 'true' && steps.check_db.outputs.skip != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: db-backup-${{ matrix.env_name }}-${{ github.run_number }}-${{ github.run_id }}
           path: hemera_backup_*.tar.gz
