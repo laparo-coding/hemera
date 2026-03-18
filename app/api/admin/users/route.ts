@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     } catch (_authError) {
       // In E2E test mode, auth() might fail, return 401
       const errorResponse = createErrorResponse(
-        'Unauthorized access',
+        'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     if (!userId) {
       const errorResponse = createErrorResponse(
-        'Unauthorized access',
+        'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
