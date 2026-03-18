@@ -49,6 +49,7 @@ export interface Course {
   location?: CourseLocation | null;
   thumbnailUrl?: string | null;
   instructor?: string | null;
+  imageTwitter?: string | null;
   heroVideoPlaybackId?: string | null;
   curriculum?: CurriculumModule[] | null;
 }

@@ -39,14 +39,8 @@
 import { DownloadOutlined } from '@mui/icons-material';
 import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { useCallback, useState } from 'react';
-
+import { colors, typography } from '@/lib/design-tokens';
 import { logClientError } from '@/lib/errors/client';
-
-// Design tokens
-const colors = {
-  petrol: '#16404D',
-  gold: '#DDA853',
-};
 
 // Button text localization (German)
 export const BUTTON_TEXT = {
@@ -233,19 +227,19 @@ export default function InvoiceDownloadButton({
           <DownloadOutlined />
         )
       }
-      aria-label={BUTTON_TEXT.DEFAULT}
+      aria-label={buttonText}
       aria-busy={isLoading}
       sx={{
-        borderColor: error ? '#d32f2f' : colors.petrol,
-        color: error ? '#d32f2f' : colors.petrol,
-        fontFamily: '"Inter", sans-serif',
+        borderColor: error ? '#d32f2f' : colors.marsala,
+        color: error ? '#d32f2f' : colors.marsala,
+        fontFamily: typography.body,
         fontWeight: 500,
         textTransform: 'none',
         minWidth: compact ? 'auto' : undefined,
         px: compact ? 1.5 : 2,
         '&:hover': {
-          borderColor: colors.gold,
-          backgroundColor: 'rgba(221, 168, 83, 0.1)',
+          borderColor: colors.bronze,
+          backgroundColor: colors.bronzeLight,
         },
         '&.Mui-disabled': {
           borderColor: 'rgba(22, 64, 77, 0.3)',

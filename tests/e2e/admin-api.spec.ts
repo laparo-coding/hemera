@@ -22,7 +22,7 @@ test.describe('Admin API Authentication & Authorization', () => {
     const body = await response.json();
     expect(body.success).toBe(false);
     expect(body.error.code).toBe('UNAUTHORIZED');
-    expect(body.error.message).toContain('Unauthorized');
+    expect(body.error.message).toContain('Du bist nicht autorisiert');
   });
 
   test('GET /api/admin/courses - should require authentication', async ({
@@ -36,7 +36,7 @@ test.describe('Admin API Authentication & Authorization', () => {
     const body = await response.json();
     expect(body.success).toBe(false);
     expect(body.error.code).toBe('UNAUTHORIZED');
-    expect(body.error.message).toContain('Unauthorized');
+    expect(body.error.message).toContain('Du bist nicht autorisiert');
   });
 
   test('GET /api/admin/analytics - should require authentication', async ({
@@ -50,7 +50,7 @@ test.describe('Admin API Authentication & Authorization', () => {
     const body = await response.json();
     expect(body.success).toBe(false);
     expect(body.error.code).toBe('UNAUTHORIZED');
-    expect(body.error.message).toContain('Unauthorized');
+    expect(body.error.message).toContain('Du bist nicht autorisiert');
   });
 
   test('GET /api/admin/errors - should require authentication', async ({

@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import TestimonialForm from '@/components/testimonial/TestimonialForm';
+import { colors } from '@/lib/design-tokens';
 
 interface UserProfile {
   firstName: string;
@@ -251,7 +252,7 @@ export default function TestimonialSectionMyCourses({
         mb: 3,
         borderRadius: '16px',
         border: '1px solid rgba(22, 64, 77, 0.1)',
-        bgcolor: '#FBF5DD',
+        bgcolor: colors.beige,
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>

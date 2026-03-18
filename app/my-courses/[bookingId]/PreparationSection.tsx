@@ -18,6 +18,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useState, useTransition } from 'react';
+import { colors } from '@/lib/design-tokens';
 import {
   CourseParticipationStepper,
   ResumeUploader,
@@ -26,15 +27,6 @@ import {
 import type { ParticipationSummary } from '../../../lib/actions/participation';
 import { startParticipationAction } from '../../../lib/actions/participation';
 import type { PreparationInput } from '../../../lib/db/courseParticipation';
-
-// Design tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-} as const;
 
 interface PreparationSectionProps {
   bookingId: string;
@@ -96,7 +88,7 @@ export default function PreparationSection({
             fontFamily: '"Playfair Display", serif',
             fontSize: '1.25rem',
             fontWeight: 600,
-            color: colors.petrol,
+            color: colors.marsala,
             mb: 2,
           }}
         >
@@ -113,7 +105,7 @@ export default function PreparationSection({
         <Typography
           sx={{
             fontFamily: '"Inter", sans-serif',
-            color: colors.petrol,
+            color: colors.lightBlack,
             opacity: 0.8,
             mb: 3,
           }}
@@ -134,10 +126,10 @@ export default function PreparationSection({
           disabled={isPending || loading}
           onClick={handleStartPreparation}
           sx={{
-            backgroundColor: colors.gold,
-            color: colors.petrol,
+            backgroundColor: colors.bronze,
+            color: colors.marsala,
             '&:hover': {
-              backgroundColor: colors.petrol,
+              backgroundColor: colors.marsala,
               color: colors.white,
             },
           }}
@@ -169,7 +161,7 @@ export default function PreparationSection({
           fontFamily: '"Playfair Display", serif',
           fontSize: '1.25rem',
           fontWeight: 600,
-          color: colors.petrol,
+          color: colors.marsala,
           mb: 2,
         }}
       >
@@ -236,7 +228,7 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
 
   return (
     <Box sx={{ mt: 2 }}>
-      <Typography variant='body2' sx={{ mb: 3, color: colors.petrol }}>
+      <Typography variant='body2' sx={{ mb: 3, color: colors.lightBlack }}>
         Bereite dich auf das Seminar vor, indem du deine Ziele definierst.
       </Typography>
 
@@ -244,7 +236,7 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
       <Box sx={{ mb: 3 }}>
         <Typography
           variant='subtitle2'
-          sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
+          sx={{ mb: 1, color: colors.marsala, fontWeight: 500 }}
         >
           Was ist deine Absicht für dieses Seminar?
         </Typography>
@@ -254,10 +246,13 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           placeholder='Beschreibe, was du mit diesem Seminar erreichen möchtest...'
           style={{
             width: '100%',
-            minHeight: '80px',
+            minHeight: '240px',
             padding: '12px',
             borderRadius: '8px',
-            border: `1px solid ${colors.sage}`,
+            border: 'none',
+            outline: 'none',
+            backgroundColor: colors.lightGray,
+            color: colors.lightBlack,
             fontFamily: 'inherit',
             fontSize: '14px',
             resize: 'vertical',
@@ -269,7 +264,7 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
       <Box sx={{ mb: 3 }}>
         <Typography
           variant='subtitle2'
-          sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
+          sx={{ mb: 1, color: colors.marsala, fontWeight: 500 }}
         >
           Welche Ergebnisse erwartest du nach dem Seminar?
         </Typography>
@@ -279,10 +274,13 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           placeholder='Welche konkreten Ergebnisse möchtest du erreichen...'
           style={{
             width: '100%',
-            minHeight: '80px',
+            minHeight: '240px',
             padding: '12px',
             borderRadius: '8px',
-            border: `1px solid ${colors.sage}`,
+            border: 'none',
+            outline: 'none',
+            backgroundColor: colors.lightGray,
+            color: colors.lightBlack,
             fontFamily: 'inherit',
             fontSize: '14px',
             resize: 'vertical',
@@ -294,7 +292,7 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
       <Box sx={{ mb: 3 }}>
         <Typography
           variant='subtitle2'
-          sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
+          sx={{ mb: 1, color: colors.marsala, fontWeight: 500 }}
         >
           Beschreibe deinen Vorgesetzten
         </Typography>
@@ -304,10 +302,13 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           placeholder='Charaktereigenschaften, Kommunikationsstil, Prioritäten deines Vorgesetzten...'
           style={{
             width: '100%',
-            minHeight: '80px',
+            minHeight: '240px',
             padding: '12px',
             borderRadius: '8px',
-            border: `1px solid ${colors.sage}`,
+            border: 'none',
+            outline: 'none',
+            backgroundColor: colors.lightGray,
+            color: colors.lightBlack,
             fontFamily: 'inherit',
             fontSize: '14px',
             resize: 'vertical',
@@ -319,7 +320,7 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
       <Box sx={{ mb: 3 }}>
         <Typography
           variant='subtitle2'
-          sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
+          sx={{ mb: 1, color: colors.marsala, fontWeight: 500 }}
         >
           Lebenslauf (optional)
         </Typography>
@@ -335,7 +336,7 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           onClick={handleComplete}
           disabled={submitting}
           style={{
-            backgroundColor: submitting ? colors.sage : colors.petrol,
+            backgroundColor: submitting ? colors.rosyBrown : colors.marsala,
             color: colors.white,
             border: 'none',
             padding: '12px 24px',
@@ -376,7 +377,7 @@ const SummaryStepContent: React.FC<SummaryStepContentProps> = ({
           onClick={onComplete}
           disabled={!allViewed}
           style={{
-            backgroundColor: allViewed ? colors.petrol : colors.sage,
+            backgroundColor: allViewed ? colors.marsala : colors.rosyBrown,
             color: colors.white,
             border: 'none',
             padding: '12px 24px',

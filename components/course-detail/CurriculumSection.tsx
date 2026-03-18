@@ -30,7 +30,7 @@ import { colors, spacing, typography } from '../../lib/design-tokens';
 const timeRangeCellSx = {
   fontFamily: typography.body,
   fontWeight: 500,
-  color: colors.gold,
+  color: colors.bronze,
   whiteSpace: 'nowrap',
   width: '140px',
   pl: 0,
@@ -38,7 +38,7 @@ const timeRangeCellSx = {
 
 const titleCellSx = {
   fontFamily: typography.body,
-  color: colors.petrol,
+  color: colors.lightBlack,
 } as const;
 
 export interface CurriculumTopic {
@@ -100,7 +100,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
             fontFamily: typography.heading,
             fontSize: { xs: '2rem', md: '2.5rem' },
             fontWeight: 700,
-            color: colors.petrol,
+            color: colors.marsala,
             mb: 4,
             textAlign: 'center',
           }}
@@ -156,10 +156,10 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
                 }}
               >
                 <AccordionSummary
-                  expandIcon={<ExpandMoreIcon sx={{ color: colors.petrol }} />}
+                  expandIcon={<ExpandMoreIcon sx={{ color: colors.marsala }} />}
                   sx={{
                     backgroundColor:
-                      expanded === module.id ? colors.cream : colors.white,
+                      expanded === module.id ? colors.beige : colors.white,
                     px: { xs: 2, md: 4 },
                     py: 1,
                   }}
@@ -169,7 +169,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
                     sx={{
                       fontFamily: typography.heading,
                       fontWeight: 600,
-                      color: colors.petrol,
+                      color: colors.marsala,
                     }}
                   >
                     {module.title}

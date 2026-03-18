@@ -9,16 +9,8 @@
 
 import { Box, Paper, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import { TERMS } from '../../lib/constants/terminology';
-
-// Design tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-};
+import { TERMS } from '@/lib/constants/terminology';
+import { colors, typography } from '@/lib/design-tokens';
 
 // Section titles (German localization)
 export const SECTION_TITLES = {
@@ -92,8 +84,8 @@ export default function DashboardSection({
         p: { xs: 2, sm: 3, md: 4 },
         mb: 3,
         borderRadius: '16px',
-        border: '1px solid rgba(22, 64, 77, 0.1)',
-        boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+        border: '1px solid rgba(136, 65, 67, 0.1)',
+        boxShadow: '0 4px 24px rgba(136, 65, 67, 0.08)',
         bgcolor: colors.white,
       }}
     >
@@ -102,10 +94,10 @@ export default function DashboardSection({
         <Typography
           component='h2'
           sx={{
-            fontFamily: '"Playfair Display", serif',
+            fontFamily: typography.heading,
             fontSize: { xs: '1.25rem', sm: '1.5rem' },
             fontWeight: 600,
-            color: colors.petrol,
+            color: colors.marsala,
             mb: sectionDescription ? 0.5 : 0,
           }}
         >
@@ -114,9 +106,9 @@ export default function DashboardSection({
         {sectionDescription && (
           <Typography
             sx={{
-              fontFamily: '"Inter", sans-serif',
+              fontFamily: typography.body,
               fontSize: '0.875rem',
-              color: colors.petrol,
+              color: colors.lightBlack,
               opacity: 0.7,
             }}
           >
@@ -130,9 +122,9 @@ export default function DashboardSection({
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography
             sx={{
-              fontFamily: '"Inter", sans-serif',
+              fontFamily: typography.body,
               fontSize: '1rem',
-              color: colors.petrol,
+              color: colors.lightBlack,
               opacity: 0.6,
             }}
           >

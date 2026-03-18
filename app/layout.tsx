@@ -28,7 +28,7 @@ export default function RootLayout({
 
   return (
     <html lang='de' suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <Providers isE2E={isE2E}>{children}</Providers>
         <BuildInfo />
       </body>

@@ -49,15 +49,7 @@ import type {
   PreparationInput,
   ResultInput,
 } from '../../lib/db/courseParticipation';
-
-// Design tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-} as const;
+import { colors } from '../../lib/design-tokens';
 
 // Step definitions
 interface StepDefinition {
@@ -344,7 +336,7 @@ export const CourseParticipationStepper: React.FC<
   if (loading) {
     return (
       <Box display='flex' justifyContent='center' py={4}>
-        <CircularProgress sx={{ color: colors.petrol }} />
+        <CircularProgress sx={{ color: colors.marsala }} />
       </Box>
     );
   }
@@ -368,12 +360,12 @@ export const CourseParticipationStepper: React.FC<
       elevation={0}
       sx={{
         p: 3,
-        border: `1px solid ${colors.sage}`,
+        border: `1px solid ${colors.rosyBrown}`,
         borderRadius: 2,
         backgroundColor: colors.white,
       }}
     >
-      <Typography variant='h6' sx={{ mb: 3, color: colors.petrol }}>
+      <Typography variant='h6' sx={{ mb: 3, color: colors.marsala }}>
         {data.participation.booking.course.title}
       </Typography>
 
@@ -389,9 +381,10 @@ export const CourseParticipationStepper: React.FC<
             <StepLabel
               StepIconProps={{
                 sx: {
-                  color: index <= activeStep ? colors.petrol : colors.sage,
-                  '&.Mui-active': { color: colors.gold },
-                  '&.Mui-completed': { color: colors.sage },
+                  color:
+                    index <= activeStep ? colors.marsala : colors.rosyBrown,
+                  '&.Mui-active': { color: colors.bronze },
+                  '&.Mui-completed': { color: colors.rosyBrown },
                 },
               }}
             >
@@ -401,7 +394,7 @@ export const CourseParticipationStepper: React.FC<
                   variant='subtitle1'
                   sx={{
                     fontWeight: index === activeStep ? 600 : 400,
-                    color: colors.petrol,
+                    color: colors.marsala,
                   }}
                 >
                   {step.label}
@@ -440,8 +433,8 @@ const DefaultStepContent: React.FC<DefaultStepContentProps> = ({
       onClick={onComplete}
       disabled={submitting}
       sx={{
-        backgroundColor: colors.petrol,
-        '&:hover': { backgroundColor: colors.gold },
+        backgroundColor: colors.marsala,
+        '&:hover': { backgroundColor: colors.bronze },
       }}
     >
       {submitting ? (

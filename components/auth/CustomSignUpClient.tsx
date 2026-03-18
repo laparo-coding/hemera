@@ -12,14 +12,7 @@ import {
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type FormEvent, useMemo, useState } from 'react';
-
-// Design tokens from Hemera spec
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-};
+import { colors } from '@/lib/design-tokens';
 
 export default function CustomSignUpClient() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -85,7 +78,7 @@ export default function CustomSignUpClient() {
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: colors.cream,
+        bgcolor: colors.beige,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -122,7 +115,7 @@ export default function CustomSignUpClient() {
                   fontFamily: '"Playfair Display", serif',
                   fontSize: { xs: '1.75rem', sm: '2rem' },
                   fontWeight: 700,
-                  color: colors.petrol,
+                  color: colors.marsala,
                   mb: 1,
                 }}
               >
@@ -132,7 +125,7 @@ export default function CustomSignUpClient() {
                 sx={{
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '1rem',
-                  color: colors.petrol,
+                  color: colors.lightBlack,
                   opacity: 0.8,
                 }}
               >
@@ -163,14 +156,14 @@ export default function CustomSignUpClient() {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '8px',
                       '&:hover fieldset': {
-                        borderColor: colors.sage,
+                        borderColor: colors.rosyBrown,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: colors.petrol,
+                        borderColor: colors.marsala,
                       },
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
-                      color: colors.petrol,
+                      color: colors.marsala,
                     },
                   }}
                 />
@@ -187,14 +180,14 @@ export default function CustomSignUpClient() {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '8px',
                       '&:hover fieldset': {
-                        borderColor: colors.sage,
+                        borderColor: colors.rosyBrown,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: colors.petrol,
+                        borderColor: colors.marsala,
                       },
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
-                      color: colors.petrol,
+                      color: colors.marsala,
                     },
                   }}
                 />
@@ -217,14 +210,14 @@ export default function CustomSignUpClient() {
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '8px',
                     '&:hover fieldset': {
-                      borderColor: colors.sage,
+                      borderColor: colors.rosyBrown,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: colors.petrol,
+                      borderColor: colors.marsala,
                     },
                   },
                   '& .MuiInputLabel-root.Mui-focused': {
-                    color: colors.petrol,
+                    color: colors.marsala,
                   },
                 }}
               />
@@ -239,8 +232,8 @@ export default function CustomSignUpClient() {
               sx={{
                 mt: 1,
                 py: 1.5,
-                bgcolor: colors.gold,
-                color: colors.petrol,
+                bgcolor: colors.bronze,
+                color: colors.marsala,
                 fontWeight: 600,
                 fontSize: '1rem',
                 textTransform: 'none',
@@ -249,8 +242,8 @@ export default function CustomSignUpClient() {
                   bgcolor: '#C99545',
                 },
                 '&:disabled': {
-                  bgcolor: colors.sage,
-                  color: colors.petrol,
+                  bgcolor: colors.rosyBrown,
+                  color: colors.marsala,
                   opacity: 0.6,
                 },
               }}
@@ -271,7 +264,7 @@ export default function CustomSignUpClient() {
                 mt: 2,
                 fontFamily: '"Inter", sans-serif',
                 fontSize: '0.875rem',
-                color: colors.petrol,
+                color: colors.lightBlack,
               }}
             >
               Bereits registriert?{' '}
@@ -279,11 +272,11 @@ export default function CustomSignUpClient() {
                 component='a'
                 href='/sign-in'
                 sx={{
-                  color: colors.petrol,
+                  color: colors.marsala,
                   fontWeight: 600,
                   textDecoration: 'underline',
                   '&:hover': {
-                    color: colors.gold,
+                    color: colors.bronze,
                   },
                 }}
               >

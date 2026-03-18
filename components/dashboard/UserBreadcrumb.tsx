@@ -11,11 +11,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Breadcrumbs, Link as MuiLink, Typography } from '@mui/material';
 import Link from 'next/link';
-
-// Design tokens from Hemera spec
-const colors = {
-  petrol: '#16404D',
-} as const;
+import { colors, typography } from '@/lib/design-tokens';
 
 export interface UserBreadcrumbItem {
   /** Display label */
@@ -48,7 +44,7 @@ export function UserBreadcrumb({ items }: UserBreadcrumbProps) {
       separator={
         <NavigateNextIcon
           fontSize='small'
-          sx={{ color: colors.petrol, opacity: 0.5 }}
+          sx={{ color: colors.marsala, opacity: 0.5 }}
         />
       }
       aria-label='Breadcrumb-Navigation'
@@ -67,8 +63,8 @@ export function UserBreadcrumb({ items }: UserBreadcrumbProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 0.5,
-                color: colors.petrol,
-                fontFamily: '"Inter", sans-serif',
+                color: colors.marsala,
+                fontFamily: typography.body,
                 fontSize: '0.875rem',
               }}
             >
@@ -89,9 +85,9 @@ export function UserBreadcrumb({ items }: UserBreadcrumbProps) {
               display: 'flex',
               alignItems: 'center',
               gap: 0.5,
-              color: colors.petrol,
+              color: colors.marsala,
               opacity: 0.7,
-              fontFamily: '"Inter", sans-serif',
+              fontFamily: typography.body,
               fontSize: '0.875rem',
               '&:hover': {
                 opacity: 1,

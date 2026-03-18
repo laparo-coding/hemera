@@ -91,7 +91,7 @@ export const DynamicTestimonialsSection: React.FC<
       data-testid='dynamic-testimonials-section'
       aria-labelledby='testimonials-title'
       sx={{
-        backgroundColor: colors.petrol,
+        backgroundColor: colors.marsala,
         py: spacing.sectionPy,
       }}
     >
@@ -105,7 +105,7 @@ export const DynamicTestimonialsSection: React.FC<
             fontFamily: typography.heading,
             fontSize: { xs: '2rem', md: '2.5rem' },
             fontWeight: 700,
-            color: colors.cream,
+            color: colors.beige,
             mb: 5,
             textAlign: 'center',
           }}
@@ -132,7 +132,7 @@ export const DynamicTestimonialsSection: React.FC<
                   <FormatQuoteIcon
                     data-testid='quote-icon'
                     sx={{
-                      color: colors.gold,
+                      color: colors.bronze,
                       fontSize: 40,
                       mb: 2,
                       transform: 'scaleX(-1)',
@@ -146,7 +146,7 @@ export const DynamicTestimonialsSection: React.FC<
                       fontFamily: typography.body,
                       fontSize: '1.1rem',
                       lineHeight: 1.7,
-                      color: colors.petrol,
+                      color: colors.lightBlack,
                       mb: 3,
                       fontStyle: 'italic',
                     }}
@@ -176,7 +176,7 @@ export const DynamicTestimonialsSection: React.FC<
                         sx={{
                           fontFamily: typography.body,
                           fontWeight: 700,
-                          color: colors.petrol,
+                          color: colors.marsala,
                         }}
                       >
                         {testimonial.displayName}

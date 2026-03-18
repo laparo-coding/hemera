@@ -2,6 +2,7 @@
 
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Box, Container, Typography } from '@mui/material';
+import { colors } from '@/lib/design-tokens';
 import CourseCard, { type CourseCardProps } from './CourseCard';
 
 export interface CourseProgressionSectionProps {
@@ -17,13 +18,6 @@ export interface CourseProgressionSectionProps {
   showProgression?: boolean;
 }
 
-// Design tokens from spec
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-};
-
 export default function CourseProgressionSection({
   id = 'kurse',
   headline,
@@ -37,7 +31,7 @@ export default function CourseProgressionSection({
       id={id}
       data-testid='course-progression-section'
       sx={{
-        bgcolor: colors.cream,
+        bgcolor: colors.beige,
         py: { xs: 8, md: 12 },
       }}
     >
@@ -50,7 +44,7 @@ export default function CourseProgressionSection({
               fontFamily: '"Playfair Display", serif',
               fontSize: { xs: '2rem', md: '2.5rem' },
               fontWeight: 700,
-              color: colors.petrol,
+              color: colors.marsala,
               mb: 2,
             }}
           >
@@ -63,7 +57,7 @@ export default function CourseProgressionSection({
                 fontFamily: '"Inter", sans-serif',
                 fontSize: '1.125rem',
                 lineHeight: 1.6,
-                color: colors.petrol,
+                color: colors.lightBlack,
                 opacity: 0.85,
                 maxWidth: '600px',
                 mx: 'auto',
@@ -115,9 +109,10 @@ export default function CourseProgressionSection({
                 }}
               >
                 <ArrowForwardIcon
+                  aria-hidden='true'
                   sx={{
                     fontSize: '2.5rem',
-                    color: colors.gold,
+                    color: colors.bronze,
                   }}
                 />
               </Box>
@@ -131,9 +126,10 @@ export default function CourseProgressionSection({
                 }}
               >
                 <ArrowForwardIcon
+                  aria-hidden='true'
                   sx={{
                     fontSize: '2.5rem',
-                    color: colors.gold,
+                    color: colors.bronze,
                   }}
                 />
               </Box>

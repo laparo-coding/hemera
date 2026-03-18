@@ -21,7 +21,7 @@ const MuxPlayer = dynamic(() => import('@mux/mux-player-react'), {
   loading: () => (
     <Skeleton
       variant='rectangular'
-      sx={{ width: '100%', height: '100%', bgcolor: colors.petrol }}
+      sx={{ width: '100%', height: '100%', bgcolor: colors.marsala }}
     />
   ),
 });
@@ -55,7 +55,7 @@ export const CourseHeroSection: React.FC<CourseHeroSectionProps> = ({
         aspectRatio: '16 / 9',
         maxHeight: '80vh',
         overflow: 'hidden',
-        backgroundColor: colors.petrol,
+        backgroundColor: colors.marsala,
         borderRadius: '16px',
         boxShadow: '0 8px 32px rgba(22, 64, 77, 0.15)',
       }}

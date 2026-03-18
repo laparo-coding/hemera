@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import {
+  type Course,
+  getCourseById,
+  getCourseBySlug,
+} from '../../../lib/api/courses';
 import { SITE_CONFIG } from '../../../lib/seo/constants';
 import {
   generateSEOMetadata,
@@ -16,43 +21,27 @@ export async function generateMetadata({
   const { id: identifier } = await params;
 
   try {
-    // Use relative fetch to work in both dev and prod, and keep absolute URLs only for canonical
-    const res = await fetch(`/api/courses/${encodeURIComponent(identifier)}`, {
-      // Metadata is static-ish but course content can change; allow a short revalidate window
-      next: { revalidate: 60 },
-    });
+    // Fetch course data directly via DB helpers instead of self-fetching an API route
+    // (relative fetch causes a server deadlock in dev because the server calls itself)
+    let course: Course;
 
-    if (!res.ok) {
-      // Fallback metadata when course is not found
-      return generateSEOMetadata({
-        title: 'Seminar',
-        description: 'Seminardetails und Informationen.',
-        canonicalUrl: `${SITE_CONFIG.url}/courses/${identifier}`,
-      });
+    try {
+      course = await getCourseBySlug(identifier);
+    } catch {
+      course = await getCourseById(identifier);
     }
 
-    const payload = await res.json();
-    const course = payload?.data as
-      | {
-          id: string;
-          title: string;
-          description?: string | null;
-          slug?: string;
-          imageTwitter?: string | null;
-        }
-      | undefined;
-
-    const title = course?.title ?? 'Kurs';
-    const canonicalSlug = course?.slug ?? identifier;
+    const title = course.title ?? 'Kurs';
+    const canonicalSlug = course.slug ?? identifier;
     const description = truncateDescription(
-      course?.description ??
+      course.description ??
         'Seminardetails der Hemera Academy: Inhalte, Termine und Buchungsinformationen.',
       160
     );
     // Use Twitter image from database if available, otherwise fallback
-    const ogImage = course?.imageTwitter
+    const ogImage = course.imageTwitter
       ? course.imageTwitter
-      : course?.slug
+      : course.slug
         ? `/images/courses/${course.slug}.jpg`
         : undefined;
 
@@ -63,7 +52,7 @@ export async function generateMetadata({
       ogImage,
     });
   } catch (_) {
-    // Network or parsing error – provide minimal but valid metadata
+    // Course not found or DB error – provide minimal but valid metadata
     return generateSEOMetadata({
       title: 'Seminar',
       description: 'Seminardetails und Informationen.',

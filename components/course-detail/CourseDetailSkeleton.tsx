@@ -16,7 +16,7 @@ export const CourseDetailSkeleton: React.FC = () => {
       <Box
         sx={{
           minHeight: { xs: '70vh', md: '80vh' },
-          backgroundColor: colors.petrol,
+          backgroundColor: colors.marsala,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -51,7 +51,7 @@ export const CourseDetailSkeleton: React.FC = () => {
       </Box>
 
       {/* Overview Section Skeleton */}
-      <Box sx={{ backgroundColor: colors.cream, py: spacing.sectionPy }}>
+      <Box sx={{ backgroundColor: colors.beige, py: spacing.sectionPy }}>
         <Container maxWidth={spacing.containerMaxWidth}>
           <Box sx={{ textAlign: 'center' }}>
             <Skeleton
@@ -125,7 +125,7 @@ export const CourseDetailSkeleton: React.FC = () => {
       </Box>
 
       {/* Pricing Section Skeleton */}
-      <Box sx={{ backgroundColor: colors.sage, py: spacing.sectionPy }}>
+      <Box sx={{ backgroundColor: colors.rosyBrown, py: spacing.sectionPy }}>
         <Container maxWidth={spacing.containerMaxWidth}>
           <Skeleton
             variant='text'
@@ -167,7 +167,7 @@ export const CourseDetailSkeleton: React.FC = () => {
               <Paper
                 elevation={0}
                 sx={{
-                  backgroundColor: colors.petrol,
+                  backgroundColor: colors.marsala,
                   borderRadius: 3,
                   p: 4,
                   height: 250,
@@ -202,7 +202,7 @@ export const CourseDetailSkeleton: React.FC = () => {
       </Box>
 
       {/* Testimonials Section Skeleton */}
-      <Box sx={{ backgroundColor: colors.petrol, py: spacing.sectionPy }}>
+      <Box sx={{ backgroundColor: colors.marsala, py: spacing.sectionPy }}>
         <Container maxWidth={spacing.containerMaxWidth}>
           <Skeleton
             variant='text'
