@@ -13,13 +13,6 @@ import { afterAll, beforeAll } from '@jest/globals';
 import '@testing-library/jest-dom';
 import dotenv from 'dotenv';
 
-// Ensure NODE_ENV is set to 'test' for Mock Auth to work
-// @ts-expect-error - NODE_ENV is read-only but we need to set it in tests
-if (!process.env.NODE_ENV) {
-  // @ts-expect-error
-  process.env.NODE_ENV = 'test';
-}
-
 // Polyfill Web APIs for jsdom environment (required by testcontainers and other libraries)
 if (typeof globalThis.TextEncoder === 'undefined') {
   globalThis.TextEncoder = TextEncoder;
