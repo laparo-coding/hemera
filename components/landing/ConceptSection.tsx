@@ -95,7 +95,7 @@ export default function ConceptSection({
                 fontFamily: typography.heading,
                 fontSize: '1.5rem',
                 fontWeight: 600,
-                color: colors.marsala,
+                color: colors.lightBlack,
                 mb: 1,
               }}
             >
