@@ -137,13 +137,13 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
             mb: 5,
           }}
         >
-          <PersonIcon sx={{ color: colors.lightBlack, fontSize: 32 }} />
+          <PersonIcon sx={{ color: colors.rosyBrown, fontSize: 32 }} />
           <Box>
             <Typography
               variant='caption'
               sx={{
                 fontFamily: typography.body,
-                color: colors.lightBlack,
+                color: colors.rosyBrown,
                 textTransform: 'uppercase',
                 letterSpacing: 1,
               }}

@@ -198,7 +198,7 @@ export default function CourseCard({
             label='Nicht teilgenommen'
             size='small'
             sx={{
-              bgcolor: 'rgba(136, 65, 67, 0.1)',
+              bgcolor: 'rgba(22, 64, 77, 0.1)',
               color: colors.marsala,
               fontFamily: '"Inter", sans-serif',
             }}
@@ -216,10 +216,10 @@ export default function CourseCard({
       sx={{
         p: { xs: 2, sm: 3 },
         borderRadius: '12px',
-        border: '1px solid rgba(136, 65, 67, 0.1)',
+        border: '1px solid rgba(22, 64, 77, 0.1)',
         transition: 'box-shadow 0.2s ease',
         '&:hover': {
-          boxShadow: '0 4px 12px rgba(136, 65, 67, 0.12)',
+          boxShadow: '0 4px 12px rgba(22, 64, 77, 0.12)',
         },
       }}
     >

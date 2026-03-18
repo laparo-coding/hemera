@@ -19,8 +19,8 @@ export function DashboardNavigation() {
       position='static'
       elevation={0}
       sx={{
-        bgcolor: colors.marsala,
-        borderBottom: `1px solid ${colors.marsalaDark}`,
+        bgcolor: colors.rosyBrown,
+        borderBottom: `1px solid ${colors.rosyBrown}`,
       }}
     >
       <Container maxWidth='lg'>

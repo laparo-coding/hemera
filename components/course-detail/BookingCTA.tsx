@@ -56,7 +56,7 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
             : buttonLabel
         }
         sx={{
-          backgroundColor: colors.bronze,
+          backgroundColor: colors.marsala,
           color: colors.white,
           fontFamily: typography.body,
           fontWeight: 600,
@@ -66,7 +66,7 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
           textTransform: 'none',
           fontSize: '1.1rem',
           '&:hover': {
-            backgroundColor: colors.bronzeHover,
+            backgroundColor: colors.marsalaDark,
           },
         }}
       >
@@ -97,7 +97,7 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
           borderWidth: 2,
           '&:hover': {
             borderWidth: 2,
-            backgroundColor: 'rgba(136, 65, 67, 0.04)',
+            backgroundColor: 'rgba(22, 64, 77, 0.04)',
           },
         }}
       >
@@ -112,7 +112,7 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
       data-testid='booking-cta-banner'
       sx={{
         width: '100%',
-        backgroundColor: colors.beige,
+        backgroundColor: colors.white,
         py: { xs: 4, md: 6 },
         textAlign: 'center',
       }}
