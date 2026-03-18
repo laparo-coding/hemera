@@ -18,9 +18,9 @@ const config: Config = {
   testMatch: [
     '<rootDir>/tests/unit/**/*.spec.ts',
     '<rootDir>/tests/unit/**/*.spec.tsx',
-    // Note: tests/contracts tests are excluded by default since they require
-    // a running HTTP server. They are deployed as separate E2E tests.
-    // To run them locally with a dev server: npx jest tests/contracts
+    // Note: tests/contracts are excluded by default since they require
+    // a running HTTP server. Run contract tests with: npm run test:contracts
+    // Test folder structure: tests/unit/ → Jest unit tests, tests/contracts/ → Jest contract tests, tests/e2e/ → Playwright E2E
   ],
   testPathIgnorePatterns: [
     '/node_modules/',

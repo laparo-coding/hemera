@@ -153,7 +153,7 @@ export const SummaryAssetList: React.FC<SummaryAssetListProps> = ({
           </Typography>
           <Typography variant='body2' color='text.secondary'>
             Für diesen Kurs sind derzeit keine Video-Zusammenfassungen
-            hinterlegt. Sie können diesen Schritt überspringen.
+            hinterlegt. Du kannst diesen Schritt überspringen.
           </Typography>
         </CardContent>
       </Card>

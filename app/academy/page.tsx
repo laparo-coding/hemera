@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import {
   getFullUrl,
   IMAGE_CONFIG,
@@ -113,7 +114,7 @@ export default function AcademyPage() {
           </div>
 
           <div className='mt-10'>
-            <a
+            <Link
               href='/courses'
               className='inline-flex items-center px-5 py-3 rounded-md text-white hover:opacity-90'
               style={{ backgroundColor: 'var(--hemera-marsala)' }}
@@ -133,7 +134,7 @@ export default function AcademyPage() {
                   d='M9 5l7 7-7 7'
                 />
               </svg>
-            </a>
+            </Link>
           </div>
         </section>
       </main>

@@ -242,7 +242,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
                     onClick={() => handleStartPreparation(item.booking.id)}
                     sx={{
                       backgroundColor: colors.bronze,
-                      color: colors.marsala,
+                      color: colors.white,
                       '&:hover': {
                         backgroundColor: colors.marsala,
                         color: colors.white,
