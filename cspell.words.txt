@@ -48,7 +48,6 @@ Berechtigung
 bereit
 Bernt
 Bezahllogik
-bronze
 bfkc
 bronze
 bhat
@@ -450,7 +449,6 @@ realen
 rechnung
 redis
 Redocly
-rosyBrown
 reporterror
 rosyBrown
 responsiv
