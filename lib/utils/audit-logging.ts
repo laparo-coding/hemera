@@ -4,6 +4,7 @@
  */
 
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { filterAuditEvent } from './log-sanitizer';
 
 export type AuditActionType =
   | 'COURSE_MATERIAL_CREATE'
@@ -51,14 +52,14 @@ export function logAuditEvent(
 
   // Log to Rollbar with "audit" tag for easy filtering
   // Note: userId remains only in structured metadata, not in human-readable message
+  // Sanitize sensitive fields before spreading to prevent information disclosure
+  const auditRecord: Record<string, unknown> = { ...auditLog };
+  const sanitizedAudit = filterAuditEvent(auditRecord);
+
   if (status === 'failure') {
-    serverInstance.warning(`Audit: ${action} failed`, {
-      ...auditLog,
-    });
+    serverInstance.warning(`Audit: ${action} failed`, sanitizedAudit);
   } else {
-    serverInstance.info(`Audit: ${action} completed`, {
-      ...auditLog,
-    });
+    serverInstance.info(`Audit: ${action} completed`, sanitizedAudit);
   }
 }
 

@@ -19,7 +19,7 @@ export function DashboardNavigation() {
       position='static'
       elevation={0}
       sx={{
-        bgcolor: colors.marsala,
+        bgcolor: colors.rosyBrown,
         borderBottom: `1px solid ${colors.marsalaDark}`,
       }}
     >

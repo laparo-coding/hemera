@@ -1,17 +1,37 @@
 /**
  * Course Material API Functions
- * Feature: 023-slide-editor
+ * Feature: 023-slide-editor, 026-course-material-integration
  *
  * Server-side functions for managing course material CRUD operations
  */
 
+import type { CourseMaterialType, Prisma } from '@prisma/client';
 import { prisma } from '../db/prisma';
+
+type CourseMaterialSummary = Prisma.CourseMaterialGetPayload<{
+  select: {
+    id: true;
+    identifier: true;
+    title: true;
+    type: true;
+    createdAt: true;
+    updatedAt: true;
+  };
+}>;
 
 /**
  * Get all course materials
  */
-export async function getAllMaterials() {
+export async function getAllMaterials(): Promise<CourseMaterialSummary[]> {
   return prisma.courseMaterial.findMany({
+    select: {
+      id: true,
+      identifier: true,
+      title: true,
+      type: true,
+      createdAt: true,
+      updatedAt: true,
+    },
     orderBy: { createdAt: 'desc' },
   });
 }
@@ -22,6 +42,16 @@ export async function getAllMaterials() {
 export async function getMaterialById(id: string) {
   return prisma.courseMaterial.findUnique({
     where: { id },
+    select: {
+      id: true,
+      identifier: true,
+      title: true,
+      type: true,
+      blobUrl: true,
+      blobPathname: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   });
 }
 
@@ -48,6 +78,7 @@ export async function isIdentifierTaken(
 export async function createMaterial(data: {
   identifier: string;
   title: string;
+  type: CourseMaterialType;
   blobUrl: string;
   blobPathname: string;
 }) {

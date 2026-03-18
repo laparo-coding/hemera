@@ -10,6 +10,7 @@
 
 import { put } from '@vercel/blob';
 import { serverInstance as rollbar } from '../monitoring/rollbar-official';
+import { sanitizeBlobUrlField } from './log-sanitizer';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -84,18 +85,19 @@ export async function uploadThumbnail(file: File): Promise<UploadResult> {
  * Delete a thumbnail from Vercel Blob (cleanup)
  */
 export async function deleteThumbnail(url: string): Promise<boolean> {
+  const blobIdentifier = sanitizeBlobUrlField(url);
   try {
     // Vercel Blob delete API would go here
     // For now, just log the deletion request
     rollbar.info('Thumbnail deletion requested', {
       action: 'delete',
-      url,
+      ...blobIdentifier,
     });
     return true;
   } catch (error) {
     rollbar.error('Failed to delete thumbnail', error as Error, {
       action: 'delete',
-      url,
+      ...blobIdentifier,
     });
     return false;
   }

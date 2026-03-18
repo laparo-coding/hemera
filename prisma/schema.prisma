@@ -279,15 +279,21 @@ model Testimonial {
   @@map("testimonials")
 }
 
-// COURSE MATERIALS (023-slide-editor)
+// COURSE MATERIALS (023-slide-editor, 026-course-material-integration)
+enum CourseMaterialType {
+  CONTENT
+  SLIDE_CONTROL
+}
+
 model CourseMaterial {
-  id           String   @id @default(cuid())
-  identifier   String   @unique
+  id           String               @id @default(cuid())
+  identifier   String               @unique
   title        String
-  blobUrl      String   @map("blob_url")
-  blobPathname String   @map("blob_pathname")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  type         CourseMaterialType   @default(CONTENT) @map("type")
+  blobUrl      String               @map("blob_url")
+  blobPathname String               @map("blob_pathname")
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @updatedAt @map("updated_at")
 
   curriculumLinks CurriculumTopicMaterial[]
 
