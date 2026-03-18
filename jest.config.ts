@@ -18,7 +18,9 @@ const config: Config = {
   testMatch: [
     '<rootDir>/tests/unit/**/*.spec.ts',
     '<rootDir>/tests/unit/**/*.spec.tsx',
-    '<rootDir>/tests/contracts/**/*.spec.ts',
+    // Note: tests/contracts tests are excluded by default since they require
+    // a running HTTP server. They are deployed as separate E2E tests.
+    // To run them locally with a dev server: npx jest tests/contracts
   ],
   testPathIgnorePatterns: [
     '/node_modules/',
