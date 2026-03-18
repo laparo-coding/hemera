@@ -13,8 +13,8 @@ body {
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: #fbf5dd;
+  color: var(--hemera-light-black);
+  background: var(--hemera-beige);
   font-family: "Inter", sans-serif;
 }
 
@@ -30,24 +30,14 @@ a {
 }
 
 :root {
-  --foreground-rgb: 22, 64, 77;
-  --background-start-rgb: 251, 245, 221;
-  --background-end-rgb: 251, 245, 221;
-  --hemera-cream: #fbf5dd;
-  --hemera-petrol: #16404d;
-  --hemera-gold: #dda853;
-  --hemera-sage: #a6cdc6;
+  --hemera-beige: #ebe2d3;
+  --hemera-marsala: #884143;
+  --hemera-bronze: #926a49;
+  --hemera-rosy-brown: #bc8f8f;
+  --hemera-light-black: #2d2d2d;
 }
 
 /* Clerk Modal: Transparenter Hintergrund für UserProfile Modal */
 .cl-modalBackdrop {
   background-color: transparent !important;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 22, 64, 77;
-    --background-start-rgb: 251, 245, 221;
-    --background-end-rgb: 251, 245, 221;
-  }
 }

@@ -27,13 +27,14 @@ import {
   Typography,
 } from '@mui/material';
 import { useMemo, useState } from 'react';
+import { TERMS } from '@/lib/constants';
+import { colors } from '@/lib/design-tokens';
 import {
   formatDisplayName,
   isFormatOptionAvailable,
   type NameDisplayFormat,
 } from '@/lib/schemas/testimonial-schema';
 import { getAvatarInitial } from '@/lib/utils/avatar';
-import { TERMS } from '../../lib/constants';
 
 interface UserProfile {
   firstName: string;
@@ -210,7 +211,7 @@ export default function TestimonialForm({
       <TextField
         label='Dein Erfahrungsbericht'
         multiline
-        rows={5}
+        rows={15}
         fullWidth
         value={statement}
         onChange={e => setStatement(e.target.value)}
@@ -223,7 +224,24 @@ export default function TestimonialForm({
               ? 'Mindestens 10 Zeichen erforderlich'
               : `${characterCount} / ${MAX_STATEMENT_LENGTH} Zeichen`
         }
-        sx={{ mb: 3 }}
+        sx={{
+          mb: 3,
+          '& .MuiInputBase-root': {
+            backgroundColor: colors.lightGray,
+            color: colors.lightBlack,
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: 'transparent',
+            },
+            '&:hover fieldset': {
+              borderColor: 'transparent',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: colors.rosyBrown,
+            },
+          },
+        }}
       />
 
       {/* Name format selection */}

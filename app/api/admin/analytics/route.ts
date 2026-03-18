@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     if (!userId) {
       logger.warn('Unauthorized analytics access attempt');
       const errorResponse = createErrorResponse(
-        'Unauthorized access',
+        'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401

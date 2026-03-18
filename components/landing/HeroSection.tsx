@@ -1,6 +1,5 @@
-'use client';
-
 import { Box, Button, Container, Typography } from '@mui/material';
+import { colors, typography } from '@/lib/design-tokens';
 
 export interface HeroSectionProps {
   /** Headline - core message (German) */
@@ -17,14 +16,6 @@ export interface HeroSectionProps {
   ctaSecondaryHref?: string;
 }
 
-// Design tokens from spec
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-};
-
 export default function HeroSection({
   headline,
   subheadline,
@@ -39,8 +30,8 @@ export default function HeroSection({
       data-testid='hero-section'
       sx={{
         minHeight: '80vh',
-        bgcolor: colors.cream,
-        color: colors.petrol,
+        bgcolor: colors.beige,
+        color: colors.marsala,
         display: 'flex',
         alignItems: 'center',
         py: { xs: 8, md: 12 },
@@ -58,12 +49,11 @@ export default function HeroSection({
             variant='h1'
             component='h1'
             sx={{
-              fontFamily: '"Playfair Display", serif',
+              fontFamily: typography.heading,
               fontSize: { xs: '2.5rem', md: '3.5rem' },
               fontWeight: 700,
               lineHeight: 1.2,
               mb: 3,
-              color: colors.petrol,
             }}
           >
             {headline}
@@ -73,12 +63,11 @@ export default function HeroSection({
             variant='h2'
             component='p'
             sx={{
-              fontFamily: '"Inter", sans-serif',
+              fontFamily: typography.body,
               fontSize: { xs: '1.125rem', md: '1.375rem' },
               fontWeight: 400,
               lineHeight: 1.6,
               mb: 5,
-              color: colors.petrol,
               opacity: 0.9,
             }}
           >

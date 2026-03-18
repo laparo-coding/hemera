@@ -8,6 +8,7 @@
  */
 
 import { requireAuthenticatedUser } from '../../../lib/auth/helpers';
+import { colors } from '../../../lib/design-tokens';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -28,15 +29,6 @@ export const metadata: Metadata = {
   title: 'Seminardetails - Hemera Academy',
   description: 'Details zu deinem gebuchten Seminar',
 };
-
-// Design tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-} as const;
 
 interface PageProps {
   params: Promise<{ bookingId: string }>;
@@ -206,7 +198,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
           alignItems: 'center',
           gap: '8px',
           marginBottom: '24px',
-          color: colors.petrol,
+          color: colors.marsala,
           fontFamily: '"Inter", sans-serif',
           textDecoration: 'none',
         }}
@@ -232,7 +224,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
             fontFamily: '"Playfair Display", serif',
             fontSize: { xs: '1.5rem', md: '2rem' },
             fontWeight: 700,
-            color: colors.petrol,
+            color: colors.marsala,
             mb: 2,
           }}
         >
@@ -247,7 +239,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
                 fontFamily: '"Inter", sans-serif',
                 fontSize: '0.875rem',
                 fontWeight: 600,
-                color: colors.petrol,
+                color: colors.marsala,
                 opacity: 0.7,
                 mb: 0.5,
               }}
@@ -258,7 +250,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
               sx={{
                 fontFamily: '"Inter", sans-serif',
                 fontSize: '1rem',
-                color: colors.petrol,
+                color: colors.lightBlack,
               }}
             >
               {formatDate(course.startDate)}
@@ -278,7 +270,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '0.875rem',
                   fontWeight: 600,
-                  color: colors.petrol,
+                  color: colors.marsala,
                   opacity: 0.7,
                   mb: 0.5,
                 }}
@@ -289,7 +281,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
                 sx={{
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '1rem',
-                  color: colors.petrol,
+                  color: colors.lightBlack,
                 }}
               >
                 {formatTime(course.startTime)}
@@ -306,7 +298,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '0.875rem',
                   fontWeight: 600,
-                  color: colors.petrol,
+                  color: colors.marsala,
                   opacity: 0.7,
                   mb: 0.5,
                 }}
@@ -317,13 +309,13 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
                 sx={{
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '1rem',
-                  color: colors.petrol,
+                  color: colors.lightBlack,
                 }}
               >
                 <Link
                   href={`/locations/${course.location.slug}`}
                   style={{
-                    color: colors.petrol,
+                    color: colors.marsala,
                     textDecoration: 'underline',
                   }}
                 >
@@ -336,7 +328,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
                   sx={{
                     fontFamily: '"Inter", sans-serif',
                     fontSize: '0.875rem',
-                    color: colors.petrol,
+                    color: colors.lightBlack,
                     opacity: 0.7,
                   }}
                 >

@@ -1,25 +1,18 @@
 import { createTheme } from '@mui/material/styles';
-
-// Hemera Design Tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-};
+import { colors } from './design-tokens';
 
 const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: colors.petrol,
-      light: '#2A5A6A',
-      dark: '#0D2A33',
+      main: colors.marsala,
+      light: '#A05A5C',
+      dark: colors.marsalaDark,
     },
     secondary: {
-      main: colors.gold,
-      light: '#E5BC75',
-      dark: '#C99744',
+      main: colors.bronze,
+      light: '#AB856A',
+      dark: '#7A5639',
     },
     warning: {
       main: '#ff9800',
@@ -32,55 +25,65 @@ const theme = createTheme({
       dark: '#e53935',
     },
     success: {
-      main: colors.sage,
-      light: '#B8D9D2',
-      dark: '#8FBFB6',
+      main: colors.rosyBrown,
+      light: '#CCAAAA',
+      dark: '#A07878',
     },
     info: {
-      main: colors.petrol,
-      light: '#2A5A6A',
-      dark: '#0D2A33',
+      main: colors.infoMain,
+      light: colors.infoLight,
+      dark: colors.infoDark,
     },
     background: {
-      default: colors.cream,
-      paper: '#ffffff',
+      default: colors.beige,
+      paper: colors.white,
+    },
+    text: {
+      primary: colors.lightBlack,
+      secondary: colors.marsala,
     },
   },
   typography: {
     fontSize: 14,
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     fontWeightLight: 300,
+    body1: {
+      color: colors.lightBlack,
+    },
+    body2: {
+      color: colors.lightBlack,
+    },
     h1: {
       fontFamily: '"Playfair Display", serif',
       fontWeight: 700,
-      color: colors.petrol,
+      color: colors.marsala,
     },
     h2: {
       fontFamily: '"Playfair Display", serif',
       fontWeight: 700,
-      color: colors.petrol,
+      color: colors.marsala,
     },
     h3: {
       fontFamily: '"Playfair Display", serif',
       fontWeight: 700,
-      color: colors.petrol,
+      color: colors.marsala,
     },
     h4: {
       fontFamily: '"Playfair Display", serif',
       fontWeight: 700,
-      color: colors.petrol,
+      color: colors.marsala,
     },
     h5: {
       fontFamily: '"Playfair Display", serif',
       fontWeight: 700,
       fontSize: '1.5rem',
       letterSpacing: '0.02em',
-      color: colors.petrol,
+      color: colors.marsala,
     },
     h6: {
       fontFamily: '"Playfair Display", serif',
       fontWeight: 700,
-      color: colors.petrol,
+      color: colors.marsala,
     },
   },
   shape: {
@@ -90,8 +93,8 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: colors.cream,
-          color: colors.petrol,
+          backgroundColor: colors.rosyBrown,
+          color: colors.beige,
         },
       },
     },

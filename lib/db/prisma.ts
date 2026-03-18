@@ -59,7 +59,10 @@ function createPrismaClient(): PrismaClient {
     });
   }
 
-  const pool = new Pool({ connectionString: databaseUrl });
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: process.env.PGSSL === 'false' ? false : { rejectUnauthorized: true },
+  });
   globalForPrisma.pool = pool;
 
   const adapter = new PrismaPg(pool);

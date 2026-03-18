@@ -5,6 +5,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Box, Button, Chip, Paper, Typography } from '@mui/material';
 import Link from 'next/link';
+import { colors } from '@/lib/design-tokens';
 
 export interface CourseDate {
   /** Start date */
@@ -51,18 +52,10 @@ export interface CourseCardProps {
   thumbnailUrl?: string | null;
 }
 
-// Design tokens from spec
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-};
-
 const levelColors = {
-  A: colors.sage,
-  B: colors.gold,
-  C: colors.petrol,
+  A: colors.rosyBrown,
+  B: colors.bronze,
+  C: colors.marsala,
 };
 
 export default function CourseCard({
@@ -87,11 +80,11 @@ export default function CourseCard({
         display: 'flex',
         flexDirection: 'column',
         border: '1px solid',
-        borderColor: 'rgba(22, 64, 77, 0.1)',
+        borderColor: 'rgba(136, 65, 67, 0.1)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: '0 12px 24px rgba(22, 64, 77, 0.1)',
+          boxShadow: '0 12px 24px rgba(136, 65, 67, 0.1)',
         },
       }}
     >
@@ -133,7 +126,7 @@ export default function CourseCard({
             alignSelf: 'flex-start',
             mb: 2,
             bgcolor: `${levelColors[level]}20`,
-            color: colors.petrol,
+            color: colors.marsala,
             fontWeight: 600,
             fontSize: '0.75rem',
           }}
@@ -147,7 +140,7 @@ export default function CourseCard({
             fontFamily: '"Playfair Display", serif',
             fontSize: '1.5rem',
             fontWeight: 700,
-            color: colors.petrol,
+            color: colors.marsala,
             mb: 2,
           }}
         >
@@ -160,7 +153,7 @@ export default function CourseCard({
             fontFamily: '"Inter", sans-serif',
             fontSize: '1rem',
             lineHeight: 1.6,
-            color: colors.petrol,
+            color: colors.lightBlack,
             opacity: 0.85,
             mb: 3,
             flexGrow: 1,
@@ -186,7 +179,7 @@ export default function CourseCard({
                   <CalendarTodayIcon
                     sx={{
                       fontSize: '1rem',
-                      color: colors.petrol,
+                      color: colors.marsala,
                       opacity: 0.6,
                     }}
                   />
@@ -194,7 +187,7 @@ export default function CourseCard({
                     sx={{
                       fontFamily: '"Inter", sans-serif',
                       fontSize: '0.875rem',
-                      color: colors.petrol,
+                      color: colors.lightBlack,
                       fontWeight: 500,
                     }}
                   >
@@ -213,7 +206,7 @@ export default function CourseCard({
                     <AccessTimeIcon
                       sx={{
                         fontSize: '1rem',
-                        color: colors.petrol,
+                        color: colors.marsala,
                         opacity: 0.6,
                       }}
                     />
@@ -221,7 +214,7 @@ export default function CourseCard({
                       sx={{
                         fontFamily: '"Inter", sans-serif',
                         fontSize: '0.875rem',
-                        color: colors.petrol,
+                        color: colors.lightBlack,
                         opacity: 0.75,
                       }}
                     >
@@ -235,7 +228,7 @@ export default function CourseCard({
                     sx={{
                       fontFamily: '"Inter", sans-serif',
                       fontSize: '0.75rem',
-                      color: colors.gold,
+                      color: colors.bronze,
                       fontWeight: 500,
                       ml: 2.5,
                     }}
@@ -260,9 +253,9 @@ export default function CourseCard({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  color: colors.petrol,
+                  color: colors.marsala,
                   '&:hover': {
-                    color: colors.gold,
+                    color: colors.bronze,
                   },
                   transition: 'color 0.2s ease',
                 }}

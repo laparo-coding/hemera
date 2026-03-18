@@ -24,6 +24,7 @@ import Link from 'next/link';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { TERMS } from '@/lib/constants';
+import { colors } from '@/lib/design-tokens';
 import { getAvatarInitial } from '@/lib/utils/avatar';
 import { formatDate } from '../lib/utils/date-format';
 
@@ -274,7 +275,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
               <Box
                 sx={{
                   height: 70,
-                  bgcolor: '#16404D',
+                  bgcolor: colors.marsala,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -283,7 +284,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                 <Typography
                   variant='h2'
                   sx={{
-                    color: '#FFFFFF',
+                    color: colors.white,
                     fontFamily: '"Playfair Display", serif',
                     fontWeight: 700,
                     fontSize: { xs: '3rem', md: '4rem' },
