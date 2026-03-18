@@ -56,7 +56,7 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
             : buttonLabel
         }
         sx={{
-          backgroundColor: colors.marsala,
+          backgroundColor: colors.bronze,
           color: colors.white,
           fontFamily: typography.body,
           fontWeight: 600,
@@ -66,7 +66,7 @@ export const BookingCTA: React.FC<BookingCTAProps> = ({
           textTransform: 'none',
           fontSize: '1.1rem',
           '&:hover': {
-            backgroundColor: colors.marsalaDark,
+            backgroundColor: colors.bronzeHover,
           },
         }}
       >
