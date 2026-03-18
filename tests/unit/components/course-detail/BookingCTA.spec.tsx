@@ -24,14 +24,14 @@ describe('BookingCTA', () => {
       render(<BookingCTA {...defaultProps} variant='primary' />);
 
       const button = screen.getByRole('link');
-      expect(button).toHaveStyle({ backgroundColor: colors.gold });
+      expect(button).toHaveStyle({ backgroundColor: colors.bronze });
     });
 
-    it('secondary variant has petrol outline', () => {
+    it('secondary variant has marsala outline', () => {
       render(<BookingCTA {...defaultProps} variant='secondary' />);
 
       const button = screen.getByRole('link');
-      expect(button).toHaveStyle({ borderColor: colors.petrol });
+      expect(button).toHaveStyle({ borderColor: colors.marsala });
     });
 
     it('banner variant is full-width', () => {

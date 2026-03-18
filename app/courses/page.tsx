@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import type { CourseCardProps } from '../../components/landing';
 import CourseCard from '../../components/landing/CourseCard';
 import { getPublishedCourses } from '../../lib/api/courses';
+import { colors } from '../../lib/design-tokens';
 import { serverInstance } from '../../lib/monitoring/rollbar-official';
 import { generateCourseListMetadata } from '../../lib/seo/metadata';
 import { SCHEMA_COMBINATIONS } from '../../lib/seo/schemas';
@@ -118,8 +119,8 @@ export default async function CoursesPage() {
         <Box
           component='section'
           sx={{
-            bgcolor: '#FBF5DD',
-            color: '#16404D',
+            bgcolor: colors.beige,
+            color: colors.marsala,
             py: { xs: 10, md: 14 },
             textAlign: 'center',
           }}
@@ -135,7 +136,7 @@ export default async function CoursesPage() {
                 fontWeight: 700,
                 mb: 3,
                 lineHeight: 1.2,
-                color: '#16404D',
+                color: colors.marsala,
               }}
             >
               Alle Seminare
@@ -150,7 +151,7 @@ export default async function CoursesPage() {
                 opacity: 0.9,
                 maxWidth: '600px',
                 mx: 'auto',
-                color: '#16404D',
+                color: colors.marsala,
               }}
             >
               Entdecke unser komplettes Angebot an praxisnahen Seminaren
@@ -162,7 +163,7 @@ export default async function CoursesPage() {
         <Box
           component='section'
           data-testid='course-overview'
-          sx={{ py: { xs: 6, md: 8 }, bgcolor: '#FBF5DD' }}
+          sx={{ py: { xs: 6, md: 8 }, bgcolor: colors.beige }}
         >
           <Container maxWidth='lg'>
             {/* Error State */}
@@ -187,7 +188,7 @@ export default async function CoursesPage() {
                 </Typography>
                 <Typography
                   variant='body1'
-                  sx={{ color: '#16404D', opacity: 0.8 }}
+                  sx={{ color: colors.marsala, opacity: 0.8 }}
                 >
                   Bitte versuche es später erneut oder kontaktiere uns, falls
                   das Problem weiterhin besteht.

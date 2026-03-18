@@ -61,7 +61,7 @@ export const CourseDetailLayout: React.FC<CourseDetailLayoutProps> = ({
       component='main'
       sx={{
         width: '100%',
-        backgroundColor: colors.cream,
+        backgroundColor: colors.beige,
         overflow: 'visible',
       }}
     >

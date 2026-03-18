@@ -3,19 +3,15 @@ export const runtime = 'nodejs';
 
 import { Box, CircularProgress } from '@mui/material';
 import { Suspense } from 'react';
+import { colors } from '@/lib/design-tokens';
 import CustomSignUpClient from '../../../components/auth/CustomSignUpClient';
-
-// Design tokens from Hemera spec
-const colors = {
-  cream: '#FBF5DD',
-};
 
 export default function CustomSignUpPage() {
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: colors.cream,
+        bgcolor: colors.beige,
       }}
     >
       <Suspense
@@ -25,9 +21,12 @@ export default function CustomSignUpPage() {
             justifyContent='center'
             alignItems='center'
             minHeight='100vh'
-            bgcolor={colors.cream}
+            bgcolor={colors.beige}
           >
-            <CircularProgress sx={{ color: '#16404D' }} />
+            <CircularProgress
+              aria-label='Laden'
+              sx={{ color: colors.marsala }}
+            />
           </Box>
         }
       >

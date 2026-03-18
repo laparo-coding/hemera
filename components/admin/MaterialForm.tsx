@@ -8,7 +8,14 @@
 
 'use client';
 
-import { Box, Button, CircularProgress, Stack, TextField } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  TextField,
+} from '@mui/material';
 import { useCallback, useState } from 'react';
 import { SlideEditor } from './SlideEditor';
 
@@ -67,17 +74,9 @@ export function MaterialForm({
     <Box component='form' onSubmit={handleSubmit}>
       <Stack spacing={3}>
         {error && (
-          <Box
-            role='alert'
-            sx={{
-              p: 2,
-              bgcolor: 'error.light',
-              color: 'error.dark',
-              borderRadius: 1,
-            }}
-          >
+          <Alert severity='error' onClose={() => setError(null)}>
             {error}
-          </Box>
+          </Alert>
         )}
 
         <TextField

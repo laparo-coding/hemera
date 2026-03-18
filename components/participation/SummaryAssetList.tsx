@@ -26,6 +26,7 @@ import {
   markSummaryViewedAction,
 } from '../../lib/actions/participation';
 import type { ResolvedSummaryAsset } from '../../lib/db/courseParticipation';
+import { colors } from '../../lib/design-tokens';
 
 // Dynamically import MuxPlayer to avoid SSR issues
 const MuxPlayer = dynamic(
@@ -42,15 +43,6 @@ const MuxPlayer = dynamic(
     ),
   }
 );
-
-// Design tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-} as const;
 
 interface SummaryAssetListProps {
   bookingId: string;
@@ -130,7 +122,7 @@ export const SummaryAssetList: React.FC<SummaryAssetListProps> = ({
   if (loading) {
     return (
       <Box display='flex' justifyContent='center' py={4}>
-        <CircularProgress sx={{ color: colors.petrol }} />
+        <CircularProgress sx={{ color: colors.marsala }} />
       </Box>
     );
   }
@@ -148,15 +140,15 @@ export const SummaryAssetList: React.FC<SummaryAssetListProps> = ({
       <Card
         elevation={0}
         sx={{
-          border: `1px dashed ${colors.sage}`,
-          backgroundColor: colors.cream,
+          border: `1px dashed ${colors.rosyBrown}`,
+          backgroundColor: colors.beige,
         }}
       >
         <CardContent sx={{ textAlign: 'center', py: 6 }}>
           <VideocamOffOutlined
-            sx={{ fontSize: 48, color: colors.sage, mb: 2 }}
+            sx={{ fontSize: 48, color: colors.rosyBrown, mb: 2 }}
           />
-          <Typography variant='h6' sx={{ color: colors.petrol, mb: 1 }}>
+          <Typography variant='h6' sx={{ color: colors.marsala, mb: 1 }}>
             Keine Zusammenfassungsvideos verfügbar
           </Typography>
           <Typography variant='body2' color='text.secondary'>
@@ -216,7 +208,7 @@ const SummaryAssetCard: React.FC<SummaryAssetCardProps> = ({
     <Card
       elevation={0}
       sx={{
-        border: `1px solid ${isViewed ? colors.sage : colors.petrol}`,
+        border: `1px solid ${isViewed ? colors.rosyBrown : colors.marsala}`,
         borderRadius: 2,
         overflow: 'hidden',
         transition: 'border-color 0.3s ease',
@@ -229,21 +221,24 @@ const SummaryAssetCard: React.FC<SummaryAssetCardProps> = ({
           gap: 1,
           px: 2,
           py: 1.5,
-          backgroundColor: isViewed ? 'rgba(166, 205, 198, 0.1)' : colors.cream,
-          borderBottom: `1px solid ${colors.sage}`,
+          backgroundColor: isViewed ? colors.sageLight : colors.beige,
+          borderBottom: `1px solid ${colors.rosyBrown}`,
         }}
       >
         <PlayCircleOutlined
-          sx={{ color: isViewed ? colors.sage : colors.petrol }}
+          sx={{ color: isViewed ? colors.rosyBrown : colors.marsala }}
         />
         <Typography
           variant='subtitle1'
-          sx={{ fontWeight: 500, color: colors.petrol }}
+          sx={{ fontWeight: 500, color: colors.marsala }}
         >
           {index + 1}. {asset.title}
         </Typography>
         {isViewed && (
-          <Typography variant='caption' sx={{ ml: 'auto', color: colors.sage }}>
+          <Typography
+            variant='caption'
+            sx={{ ml: 'auto', color: colors.rosyBrown }}
+          >
             ✓ Angesehen
           </Typography>
         )}
@@ -256,7 +251,7 @@ const SummaryAssetCard: React.FC<SummaryAssetCardProps> = ({
             video_title: asset.title,
             viewer_user_id: 'participant',
           }}
-          accentColor={colors.gold}
+          accentColor={colors.bronze}
           onPlay={handlePlay}
           style={{ width: '100%', height: '100%' }}
         />

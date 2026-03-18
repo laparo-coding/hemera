@@ -49,7 +49,7 @@ export function UserPageContainer({
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: colors.cream,
+        bgcolor: colors.beige,
         pt: USER_HEAD_SPACE.paddingTop,
         px: { xs: 2, sm: 3, md: 4 },
         pb: USER_HEAD_SPACE.paddingBottom,
@@ -82,7 +82,7 @@ export function UserPageContainer({
                 fontFamily: '"Playfair Display", serif',
                 fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
                 fontWeight: 700,
-                color: colors.petrol,
+                color: colors.marsala,
                 mb: subtitle ? 1 : 0,
               }}
             >
@@ -93,7 +93,7 @@ export function UserPageContainer({
                 sx={{
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '1rem',
-                  color: colors.petrol,
+                  color: colors.lightBlack,
                   opacity: 0.8,
                 }}
               >

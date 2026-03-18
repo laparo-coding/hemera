@@ -2,21 +2,14 @@
 
 import { SignUp } from '@clerk/nextjs';
 import { Box } from '@mui/material';
-
-// Design tokens from Hemera spec
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-};
+import { colors } from '@/lib/design-tokens';
 
 export default function SignUpPage() {
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: colors.cream,
+        bgcolor: colors.beige,
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'center',
@@ -26,11 +19,11 @@ export default function SignUpPage() {
       <SignUp
         appearance={{
           variables: {
-            colorPrimary: colors.petrol,
-            colorTextOnPrimaryBackground: colors.cream,
-            colorBackground: '#FFFFFF',
-            colorInputBackground: '#FFFFFF',
-            colorInputText: colors.petrol,
+            colorPrimary: colors.marsala,
+            colorTextOnPrimaryBackground: colors.beige,
+            colorBackground: colors.white,
+            colorInputBackground: colors.white,
+            colorInputText: colors.marsala,
             borderRadius: '8px',
           },
           elements: {
@@ -40,47 +33,47 @@ export default function SignUpPage() {
             },
             headerTitle: {
               fontFamily: '"Playfair Display", serif',
-              color: colors.petrol,
+              color: colors.marsala,
               fontSize: '1.75rem',
             },
             headerSubtitle: {
               display: 'none',
             },
             formButtonPrimary: {
-              backgroundColor: colors.gold,
-              color: colors.petrol,
+              backgroundColor: colors.bronze,
+              color: colors.marsala,
               fontWeight: 600,
               '&:hover': {
-                backgroundColor: '#C99545',
+                backgroundColor: colors.bronzeHover,
               },
             },
             formFieldInput: {
               borderRadius: '8px',
-              borderColor: colors.sage,
+              borderColor: colors.rosyBrown,
               '&:focus': {
-                borderColor: colors.petrol,
+                borderColor: colors.marsala,
               },
             },
             footerActionLink: {
-              color: colors.petrol,
+              color: colors.marsala,
               fontWeight: 600,
               '&:hover': {
-                color: colors.gold,
+                color: colors.bronze,
               },
             },
             socialButtonsBlockButton: {
-              borderColor: colors.sage,
-              color: colors.petrol,
+              borderColor: colors.rosyBrown,
+              color: colors.marsala,
               '&:hover': {
-                borderColor: colors.petrol,
+                borderColor: colors.marsala,
                 backgroundColor: 'rgba(166, 205, 198, 0.1)',
               },
             },
             dividerLine: {
-              backgroundColor: colors.sage,
+              backgroundColor: colors.rosyBrown,
             },
             dividerText: {
-              color: colors.petrol,
+              color: colors.marsala,
             },
           },
         }}

@@ -1,13 +1,14 @@
+import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkUserAdminStatus, getCurrentUser } from '@/lib/auth/helpers';
-import { prisma } from '@/lib/db/prisma';
+import { checkUserAdminStatus } from '../../../../lib/auth/helpers';
+import { prisma } from '../../../../lib/db/prisma';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
-} from '@/lib/utils/api-response';
-import { getCorsHeaders } from '@/lib/utils/cors';
-import { getOrCreateRequestId } from '@/lib/utils/request-id';
+} from '../../../../lib/utils/api-response';
+import { getCorsHeaders } from '../../../../lib/utils/cors';
+import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
 
 // CORS headers restricted to same origin (not wildcard)
 const corsHeaders = getCorsHeaders();
@@ -20,13 +21,13 @@ export async function GET(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);
 
   try {
-    // Authentication check — single Clerk call avoids redundant auth() + currentUser()
+    // Authentication check
     let userId: string | null = null;
-    let authenticatedUser: Awaited<ReturnType<typeof getCurrentUser>> = null;
     try {
-      authenticatedUser = await getCurrentUser();
-      userId = authenticatedUser?.id ?? null;
+      const authResult = await auth();
+      userId = authResult.userId;
     } catch (_authError) {
+      // In E2E test mode, auth() might fail, return 401
       const errorResponse = createErrorResponse(
         'Unauthorized access',
         ErrorCodes.UNAUTHORIZED,
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Admin authorization check
-    const isAdmin = await checkUserAdminStatus(authenticatedUser);
+    const isAdmin = await checkUserAdminStatus();
     if (!isAdmin) {
       const errorResponse = createErrorResponse(
         'Admin privileges required',

@@ -9,14 +9,7 @@
 
 import { CheckCircleOutlined, SchoolOutlined } from '@mui/icons-material';
 import { Box, Divider, Paper, Stack, Typography } from '@mui/material';
-
-// Design tokens
-const colors = {
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-} as const;
+import { colors, typography } from '@/lib/design-tokens';
 
 interface Participation {
   id: string;
@@ -44,14 +37,14 @@ export default function ResultsSection({ participation }: ResultsSectionProps) {
       }}
     >
       <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 2 }}>
-        <CheckCircleOutlined sx={{ color: colors.sage, fontSize: 28 }} />
+        <CheckCircleOutlined sx={{ color: colors.rosyBrown, fontSize: 28 }} />
         <Typography
           component='h2'
           sx={{
             fontFamily: '"Playfair Display", serif',
             fontSize: '1.25rem',
             fontWeight: 600,
-            color: colors.petrol,
+            color: colors.marsala,
           }}
         >
           Teilnahme bestätigt
@@ -67,7 +60,7 @@ export default function ResultsSection({ participation }: ResultsSectionProps) {
               fontFamily: '"Inter", sans-serif',
               fontSize: '0.875rem',
               fontWeight: 600,
-              color: colors.petrol,
+              color: colors.marsala,
               opacity: 0.7,
               mb: 1,
             }}
@@ -78,7 +71,7 @@ export default function ResultsSection({ participation }: ResultsSectionProps) {
             sx={{
               fontFamily: '"Inter", sans-serif',
               fontSize: '1rem',
-              color: colors.petrol,
+              color: colors.lightBlack,
               lineHeight: 1.7,
             }}
           >
@@ -87,12 +80,14 @@ export default function ResultsSection({ participation }: ResultsSectionProps) {
         </Box>
       ) : (
         <Box sx={{ textAlign: 'center', py: 4 }}>
-          <SchoolOutlined sx={{ fontSize: 48, color: colors.sage, mb: 2 }} />
+          <SchoolOutlined
+            sx={{ fontSize: 48, color: colors.rosyBrown, mb: 2 }}
+          />
           <Typography
             sx={{
-              fontFamily: '"Inter", sans-serif',
+              fontFamily: typography.body,
               fontSize: '1rem',
-              color: colors.petrol,
+              color: colors.lightBlack,
               opacity: 0.7,
             }}
           >

@@ -116,7 +116,7 @@ export default function AcademyPage() {
             <a
               href='/courses'
               className='inline-flex items-center px-5 py-3 rounded-md text-white hover:opacity-90'
-              style={{ backgroundColor: '#16404D' }}
+              style={{ backgroundColor: 'var(--hemera-marsala)' }}
             >
               Seminare entdecken
               <svg

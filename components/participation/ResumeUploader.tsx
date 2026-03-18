@@ -28,6 +28,7 @@ import {
 } from '@mui/material';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { colors } from '@/lib/design-tokens';
 import {
   deleteResumeAction,
   getActiveResumeAction,
@@ -37,15 +38,6 @@ import {
   getAllowedResumeMimeTypes,
   getMaxResumeSizeFormatted,
 } from '../../lib/utils/resumeUpload';
-
-// Design tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-} as const;
 
 interface ResumeInfo {
   id: string;
@@ -200,7 +192,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
   if (loading) {
     return (
       <Box display='flex' justifyContent='center' py={4}>
-        <CircularProgress sx={{ color: colors.petrol }} />
+        <CircularProgress sx={{ color: colors.marsala }} />
       </Box>
     );
   }
@@ -227,7 +219,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
         <Card
           elevation={0}
           sx={{
-            border: `1px solid ${colors.sage}`,
+            border: `1px solid ${colors.rosyBrown}`,
             borderRadius: 2,
             backgroundColor: colors.white,
           }}
@@ -240,10 +232,13 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
             >
               <Box display='flex' alignItems='center' gap={2}>
                 <DescriptionOutlined
-                  sx={{ fontSize: 40, color: colors.petrol }}
+                  sx={{ fontSize: 40, color: colors.marsala }}
                 />
                 <Box>
-                  <Typography variant='subtitle1' sx={{ color: colors.petrol }}>
+                  <Typography
+                    variant='subtitle1'
+                    sx={{ color: colors.marsala }}
+                  >
                     {currentResume.fileName}
                   </Typography>
                   <Typography variant='body2' color='text.secondary'>
@@ -261,7 +256,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
                   <IconButton
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    sx={{ color: colors.petrol }}
+                    sx={{ color: colors.marsala }}
                   >
                     {uploading ? (
                       <CircularProgress size={20} />
@@ -295,11 +290,11 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
               size='small'
               sx={{
                 mt: 2,
-                borderColor: colors.petrol,
-                color: colors.petrol,
+                borderColor: colors.marsala,
+                color: colors.marsala,
                 '&:hover': {
-                  borderColor: colors.gold,
-                  backgroundColor: 'rgba(221, 168, 83, 0.1)',
+                  borderColor: colors.bronze,
+                  backgroundColor: colors.bronzeLight,
                 },
               }}
             >
@@ -315,32 +310,29 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
           onDrop={handleDrop}
           onClick={() => !uploading && fileInputRef.current?.click()}
           sx={{
-            border: `2px dashed ${dragOver ? colors.gold : colors.sage}`,
+            border: 'none',
             borderRadius: 2,
-            backgroundColor: dragOver
-              ? 'rgba(221, 168, 83, 0.1)'
-              : colors.cream,
+            backgroundColor: dragOver ? colors.bronzeLight : colors.beige,
             p: 4,
             textAlign: 'center',
             cursor: uploading ? 'wait' : 'pointer',
             transition: 'all 0.2s ease',
             '&:hover': {
-              borderColor: colors.gold,
               backgroundColor: 'rgba(221, 168, 83, 0.05)',
             },
           }}
         >
           {uploading ? (
             <Box>
-              <CircularProgress sx={{ color: colors.petrol, mb: 2 }} />
-              <Typography variant='body1' sx={{ color: colors.petrol }}>
+              <CircularProgress sx={{ color: colors.marsala, mb: 2 }} />
+              <Typography variant='body1' sx={{ color: colors.lightBlack }}>
                 Wird hochgeladen...
               </Typography>
               <LinearProgress
                 sx={{
                   mt: 2,
                   '& .MuiLinearProgress-bar': {
-                    backgroundColor: colors.gold,
+                    backgroundColor: colors.bronze,
                   },
                 }}
               />
@@ -348,9 +340,9 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
           ) : (
             <>
               <CloudUploadOutlined
-                sx={{ fontSize: 48, color: colors.sage, mb: 2 }}
+                sx={{ fontSize: 48, color: colors.rosyBrown, mb: 2 }}
               />
-              <Typography variant='h6' sx={{ color: colors.petrol, mb: 1 }}>
+              <Typography variant='h6' sx={{ color: colors.marsala, mb: 1 }}>
                 Lebenslauf hochladen
               </Typography>
               <Typography variant='body2' color='text.secondary'>

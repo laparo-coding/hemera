@@ -11,17 +11,10 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useLayoutEffect, useState } from 'react';
+import { colors, typography } from '@/lib/design-tokens';
 import { TERMS } from '../../lib/constants/terminology';
 import { SignedIn, SignedOut, UserButton } from '../auth/ClerkComponents';
 import ClientOnly from '../ClientOnly';
-
-// Hemera Design Tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-};
 
 /**
  * Public navigation component for non-protected pages
@@ -75,8 +68,8 @@ export function PublicNavigation({
       elevation={0}
       sx={{
         zIndex: 1100,
-        bgcolor: colors.cream,
-        borderBottom: `1px solid ${colors.sage}`,
+        bgcolor: colors.rosyBrown,
+        borderBottom: `1px solid ${colors.rosyBrown}`,
       }}
     >
       <Container maxWidth='lg'>
@@ -93,10 +86,10 @@ export function PublicNavigation({
             <Typography
               component='div'
               sx={{
-                fontFamily: '"Playfair Display", serif !important',
+                fontFamily: `${typography.heading} !important`,
                 fontWeight: '700 !important',
                 fontSize: { xs: '1.25rem', md: '1.5rem' },
-                color: `${colors.petrol} !important`,
+                color: `${colors.white} !important`,
                 cursor: 'pointer',
                 letterSpacing: '0.02em',
               }}
@@ -120,11 +113,11 @@ export function PublicNavigation({
                 data-testid='nav-admin'
                 sx={{
                   textTransform: 'none',
-                  color: colors.petrol,
-                  fontFamily: '"Inter", sans-serif',
+                  color: colors.white,
+                  fontFamily: typography.body,
                   fontWeight: 500,
                   '&:hover': {
-                    bgcolor: `${colors.sage}33`,
+                    bgcolor: colors.whiteOverlay15,
                   },
                 }}
               >
@@ -150,13 +143,13 @@ export function PublicNavigation({
                     sx={{
                       textTransform: 'none',
                       px: 3,
-                      color: colors.petrol,
-                      borderColor: colors.petrol,
-                      fontFamily: '"Inter", sans-serif',
+                      color: colors.white,
+                      borderColor: colors.white,
+                      fontFamily: typography.body,
                       fontWeight: 500,
                       '&:hover': {
-                        borderColor: colors.petrol,
-                        bgcolor: `${colors.sage}33`,
+                        borderColor: colors.beige,
+                        bgcolor: colors.whiteOverlay15,
                       },
                     }}
                   >
@@ -170,12 +163,12 @@ export function PublicNavigation({
                     sx={{
                       textTransform: 'none',
                       px: 3,
-                      bgcolor: colors.gold,
-                      color: colors.petrol,
-                      fontFamily: '"Inter", sans-serif',
+                      bgcolor: colors.marsala,
+                      color: colors.white,
+                      fontFamily: typography.body,
                       fontWeight: 600,
                       '&:hover': {
-                        bgcolor: '#C99744',
+                        bgcolor: colors.marsalaDark,
                       },
                     }}
                   >
@@ -193,11 +186,11 @@ export function PublicNavigation({
                       sx={{
                         textTransform: 'none',
                         mr: 1,
-                        color: colors.petrol,
-                        fontFamily: '"Inter", sans-serif',
+                        color: colors.white,
+                        fontFamily: typography.body,
                         fontWeight: 500,
                         '&:hover': {
-                          bgcolor: `${colors.sage}33`,
+                          bgcolor: colors.whiteOverlay15,
                         },
                       }}
                     >
@@ -235,13 +228,13 @@ export function PublicNavigation({
                   sx={{
                     textTransform: 'none',
                     px: 3,
-                    color: colors.petrol,
-                    borderColor: colors.petrol,
-                    fontFamily: '"Inter", sans-serif',
+                    color: colors.white,
+                    borderColor: colors.white,
+                    fontFamily: typography.body,
                     fontWeight: 500,
                     '&:hover': {
-                      borderColor: colors.petrol,
-                      bgcolor: `${colors.sage}33`,
+                      borderColor: colors.beige,
+                      bgcolor: colors.whiteOverlay15,
                     },
                   }}
                 >
@@ -255,12 +248,12 @@ export function PublicNavigation({
                   sx={{
                     textTransform: 'none',
                     px: 3,
-                    bgcolor: colors.gold,
-                    color: colors.petrol,
-                    fontFamily: '"Inter", sans-serif',
+                    bgcolor: colors.marsala,
+                    color: colors.white,
+                    fontFamily: typography.body,
                     fontWeight: 600,
                     '&:hover': {
-                      bgcolor: '#C99744',
+                      bgcolor: colors.marsalaDark,
                     },
                   }}
                 >

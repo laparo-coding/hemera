@@ -2,6 +2,7 @@
 
 import { Box, Container, Paper, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { colors, typography } from '@/lib/design-tokens';
 
 export interface ConceptFeature {
   icon?: ReactNode;
@@ -25,14 +26,6 @@ export interface ConceptSectionProps {
   features?: ConceptFeature[];
 }
 
-// Design tokens from spec
-const colors = {
-  creamDark: '#F5EDD0',
-  petrol: '#16404D',
-  sage: '#A6CDC6',
-  gold: '#DDA853',
-};
-
 export default function ConceptSection({
   id = 'konzept',
   headline,
@@ -46,7 +39,7 @@ export default function ConceptSection({
       id={id}
       data-testid='concept-section'
       sx={{
-        bgcolor: colors.creamDark,
+        bgcolor: colors.beige,
         py: { xs: 8, md: 12 },
       }}
     >
@@ -55,10 +48,10 @@ export default function ConceptSection({
           variant='h2'
           component='h2'
           sx={{
-            fontFamily: '"Playfair Display", serif',
+            fontFamily: typography.heading,
             fontSize: { xs: '2rem', md: '2.5rem' },
             fontWeight: 700,
-            color: colors.petrol,
+            color: colors.marsala,
             textAlign: 'center',
             mb: 4,
           }}
@@ -71,10 +64,10 @@ export default function ConceptSection({
             <Typography
               key={index}
               sx={{
-                fontFamily: '"Inter", sans-serif',
+                fontFamily: typography.body,
                 fontSize: '1.125rem',
                 lineHeight: 1.8,
-                color: colors.petrol,
+                color: colors.lightBlack,
                 mb: 3,
                 textAlign: 'center',
               }}
@@ -88,7 +81,7 @@ export default function ConceptSection({
           <Paper
             elevation={0}
             sx={{
-              bgcolor: colors.sage,
+              bgcolor: colors.rosyBrown,
               p: { xs: 3, md: 4 },
               borderRadius: '12px',
               maxWidth: '600px',
@@ -99,10 +92,10 @@ export default function ConceptSection({
             <Typography
               variant='h3'
               sx={{
-                fontFamily: '"Playfair Display", serif',
+                fontFamily: typography.heading,
                 fontSize: '1.5rem',
                 fontWeight: 600,
-                color: colors.petrol,
+                color: colors.marsala,
                 mb: 1,
               }}
             >
@@ -110,10 +103,10 @@ export default function ConceptSection({
             </Typography>
             <Typography
               sx={{
-                fontFamily: '"Inter", sans-serif',
+                fontFamily: typography.body,
                 fontSize: '1rem',
                 lineHeight: 1.6,
-                color: colors.petrol,
+                color: colors.lightBlack,
               }}
             >
               {highlight.text}
@@ -139,17 +132,17 @@ export default function ConceptSection({
                 }}
               >
                 {feature.icon && (
-                  <Box sx={{ color: colors.gold, mb: 2, fontSize: '2.5rem' }}>
+                  <Box sx={{ color: colors.bronze, mb: 2, fontSize: '2.5rem' }}>
                     {feature.icon}
                   </Box>
                 )}
                 <Typography
                   variant='h4'
                   sx={{
-                    fontFamily: '"Playfair Display", serif',
+                    fontFamily: typography.heading,
                     fontSize: '1.25rem',
                     fontWeight: 600,
-                    color: colors.petrol,
+                    color: colors.marsala,
                     mb: 1,
                   }}
                 >
@@ -157,10 +150,10 @@ export default function ConceptSection({
                 </Typography>
                 <Typography
                   sx={{
-                    fontFamily: '"Inter", sans-serif',
+                    fontFamily: typography.body,
                     fontSize: '1rem',
                     lineHeight: 1.6,
-                    color: colors.petrol,
+                    color: colors.lightBlack,
                     opacity: 0.85,
                   }}
                 >

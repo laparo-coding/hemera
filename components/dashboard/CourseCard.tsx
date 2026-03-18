@@ -16,16 +16,8 @@ import {
 } from '@mui/icons-material';
 import { Box, Button, Chip, Paper, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
+import { colors } from '@/lib/design-tokens';
 import InvoiceDownloadButton from './InvoiceDownloadButton';
-
-// Design tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-};
 
 export interface CourseCardProps {
   id: string;
@@ -207,7 +199,7 @@ export default function CourseCard({
             size='small'
             sx={{
               bgcolor: 'rgba(22, 64, 77, 0.1)',
-              color: colors.petrol,
+              color: colors.marsala,
               fontFamily: '"Inter", sans-serif',
             }}
           />
@@ -240,13 +232,13 @@ export default function CourseCard({
         {/* Course Info */}
         <Box sx={{ flex: 1 }}>
           <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 1 }}>
-            <SchoolOutlined sx={{ color: colors.petrol }} />
+            <SchoolOutlined sx={{ color: colors.marsala }} />
             <Typography
               sx={{
                 fontFamily: '"Inter", sans-serif',
                 fontSize: '1rem',
                 fontWeight: 600,
-                color: colors.petrol,
+                color: colors.marsala,
               }}
             >
               {courseTitle}
@@ -262,13 +254,13 @@ export default function CourseCard({
             {/* Date */}
             <Stack direction='row' spacing={0.5} alignItems='center'>
               <CalendarTodayOutlined
-                sx={{ fontSize: 16, color: colors.petrol, opacity: 0.7 }}
+                sx={{ fontSize: 16, color: colors.marsala, opacity: 0.7 }}
               />
               <Typography
                 sx={{
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '0.875rem',
-                  color: colors.petrol,
+                  color: colors.lightBlack,
                   opacity: 0.7,
                 }}
               >
@@ -280,13 +272,13 @@ export default function CourseCard({
             {timeText && (
               <Stack direction='row' spacing={0.5} alignItems='center'>
                 <ScheduleOutlined
-                  sx={{ fontSize: 16, color: colors.petrol, opacity: 0.7 }}
+                  sx={{ fontSize: 16, color: colors.marsala, opacity: 0.7 }}
                 />
                 <Typography
                   sx={{
                     fontFamily: '"Inter", sans-serif',
                     fontSize: '0.875rem',
-                    color: colors.petrol,
+                    color: colors.lightBlack,
                     opacity: 0.7,
                   }}
                 >
@@ -299,7 +291,7 @@ export default function CourseCard({
             {locationText && (
               <Stack direction='row' spacing={0.5} alignItems='center'>
                 <LocationOnOutlined
-                  sx={{ fontSize: 16, color: colors.petrol, opacity: 0.7 }}
+                  sx={{ fontSize: 16, color: colors.marsala, opacity: 0.7 }}
                 />
                 {locationSlug ? (
                   <Link
@@ -310,7 +302,7 @@ export default function CourseCard({
                       sx={{
                         fontFamily: '"Inter", sans-serif',
                         fontSize: '0.875rem',
-                        color: colors.petrol,
+                        color: colors.lightBlack,
                         opacity: 0.7,
                         '&:hover': {
                           opacity: 1,
@@ -326,7 +318,7 @@ export default function CourseCard({
                     sx={{
                       fontFamily: '"Inter", sans-serif',
                       fontSize: '0.875rem',
-                      color: colors.petrol,
+                      color: colors.lightBlack,
                       opacity: 0.7,
                     }}
                   >
