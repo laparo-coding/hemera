@@ -38,6 +38,7 @@ basecheck
 basierend
 Basisvalidierung
 bearbeiten
+beige
 beim
 Beispiele
 Benutzerkonto
@@ -47,6 +48,7 @@ Berechtigung
 bereit
 Bernt
 Bezahllogik
+bronze
 bfkc
 bhat
 bietet
@@ -309,6 +311,7 @@ Mapbox
 Mariahilfer
 markdownlintrc
 marocchino
+marsala
 martinkempdesign
 Masterclass
 matchen
@@ -446,6 +449,7 @@ realen
 rechnung
 redis
 Redocly
+rosyBrown
 reporterror
 responsiv
 retriable
