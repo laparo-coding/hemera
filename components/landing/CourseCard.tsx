@@ -80,11 +80,11 @@ export default function CourseCard({
         display: 'flex',
         flexDirection: 'column',
         border: '1px solid',
-        borderColor: 'rgba(22, 64, 77, 0.1)',
+        borderColor: 'rgba(136, 65, 67, 0.1)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: '0 12px 24px rgba(22, 64, 77, 0.1)',
+          boxShadow: '0 12px 24px rgba(136, 65, 67, 0.1)',
         },
       }}
     >

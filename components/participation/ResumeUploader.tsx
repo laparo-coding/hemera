@@ -269,7 +269,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
                   <IconButton
                     onClick={handleDelete}
                     disabled={deleting}
-                    sx={{ color: '#E8B4B8' }}
+                    sx={{ color: colors.rosyBrown }}
                   >
                     {deleting ? (
                       <CircularProgress size={20} />
@@ -318,7 +318,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
             cursor: uploading ? 'wait' : 'pointer',
             transition: 'all 0.2s ease',
             '&:hover': {
-              backgroundColor: 'rgba(221, 168, 83, 0.05)',
+              backgroundColor: 'rgba(146, 106, 73, 0.05)',
             },
           }}
         >

@@ -84,8 +84,8 @@ export default function DashboardSection({
         p: { xs: 2, sm: 3, md: 4 },
         mb: 3,
         borderRadius: '16px',
-        border: '1px solid rgba(22, 64, 77, 0.1)',
-        boxShadow: '0 4px 24px rgba(22, 64, 77, 0.08)',
+        border: '1px solid rgba(136, 65, 67, 0.1)',
+        boxShadow: '0 4px 24px rgba(136, 65, 67, 0.08)',
         bgcolor: colors.white,
       }}
     >

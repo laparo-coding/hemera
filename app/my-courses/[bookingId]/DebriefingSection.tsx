@@ -32,7 +32,7 @@ export default function DebriefingSection({
         p: { xs: 3, md: 4 },
         mb: 3,
         borderRadius: '16px',
-        border: '1px solid rgba(22, 64, 77, 0.1)',
+        border: '1px solid rgba(136, 65, 67, 0.1)',
         bgcolor: colors.white,
         scrollMarginTop: '80px',
       }}
@@ -52,7 +52,7 @@ export default function DebriefingSection({
         </Typography>
       </Stack>
 
-      <Divider sx={{ mb: 3, borderColor: 'rgba(22, 64, 77, 0.1)' }} />
+      <Divider sx={{ mb: 3, borderColor: 'rgba(136, 65, 67, 0.1)' }} />
 
       <Box sx={{ textAlign: 'center', py: 4 }}>
         <PlayCircleOutlined
