@@ -34,7 +34,10 @@ jobs:
 
   automerge:
     needs: check-actor
-    if: needs.check-actor.outputs.is-dependabot == 'true'
+    if: |
+      needs.check-actor.outputs.is-dependabot == 'true' &&
+      contains(join(github.event.pull_request.labels.*.name, ','), 'automerge') &&
+      !contains(github.event.pull_request.title, 'major')
     runs-on: ubuntu-latest
     steps:
       - name: Wait for required checks (excluding preview deployment)
