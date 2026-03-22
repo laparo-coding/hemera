@@ -45,8 +45,9 @@ jobs:
 
       - name: Block major version updates
         if: steps.metadata.outputs.update-type == 'version-update:semver-major'
-        continue-on-error: true
-        run: echo "Major version update detected. Skipping auto-merge."
+        run: |
+          echo "Major version update detected. Skipping auto-merge."
+          exit 1
 
       - name: Wait for required checks
         uses: lewagon/wait-on-check-action@v1.5.0
