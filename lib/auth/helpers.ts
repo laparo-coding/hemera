@@ -1,6 +1,6 @@
 // Clerk-based auth helpers
 import type { User } from '@clerk/nextjs/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 export type { User };
@@ -74,6 +74,22 @@ export async function getCurrentUser() {
     return getMockUser('user');
   }
   return await currentUser();
+}
+
+/**
+ * Get auth session safely - handles E2E mock environments gracefully  */
+export async function getAuthSession() {
+  if (isMockAuthEnvironment()) {
+    // Return a mock auth session for E2E tests
+    const mockUser = getMockUser('user');
+    return {
+      userId: mockUser.id,
+      sessionId: 'e2e_session_mock',
+      user: mockUser,
+    };
+  }
+  // In production, call auth() directly
+  return await auth();
 }
 
 /**
