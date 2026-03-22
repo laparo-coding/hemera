@@ -86,15 +86,14 @@ export async function getCurrentUser() {
 }
 
 /**
- * Get auth session safely - handles E2E mock environments gracefully  */
+ * Get auth session safely - handles E2E mock environments gracefully
+ */
 export async function getAuthSession() {
   if (isMockAuthEnvironment()) {
     // Return a mock auth session for E2E tests
-    const mockUser = getMockUser('user');
     return {
-      userId: mockUser.id,
+      userId: 'e2e_mock_user',
       sessionId: 'e2e_session_mock',
-      user: mockUser,
     };
   }
   // In production, call auth() directly

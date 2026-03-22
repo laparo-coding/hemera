@@ -170,8 +170,12 @@ jobs:
     steps:
       - name: Check Secret Availability
         id: check-secrets
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          if [ -z "${{ secrets.VERCEL_TOKEN }}" ] || [ -z "${{ secrets.VERCEL_ORG_ID }}" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
             echo "available=false" >> "$GITHUB_OUTPUT"
             echo "⚠️  Skipping preview deployment: Required Vercel secrets not available"
             echo "This is expected for Dependabot PRs due to GitHub Actions security restrictions"
