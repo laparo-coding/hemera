@@ -244,7 +244,7 @@ jobs:
         with:
           script: |
             let deploymentId = null;
-            
+
             const deployment = await github.rest.repos.createDeployment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -274,7 +274,7 @@ jobs:
                 ref: context.payload.pull_request.head.sha,
                 environment: 'Preview',
               });
-              
+
               if (deployments.data.length > 0) {
                 deploymentId = deployments.data[0].id;
                 console.log(`Using existing deployment ID: ${deploymentId}`);
