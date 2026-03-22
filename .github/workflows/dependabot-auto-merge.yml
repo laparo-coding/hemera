@@ -34,12 +34,10 @@ jobs:
 
   automerge:
     needs: check-actor
-    if: |
-      needs.check-actor.outputs.is-dependabot == 'true' &&
-      contains(join(github.event.pull_request.labels.*.name, ','), 'automerge')
+    if: needs.check-actor.outputs.is-dependabot == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for required checks
+      - name: Wait for required checks (excluding preview deployment)
         uses: lewagon/wait-on-check-action@v1.5.0
         with:
           ref: ${{ github.event.pull_request.head.sha }}
