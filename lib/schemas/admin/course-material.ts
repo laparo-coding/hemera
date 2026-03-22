@@ -6,6 +6,21 @@
 import { z } from 'zod';
 
 /**
+ * Material type union - defines the available course material types
+ */
+export type MaterialType = 'CONTENT' | 'SLIDE_CONTROL';
+
+/**
+ * Allowed file extensions for uploads
+ */
+export const ALLOWED_FILE_EXTENSIONS = ['.html'];
+
+/**
+ * Maximum file size in bytes (2MB)
+ */
+export const MAX_FILE_SIZE = 2 * 1024 * 1024;
+
+/**
  * Identifier schema for course materials
  * - lowercase, hyphens, alphanumeric
  * - 2-100 characters
