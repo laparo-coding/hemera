@@ -234,17 +234,17 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      issues: write
       deployments: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
       - name: Create deployment
         id: deployment
         uses: actions/github-script@v8
         with:
           script: |
+            let deploymentId = null;
+            
             const deployment = await github.rest.repos.createDeployment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -256,15 +256,33 @@ jobs:
               production_environment: false,
             }).catch(err => {
               if (err.status === 409) {
-                console.log('Deployment already exists');
+                console.log('Deployment already exists, fetching existing deployment');
+                // When 409, we need to fetch the existing deployment
                 return null;
               }
               throw err;
             });
 
             if (deployment) {
-              console.log(`Deployment ID: ${deployment.data.id}`);
-              core.setOutput('deployment_id', deployment.data.id);
+              deploymentId = deployment.data.id;
+              console.log(`Deployment created with ID: ${deploymentId}`);
+            } else {
+              // Fetch existing deployments for this ref and environment
+              const deployments = await github.rest.repos.listDeployments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: context.payload.pull_request.head.sha,
+                environment: 'Preview',
+              });
+              
+              if (deployments.data.length > 0) {
+                deploymentId = deployments.data[0].id;
+                console.log(`Using existing deployment ID: ${deploymentId}`);
+              }
+            }
+
+            if (deploymentId) {
+              core.setOutput('deployment_id', deploymentId);
             }
 
       - name: Create deployment status (success)
@@ -284,12 +302,13 @@ jobs:
               deployment_id: deploymentId,
               state: 'success',
               description: 'Dependabot PR verified - ready to merge',
-              environment_url: 'https://github.com/Laparo/hemera/actions/runs/${{ github.run_id }}',
+              environment_url: `${context.payload.repository.html_url}/actions/runs/${context.runId}`,
             });
 
             console.log('Deployment status set to success');
 
       - name: Comment PR
+        if: steps.deployment.outputs.deployment_id
         uses: actions/github-script@v8
         with:
           script: |
