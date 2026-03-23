@@ -39,7 +39,7 @@ export default function SignInPage() {
       }}
     >
       <SignIn
-        redirectUrl={redirectUrl}
+        forceRedirectUrl={redirectUrl}
         signUpUrl='/sign-up'
         appearance={{
           variables: {

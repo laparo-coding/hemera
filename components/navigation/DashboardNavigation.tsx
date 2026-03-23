@@ -94,7 +94,6 @@ export function DashboardNavigation() {
             </Button>
 
             <UserButton
-              afterSignOutUrl='/'
               appearance={{
                 elements: {
                   avatarBox: {

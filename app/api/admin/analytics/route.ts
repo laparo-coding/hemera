@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     } catch (authError) {
       logger.warn('Auth failed', authError);
       const errorResponse = createErrorResponse(
-        'Unauthorized access',
+        'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,
         requestId,
         401
