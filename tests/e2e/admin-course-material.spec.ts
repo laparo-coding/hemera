@@ -101,35 +101,16 @@ test.describe('Admin Course Material Page', () => {
   test('API /api/admin/course-material should return correct structure', async ({
     request,
   }) => {
-    const isMockAuth =
-      !!process.env.E2E_TEST || !!process.env.NEXT_PUBLIC_DISABLE_CLERK;
-
     const response = await request.get('/api/admin/course-material', {
       headers: {
         Accept: 'application/json',
       },
     });
 
-    if (isMockAuth) {
-      // Mock-Auth: Request ist automatisch authentifiziert
-      expect(response.status()).toBe(200);
-
-      const body = await response.json();
-      expect(body).toHaveProperty('materials');
-      expect(Array.isArray(body.materials)).toBe(true);
-
-      if (body.materials.length > 0) {
-        const material = body.materials[0];
-        expect(material).toHaveProperty('id');
-        expect(material).toHaveProperty('identifier');
-        expect(material).toHaveProperty('title');
-        expect(material).toHaveProperty('createdAt');
-        expect(material).toHaveProperty('updatedAt');
-      }
-    } else {
-      // Echte Auth: Request ohne Auth wird abgelehnt
-      expect(response.status()).toBe(401);
-    }
+    // Unauthentifizierte Requests werden immer mit 401 abgelehnt.
+    // Server-seitig ist Mock-Auth nur in Jest aktiv (isMockAuthEnvironment),
+    // nicht im E2E-Modus — daher hier immer 401 erwartet.
+    expect(response.status()).toBe(401);
   });
 
   test('should navigate to material detail via table action', async ({ page }) => {

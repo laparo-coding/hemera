@@ -1,5 +1,6 @@
+import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkUserAdminStatus, getAuthSession } from '@/lib/auth/helpers';
+import { checkUserAdminStatus } from '@/lib/auth/helpers';
 import { prisma } from '@/lib/db/prisma';
 import {
   createErrorResponse,
@@ -23,10 +24,10 @@ export async function GET(request: NextRequest) {
     // Authentication check
     let userId: string | null = null;
     try {
-      const authResult = await getAuthSession();
+      const authResult = await auth();
       userId = authResult.userId;
     } catch (_authError) {
-      // In E2E test mode or if auth fails, return 401
+      // In E2E test mode, auth() might fail, return 401
       const errorResponse = createErrorResponse(
         'Du bist nicht autorisiert',
         ErrorCodes.UNAUTHORIZED,

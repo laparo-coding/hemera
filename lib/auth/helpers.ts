@@ -1,6 +1,6 @@
 // Clerk-based auth helpers
 import type { User } from '@clerk/nextjs/server';
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 export type { User };
@@ -10,24 +10,15 @@ import { redirect } from 'next/navigation';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 /**
- * Detects if we are running in a unit test, E2E test, or Clerk-disabled environment.
- * Returns true if ANY of these conditions are met:
- * - NODE_ENV='test' (unit tests)
- * - JEST_WORKER_ID is set (Jest running)
- * - E2E_TEST='1' (E2E testing flag)
- * - NEXT_PUBLIC_DISABLE_CLERK='1' (Clerk disabled in client)
+ * Detects if we are running in a unit test or Clerk-disabled CLIENT environment.
+ * - Only returns true for actual unit tests (NODE_ENV=test or JEST_WORKER_ID is set)
+ * - Returns false for E2E tests (which need real auth checks)
+ * - Returns false for NEXT_PUBLIC_* vars (those control client-only behavior)
  */
 function isMockAuthEnvironment(): boolean {
+  // Jest sets JEST_WORKER_ID when running tests
   const isJestRunning = !!process.env.JEST_WORKER_ID;
-  const isE2ETest = process.env.E2E_TEST === '1';
-  const isClerkDisabled = process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
-
-  return (
-    process.env.NODE_ENV === 'test' ||
-    isJestRunning ||
-    isE2ETest ||
-    isClerkDisabled
-  );
+  return process.env.NODE_ENV === 'test' || isJestRunning;
 }
 
 /**
@@ -83,21 +74,6 @@ export async function getCurrentUser() {
     return getMockUser('user');
   }
   return await currentUser();
-}
-
-/**
- * Get auth session safely - handles E2E mock environments gracefully
- */
-export async function getAuthSession() {
-  if (isMockAuthEnvironment()) {
-    // Return a mock auth session for E2E tests
-    return {
-      userId: 'e2e_mock_user',
-      sessionId: 'e2e_session_mock',
-    };
-  }
-  // In production, call auth() directly
-  return await auth();
 }
 
 /**
