@@ -15,7 +15,7 @@ import { type FormEvent, useMemo, useState } from 'react';
 import { colors } from '@/lib/design-tokens';
 
 export default function CustomSignUpClient() {
-  const { isLoaded, signUp, setActive } = useSignUp();
+  const { signUp, fetchStatus } = useSignUp();
   const router = useRouter();
   const params = useSearchParams();
   const [email, setEmail] = useState('');
@@ -24,6 +24,8 @@ export default function CustomSignUpClient() {
   const [submitting, setSubmitting] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [code, setCode] = useState('');
+
+  const isLoaded = fetchStatus === 'idle';
 
   const redirectTo = useMemo(
     () => params?.get('redirect_url') || '/dashboard',
@@ -36,8 +38,30 @@ export default function CustomSignUpClient() {
     if (!isLoaded || !signUp) return;
     setSubmitting(true);
     try {
-      await signUp.create({ emailAddress: email, password });
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      const createResult = await signUp.create({ emailAddress: email });
+      if (createResult.error) {
+        setError(
+          createResult.error.message || 'Sign-up failed. Please try again.'
+        );
+        return;
+      }
+      const passwordResult = await signUp.password({
+        password,
+        emailAddress: email,
+      });
+      if (passwordResult.error) {
+        setError(
+          passwordResult.error.message || 'Sign-up failed. Please try again.'
+        );
+        return;
+      }
+      const sendResult = await signUp.verifications.sendEmailCode();
+      if (sendResult.error) {
+        setError(
+          sendResult.error.message || 'Sign-up failed. Please try again.'
+        );
+        return;
+      }
       setIsVerifying(true);
     } catch (err: unknown) {
       const error = err as { errors?: Array<{ message?: string }> };
@@ -55,9 +79,15 @@ export default function CustomSignUpClient() {
     if (!isLoaded || !signUp) return;
     setSubmitting(true);
     try {
-      const complete = await signUp.attemptEmailAddressVerification({ code });
-      if (complete.status === 'complete') {
-        await setActive?.({ session: complete.createdSessionId });
+      const verifyResult = await signUp.verifications.verifyEmailCode({ code });
+      if (verifyResult.error) {
+        setError(
+          verifyResult.error.message || 'Verification failed. Please try again.'
+        );
+        return;
+      }
+      if (signUp.status === 'complete') {
+        await signUp.finalize();
         router.push(redirectTo);
       } else {
         setError(

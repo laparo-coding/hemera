@@ -13,13 +13,15 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { type FormEvent, useMemo, useState } from 'react';
 
 export default function CustomSignInClient() {
-  const { isLoaded, signIn, setActive } = useSignIn();
+  const { signIn, fetchStatus } = useSignIn();
   const router = useRouter();
   const params = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const isLoaded = fetchStatus === 'idle';
 
   const redirectTo = useMemo(
     () => params?.get('redirect_url') || '/dashboard',
@@ -32,9 +34,22 @@ export default function CustomSignInClient() {
     if (!isLoaded || !signIn) return;
     setSubmitting(true);
     try {
-      const result = await signIn.create({ identifier: email, password });
-      if (result.status === 'complete') {
-        await setActive?.({ session: result.createdSessionId });
+      const createResult = await signIn.create({ identifier: email });
+      if (createResult.error) {
+        setError(
+          createResult.error.message || 'Sign-in failed. Please try again.'
+        );
+        return;
+      }
+      const passwordResult = await signIn.password({ password });
+      if (passwordResult.error) {
+        setError(
+          passwordResult.error.message || 'Sign-in failed. Please try again.'
+        );
+        return;
+      }
+      if (signIn.status === 'complete') {
+        await signIn.finalize();
         router.push(redirectTo);
       } else {
         setError(
