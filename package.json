@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@clerk/localizations": "^4.2.1",
-    "@clerk/nextjs": "^6.38.1",
+    "@clerk/nextjs": "^7.0.6",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@floating-ui/dom": "^1.7.6",
