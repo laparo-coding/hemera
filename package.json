@@ -4,7 +4,7 @@
   "version": "0.1.2",
   "type": "module",
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=20.9.0",
     "npm": ">=9.0.0"
   },
   "overrides": {
@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@clerk/localizations": "^4.2.1",
-    "@clerk/nextjs": "^6.38.1",
+    "@clerk/nextjs": "^7.0.6",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@floating-ui/dom": "^1.7.6",
