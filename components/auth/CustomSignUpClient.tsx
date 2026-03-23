@@ -25,8 +25,6 @@ export default function CustomSignUpClient() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [code, setCode] = useState('');
 
-  const isLoaded = fetchStatus === 'idle';
-
   const redirectTo = useMemo(
     () => params?.get('redirect_url') || '/dashboard',
     [params]
