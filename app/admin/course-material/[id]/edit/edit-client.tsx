@@ -63,6 +63,7 @@ export default function EditCourseMaterialClient({
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleCancel = useCallback(
     () => router.push('/admin/course-material'),
@@ -101,17 +102,10 @@ export default function EditCourseMaterialClient({
       } else {
         // Only treat content fetch failure as blocking error for CONTENT type
         if (metaData.type === 'CONTENT') {
-          let contentErrorMsg = 'Inhalt konnte nicht geladen werden';
-          try {
-            const contentErrorData = await contentRes.json();
-            contentErrorMsg = contentErrorData.message || contentErrorMsg;
-          } catch {
-            try {
-              contentErrorMsg = await contentRes.text();
-            } catch {
-              // keep default message
-            }
-          }
+          const contentErrorMsg = await extractErrorMessage(
+            contentRes,
+            'Inhalt konnte nicht geladen werden'
+          );
           setError(contentErrorMsg);
         } else {
           // For SLIDE_CONTROL, swallow the error - content is stored in Vercel Blob
@@ -143,7 +137,7 @@ export default function EditCourseMaterialClient({
     let response: Response;
     try {
       response = await fetch(url, options);
-    } catch (err) {
+    } catch {
       throw new Error('Netzwerkfehler – bitte versuche es erneut');
     }
 
@@ -163,21 +157,33 @@ export default function EditCourseMaterialClient({
     identifier?: string;
     htmlContent: string;
   }) => {
-    await fetchWithErrorHandling(`/api/admin/course-material/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    router.push('/admin/course-material');
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await fetchWithErrorHandling(`/api/admin/course-material/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      router.push('/admin/course-material');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleSlideControlSubmit = async (formData: FormData) => {
-    await fetchWithErrorHandling(`/api/admin/course-material/${id}`, {
-      method: 'PUT',
-      body: formData,
-    });
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await fetchWithErrorHandling(`/api/admin/course-material/${id}`, {
+        method: 'PUT',
+        body: formData,
+      });
 
-    router.push('/admin/course-material');
+      router.push('/admin/course-material');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {

@@ -177,7 +177,7 @@ jobs:
 
       - name: Post sticky PR comment with Lighthouse summary
         if: always() && steps.prnum.outputs.number != '' && steps.target.outputs.url != ''
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           number: ${{ steps.prnum.outputs.number }}
           header: lighthouse-ci

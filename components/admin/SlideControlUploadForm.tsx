@@ -359,7 +359,12 @@ export default function SlideControlUploadForm({
           }}
         >
           {isLoading ? (
-            <CircularProgress size={24} sx={{ color: 'white' }} />
+            <CircularProgress
+              size={24}
+              sx={{ color: 'white' }}
+              aria-label='Ladevorgang läuft'
+              role='status'
+            />
           ) : isEditMode ? (
             'Speichern'
           ) : (

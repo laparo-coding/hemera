@@ -23,7 +23,7 @@ import {
 import { useRollbar } from '@rollbar/react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MaterialForm } from '@/components/admin/MaterialForm';
 import MaterialTypeSelector from '@/components/admin/MaterialTypeSelector';
 import SlideControlUploadForm from '@/components/admin/SlideControlUploadForm';
@@ -53,6 +53,15 @@ export default function CreateCourseMaterialClient() {
   const rollbar = useRollbar();
   const [selectedType, setSelectedType] = useState<MaterialType | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // Manage focus for screen readers when form type changes
+  useEffect(() => {
+    if (selectedType && headingRef.current) {
+      headingRef.current.focus();
+    }
+  }, [selectedType]);
 
   function reportMaterialCreationError(err: unknown) {
     if (err instanceof ExpectedMaterialError) return;
@@ -93,12 +102,20 @@ export default function CreateCourseMaterialClient() {
       throw new ExpectedMaterialError(errorMessage);
     }
 
-    const result = await response.json();
-    if (!result || typeof result.id !== 'string') {
+    let result: { id: string };
+    try {
+      result = await response.json();
+      if (!result || typeof result.id !== 'string') {
+        throw new ExpectedMaterialError('Ungültige Serverantwort');
+      }
+    } catch (err) {
+      if (err instanceof ExpectedMaterialError) {
+        throw err;
+      }
       throw new ExpectedMaterialError('Ungültige Serverantwort');
     }
 
-    return result as { id: string };
+    return result;
   };
 
   const handleContentSubmit = async (data: {
@@ -106,6 +123,8 @@ export default function CreateCourseMaterialClient() {
     identifier?: string;
     htmlContent: string;
   }) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       setCreateError(null);
       await submitCourseMaterial(JSON.stringify(data), {
@@ -115,10 +134,14 @@ export default function CreateCourseMaterialClient() {
     } catch (err) {
       reportMaterialCreationError(err);
       setCreateError(handleCreateError(err));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleSlideControlSubmit = async (formData: FormData) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       setCreateError(null);
       await submitCourseMaterial(formData);
@@ -126,6 +149,8 @@ export default function CreateCourseMaterialClient() {
     } catch (err) {
       reportMaterialCreationError(err);
       setCreateError(handleCreateError(err));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -195,6 +220,15 @@ export default function CreateCourseMaterialClient() {
               Zurück zur Auswahl
             </Button>
           </Box>
+          <Typography
+            ref={headingRef}
+            component='h2'
+            variant='h6'
+            tabIndex={-1}
+            sx={{ mb: 2 }}
+          >
+            Inhaltsseite erstellen
+          </Typography>
           <MaterialForm onSubmit={handleContentSubmit} />
         </Paper>
       )}
@@ -210,6 +244,15 @@ export default function CreateCourseMaterialClient() {
               Zurück zur Auswahl
             </Button>
           </Box>
+          <Typography
+            ref={headingRef}
+            component='h2'
+            variant='h6'
+            tabIndex={-1}
+            sx={{ mb: 2 }}
+          >
+            Steuerdatei hochladen
+          </Typography>
           <SlideControlUploadForm
             onSubmit={handleSlideControlSubmit}
             onCancel={() => router.push('/admin/course-material')}

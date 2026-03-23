@@ -127,12 +127,12 @@ export const spacing = {
 export const courseLevelColors = {
   BEGINNER: {
     bg: colors.rosyBrown,
-    text: colors.marsala,
+    text: colors.lightBlack,
     label: 'A',
   },
   INTERMEDIATE: {
     bg: colors.bronze,
-    text: colors.marsala,
+    text: colors.lightBlack,
     label: 'B',
   },
   ADVANCED: {
