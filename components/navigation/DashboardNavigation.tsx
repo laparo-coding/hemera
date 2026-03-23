@@ -10,15 +10,8 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
+import { colors, typography } from '@/lib/design-tokens';
 import { TERMS } from '../../lib/constants/terminology';
-
-// Hemera Design Tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-};
 
 export function DashboardNavigation() {
   return (
@@ -26,8 +19,8 @@ export function DashboardNavigation() {
       position='static'
       elevation={0}
       sx={{
-        bgcolor: colors.cream,
-        borderBottom: `1px solid ${colors.sage}`,
+        bgcolor: colors.marsala,
+        borderBottom: `1px solid ${colors.marsalaDark}`,
       }}
     >
       <Container maxWidth='lg'>
@@ -38,10 +31,10 @@ export function DashboardNavigation() {
               variant='h5'
               component='div'
               sx={{
-                fontFamily: '"Playfair Display", serif',
+                fontFamily: typography.heading,
                 fontWeight: 700,
                 fontSize: { xs: '1.25rem', md: '1.5rem' },
-                color: colors.petrol,
+                color: colors.white,
                 cursor: 'pointer',
                 letterSpacing: '0.02em',
               }}
@@ -57,11 +50,11 @@ export function DashboardNavigation() {
               href='/dashboard'
               sx={{
                 textTransform: 'none',
-                color: colors.petrol,
-                fontFamily: '"Inter", sans-serif',
+                color: colors.white,
+                fontFamily: typography.body,
                 fontWeight: 500,
                 '&:hover': {
-                  bgcolor: `${colors.sage}33`,
+                  bgcolor: colors.whiteOverlay15,
                 },
               }}
             >
@@ -73,11 +66,11 @@ export function DashboardNavigation() {
               href='/my-courses'
               sx={{
                 textTransform: 'none',
-                color: colors.petrol,
-                fontFamily: '"Inter", sans-serif',
+                color: colors.white,
+                fontFamily: typography.body,
                 fontWeight: 500,
                 '&:hover': {
-                  bgcolor: `${colors.sage}33`,
+                  bgcolor: colors.whiteOverlay15,
                 },
               }}
             >
@@ -89,11 +82,11 @@ export function DashboardNavigation() {
               href='/courses'
               sx={{
                 textTransform: 'none',
-                color: colors.petrol,
-                fontFamily: '"Inter", sans-serif',
+                color: colors.white,
+                fontFamily: typography.body,
                 fontWeight: 500,
                 '&:hover': {
-                  bgcolor: `${colors.sage}33`,
+                  bgcolor: colors.whiteOverlay15,
                 },
               }}
             >
@@ -101,7 +94,6 @@ export function DashboardNavigation() {
             </Button>
 
             <UserButton
-              afterSignOutUrl='/'
               appearance={{
                 elements: {
                   avatarBox: {

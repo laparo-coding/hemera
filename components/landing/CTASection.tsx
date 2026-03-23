@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Button, Container, Typography } from '@mui/material';
+import { colors } from '@/lib/design-tokens';
 
 export interface CTASectionProps {
   /** Headline (German) */
@@ -13,13 +14,6 @@ export interface CTASectionProps {
   ctaHref: string;
 }
 
-// Design tokens from spec
-const colors = {
-  petrol: '#16404D',
-  gold: '#DDA853',
-  cream: '#FBF5DD',
-};
-
 export default function CTASection({
   headline,
   subheadline,
@@ -31,7 +25,7 @@ export default function CTASection({
       component='section'
       data-testid='cta-section'
       sx={{
-        bgcolor: colors.petrol,
+        bgcolor: colors.marsala,
         py: { xs: 8, md: 10 },
       }}
     >
@@ -44,7 +38,7 @@ export default function CTASection({
               fontFamily: '"Playfair Display", serif',
               fontSize: { xs: '2rem', md: '2.5rem' },
               fontWeight: 700,
-              color: colors.cream,
+              color: colors.beige,
               mb: 2,
             }}
           >
@@ -56,7 +50,7 @@ export default function CTASection({
               fontFamily: '"Inter", sans-serif',
               fontSize: '1.125rem',
               lineHeight: 1.6,
-              color: colors.cream,
+              color: colors.beige,
               opacity: 0.9,
               mb: 4,
               maxWidth: '500px',
@@ -71,8 +65,8 @@ export default function CTASection({
             variant='contained'
             size='large'
             sx={{
-              bgcolor: colors.gold,
-              color: colors.petrol,
+              bgcolor: colors.white,
+              color: colors.marsala,
               fontWeight: 600,
               px: 5,
               py: 1.5,
@@ -80,7 +74,8 @@ export default function CTASection({
               textTransform: 'none',
               borderRadius: '8px',
               '&:hover': {
-                bgcolor: '#C99545',
+                bgcolor: colors.beige,
+                color: colors.marsala,
               },
             }}
           >

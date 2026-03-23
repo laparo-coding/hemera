@@ -1,4 +1,4 @@
-import type { UserResource } from '@clerk/types';
+import type { UserResource } from '@clerk/shared/types';
 import { Box, Tab, Tabs } from '@mui/material';
 import Link from 'next/link';
 

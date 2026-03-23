@@ -1,8 +1,7 @@
 'use client';
 
 import {
-  SignedIn as ClerkSignedIn,
-  SignedOut as ClerkSignedOut,
+  Show as ClerkShow,
   UserButton as ClerkUserButton,
 } from '@clerk/nextjs';
 import type { ReactNode } from 'react';
@@ -39,7 +38,7 @@ export function SignedIn({ children }: AuthWrapperProps) {
     return null;
   }
 
-  return <ClerkSignedIn>{children}</ClerkSignedIn>;
+  return <ClerkShow when='signed-in'>{children}</ClerkShow>;
 }
 
 /**
@@ -69,7 +68,7 @@ export function SignedOut({ children }: AuthWrapperProps) {
     return <>{children}</>;
   }
 
-  return <ClerkSignedOut>{children}</ClerkSignedOut>;
+  return <ClerkShow when='signed-out'>{children}</ClerkShow>;
 }
 
 /**

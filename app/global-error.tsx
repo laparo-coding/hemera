@@ -2,8 +2,8 @@
 
 import { ErrorOutline, Refresh } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
-import { useRollbar } from '@rollbar/react';
 import React from 'react';
+import { logClientError } from '@/lib/errors/client';
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -11,18 +11,14 @@ interface GlobalErrorProps {
 }
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
-  const rollbar = useRollbar();
-
   React.useEffect(() => {
-    // Log the global error
-
-    // Report critical error to Rollbar
-    rollbar.critical(error, {
+    // Report critical error to Rollbar (direct client, no Provider needed)
+    logClientError(error, {
       level: 'critical',
       context: 'global-error-boundary',
       fingerprint: `global-error-${error.name}`,
     });
-  }, [error, rollbar]);
+  }, [error]);
 
   return (
     <html lang='de'>

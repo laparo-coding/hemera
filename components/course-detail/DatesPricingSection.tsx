@@ -84,7 +84,7 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
       data-testid='pricing-section'
       aria-labelledby='pricing-title'
       sx={{
-        backgroundColor: colors.sage,
+        backgroundColor: colors.beige,
         py: spacing.sectionPy,
       }}
     >
@@ -98,7 +98,7 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
             fontFamily: typography.heading,
             fontSize: { xs: '2rem', md: '2.5rem' },
             fontWeight: 700,
-            color: colors.petrol,
+            color: colors.marsala,
             mb: 5,
             textAlign: 'center',
           }}
@@ -122,14 +122,14 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
             {/* Date */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <CalendarTodayIcon
-                sx={{ color: colors.gold, mr: 2, fontSize: 28 }}
+                sx={{ color: colors.bronze, mr: 2, fontSize: 28 }}
               />
               <Box>
                 <Typography
                   variant='caption'
                   sx={{
                     fontFamily: typography.body,
-                    color: colors.sage,
+                    color: colors.rosyBrown,
                     textTransform: 'uppercase',
                     letterSpacing: 1,
                   }}
@@ -141,7 +141,7 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
                   sx={{
                     fontFamily: typography.body,
                     fontWeight: 600,
-                    color: colors.petrol,
+                    color: colors.marsala,
                   }}
                 >
                   {startDate
@@ -154,14 +154,14 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
             {/* Time */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <AccessTimeIcon
-                sx={{ color: colors.gold, mr: 2, fontSize: 28 }}
+                sx={{ color: colors.bronze, mr: 2, fontSize: 28 }}
               />
               <Box>
                 <Typography
                   variant='caption'
                   sx={{
                     fontFamily: typography.body,
-                    color: colors.sage,
+                    color: colors.rosyBrown,
                     textTransform: 'uppercase',
                     letterSpacing: 1,
                   }}
@@ -173,7 +173,7 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
                   sx={{
                     fontFamily: typography.body,
                     fontWeight: 600,
-                    color: colors.petrol,
+                    color: colors.marsala,
                   }}
                 >
                   {startTime && endTime
@@ -186,14 +186,14 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
             {/* Location */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <LocationOnIcon
-                sx={{ color: colors.gold, mr: 2, fontSize: 28 }}
+                sx={{ color: colors.bronze, mr: 2, fontSize: 28 }}
               />
               <Box>
                 <Typography
                   variant='caption'
                   sx={{
                     fontFamily: typography.body,
-                    color: colors.sage,
+                    color: colors.rosyBrown,
                     textTransform: 'uppercase',
                     letterSpacing: 1,
                   }}
@@ -205,7 +205,7 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
                   sx={{
                     fontFamily: typography.body,
                     fontWeight: 600,
-                    color: colors.petrol,
+                    color: colors.marsala,
                   }}
                 >
                   {location
@@ -217,13 +217,13 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
 
             {/* Price */}
             <Box sx={{ display: 'flex', alignItems: 'center', mt: 3 }}>
-              <EuroIcon sx={{ color: colors.gold, mr: 2, fontSize: 28 }} />
+              <EuroIcon sx={{ color: colors.bronze, mr: 2, fontSize: 28 }} />
               <Box>
                 <Typography
                   variant='caption'
                   sx={{
                     fontFamily: typography.body,
-                    color: colors.sage,
+                    color: colors.rosyBrown,
                     textTransform: 'uppercase',
                     letterSpacing: 1,
                   }}
@@ -235,7 +235,7 @@ export const DatesPricingSection: React.FC<DatesPricingSectionProps> = ({
                   sx={{
                     fontFamily: typography.body,
                     fontWeight: 600,
-                    color: colors.petrol,
+                    color: colors.marsala,
                   }}
                 >
                   {formatPrice(price, currency)} inkl. 19% MwSt.

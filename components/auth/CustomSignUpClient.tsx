@@ -12,17 +12,10 @@ import {
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type FormEvent, useMemo, useState } from 'react';
-
-// Design tokens from Hemera spec
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-};
+import { colors } from '@/lib/design-tokens';
 
 export default function CustomSignUpClient() {
-  const { isLoaded, signUp, setActive } = useSignUp();
+  const { signUp, fetchStatus } = useSignUp();
   const router = useRouter();
   const params = useSearchParams();
   const [email, setEmail] = useState('');
@@ -40,16 +33,42 @@ export default function CustomSignUpClient() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!isLoaded || !signUp) return;
+    if (fetchStatus === 'fetching' || !signUp) return;
     setSubmitting(true);
     try {
-      await signUp.create({ emailAddress: email, password });
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      const createResult = await signUp.create({ emailAddress: email });
+      if (createResult.error) {
+        setError(
+          createResult.error.message ||
+            'Registrierung fehlgeschlagen. Bitte versuche es erneut.'
+        );
+        return;
+      }
+      const passwordResult = await signUp.password({
+        password,
+        emailAddress: email,
+      });
+      if (passwordResult.error) {
+        setError(
+          passwordResult.error.message ||
+            'Registrierung fehlgeschlagen. Bitte versuche es erneut.'
+        );
+        return;
+      }
+      const sendResult = await signUp.verifications.sendEmailCode();
+      if (sendResult.error) {
+        setError(
+          sendResult.error.message ||
+            'Registrierung fehlgeschlagen. Bitte versuche es erneut.'
+        );
+        return;
+      }
       setIsVerifying(true);
     } catch (err: unknown) {
       const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        error?.errors?.[0]?.message || 'Sign-up failed. Please try again.';
+        error?.errors?.[0]?.message ||
+        'Registrierung fehlgeschlagen. Bitte versuche es erneut.';
       setError(message);
     } finally {
       setSubmitting(false);
@@ -59,22 +78,30 @@ export default function CustomSignUpClient() {
   async function onVerify(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!isLoaded || !signUp) return;
+    if (fetchStatus === 'fetching' || !signUp) return;
     setSubmitting(true);
     try {
-      const complete = await signUp.attemptEmailAddressVerification({ code });
-      if (complete.status === 'complete') {
-        await setActive?.({ session: complete.createdSessionId });
+      const verifyResult = await signUp.verifications.verifyEmailCode({ code });
+      if (verifyResult.error) {
+        setError(
+          verifyResult.error.message ||
+            'Verifizierung fehlgeschlagen. Bitte versuche es erneut.'
+        );
+        return;
+      }
+      if (signUp.status === 'complete') {
+        await signUp.finalize();
         router.push(redirectTo);
       } else {
         setError(
-          'Verification not complete. Please check the code and try again.'
+          'Verifizierung nicht abgeschlossen. Überprüfe den Code und versuche es erneut.'
         );
       }
     } catch (err: unknown) {
       const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        error?.errors?.[0]?.message || 'Verification failed. Please try again.';
+        error?.errors?.[0]?.message ||
+        'Verifizierung fehlgeschlagen. Bitte versuche es erneut.';
       setError(message);
     } finally {
       setSubmitting(false);
@@ -85,7 +112,7 @@ export default function CustomSignUpClient() {
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: colors.cream,
+        bgcolor: colors.beige,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -122,7 +149,7 @@ export default function CustomSignUpClient() {
                   fontFamily: '"Playfair Display", serif',
                   fontSize: { xs: '1.75rem', sm: '2rem' },
                   fontWeight: 700,
-                  color: colors.petrol,
+                  color: colors.marsala,
                   mb: 1,
                 }}
               >
@@ -132,7 +159,7 @@ export default function CustomSignUpClient() {
                 sx={{
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '1rem',
-                  color: colors.petrol,
+                  color: colors.lightBlack,
                   opacity: 0.8,
                 }}
               >
@@ -157,20 +184,20 @@ export default function CustomSignUpClient() {
                   onChange={e => setEmail(e.target.value)}
                   required
                   autoComplete='email'
-                  disabled={!isLoaded || submitting}
+                  disabled={fetchStatus === 'fetching' || submitting}
                   fullWidth
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '8px',
                       '&:hover fieldset': {
-                        borderColor: colors.sage,
+                        borderColor: colors.rosyBrown,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: colors.petrol,
+                        borderColor: colors.marsala,
                       },
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
-                      color: colors.petrol,
+                      color: colors.marsala,
                     },
                   }}
                 />
@@ -181,20 +208,20 @@ export default function CustomSignUpClient() {
                   onChange={e => setPassword(e.target.value)}
                   required
                   autoComplete='new-password'
-                  disabled={!isLoaded || submitting}
+                  disabled={fetchStatus === 'fetching' || submitting}
                   fullWidth
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '8px',
                       '&:hover fieldset': {
-                        borderColor: colors.sage,
+                        borderColor: colors.rosyBrown,
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: colors.petrol,
+                        borderColor: colors.marsala,
                       },
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
-                      color: colors.petrol,
+                      color: colors.marsala,
                     },
                   }}
                 />
@@ -211,20 +238,20 @@ export default function CustomSignUpClient() {
                   pattern: '[0-9]*',
                   maxLength: 6,
                 }}
-                disabled={!isLoaded || submitting}
+                disabled={fetchStatus === 'fetching' || submitting}
                 fullWidth
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '8px',
                     '&:hover fieldset': {
-                      borderColor: colors.sage,
+                      borderColor: colors.rosyBrown,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: colors.petrol,
+                      borderColor: colors.marsala,
                     },
                   },
                   '& .MuiInputLabel-root.Mui-focused': {
-                    color: colors.petrol,
+                    color: colors.marsala,
                   },
                 }}
               />
@@ -234,13 +261,13 @@ export default function CustomSignUpClient() {
               type='submit'
               variant='contained'
               size='large'
-              disabled={!isLoaded || submitting}
+              disabled={fetchStatus === 'fetching' || submitting}
               fullWidth
               sx={{
                 mt: 1,
                 py: 1.5,
-                bgcolor: colors.gold,
-                color: colors.petrol,
+                bgcolor: colors.bronze,
+                color: colors.marsala,
                 fontWeight: 600,
                 fontSize: '1rem',
                 textTransform: 'none',
@@ -249,8 +276,8 @@ export default function CustomSignUpClient() {
                   bgcolor: '#C99545',
                 },
                 '&:disabled': {
-                  bgcolor: colors.sage,
-                  color: colors.petrol,
+                  bgcolor: colors.rosyBrown,
+                  color: colors.marsala,
                   opacity: 0.6,
                 },
               }}
@@ -271,7 +298,7 @@ export default function CustomSignUpClient() {
                 mt: 2,
                 fontFamily: '"Inter", sans-serif',
                 fontSize: '0.875rem',
-                color: colors.petrol,
+                color: colors.lightBlack,
               }}
             >
               Bereits registriert?{' '}
@@ -279,11 +306,11 @@ export default function CustomSignUpClient() {
                 component='a'
                 href='/sign-in'
                 sx={{
-                  color: colors.petrol,
+                  color: colors.marsala,
                   fontWeight: 600,
                   textDecoration: 'underline',
                   '&:hover': {
-                    color: colors.gold,
+                    color: colors.bronze,
                   },
                 }}
               >

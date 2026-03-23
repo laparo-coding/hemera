@@ -44,7 +44,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
       data-testid='testimonials-section'
       aria-labelledby='testimonials-title'
       sx={{
-        backgroundColor: colors.petrol,
+        backgroundColor: colors.marsala,
         py: spacing.sectionPy,
       }}
     >
@@ -58,7 +58,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
             fontFamily: typography.heading,
             fontSize: { xs: '2rem', md: '2.5rem' },
             fontWeight: 700,
-            color: colors.cream,
+            color: colors.beige,
             mb: 5,
             textAlign: 'center',
           }}
@@ -85,7 +85,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                   <FormatQuoteIcon
                     data-testid='quote-icon'
                     sx={{
-                      color: colors.gold,
+                      color: colors.bronze,
                       fontSize: 40,
                       mb: 2,
                       transform: 'scaleX(-1)',
@@ -99,7 +99,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                       fontFamily: typography.body,
                       fontSize: '1.1rem',
                       lineHeight: 1.7,
-                      color: colors.petrol,
+                      color: colors.lightBlack,
                       mb: 3,
                       fontStyle: 'italic',
                     }}
@@ -114,7 +114,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                       sx={{
                         fontFamily: typography.body,
                         fontWeight: 600,
-                        color: colors.petrol,
+                        color: colors.marsala,
                       }}
                     >
                       {testimonial.authorName}
@@ -123,7 +123,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                       variant='body2'
                       sx={{
                         fontFamily: typography.body,
-                        color: colors.sage,
+                        color: colors.rosyBrown,
                       }}
                     >
                       {testimonial.authorRole}
@@ -137,21 +137,21 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                       display: 'flex',
                       alignItems: 'center',
                       gap: 1,
-                      backgroundColor: colors.cream,
+                      backgroundColor: colors.beige,
                       borderRadius: 2,
                       px: 2,
                       py: 1,
                     }}
                   >
                     <CheckCircleIcon
-                      sx={{ color: colors.gold, fontSize: 20 }}
+                      sx={{ color: colors.bronze, fontSize: 20 }}
                     />
                     <Typography
                       variant='body2'
                       sx={{
                         fontFamily: typography.body,
                         fontWeight: 500,
-                        color: colors.petrol,
+                        color: colors.lightBlack,
                       }}
                     >
                       {testimonial.successIndicator}

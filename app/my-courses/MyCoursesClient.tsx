@@ -25,10 +25,12 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  TextField,
   Typography,
 } from '@mui/material';
 import type React from 'react';
 import { useCallback, useEffect, useState, useTransition } from 'react';
+import { colors } from '@/lib/design-tokens';
 import {
   CourseParticipationStepper,
   ResumeUploader,
@@ -43,15 +45,6 @@ import {
   startParticipationAction,
 } from '../../lib/actions/participation';
 import type { PreparationInput } from '../../lib/db/courseParticipation';
-
-// Design tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-} as const;
 
 // Status labels in German
 const statusLabels: Record<string, string> = {
@@ -141,7 +134,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
   if (loading) {
     return (
       <Box display='flex' justifyContent='center' py={8}>
-        <CircularProgress sx={{ color: colors.petrol }} />
+        <CircularProgress sx={{ color: colors.marsala }} />
       </Box>
     );
   }
@@ -159,13 +152,15 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
       <Card
         elevation={0}
         sx={{
-          border: `1px dashed ${colors.sage}`,
-          backgroundColor: colors.cream,
+          border: `1px dashed ${colors.rosyBrown}`,
+          backgroundColor: colors.beige,
         }}
       >
         <CardContent sx={{ textAlign: 'center', py: 8 }}>
-          <SchoolOutlined sx={{ fontSize: 64, color: colors.sage, mb: 2 }} />
-          <Typography variant='h5' sx={{ color: colors.petrol, mb: 2 }}>
+          <SchoolOutlined
+            sx={{ fontSize: 64, color: colors.rosyBrown, mb: 2 }}
+          />
+          <Typography variant='h5' sx={{ color: colors.marsala, mb: 2 }}>
             Noch keine Seminare gebucht
           </Typography>
           <Typography variant='body1' color='text.secondary'>
@@ -195,7 +190,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
         <Box sx={{ mb: 4 }}>
           <Typography
             variant='h6'
-            sx={{ color: colors.petrol, mb: 2, fontWeight: 600 }}
+            sx={{ color: colors.marsala, mb: 2, fontWeight: 600 }}
           >
             Gebuchte Seminare ({notStartedEnrollments.length})
           </Typography>
@@ -206,7 +201,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
               elevation={0}
               sx={{
                 mb: 2,
-                border: `1px solid ${colors.sage}`,
+                border: `1px solid ${colors.rosyBrown}`,
                 borderRadius: '8px',
               }}
             >
@@ -221,7 +216,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
                   <Box>
                     <Typography
                       variant='subtitle1'
-                      sx={{ fontWeight: 500, color: colors.petrol }}
+                      sx={{ fontWeight: 500, color: colors.marsala }}
                     >
                       {item.booking.course.title}
                     </Typography>
@@ -246,10 +241,10 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
                     disabled={isPending}
                     onClick={() => handleStartPreparation(item.booking.id)}
                     sx={{
-                      backgroundColor: colors.gold,
-                      color: colors.petrol,
+                      backgroundColor: colors.bronze,
+                      color: colors.white,
                       '&:hover': {
-                        backgroundColor: colors.petrol,
+                        backgroundColor: colors.marsala,
                         color: colors.white,
                       },
                     }}
@@ -273,16 +268,16 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
               onChange={() => handleAccordionChange(item.booking.id)}
               sx={{
                 mb: 2,
-                border: `1px solid ${colors.sage}`,
+                border: `1px solid ${colors.rosyBrown}`,
                 borderRadius: '8px !important',
                 '&:before': { display: 'none' },
                 boxShadow: 'none',
               }}
             >
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{ color: colors.petrol }} />}
+                expandIcon={<ExpandMoreIcon sx={{ color: colors.marsala }} />}
                 sx={{
-                  backgroundColor: colors.cream,
+                  backgroundColor: colors.beige,
                   borderRadius: '8px',
                   '&.Mui-expanded': {
                     borderBottomLeftRadius: 0,
@@ -300,7 +295,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
                   <Box>
                     <Typography
                       variant='subtitle1'
-                      sx={{ fontWeight: 500, color: colors.petrol }}
+                      sx={{ fontWeight: 500, color: colors.marsala }}
                     >
                       {item.booking.course.title}
                     </Typography>
@@ -318,12 +313,12 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
                       px: 2,
                       py: 0.5,
                       borderRadius: 1,
-                      backgroundColor: 'rgba(221, 168, 83, 0.2)',
+                      backgroundColor: colors.bronzeLight,
                     }}
                   >
                     <Typography
                       variant='caption'
-                      sx={{ color: colors.petrol, fontWeight: 500 }}
+                      sx={{ color: colors.marsala, fontWeight: 500 }}
                     >
                       {item.participation &&
                         (statusLabels[item.participation.status] ||
@@ -361,7 +356,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
         <Box>
           <Typography
             variant='h6'
-            sx={{ color: colors.petrol, mb: 2, fontWeight: 600 }}
+            sx={{ color: colors.marsala, mb: 2, fontWeight: 600 }}
           >
             Abgeschlossene Kurse ({completedEnrollments.length})
           </Typography>
@@ -372,17 +367,19 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
               elevation={0}
               sx={{
                 mb: 2,
-                border: `1px solid ${colors.sage}`,
-                backgroundColor: 'rgba(166, 205, 198, 0.1)',
+                border: `1px solid ${colors.rosyBrown}`,
+                backgroundColor: colors.sageLight,
               }}
             >
               <CardContent>
                 <Box display='flex' alignItems='center' gap={2}>
-                  <SchoolOutlined sx={{ color: colors.sage, fontSize: 32 }} />
+                  <SchoolOutlined
+                    sx={{ color: colors.rosyBrown, fontSize: 32 }}
+                  />
                   <Box>
                     <Typography
                       variant='subtitle1'
-                      sx={{ fontWeight: 500, color: colors.petrol }}
+                      sx={{ fontWeight: 500, color: colors.marsala }}
                     >
                       {item.booking.course.title}
                     </Typography>
@@ -442,9 +439,24 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
     }
   };
 
+  const textFieldSx = {
+    '& .MuiInputBase-root': {
+      backgroundColor: colors.lightGray,
+      borderRadius: '8px',
+      fontSize: '14px',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      border: '2px solid transparent',
+    },
+    '&:focus-within .MuiOutlinedInput-notchedOutline': {
+      borderColor: colors.marsala,
+      borderWidth: '2px',
+    },
+  };
+
   return (
     <Box sx={{ mt: 2 }}>
-      <Typography variant='body2' sx={{ mb: 3, color: colors.petrol }}>
+      <Typography variant='body2' sx={{ mb: 3, color: colors.lightBlack }}>
         Bereite dich auf den Kurs vor, indem du deine Ziele definierst.
       </Typography>
 
@@ -452,24 +464,19 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
       <Box sx={{ mb: 3 }}>
         <Typography
           variant='subtitle2'
-          sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
+          sx={{ mb: 1, color: colors.marsala, fontWeight: 500 }}
         >
           Was ist deine Absicht für dieses Seminar?
         </Typography>
-        <textarea
+        <TextField
+          multiline
+          minRows={6}
+          fullWidth
+          aria-label='Vorbereitungsabsicht'
           value={preparationIntent}
           onChange={e => setPreparationIntent(e.target.value)}
           placeholder='Beschreibe, was du mit diesem Seminar erreichen möchtest...'
-          style={{
-            width: '100%',
-            minHeight: '80px',
-            padding: '12px',
-            borderRadius: '8px',
-            border: `1px solid ${colors.sage}`,
-            fontFamily: 'inherit',
-            fontSize: '14px',
-            resize: 'vertical',
-          }}
+          sx={textFieldSx}
         />
       </Box>
 
@@ -477,24 +484,19 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
       <Box sx={{ mb: 3 }}>
         <Typography
           variant='subtitle2'
-          sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
+          sx={{ mb: 1, color: colors.marsala, fontWeight: 500 }}
         >
           Welche Ergebnisse erwartest du nach dem Seminar?
         </Typography>
-        <textarea
+        <TextField
+          multiline
+          minRows={6}
+          fullWidth
+          aria-label='Gewünschte Ergebnisse'
           value={desiredResults}
           onChange={e => setDesiredResults(e.target.value)}
           placeholder='Welche konkreten Ergebnisse möchtest du erreichen...'
-          style={{
-            width: '100%',
-            minHeight: '80px',
-            padding: '12px',
-            borderRadius: '8px',
-            border: `1px solid ${colors.sage}`,
-            fontFamily: 'inherit',
-            fontSize: '14px',
-            resize: 'vertical',
-          }}
+          sx={textFieldSx}
         />
       </Box>
 
@@ -502,24 +504,19 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
       <Box sx={{ mb: 3 }}>
         <Typography
           variant='subtitle2'
-          sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
+          sx={{ mb: 1, color: colors.marsala, fontWeight: 500 }}
         >
           Beschreibe deinen Vorgesetzten
         </Typography>
-        <textarea
+        <TextField
+          multiline
+          minRows={6}
+          fullWidth
+          aria-label='Profil des Vorgesetzten'
           value={lineManagerProfile}
           onChange={e => setLineManagerProfile(e.target.value)}
           placeholder='Charaktereigenschaften, Kommunikationsstil, Prioritäten deines Vorgesetzten...'
-          style={{
-            width: '100%',
-            minHeight: '80px',
-            padding: '12px',
-            borderRadius: '8px',
-            border: `1px solid ${colors.sage}`,
-            fontFamily: 'inherit',
-            fontSize: '14px',
-            resize: 'vertical',
-          }}
+          sx={textFieldSx}
         />
       </Box>
 
@@ -527,7 +524,7 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
       <Box sx={{ mb: 3 }}>
         <Typography
           variant='subtitle2'
-          sx={{ mb: 1, color: colors.petrol, fontWeight: 500 }}
+          sx={{ mb: 1, color: colors.marsala, fontWeight: 500 }}
         >
           Lebenslauf (optional)
         </Typography>
@@ -542,7 +539,7 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           onClick={handleComplete}
           disabled={submitting}
           style={{
-            backgroundColor: submitting ? colors.sage : colors.petrol,
+            backgroundColor: submitting ? colors.rosyBrown : colors.marsala,
             color: colors.white,
             border: 'none',
             padding: '12px 24px',
@@ -582,7 +579,7 @@ const SummaryStepContent: React.FC<SummaryStepContentProps> = ({
           onClick={onComplete}
           disabled={!allViewed}
           style={{
-            backgroundColor: allViewed ? colors.petrol : colors.sage,
+            backgroundColor: allViewed ? colors.marsala : colors.rosyBrown,
             color: colors.white,
             border: 'none',
             padding: '12px 24px',

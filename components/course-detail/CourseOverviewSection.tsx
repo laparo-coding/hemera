@@ -43,7 +43,7 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
       data-testid='overview-section'
       aria-labelledby='overview-title'
       sx={{
-        backgroundColor: colors.cream,
+        backgroundColor: colors.beige,
         py: spacing.sectionPy,
       }}
     >
@@ -57,7 +57,7 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
             fontFamily: typography.heading,
             fontSize: { xs: '2rem', md: '2.5rem' },
             fontWeight: 700,
-            color: colors.petrol,
+            color: colors.marsala,
             mb: 4,
             textAlign: 'center',
           }}
@@ -72,7 +72,7 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
             fontFamily: typography.body,
             fontSize: { xs: '1rem', md: '1.125rem' },
             lineHeight: 1.8,
-            color: colors.petrol,
+            color: colors.lightBlack,
             mb: 5,
             maxWidth: '800px',
             mx: 'auto',
@@ -102,7 +102,7 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
                 fontFamily: typography.heading,
                 fontSize: { xs: '1.5rem', md: '1.75rem' },
                 fontWeight: 600,
-                color: colors.petrol,
+                color: colors.marsala,
                 mb: 3,
               }}
             >
@@ -112,13 +112,13 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
               {learningObjectives.map((objective, index) => (
                 <ListItem key={index} sx={{ py: 1 }}>
                   <ListItemIcon sx={{ minWidth: 40 }}>
-                    <CheckCircleOutlineIcon sx={{ color: colors.gold }} />
+                    <CheckCircleOutlineIcon sx={{ color: colors.bronze }} />
                   </ListItemIcon>
                   <ListItemText
                     primary={objective}
                     primaryTypographyProps={{
                       fontFamily: typography.body,
-                      color: colors.petrol,
+                      color: colors.lightBlack,
                     }}
                   />
                 </ListItem>
@@ -137,13 +137,13 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
             mb: 5,
           }}
         >
-          <PersonIcon sx={{ color: colors.sage, fontSize: 32 }} />
+          <PersonIcon sx={{ color: colors.lightBlack, fontSize: 32 }} />
           <Box>
             <Typography
               variant='caption'
               sx={{
                 fontFamily: typography.body,
-                color: colors.sage,
+                color: colors.lightBlack,
                 textTransform: 'uppercase',
                 letterSpacing: 1,
               }}
@@ -155,7 +155,7 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
               sx={{
                 fontFamily: typography.body,
                 fontWeight: 600,
-                color: colors.petrol,
+                color: colors.marsala,
               }}
             >
               {instructor}

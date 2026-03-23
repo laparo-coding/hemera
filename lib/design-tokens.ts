@@ -10,29 +10,56 @@
 // ============================================
 
 export const colors = {
-  /** Primary cream background - warm, inviting */
-  cream: '#FBF5DD',
+  /** Warm beige – background color, inviting and soft */
+  beige: '#EBE2D3',
 
-  /** Primary petrol text/accent - professional, trustworthy */
-  petrol: '#16404D',
+  /** Muted marsala red – primary color for headings and accents */
+  marsala: '#884143',
 
-  /** Gold accent - premium, call-to-action */
-  gold: '#DDA853',
+  /** Warm bronze brown – secondary color for call-to-actions */
+  bronze: '#926A49',
 
-  /** Sage accent - calming, supportive */
-  sage: '#A6CDC6',
+  /** Rosy brown – subtle accent, calming */
+  rosyBrown: '#bc8f8f',
 
-  /** Pure white for cards and contrast */
+  /** Pure white – cards and contrast surfaces */
   white: '#FFFFFF',
 
-  /** Light gray for borders and dividers */
+  /** Light gray – borders and dividers */
   lightGray: '#E5E5E5',
 
-  /** Black for success indicators */
+  /** Light black – body text, easy to read */
+  lightBlack: '#2D2D2D',
+
+  /** Pure black – success indicators */
   success: '#000000',
 
-  /** Red for warning indicators */
+  /** Signal red – warnings and errors */
   warning: '#FF0000',
+
+  /** Marsala dark – hover/active state for marsala buttons */
+  marsalaDark: '#6B3234',
+
+  /** Bronze hover – lighter bronze for hover states */
+  bronzeHover: '#C99545',
+
+  /** White overlay – semi-transparent white for hover on dark backgrounds */
+  whiteOverlay15: 'rgba(255, 255, 255, 0.15)',
+
+  /** Sage light – subtle sage green tint for backgrounds */
+  sageLight: 'rgba(166, 205, 198, 0.1)',
+
+  /** Bronze light – subtle bronze tint for hover/drag backgrounds */
+  bronzeLight: 'rgba(221, 168, 83, 0.1)',
+
+  /** Info main – sage green for informational elements */
+  infoMain: '#5B9A8B',
+
+  /** Info light – lighter sage green */
+  infoLight: '#7DB8AB',
+
+  /** Info dark – darker sage green */
+  infoDark: '#3E7A6D',
 } as const;
 
 export type ColorKey = keyof typeof colors;
@@ -78,18 +105,18 @@ export const spacing = {
 
 export const courseLevelColors = {
   BEGINNER: {
-    bg: colors.sage,
-    text: colors.petrol,
+    bg: colors.rosyBrown,
+    text: colors.marsala,
     label: 'A',
   },
   INTERMEDIATE: {
-    bg: colors.gold,
-    text: colors.petrol,
+    bg: colors.bronze,
+    text: colors.marsala,
     label: 'B',
   },
   ADVANCED: {
-    bg: colors.petrol,
-    text: colors.cream,
+    bg: colors.marsala,
+    text: colors.beige,
     label: 'C',
   },
 } as const;

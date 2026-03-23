@@ -10,15 +10,15 @@ import { redirect } from 'next/navigation';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 
 /**
- * Detects if we are running in a test/E2E or Clerk-disabled environment.
- * In these cases, server-side calls to Clerk should be avoided to prevent middleware errors.
+ * Detects if we are running in a unit test or Clerk-disabled CLIENT environment.
+ * - Only returns true for actual unit tests (NODE_ENV=test or JEST_WORKER_ID is set)
+ * - Returns false for E2E tests (which need real auth checks)
+ * - Returns false for NEXT_PUBLIC_* vars (those control client-only behavior)
  */
 function isMockAuthEnvironment(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_DISABLE_CLERK === '1' ||
-    process.env.E2E_TEST === '1' ||
-    process.env.NODE_ENV === 'test'
-  );
+  // Jest sets JEST_WORKER_ID when running tests
+  const isJestRunning = !!process.env.JEST_WORKER_ID;
+  return process.env.NODE_ENV === 'test' || isJestRunning;
 }
 
 /**

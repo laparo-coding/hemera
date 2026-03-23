@@ -16,16 +16,16 @@ export interface CourseHeaderProps {
   thumbnailUrl?: string | null;
 }
 
-const LEVEL_LABELS: Record<string, string> = {
+const LEVEL_LABELS: Record<CourseHeaderProps['level'], string> = {
   BEGINNER: 'Basis',
   INTERMEDIATE: 'Fortgeschrittene',
   ADVANCED: 'Masterclass',
 };
 
-const LEVEL_COLORS: Record<string, string> = {
-  BEGINNER: colors.sage,
-  INTERMEDIATE: colors.gold,
-  ADVANCED: colors.petrol,
+const LEVEL_COLORS: Record<CourseHeaderProps['level'], string> = {
+  BEGINNER: colors.rosyBrown,
+  INTERMEDIATE: colors.bronze,
+  ADVANCED: colors.marsala,
 };
 
 export const CourseHeader: React.FC<CourseHeaderProps> = ({
@@ -35,7 +35,7 @@ export const CourseHeader: React.FC<CourseHeaderProps> = ({
   thumbnailUrl,
 }) => {
   const levelLabel = LEVEL_LABELS[level] || level;
-  const levelColor = LEVEL_COLORS[level] || colors.petrol;
+  const levelColor = LEVEL_COLORS[level] || colors.marsala;
 
   return (
     <Box
@@ -43,7 +43,7 @@ export const CourseHeader: React.FC<CourseHeaderProps> = ({
       data-testid='course-header'
       id='course-top'
       sx={{
-        backgroundColor: colors.cream,
+        backgroundColor: colors.beige,
         pt: { xs: 10, md: 12 }, // Account for fixed navigation
         pb: spacing.sectionPy,
         position: 'relative',
@@ -84,7 +84,7 @@ export const CourseHeader: React.FC<CourseHeaderProps> = ({
             size='small'
             sx={{
               backgroundColor: `${levelColor}20`,
-              color: colors.petrol,
+              color: colors.marsala,
               fontWeight: 600,
               fontSize: '0.875rem',
               px: 1,
@@ -100,7 +100,7 @@ export const CourseHeader: React.FC<CourseHeaderProps> = ({
             fontFamily: typography.heading,
             fontSize: { xs: '2rem', md: '3rem' },
             fontWeight: 700,
-            color: colors.petrol,
+            color: colors.marsala,
             textAlign: 'center',
             mb: tagline ? 2 : 0,
           }}
@@ -115,7 +115,7 @@ export const CourseHeader: React.FC<CourseHeaderProps> = ({
             sx={{
               fontFamily: typography.body,
               fontSize: { xs: '1.125rem', md: '1.25rem' },
-              color: colors.petrol,
+              color: colors.marsala,
               opacity: 0.85,
               textAlign: 'center',
               maxWidth: 600,

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 
 import { Box, Typography } from '@mui/material';
 import type { Metadata } from 'next';
+import { colors } from '@/lib/design-tokens';
 import { MyCoursesClient } from './MyCoursesClient';
 
 export const metadata: Metadata = {
@@ -11,12 +12,6 @@ export const metadata: Metadata = {
   description:
     'Verwalte deine gebuchten Seminare und verfolge deinen Fortschritt',
 };
-
-// Design tokens
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-} as const;
 
 export default async function MyCoursesPage() {
   const user = await requireAuthenticatedUser();
@@ -34,7 +29,7 @@ export default async function MyCoursesPage() {
       <Typography
         variant='h4'
         component='h1'
-        sx={{ color: colors.petrol, fontWeight: 600, mb: 1 }}
+        sx={{ color: colors.marsala, fontWeight: 600, mb: 1 }}
       >
         Meine Seminare
       </Typography>

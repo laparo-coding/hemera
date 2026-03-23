@@ -17,20 +17,12 @@ import Link from 'next/link';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TERMS } from '@/lib/constants';
+import { colors } from '@/lib/design-tokens';
 import {
   type BookingForCategorization,
   categorizeBookings as categorizeBookingsUtil,
 } from '@/lib/utils/booking-categorization';
 import { CourseCard, DashboardSection, UserPageContainer } from './dashboard';
-
-// Design tokens from Hemera spec (matching landing page and auth pages)
-const colors = {
-  cream: '#FBF5DD',
-  petrol: '#16404D',
-  gold: '#DDA853',
-  sage: '#A6CDC6',
-  white: '#FFFFFF',
-} as const;
 
 // Extended Booking interface with all fields needed for dashboard
 interface Booking {
@@ -187,7 +179,7 @@ const UserDashboardE2E: React.FC = () => {
                 sx={{
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '0.875rem',
-                  color: colors.petrol,
+                  color: colors.lightBlack,
                   opacity: 0.7,
                 }}
               >
@@ -209,7 +201,7 @@ const UserDashboardE2E: React.FC = () => {
                 sx={{
                   fontFamily: '"Inter", sans-serif',
                   fontSize: '0.875rem',
-                  color: colors.petrol,
+                  color: colors.lightBlack,
                   opacity: 0.7,
                 }}
               >
@@ -234,7 +226,7 @@ const UserDashboardE2E: React.FC = () => {
                 fontFamily: '"Playfair Display", serif',
                 fontSize: '1.25rem',
                 fontWeight: 600,
-                color: colors.petrol,
+                color: colors.marsala,
               }}
             >
               Courses
@@ -303,13 +295,13 @@ const UserDashboardClerk: React.FC = () => {
   const EmptyState = useMemo(
     () => (
       <Box sx={{ textAlign: 'center', py: 6 }}>
-        <SchoolOutlined sx={{ fontSize: 64, color: colors.sage, mb: 2 }} />
+        <SchoolOutlined sx={{ fontSize: 64, color: colors.rosyBrown, mb: 2 }} />
         <Typography
           sx={{
             fontFamily: '"Playfair Display", serif',
             fontSize: '1.5rem',
             fontWeight: 600,
-            color: colors.petrol,
+            color: colors.marsala,
             mb: 1,
           }}
         >
@@ -319,7 +311,7 @@ const UserDashboardClerk: React.FC = () => {
           sx={{
             fontFamily: '"Inter", sans-serif',
             fontSize: '1rem',
-            color: colors.petrol,
+            color: colors.lightBlack,
             opacity: 0.8,
             mb: 3,
             maxWidth: 400,

@@ -35,7 +35,7 @@ export const CourseRecommendationSection: React.FC<
       data-testid='recommendation-section'
       aria-labelledby='recommendation-title'
       sx={{
-        backgroundColor: colors.cream,
+        backgroundColor: colors.beige,
         py: spacing.sectionPy,
       }}
     >
@@ -48,7 +48,7 @@ export const CourseRecommendationSection: React.FC<
             fontFamily: typography.heading,
             fontSize: { xs: '1.75rem', md: '2rem' },
             fontWeight: 700,
-            color: colors.petrol,
+            color: colors.marsala,
             mb: 4,
             textAlign: 'center',
           }}
@@ -92,7 +92,7 @@ export const CourseRecommendationSection: React.FC<
                     sx={{
                       fontFamily: typography.heading,
                       fontWeight: 600,
-                      color: colors.petrol,
+                      color: colors.marsala,
                       mb: 1,
                       fontSize: { xs: '1rem', md: '1.125rem' },
                     }}
@@ -103,7 +103,7 @@ export const CourseRecommendationSection: React.FC<
                     variant='body1'
                     sx={{
                       fontFamily: typography.body,
-                      color: colors.petrol,
+                      color: colors.lightBlack,
                       lineHeight: 1.7,
                       whiteSpace: 'pre-wrap',
                     }}
@@ -144,7 +144,7 @@ export const CourseRecommendationSection: React.FC<
                     sx={{
                       fontFamily: typography.heading,
                       fontWeight: 600,
-                      color: colors.petrol,
+                      color: colors.marsala,
                       mb: 1,
                       fontSize: { xs: '1rem', md: '1.125rem' },
                     }}
@@ -155,7 +155,7 @@ export const CourseRecommendationSection: React.FC<
                     variant='body1'
                     sx={{
                       fontFamily: typography.body,
-                      color: colors.petrol,
+                      color: colors.lightBlack,
                       lineHeight: 1.7,
                       whiteSpace: 'pre-wrap',
                     }}
