@@ -37,14 +37,16 @@ export default function CustomSignInClient() {
       const createResult = await signIn.create({ identifier: email });
       if (createResult.error) {
         setError(
-          createResult.error.message || 'Sign-in failed. Please try again.'
+          createResult.error.message ||
+            'Anmeldung fehlgeschlagen. Bitte versuche es erneut.'
         );
         return;
       }
       const passwordResult = await signIn.password({ password });
       if (passwordResult.error) {
         setError(
-          passwordResult.error.message || 'Sign-in failed. Please try again.'
+          passwordResult.error.message ||
+            'Anmeldung fehlgeschlagen. Bitte versuche es erneut.'
         );
         return;
       }
@@ -53,13 +55,14 @@ export default function CustomSignInClient() {
         router.push(redirectTo);
       } else {
         setError(
-          'Additional steps required. Please complete the sign-in flow.'
+          'Zusätzliche Schritte erforderlich. Bitte vervollständige den Anmeldeprozess.'
         );
       }
     } catch (err: unknown) {
       const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        error?.errors?.[0]?.message || 'Sign-in failed. Please try again.';
+        error?.errors?.[0]?.message ||
+        'Anmeldung fehlgeschlagen. Bitte versuche es erneut.';
       setError(message);
     } finally {
       setSubmitting(false);

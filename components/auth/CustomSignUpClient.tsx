@@ -35,13 +35,14 @@ export default function CustomSignUpClient() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!isLoaded || !signUp) return;
+    if (fetchStatus === 'fetching' || !signUp) return;
     setSubmitting(true);
     try {
       const createResult = await signUp.create({ emailAddress: email });
       if (createResult.error) {
         setError(
-          createResult.error.message || 'Sign-up failed. Please try again.'
+          createResult.error.message ||
+            'Registrierung fehlgeschlagen. Bitte versuche es erneut.'
         );
         return;
       }
@@ -51,14 +52,16 @@ export default function CustomSignUpClient() {
       });
       if (passwordResult.error) {
         setError(
-          passwordResult.error.message || 'Sign-up failed. Please try again.'
+          passwordResult.error.message ||
+            'Registrierung fehlgeschlagen. Bitte versuche es erneut.'
         );
         return;
       }
       const sendResult = await signUp.verifications.sendEmailCode();
       if (sendResult.error) {
         setError(
-          sendResult.error.message || 'Sign-up failed. Please try again.'
+          sendResult.error.message ||
+            'Registrierung fehlgeschlagen. Bitte versuche es erneut.'
         );
         return;
       }
@@ -66,7 +69,8 @@ export default function CustomSignUpClient() {
     } catch (err: unknown) {
       const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        error?.errors?.[0]?.message || 'Sign-up failed. Please try again.';
+        error?.errors?.[0]?.message ||
+        'Registrierung fehlgeschlagen. Bitte versuche es erneut.';
       setError(message);
     } finally {
       setSubmitting(false);
@@ -76,13 +80,14 @@ export default function CustomSignUpClient() {
   async function onVerify(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!isLoaded || !signUp) return;
+    if (fetchStatus === 'fetching' || !signUp) return;
     setSubmitting(true);
     try {
       const verifyResult = await signUp.verifications.verifyEmailCode({ code });
       if (verifyResult.error) {
         setError(
-          verifyResult.error.message || 'Verification failed. Please try again.'
+          verifyResult.error.message ||
+            'Verifizierung fehlgeschlagen. Bitte versuche es erneut.'
         );
         return;
       }
@@ -91,13 +96,14 @@ export default function CustomSignUpClient() {
         router.push(redirectTo);
       } else {
         setError(
-          'Verification not complete. Please check the code and try again.'
+          'Verifizierung nicht abgeschlossen. Überprüfe den Code und versuche es erneut.'
         );
       }
     } catch (err: unknown) {
       const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        error?.errors?.[0]?.message || 'Verification failed. Please try again.';
+        error?.errors?.[0]?.message ||
+        'Verifizierung fehlgeschlagen. Bitte versuche es erneut.';
       setError(message);
     } finally {
       setSubmitting(false);
@@ -180,7 +186,7 @@ export default function CustomSignUpClient() {
                   onChange={e => setEmail(e.target.value)}
                   required
                   autoComplete='email'
-                  disabled={!isLoaded || submitting}
+                  disabled={fetchStatus === 'fetching' || submitting}
                   fullWidth
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -204,7 +210,7 @@ export default function CustomSignUpClient() {
                   onChange={e => setPassword(e.target.value)}
                   required
                   autoComplete='new-password'
-                  disabled={!isLoaded || submitting}
+                  disabled={fetchStatus === 'fetching' || submitting}
                   fullWidth
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -234,7 +240,7 @@ export default function CustomSignUpClient() {
                   pattern: '[0-9]*',
                   maxLength: 6,
                 }}
-                disabled={!isLoaded || submitting}
+                disabled={fetchStatus === 'fetching' || submitting}
                 fullWidth
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -257,7 +263,7 @@ export default function CustomSignUpClient() {
               type='submit'
               variant='contained'
               size='large'
-              disabled={!isLoaded || submitting}
+              disabled={fetchStatus === 'fetching' || submitting}
               fullWidth
               sx={{
                 mt: 1,
