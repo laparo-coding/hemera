@@ -157,8 +157,8 @@ jobs:
     name: Deploy Preview
     runs-on: ubuntu-latest
     needs: quality-gates
-    # Run on PRs (except Dependabot - no access to secrets), or manual dispatch explicitly targeting preview on any ref
-    if: (github.event_name == 'pull_request' && github.actor != 'dependabot[bot]') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'preview')
+    # Run on PRs (including Dependabot), or manual dispatch explicitly targeting preview on any ref
+    if: (github.event_name == 'pull_request') || (github.event_name == 'workflow_dispatch' && inputs.environment == 'preview')
     permissions:
       contents: read
       pull-requests: write
@@ -168,28 +168,49 @@ jobs:
       url: ${{ steps.deploy.outputs.url }}
 
     steps:
+      - name: Check Secret Availability
+        id: check-secrets
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️  Skipping preview deployment: Required Vercel secrets not available"
+            echo "This is expected for Dependabot PRs due to GitHub Actions security restrictions"
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v6
+        if: steps.check-secrets.outputs.available == 'true'
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
+        if: steps.check-secrets.outputs.available == 'true'
 
       - name: Sanitize Vercel Token
+        if: steps.check-secrets.outputs.available == 'true'
         run: |
           set -euo pipefail
           token=$(printf %s "${{ secrets.VERCEL_TOKEN }}" | tr -d '"' | tr -d "\n\r\t" | sed -e 's/^ *//' -e 's/ *$//')
           echo "SANITIZED_VERCEL_TOKEN=$token" >> "$GITHUB_ENV"
 
       - name: Set BUILD_TIME (UTC)
+        if: steps.check-secrets.outputs.available == 'true'
         run: echo "BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
 
       - name: Pull Vercel Environment Information
+        if: steps.check-secrets.outputs.available == 'true'
         run: vercel pull --yes --environment=preview --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
+        if: steps.check-secrets.outputs.available == 'true'
         run: vercel build --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -200,6 +221,7 @@ jobs:
           NEXT_PUBLIC_DISABLE_CLERK: ${{ secrets.CLERK_SECRET_KEY == '' && '1' || '0' }}
 
       - name: Deploy Project Artifacts to Vercel
+        if: steps.check-secrets.outputs.available == 'true'
         id: deploy
         run: |
           url=$(vercel deploy --prebuilt --archive=tgz --token="$SANITIZED_VERCEL_TOKEN" --scope="$VERCEL_ORG_ID" --yes)
