@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * MaterialTypeSelector Component
  *
@@ -5,8 +7,6 @@
  * Responsive grid: side-by-side on desktop, stacked on mobile.
  * Keyboard accessible with focus/hover states using design tokens.
  */
-
-'use client';
 
 import { EditNoteOutlined, UploadFileOutlined } from '@mui/icons-material';
 import {

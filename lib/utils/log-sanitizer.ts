@@ -156,17 +156,21 @@ export function sanitizeLoggingObject(
 
 /**
  * Safe logging version for blob URLs
- * Redacts the full URL but preserves non-sensitive identifier info
+ * Redacts the full URL and pathname to prevent PII leakage.
+ * Returns only the top-level category (first path segment) and domain.
  */
 export function sanitizeBlobUrlField(blobUrl: string | undefined | null): {
   blobPathname: string;
   blobDomain: string;
-} {
-  if (!blobUrl) return { blobPathname: '', blobDomain: '' };
+} | null {
+  if (!blobUrl) return null;
 
   const identifier = extractBlobIdentifier(blobUrl);
+  // Only expose the top-level category (e.g., "course-material", "resumes")
+  // to avoid leaking participationId or filenames from deeper path segments
+  const firstSegment = identifier.pathname.split('/').filter(Boolean)[0] || '';
   return {
-    blobPathname: identifier.pathname,
+    blobPathname: firstSegment ? `${firstSegment}/...` : '',
     blobDomain: identifier.domain,
   };
 }

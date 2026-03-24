@@ -181,6 +181,16 @@ async function handleFormDataPut(
   // Handle identifier change
   const newIdentifier = identifierField || existingMaterial.identifier;
   if (identifierField && identifierField !== existingMaterial.identifier) {
+    // Require new file upload when changing identifier to prevent orphaned blobs
+    if (!file) {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: 'Identifier-Änderung erfordert eine neue Datei',
+        },
+        { status: 400 }
+      );
+    }
     if (await isIdentifierTaken(identifierField, id)) {
       return NextResponse.json(
         {
@@ -203,6 +213,15 @@ async function handleFormDataPut(
         {
           error: 'validation_error',
           message: 'Nur .html-Dateien sind erlaubt',
+        },
+        { status: 400 }
+      );
+    }
+    if (!file.type.toLowerCase().startsWith('text/html')) {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: 'Datei muss den Content-Type text/html haben',
         },
         { status: 400 }
       );
@@ -355,6 +374,16 @@ async function handleJsonPut(
 
   // Check if new identifier is already taken
   if (identifier && identifier !== existingMaterial.identifier) {
+    // Require new content when changing identifier to prevent orphaned blobs
+    if (htmlContent === undefined) {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message: 'Identifier-Änderung erfordert neuen Inhalt',
+        },
+        { status: 400 }
+      );
+    }
     if (await isIdentifierTaken(identifier, id)) {
       return NextResponse.json(
         {

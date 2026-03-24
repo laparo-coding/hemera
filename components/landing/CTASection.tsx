@@ -65,8 +65,8 @@ export default function CTASection({
             variant='contained'
             size='large'
             sx={{
-              bgcolor: colors.marsala,
-              color: colors.white,
+              bgcolor: colors.white,
+              color: colors.marsala,
               fontWeight: 600,
               px: 5,
               py: 1.5,
@@ -74,7 +74,7 @@ export default function CTASection({
               textTransform: 'none',
               borderRadius: '8px',
               '&:hover': {
-                bgcolor: colors.marsalaDark,
+                bgcolor: colors.beige,
               },
             }}
           >

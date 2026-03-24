@@ -246,6 +246,16 @@ async function handleFormDataPost(request: NextRequest, userId: string | null) {
     );
   }
 
+  if (!file.type.toLowerCase().startsWith('text/html')) {
+    return NextResponse.json(
+      {
+        error: 'validation_error',
+        message: 'Datei muss den Content-Type text/html haben',
+      },
+      { status: 400 }
+    );
+  }
+
   if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json(
       {
