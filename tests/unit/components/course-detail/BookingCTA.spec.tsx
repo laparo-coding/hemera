@@ -24,7 +24,7 @@ describe('BookingCTA', () => {
       render(<BookingCTA {...defaultProps} variant='primary' />);
 
       const button = screen.getByRole('link');
-      expect(button).toHaveStyle({ backgroundColor: colors.bronze });
+      expect(button).toHaveStyle({ backgroundColor: colors.marsala });
     });
 
     it('secondary variant has marsala outline', () => {

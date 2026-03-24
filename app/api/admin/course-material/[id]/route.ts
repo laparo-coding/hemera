@@ -455,7 +455,7 @@ async function handleJsonPut(
         // Log but don't fail - old blob will be orphaned but new content is safe
         const blobIdentifier = sanitizeBlobUrlField(existingMaterial.blobUrl);
         serverInstance.warning('Failed to delete old blob during update', {
-          ...blobIdentifier,
+          ...(blobIdentifier ?? {}),
           error:
             deleteError instanceof Error
               ? deleteError.message
@@ -543,7 +543,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
         // Log but continue with DB deletion
         const blobIdentifier = sanitizeBlobUrlField(material.blobUrl);
         serverInstance.warning('Failed to delete blob file', {
-          ...blobIdentifier,
+          ...(blobIdentifier ?? {}),
         });
       }
     }

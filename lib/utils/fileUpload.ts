@@ -91,13 +91,15 @@ export async function deleteThumbnail(url: string): Promise<boolean> {
     // For now, just log the deletion request
     rollbar.info('Thumbnail deletion requested', {
       action: 'delete',
-      ...blobIdentifier,
+      ...(blobIdentifier ?? {}),
+      blobIdentifierPresent: blobIdentifier !== null,
     });
     return true;
   } catch (error) {
     rollbar.error('Failed to delete thumbnail', error as Error, {
       action: 'delete',
-      ...blobIdentifier,
+      ...(blobIdentifier ?? {}),
+      blobIdentifierPresent: blobIdentifier !== null,
     });
     return false;
   }

@@ -40,13 +40,14 @@ export function logAuditEvent(
     details?: Record<string, unknown>;
   }
 ): void {
+  const timestamp = new Date().toISOString();
   const auditLog: AuditLog = {
     action,
     userId,
     resourceId,
     resourceType,
     status,
-    timestamp: new Date().toISOString(),
+    timestamp,
     ...options,
   };
 
@@ -54,7 +55,21 @@ export function logAuditEvent(
   // Note: userId remains only in structured metadata, not in human-readable message
   // Sanitize sensitive fields before spreading to prevent information disclosure
   const auditRecord: Record<string, unknown> = { ...auditLog };
-  const sanitizedAudit = filterAuditEvent(auditRecord);
+  let sanitizedAudit: Record<string, unknown>;
+  try {
+    sanitizedAudit = filterAuditEvent(auditRecord);
+  } catch (err) {
+    serverInstance.error('filterAuditEvent failed', {
+      error: err instanceof Error ? err.message : 'Unknown error',
+      action,
+    });
+    sanitizedAudit = {
+      action,
+      status,
+      resourceType,
+      timestamp,
+    };
+  }
 
   if (status === 'failure') {
     serverInstance.warning(`Audit: ${action} failed`, sanitizedAudit);

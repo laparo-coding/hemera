@@ -46,6 +46,9 @@ export const colors = {
   /** White overlay – semi-transparent white for hover on dark backgrounds */
   whiteOverlay15: 'rgba(255, 255, 255, 0.15)',
 
+  /** White overlay 25% – stronger hover effect on dark backgrounds */
+  whiteOverlay25: 'rgba(255, 255, 255, 0.25)',
+
   /** Sage light – subtle sage green tint for backgrounds */
   sageLight: 'rgba(166, 205, 198, 0.1)',
 

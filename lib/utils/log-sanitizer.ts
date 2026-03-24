@@ -62,7 +62,11 @@ function createArraySanitizer(
     return arr.map(item => {
       if (Array.isArray(item)) return sanitizeArray(item, depth + 1, visited);
       if (typeof item === 'object' && item !== null)
-        return sanitizeElement(item as Record<string, unknown>, depth, visited);
+        return sanitizeElement(
+          item as Record<string, unknown>,
+          depth + 1,
+          visited
+        );
       return item;
     });
   };
@@ -90,7 +94,10 @@ function sanitizeLoggingObjectInternal(
       key.toLowerCase().includes('secret') ||
       key.toLowerCase().includes('credential') ||
       key.toLowerCase().includes('password') ||
-      key.toLowerCase().includes('apikey')
+      key.toLowerCase().includes('apikey') ||
+      key.toLowerCase().includes('authorization') ||
+      key.toLowerCase().includes('cookie') ||
+      key.toLowerCase().includes('session')
     ) {
       continue;
     }
@@ -194,7 +201,10 @@ function sanitizeAuditLogDetailsInternal(
       lowerKey.includes('secret') ||
       lowerKey.includes('credential') ||
       lowerKey.includes('apikey') ||
-      lowerKey.includes('privatekey')
+      lowerKey.includes('privatekey') ||
+      lowerKey.includes('authorization') ||
+      lowerKey.includes('cookie') ||
+      lowerKey.includes('session')
     ) {
       continue;
     }
@@ -248,6 +258,7 @@ export function sanitizeAuditLogDetails(
  */
 const SAFE_AUDIT_FIELDS = new Set([
   'id',
+  'userId',
   'resourceId',
   'action',
   'resourceType',

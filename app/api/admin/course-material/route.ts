@@ -56,6 +56,60 @@ async function validateAndResolveIdentifier(
 }
 
 /**
+ * Handle DB error during material creation: clean up orphaned blob,
+ * log DB error to Rollbar, audit-log the failure, and return 500 response.
+ */
+async function handleDbErrorWithBlobCleanup(
+  blob: { url: string; pathname: string },
+  identifier: string,
+  userId: string | null,
+  dbError: unknown
+): Promise<NextResponse> {
+  const dbErrorMessage =
+    dbError instanceof Error ? dbError.message : 'Unknown error';
+
+  // Log the primary DB error to Rollbar
+  const blobId = sanitizeBlobUrlField(blob.url);
+  serverInstance.error('Database error during material creation', {
+    ...(blobId ?? {}),
+    identifier,
+    userId: userId ?? 'unknown',
+    operation: 'COURSE_MATERIAL_CREATE',
+    error: dbErrorMessage,
+  });
+
+  // Attempt to clean up the orphaned blob
+  if (blob.pathname) {
+    try {
+      await del(blob.pathname);
+    } catch (deleteError) {
+      serverInstance.error('Failed to delete orphaned blob after DB error', {
+        ...(blobId ?? {}),
+        error:
+          deleteError instanceof Error ? deleteError.message : 'Unknown error',
+      });
+    }
+  }
+
+  logAuditEvent(
+    'COURSE_MATERIAL_CREATE',
+    userId ?? 'unknown',
+    identifier,
+    'course-material',
+    'failure',
+    { error: `Database error: ${dbErrorMessage}` }
+  );
+
+  return NextResponse.json(
+    {
+      error: 'internal_error',
+      message: 'Fehler beim Speichern des Materials',
+    },
+    { status: 500 }
+  );
+}
+
+/**
  * GET /api/admin/course-material
  * List all course materials
  */
@@ -261,38 +315,11 @@ async function handleFormDataPost(request: NextRequest, userId: string | null) {
       blobPathname: blob.pathname,
     });
   } catch (dbError) {
-    // Delete the uploaded blob since DB write failed
-    if (blob.pathname) {
-      try {
-        await del(blob.pathname);
-      } catch (deleteError) {
-        const blobIdentifier = sanitizeBlobUrlField(blob.url);
-        serverInstance.error('Failed to delete orphaned blob after DB error', {
-          ...blobIdentifier,
-          error:
-            deleteError instanceof Error
-              ? deleteError.message
-              : 'Unknown error',
-        });
-      }
-    }
-    // Log the DB error
-    logAuditEvent(
-      'COURSE_MATERIAL_CREATE',
-      userId ?? 'unknown',
+    return await handleDbErrorWithBlobCleanup(
+      blob,
       identifier,
-      'course-material',
-      'failure',
-      {
-        error: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`,
-      }
-    );
-    return NextResponse.json(
-      {
-        error: 'internal_error',
-        message: 'Fehler beim Speichern des Materials',
-      },
-      { status: 500 }
+      userId,
+      dbError
     );
   }
 
@@ -431,13 +458,23 @@ async function handleJsonPost(request: NextRequest, userId: string | null) {
   }
 
   // Create database record
-  const material = await createMaterial({
-    identifier,
-    title,
-    type: 'CONTENT',
-    blobUrl: blob.url,
-    blobPathname: blob.pathname,
-  });
+  let material;
+  try {
+    material = await createMaterial({
+      identifier,
+      title,
+      type: 'CONTENT',
+      blobUrl: blob.url,
+      blobPathname: blob.pathname,
+    });
+  } catch (dbError) {
+    return await handleDbErrorWithBlobCleanup(
+      blob,
+      identifier,
+      userId,
+      dbError
+    );
+  }
 
   logAuditEvent(
     'COURSE_MATERIAL_CREATE',

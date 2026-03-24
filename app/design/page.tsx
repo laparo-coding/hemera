@@ -593,7 +593,7 @@ export default function DesignPage() {
               py: 1,
               borderRadius: 2,
               textTransform: 'none',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.25)' },
+              '&:hover': { bgcolor: colors.whiteOverlay25 },
             }}
           >
             Mehr erfahren
