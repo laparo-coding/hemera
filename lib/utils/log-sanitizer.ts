@@ -215,11 +215,13 @@ function sanitizeAuditLogDetailsInternal(
   for (const [key, value] of Object.entries(details)) {
     const lowerKey = key.toLowerCase();
 
-    // Replace blob URLs with safe per-field identifiers
+    // Replace blob URLs with safe per-field identifiers (same masking as sanitizeBlobUrlField)
     if (lowerKey.includes('bloburl') && typeof value === 'string') {
-      const identifier = extractBlobIdentifier(value);
-      sanitized[`${key}Pathname`] = identifier.pathname;
-      sanitized[`${key}Domain`] = identifier.domain;
+      const sanitizedBlob = sanitizeBlobUrlField(value);
+      if (sanitizedBlob) {
+        sanitized[`${key}Pathname`] = sanitizedBlob.blobPathname;
+        sanitized[`${key}Domain`] = sanitizedBlob.blobDomain;
+      }
       continue;
     }
 
