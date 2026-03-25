@@ -46,6 +46,9 @@ export const colors = {
   /** White overlay – semi-transparent white for hover on dark backgrounds */
   whiteOverlay15: 'rgba(255, 255, 255, 0.15)',
 
+  /** White overlay 25% – stronger hover effect on dark backgrounds */
+  whiteOverlay25: 'rgba(255, 255, 255, 0.25)',
+
   /** Sage light – subtle sage green tint for backgrounds */
   sageLight: 'rgba(166, 205, 198, 0.1)',
 
@@ -60,6 +63,27 @@ export const colors = {
 
   /** Info dark – darker sage green */
   infoDark: '#3E7A6D',
+
+  /** Teal base – used for borders, shadows, and subtle backgrounds */
+  teal: '#16404D',
+
+  /** Teal 4% alpha – subtle hover backgrounds */
+  tealAlpha4: 'rgba(22, 64, 77, 0.04)',
+
+  /** Teal 8% alpha – subtle shadows */
+  tealAlpha8: 'rgba(22, 64, 77, 0.08)',
+
+  /** Teal 10% alpha – chip backgrounds and borders */
+  tealAlpha10: 'rgba(22, 64, 77, 0.1)',
+
+  /** Teal 12% alpha – hover shadows */
+  tealAlpha12: 'rgba(22, 64, 77, 0.12)',
+
+  /** Bronze hover light – very subtle bronze for hover backgrounds */
+  bronzeHoverLight: 'rgba(221, 168, 83, 0.05)',
+
+  /** Rosy pink – delete/warning icon accent */
+  rosyPink: '#E8B4B8',
 } as const;
 
 export type ColorKey = keyof typeof colors;
@@ -122,6 +146,9 @@ export const courseLevelColors = {
 } as const;
 
 export type CourseLevel = keyof typeof courseLevelColors;
+export type CourseLevelColorEntries = Array<
+  [CourseLevel, (typeof courseLevelColors)[CourseLevel]]
+>;
 
 // ============================================
 // SHADOWS

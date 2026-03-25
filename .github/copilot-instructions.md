@@ -73,9 +73,9 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
+- 026-course-material-integration: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, PostgreSQL via Prisma 7.3 ORM, Vercel Blob storage (@vercel/blob), HTML sanitization (sanitize-html)
 - 024-admin-dashboard: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, Clerk SDK, Prisma ORM
 - 022-test-coverage: Added TypeScript 5.9, Next.js 16, React 19 + Jest, Playwright, @testing-library/react, Rollbar
-- 021-learning-path: Added TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Prisma ORM, Material-UI v5, Clerk auth, Loops.so SDK (new), Rollbar
 
 ## PR Review Process
 

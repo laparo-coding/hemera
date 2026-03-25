@@ -75,7 +75,6 @@ export default function CTASection({
               borderRadius: '8px',
               '&:hover': {
                 bgcolor: colors.beige,
-                color: colors.marsala,
               },
             }}
           >

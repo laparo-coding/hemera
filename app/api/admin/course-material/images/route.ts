@@ -103,20 +103,22 @@ export async function POST(request: NextRequest) {
         contentType: file.type,
       });
     } catch (blobError) {
+      const blobErrorMessage =
+        blobError instanceof Error ? blobError.message : 'Unknown error';
       logAuditEvent('IMAGE_UPLOAD', userId, undefined, 'image', 'failure', {
-        error: `Blob upload failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`,
+        error: `Blob upload failed: ${blobErrorMessage}`,
         details: { requestId },
       });
       serverInstance.error('Image blob upload failed', {
         requestId,
         filename,
         fileSize: file.size,
-        error: blobError instanceof Error ? blobError.message : 'Unknown error',
+        error: blobErrorMessage,
       });
       return NextResponse.json(
         {
           error: 'blob_error',
-          message: 'Bild-Upload zu Blob fehlgeschlagen',
+          message: 'Bild-Upload fehlgeschlagen',
         },
         { status: 502 }
       );

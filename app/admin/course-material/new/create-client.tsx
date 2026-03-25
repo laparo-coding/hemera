@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Course Material Create Client Component
  * Feature: 026-course-material-integration
@@ -5,8 +7,6 @@
  * Client-side component for creating new course materials.
  * Shows MaterialTypeSelector first, then appropriate form based on type.
  */
-
-'use client';
 
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import {

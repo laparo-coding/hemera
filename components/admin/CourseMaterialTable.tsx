@@ -21,6 +21,7 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   CircularProgress,
   Dialog,
   DialogContent,
@@ -42,6 +43,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import type { MaterialType } from '@/lib/schemas/admin/course-material';
 import { normalizeForSearch } from '@/lib/utils/searchNormalization';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
@@ -49,6 +51,7 @@ interface CourseMaterial {
   id: string;
   identifier: string;
   title: string;
+  type: MaterialType;
   createdAt: string;
   updatedAt: string;
 }
@@ -305,6 +308,7 @@ export default function CourseMaterialTable({
                 }}
               >
                 <TableCell>Titel</TableCell>
+                <TableCell>Typ</TableCell>
                 <TableCell>Kennung</TableCell>
                 <TableCell>Erstellt am</TableCell>
                 <TableCell>Aktualisiert am</TableCell>
@@ -314,7 +318,7 @@ export default function CourseMaterialTable({
             <TableBody>
               {paginatedMaterials.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} align='center'>
+                  <TableCell colSpan={6} align='center'>
                     <Typography color='text.secondary' sx={{ py: 4 }}>
                       {searchQuery
                         ? 'Keine Materialien gefunden'
@@ -345,6 +349,21 @@ export default function CourseMaterialTable({
                       <Typography variant='body2' fontWeight='medium'>
                         {material.title}
                       </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={
+                          material.type === 'SLIDE_CONTROL'
+                            ? 'Steuerdatei'
+                            : 'Inhaltsseite'
+                        }
+                        size='small'
+                        color={
+                          material.type === 'SLIDE_CONTROL'
+                            ? 'secondary'
+                            : 'default'
+                        }
+                      />
                     </TableCell>
                     <TableCell>
                       <Typography

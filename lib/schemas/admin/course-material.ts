@@ -1,24 +1,25 @@
 /**
  * Course Material Validation Schemas
- * Feature: 023-slide-editor
+ * Feature: 023-slide-editor, 026-course-material-integration
  */
 
 import { z } from 'zod';
 
-/**
- * Material type union - defines the available course material types
- */
-export type MaterialType = 'CONTENT' | 'SLIDE_CONTROL';
+// ─── Material Type Constants ────────────────────────────────────────────────
 
-/**
- * Allowed file extensions for uploads
- */
-export const ALLOWED_FILE_EXTENSIONS = ['.html'];
+/** Allowed material type values */
+export const MATERIAL_TYPES = ['CONTENT', 'SLIDE_CONTROL'] as const;
 
-/**
- * Maximum file size in bytes (2MB)
- */
-export const MAX_FILE_SIZE = 2 * 1024 * 1024;
+/** TypeScript type for material types */
+export type MaterialType = (typeof MATERIAL_TYPES)[number];
+
+/** Maximum file size for slide control uploads: 20 MB */
+export const MAX_FILE_SIZE = 20_971_520;
+
+/** Allowed file extensions for slide control uploads */
+export const ALLOWED_FILE_EXTENSIONS = ['.html'] as const;
+
+// ─── Base Schemas ───────────────────────────────────────────────────────────
 
 /**
  * Identifier schema for course materials
@@ -47,6 +48,36 @@ export const htmlContentSchema = z
   );
 
 /**
+ * Schema for validating slide control file uploads
+ * - extension must be .html
+ * - MIME must be text/html
+ * - size must be ≤ MAX_FILE_SIZE (20 MB)
+ */
+export const slideControlFileSchema = z.object({
+  name: z
+    .string()
+    .refine(
+      name =>
+        ALLOWED_FILE_EXTENSIONS.some(ext => name.toLowerCase().endsWith(ext)),
+      `Datei muss eine der folgenden Endungen haben: ${ALLOWED_FILE_EXTENSIONS.join(', ')}`
+    ),
+  type: z
+    .string()
+    .refine(
+      mime => /^text\/html(?:\s*;|$)/i.test(mime),
+      'Datei muss vom Typ text/html sein'
+    ),
+  size: z
+    .number()
+    .max(
+      MAX_FILE_SIZE,
+      `Datei darf maximal ${MAX_FILE_SIZE / 1024 / 1024} MB groß sein`
+    ),
+});
+
+// ─── Composite Schemas ──────────────────────────────────────────────────────
+
+/**
  * Schema for creating a new course material
  */
 export const courseMaterialCreateSchema = z.object({
@@ -55,7 +86,8 @@ export const courseMaterialCreateSchema = z.object({
     .min(1, 'Titel ist erforderlich')
     .max(200, 'Titel darf maximal 200 Zeichen lang sein'),
   identifier: identifierSchema.optional(),
-  htmlContent: htmlContentSchema,
+  htmlContent: htmlContentSchema.optional(),
+  type: z.enum(MATERIAL_TYPES).default('CONTENT'),
 });
 
 /**
@@ -69,6 +101,7 @@ export const courseMaterialUpdateSchema = z.object({
     .optional(),
   identifier: identifierSchema.optional(),
   htmlContent: htmlContentSchema.optional(),
+  type: z.enum(MATERIAL_TYPES).optional(),
 });
 
 /**
@@ -78,6 +111,7 @@ export const courseMaterialResponseSchema = z.object({
   id: z.string(),
   identifier: z.string(),
   title: z.string(),
+  type: z.enum(MATERIAL_TYPES),
   blobUrl: z.string().url(),
   blobPathname: z.string(),
   createdAt: z.string().datetime(),

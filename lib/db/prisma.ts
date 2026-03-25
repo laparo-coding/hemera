@@ -27,6 +27,10 @@ let _prismaClient: PrismaClient | undefined;
  *
  * Prisma 7 with engine type "client" requires accelerateUrl for production.
  * For tests/CI (when PRISMA_ACCELERATE_URL is not set), we use PG adapter.
+ *
+ * @types/pg pinned to 8.11.x to match @prisma/adapter-pg's bundled types.
+ * If pg or @prisma/adapter-pg is upgraded, verify type compatibility
+ * (connect() return type changed in @types/pg@8.20).
  */
 function createPrismaClient(): PrismaClient {
   const accelerateUrl = process.env.PRISMA_ACCELERATE_URL;

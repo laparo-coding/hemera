@@ -179,7 +179,10 @@ export function SlideEditorToolbar({
     handleTableClose();
   }, [editor, handleTableClose]);
 
-  if (!editor) return null;
+  // Early return after all hooks are defined
+  if (!editor) {
+    return null;
+  }
 
   return (
     <Box

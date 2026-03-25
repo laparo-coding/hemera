@@ -12,6 +12,7 @@
 
 import { del, put } from '@vercel/blob';
 import { serverInstance as rollbar } from '../monitoring/rollbar-official';
+import { sanitizeBlobUrlField } from './log-sanitizer';
 
 const MAX_RESUME_SIZE = 5 * 1024 * 1024; // 5MB per docs/development/mux-setup.md
 const ALLOWED_MIME_TYPES = ['application/pdf'];
@@ -180,11 +181,12 @@ export async function deleteResume(
     reason?: string;
   }
 ): Promise<ResumeDeleteResult> {
+  const blobIdentifier = sanitizeBlobUrlField(blobUrl);
   try {
     await del(blobUrl);
 
     rollbar.info('Résumé deleted successfully', {
-      blobUrl,
+      ...(blobIdentifier ?? {}),
       ...context,
     });
 
@@ -194,7 +196,7 @@ export async function deleteResume(
       error instanceof Error ? error.message : 'Unknown error';
 
     rollbar.error('Failed to delete résumé', error as Error, {
-      blobUrl,
+      ...(blobIdentifier ?? {}),
       errorMessage,
       ...context,
     });

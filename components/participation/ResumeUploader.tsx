@@ -269,7 +269,9 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
                   <IconButton
                     onClick={handleDelete}
                     disabled={deleting}
-                    sx={{ color: colors.rosyBrown }}
+                    // Design decision: rosyPink provides a soft destructive cue
+                    // consistent with the Hemera warm color palette
+                    sx={{ color: colors.rosyPink }}
                   >
                     {deleting ? (
                       <CircularProgress size={20} />
@@ -318,7 +320,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
             cursor: uploading ? 'wait' : 'pointer',
             transition: 'all 0.2s ease',
             '&:hover': {
-              backgroundColor: 'rgba(146, 106, 73, 0.05)',
+              backgroundColor: colors.bronzeHoverLight,
             },
           }}
         >
