@@ -12,6 +12,7 @@ import {
   ALLOWED_FILE_EXTENSIONS,
   courseMaterialCreateSchema,
   generateSlug,
+  identifierSchema,
   MAX_FILE_SIZE,
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
@@ -29,20 +30,22 @@ async function validateAndResolveIdentifier(
 ): Promise<{ identifier: string } | NextResponse> {
   const identifier = providedIdentifier || generateSlug(title);
 
-  // Validate identifier is not empty
-  if (!identifier || identifier.length < 2) {
+  // Validate identifier format (same rules as JSON schema: lowercase alphanumeric + hyphens, 2-100 chars)
+  const formatResult = identifierSchema.safeParse(identifier);
+  if (!formatResult.success) {
     return NextResponse.json(
       {
         error: 'validation_error',
         message:
-          'Der generierte Identifier ist ungültig. Bitte einen Identifier manuell angeben.',
+          formatResult.error.issues[0]?.message ||
+          'Der Identifier ist ungültig. Bitte einen gültigen Identifier angeben.',
       },
       { status: 400 }
     );
   }
 
   // Check identifier uniqueness
-  if (await isIdentifierTaken(identifier, excludeId)) {
+  if (await isIdentifierTaken(formatResult.data, excludeId)) {
     return NextResponse.json(
       {
         error: 'conflict',
@@ -52,7 +55,7 @@ async function validateAndResolveIdentifier(
     );
   }
 
-  return { identifier };
+  return { identifier: formatResult.data };
 }
 
 /**

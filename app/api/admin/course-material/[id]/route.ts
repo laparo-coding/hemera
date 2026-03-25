@@ -12,14 +12,12 @@ import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   ALLOWED_FILE_EXTENSIONS,
   courseMaterialUpdateSchema,
+  identifierSchema,
   MAX_FILE_SIZE,
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
-import {
-  sanitizeAuditLogDetails,
-  sanitizeBlobUrlField,
-} from '@/lib/utils/log-sanitizer';
+import { sanitizeBlobUrlField } from '@/lib/utils/log-sanitizer';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -179,8 +177,21 @@ async function handleFormDataPut(
   }
 
   // Handle identifier change
-  const newIdentifier = identifierField || existingMaterial.identifier;
   if (identifierField && identifierField !== existingMaterial.identifier) {
+    // Validate identifier format (same rules as JSON schema)
+    const formatResult = identifierSchema.safeParse(identifierField);
+    if (!formatResult.success) {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message:
+            formatResult.error.issues[0]?.message ||
+            'Identifier muss aus Kleinbuchstaben, Zahlen und Bindestrichen bestehen',
+        },
+        { status: 400 }
+      );
+    }
+
     // Require new file upload when changing identifier to prevent orphaned blobs
     if (!file) {
       return NextResponse.json(
@@ -191,17 +202,19 @@ async function handleFormDataPut(
         { status: 400 }
       );
     }
-    if (await isIdentifierTaken(identifierField, id)) {
+    if (await isIdentifierTaken(formatResult.data, id)) {
       return NextResponse.json(
         {
           error: 'conflict',
-          message: `Identifier "${identifierField}" ist bereits vergeben`,
+          message: `Identifier "${formatResult.data}" ist bereits vergeben`,
         },
         { status: 409 }
       );
     }
-    updateData.identifier = identifierField;
+    updateData.identifier = formatResult.data;
   }
+
+  const newIdentifier = updateData.identifier || existingMaterial.identifier;
 
   // Handle file upload replacement
   if (file && file.size > 0) {
@@ -306,10 +319,10 @@ async function handleFormDataPut(
     'course-material',
     'success',
     {
-      details: sanitizeAuditLogDetails({
+      details: {
         ...updateData,
         type: existingMaterial.type,
-      }),
+      },
     }
   );
 
@@ -521,10 +534,10 @@ async function handleJsonPut(
     'course-material',
     'success',
     {
-      details: sanitizeAuditLogDetails({
+      details: {
         ...updateData,
         type: existingMaterial.type,
-      }),
+      },
     }
   );
 

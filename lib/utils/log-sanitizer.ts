@@ -59,6 +59,14 @@ function createArraySanitizer(
     depth: number,
     visited: WeakSet<object>
   ): unknown[] => {
+    if (depth > MAX_SANITIZE_DEPTH) {
+      return [{ _truncated: '[MaxDepth]' }];
+    }
+    if (visited.has(arr)) {
+      return [{ _circular: '[Circular]' }];
+    }
+    visited.add(arr);
+
     return arr.map(item => {
       if (Array.isArray(item)) return sanitizeArray(item, depth + 1, visited);
       if (typeof item === 'object' && item !== null)
@@ -71,6 +79,32 @@ function createArraySanitizer(
     });
   };
   return sanitizeArray;
+}
+
+// --- Shared sensitive key detection ---
+
+/**
+ * Normalize a key for sensitive field matching.
+ * Strips all non-alphanumeric characters and lowercases so that
+ * `api_key`, `api-key`, `x-api-key`, `apiKey` all match `apikey`.
+ */
+function normalizeSensitiveKey(key: string): string {
+  return key.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function isSensitiveKey(key: string): boolean {
+  const normalized = normalizeSensitiveKey(key);
+  return (
+    normalized.includes('token') ||
+    normalized.includes('secret') ||
+    normalized.includes('credential') ||
+    normalized.includes('password') ||
+    normalized.includes('apikey') ||
+    normalized.includes('privatekey') ||
+    normalized.includes('authorization') ||
+    normalized.includes('cookie') ||
+    normalized.includes('session')
+  );
 }
 
 // --- Internal implementations with depth/circular tracking ---
@@ -89,16 +123,7 @@ function sanitizeLoggingObjectInternal(
 
   for (const [key, value] of Object.entries(obj)) {
     // Skip sensitive fields entirely
-    if (
-      key.toLowerCase().includes('token') ||
-      key.toLowerCase().includes('secret') ||
-      key.toLowerCase().includes('credential') ||
-      key.toLowerCase().includes('password') ||
-      key.toLowerCase().includes('apikey') ||
-      key.toLowerCase().includes('authorization') ||
-      key.toLowerCase().includes('cookie') ||
-      key.toLowerCase().includes('session')
-    ) {
+    if (isSensitiveKey(key)) {
       continue;
     }
 
@@ -198,18 +223,8 @@ function sanitizeAuditLogDetailsInternal(
       continue;
     }
 
-    // Skip sensitive fields entirely (case-insensitive substring matching)
-    if (
-      lowerKey.includes('password') ||
-      lowerKey.includes('token') ||
-      lowerKey.includes('secret') ||
-      lowerKey.includes('credential') ||
-      lowerKey.includes('apikey') ||
-      lowerKey.includes('privatekey') ||
-      lowerKey.includes('authorization') ||
-      lowerKey.includes('cookie') ||
-      lowerKey.includes('session')
-    ) {
+    // Skip sensitive fields entirely
+    if (isSensitiveKey(key)) {
       continue;
     }
 
