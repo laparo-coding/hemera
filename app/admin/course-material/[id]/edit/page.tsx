@@ -5,8 +5,13 @@
  * Edit an existing course material (title, identifier, HTML content).
  */
 
-import { Box, Typography } from '@mui/material';
-import EditCourseMaterialClient from './edit-client';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import dynamic from 'next/dynamic';
+
+const EditCourseMaterialClient = dynamic(() => import('./edit-client'), {
+  ssr: false,
+  loading: () => <CircularProgress aria-label='Lade Formular' />,
+});
 
 interface PageProps {
   params: Promise<{ id: string }>;

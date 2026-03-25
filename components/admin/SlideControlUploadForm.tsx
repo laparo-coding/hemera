@@ -79,6 +79,10 @@ export default function SlideControlUploadForm({
     if (!hasValidExtension) {
       return 'Nur .html-Dateien sind erlaubt';
     }
+    const mimeType = file.type?.toLowerCase() ?? '';
+    if (!mimeType.startsWith('text/html')) {
+      return 'Datei muss den Content-Type text/html haben';
+    }
     if (file.size > MAX_FILE_SIZE) {
       return `Datei darf maximal ${MAX_FILE_SIZE / 1024 / 1024} MB groß sein`;
     }

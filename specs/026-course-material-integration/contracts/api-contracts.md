@@ -155,7 +155,7 @@ If the request sends `multipart/form-data` to a CONTENT material (or JSON with `
 SLIDE_CONTROL material), the server returns:
 
 ```json
-{ "error": "validation_error", "message": "Materialtyp stimmt nicht mit der Anfrage überein" }
+{ "error": "type_mismatch", "message": "Materialtyp stimmt nicht mit der Anfrage überein" }
 ```
 
 Status: 400
