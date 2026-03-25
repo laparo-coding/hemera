@@ -40,13 +40,14 @@ export function logAuditEvent(
     details?: Record<string, unknown>;
   }
 ): void {
+  const timestamp = new Date().toISOString();
   const auditLog: AuditLog = {
     action,
     userId,
     resourceId,
     resourceType,
     status,
-    timestamp: new Date().toISOString(),
+    timestamp,
     ...options,
   };
 

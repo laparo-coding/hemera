@@ -16,6 +16,7 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
+import { useRollbar } from '@rollbar/react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { MaterialForm } from '@/components/admin/MaterialForm';
@@ -58,6 +59,7 @@ export default function EditCourseMaterialClient({
   id,
 }: EditCourseMaterialClientProps) {
   const router = useRouter();
+  const rollbar = useRollbar();
 
   const [material, setMaterial] = useState<MaterialDetail | null>(null);
   const [htmlContent, setHtmlContent] = useState<string>('');
@@ -142,6 +144,12 @@ export default function EditCourseMaterialClient({
     }
 
     if (!response.ok) {
+      rollbar.error('Non-OK HTTP response in material editor', {
+        url,
+        method: options.method,
+        status: response.status,
+        statusText: response.statusText,
+      });
       const errorMessage = await extractErrorMessage(
         response,
         'Aktualisieren fehlgeschlagen'
