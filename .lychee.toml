@@ -1,12 +1,27 @@
-exclude = [
-  "https://localhost",
-  "http://localhost",
-  "https://127.0.0.1",
-  "http://127.0.0.1",
-  "https://vercel.com/*/deployments*",
-  "https://platform.openai.com/api-keys"
+# Lychee link checker configuration
+
+# Timeout in seconds for HTTP requests
+timeout = 30
+
+# List of glob patterns to exclude from checking
+exclude_paths = [
+  # Build artifacts
+  "**/node_modules/**",
+  "**/.next/**",
+  "**/dist/**",
+  "**/build/**",
+  # Version control
+  "**/.git/**",
+  # IDE config
+  "**/.vscode/**",
+  "**/.idea/**",
+  # Local dev
+  "**/.env.local",
+  "**/backup_restore_temp/**"
 ]
-retry_wait_time = 2
-max_retries = 2
-timeout = 10
-user_agent = "hemera-docs-link-check/1.0"
+
+# HTTP status codes to treat as success
+include = []
+
+# Headers to send with requests
+[headers]

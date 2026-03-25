@@ -9,29 +9,22 @@ Auto-generated from all feature plans. Last updated: 2025-01-15
 - Example: "Dein Kurs", "Lade deinen Lebenslauf hoch", "Deine Buchung"
 
 ## Active Technologies
-- TypeScript 5.x with Next.js 15.5.6 (App Router) + React 18, Material-UI v5, Clerk auth, Prisma ORM, Rollbar monitoring (017-testimonial-management)
-- PostgreSQL via Prisma models (Testimonial entity with admin approval workflow) (017-testimonial-management)
-- TypeScript 5+ with Next.js 15.5.6 (App Router) + React 18+, Material-UI v5, Clerk (auth), Prisma (ORM), Rollbar (monitoring) (014-create-an-admin)
-- PostgreSQL with Prisma ORM for course data and enrollment relationships (014-create-an-admin)
-- TypeScript 5+, Next.js 15.5.6 (App Router), React 18+ + MUI v5, Clerk (auth), Prisma (ORM), React Leaflet, Leafle (015-course-locations)
-- TypeScript 5.x with Next.js 15.5.6 (App Router) + React 18, Material-UI v5, Clerk auth, Prisma ORM, Mux video SDK/API, Rollbar monitoring (016-course-assignments)
-- PostgreSQL via Prisma models (course participation, documents, summary assets) (016-course-assignments)
-- Docker Compose 3.8+, Bash scripts + Docker Desktop, PostgreSQL 16, Prisma ORM (existing) (020-docker-postgres)
-- PostgreSQL 16 via Docker container with optional persistent volumes (020-docker-postgres)
-- TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Prisma ORM, Material-UI v5, Clerk auth, Loops.so SDK (new), Rollbar (021-learning-path)
-- PostgreSQL via Prisma (existing schema extension) (021-learning-path)
-- TypeScript 5.9, Next.js 16, React 19 + Jest, Playwright, @testing-library/react, Rollbar (022-test-coverage)
-- PostgreSQL via Prisma 7.3 (022-test-coverage)
-- TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, Clerk SDK, Prisma ORM (024-admin-dashboard)
-
-- TypeScript 5.x, Next.js 15.5.6, React 18+ + MUI v5+, Clerk (auth), Rollbar (monitoring), Prisma
-  (ORM)
+- TypeScript 5.9, Next.js 16 (App Router), React 19
+- Material-UI v5, Clerk auth, Prisma 7.3 ORM, PostgreSQL 16, Rollbar monitoring
+- Vercel Blob storage (@vercel/blob), HTML sanitization (sanitize-html)
+- Jest, Playwright, @testing-library/react
+- Loops.so SDK (transactional emails), Mux video SDK/API
+- React Leaflet (course locations)
+- Docker Compose 3.8+ (local PostgreSQL)
 
 ## Project Structure
 
 ```
-src/
-tests/
+app/       # Next.js App Router pages, layouts, API routes
+components/ # Reusable UI components
+lib/       # Domain logic, services, utilities
+prisma/   # Schema, migrations, seeds
+tests/     # unit/, contracts/, e2e/
 ```
 
 ## Commands
@@ -40,14 +33,14 @@ npm test npm run lint
 
 ## Code Style
 
-TypeScript 5.x, Next.js 15.5.6, React 18+: Follow standard conventions
+Follow standard TypeScript/Next.js/React conventions (see AGENTS.md for details)
 
 ## Database Naming Convention
 
 All database tables and columns follow PostgreSQL naming standards with Prisma mapping:
 
 | Layer | Convention | Example |
-|-------|------------|---------|
+|-------|------------|----------|
 | Prisma Models | PascalCase | `User`, `Course`, `Booking` |
 | Prisma Fields | camelCase | `userId`, `createdAt`, `isPublished` |
 | DB Tables | snake_case plural | `users`, `courses`, `bookings` |
@@ -73,9 +66,9 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
-- 026-course-material-integration: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, PostgreSQL via Prisma 7.3 ORM, Vercel Blob storage (@vercel/blob), HTML sanitization (sanitize-html)
-- 024-admin-dashboard: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, Clerk SDK, Prisma ORM
-- 022-test-coverage: Added TypeScript 5.9, Next.js 16, React 19 + Jest, Playwright, @testing-library/react, Rollbar
+- 026-course-material-integration: Vercel Blob storage, HTML sanitization, course material upload/management
+- 024-admin-dashboard: Admin dashboard UI and management features
+- 022-test-coverage: Jest + Playwright test infrastructure
 
 ## PR Review Process
 
