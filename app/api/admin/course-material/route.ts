@@ -431,13 +431,50 @@ async function handleJsonPost(request: NextRequest, userId: string | null) {
   }
 
   // Create database record
-  const material = await createMaterial({
-    identifier,
-    title,
-    type: 'CONTENT',
-    blobUrl: blob.url,
-    blobPathname: blob.pathname,
-  });
+  let material;
+  try {
+    material = await createMaterial({
+      identifier,
+      title,
+      type: 'CONTENT',
+      blobUrl: blob.url,
+      blobPathname: blob.pathname,
+    });
+  } catch (dbError) {
+    // Delete the uploaded blob since DB write failed
+    if (blob.pathname) {
+      try {
+        await del(blob.pathname);
+      } catch (deleteError) {
+        const blobIdentifier = sanitizeBlobUrlField(blob.url);
+        serverInstance.error('Failed to delete orphaned blob after DB error', {
+          ...blobIdentifier,
+          error:
+            deleteError instanceof Error
+              ? deleteError.message
+              : 'Unknown error',
+        });
+      }
+    }
+    // Log the DB error
+    logAuditEvent(
+      'COURSE_MATERIAL_CREATE',
+      userId ?? 'unknown',
+      identifier,
+      'course-material',
+      'failure',
+      {
+        error: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`,
+      }
+    );
+    return NextResponse.json(
+      {
+        error: 'internal_error',
+        message: 'Fehler beim Speichern des Materials',
+      },
+      { status: 500 }
+    );
+  }
 
   logAuditEvent(
     'COURSE_MATERIAL_CREATE',

@@ -5,8 +5,16 @@
  * Edit an existing course material (title, identifier, HTML content).
  */
 
+import dynamic from 'next/dynamic';
 import { Box, Typography } from '@mui/material';
-import EditCourseMaterialClient from './edit-client';
+
+const EditCourseMaterialClient = dynamic(
+  () => import('./edit-client'),
+  {
+    ssr: false,
+    loading: () => <div>Lade deinen Editor ...</div>,
+  }
+);
 
 interface PageProps {
   params: Promise<{ id: string }>;
