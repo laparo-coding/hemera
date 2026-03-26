@@ -56,7 +56,7 @@ function createPrismaClient(): PrismaClient {
       connectionString: 'postgresql://placeholder:5432/placeholder',
     });
     globalForPrisma.pool = placeholderPool;
-    const adapter = new PrismaPg(placeholderPool);
+    const adapter = new PrismaPg(placeholderPool as any);
     return new PrismaClient({
       adapter,
       log: ['error'],
@@ -69,7 +69,7 @@ function createPrismaClient(): PrismaClient {
   });
   globalForPrisma.pool = pool;
 
-  const adapter = new PrismaPg(pool);
+  const adapter = new PrismaPg(pool as any);
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
