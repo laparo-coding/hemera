@@ -24,7 +24,7 @@ export async function GET(
       select: { id: true, isPublished: true },
     });
 
-    if (!course || !course.isPublished) {
+    if (!course?.isPublished) {
       return NextResponse.json(
         { success: false, error: 'Kurs nicht gefunden' },
         { status: 404 }
