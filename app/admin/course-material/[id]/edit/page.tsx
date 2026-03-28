@@ -6,12 +6,7 @@
  */
 
 import { Box, Typography } from '@mui/material';
-import dynamic from 'next/dynamic';
-
-const EditCourseMaterialClient = dynamic(() => import('./edit-client'), {
-  ssr: false,
-  loading: () => <div>Lade deinen Editor ...</div>,
-});
+import EditCourseMaterialClient from './edit-client';
 
 interface PageProps {
   params: Promise<{ id: string }>;

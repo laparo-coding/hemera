@@ -5,12 +5,7 @@
  * Server component that renders the client-side create form.
  */
 
-import dynamic from 'next/dynamic';
-
-const CreateCourseMaterialClient = dynamic(() => import('./create-client'), {
-  ssr: false,
-  loading: () => <div>Lade deinen Editor ...</div>,
-});
+import CreateCourseMaterialClient from './create-client';
 
 export default function NewCourseMaterialPage() {
   return <CreateCourseMaterialClient />;
