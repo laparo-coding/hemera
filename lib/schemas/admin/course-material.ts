@@ -79,19 +79,37 @@ export const slideControlFileSchema = z.object({
 
 /**
  * Schema for creating a new course material
+ * Uses discriminated union based on type:
+ * - CONTENT: htmlContent is required (default type)
+ * - SLIDE_CONTROL: htmlContent is optional (file uploaded separately)
+ * Type defaults to 'CONTENT' if omitted
  */
-export const courseMaterialCreateSchema = z.object({
-  title: z
-    .string()
-    .min(1, 'Titel ist erforderlich')
-    .max(200, 'Titel darf maximal 200 Zeichen lang sein'),
-  identifier: identifierSchema.optional(),
-  htmlContent: htmlContentSchema.optional(),
-  type: z.enum(MATERIAL_TYPES).default('CONTENT'),
-});
+export const courseMaterialCreateSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, 'Titel ist erforderlich')
+      .max(200, 'Titel darf maximal 200 Zeichen lang sein'),
+    identifier: identifierSchema.optional(),
+    type: z.enum(['CONTENT', 'SLIDE_CONTROL']).optional().default('CONTENT'),
+    htmlContent: htmlContentSchema.optional(),
+  })
+  .refine(
+    data => {
+      if (data.type === 'CONTENT') {
+        return !!data.htmlContent;
+      }
+      return true;
+    },
+    {
+      message: 'htmlContent ist erforderlich für CONTENT-Materialien',
+      path: ['htmlContent'],
+    }
+  );
 
 /**
  * Schema for updating a course material
+ * Note: type cannot be changed after creation
  */
 export const courseMaterialUpdateSchema = z.object({
   title: z
@@ -101,7 +119,6 @@ export const courseMaterialUpdateSchema = z.object({
     .optional(),
   identifier: identifierSchema.optional(),
   htmlContent: htmlContentSchema.optional(),
-  type: z.enum(MATERIAL_TYPES).optional(),
 });
 
 /**

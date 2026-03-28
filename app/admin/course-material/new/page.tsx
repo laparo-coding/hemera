@@ -2,7 +2,7 @@
  * Course Material Create Page
  * Feature: 026-course-material-integration
  *
- * Server component that renders the client-side create form.
+ * Client component that renders the create form.
  */
 
 import CreateCourseMaterialClient from './create-client';

@@ -237,11 +237,7 @@ export async function getCourseById(id: string): Promise<Course> {
       },
     });
 
-    if (
-      !courseRecord ||
-      !courseRecord.isPublished ||
-      courseRecord.isNonPublic
-    ) {
+    if (!courseRecord?.isPublished || courseRecord?.isNonPublic) {
       throw new CourseNotFoundError(id);
     }
 

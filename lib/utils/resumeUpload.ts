@@ -186,7 +186,7 @@ export async function deleteResume(
     await del(blobUrl);
 
     rollbar.info('Résumé deleted successfully', {
-      ...(blobIdentifier ?? {}),
+      ...blobIdentifier,
       ...context,
     });
 
@@ -196,7 +196,7 @@ export async function deleteResume(
       error instanceof Error ? error.message : 'Unknown error';
 
     rollbar.error('Failed to delete résumé', error as Error, {
-      ...(blobIdentifier ?? {}),
+      ...blobIdentifier,
       errorMessage,
       ...context,
     });

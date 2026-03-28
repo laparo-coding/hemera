@@ -58,17 +58,24 @@ export function logAuditEvent(
   let sanitizedAudit: Record<string, unknown>;
   try {
     sanitizedAudit = filterAuditEvent(auditRecord);
-  } catch (err) {
-    serverInstance.error('filterAuditEvent failed', {
-      error: err instanceof Error ? err.message : 'Unknown error',
-      action,
-    });
+  } catch (sanitizeError) {
+    // Fallback: log only safe primitive fields if sanitization fails
     sanitizedAudit = {
       action,
-      status,
+      resourceId,
       resourceType,
+      status,
       timestamp,
     };
+    // Emit structured error so sanitization bugs surface in monitoring
+    serverInstance.error('Audit sanitization failed', {
+      sanitizeError:
+        sanitizeError instanceof Error
+          ? sanitizeError.message
+          : 'Unknown error',
+      action,
+      resourceType,
+    });
   }
 
   if (status === 'failure') {

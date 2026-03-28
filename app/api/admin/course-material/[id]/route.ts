@@ -12,12 +12,14 @@ import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   ALLOWED_FILE_EXTENSIONS,
   courseMaterialUpdateSchema,
-  identifierSchema,
   MAX_FILE_SIZE,
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
-import { sanitizeBlobUrlField } from '@/lib/utils/log-sanitizer';
+import {
+  sanitizeAuditLogDetails,
+  sanitizeBlobUrlField,
+} from '@/lib/utils/log-sanitizer';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -177,44 +179,19 @@ async function handleFormDataPut(
   }
 
   // Handle identifier change
+  const newIdentifier = identifierField || existingMaterial.identifier;
   if (identifierField && identifierField !== existingMaterial.identifier) {
-    // Validate identifier format (same rules as JSON schema)
-    const formatResult = identifierSchema.safeParse(identifierField);
-    if (!formatResult.success) {
-      return NextResponse.json(
-        {
-          error: 'validation_error',
-          message:
-            formatResult.error.issues[0]?.message ||
-            'Identifier muss aus Kleinbuchstaben, Zahlen und Bindestrichen bestehen',
-        },
-        { status: 400 }
-      );
-    }
-
-    // Require new file upload when changing identifier to prevent orphaned blobs
-    if (!file) {
-      return NextResponse.json(
-        {
-          error: 'validation_error',
-          message: 'Identifier-Änderung erfordert eine neue Datei',
-        },
-        { status: 400 }
-      );
-    }
-    if (await isIdentifierTaken(formatResult.data, id)) {
+    if (await isIdentifierTaken(identifierField, id)) {
       return NextResponse.json(
         {
           error: 'conflict',
-          message: `Identifier "${formatResult.data}" ist bereits vergeben`,
+          message: `Identifier "${identifierField}" ist bereits vergeben`,
         },
         { status: 409 }
       );
     }
-    updateData.identifier = formatResult.data;
+    updateData.identifier = identifierField;
   }
-
-  const newIdentifier = updateData.identifier || existingMaterial.identifier;
 
   // Handle file upload replacement
   if (file && file.size > 0) {
@@ -226,15 +203,6 @@ async function handleFormDataPut(
         {
           error: 'validation_error',
           message: 'Nur .html-Dateien sind erlaubt',
-        },
-        { status: 400 }
-      );
-    }
-    if (!file.type.toLowerCase().startsWith('text/html')) {
-      return NextResponse.json(
-        {
-          error: 'validation_error',
-          message: 'Datei muss den Content-Type text/html haben',
         },
         { status: 400 }
       );
@@ -319,10 +287,10 @@ async function handleFormDataPut(
     'course-material',
     'success',
     {
-      details: {
+      details: sanitizeAuditLogDetails({
         ...updateData,
         type: existingMaterial.type,
-      },
+      }),
     }
   );
 
@@ -387,16 +355,6 @@ async function handleJsonPut(
 
   // Check if new identifier is already taken
   if (identifier && identifier !== existingMaterial.identifier) {
-    // Require new content when changing identifier to prevent orphaned blobs
-    if (htmlContent === undefined) {
-      return NextResponse.json(
-        {
-          error: 'validation_error',
-          message: 'Identifier-Änderung erfordert neuen Inhalt',
-        },
-        { status: 400 }
-      );
-    }
     if (await isIdentifierTaken(identifier, id)) {
       return NextResponse.json(
         {
@@ -497,7 +455,7 @@ async function handleJsonPut(
         // Log but don't fail - old blob will be orphaned but new content is safe
         const blobIdentifier = sanitizeBlobUrlField(existingMaterial.blobUrl);
         serverInstance.warning('Failed to delete old blob during update', {
-          ...(blobIdentifier ?? {}),
+          ...blobIdentifier,
           error:
             deleteError instanceof Error
               ? deleteError.message
@@ -534,10 +492,10 @@ async function handleJsonPut(
     'course-material',
     'success',
     {
-      details: {
+      details: sanitizeAuditLogDetails({
         ...updateData,
         type: existingMaterial.type,
-      },
+      }),
     }
   );
 
@@ -585,7 +543,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
         // Log but continue with DB deletion
         const blobIdentifier = sanitizeBlobUrlField(material.blobUrl);
         serverInstance.warning('Failed to delete blob file', {
-          ...(blobIdentifier ?? {}),
+          ...blobIdentifier,
         });
       }
     }

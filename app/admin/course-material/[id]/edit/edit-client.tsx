@@ -140,10 +140,10 @@ export default function EditCourseMaterialClient({
     try {
       response = await fetch(url, options);
     } catch (err) {
-      rollbar.error('Network request failed in material editor', {
+      rollbar.error('Network failure in material editor', {
         url,
         method: options.method,
-        error: err instanceof Error ? err.message : 'Unknown error',
+        error: err instanceof Error ? err.message : 'unknown network error',
       });
       throw new Error('Netzwerkfehler – bitte versuche es erneut');
     }
@@ -172,6 +172,7 @@ export default function EditCourseMaterialClient({
   }) => {
     if (submitting) return;
     setSubmitting(true);
+    setError(null);
     try {
       await fetchWithErrorHandling(`/api/admin/course-material/${id}`, {
         method: 'PUT',
@@ -179,6 +180,10 @@ export default function EditCourseMaterialClient({
         body: JSON.stringify(data),
       });
       router.push('/admin/course-material');
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten'
+      );
     } finally {
       setSubmitting(false);
     }
@@ -187,6 +192,7 @@ export default function EditCourseMaterialClient({
   const handleSlideControlSubmit = async (formData: FormData) => {
     if (submitting) return;
     setSubmitting(true);
+    setError(null);
     try {
       await fetchWithErrorHandling(`/api/admin/course-material/${id}`, {
         method: 'PUT',
@@ -194,6 +200,10 @@ export default function EditCourseMaterialClient({
       });
 
       router.push('/admin/course-material');
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten'
+      );
     } finally {
       setSubmitting(false);
     }

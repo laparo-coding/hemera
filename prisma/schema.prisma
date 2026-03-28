@@ -289,7 +289,7 @@ model CourseMaterial {
   id           String               @id @default(cuid())
   identifier   String               @unique
   title        String
-  type         CourseMaterialType   @default(CONTENT)
+  type         CourseMaterialType   @default(CONTENT) @map("type")
   blobUrl      String               @map("blob_url")
   blobPathname String               @map("blob_pathname")
   createdAt    DateTime             @default(now()) @map("created_at")

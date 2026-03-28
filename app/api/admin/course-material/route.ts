@@ -12,7 +12,6 @@ import {
   ALLOWED_FILE_EXTENSIONS,
   courseMaterialCreateSchema,
   generateSlug,
-  identifierSchema,
   MAX_FILE_SIZE,
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
@@ -30,22 +29,20 @@ async function validateAndResolveIdentifier(
 ): Promise<{ identifier: string } | NextResponse> {
   const identifier = providedIdentifier || generateSlug(title);
 
-  // Validate identifier format (same rules as JSON schema: lowercase alphanumeric + hyphens, 2-100 chars)
-  const formatResult = identifierSchema.safeParse(identifier);
-  if (!formatResult.success) {
+  // Validate identifier is not empty
+  if (!identifier || identifier.length < 2) {
     return NextResponse.json(
       {
         error: 'validation_error',
         message:
-          formatResult.error.issues[0]?.message ||
-          'Der Identifier ist ungültig. Bitte einen gültigen Identifier angeben.',
+          'Der generierte Identifier ist ungültig. Bitte einen Identifier manuell angeben.',
       },
       { status: 400 }
     );
   }
 
   // Check identifier uniqueness
-  if (await isIdentifierTaken(formatResult.data, excludeId)) {
+  if (await isIdentifierTaken(identifier, excludeId)) {
     return NextResponse.json(
       {
         error: 'conflict',
@@ -55,61 +52,7 @@ async function validateAndResolveIdentifier(
     );
   }
 
-  return { identifier: formatResult.data };
-}
-
-/**
- * Handle DB error during material creation: clean up orphaned blob,
- * log DB error to Rollbar, audit-log the failure, and return 500 response.
- */
-async function handleDbErrorWithBlobCleanup(
-  blob: { url: string; pathname: string },
-  identifier: string,
-  userId: string | null,
-  dbError: unknown
-): Promise<NextResponse> {
-  const dbErrorMessage =
-    dbError instanceof Error ? dbError.message : 'Unknown error';
-
-  // Log the primary DB error to Rollbar
-  const blobId = sanitizeBlobUrlField(blob.url);
-  serverInstance.error('Database error during material creation', {
-    ...(blobId ?? {}),
-    identifier,
-    userId: userId ?? 'unknown',
-    operation: 'COURSE_MATERIAL_CREATE',
-    error: dbErrorMessage,
-  });
-
-  // Attempt to clean up the orphaned blob
-  if (blob.pathname) {
-    try {
-      await del(blob.pathname);
-    } catch (deleteError) {
-      serverInstance.error('Failed to delete orphaned blob after DB error', {
-        ...(blobId ?? {}),
-        error:
-          deleteError instanceof Error ? deleteError.message : 'Unknown error',
-      });
-    }
-  }
-
-  logAuditEvent(
-    'COURSE_MATERIAL_CREATE',
-    userId ?? 'unknown',
-    identifier,
-    'course-material',
-    'failure',
-    { error: `Database error: ${dbErrorMessage}` }
-  );
-
-  return NextResponse.json(
-    {
-      error: 'internal_error',
-      message: 'Fehler beim Speichern des Materials',
-    },
-    { status: 500 }
-  );
+  return { identifier };
 }
 
 /**
@@ -129,6 +72,7 @@ export async function GET() {
         identifier: m.identifier,
         title: m.title,
         type: m.type,
+        blobUrl: m.blobUrl,
         createdAt: m.createdAt.toISOString(),
         updatedAt: m.updatedAt.toISOString(),
       })),
@@ -249,16 +193,6 @@ async function handleFormDataPost(request: NextRequest, userId: string | null) {
     );
   }
 
-  if (!file.type.toLowerCase().startsWith('text/html')) {
-    return NextResponse.json(
-      {
-        error: 'validation_error',
-        message: 'Datei muss den Content-Type text/html haben',
-      },
-      { status: 400 }
-    );
-  }
-
   if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json(
       {
@@ -328,11 +262,38 @@ async function handleFormDataPost(request: NextRequest, userId: string | null) {
       blobPathname: blob.pathname,
     });
   } catch (dbError) {
-    return await handleDbErrorWithBlobCleanup(
-      blob,
+    // Delete the uploaded blob since DB write failed
+    if (blob.pathname) {
+      try {
+        await del(blob.pathname);
+      } catch (deleteError) {
+        const blobIdentifier = sanitizeBlobUrlField(blob.url);
+        serverInstance.error('Failed to delete orphaned blob after DB error', {
+          ...blobIdentifier,
+          error:
+            deleteError instanceof Error
+              ? deleteError.message
+              : 'Unknown error',
+        });
+      }
+    }
+    // Log the DB error
+    logAuditEvent(
+      'COURSE_MATERIAL_CREATE',
+      userId ?? 'unknown',
       identifier,
-      userId,
-      dbError
+      'course-material',
+      'failure',
+      {
+        error: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`,
+      }
+    );
+    return NextResponse.json(
+      {
+        error: 'internal_error',
+        message: 'Fehler beim Speichern des Materials',
+      },
+      { status: 500 }
     );
   }
 
@@ -389,7 +350,24 @@ async function handleJsonPost(request: NextRequest, userId: string | null) {
     );
   }
 
-  const { title, identifier: providedIdentifier, htmlContent } = parsed.data;
+  const {
+    title,
+    identifier: providedIdentifier,
+    htmlContent,
+    type,
+  } = parsed.data;
+
+  // JSON POST only supports CONTENT type; SLIDE_CONTROL requires FormData
+  if (type && type !== 'CONTENT') {
+    return NextResponse.json(
+      {
+        error: 'validation_error',
+        message:
+          'SLIDE_CONTROL-Materialien müssen als FormData hochgeladen werden',
+      },
+      { status: 400 }
+    );
+  }
 
   // CONTENT type requires htmlContent
   if (!htmlContent) {
@@ -416,7 +394,8 @@ async function handleJsonPost(request: NextRequest, userId: string | null) {
     return NextResponse.json(
       {
         error: 'validation_error',
-        message: `HTML-Validierung fehlgeschlagen: ${htmlValidation.errors[0]}`,
+        message:
+          'HTML-Validierung fehlgeschlagen. Bitte entferne unsichere Inhalte und versuche es erneut.',
       },
       { status: 400 }
     );
@@ -481,11 +460,38 @@ async function handleJsonPost(request: NextRequest, userId: string | null) {
       blobPathname: blob.pathname,
     });
   } catch (dbError) {
-    return await handleDbErrorWithBlobCleanup(
-      blob,
+    // Delete the uploaded blob since DB write failed
+    if (blob.pathname) {
+      try {
+        await del(blob.pathname);
+      } catch (deleteError) {
+        const blobIdentifier = sanitizeBlobUrlField(blob.url);
+        serverInstance.error('Failed to delete orphaned blob after DB error', {
+          ...blobIdentifier,
+          error:
+            deleteError instanceof Error
+              ? deleteError.message
+              : 'Unknown error',
+        });
+      }
+    }
+    // Log the DB error
+    logAuditEvent(
+      'COURSE_MATERIAL_CREATE',
+      userId ?? 'unknown',
       identifier,
-      userId,
-      dbError
+      'course-material',
+      'failure',
+      {
+        error: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`,
+      }
+    );
+    return NextResponse.json(
+      {
+        error: 'internal_error',
+        message: 'Fehler beim Speichern des Materials',
+      },
+      { status: 500 }
     );
   }
 
