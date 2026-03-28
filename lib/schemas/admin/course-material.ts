@@ -92,6 +92,7 @@ export const courseMaterialCreateSchema = z.object({
 
 /**
  * Schema for updating a course material
+ * Note: type cannot be changed after creation
  */
 export const courseMaterialUpdateSchema = z.object({
   title: z
@@ -101,7 +102,6 @@ export const courseMaterialUpdateSchema = z.object({
     .optional(),
   identifier: identifierSchema.optional(),
   htmlContent: htmlContentSchema.optional(),
-  type: z.enum(MATERIAL_TYPES).optional(),
 });
 
 /**

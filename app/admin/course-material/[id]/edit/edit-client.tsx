@@ -167,6 +167,7 @@ export default function EditCourseMaterialClient({
   }) => {
     if (submitting) return;
     setSubmitting(true);
+    setError(null);
     try {
       await fetchWithErrorHandling(`/api/admin/course-material/${id}`, {
         method: 'PUT',
@@ -174,6 +175,10 @@ export default function EditCourseMaterialClient({
         body: JSON.stringify(data),
       });
       router.push('/admin/course-material');
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten'
+      );
     } finally {
       setSubmitting(false);
     }
@@ -182,6 +187,7 @@ export default function EditCourseMaterialClient({
   const handleSlideControlSubmit = async (formData: FormData) => {
     if (submitting) return;
     setSubmitting(true);
+    setError(null);
     try {
       await fetchWithErrorHandling(`/api/admin/course-material/${id}`, {
         method: 'PUT',
@@ -189,6 +195,10 @@ export default function EditCourseMaterialClient({
       });
 
       router.push('/admin/course-material');
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten'
+      );
     } finally {
       setSubmitting(false);
     }

@@ -243,8 +243,9 @@ export function sanitizeAuditLogDetails(
 }
 
 /**
- * Default safe audit fields that can be logged without sanitization
- * Extend this list if additional audit fields are needed
+ * Default safe audit fields that can be logged without sanitization.
+ * userId is intentionally excluded — it must stay in structured metadata
+ * only and never be spread into monitoring payloads (PII protection).
  */
 const SAFE_AUDIT_FIELDS = new Set([
   'id',

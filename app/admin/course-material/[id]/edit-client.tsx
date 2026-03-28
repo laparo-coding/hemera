@@ -69,6 +69,8 @@ export default function EditCourseMaterialClient({
       if (contentRes.ok) {
         const contentData = await contentRes.json();
         htmlContent = contentData.htmlContent || '';
+      } else {
+        throw new Error('Inhalt konnte nicht geladen werden');
       }
 
       setState(s => ({
@@ -96,6 +98,7 @@ export default function EditCourseMaterialClient({
     identifier?: string;
     htmlContent: string;
   }) => {
+    setState(s => ({ ...s, error: null }));
     try {
       const response = await fetch(`/api/admin/course-material/${id}`, {
         method: 'PUT',
@@ -111,14 +114,15 @@ export default function EditCourseMaterialClient({
         } catch {
           // Non-JSON response
         }
-        throw new Error(errorMessage);
+        setState(s => ({ ...s, error: errorMessage }));
+        return;
       }
 
       router.push('/admin/course-material');
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Aktualisieren fehlgeschlagen';
-      throw new Error(message);
+      setState(s => ({ ...s, error: message }));
     }
   };
 

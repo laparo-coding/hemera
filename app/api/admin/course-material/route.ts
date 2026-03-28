@@ -72,6 +72,7 @@ export async function GET() {
         identifier: m.identifier,
         title: m.title,
         type: m.type,
+        blobUrl: m.blobUrl,
         createdAt: m.createdAt.toISOString(),
         updatedAt: m.updatedAt.toISOString(),
       })),
@@ -349,7 +350,24 @@ async function handleJsonPost(request: NextRequest, userId: string | null) {
     );
   }
 
-  const { title, identifier: providedIdentifier, htmlContent } = parsed.data;
+  const {
+    title,
+    identifier: providedIdentifier,
+    htmlContent,
+    type,
+  } = parsed.data;
+
+  // JSON POST only supports CONTENT type; SLIDE_CONTROL requires FormData
+  if (type && type !== 'CONTENT') {
+    return NextResponse.json(
+      {
+        error: 'validation_error',
+        message:
+          'SLIDE_CONTROL-Materialien müssen als FormData hochgeladen werden',
+      },
+      { status: 400 }
+    );
+  }
 
   // CONTENT type requires htmlContent
   if (!htmlContent) {
@@ -376,7 +394,8 @@ async function handleJsonPost(request: NextRequest, userId: string | null) {
     return NextResponse.json(
       {
         error: 'validation_error',
-        message: `HTML-Validierung fehlgeschlagen: ${htmlValidation.errors[0]}`,
+        message:
+          'HTML-Validierung fehlgeschlagen. Bitte entferne unsichere Inhalte und versuche es erneut.',
       },
       { status: 400 }
     );

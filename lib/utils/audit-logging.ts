@@ -55,7 +55,28 @@ export function logAuditEvent(
   // Note: userId remains only in structured metadata, not in human-readable message
   // Sanitize sensitive fields before spreading to prevent information disclosure
   const auditRecord: Record<string, unknown> = { ...auditLog };
-  const sanitizedAudit = filterAuditEvent(auditRecord);
+  let sanitizedAudit: Record<string, unknown>;
+  try {
+    sanitizedAudit = filterAuditEvent(auditRecord);
+  } catch (sanitizeError) {
+    // Fallback: log only safe primitive fields if sanitization fails
+    sanitizedAudit = {
+      action,
+      resourceId,
+      resourceType,
+      status,
+      timestamp,
+    };
+    // Emit structured error so sanitization bugs surface in monitoring
+    serverInstance.error('Audit sanitization failed', {
+      sanitizeError:
+        sanitizeError instanceof Error
+          ? sanitizeError.message
+          : 'Unknown error',
+      action,
+      resourceType,
+    });
+  }
 
   if (status === 'failure') {
     serverInstance.warning(`Audit: ${action} failed`, sanitizedAudit);
