@@ -64,6 +64,9 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 
 - **Deferred Loading**: Use `dynamic(() => import(...), { ssr: false })` for non-essential scripts
   (Rollbar, analytics)
+- **⚠️ No `ssr: false` in Server Components**: Next.js forbids `dynamic(..., { ssr: false })` in
+  Server Components (files without `'use client'`). Instead, import the Client Component directly
+  (static import). Only use `ssr: false` inside files that already have `'use client'`.
 - **Skeleton UI**: Provide `app/loading.tsx` for route groups to prevent CLS
 - **SSR-First**: Keep Navigation, Hero, above-fold content server-rendered
 - **Lazy Loading**: Use dynamic imports with loading states for below-fold content
