@@ -102,8 +102,7 @@ export const courseMaterialCreateSchema = z
       return true;
     },
     {
-      message:
-        'htmlContent ist erforderlich für CONTENT-Materialien',
+      message: 'htmlContent ist erforderlich für CONTENT-Materialien',
       path: ['htmlContent'],
     }
   );
