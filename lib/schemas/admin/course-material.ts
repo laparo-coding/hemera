@@ -80,7 +80,7 @@ export const slideControlFileSchema = z.object({
 /**
  * Schema for creating a new course material
  * Uses discriminated union based on type:
- * - CONTENT: htmlContent is required
+ * - CONTENT: htmlContent is required (default type)
  * - SLIDE_CONTROL: htmlContent is optional (file uploaded separately)
  */
 export const courseMaterialCreateSchema = z.discriminatedUnion('type', [
@@ -90,7 +90,7 @@ export const courseMaterialCreateSchema = z.discriminatedUnion('type', [
       .min(1, 'Titel ist erforderlich')
       .max(200, 'Titel darf maximal 200 Zeichen lang sein'),
     identifier: identifierSchema.optional(),
-    type: z.literal('CONTENT'),
+    type: z.literal('CONTENT').default('CONTENT'),
     htmlContent: htmlContentSchema,
   }),
   z.object({
