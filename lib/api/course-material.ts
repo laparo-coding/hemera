@@ -14,6 +14,7 @@ type CourseMaterialSummary = Prisma.CourseMaterialGetPayload<{
     identifier: true;
     title: true;
     type: true;
+    blobUrl: true;
     createdAt: true;
     updatedAt: true;
   };
@@ -29,6 +30,7 @@ export async function getAllMaterials(): Promise<CourseMaterialSummary[]> {
       identifier: true,
       title: true,
       type: true,
+      blobUrl: true,
       createdAt: true,
       updatedAt: true,
     },
