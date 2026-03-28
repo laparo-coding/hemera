@@ -82,27 +82,31 @@ export const slideControlFileSchema = z.object({
  * Uses discriminated union based on type:
  * - CONTENT: htmlContent is required (default type)
  * - SLIDE_CONTROL: htmlContent is optional (file uploaded separately)
+ * Type defaults to 'CONTENT' if omitted
  */
-export const courseMaterialCreateSchema = z.discriminatedUnion('type', [
-  z.object({
+export const courseMaterialCreateSchema = z
+  .object({
     title: z
       .string()
       .min(1, 'Titel ist erforderlich')
       .max(200, 'Titel darf maximal 200 Zeichen lang sein'),
     identifier: identifierSchema.optional(),
-    type: z.literal('CONTENT').default('CONTENT'),
-    htmlContent: htmlContentSchema,
-  }),
-  z.object({
-    title: z
-      .string()
-      .min(1, 'Titel ist erforderlich')
-      .max(200, 'Titel darf maximal 200 Zeichen lang sein'),
-    identifier: identifierSchema.optional(),
-    type: z.literal('SLIDE_CONTROL'),
+    type: z.enum(['CONTENT', 'SLIDE_CONTROL']).optional().default('CONTENT'),
     htmlContent: htmlContentSchema.optional(),
-  }),
-]);
+  })
+  .refine(
+    data => {
+      if (data.type === 'CONTENT') {
+        return !!data.htmlContent;
+      }
+      return true;
+    },
+    {
+      message:
+        'htmlContent ist erforderlich für CONTENT-Materialien',
+      path: ['htmlContent'],
+    }
+  );
 
 /**
  * Schema for updating a course material
