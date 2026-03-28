@@ -169,7 +169,7 @@ function sanitizeAuditLogDetailsInternal(
   depth: number,
   visited: WeakSet<object>
 ): Record<string, unknown> {
-  if (!details || typeof details !== 'object') return { _value: details };
+  if (!details || typeof details !== 'object') return {};
   if (depth > MAX_SANITIZE_DEPTH) return { _truncated: '[MaxDepth]' };
   if (visited.has(details)) return { _circular: '[Circular]' };
   visited.add(details);

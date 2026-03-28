@@ -74,8 +74,8 @@ export default function CTASection({
               textTransform: 'none',
               borderRadius: '8px',
               '&:hover': {
-                bgcolor: colors.whiteOverlay25,
-                color: colors.marsalaDark,
+                bgcolor: colors.beige,
+                color: colors.marsala,
               },
             }}
           >

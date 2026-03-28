@@ -155,7 +155,7 @@ hemera/
 
 - **Language:** TypeScript 5.9 (strict ESM) for both React UI and Node scripts.
 - **Framework:** Next.js 16 App Router with React 19 for hybrid SSR/ISR and API routes.
-- **Database:** Vercel Postgres via Prisma 7.3 (Accelerate in prod, pg adapter locally/Testcontainers).
+- **Database:** Vercel Postgres via Prisma 7.5.0 (Accelerate in prod, pg adapter locally/Testcontainers).
 - **Styling/UI:** MUI 7, Emotion 11, custom theme tokens (`lib/theme.ts`, `components/ThemeRegistry`).
 
 ### Key Libraries

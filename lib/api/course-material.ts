@@ -38,10 +38,25 @@ export async function getAllMaterials(): Promise<CourseMaterialSummary[]> {
   });
 }
 
+type CourseMaterialDetail = Prisma.CourseMaterialGetPayload<{
+  select: {
+    id: true;
+    identifier: true;
+    title: true;
+    type: true;
+    blobUrl: true;
+    blobPathname: true;
+    createdAt: true;
+    updatedAt: true;
+  };
+}>;
+
 /**
  * Get a single course material by ID
  */
-export async function getMaterialById(id: string) {
+export async function getMaterialById(
+  id: string
+): Promise<CourseMaterialDetail | null> {
   return prisma.courseMaterial.findUnique({
     where: { id },
     select: {

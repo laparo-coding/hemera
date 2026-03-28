@@ -142,7 +142,7 @@ for edit page to detect type and show download link).
 
 | Status | Error Code | Message |
 |--------|------------|--------|
-| 400 | `validation_error` | `Materialtyp stimmt nicht mit der Anfrage überein` / `Ungültige Eingabe` |
+| 400 | `type_mismatch` | `Materialtyp stimmt nicht mit der Anfrage überein` / `Ungültige Eingabe` |
 | 401 | `unauthorized` | `Authentifizierung erforderlich` |
 | 404 | `not_found` | `Material nicht gefunden` |
 | 409 | `conflict` | `Identifier "{identifier}" ist bereits vergeben` |
@@ -155,7 +155,7 @@ If the request sends `multipart/form-data` to a CONTENT material (or JSON with `
 SLIDE_CONTROL material), the server returns:
 
 ```json
-{ "error": "validation_error", "message": "Materialtyp stimmt nicht mit der Anfrage überein" }
+{ "error": "type_mismatch", "message": "Materialtyp stimmt nicht mit der Anfrage überein" }
 ```
 
 Status: 400

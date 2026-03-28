@@ -180,9 +180,14 @@ the two workflows.
 ### `CourseMaterial` — new field
 
 ```prisma
+enum CourseMaterialType {
+  CONTENT
+  SLIDE_CONTROL
+}
+
 model CourseMaterial {
   // … existing fields …
-  type  String @default("CONTENT") @map("type")   // "CONTENT" | "SLIDE_CONTROL"
+  type  CourseMaterialType @default(CONTENT) @map("type")
 }
 ```
 

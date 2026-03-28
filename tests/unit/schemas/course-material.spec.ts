@@ -15,7 +15,6 @@ import {
   MAX_FILE_SIZE,
   ALLOWED_FILE_EXTENSIONS,
 } from '@/lib/schemas/admin/course-material';
-import type { MaterialType } from '@/lib/schemas/admin/course-material';
 
 describe('identifierSchema', () => {
   it('accepts valid identifiers', () => {
