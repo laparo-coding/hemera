@@ -59,14 +59,52 @@ function createArraySanitizer(
     depth: number,
     visited: WeakSet<object>
   ): unknown[] => {
+    if (depth > MAX_SANITIZE_DEPTH) {
+      return [{ _truncated: '[MaxDepth]' }];
+    }
+    if (visited.has(arr)) {
+      return [{ _circular: '[Circular]' }];
+    }
+    visited.add(arr);
+
     return arr.map(item => {
       if (Array.isArray(item)) return sanitizeArray(item, depth + 1, visited);
       if (typeof item === 'object' && item !== null)
-        return sanitizeElement(item as Record<string, unknown>, depth, visited);
+        return sanitizeElement(
+          item as Record<string, unknown>,
+          depth + 1,
+          visited
+        );
       return item;
     });
   };
   return sanitizeArray;
+}
+
+// --- Shared sensitive key detection ---
+
+/**
+ * Normalize a key for sensitive field matching.
+ * Strips all non-alphanumeric characters and lowercases so that
+ * `api_key`, `api-key`, `x-api-key`, `apiKey` all match `apikey`.
+ */
+function normalizeSensitiveKey(key: string): string {
+  return key.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function isSensitiveKey(key: string): boolean {
+  const normalized = normalizeSensitiveKey(key);
+  return (
+    normalized.includes('token') ||
+    normalized.includes('secret') ||
+    normalized.includes('credential') ||
+    normalized.includes('password') ||
+    normalized.includes('apikey') ||
+    normalized.includes('privatekey') ||
+    normalized.includes('authorization') ||
+    normalized.includes('cookie') ||
+    normalized.includes('session')
+  );
 }
 
 // --- Internal implementations with depth/circular tracking ---
@@ -85,13 +123,7 @@ function sanitizeLoggingObjectInternal(
 
   for (const [key, value] of Object.entries(obj)) {
     // Skip sensitive fields entirely
-    if (
-      key.toLowerCase().includes('token') ||
-      key.toLowerCase().includes('secret') ||
-      key.toLowerCase().includes('credential') ||
-      key.toLowerCase().includes('password') ||
-      key.toLowerCase().includes('apikey')
-    ) {
+    if (isSensitiveKey(key)) {
       continue;
     }
 
@@ -149,17 +181,21 @@ export function sanitizeLoggingObject(
 
 /**
  * Safe logging version for blob URLs
- * Redacts the full URL but preserves non-sensitive identifier info
+ * Redacts the full URL and pathname to prevent PII leakage.
+ * Returns only the top-level category (first path segment) and domain.
  */
 export function sanitizeBlobUrlField(blobUrl: string | undefined | null): {
   blobPathname: string;
   blobDomain: string;
-} {
-  if (!blobUrl) return { blobPathname: '', blobDomain: '' };
+} | null {
+  if (!blobUrl) return null;
 
   const identifier = extractBlobIdentifier(blobUrl);
+  // Only expose the top-level category (e.g., "course-material", "resumes")
+  // to avoid leaking participationId or filenames from deeper path segments
+  const firstSegment = identifier.pathname.split('/').filter(Boolean)[0] || '';
   return {
-    blobPathname: identifier.pathname,
+    blobPathname: firstSegment ? `${firstSegment}/...` : '',
     blobDomain: identifier.domain,
   };
 }
@@ -169,7 +205,7 @@ function sanitizeAuditLogDetailsInternal(
   depth: number,
   visited: WeakSet<object>
 ): Record<string, unknown> {
-  if (!details || typeof details !== 'object') return {};
+  if (!details || typeof details !== 'object') return { _value: details };
   if (depth > MAX_SANITIZE_DEPTH) return { _truncated: '[MaxDepth]' };
   if (visited.has(details)) return { _circular: '[Circular]' };
   visited.add(details);
@@ -179,23 +215,18 @@ function sanitizeAuditLogDetailsInternal(
   for (const [key, value] of Object.entries(details)) {
     const lowerKey = key.toLowerCase();
 
-    // Replace blob URLs with safe per-field identifiers
+    // Replace blob URLs with safe per-field identifiers (same masking as sanitizeBlobUrlField)
     if (lowerKey.includes('bloburl') && typeof value === 'string') {
-      const identifier = extractBlobIdentifier(value);
-      sanitized[`${key}Pathname`] = identifier.pathname;
-      sanitized[`${key}Domain`] = identifier.domain;
+      const sanitizedBlob = sanitizeBlobUrlField(value);
+      if (sanitizedBlob) {
+        sanitized[`${key}Pathname`] = sanitizedBlob.blobPathname;
+        sanitized[`${key}Domain`] = sanitizedBlob.blobDomain;
+      }
       continue;
     }
 
-    // Skip sensitive fields entirely (case-insensitive substring matching)
-    if (
-      lowerKey.includes('password') ||
-      lowerKey.includes('token') ||
-      lowerKey.includes('secret') ||
-      lowerKey.includes('credential') ||
-      lowerKey.includes('apikey') ||
-      lowerKey.includes('privatekey')
-    ) {
+    // Skip sensitive fields entirely
+    if (isSensitiveKey(key)) {
       continue;
     }
 
@@ -243,12 +274,12 @@ export function sanitizeAuditLogDetails(
 }
 
 /**
- * Default safe audit fields that can be logged without sanitization.
- * userId is intentionally excluded — it must stay in structured metadata
- * only and never be spread into monitoring payloads (PII protection).
+ * Default safe audit fields that can be logged without sanitization
+ * Extend this list if additional audit fields are needed
  */
 const SAFE_AUDIT_FIELDS = new Set([
   'id',
+  'userId',
   'resourceId',
   'action',
   'resourceType',
