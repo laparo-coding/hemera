@@ -148,7 +148,7 @@
     "testcontainers": "^11.7.2",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.2",
     "webpack": "^5.105.4"
   },
   "prisma": {
