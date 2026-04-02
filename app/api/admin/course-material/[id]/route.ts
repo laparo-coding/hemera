@@ -16,10 +16,7 @@ import {
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
-import {
-  sanitizeAuditLogDetails,
-  sanitizeBlobUrlField,
-} from '@/lib/utils/log-sanitizer';
+import { sanitizeAuditLogDetails } from '@/lib/utils/log-sanitizer';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -445,7 +442,7 @@ async function handleJsonPut(
       } catch (deleteError) {
         // Log but don't fail - old blob will be orphaned but new content is safe
         serverInstance.warning('Failed to delete old blob during update', {
-          ...blobIdentifier,
+          blobUrl: existingMaterial.blobUrl,
           error:
             deleteError instanceof Error
               ? deleteError.message
@@ -531,7 +528,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       } catch {
         // Log but continue with DB deletion
         serverInstance.warning('Failed to delete blob file', {
-          ...blobIdentifier,
+          blobUrl: material.blobUrl,
         });
       }
     }

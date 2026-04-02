@@ -12,6 +12,7 @@ import {
   ALLOWED_FILE_EXTENSIONS,
   courseMaterialCreateSchema,
   generateSlug,
+  identifierSchema,
   MAX_FILE_SIZE,
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
@@ -29,13 +30,15 @@ async function validateAndResolveIdentifier(
 ): Promise<{ identifier: string } | NextResponse> {
   const rawIdentifier = providedIdentifier || generateSlug(title);
 
-  // Validate identifier is not empty
-  if (!identifier || identifier.length < 2) {
+  // Normalize and validate identifier using schema (includes toLowerCase and regex checks)
+  const validationResult = identifierSchema.safeParse(rawIdentifier);
+  if (!validationResult.success) {
     return NextResponse.json(
       {
         error: 'validation_error',
         message:
-          'Der generierte Identifier ist ungültig. Bitte einen Identifier manuell angeben.',
+          validationResult.error.issues[0]?.message ||
+          'Der Identifier ist ungültig. Bitte einen gültigen Identifier angeben.',
       },
       { status: 400 }
     );
