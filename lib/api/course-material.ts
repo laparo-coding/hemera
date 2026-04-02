@@ -38,7 +38,7 @@ export async function getAllMaterials(): Promise<CourseMaterialSummary[]> {
   });
 }
 
-export type CourseMaterialDetail = Prisma.CourseMaterialGetPayload<{
+type CourseMaterialDetail = Prisma.CourseMaterialGetPayload<{
   select: {
     id: true;
     identifier: true;

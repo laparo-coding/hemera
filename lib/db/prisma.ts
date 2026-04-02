@@ -56,9 +56,7 @@ function createPrismaClient(): PrismaClient {
       connectionString: 'postgresql://placeholder:5432/placeholder',
     });
     globalForPrisma.pool = placeholderPool;
-    // NOTE: Type mismatch between @types/pg@8.20.0 and @prisma/adapter-pg@7.5.0
-    // Use 'as unknown' for minimal type assumption. Fix: upgrade adapter to ^7.6.0
-    const adapter = new PrismaPg(placeholderPool as unknown as any);
+    const adapter = new PrismaPg(placeholderPool as any);
     return new PrismaClient({
       adapter,
       log: ['error'],
@@ -71,9 +69,7 @@ function createPrismaClient(): PrismaClient {
   });
   globalForPrisma.pool = pool;
 
-  // NOTE: Type mismatch between @types/pg@8.20.0 and @prisma/adapter-pg@7.5.0
-  // Use 'as unknown' for minimal type assumption. Fix: upgrade adapter to ^7.6.0
-  const adapter = new PrismaPg(pool as unknown as any);
+  const adapter = new PrismaPg(pool as any);
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],

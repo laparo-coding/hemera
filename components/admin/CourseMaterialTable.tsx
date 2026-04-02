@@ -52,6 +52,7 @@ interface CourseMaterial {
   identifier: string;
   title: string;
   type: MaterialType;
+  blobUrl: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -176,8 +177,15 @@ export default function CourseMaterialTable({
   const handleView = async (material: CourseMaterial) => {
     setViewMaterial(material);
     setViewDialogOpen(true);
-    setViewLoading(true);
     setViewHtmlContent('');
+
+    // SLIDE_CONTROL materials are rendered via sandboxed iframe using blobUrl
+    if (material.type === 'SLIDE_CONTROL') {
+      setViewLoading(false);
+      return;
+    }
+
+    setViewLoading(true);
 
     try {
       const response = await fetch(
@@ -500,6 +508,18 @@ export default function CourseMaterialTable({
             <Box display='flex' justifyContent='center' py={4}>
               <CircularProgress />
             </Box>
+          ) : viewMaterial?.type === 'SLIDE_CONTROL' ? (
+            <Box
+              component='iframe'
+              src={viewMaterial.blobUrl}
+              sandbox='allow-scripts'
+              sx={{
+                width: '100%',
+                height: '70vh',
+                border: 'none',
+              }}
+              title={viewMaterial.title}
+            />
           ) : (
             <Box
               sx={{

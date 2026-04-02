@@ -2,8 +2,7 @@
  * Course Material Create Page
  * Feature: 026-course-material-integration
  *
- * Server Component that statically imports CreateCourseMaterialClient (a Client Component)
- * per coding guidelines. This component acts as a route boundary for the /new page.
+ * Client component that renders the create form.
  */
 
 import CreateCourseMaterialClient from './create-client';

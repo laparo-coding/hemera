@@ -12,11 +12,14 @@ import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   ALLOWED_FILE_EXTENSIONS,
   courseMaterialUpdateSchema,
-  identifierSchema,
   MAX_FILE_SIZE,
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
+import {
+  sanitizeAuditLogDetails,
+  sanitizeBlobUrlField,
+} from '@/lib/utils/log-sanitizer';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -175,34 +178,18 @@ async function handleFormDataPut(
   }
 
   // Handle identifier change
-  let newIdentifier = existingMaterial.identifier;
+  const newIdentifier = identifierField || existingMaterial.identifier;
   if (identifierField && identifierField !== existingMaterial.identifier) {
-    // Normalize and validate identifier using schema
-    const validationResult = identifierSchema.safeParse(identifierField);
-    if (!validationResult.success) {
-      return NextResponse.json(
-        {
-          error: 'validation_error',
-          message:
-            validationResult.error.issues[0]?.message ||
-            'Identifier muss aus Kleinbuchstaben, Zahlen und Bindestrichen bestehen',
-        },
-        { status: 400 }
-      );
-    }
-
-    const normalizedIdentifier = validationResult.data;
-    if (await isIdentifierTaken(normalizedIdentifier, id)) {
+    if (await isIdentifierTaken(identifierField, id)) {
       return NextResponse.json(
         {
           error: 'conflict',
-          message: `Identifier "${normalizedIdentifier}" ist bereits vergeben`,
+          message: `Identifier "${identifierField}" ist bereits vergeben`,
         },
         { status: 409 }
       );
     }
-    newIdentifier = normalizedIdentifier;
-    updateData.identifier = normalizedIdentifier;
+    updateData.identifier = identifierField;
   }
 
   // Handle file upload replacement
@@ -291,7 +278,12 @@ async function handleFormDataPut(
     id,
     'course-material',
     'success',
-    { details: { ...updateData, type: 'SLIDE_CONTROL' } }
+    {
+      details: sanitizeAuditLogDetails({
+        ...updateData,
+        type: existingMaterial.type,
+      }),
+    }
   );
 
   return NextResponse.json({
@@ -453,7 +445,7 @@ async function handleJsonPut(
       } catch (deleteError) {
         // Log but don't fail - old blob will be orphaned but new content is safe
         serverInstance.warning('Failed to delete old blob during update', {
-          blobUrl: existingMaterial.blobUrl,
+          ...blobIdentifier,
           error:
             deleteError instanceof Error
               ? deleteError.message
@@ -489,7 +481,12 @@ async function handleJsonPut(
     id,
     'course-material',
     'success',
-    { details: updateData }
+    {
+      details: sanitizeAuditLogDetails({
+        ...updateData,
+        type: existingMaterial.type,
+      }),
+    }
   );
 
   return NextResponse.json({
@@ -534,7 +531,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       } catch {
         // Log but continue with DB deletion
         serverInstance.warning('Failed to delete blob file', {
-          blobUrl: material.blobUrl,
+          ...blobIdentifier,
         });
       }
     }
