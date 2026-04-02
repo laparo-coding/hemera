@@ -16,10 +16,7 @@ import {
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
-import {
-  sanitizeAuditLogDetails,
-  sanitizeBlobUrlField,
-} from '@/lib/utils/log-sanitizer';
+import { sanitizeAuditLogDetails } from '@/lib/utils/log-sanitizer';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -91,8 +88,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     const contentType = request.headers.get('content-type') || '';
-    const mediaType = (contentType.split(';')[0] ?? '').trim().toLowerCase();
-    const isFormData = mediaType === 'multipart/form-data';
+    const isFormData = contentType.includes('multipart/form-data');
 
     // Type mismatch guard
     if (isFormData && existingMaterial.type === 'CONTENT') {
@@ -148,7 +144,7 @@ async function handleFormDataPut(
   const identifierValue = formData.get('identifier');
   const fileValue = formData.get('file');
 
-  // Validate types at runtime
+  // Runtime type validation for formData fields
   const title =
     titleValue !== null && typeof titleValue === 'string' ? titleValue : null;
   const identifierField =
@@ -218,9 +214,6 @@ async function handleFormDataPut(
     }
 
     const fileContent = await file.text();
-
-    // SLIDE_CONTROL: store as-is — admin-uploaded, intentional scripts/event
-    // handlers allowed, origin-isolated via Vercel Blob separate domain
     const blobPathname = `course-material/slides/${newIdentifier}.html`;
 
     let blob;
@@ -244,17 +237,13 @@ async function handleFormDataPut(
       );
     }
 
-    // Delete old blob if URL changed
-    if (
-      existingMaterial.blobUrl !== blob.url &&
-      existingMaterial.blobPathname
-    ) {
+    // Delete old blob if URL changed and old blob exists
+    if (existingMaterial.blobUrl && existingMaterial.blobUrl !== blob.url) {
       try {
-        await del(existingMaterial.blobPathname);
+        await del(existingMaterial.blobUrl);
       } catch (deleteError) {
-        const blobIdentifier = sanitizeBlobUrlField(existingMaterial.blobUrl);
         serverInstance.warning('Failed to delete old blob during update', {
-          ...(blobIdentifier || {}),
+          blobUrl: existingMaterial.blobUrl,
           error:
             deleteError instanceof Error
               ? deleteError.message
@@ -402,7 +391,7 @@ async function handleJsonPut(
       );
     }
 
-    // Sanitize HTML to remove potentially dangerous content (CONTENT type)
+    // Sanitize HTML
     const sanitizedHtml = sanitizeHtml(htmlContent);
 
     // Upload new content first, then delete old blob (prevents data loss on upload failure)
@@ -431,6 +420,7 @@ async function handleJsonPut(
         identifier: newIdentifier,
         blobPathname,
         contentLength: sanitizedHtml.length,
+        tokenAvailable: !!process.env.BLOB_READ_WRITE_TOKEN,
         error: blobErrorMessage,
       });
       return NextResponse.json(
@@ -442,20 +432,17 @@ async function handleJsonPut(
       );
     }
 
-    // Delete old blob only if the URL changed (different identifier → different pathname).
+    // Delete old blob only if the URL changed (different identifier → different pathname)
+    // and old blob exists.
     // With allowOverwrite the new upload replaces the old content at the same URL,
     // so deleting it would destroy the just-uploaded file.
-    if (
-      existingMaterial.blobUrl !== blob.url &&
-      existingMaterial.blobPathname
-    ) {
+    if (existingMaterial.blobUrl && existingMaterial.blobUrl !== blob.url) {
       try {
-        await del(existingMaterial.blobPathname);
+        await del(existingMaterial.blobUrl);
       } catch (deleteError) {
         // Log but don't fail - old blob will be orphaned but new content is safe
-        const blobIdentifier = sanitizeBlobUrlField(existingMaterial.blobUrl);
         serverInstance.warning('Failed to delete old blob during update', {
-          ...blobIdentifier,
+          blobUrl: existingMaterial.blobUrl,
           error:
             deleteError instanceof Error
               ? deleteError.message
@@ -534,16 +521,14 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Delete blob file
-    const blobTarget = material.blobPathname || material.blobUrl;
-    if (blobTarget) {
+    // Delete blob file (only SLIDE_CONTROL and CONTENT materials with a blobUrl)
+    if (material.blobUrl) {
       try {
-        await del(blobTarget);
+        await del(material.blobUrl);
       } catch {
         // Log but continue with DB deletion
-        const blobIdentifier = sanitizeBlobUrlField(material.blobUrl);
         serverInstance.warning('Failed to delete blob file', {
-          ...blobIdentifier,
+          blobUrl: material.blobUrl,
         });
       }
     }
