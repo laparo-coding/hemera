@@ -505,7 +505,9 @@ describe('DELETE /api/admin/course-material/[id]', () => {
     const response = await DELETE(request, { params: createParams('mat_1') });
 
     expect(response.status).toBe(204);
-    expect(mockDel).toHaveBeenCalledWith('course-material/test.html');
+    expect(mockDel).toHaveBeenCalledWith(
+      'https://blob.vercel-storage.com/test.html'
+    );
     expect(mockPrisma.courseMaterial.delete).toHaveBeenCalledWith({
       where: { id: 'mat_1' },
     });
@@ -827,6 +829,8 @@ describe('026: POST /api/admin/course-material — FormData SLIDE_CONTROL', () =
     mockAuthenticatedAdmin();
 
     // Create a file with actual content exceeding 20 MB
+    // Note: Object.defineProperty(file, 'size') does not work because NextRequest
+    // reconstructs the File from serialized data, losing the stubbed property.
     const oversizedContent = new Uint8Array(20_971_521);
     const file = new File([oversizedContent], 'huge.html', {
       type: 'text/html',
@@ -1017,7 +1021,9 @@ describe('026: PUT /api/admin/course-material/[id] — FormData + type mismatch'
     });
 
     expect(response.status).toBe(200);
-    expect(mockDel).toHaveBeenCalled(); // old blob deleted (URL changed due to identifier change)
+    expect(mockDel).toHaveBeenCalledWith(
+      'https://blob.vercel-storage.com/course-material/slides/my-slides.html'
+    ); // old blob deleted (URL changed due to identifier change)
     expect(mockPut).toHaveBeenCalled(); // new blob uploaded
   });
 
