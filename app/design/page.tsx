@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import type { Metadata } from 'next';
 import {
-  type CourseLevelColorEntries,
   colors,
   courseLevelColors,
   fontWeights,
@@ -223,22 +222,25 @@ export default function DesignPage() {
         Kurs-Level Chips
       </Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 4 }}>
-        {(Object.entries(courseLevelColors) as CourseLevelColorEntries).map(
-          ([level, { bg, text, label }]) => (
-            <Chip
-              key={level}
-              label={`${label} – ${level.charAt(0) + level.slice(1).toLowerCase()}`}
-              sx={{
-                bgcolor: bg,
-                color: text,
-                fontFamily: typography.body,
-                fontWeight: fontWeights.semibold,
-                fontSize: '0.875rem',
-                px: 1,
-              }}
-            />
-          )
-        )}
+        {(
+          Object.entries(courseLevelColors) as [
+            string,
+            { bg: string; text: string; label: string },
+          ][]
+        ).map(([level, { bg, text, label }]) => (
+          <Chip
+            key={level}
+            label={`${label} – ${level.charAt(0) + level.slice(1).toLowerCase()}`}
+            sx={{
+              bgcolor: bg,
+              color: text,
+              fontFamily: typography.body,
+              fontWeight: fontWeights.semibold,
+              fontSize: '0.875rem',
+              px: 1,
+            }}
+          />
+        ))}
       </Box>
 
       {/* Status Chips */}

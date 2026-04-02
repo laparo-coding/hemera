@@ -183,7 +183,6 @@ the two workflows.
 enum CourseMaterialType {
   CONTENT
   SLIDE_CONTROL
-  @@map("course_material_type")
 }
 
 model CourseMaterial {

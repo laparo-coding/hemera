@@ -140,11 +140,15 @@ export default function EditCourseMaterialClient({
     try {
       response = await fetch(url, options);
     } catch (err) {
-      rollbar.error('Network failure in material editor', {
-        url,
-        method: options.method,
-        error: err instanceof Error ? err.message : 'unknown network error',
-      });
+      try {
+        rollbar.error('Network failure in material editor', {
+          url,
+          method: options.method,
+          error: err instanceof Error ? err.message : 'unknown network error',
+        });
+      } catch (_rbErr) {
+        // Swallow rollbar errors to ensure user-facing error is thrown
+      }
       throw new Error('Netzwerkfehler – bitte versuche es erneut');
     }
 

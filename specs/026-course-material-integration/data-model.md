@@ -9,7 +9,7 @@
 | id | String | `cuid()` | `@id` | — | Existing |
 | identifier | String | — | `@unique` | — | Existing |
 | title | String | — | — | — | Existing |
-| **type** | **String** | **`"CONTENT"`** | — | **`@map("type")`** | **NEW** — `"CONTENT"` or `"SLIDE_CONTROL"` |
+| **type** | **CourseMaterialType** | **`CONTENT`** | — | **`@map("type")`** | **NEW** — `CONTENT` or `SLIDE_CONTROL` |
 | blobUrl | String | — | — | `@map("blob_url")` | Existing |
 | blobPathname | String | — | — | `@map("blob_pathname")` | Existing |
 | createdAt | DateTime | `now()` | — | `@map("created_at")` | Existing |
@@ -23,19 +23,17 @@
 enum CourseMaterialType {
   CONTENT
   SLIDE_CONTROL
-
-  @@map("course_material_type")
 }
 
 model CourseMaterial {
-  id           String              @id @default(cuid())
-  identifier   String              @unique
+  id           String               @id @default(cuid())
+  identifier   String               @unique
   title        String
-  type         CourseMaterialType  @default(CONTENT) @map("type")
-  blobUrl      String              @map("blob_url")
-  blobPathname String              @map("blob_pathname")
-  createdAt    DateTime            @default(now()) @map("created_at")
-  updatedAt    DateTime            @updatedAt @map("updated_at")
+  type         CourseMaterialType   @default(CONTENT) @map("type")
+  blobUrl      String               @map("blob_url")
+  blobPathname String               @map("blob_pathname")
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @updatedAt @map("updated_at")
 
   curriculumLinks CurriculumTopicMaterial[]
 
@@ -45,18 +43,18 @@ model CourseMaterial {
 
 ### Migration
 
-- Migration `add_material_type`: `ALTER TABLE seminar_materials ADD COLUMN "type" TEXT NOT NULL DEFAULT 'CONTENT';`
-- Migration `convert_material_type_to_enum`: Converts the `type` column from `TEXT` to a native PostgreSQL enum `course_material_type`.
-- All existing rows receive `CONTENT` automatically.
+- Migration name: `add_material_type`
+- SQL: `CREATE TYPE "CourseMaterialType" AS ENUM ('CONTENT', 'SLIDE_CONTROL'); ALTER TABLE seminar_materials ADD COLUMN "type" "CourseMaterialType" NOT NULL DEFAULT 'CONTENT';`
+- All existing rows receive `'CONTENT'` automatically.
 - No data migration or backfill script needed.
 
 ## Validation Rules
 
 ### Type Field
 
-- Allowed values: `"CONTENT"`, `"SLIDE_CONTROL"`
+- Allowed values: `CONTENT`, `SLIDE_CONTROL`
 - Set at creation time, immutable after.
-- Default: `"CONTENT"` (backward compatible).
+- Default: `CONTENT` (backward compatible).
 
 ### File Upload (SLIDE_CONTROL only)
 

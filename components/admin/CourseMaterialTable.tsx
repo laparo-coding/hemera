@@ -43,7 +43,6 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import type { MaterialType } from '@/lib/schemas/admin/course-material';
 import { normalizeForSearch } from '@/lib/utils/searchNormalization';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
@@ -51,10 +50,24 @@ interface CourseMaterial {
   id: string;
   identifier: string;
   title: string;
-  type: MaterialType;
-  blobUrl: string;
+  type: string;
   createdAt: string;
   updatedAt: string;
+}
+
+// Centralized material type display configuration
+const MATERIAL_TYPE_CONFIG: Record<
+  string,
+  { label: string; color: 'default' | 'secondary' }
+> = {
+  SLIDE_CONTROL: { label: 'Steuerdatei', color: 'secondary' },
+  CONTENT: { label: 'Inhaltsseite', color: 'default' },
+};
+
+const DEFAULT_TYPE_CONFIG = { label: 'Unbekannt', color: 'default' as const };
+
+function getTypeConfig(type: string) {
+  return MATERIAL_TYPE_CONFIG[type] ?? DEFAULT_TYPE_CONFIG;
 }
 
 interface CourseMaterialTableProps {
@@ -162,15 +175,8 @@ export default function CourseMaterialTable({
   const handleView = async (material: CourseMaterial) => {
     setViewMaterial(material);
     setViewDialogOpen(true);
-    setViewHtmlContent('');
-
-    // SLIDE_CONTROL materials are rendered via sandboxed iframe using blobUrl
-    if (material.type === 'SLIDE_CONTROL') {
-      setViewLoading(false);
-      return;
-    }
-
     setViewLoading(true);
+    setViewHtmlContent('');
 
     try {
       const response = await fetch(
@@ -360,17 +366,9 @@ export default function CourseMaterialTable({
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={
-                          material.type === 'SLIDE_CONTROL'
-                            ? 'Steuerdatei'
-                            : 'Inhaltsseite'
-                        }
+                        label={getTypeConfig(material.type).label}
                         size='small'
-                        color={
-                          material.type === 'SLIDE_CONTROL'
-                            ? 'secondary'
-                            : 'default'
-                        }
+                        color={getTypeConfig(material.type).color}
                       />
                     </TableCell>
                     <TableCell>
@@ -501,18 +499,6 @@ export default function CourseMaterialTable({
             <Box display='flex' justifyContent='center' py={4}>
               <CircularProgress />
             </Box>
-          ) : viewMaterial?.type === 'SLIDE_CONTROL' ? (
-            <Box
-              component='iframe'
-              src={viewMaterial.blobUrl}
-              sandbox='allow-scripts'
-              sx={{
-                width: '100%',
-                height: '70vh',
-                border: 'none',
-              }}
-              title={viewMaterial.title}
-            />
           ) : (
             <Box
               sx={{

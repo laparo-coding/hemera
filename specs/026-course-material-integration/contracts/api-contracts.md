@@ -142,7 +142,7 @@ for edit page to detect type and show download link).
 
 | Status | Error Code | Message |
 |--------|------------|--------|
-| 400 | `type_mismatch` | `Materialtyp stimmt nicht mit der Anfrage überein` / `Ungültige Eingabe` |
+| 400 | `type_mismatch` | `Materialtyp stimmt nicht mit der Anfrage überein` |
 | 401 | `unauthorized` | `Authentifizierung erforderlich` |
 | 404 | `not_found` | `Material nicht gefunden` |
 | 409 | `conflict` | `Identifier "{identifier}" ist bereits vergeben` |
