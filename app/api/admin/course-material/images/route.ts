@@ -113,6 +113,7 @@ export async function POST(request: NextRequest) {
         requestId,
         filename,
         fileSize: file.size,
+        tokenAvailable: !!process.env.BLOB_READ_WRITE_TOKEN,
         error: blobErrorMessage,
       });
       return NextResponse.json(

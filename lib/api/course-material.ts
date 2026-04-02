@@ -8,7 +8,7 @@
 import type { CourseMaterialType, Prisma } from '@prisma/client';
 import { prisma } from '../db/prisma';
 
-type CourseMaterialSummary = Prisma.CourseMaterialGetPayload<{
+export type CourseMaterialSummary = Prisma.CourseMaterialGetPayload<{
   select: {
     id: true;
     identifier: true;
