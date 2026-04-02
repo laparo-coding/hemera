@@ -57,6 +57,21 @@ interface CourseMaterial {
   updatedAt: string;
 }
 
+// Centralized material type display configuration
+const MATERIAL_TYPE_CONFIG: Record<
+  string,
+  { label: string; color: 'default' | 'secondary' }
+> = {
+  SLIDE_CONTROL: { label: 'Steuerdatei', color: 'secondary' },
+  CONTENT: { label: 'Inhaltsseite', color: 'default' },
+};
+
+const DEFAULT_TYPE_CONFIG = { label: 'Unbekannt', color: 'default' as const };
+
+function getTypeConfig(type: string) {
+  return MATERIAL_TYPE_CONFIG[type] ?? DEFAULT_TYPE_CONFIG;
+}
+
 interface CourseMaterialTableProps {
   onRefresh?: () => void;
 }
@@ -360,17 +375,9 @@ export default function CourseMaterialTable({
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={
-                          material.type === 'SLIDE_CONTROL'
-                            ? 'Steuerdatei'
-                            : 'Inhaltsseite'
-                        }
+                        label={getTypeConfig(material.type).label}
                         size='small'
-                        color={
-                          material.type === 'SLIDE_CONTROL'
-                            ? 'secondary'
-                            : 'default'
-                        }
+                        color={getTypeConfig(material.type).color}
                       />
                     </TableCell>
                     <TableCell>
