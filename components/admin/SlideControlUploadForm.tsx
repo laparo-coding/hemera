@@ -9,7 +9,6 @@
 'use client';
 
 import {
-  ArrowBackOutlined,
   CloudUploadOutlined,
   DeleteOutlined,
   DescriptionOutlined,
@@ -20,6 +19,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  LinearProgress,
   TextField,
   Typography,
 } from '@mui/material';
@@ -78,10 +78,6 @@ export default function SlideControlUploadForm({
     );
     if (!hasValidExtension) {
       return 'Nur .html-Dateien sind erlaubt';
-    }
-    const mimeType = file.type?.toLowerCase() ?? '';
-    if (!mimeType.startsWith('text/html')) {
-      return 'Datei muss den Content-Type text/html haben';
     }
     if (file.size > MAX_FILE_SIZE) {
       return `Datei darf maximal ${MAX_FILE_SIZE / 1024 / 1024} MB groß sein`;
@@ -235,7 +231,6 @@ export default function SlideControlUploadForm({
             href={initialData.blobUrl}
             target='_blank'
             rel='noopener noreferrer'
-            component='a'
           >
             Herunterladen
           </Button>
@@ -291,6 +286,7 @@ export default function SlideControlUploadForm({
               aria-label='Datei wird hochgeladen'
               sx={{ color: colors.bronze, mb: 1 }}
             />
+            <LinearProgress sx={{ mt: 2, maxWidth: 300, mx: 'auto' }} />
           </Box>
         ) : (
           <Box>
@@ -351,37 +347,33 @@ export default function SlideControlUploadForm({
         </Box>
       )}
 
-      {/* Actions */}
-      <Box sx={{ display: 'flex', gap: 2 }}>
+      {/* Actions — same layout as CourseForm / MaterialForm */}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          mt: 2,
+        }}
+      >
+        <Button
+          variant='outlined'
+          color='primary'
+          onClick={onCancel}
+          disabled={isLoading}
+        >
+          Abbrechen
+        </Button>
         <Button
           type='submit'
           variant='contained'
+          color='primary'
           disabled={isLoading}
-          sx={{
-            backgroundColor: colors.bronze,
-            '&:hover': { backgroundColor: colors.bronzeHover },
-          }}
+          aria-busy={isLoading}
+          startIcon={isLoading ? <CircularProgress size={20} /> : null}
         >
-          {isLoading ? (
-            <CircularProgress
-              size={24}
-              sx={{ color: 'white' }}
-              aria-label='Ladevorgang läuft'
-              role='status'
-            />
-          ) : isEditMode ? (
-            'Speichern'
-          ) : (
-            'Steuerdatei anlegen'
-          )}
-        </Button>
-        <Button
-          variant='outlined'
-          onClick={onCancel}
-          disabled={isLoading}
-          startIcon={<ArrowBackOutlined />}
-        >
-          Abbrechen
+          {isLoading ? 'Wird gespeichert...' : 'Speichern'}
         </Button>
       </Box>
     </Box>
