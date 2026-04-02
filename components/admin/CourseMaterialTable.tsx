@@ -43,6 +43,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import type { MaterialType } from '@/lib/schemas/admin/course-material';
 import { normalizeForSearch } from '@/lib/utils/searchNormalization';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
@@ -50,7 +51,7 @@ interface CourseMaterial {
   id: string;
   identifier: string;
   title: string;
-  type: string;
+  type: MaterialType;
   createdAt: string;
   updatedAt: string;
 }

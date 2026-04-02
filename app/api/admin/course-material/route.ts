@@ -12,6 +12,7 @@ import {
   ALLOWED_FILE_EXTENSIONS,
   courseMaterialCreateSchema,
   generateSlug,
+  identifierSchema,
   MAX_FILE_SIZE,
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
@@ -27,19 +28,23 @@ async function validateAndResolveIdentifier(
   title: string,
   excludeId?: string
 ): Promise<{ identifier: string } | NextResponse> {
-  const identifier = providedIdentifier || generateSlug(title);
+  const rawIdentifier = providedIdentifier || generateSlug(title);
 
-  // Validate identifier is not empty
-  if (!identifier || identifier.length < 2) {
+  // Normalize and validate identifier using schema (includes toLowerCase and regex checks)
+  const validationResult = identifierSchema.safeParse(rawIdentifier);
+  if (!validationResult.success) {
     return NextResponse.json(
       {
         error: 'validation_error',
         message:
-          'Der generierte Identifier ist ungültig. Bitte einen Identifier manuell angeben.',
+          validationResult.error.issues[0]?.message ||
+          'Der Identifier ist ungültig. Bitte einen gültigen Identifier angeben.',
       },
       { status: 400 }
     );
   }
+
+  const identifier = validationResult.data;
 
   // Check identifier uniqueness
   if (await isIdentifierTaken(identifier, excludeId)) {
@@ -189,6 +194,17 @@ async function handleFormDataPost(request: NextRequest, userId: string | null) {
   if (!hasValidExtension) {
     return NextResponse.json(
       { error: 'validation_error', message: 'Nur .html-Dateien sind erlaubt' },
+      { status: 400 }
+    );
+  }
+
+  // Validate MIME type (tolerant: allow empty or text/html)
+  if (file.type && !file.type.toLowerCase().startsWith('text/html')) {
+    return NextResponse.json(
+      {
+        error: 'validation_error',
+        message: 'Datei muss den Content-Type text/html haben',
+      },
       { status: 400 }
     );
   }

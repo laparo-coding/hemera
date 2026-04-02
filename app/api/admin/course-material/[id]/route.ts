@@ -12,6 +12,7 @@ import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   ALLOWED_FILE_EXTENSIONS,
   courseMaterialUpdateSchema,
+  identifierSchema,
   MAX_FILE_SIZE,
 } from '@/lib/schemas/admin/course-material';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
@@ -174,18 +175,34 @@ async function handleFormDataPut(
   }
 
   // Handle identifier change
-  const newIdentifier = identifierField || existingMaterial.identifier;
+  let newIdentifier = existingMaterial.identifier;
   if (identifierField && identifierField !== existingMaterial.identifier) {
-    if (await isIdentifierTaken(identifierField, id)) {
+    // Normalize and validate identifier using schema
+    const validationResult = identifierSchema.safeParse(identifierField);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: 'validation_error',
+          message:
+            validationResult.error.issues[0]?.message ||
+            'Identifier muss aus Kleinbuchstaben, Zahlen und Bindestrichen bestehen',
+        },
+        { status: 400 }
+      );
+    }
+
+    const normalizedIdentifier = validationResult.data;
+    if (await isIdentifierTaken(normalizedIdentifier, id)) {
       return NextResponse.json(
         {
           error: 'conflict',
-          message: `Identifier "${identifierField}" ist bereits vergeben`,
+          message: `Identifier "${normalizedIdentifier}" ist bereits vergeben`,
         },
         { status: 409 }
       );
     }
-    updateData.identifier = identifierField;
+    newIdentifier = normalizedIdentifier;
+    updateData.identifier = normalizedIdentifier;
   }
 
   // Handle file upload replacement
