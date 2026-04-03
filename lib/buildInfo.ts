@@ -4,8 +4,11 @@
 // Importing JSON works with TypeScript's resolveJsonModule and Next.js bundling
 import pkgJson from '../package.json';
 
-// Cache git SHA at module scope so execSync runs at most once
+// Cache git SHA at module scope so execSync runs at most once (dev only)
 const cachedLocalSha: string | undefined = (() => {
+  if (typeof window !== 'undefined' || process.env.NODE_ENV === 'production') {
+    return undefined;
+  }
   try {
     const { execSync } = require('node:child_process');
     const sha = execSync('git rev-parse HEAD', {
