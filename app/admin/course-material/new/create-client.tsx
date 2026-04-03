@@ -104,7 +104,7 @@ export default function CreateCourseMaterialClient() {
           <Link
             href='/admin'
             underline='hover'
-            color='inherit'
+            color='text.primary'
             sx={{ cursor: 'pointer' }}
           >
             Admin
@@ -112,7 +112,7 @@ export default function CreateCourseMaterialClient() {
           <Link
             href='/admin/course-material'
             underline='hover'
-            color='inherit'
+            color='text.primary'
             sx={{ cursor: 'pointer' }}
           >
             Seminarmaterial

@@ -84,6 +84,24 @@ export const colors = {
 
   /** Rosy pink – delete/warning icon accent */
   rosyPink: '#E8B4B8',
+
+  /** Status green – healthy / success indicators */
+  statusHealthy: '#2E7D32',
+
+  /** Status green light – healthy chip background */
+  statusHealthyBg: 'rgba(46, 125, 50, 0.12)',
+
+  /** Status amber – degraded / warning indicators */
+  statusDegraded: '#ED6C02',
+
+  /** Status amber light – degraded chip background */
+  statusDegradedBg: 'rgba(237, 108, 2, 0.12)',
+
+  /** Status red – unhealthy / error indicators */
+  statusUnhealthy: '#D32F2F',
+
+  /** Status red light – unhealthy chip background */
+  statusUnhealthyBg: 'rgba(211, 47, 47, 0.12)',
 } as const;
 
 export type ColorKey = keyof typeof colors;

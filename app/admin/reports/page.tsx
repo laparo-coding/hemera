@@ -25,6 +25,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { AdminPageContainer } from '@/components/admin/AdminPageContainer';
 import { ADMIN_LABELS } from '@/lib/constants/admin';
+import { colors } from '@/lib/design-tokens';
 import type {
   AdminReportsResponse,
   HealthStatus,
@@ -41,21 +42,36 @@ function getStatusLabel(status: string): string {
   return STATUS_LABELS[status] ?? status;
 }
 
+const statusStyles = {
+  healthy: {
+    color: colors.statusHealthy,
+    backgroundColor: colors.statusHealthyBg,
+  },
+  degraded: {
+    color: colors.statusDegraded,
+    backgroundColor: colors.statusDegradedBg,
+  },
+  unhealthy: {
+    color: colors.statusUnhealthy,
+    backgroundColor: colors.statusUnhealthyBg,
+  },
+} as const;
+
+function getStatusStyle(status: string) {
+  return (
+    statusStyles[status as keyof typeof statusStyles] ?? statusStyles.unhealthy
+  );
+}
+
 function ServiceHealthChip({ service }: { service: ServiceHealth }) {
-  const statusColor =
-    service.status === 'healthy'
-      ? 'success'
-      : service.status === 'degraded'
-        ? 'warning'
-        : 'error';
+  const style = getStatusStyle(service.status);
 
   return (
     <Chip
       data-testid={`health-status-${service.name}`}
       label={`${service.nameDe}: ${getStatusLabel(service.status)}`}
-      color={statusColor}
       size='small'
-      sx={{ mr: 1, mb: 1 }}
+      sx={{ mr: 1, mb: 1, fontWeight: 500, ...style }}
     />
   );
 }
@@ -347,43 +363,27 @@ export default function ReportsPage() {
                 </Typography>
                 <Chip
                   label={getStatusLabel(health.overall)}
-                  color={
-                    health.overall === 'healthy'
-                      ? 'success'
-                      : health.overall === 'degraded'
-                        ? 'warning'
-                        : 'error'
-                  }
                   size='small'
+                  sx={{ fontWeight: 500, ...getStatusStyle(health.overall) }}
                 />
               </Box>
 
-              <Typography variant='body2' component='span' sx={{ mr: 1 }}>
-                Dienste:
-              </Typography>
-              <Box sx={{ mb: 2 }}>
+              <Box
+                sx={{
+                  mb: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 0.5,
+                }}
+              >
+                <Typography variant='body2' component='span' sx={{ mr: 0.5 }}>
+                  Dienste:
+                </Typography>
                 {Object.values(health.services).map(service => (
                   <ServiceHealthChip key={service.name} service={service} />
                 ))}
               </Box>
-
-              {health.build && (
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant='body2' color='text.secondary'>
-                    Version: {health.build.version}
-                  </Typography>
-                  {health.build.commitSha && (
-                    <Typography variant='body2' color='text.secondary'>
-                      Commit: {health.build.commitSha.slice(0, 7)}
-                    </Typography>
-                  )}
-                  {health.build.environment && (
-                    <Typography variant='body2' color='text.secondary'>
-                      Umgebung: {health.build.environment}
-                    </Typography>
-                  )}
-                </Box>
-              )}
 
               <Typography variant='body2' color='text.secondary'>
                 Zuletzt aktualisiert:{' '}

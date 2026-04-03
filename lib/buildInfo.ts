@@ -25,6 +25,21 @@ function getCommitSha(): string | undefined {
   const gha = process.env.GITHUB_SHA;
   if (gha && gha.trim().length > 0) return gha.trim();
 
+  // Fallback: Read current Git commit from CLI for local development
+  // This only works on the server side (not during Next.js client rendering)
+  if (typeof window === 'undefined') {
+    try {
+      const { execSync } = require('node:child_process');
+      const sha = execSync('git rev-parse HEAD', {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'ignore'],
+      });
+      if (sha && sha.trim().length > 0) return sha.trim();
+    } catch {
+      // Git not available or not in a git repo - return undefined
+    }
+  }
+
   return undefined;
 }
 

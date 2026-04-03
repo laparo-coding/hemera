@@ -99,13 +99,13 @@ export default function EditLocationClient({
       <Breadcrumbs sx={{ mb: 2 }}>
         <Link
           href='/admin'
-          style={{ textDecoration: 'none', color: 'inherit' }}
+          style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
         >
           Admin
         </Link>
         <Link
           href='/admin/locations'
-          style={{ textDecoration: 'none', color: 'inherit' }}
+          style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
         >
           Locations
         </Link>

@@ -61,7 +61,7 @@ export function AdminBreadcrumb({ items }: AdminBreadcrumbProps) {
             key={item.href}
             component={Link}
             href={item.href}
-            color='inherit'
+            color='text.primary'
             underline='hover'
             sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
           >
