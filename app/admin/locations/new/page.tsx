@@ -15,7 +15,6 @@ import {
   Typography,
 } from '@mui/material';
 import type { Metadata } from 'next';
-import NextLink from 'next/link';
 import NewLocationForm from './NewLocationForm';
 
 export const metadata: Metadata = {
@@ -27,20 +26,10 @@ export default function NewLocationPage() {
   return (
     <Container maxWidth='md' sx={{ py: 4 }}>
       <Breadcrumbs sx={{ mb: 2 }}>
-        <MuiLink
-          component={NextLink}
-          href='/admin'
-          underline='hover'
-          color='text.primary'
-        >
+        <MuiLink href='/admin' underline='hover' color='text.primary'>
           Admin
         </MuiLink>
-        <MuiLink
-          component={NextLink}
-          href='/admin/locations'
-          underline='hover'
-          color='text.primary'
-        >
+        <MuiLink href='/admin/locations' underline='hover' color='text.primary'>
           Locations
         </MuiLink>
         <Typography color='text.primary'>Neu</Typography>
