@@ -4,6 +4,21 @@
 // Importing JSON works with TypeScript's resolveJsonModule and Next.js bundling
 import pkgJson from '../package.json';
 
+// Cache git SHA at module scope so execSync runs at most once
+const cachedLocalSha: string | undefined = (() => {
+  try {
+    const { execSync } = require('node:child_process');
+    const sha = execSync('git rev-parse HEAD', {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'ignore'],
+    });
+    if (sha && sha.trim().length > 0) return sha.trim();
+  } catch {
+    // Git not available or not in a git repo
+  }
+  return undefined;
+})();
+
 export type BuildInfo = {
   version: string;
   commitSha?: string;
@@ -25,19 +40,9 @@ function getCommitSha(): string | undefined {
   const gha = process.env.GITHUB_SHA;
   if (gha && gha.trim().length > 0) return gha.trim();
 
-  // Fallback: Read current Git commit from CLI for local development
-  // This only works on the server side (not during Next.js client rendering)
-  if (typeof window === 'undefined') {
-    try {
-      const { execSync } = require('node:child_process');
-      const sha = execSync('git rev-parse HEAD', {
-        encoding: 'utf8',
-        stdio: ['pipe', 'pipe', 'ignore'],
-      });
-      if (sha && sha.trim().length > 0) return sha.trim();
-    } catch {
-      // Git not available or not in a git repo - return undefined
-    }
+  // Fallback: Read current Git commit from CLI for local development only
+  if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production') {
+    return cachedLocalSha;
   }
 
   return undefined;

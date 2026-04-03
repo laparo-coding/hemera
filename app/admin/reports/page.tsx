@@ -29,6 +29,7 @@ import { colors } from '@/lib/design-tokens';
 import type {
   AdminReportsResponse,
   HealthStatus,
+  HealthStatusLevel,
   ServiceHealth,
 } from '@/lib/types/admin';
 
@@ -57,10 +58,8 @@ const statusStyles = {
   },
 } as const;
 
-function getStatusStyle(status: string) {
-  return (
-    statusStyles[status as keyof typeof statusStyles] ?? statusStyles.unhealthy
-  );
+function getStatusStyle(status: HealthStatusLevel) {
+  return statusStyles[status] ?? statusStyles.unhealthy;
 }
 
 function ServiceHealthChip({ service }: { service: ServiceHealth }) {
@@ -71,7 +70,7 @@ function ServiceHealthChip({ service }: { service: ServiceHealth }) {
       data-testid={`health-status-${service.name}`}
       label={`${service.nameDe}: ${getStatusLabel(service.status)}`}
       size='small'
-      sx={{ mr: 1, mb: 1, fontWeight: 500, ...style }}
+      sx={{ fontWeight: 500, ...style }}
     />
   );
 }

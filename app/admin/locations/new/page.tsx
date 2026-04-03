@@ -7,9 +7,15 @@
  * This page follows the Server Component + Client Child pattern.
  */
 
-import { Box, Breadcrumbs, Container, Typography } from '@mui/material';
+import {
+  Box,
+  Breadcrumbs,
+  Container,
+  Link as MuiLink,
+  Typography,
+} from '@mui/material';
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import NewLocationForm from './NewLocationForm';
 
 export const metadata: Metadata = {
@@ -21,18 +27,22 @@ export default function NewLocationPage() {
   return (
     <Container maxWidth='md' sx={{ py: 4 }}>
       <Breadcrumbs sx={{ mb: 2 }}>
-        <Link
+        <MuiLink
+          component={NextLink}
           href='/admin'
-          style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
+          underline='hover'
+          color='text.primary'
         >
           Admin
-        </Link>
-        <Link
+        </MuiLink>
+        <MuiLink
+          component={NextLink}
           href='/admin/locations'
-          style={{ textDecoration: 'none', color: 'rgba(0, 0, 0, 0.87)' }}
+          underline='hover'
+          color='text.primary'
         >
           Locations
-        </Link>
+        </MuiLink>
         <Typography color='text.primary'>Neu</Typography>
       </Breadcrumbs>
 
