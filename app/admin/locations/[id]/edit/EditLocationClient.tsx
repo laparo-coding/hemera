@@ -14,6 +14,7 @@ import {
   Breadcrumbs,
   Button,
   Container,
+  Link as MuiLink,
   Paper,
   Typography,
 } from '@mui/material';
@@ -97,18 +98,22 @@ export default function EditLocationClient({
   return (
     <Container maxWidth='md' sx={{ py: 4 }}>
       <Breadcrumbs sx={{ mb: 2 }}>
-        <Link
+        <MuiLink
+          component={Link}
           href='/admin'
-          style={{ textDecoration: 'none', color: 'inherit' }}
+          underline='hover'
+          color='text.primary'
         >
           Admin
-        </Link>
-        <Link
+        </MuiLink>
+        <MuiLink
+          component={Link}
           href='/admin/locations'
-          style={{ textDecoration: 'none', color: 'inherit' }}
+          underline='hover'
+          color='text.primary'
         >
           Locations
-        </Link>
+        </MuiLink>
         <Typography color='text.primary'>Bearbeiten</Typography>
       </Breadcrumbs>
 
