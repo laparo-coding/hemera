@@ -7,7 +7,10 @@ const config: Config = {
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
-      { useESM: true, tsconfig: { jsx: 'react-jsx' } },
+      {
+        useESM: true,
+        tsconfig: { jsx: 'react-jsx', rootDir: '.', ignoreDeprecations: '6.0' },
+      },
     ],
   },
   moduleNameMapper: {
