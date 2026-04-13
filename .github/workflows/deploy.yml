@@ -232,7 +232,7 @@ jobs:
 
       - name: Comment PR with Preview URL
         if: github.event_name == 'pull_request' && steps.deploy.outputs.url != ''
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             github.rest.issues.createComment({
@@ -262,7 +262,7 @@ jobs:
     steps:
       - name: Create deployment
         id: deployment
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             let deploymentId = null;
@@ -309,7 +309,7 @@ jobs:
 
       - name: Create deployment status (success)
         if: steps.deployment.outputs.deployment_id
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const deploymentId = ${{ steps.deployment.outputs.deployment_id }};
@@ -331,7 +331,7 @@ jobs:
 
       - name: Comment PR
         if: steps.deployment.outputs.deployment_id
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.issues.createComment({

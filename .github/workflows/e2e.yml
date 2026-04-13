@@ -291,7 +291,7 @@ jobs:
       - name: Comment E2E result on PR
         if: github.event_name == 'pull_request'
         continue-on-error: true
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           BASE_URL: ${{ steps.basecheck.outputs.final_base }}
           OUTCOME: ${{ steps.e2e.outcome }}
