@@ -72,7 +72,7 @@
     "@emotion/styled": "^11.13.0",
     "@floating-ui/dom": "^1.7.6",
     "@hookform/resolvers": "^5.2.2",
-    "@mui/icons-material": "^7.3.9",
+    "@mui/icons-material": "^9.0.0",
     "@mui/material": "^7.3.4",
     "@mux/mux-player-react": "^3.11.7",
     "@prisma/adapter-pg": "^7.6.0",
