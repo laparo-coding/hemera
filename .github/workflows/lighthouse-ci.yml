@@ -108,7 +108,7 @@ jobs:
       - name: Summarize Lighthouse results
         if: always() && steps.target.outputs.url != ''
         id: summarize
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
@@ -159,7 +159,7 @@ jobs:
       - name: Resolve PR number
         if: always()
         id: prnum
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             if (context.eventName === 'pull_request') {

@@ -68,7 +68,7 @@ jobs:
 
       - name: Comment schema on PR
         if: ${{ github.event.action != 'closed' }}
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           SCHEMA: ${{ env.SCHEMA }}
         with:
