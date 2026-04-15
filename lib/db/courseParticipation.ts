@@ -62,6 +62,8 @@ export interface DebriefingInput {
 
 /** Input for result data */
 export interface ResultInput {
+  resultDate?: Date | null;
+  resultNegotiationPartner?: string | null;
   resultOutcome?: string;
   resultNotes?: string;
 }
@@ -382,8 +384,25 @@ export async function updateResult(
   return prisma.courseParticipation.update({
     where: { id: participationId },
     data: {
+      resultDate: input.resultDate,
+      resultNegotiationPartner: input.resultNegotiationPartner,
       resultOutcome: input.resultOutcome,
       resultNotes: input.resultNotes,
+    },
+  });
+}
+
+export async function loadNegotiationResult(participationId: string): Promise<{
+  resultDate: Date | null;
+  resultNegotiationPartner: string | null;
+  resultOutcome: string | null;
+} | null> {
+  return prisma.courseParticipation.findUnique({
+    where: { id: participationId },
+    select: {
+      resultDate: true,
+      resultNegotiationPartner: true,
+      resultOutcome: true,
     },
   });
 }

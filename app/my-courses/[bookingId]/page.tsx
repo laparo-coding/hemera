@@ -1,8 +1,9 @@
 /**
  * User Course Detail Page
  *
- * Displays detailed information about a specific booked course.
- * Shows preparation materials, participation data, or debriefing info
+          Dein Profil konnte nicht geladen werden. Bitte{' '}
+          <Link href={`/my-courses/${bookingId}`}>lade die Seite neu</Link>,
+          um einen Erfahrungsbericht zu schreiben.
  * depending on course status.
  * Feature: 017-testimonial-management - Testimonial form for completed courses
  */

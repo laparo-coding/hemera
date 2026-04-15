@@ -10,6 +10,7 @@
 import HomeIcon from '@mui/icons-material/Home';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Breadcrumbs, Link as MuiLink, Typography } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material/styles';
 import Link from 'next/link';
 import { ADMIN_LABELS, ADMIN_ROUTES } from '@/lib/constants/admin';
 import type { BreadcrumbItem } from '@/lib/types/admin';
@@ -18,6 +19,12 @@ interface AdminBreadcrumbProps {
   /** Breadcrumb items to display. Dashboard is always prepended. */
   items: BreadcrumbItem[];
 }
+
+const breadcrumbTextSx: SxProps<Theme> = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 0.5,
+};
 
 export function AdminBreadcrumb({ items }: AdminBreadcrumbProps) {
   // Always include dashboard as first item
@@ -47,7 +54,7 @@ export function AdminBreadcrumb({ items }: AdminBreadcrumbProps) {
             <Typography
               key={item.href}
               color='text.primary'
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+              sx={breadcrumbTextSx}
             >
               {isFirst && <HomeIcon fontSize='small' />}
               {item.label}
@@ -63,7 +70,7 @@ export function AdminBreadcrumb({ items }: AdminBreadcrumbProps) {
             href={item.href}
             color='text.primary'
             underline='hover'
-            sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+            sx={breadcrumbTextSx}
           >
             {isFirst && <HomeIcon fontSize='small' />}
             {item.label}

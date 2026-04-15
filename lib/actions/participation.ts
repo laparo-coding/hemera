@@ -45,11 +45,14 @@ import {
   withServerActionErrorHandling,
 } from '../middleware/server-action-error-handling';
 import { serverInstance } from '../monitoring/rollbar-official';
+import { isNegotiationPartner } from '../types/participation';
 import {
   deleteResume,
   type ResumeUploadResult,
   uploadResume,
 } from '../utils/resumeUpload';
+
+const STRICT_ISO_8601_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 // ============================================================================
 // Types
@@ -86,6 +89,7 @@ export type {
   ParticipationWithRelations,
   ResolvedSummaryAsset,
 } from '../db/courseParticipation';
+export { loadNegotiationResult } from '../db/courseParticipation';
 
 // ============================================================================
 // Authorization Helpers
@@ -640,6 +644,135 @@ export async function completeResultAction(
       success: false,
       error: {
         code: 'RESULT_COMPLETE_FAILED',
+        message,
+      },
+    };
+  }
+}
+
+export async function saveNegotiationResultAction(params: {
+  bookingId: string;
+  resultDate?: string | null;
+  resultNegotiationPartner?: string | null;
+  resultOutcome?: string | null;
+}): Promise<ServerActionResult> {
+  try {
+    const { userId, participation } = await verifyParticipationOwnership(
+      params.bookingId
+    );
+
+    const trimmedPartner = params.resultNegotiationPartner?.trim() || null;
+    if (trimmedPartner && !isNegotiationPartner(trimmedPartner)) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_NEGOTIATION_PARTNER',
+          message: 'Ungültiger Verhandlungspartner',
+        },
+      };
+    }
+
+    const trimmedOutcome = params.resultOutcome?.trim() || null;
+    if (trimmedOutcome && trimmedOutcome.length > 2000) {
+      return {
+        success: false,
+        error: {
+          code: 'OUTCOME_TOO_LONG',
+          message:
+            'Das Verhandlungsergebnis darf maximal 2000 Zeichen lang sein',
+        },
+      };
+    }
+
+    let parsedDate: Date | null = null;
+    if (params.resultDate) {
+      if (!STRICT_ISO_8601_REGEX.test(params.resultDate)) {
+        return {
+          success: false,
+          error: {
+            code: 'INVALID_DATE',
+            message: 'Ungültiges Datum',
+          },
+        };
+      }
+
+      const [year, month, day] = params.resultDate.split('-').map(Number);
+      if (!year || !month || !day) {
+        return {
+          success: false,
+          error: {
+            code: 'INVALID_DATE',
+            message: 'Ungültiges Datum',
+          },
+        };
+      }
+
+      parsedDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+      const roundTrip = [
+        parsedDate.getUTCFullYear(),
+        String(parsedDate.getUTCMonth() + 1).padStart(2, '0'),
+        String(parsedDate.getUTCDate()).padStart(2, '0'),
+      ].join('-');
+
+      if (roundTrip !== params.resultDate) {
+        return {
+          success: false,
+          error: {
+            code: 'INVALID_DATE',
+            message: 'Ungültiges Datum',
+          },
+        };
+      }
+
+      const today = new Date();
+      const todayUtc = new Date(
+        Date.UTC(
+          today.getUTCFullYear(),
+          today.getUTCMonth(),
+          today.getUTCDate(),
+          12,
+          0,
+          0
+        )
+      );
+
+      if (parsedDate.getTime() > todayUtc.getTime()) {
+        return {
+          success: false,
+          error: {
+            code: 'DATE_IN_FUTURE',
+            message: 'Das Datum darf nicht in der Zukunft liegen',
+          },
+        };
+      }
+    }
+
+    await updateResult(participation.id, {
+      resultDate: parsedDate,
+      resultNegotiationPartner: trimmedPartner,
+      resultOutcome: trimmedOutcome ?? undefined,
+    });
+
+    serverInstance.info('Negotiation result saved', {
+      bookingId: params.bookingId,
+      participationId: participation.id,
+      userId,
+    });
+
+    revalidatePath('/my-courses');
+    revalidatePath(`/my-courses/${params.bookingId}`);
+
+    return { success: true };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Unbekannter Fehler';
+    serverInstance.error('Failed to save negotiation result', error as Error, {
+      bookingId: params.bookingId,
+    });
+    return {
+      success: false,
+      error: {
+        code: 'NEGOTIATION_RESULT_SAVE_FAILED',
         message,
       },
     };

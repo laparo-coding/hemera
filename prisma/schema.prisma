@@ -182,6 +182,8 @@ model CourseParticipation {
   summaryCompletedAt    DateTime?             @map("summary_completed_at")
   debriefingPlan        String?               @map("debriefing_plan") @db.VarChar(2000)
   salaryDiscussionMonth String?               @map("salary_discussion_month") @db.VarChar(7)
+  resultDate            DateTime?             @map("result_date")
+  resultNegotiationPartner String?            @map("result_negotiation_partner") @db.VarChar(30)
   resultOutcome         String?               @map("result_outcome") @db.VarChar(2000)
   resultNotes           String?               @map("result_notes") @db.VarChar(2000)
   resultCompletedAt     DateTime?             @map("result_completed_at")
