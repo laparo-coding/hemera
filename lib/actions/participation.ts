@@ -89,7 +89,6 @@ export type {
   ParticipationWithRelations,
   ResolvedSummaryAsset,
 } from '../db/courseParticipation';
-export { loadNegotiationResult } from '../db/courseParticipation';
 
 // ============================================================================
 // Authorization Helpers
