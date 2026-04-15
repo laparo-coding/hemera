@@ -151,7 +151,10 @@ export default function ClerkProviderWrapper({
   if (bypass) {
     if (reason) {
       // Only log in development - this is expected behavior in test mode
-      if (process.env.NODE_ENV === 'development') {
+      if (
+        process.env.NODE_ENV === 'development' &&
+        reason !== 'E2E test mode'
+      ) {
         logClientWarning('[ClerkProviderWrapper] Clerk bypassed', { reason });
       }
     }

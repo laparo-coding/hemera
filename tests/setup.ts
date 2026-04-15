@@ -44,7 +44,7 @@ if (typeof globalThis.TransformStream === 'undefined') {
     ];
     for (const p of envCandidates) {
       if (fs.existsSync(p)) {
-        dotenv.config({ path: p });
+        dotenv.config({ path: p, quiet: true });
         if (process.env.DATABASE_URL) break;
       }
     }

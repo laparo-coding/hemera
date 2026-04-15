@@ -3,14 +3,6 @@ import { expect, test } from '@playwright/test';
 const ALIGNMENT_TOLERANCE_PX = 2;
 const STEPPER_WAIT_TIMEOUT_MS = 15000;
 
-function getRoundedTop(element: Element | null): number | null {
-  if (!element) {
-    return null;
-  }
-
-  return Math.round(element.getBoundingClientRect().top * 10) / 10;
-}
-
 test('screenshot stepper-debug page and verify label alignment', async ({ page }) => {
   await page.goto('/e2e/stepper-debug');
   const progressLocator = page.locator('[aria-label="Dein Fortschritt"]');
@@ -19,6 +11,14 @@ test('screenshot stepper-debug page and verify label alignment', async ({ page }
 
   // Also measure alignment
   const data = await page.evaluate(() => {
+    const getRoundedTop = (element: Element | null): number | null => {
+      if (!element) {
+        return null;
+      }
+
+      return Math.round(element.getBoundingClientRect().top * 10) / 10;
+    };
+
     const steppers = document.querySelectorAll('[aria-label="Dein Fortschritt"]');
     const all: Array<{ stepper: number; labels: (number | null)[]; delta: number }> = [];
     steppers.forEach((stepper, si) => {
