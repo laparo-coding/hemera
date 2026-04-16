@@ -11,20 +11,14 @@ import {
   ArrowForwardOutlined,
   CalendarTodayOutlined,
   LocationOnOutlined,
-  RateReviewOutlined,
   ScheduleOutlined,
   SchoolOutlined,
 } from '@mui/icons-material';
 import { Box, Button, Chip, Paper, Stack, Typography } from '@mui/material';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useState } from 'react';
 import { colors } from '@/lib/design-tokens';
 import InvoiceDownloadButton from './InvoiceDownloadButton';
-
-const TestimonialDrawer = dynamic(() => import('./TestimonialDrawer'), {
-  ssr: false,
-});
+import TestimonialButton from './TestimonialButton';
 
 export interface CourseCardProps {
   id: string;
@@ -152,7 +146,6 @@ export default function CourseCard({
   sectionType,
   userProfile,
 }: CourseCardProps) {
-  const [testimonialOpen, setTestimonialOpen] = useState(false);
   const showTestimonialButton =
     sectionType === 'COMPLETED' && userProfile != null;
   const dateText = formatDateRange(startDate, endDate);
@@ -358,37 +351,15 @@ export default function CourseCard({
         {/* Actions */}
         <Stack sx={{ flexShrink: 0, alignItems: 'flex-end' }} spacing={1}>
           {getPrimaryAction()}
-          {showTestimonialButton && (
-            <Button
-              variant='outlined'
-              color='primary'
-              startIcon={<RateReviewOutlined />}
-              onClick={() => setTestimonialOpen(true)}
-              sx={{
-                fontFamily: '"Inter", sans-serif',
-                fontWeight: 600,
-                fontSize: '0.875rem',
-                textTransform: 'none',
-                borderRadius: '8px',
-                px: 3,
-                py: 1,
-              }}
-            >
-              Erfahrungsbericht
-            </Button>
+          {showTestimonialButton && userProfile && (
+            <TestimonialButton
+              bookingId={bookingId}
+              courseName={courseTitle}
+              userProfile={userProfile}
+            />
           )}
         </Stack>
       </Stack>
-
-      {showTestimonialButton && userProfile && (
-        <TestimonialDrawer
-          open={testimonialOpen}
-          onClose={() => setTestimonialOpen(false)}
-          bookingId={bookingId}
-          courseName={courseTitle}
-          userProfile={userProfile}
-        />
-      )}
     </Paper>
   );
 }

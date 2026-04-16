@@ -56,21 +56,20 @@ export class ApiLogger {
         context: this.requestContext,
         timestamp: new Date().toISOString(),
       });
-    }
 
-    // Track error event in analytics
-    analytics.trackEvent(
-      this.requestContext.id,
-      'api_error',
-      {
-        message,
-        errorType: error?.name,
-        route: this.requestContext.url,
-        method: this.requestContext.method,
-        data,
-      },
-      this.requestContext
-    );
+      analytics.trackEvent(
+        this.requestContext.id,
+        'api_error',
+        {
+          message,
+          errorType: error?.name,
+          route: this.requestContext.url,
+          method: this.requestContext.method,
+          data,
+        },
+        this.requestContext
+      );
+    }
   }
 
   /**
@@ -84,20 +83,19 @@ export class ApiLogger {
         context: this.requestContext,
         timestamp: new Date().toISOString(),
       });
-    }
 
-    // Track warning event in analytics
-    analytics.trackEvent(
-      this.requestContext.id,
-      'api_warning',
-      {
-        message,
-        route: this.requestContext.url,
-        method: this.requestContext.method,
-        data,
-      },
-      this.requestContext
-    );
+      analytics.trackEvent(
+        this.requestContext.id,
+        'api_warning',
+        {
+          message,
+          route: this.requestContext.url,
+          method: this.requestContext.method,
+          data,
+        },
+        this.requestContext
+      );
+    }
   }
 
   /**
@@ -138,26 +136,30 @@ export class ApiLogger {
    * Track request completion with performance metrics
    */
   trackRequestCompletion(statusCode: number): void {
-    analytics.trackPerformance(
-      this.requestContext.id,
-      this.requestContext.url,
-      this.requestContext.method,
-      this.startTime,
-      statusCode,
-      this.requestContext
-    );
+    if (!this.isTestRuntime()) {
+      analytics.trackPerformance(
+        this.requestContext.id,
+        this.requestContext.url,
+        this.requestContext.method,
+        this.startTime,
+        statusCode,
+        this.requestContext
+      );
+    }
   }
 
   /**
    * Track custom business event
    */
   trackBusinessEvent(eventType: string, data: Record<string, unknown>): void {
-    analytics.trackEvent(
-      this.requestContext.id,
-      eventType,
-      data,
-      this.requestContext
-    );
+    if (!this.isTestRuntime()) {
+      analytics.trackEvent(
+        this.requestContext.id,
+        eventType,
+        data,
+        this.requestContext
+      );
+    }
   }
 }
 

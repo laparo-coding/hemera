@@ -88,6 +88,8 @@ const allSteps: StepDefinition[] = [
   },
 ];
 
+const orderedStepKeys = allSteps.map(step => step.key);
+
 // Map participation status to step index
 function getStepIndex(status: string, steps: StepDefinition[]): number {
   const statusToStep: Record<string, string> = {
@@ -104,8 +106,21 @@ function getStepIndex(status: string, steps: StepDefinition[]): number {
     return steps.length; // All steps completed
   }
 
-  const index = steps.findIndex(s => s.key === currentStep);
-  return index >= 0 ? index : 0;
+  const visibleIndex = steps.findIndex(s => s.key === currentStep);
+  if (visibleIndex >= 0) {
+    return visibleIndex;
+  }
+
+  const currentOrder = orderedStepKeys.indexOf(currentStep as StepKey);
+  if (currentOrder < 0) {
+    return 0;
+  }
+
+  const nextVisibleIndex = steps.findIndex(
+    step => orderedStepKeys.indexOf(step.key) > currentOrder
+  );
+
+  return nextVisibleIndex >= 0 ? nextVisibleIndex : steps.length;
 }
 
 interface CourseParticipationStepperProps {
