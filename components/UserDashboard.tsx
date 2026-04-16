@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { TERMS } from '@/lib/constants';
 import { colors } from '@/lib/design-tokens';
+import { ErrorSeverity, reportError } from '@/lib/monitoring/rollbar-official';
 import {
   type BookingForCategorization,
   categorizeBookings as categorizeBookingsUtil,
@@ -30,9 +31,9 @@ import {
   UserPageContainer,
 } from './dashboard';
 
-const ParticipationStatusSchema = z.nativeEnum(ParticipationStatus).nullable();
+const participationStatusSchema = z.nativeEnum(ParticipationStatus).nullable();
 
-const BookingSchema = z.object({
+const bookingSchema = z.object({
   id: z.string(),
   courseId: z.string(),
   courseTitle: z.string(),
@@ -48,14 +49,14 @@ const BookingSchema = z.object({
   locationSlug: z.string().nullable(),
   locationCity: z.string().nullable(),
   hasParticipation: z.boolean(),
-  participationStatus: ParticipationStatusSchema,
+  participationStatus: participationStatusSchema,
   stripeInvoicePdfUrl: z.string().nullable(),
 });
 
-const BookingsResponseSchema = z.object({
+const bookingsResponseSchema = z.object({
   success: z.literal(true),
   data: z.object({
-    bookings: z.array(BookingSchema),
+    bookings: z.array(bookingSchema),
     pagination: z
       .object({
         page: z.number(),
@@ -67,7 +68,7 @@ const BookingsResponseSchema = z.object({
   }),
 });
 
-type Booking = z.infer<typeof BookingSchema>;
+type Booking = z.infer<typeof bookingSchema>;
 
 function logBookingsValidationError(
   flattenedError: ReturnType<z.ZodError['flatten']>
@@ -78,28 +79,23 @@ function logBookingsValidationError(
     process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0';
 
   if (!isRollbarDisabled) {
-    void import('rollbar')
-      .then(Rollbar =>
-        import('@/lib/monitoring/rollbar-official').then(({ clientConfig }) => {
-          try {
-            const rollbar = new Rollbar.default(clientConfig);
-            rollbar.error(new Error('Invalid bookings response'), {
-              custom: {
-                source: 'UserDashboard.fetchBookings',
-                validationErrors: flattenedError,
-              },
-            });
-          } catch {
-            // ignore reporting errors
-          }
-        })
-      )
-      .catch(() => {
-        if (process.env.NODE_ENV !== 'production') {
-          // biome-ignore lint/suspicious/noConsole: Development fallback when client monitoring is unavailable
-          console.error('Invalid bookings response', flattenedError);
-        }
-      });
+    try {
+      reportError(
+        new Error('Invalid bookings response'),
+        {
+          additionalData: {
+            source: 'UserDashboard.fetchBookings',
+            validationErrors: flattenedError,
+          },
+        },
+        ErrorSeverity.WARNING
+      );
+    } catch {
+      if (process.env.NODE_ENV !== 'production') {
+        // biome-ignore lint/suspicious/noConsole: Development fallback when monitoring is unavailable
+        console.error('Invalid bookings response', flattenedError);
+      }
+    }
 
     return;
   }
@@ -331,7 +327,7 @@ const UserDashboardClerk: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
-        const parsedData = BookingsResponseSchema.safeParse(data);
+        const parsedData = bookingsResponseSchema.safeParse(data);
         if (!parsedData.success) {
           logBookingsValidationError(parsedData.error.flatten());
           throw new Error('Ungültige Buchungsdaten erhalten');

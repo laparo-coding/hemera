@@ -18,7 +18,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '../../../lib/db/prisma';
+import DebriefingSection from './DebriefingSection';
 import PreparationSection from './PreparationSection';
+import ResultsSection from './ResultsSection';
 
 export const metadata: Metadata = {
   title: 'Seminardetails - Hemera Academy',
@@ -322,11 +324,18 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
       </Paper>
 
       {/* Section-specific content */}
-      {(sectionType === 'UPCOMING' || sectionType === 'COMPLETED') && (
+      {sectionType === 'UPCOMING' && (
         <PreparationSection
           bookingId={booking.id}
           hasParticipation={hasParticipation}
         />
+      )}
+
+      {sectionType === 'COMPLETED' && participation && (
+        <>
+          <ResultsSection participation={participation} />
+          <DebriefingSection courseId={course.id} bookingId={booking.id} />
+        </>
       )}
 
       {sectionType === 'NO_SHOW' && (

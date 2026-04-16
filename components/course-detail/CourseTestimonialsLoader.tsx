@@ -37,11 +37,12 @@ export function CourseTestimonialsLoader({
 
   useEffect(() => {
     let isMounted = true;
+    const normalizedCourseIdOrSlug = courseIdOrSlug.trim();
 
     async function loadTestimonials() {
       try {
         const res = await fetch(
-          `/api/courses/${encodeURIComponent(courseIdOrSlug)}/testimonials?limit=6`,
+          `/api/courses/${encodeURIComponent(normalizedCourseIdOrSlug)}/testimonials?limit=6`,
           {
             method: 'GET',
             headers: {
@@ -71,8 +72,10 @@ export function CourseTestimonialsLoader({
     }
 
     // Nur laden, wenn wir noch keinen Versuch gemacht haben
-    if (!hasTried && courseIdOrSlug) {
+    if (!hasTried && normalizedCourseIdOrSlug) {
       void loadTestimonials();
+    } else if (!hasTried && !normalizedCourseIdOrSlug) {
+      setHasTried(true);
     }
 
     return () => {

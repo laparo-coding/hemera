@@ -220,7 +220,6 @@ export default function InvoiceDownloadButton({
       type='button'
       underline='hover'
       onClick={handleClick}
-      disabled={buttonDisabled}
       aria-disabled={buttonDisabled}
       aria-label={buttonText}
       aria-busy={isLoading}
@@ -233,6 +232,7 @@ export default function InvoiceDownloadButton({
         fontWeight: 500,
         fontSize: '0.875rem',
         cursor: buttonDisabled ? 'not-allowed' : 'pointer',
+        pointerEvents: buttonDisabled ? 'none' : 'auto',
         opacity: buttonDisabled ? 0.5 : 1,
         border: 'none',
         background: 'none',
