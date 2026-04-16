@@ -33,18 +33,28 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
+  const normalizedId = id.trim();
   const requestId = getOrCreateRequestId(request);
   const context = createRequestContext(
     requestId,
     'GET',
-    `/api/courses/${id}/testimonials`
+    `/api/courses/${normalizedId}/testimonials`
   );
   const logger = createApiLogger(context);
 
   try {
+    if (!normalizedId) {
+      return createErrorResponse(
+        'Kurs nicht gefunden',
+        ErrorCodes.NOT_FOUND,
+        requestId,
+        404
+      );
+    }
+
     logger.info('Fetching course testimonials', {
-      courseId: id,
-      idType: id.startsWith('c') ? 'cuid' : 'slug',
+      courseId: normalizedId,
+      idType: normalizedId.startsWith('c') ? 'cuid' : 'slug',
     });
 
     // Find course by ID or slug in a single query
@@ -52,7 +62,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       where: {
         isPublished: true,
         isNonPublic: false, // Exclude Learning Path invite-only courses
-        OR: [{ id }, { slug: id }],
+        OR: [{ id: normalizedId }, { slug: normalizedId }],
       },
       select: { id: true },
     });

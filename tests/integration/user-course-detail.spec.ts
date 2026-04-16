@@ -288,31 +288,40 @@ describe('User Course Detail Page Integration', () => {
     ] as const;
 
     it('should support vorbereitung route', () => {
-      const url = `/my-courses/${testBooking.id}/vorbereitung`;
-      expect(url).toContain('/vorbereitung');
+      expect(routes[0]).toBe('vorbereitung');
+      expect(`/my-courses/${testBooking.id}/${routes[0]}`).toBe(
+        `/my-courses/${testBooking.id}/vorbereitung`
+      );
     });
 
     it('should support seminarveranstaltung route', () => {
-      const url = `/my-courses/${testBooking.id}/seminarveranstaltung`;
-      expect(url).toContain('/seminarveranstaltung');
+      expect(routes[1]).toBe('seminarveranstaltung');
+      expect(`/my-courses/${testBooking.id}/${routes[1]}`).toBe(
+        `/my-courses/${testBooking.id}/seminarveranstaltung`
+      );
     });
 
     it('should support nachbereitung route', () => {
-      const url = `/my-courses/${testBooking.id}/nachbereitung`;
-      expect(url).toContain('/nachbereitung');
+      expect(routes[2]).toBe('nachbereitung');
+      expect(`/my-courses/${testBooking.id}/${routes[2]}`).toBe(
+        `/my-courses/${testBooking.id}/nachbereitung`
+      );
     });
 
     it('should support verhandlungsergebnis route', () => {
-      const url = `/my-courses/${testBooking.id}/verhandlungsergebnis`;
-      expect(url).toContain('/verhandlungsergebnis');
+      expect(routes[3]).toBe('verhandlungsergebnis');
+      expect(`/my-courses/${testBooking.id}/${routes[3]}`).toBe(
+        `/my-courses/${testBooking.id}/verhandlungsergebnis`
+      );
     });
 
-    it('should have all step routes defined', () => {
-      expect(routes.length).toBe(4);
-      expect(routes).toContain('vorbereitung');
-      expect(routes).toContain('seminarveranstaltung');
-      expect(routes).toContain('nachbereitung');
-      expect(routes).toContain('verhandlungsergebnis');
+    it('should have all canonical step routes defined without localization variants', () => {
+      expect(routes).toEqual([
+        'vorbereitung',
+        'seminarveranstaltung',
+        'nachbereitung',
+        'verhandlungsergebnis',
+      ]);
     });
   });
 
