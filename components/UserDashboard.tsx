@@ -69,6 +69,47 @@ const BookingsResponseSchema = z.object({
 
 type Booking = z.infer<typeof BookingSchema>;
 
+function logBookingsValidationError(
+  flattenedError: ReturnType<z.ZodError['flatten']>
+): void {
+  const isRollbarDisabled =
+    process.env.E2E_TEST === '1' ||
+    process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
+    process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0';
+
+  if (!isRollbarDisabled) {
+    void import('rollbar')
+      .then(Rollbar =>
+        import('@/lib/monitoring/rollbar-official').then(({ clientConfig }) => {
+          try {
+            const rollbar = new Rollbar.default(clientConfig);
+            rollbar.error(new Error('Invalid bookings response'), {
+              custom: {
+                source: 'UserDashboard.fetchBookings',
+                validationErrors: flattenedError,
+              },
+            });
+          } catch {
+            // ignore reporting errors
+          }
+        })
+      )
+      .catch(() => {
+        if (process.env.NODE_ENV !== 'production') {
+          // biome-ignore lint/suspicious/noConsole: Development fallback when client monitoring is unavailable
+          console.error('Invalid bookings response', flattenedError);
+        }
+      });
+
+    return;
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    // biome-ignore lint/suspicious/noConsole: Development fallback when Rollbar is disabled
+    console.error('Invalid bookings response', flattenedError);
+  }
+}
+
 // Categorized bookings for dashboard display (with original Booking objects)
 interface CategorizedDashboardBookings {
   nextSeminar: Booking | null;
@@ -292,9 +333,8 @@ const UserDashboardClerk: React.FC = () => {
       if (data.success) {
         const parsedData = BookingsResponseSchema.safeParse(data);
         if (!parsedData.success) {
-          throw new Error(
-            `Invalid bookings response: ${JSON.stringify(parsedData.error.flatten())}`
-          );
+          logBookingsValidationError(parsedData.error.flatten());
+          throw new Error('Ungültige Buchungsdaten erhalten');
         }
         setBookings(parsedData.data.data.bookings);
       } else {
