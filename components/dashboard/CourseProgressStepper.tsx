@@ -14,15 +14,11 @@ import { Check } from '@mui/icons-material';
 import { Box, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import type { StepIconProps } from '@mui/material/StepIcon';
 import { useTheme } from '@mui/material/styles';
+import type { ParticipationStatus } from '@prisma/client';
 import Link from 'next/link';
 import { colors, typography } from '@/lib/design-tokens';
 
-export type ParticipationStatus =
-  | 'PREPARATION'
-  | 'SUMMARY'
-  | 'DEBRIEFING'
-  | 'RESULT'
-  | 'COMPLETE';
+export type { ParticipationStatus } from '@prisma/client';
 
 type DashboardStepKey =
   | 'VORBEREITUNG'

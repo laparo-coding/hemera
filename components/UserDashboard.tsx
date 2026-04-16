@@ -13,16 +13,17 @@ import {
   Typography,
 } from '@mui/material';
 import type { PaymentStatus } from '@prisma/client';
+import { ParticipationStatus } from '@prisma/client';
 import Link from 'next/link';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { z } from 'zod';
 import { TERMS } from '@/lib/constants';
 import { colors } from '@/lib/design-tokens';
 import {
   type BookingForCategorization,
   categorizeBookings as categorizeBookingsUtil,
 } from '@/lib/utils/booking-categorization';
-import type { ParticipationStatus } from './dashboard';
 import {
   CourseCard,
   CourseProgressStepper,
@@ -30,27 +31,58 @@ import {
   UserPageContainer,
 } from './dashboard';
 
-// Extended Booking interface with all fields needed for dashboard
-interface Booking {
-  id: string;
-  courseId: string;
-  courseTitle: string;
-  coursePrice: number;
-  currency: string;
-  paymentStatus: string;
-  createdAt: string;
-  // New fields for dashboard sections
-  startDate: string | null;
-  endDate: string | null;
-  startTime: string | null;
-  endTime: string | null;
-  locationName: string | null;
-  locationSlug: string | null;
-  locationCity: string | null;
-  hasParticipation: boolean;
-  participationStatus: string | null;
-  stripeInvoicePdfUrl: string | null;
-}
+const ParticipationStatusSchema = z.preprocess(
+  value => (value == null ? null : value),
+  z.union([
+    z
+      .string()
+      .refine(
+        (value): value is ParticipationStatus =>
+          Object.values(ParticipationStatus).includes(
+            value as ParticipationStatus
+          ),
+        { message: 'Invalid participation status' }
+      ),
+    z.null(),
+  ])
+);
+
+const BookingSchema = z.object({
+  id: z.string(),
+  courseId: z.string(),
+  courseTitle: z.string(),
+  coursePrice: z.number(),
+  currency: z.string(),
+  paymentStatus: z.string(),
+  createdAt: z.string(),
+  startDate: z.string().nullable(),
+  endDate: z.string().nullable(),
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable(),
+  locationName: z.string().nullable(),
+  locationSlug: z.string().nullable(),
+  locationCity: z.string().nullable(),
+  hasParticipation: z.boolean(),
+  participationStatus: ParticipationStatusSchema,
+  stripeInvoicePdfUrl: z.string().nullable(),
+});
+
+const BookingsResponseSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    bookings: z.array(BookingSchema),
+    pagination: z
+      .object({
+        page: z.number(),
+        limit: z.number(),
+        total: z.number(),
+        pages: z.number(),
+      })
+      .optional(),
+  }),
+});
+
+type Booking = z.infer<typeof BookingSchema>;
 
 // Categorized bookings for dashboard display (with original Booking objects)
 interface CategorizedDashboardBookings {
@@ -273,8 +305,11 @@ const UserDashboardClerk: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
-        const bookingsData = data.data.bookings || [];
-        setBookings(bookingsData);
+        const parsedData = BookingsResponseSchema.safeParse(data);
+        if (!parsedData.success) {
+          throw new Error('Invalid bookings response');
+        }
+        setBookings(parsedData.data.data.bookings);
       } else {
         throw new Error(data.error || 'Failed to load bookings');
       }
@@ -505,8 +540,7 @@ const UserDashboardClerk: React.FC = () => {
                   <CourseProgressStepper
                     bookingId={categorized.nextSeminar.id}
                     participationStatus={
-                      categorized.nextSeminar
-                        .participationStatus as ParticipationStatus | null
+                      categorized.nextSeminar.participationStatus
                     }
                     courseStartDate={categorized.nextSeminar.startDate}
                   />
@@ -542,9 +576,7 @@ const UserDashboardClerk: React.FC = () => {
                   {booking.hasParticipation && (
                     <CourseProgressStepper
                       bookingId={booking.id}
-                      participationStatus={
-                        booking.participationStatus as ParticipationStatus | null
-                      }
+                      participationStatus={booking.participationStatus}
                       courseStartDate={booking.startDate}
                     />
                   )}
@@ -580,9 +612,7 @@ const UserDashboardClerk: React.FC = () => {
                   {booking.hasParticipation && (
                     <CourseProgressStepper
                       bookingId={booking.id}
-                      participationStatus={
-                        booking.participationStatus as ParticipationStatus | null
-                      }
+                      participationStatus={booking.participationStatus}
                       courseStartDate={booking.startDate}
                     />
                   )}
