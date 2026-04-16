@@ -18,6 +18,7 @@ import { Box, Button, Chip, Paper, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import { colors } from '@/lib/design-tokens';
 import InvoiceDownloadButton from './InvoiceDownloadButton';
+import TestimonialButton from './TestimonialButton';
 
 export interface CourseCardProps {
   id: string;
@@ -35,6 +36,13 @@ export interface CourseCardProps {
   stripeInvoicePdfUrl: string | null;
   /** Which section this card is displayed in */
   sectionType: 'NEXT_SEMINAR' | 'UPCOMING' | 'COMPLETED' | 'NO_SHOW';
+  /** User profile for testimonial drawer */
+  userProfile?: {
+    firstName: string | null;
+    lastName: string | null;
+    imageUrl?: string;
+    city?: string;
+  };
 }
 
 /**
@@ -136,7 +144,10 @@ export default function CourseCard({
   paymentStatus,
   stripeInvoicePdfUrl,
   sectionType,
+  userProfile,
 }: CourseCardProps) {
+  const showTestimonialButton =
+    sectionType === 'COMPLETED' && userProfile != null;
   const dateText = formatDateRange(startDate, endDate);
   const timeText = formatTimeRange(startTime, endTime);
   const locationText = getLocationDisplayText(locationName, locationCity);
@@ -338,7 +349,16 @@ export default function CourseCard({
         </Box>
 
         {/* Actions */}
-        <Box sx={{ flexShrink: 0 }}>{getPrimaryAction()}</Box>
+        <Stack sx={{ flexShrink: 0, alignItems: 'flex-end' }} spacing={1}>
+          {getPrimaryAction()}
+          {showTestimonialButton && userProfile && (
+            <TestimonialButton
+              bookingId={bookingId}
+              courseName={courseTitle}
+              userProfile={userProfile}
+            />
+          )}
+        </Stack>
       </Stack>
     </Paper>
   );

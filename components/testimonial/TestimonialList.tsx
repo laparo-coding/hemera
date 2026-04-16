@@ -30,15 +30,23 @@ export default function TestimonialList({
 
   useEffect(() => {
     async function fetchTestimonials() {
+      const normalizedCourseSlug = courseSlug.trim();
+
+      if (!normalizedCourseSlug) {
+        setTestimonials([]);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null); // Clear previous errors
         const response = await fetch(
-          `/api/courses/${courseSlug}/testimonials?limit=${limit}`
+          `/api/courses/${encodeURIComponent(normalizedCourseSlug)}/testimonials?limit=${limit}`
         );
 
         if (!response.ok) {
-          if (response.status === 404) {
+          if (response.status === 400 || response.status === 404) {
             // Course not found - just show no testimonials
             setTestimonials([]);
             return;

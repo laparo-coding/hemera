@@ -1,14 +1,11 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { PaymentStatus } from '@prisma/client';
+import { type ParticipationStatus, PaymentStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '../../../lib/db/prisma';
-import { logError } from '../../../lib/errors';
-import {
-  ErrorSeverity,
-  reportError,
-} from '../../../lib/monitoring/rollbar-official';
-import { isClerkDisabled } from '../../../lib/utils/clerk-disabled-check';
+import { prisma } from '@/lib/db/prisma';
+import { logError } from '@/lib/errors';
+import { ErrorSeverity, reportError } from '@/lib/monitoring/rollbar-official';
+import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -79,6 +76,7 @@ type BookingRecord = {
   } | null;
   participation?: {
     id: string;
+    status: ParticipationStatus;
   } | null;
 };
 
@@ -115,6 +113,7 @@ function normalizeBookings(bookings: BookingRecord[], requestId: string) {
       locationSlug: booking.course?.location?.slug ?? null,
       locationCity: booking.course?.location?.city ?? null,
       hasParticipation: booking.participation?.id != null,
+      participationStatus: booking.participation?.status ?? null,
       stripeInvoicePdfUrl: booking.stripeInvoicePdfUrl,
     };
   });
@@ -185,6 +184,7 @@ export async function GET(request: Request) {
           participation: {
             select: {
               id: true,
+              status: true,
             },
           },
         },
@@ -278,12 +278,12 @@ export async function POST(request: Request) {
 
     // Ensure the user exists in our database (upsert from Clerk)
     const { syncUserFromClerk } = await import('../../../lib/api/users');
-    await syncUserFromClerk(user);
+    const syncedUser = await syncUserFromClerk(user);
 
     // Check if user already has a booking for this course
     const existingBooking = await prisma.booking.findFirst({
       where: {
-        userId: user.id,
+        userId: syncedUser.id,
         courseId: validatedData.courseId,
       },
     });
@@ -298,7 +298,7 @@ export async function POST(request: Request) {
     // Create the booking
     const booking = await prisma.booking.create({
       data: {
-        userId: user.id,
+        userId: syncedUser.id,
         courseId: validatedData.courseId,
         paymentStatus: PaymentStatus.PENDING,
         amount: course.price,

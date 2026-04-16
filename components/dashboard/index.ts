@@ -12,6 +12,11 @@ export {
   getLocationDisplayText,
 } from './CourseCard';
 export {
+  type CourseProgressStepperProps,
+  default as CourseProgressStepper,
+  type ParticipationStatus,
+} from './CourseProgressStepper';
+export {
   default as DashboardSection,
   SECTION_TITLES,
   type SectionType,

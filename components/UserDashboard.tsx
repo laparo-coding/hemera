@@ -12,37 +12,98 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import type { PaymentStatus } from '@prisma/client';
+import { ParticipationStatus, PaymentStatus } from '@prisma/client';
 import Link from 'next/link';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { z } from 'zod';
 import { TERMS } from '@/lib/constants';
 import { colors } from '@/lib/design-tokens';
+import { ErrorSeverity, reportError } from '@/lib/monitoring/rollbar-official';
 import {
   type BookingForCategorization,
   categorizeBookings as categorizeBookingsUtil,
 } from '@/lib/utils/booking-categorization';
-import { CourseCard, DashboardSection, UserPageContainer } from './dashboard';
+import {
+  CourseCard,
+  CourseProgressStepper,
+  DashboardSection,
+  UserPageContainer,
+} from './dashboard';
 
-// Extended Booking interface with all fields needed for dashboard
-interface Booking {
-  id: string;
-  courseId: string;
-  courseTitle: string;
-  coursePrice: number;
-  currency: string;
-  paymentStatus: string;
-  createdAt: string;
-  // New fields for dashboard sections
-  startDate: string | null;
-  endDate: string | null;
-  startTime: string | null;
-  endTime: string | null;
-  locationName: string | null;
-  locationSlug: string | null;
-  locationCity: string | null;
-  hasParticipation: boolean;
-  stripeInvoicePdfUrl: string | null;
+const participationStatusSchema = z.nativeEnum(ParticipationStatus).nullable();
+
+const bookingSchema = z.object({
+  id: z.string(),
+  courseId: z.string(),
+  courseTitle: z.string(),
+  coursePrice: z.number(),
+  currency: z.string(),
+  paymentStatus: z.nativeEnum(PaymentStatus),
+  createdAt: z.string(),
+  startDate: z.string().nullable(),
+  endDate: z.string().nullable(),
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable(),
+  locationName: z.string().nullable(),
+  locationSlug: z.string().nullable(),
+  locationCity: z.string().nullable(),
+  hasParticipation: z.boolean(),
+  participationStatus: participationStatusSchema,
+  stripeInvoicePdfUrl: z.string().nullable(),
+});
+
+const bookingsResponseSchema = z.object({
+  success: z.literal(true),
+  data: z.object({
+    bookings: z.array(bookingSchema),
+    pagination: z
+      .object({
+        page: z.number(),
+        limit: z.number(),
+        total: z.number(),
+        pages: z.number(),
+      })
+      .optional(),
+  }),
+});
+
+type Booking = z.infer<typeof bookingSchema>;
+
+function logBookingsValidationError(
+  flattenedError: ReturnType<z.ZodError['flatten']>
+): void {
+  const isRollbarDisabled =
+    process.env.E2E_TEST === '1' ||
+    process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
+    process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0';
+
+  if (!isRollbarDisabled) {
+    try {
+      reportError(
+        new Error('Invalid bookings response'),
+        {
+          additionalData: {
+            source: 'UserDashboard.fetchBookings',
+            validationErrors: flattenedError,
+          },
+        },
+        ErrorSeverity.WARNING
+      );
+    } catch {
+      if (process.env.NODE_ENV !== 'production') {
+        // biome-ignore lint/suspicious/noConsole: Development fallback when monitoring is unavailable
+        console.error('Invalid bookings response', flattenedError);
+      }
+    }
+
+    return;
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    // biome-ignore lint/suspicious/noConsole: Development fallback when Rollbar is disabled
+    console.error('Invalid bookings response', flattenedError);
+  }
 }
 
 // Categorized bookings for dashboard display (with original Booking objects)
@@ -61,7 +122,7 @@ function toBookingForCategorization(
 ): BookingForCategorization {
   return {
     id: booking.id,
-    paymentStatus: booking.paymentStatus as PaymentStatus,
+    paymentStatus: booking.paymentStatus,
     course: {
       startDate: booking.startDate ? new Date(booking.startDate) : null,
       endDate: booking.endDate ? new Date(booking.endDate) : null,
@@ -266,8 +327,12 @@ const UserDashboardClerk: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
-        const bookingsData = data.data.bookings || [];
-        setBookings(bookingsData);
+        const parsedData = bookingsResponseSchema.safeParse(data);
+        if (!parsedData.success) {
+          logBookingsValidationError(parsedData.error.flatten());
+          throw new Error('Ungültige Buchungsdaten erhalten');
+        }
+        setBookings(parsedData.data.data.bookings);
       } else {
         throw new Error(data.error || 'Failed to load bookings');
       }
@@ -418,7 +483,13 @@ const UserDashboardClerk: React.FC = () => {
     categorized.upcoming.length > 0 ||
     categorized.completed.length > 0 ||
     categorized.noShow.length > 0;
-
+  const userProfile = user
+    ? {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        imageUrl: user.imageUrl,
+      }
+    : undefined;
   return (
     <UserPageContainer
       title={`Willkommen zurück, ${user?.firstName || 'Benutzer'}!`}
@@ -468,24 +539,36 @@ const UserDashboardClerk: React.FC = () => {
             testId='section-next-seminar'
           >
             <Stack spacing={2}>
-              <CourseCard
-                id={categorized.nextSeminar.courseId}
-                bookingId={categorized.nextSeminar.id}
-                courseTitle={categorized.nextSeminar.courseTitle}
-                startDate={categorized.nextSeminar.startDate}
-                endDate={categorized.nextSeminar.endDate}
-                startTime={categorized.nextSeminar.startTime}
-                endTime={categorized.nextSeminar.endTime}
-                locationName={categorized.nextSeminar.locationName}
-                locationSlug={categorized.nextSeminar.locationSlug}
-                locationCity={categorized.nextSeminar.locationCity}
-                hasParticipation={categorized.nextSeminar.hasParticipation}
-                paymentStatus={categorized.nextSeminar.paymentStatus}
-                stripeInvoicePdfUrl={
-                  categorized.nextSeminar.stripeInvoicePdfUrl
-                }
-                sectionType='NEXT_SEMINAR'
-              />
+              <Box>
+                <CourseCard
+                  id={categorized.nextSeminar.courseId}
+                  bookingId={categorized.nextSeminar.id}
+                  courseTitle={categorized.nextSeminar.courseTitle}
+                  startDate={categorized.nextSeminar.startDate}
+                  endDate={categorized.nextSeminar.endDate}
+                  startTime={categorized.nextSeminar.startTime}
+                  endTime={categorized.nextSeminar.endTime}
+                  locationName={categorized.nextSeminar.locationName}
+                  locationSlug={categorized.nextSeminar.locationSlug}
+                  locationCity={categorized.nextSeminar.locationCity}
+                  hasParticipation={categorized.nextSeminar.hasParticipation}
+                  paymentStatus={categorized.nextSeminar.paymentStatus}
+                  stripeInvoicePdfUrl={
+                    categorized.nextSeminar.stripeInvoicePdfUrl
+                  }
+                  sectionType='NEXT_SEMINAR'
+                  userProfile={userProfile}
+                />
+                {categorized.nextSeminar.hasParticipation && (
+                  <CourseProgressStepper
+                    bookingId={categorized.nextSeminar.id}
+                    participationStatus={
+                      categorized.nextSeminar.participationStatus
+                    }
+                    courseStartDate={categorized.nextSeminar.startDate}
+                  />
+                )}
+              </Box>
             </Stack>
           </DashboardSection>
         )}
@@ -495,23 +578,32 @@ const UserDashboardClerk: React.FC = () => {
           <DashboardSection sectionType='UPCOMING' testId='section-upcoming'>
             <Stack spacing={2}>
               {categorized.upcoming.map(booking => (
-                <CourseCard
-                  key={booking.id}
-                  id={booking.courseId}
-                  bookingId={booking.id}
-                  courseTitle={booking.courseTitle}
-                  startDate={booking.startDate}
-                  endDate={booking.endDate}
-                  startTime={booking.startTime}
-                  endTime={booking.endTime}
-                  locationName={booking.locationName}
-                  locationSlug={booking.locationSlug}
-                  locationCity={booking.locationCity}
-                  hasParticipation={booking.hasParticipation}
-                  paymentStatus={booking.paymentStatus}
-                  stripeInvoicePdfUrl={booking.stripeInvoicePdfUrl}
-                  sectionType='UPCOMING'
-                />
+                <Box key={booking.id}>
+                  <CourseCard
+                    id={booking.courseId}
+                    bookingId={booking.id}
+                    courseTitle={booking.courseTitle}
+                    startDate={booking.startDate}
+                    endDate={booking.endDate}
+                    startTime={booking.startTime}
+                    endTime={booking.endTime}
+                    locationName={booking.locationName}
+                    locationSlug={booking.locationSlug}
+                    locationCity={booking.locationCity}
+                    hasParticipation={booking.hasParticipation}
+                    paymentStatus={booking.paymentStatus}
+                    stripeInvoicePdfUrl={booking.stripeInvoicePdfUrl}
+                    sectionType='UPCOMING'
+                    userProfile={userProfile}
+                  />
+                  {booking.hasParticipation && (
+                    <CourseProgressStepper
+                      bookingId={booking.id}
+                      participationStatus={booking.participationStatus}
+                      courseStartDate={booking.startDate}
+                    />
+                  )}
+                </Box>
               ))}
             </Stack>
           </DashboardSection>
@@ -522,23 +614,32 @@ const UserDashboardClerk: React.FC = () => {
           <DashboardSection sectionType='COMPLETED' testId='section-completed'>
             <Stack spacing={2}>
               {categorized.completed.map(booking => (
-                <CourseCard
-                  key={booking.id}
-                  id={booking.courseId}
-                  bookingId={booking.id}
-                  courseTitle={booking.courseTitle}
-                  startDate={booking.startDate}
-                  endDate={booking.endDate}
-                  startTime={booking.startTime}
-                  endTime={booking.endTime}
-                  locationName={booking.locationName}
-                  locationSlug={booking.locationSlug}
-                  locationCity={booking.locationCity}
-                  hasParticipation={booking.hasParticipation}
-                  paymentStatus={booking.paymentStatus}
-                  stripeInvoicePdfUrl={booking.stripeInvoicePdfUrl}
-                  sectionType='COMPLETED'
-                />
+                <Box key={booking.id}>
+                  <CourseCard
+                    id={booking.courseId}
+                    bookingId={booking.id}
+                    courseTitle={booking.courseTitle}
+                    startDate={booking.startDate}
+                    endDate={booking.endDate}
+                    startTime={booking.startTime}
+                    endTime={booking.endTime}
+                    locationName={booking.locationName}
+                    locationSlug={booking.locationSlug}
+                    locationCity={booking.locationCity}
+                    hasParticipation={booking.hasParticipation}
+                    paymentStatus={booking.paymentStatus}
+                    stripeInvoicePdfUrl={booking.stripeInvoicePdfUrl}
+                    sectionType='COMPLETED'
+                    userProfile={userProfile}
+                  />
+                  {booking.hasParticipation && (
+                    <CourseProgressStepper
+                      bookingId={booking.id}
+                      participationStatus={booking.participationStatus}
+                      courseStartDate={booking.startDate}
+                    />
+                  )}
+                </Box>
               ))}
             </Stack>
           </DashboardSection>

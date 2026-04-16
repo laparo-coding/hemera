@@ -52,8 +52,10 @@ import type {
 import { colors } from '../../lib/design-tokens';
 
 // Step definitions
+export type StepKey = 'PREPARATION' | 'SUMMARY' | 'DEBRIEFING' | 'RESULT';
+
 interface StepDefinition {
-  key: 'PREPARATION' | 'SUMMARY' | 'DEBRIEFING' | 'RESULT';
+  key: StepKey;
   label: string;
   description: string;
   icon: React.ReactNode;
@@ -86,12 +88,10 @@ const allSteps: StepDefinition[] = [
   },
 ];
 
-// Map participation status to step index
-function getStepIndex(status: string, hasSummaryAssets: boolean): number {
-  const steps = hasSummaryAssets
-    ? allSteps
-    : allSteps.filter(s => s.key !== 'SUMMARY');
+const orderedStepKeys = allSteps.map(step => step.key);
 
+// Map participation status to step index
+function getStepIndex(status: string, steps: StepDefinition[]): number {
   const statusToStep: Record<string, string> = {
     PREPARATION: 'PREPARATION',
     SUMMARY: 'SUMMARY',
@@ -106,12 +106,26 @@ function getStepIndex(status: string, hasSummaryAssets: boolean): number {
     return steps.length; // All steps completed
   }
 
-  const index = steps.findIndex(s => s.key === currentStep);
-  return index >= 0 ? index : 0;
+  const visibleIndex = steps.findIndex(s => s.key === currentStep);
+  if (visibleIndex >= 0) {
+    return visibleIndex;
+  }
+
+  const currentOrder = orderedStepKeys.indexOf(currentStep as StepKey);
+  if (currentOrder < 0) {
+    return 0;
+  }
+
+  const nextVisibleIndex = steps.findIndex(
+    step => orderedStepKeys.indexOf(step.key) > currentOrder
+  );
+
+  return nextVisibleIndex >= 0 ? nextVisibleIndex : steps.length;
 }
 
 interface CourseParticipationStepperProps {
   bookingId: string;
+  visibleStepKeys?: StepKey[];
   onStepChange?: (step: string) => void;
   /** Render props for step content */
   renderPreparation?: (props: {
@@ -136,6 +150,7 @@ export const CourseParticipationStepper: React.FC<
   CourseParticipationStepperProps
 > = ({
   bookingId,
+  visibleStepKeys,
   onStepChange,
   renderPreparation,
   renderSummary,
@@ -169,13 +184,21 @@ export const CourseParticipationStepper: React.FC<
     loadData();
   }, [loadData]);
 
-  // Filter steps based on summary asset availability
-  const visibleSteps = data?.hasSummaryAssets
-    ? allSteps
-    : allSteps.filter(s => s.key !== 'SUMMARY');
+  // Filter steps based on summary asset availability and caller context
+  const visibleSteps = allSteps.filter(step => {
+    if (visibleStepKeys && !visibleStepKeys.includes(step.key)) {
+      return false;
+    }
+
+    if (step.key === 'SUMMARY') {
+      return data?.hasSummaryAssets ?? false;
+    }
+
+    return true;
+  });
 
   const activeStep = data
-    ? getStepIndex(data.participation.status, data.hasSummaryAssets)
+    ? getStepIndex(data.participation.status, visibleSteps)
     : 0;
 
   // Notify parent of step changes

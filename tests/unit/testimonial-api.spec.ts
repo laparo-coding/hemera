@@ -57,7 +57,7 @@ describe('GET /api/courses/[id]/testimonials', () => {
     jest.clearAllMocks();
   });
 
-  it('returns 404 for empty course ID (course not found)', async () => {
+  it('returns 400 for empty course ID (invalid input)', async () => {
     mockPrisma.course.findFirst.mockResolvedValue(null);
 
     const request = new NextRequest(
@@ -69,12 +69,12 @@ describe('GET /api/courses/[id]/testimonials', () => {
     });
     const json = await response.json();
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(400);
     expect(json.success).toBe(false);
-    expect(json.error?.code).toBe('NOT_FOUND');
+    expect(json.error?.code).toBe('INVALID_INPUT');
   });
 
-  it('returns 404 for whitespace-only course ID (course not found)', async () => {
+  it('returns 400 for whitespace-only course ID (invalid input)', async () => {
     mockPrisma.course.findFirst.mockResolvedValue(null);
 
     const request = new NextRequest(
@@ -86,8 +86,9 @@ describe('GET /api/courses/[id]/testimonials', () => {
     });
     const json = await response.json();
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(400);
     expect(json.success).toBe(false);
+    expect(json.error?.code).toBe('INVALID_INPUT');
   });
 
   it('returns 404 when course not found', async () => {

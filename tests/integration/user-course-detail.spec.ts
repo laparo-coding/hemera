@@ -1,10 +1,7 @@
 /**
  * T012: Integration Test - User Course Detail Page Navigation
  *
- * Tests for the user course detail page with sections:
- * - Vorbereitung
- * - Ergebnisse
- * - Nachbereitung
+ * Tests for the user course detail flow and related routes.
  */
 
 import { afterAll, beforeEach, describe, expect, it } from '@jest/globals';
@@ -279,32 +276,6 @@ describe('User Course Detail Page Integration', () => {
 
       expect(participation?.resultOutcome).toBe('Erfolgreich abgeschlossen');
       expect(participation?.resultCompletedAt).not.toBeNull();
-    });
-  });
-
-  describe('URL anchor navigation', () => {
-    const sections = ['vorbereitung', 'ergebnisse', 'nachbereitung'] as const;
-
-    it('should support vorbereitung anchor', () => {
-      const url = `/my-courses/${testBooking.id}#vorbereitung`;
-      expect(url).toContain('#vorbereitung');
-    });
-
-    it('should support ergebnisse anchor', () => {
-      const url = `/my-courses/${testBooking.id}#ergebnisse`;
-      expect(url).toContain('#ergebnisse');
-    });
-
-    it('should support nachbereitung anchor', () => {
-      const url = `/my-courses/${testBooking.id}#nachbereitung`;
-      expect(url).toContain('#nachbereitung');
-    });
-
-    it('should have all three sections defined', () => {
-      expect(sections.length).toBe(3);
-      expect(sections).toContain('vorbereitung');
-      expect(sections).toContain('ergebnisse');
-      expect(sections).toContain('nachbereitung');
     });
   });
 
