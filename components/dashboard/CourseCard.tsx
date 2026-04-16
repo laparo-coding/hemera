@@ -154,7 +154,7 @@ export default function CourseCard({
 }: CourseCardProps) {
   const [testimonialOpen, setTestimonialOpen] = useState(false);
   const showTestimonialButton =
-    sectionType !== 'NO_SHOW' && userProfile != null;
+    sectionType === 'COMPLETED' && userProfile != null;
   const dateText = formatDateRange(startDate, endDate);
   const timeText = formatTimeRange(startTime, endTime);
   const locationText = getLocationDisplayText(locationName, locationCity);

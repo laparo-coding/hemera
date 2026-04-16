@@ -279,52 +279,6 @@ describe('User Course Detail Page Integration', () => {
     });
   });
 
-  describe('Step route navigation', () => {
-    const routes = [
-      'vorbereitung',
-      'seminarveranstaltung',
-      'nachbereitung',
-      'verhandlungsergebnis',
-    ] as const;
-
-    it('should support vorbereitung route', () => {
-      expect(routes[0]).toBe('vorbereitung');
-      expect(`/my-courses/${testBooking.id}/${routes[0]}`).toBe(
-        `/my-courses/${testBooking.id}/vorbereitung`
-      );
-    });
-
-    it('should support seminarveranstaltung route', () => {
-      expect(routes[1]).toBe('seminarveranstaltung');
-      expect(`/my-courses/${testBooking.id}/${routes[1]}`).toBe(
-        `/my-courses/${testBooking.id}/seminarveranstaltung`
-      );
-    });
-
-    it('should support nachbereitung route', () => {
-      expect(routes[2]).toBe('nachbereitung');
-      expect(`/my-courses/${testBooking.id}/${routes[2]}`).toBe(
-        `/my-courses/${testBooking.id}/nachbereitung`
-      );
-    });
-
-    it('should support verhandlungsergebnis route', () => {
-      expect(routes[3]).toBe('verhandlungsergebnis');
-      expect(`/my-courses/${testBooking.id}/${routes[3]}`).toBe(
-        `/my-courses/${testBooking.id}/verhandlungsergebnis`
-      );
-    });
-
-    it('should have all canonical step routes defined without localization variants', () => {
-      expect(routes).toEqual([
-        'vorbereitung',
-        'seminarveranstaltung',
-        'nachbereitung',
-        'verhandlungsergebnis',
-      ]);
-    });
-  });
-
   describe('Status-based section visibility', () => {
     it('should show different sections based on participation status', async () => {
       const statuses = [

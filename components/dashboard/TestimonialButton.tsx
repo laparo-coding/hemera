@@ -1,11 +1,23 @@
 'use client';
 
 import { RateReviewOutlined } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 
 const TestimonialDrawer = dynamic(() => import('./TestimonialDrawer'), {
+  loading: () => (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: 64,
+      }}
+    >
+      <CircularProgress size={24} />
+    </Box>
+  ),
   ssr: false,
 });
 
@@ -34,13 +46,13 @@ export default function TestimonialButton({
         color='primary'
         startIcon={<RateReviewOutlined />}
         onClick={() => setOpen(true)}
-        sx={{
+        sx={theme => ({
           typography: 'button',
           textTransform: 'none',
-          borderRadius: '8px',
+          borderRadius: theme.shape.borderRadius,
           px: 3,
           py: 1,
-        }}
+        })}
       >
         Erfahrungsbericht
       </Button>

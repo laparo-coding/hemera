@@ -45,10 +45,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     if (!normalizedId) {
       return createErrorResponse(
-        'Kurs nicht gefunden',
-        ErrorCodes.NOT_FOUND,
+        'Ungültige oder fehlende Kurs-ID',
+        ErrorCodes.INVALID_INPUT,
         requestId,
-        404
+        400
       );
     }
 

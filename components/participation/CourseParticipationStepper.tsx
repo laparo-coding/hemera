@@ -52,7 +52,7 @@ import type {
 import { colors } from '../../lib/design-tokens';
 
 // Step definitions
-type StepKey = 'PREPARATION' | 'SUMMARY' | 'DEBRIEFING' | 'RESULT';
+export type StepKey = 'PREPARATION' | 'SUMMARY' | 'DEBRIEFING' | 'RESULT';
 
 interface StepDefinition {
   key: StepKey;

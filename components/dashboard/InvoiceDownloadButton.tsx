@@ -221,13 +221,14 @@ export default function InvoiceDownloadButton({
       underline='hover'
       onClick={handleClick}
       disabled={buttonDisabled}
+      aria-disabled={buttonDisabled}
       aria-label={buttonText}
       aria-busy={isLoading}
       sx={{
         display: 'inline-flex',
         alignItems: 'center',
         gap: 0.5,
-        color: error ? '#d32f2f' : colors.marsala,
+        color: error ? colors.statusUnhealthy : colors.marsala,
         fontFamily: typography.body,
         fontWeight: 500,
         fontSize: '0.875rem',

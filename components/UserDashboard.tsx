@@ -12,8 +12,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import type { PaymentStatus } from '@prisma/client';
-import { ParticipationStatus } from '@prisma/client';
+import { ParticipationStatus, PaymentStatus } from '@prisma/client';
 import Link from 'next/link';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -31,21 +30,7 @@ import {
   UserPageContainer,
 } from './dashboard';
 
-const ParticipationStatusSchema = z.preprocess(
-  value => (value == null ? null : value),
-  z.union([
-    z
-      .string()
-      .refine(
-        (value): value is ParticipationStatus =>
-          Object.values(ParticipationStatus).includes(
-            value as ParticipationStatus
-          ),
-        { message: 'Invalid participation status' }
-      ),
-    z.null(),
-  ])
-);
+const ParticipationStatusSchema = z.nativeEnum(ParticipationStatus).nullable();
 
 const BookingSchema = z.object({
   id: z.string(),
@@ -53,7 +38,7 @@ const BookingSchema = z.object({
   courseTitle: z.string(),
   coursePrice: z.number(),
   currency: z.string(),
-  paymentStatus: z.string(),
+  paymentStatus: z.nativeEnum(PaymentStatus),
   createdAt: z.string(),
   startDate: z.string().nullable(),
   endDate: z.string().nullable(),
@@ -100,7 +85,7 @@ function toBookingForCategorization(
 ): BookingForCategorization {
   return {
     id: booking.id,
-    paymentStatus: booking.paymentStatus as PaymentStatus,
+    paymentStatus: booking.paymentStatus,
     course: {
       startDate: booking.startDate ? new Date(booking.startDate) : null,
       endDate: booking.endDate ? new Date(booking.endDate) : null,
@@ -307,7 +292,9 @@ const UserDashboardClerk: React.FC = () => {
       if (data.success) {
         const parsedData = BookingsResponseSchema.safeParse(data);
         if (!parsedData.success) {
-          throw new Error('Invalid bookings response');
+          throw new Error(
+            `Invalid bookings response: ${JSON.stringify(parsedData.error.flatten())}`
+          );
         }
         setBookings(parsedData.data.data.bookings);
       } else {
