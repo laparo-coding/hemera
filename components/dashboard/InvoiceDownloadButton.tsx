@@ -217,6 +217,7 @@ export default function InvoiceDownloadButton({
   const link = (
     <MuiLink
       component='button'
+      type='button'
       underline='hover'
       onClick={handleClick}
       disabled={buttonDisabled}
@@ -230,13 +231,17 @@ export default function InvoiceDownloadButton({
         fontFamily: typography.body,
         fontWeight: 500,
         fontSize: '0.875rem',
-        cursor: buttonDisabled ? 'default' : 'pointer',
+        cursor: buttonDisabled ? 'not-allowed' : 'pointer',
         opacity: buttonDisabled ? 0.5 : 1,
         border: 'none',
         background: 'none',
         p: 0,
         '&:hover': {
           color: colors.bronze,
+        },
+        '&:focus-visible': {
+          outline: `2px solid ${colors.bronze}`,
+          outlineOffset: 2,
         },
       }}
       data-testid={`invoice-download-${bookingId}`}

@@ -16,11 +16,15 @@ import {
   SchoolOutlined,
 } from '@mui/icons-material';
 import { Box, Button, Chip, Paper, Stack, Typography } from '@mui/material';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useState } from 'react';
 import { colors } from '@/lib/design-tokens';
 import InvoiceDownloadButton from './InvoiceDownloadButton';
-import TestimonialDrawer from './TestimonialDrawer';
+
+const TestimonialDrawer = dynamic(() => import('./TestimonialDrawer'), {
+  ssr: false,
+});
 
 export interface CourseCardProps {
   id: string;
@@ -376,7 +380,7 @@ export default function CourseCard({
         </Stack>
       </Stack>
 
-      {showTestimonialButton && (
+      {showTestimonialButton && userProfile && (
         <TestimonialDrawer
           open={testimonialOpen}
           onClose={() => setTestimonialOpen(false)}

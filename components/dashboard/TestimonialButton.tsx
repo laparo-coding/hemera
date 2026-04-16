@@ -2,8 +2,12 @@
 
 import { RateReviewOutlined } from '@mui/icons-material';
 import { Button } from '@mui/material';
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import TestimonialDrawer from './TestimonialDrawer';
+
+const TestimonialDrawer = dynamic(() => import('./TestimonialDrawer'), {
+  ssr: false,
+});
 
 interface TestimonialButtonProps {
   bookingId: string;
@@ -31,9 +35,7 @@ export default function TestimonialButton({
         startIcon={<RateReviewOutlined />}
         onClick={() => setOpen(true)}
         sx={{
-          fontFamily: '"Inter", sans-serif',
-          fontWeight: 600,
-          fontSize: '0.875rem',
+          typography: 'button',
           textTransform: 'none',
           borderRadius: '8px',
           px: 3,
