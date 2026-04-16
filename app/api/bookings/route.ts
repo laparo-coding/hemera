@@ -79,6 +79,7 @@ type BookingRecord = {
   } | null;
   participation?: {
     id: string;
+    status: string;
   } | null;
 };
 
@@ -115,6 +116,7 @@ function normalizeBookings(bookings: BookingRecord[], requestId: string) {
       locationSlug: booking.course?.location?.slug ?? null,
       locationCity: booking.course?.location?.city ?? null,
       hasParticipation: booking.participation?.id != null,
+      participationStatus: booking.participation?.status ?? null,
       stripeInvoicePdfUrl: booking.stripeInvoicePdfUrl,
     };
   });
@@ -185,6 +187,7 @@ export async function GET(request: Request) {
           participation: {
             select: {
               id: true,
+              status: true,
             },
           },
         },

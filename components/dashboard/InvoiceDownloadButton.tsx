@@ -36,8 +36,8 @@
 
 'use client';
 
-import { DownloadOutlined } from '@mui/icons-material';
-import { Button, CircularProgress, Tooltip } from '@mui/material';
+import { DescriptionOutlined } from '@mui/icons-material';
+import { CircularProgress, Link as MuiLink, Tooltip } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { colors, typography } from '@/lib/design-tokens';
 import { logClientError } from '@/lib/errors/client';
@@ -214,52 +214,50 @@ export default function InvoiceDownloadButton({
       ? BUTTON_TEXT.ERROR
       : BUTTON_TEXT.DEFAULT;
 
-  const button = (
-    <Button
-      variant='outlined'
-      size='small'
+  const link = (
+    <MuiLink
+      component='button'
+      underline='hover'
       onClick={handleClick}
       disabled={buttonDisabled}
-      startIcon={
-        isLoading ? (
-          <CircularProgress size={16} color='inherit' />
-        ) : (
-          <DownloadOutlined />
-        )
-      }
       aria-label={buttonText}
       aria-busy={isLoading}
       sx={{
-        borderColor: error ? '#d32f2f' : colors.marsala,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.5,
         color: error ? '#d32f2f' : colors.marsala,
         fontFamily: typography.body,
         fontWeight: 500,
-        textTransform: 'none',
-        minWidth: compact ? 'auto' : undefined,
-        px: compact ? 1.5 : 2,
+        fontSize: '0.875rem',
+        cursor: buttonDisabled ? 'default' : 'pointer',
+        opacity: buttonDisabled ? 0.5 : 1,
+        border: 'none',
+        background: 'none',
+        p: 0,
         '&:hover': {
-          borderColor: colors.bronze,
-          backgroundColor: colors.bronzeLight,
-        },
-        '&.Mui-disabled': {
-          borderColor: 'rgba(22, 64, 77, 0.3)',
-          color: 'rgba(22, 64, 77, 0.5)',
+          color: colors.bronze,
         },
       }}
       data-testid={`invoice-download-${bookingId}`}
     >
+      {isLoading ? (
+        <CircularProgress size={14} color='inherit' />
+      ) : (
+        <DescriptionOutlined sx={{ fontSize: '1rem' }} />
+      )}
       {compact ? null : buttonText}
-    </Button>
+    </MuiLink>
   );
 
   // Show tooltip on error
   if (error) {
     return (
       <Tooltip title={error} arrow>
-        {button}
+        {link}
       </Tooltip>
     );
   }
 
-  return button;
+  return link;
 }

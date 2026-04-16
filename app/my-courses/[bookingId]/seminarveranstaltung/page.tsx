@@ -82,9 +82,9 @@ export default async function SeminarveranstaltungPage({
   return (
     <Box sx={{ maxWidth: 960, mx: 'auto', px: { xs: 2, sm: 3 }, py: 4 }}>
       <Link
-        href={bookingId ? `/my-courses/${bookingId}` : '/dashboard'}
+        href='/dashboard'
         style={{ textDecoration: 'none' }}
-        aria-label='Zurück zur Buchungsübersicht'
+        aria-label='Zurück zum Dashboard'
       >
         <Box
           sx={{

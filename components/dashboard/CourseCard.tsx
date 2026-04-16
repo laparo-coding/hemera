@@ -11,13 +11,16 @@ import {
   ArrowForwardOutlined,
   CalendarTodayOutlined,
   LocationOnOutlined,
+  RateReviewOutlined,
   ScheduleOutlined,
   SchoolOutlined,
 } from '@mui/icons-material';
 import { Box, Button, Chip, Paper, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
+import { useState } from 'react';
 import { colors } from '@/lib/design-tokens';
 import InvoiceDownloadButton from './InvoiceDownloadButton';
+import TestimonialDrawer from './TestimonialDrawer';
 
 export interface CourseCardProps {
   id: string;
@@ -35,6 +38,13 @@ export interface CourseCardProps {
   stripeInvoicePdfUrl: string | null;
   /** Which section this card is displayed in */
   sectionType: 'NEXT_SEMINAR' | 'UPCOMING' | 'COMPLETED' | 'NO_SHOW';
+  /** User profile for testimonial drawer */
+  userProfile?: {
+    firstName: string | null;
+    lastName: string | null;
+    imageUrl?: string;
+    city?: string;
+  };
 }
 
 /**
@@ -136,7 +146,11 @@ export default function CourseCard({
   paymentStatus,
   stripeInvoicePdfUrl,
   sectionType,
+  userProfile,
 }: CourseCardProps) {
+  const [testimonialOpen, setTestimonialOpen] = useState(false);
+  const showTestimonialButton =
+    sectionType !== 'NO_SHOW' && userProfile != null;
   const dateText = formatDateRange(startDate, endDate);
   const timeText = formatTimeRange(startTime, endTime);
   const locationText = getLocationDisplayText(locationName, locationCity);
@@ -338,8 +352,39 @@ export default function CourseCard({
         </Box>
 
         {/* Actions */}
-        <Box sx={{ flexShrink: 0 }}>{getPrimaryAction()}</Box>
+        <Stack sx={{ flexShrink: 0, alignItems: 'flex-end' }} spacing={1}>
+          {getPrimaryAction()}
+          {showTestimonialButton && (
+            <Button
+              variant='outlined'
+              color='primary'
+              startIcon={<RateReviewOutlined />}
+              onClick={() => setTestimonialOpen(true)}
+              sx={{
+                fontFamily: '"Inter", sans-serif',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                textTransform: 'none',
+                borderRadius: '8px',
+                px: 3,
+                py: 1,
+              }}
+            >
+              Erfahrungsbericht
+            </Button>
+          )}
+        </Stack>
       </Stack>
+
+      {showTestimonialButton && (
+        <TestimonialDrawer
+          open={testimonialOpen}
+          onClose={() => setTestimonialOpen(false)}
+          bookingId={bookingId}
+          courseName={courseTitle}
+          userProfile={userProfile}
+        />
+      )}
     </Paper>
   );
 }

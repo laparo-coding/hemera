@@ -1,10 +1,7 @@
 /**
  * T012: Integration Test - User Course Detail Page Navigation
  *
- * Tests for the user course detail page with sections:
- * - Vorbereitung
- * - Ergebnisse
- * - Nachbereitung
+ * Tests for the user course detail flow and related routes.
  */
 
 import { afterAll, beforeEach, describe, expect, it } from '@jest/globals';
@@ -282,29 +279,40 @@ describe('User Course Detail Page Integration', () => {
     });
   });
 
-  describe('URL anchor navigation', () => {
-    const sections = ['vorbereitung', 'ergebnisse', 'nachbereitung'] as const;
+  describe('Step route navigation', () => {
+    const routes = [
+      'vorbereitung',
+      'seminarveranstaltung',
+      'nachbereitung',
+      'verhandlungsergebnis',
+    ] as const;
 
-    it('should support vorbereitung anchor', () => {
-      const url = `/my-courses/${testBooking.id}#vorbereitung`;
-      expect(url).toContain('#vorbereitung');
+    it('should support vorbereitung route', () => {
+      const url = `/my-courses/${testBooking.id}/vorbereitung`;
+      expect(url).toContain('/vorbereitung');
     });
 
-    it('should support ergebnisse anchor', () => {
-      const url = `/my-courses/${testBooking.id}#ergebnisse`;
-      expect(url).toContain('#ergebnisse');
+    it('should support seminarveranstaltung route', () => {
+      const url = `/my-courses/${testBooking.id}/seminarveranstaltung`;
+      expect(url).toContain('/seminarveranstaltung');
     });
 
-    it('should support nachbereitung anchor', () => {
-      const url = `/my-courses/${testBooking.id}#nachbereitung`;
-      expect(url).toContain('#nachbereitung');
+    it('should support nachbereitung route', () => {
+      const url = `/my-courses/${testBooking.id}/nachbereitung`;
+      expect(url).toContain('/nachbereitung');
     });
 
-    it('should have all three sections defined', () => {
-      expect(sections.length).toBe(3);
-      expect(sections).toContain('vorbereitung');
-      expect(sections).toContain('ergebnisse');
-      expect(sections).toContain('nachbereitung');
+    it('should support verhandlungsergebnis route', () => {
+      const url = `/my-courses/${testBooking.id}/verhandlungsergebnis`;
+      expect(url).toContain('/verhandlungsergebnis');
+    });
+
+    it('should have all step routes defined', () => {
+      expect(routes.length).toBe(4);
+      expect(routes).toContain('vorbereitung');
+      expect(routes).toContain('seminarveranstaltung');
+      expect(routes).toContain('nachbereitung');
+      expect(routes).toContain('verhandlungsergebnis');
     });
   });
 
