@@ -331,6 +331,12 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
               <AccordionDetails sx={{ pt: 3 }}>
                 <CourseParticipationStepper
                   bookingId={item.booking.id}
+                  visibleStepKeys={[
+                    'PREPARATION',
+                    'SUMMARY',
+                    'DEBRIEFING',
+                    'RESULT',
+                  ]}
                   renderPreparation={({ participation, onComplete }) => (
                     <PreparationStepContent
                       bookingId={participation.booking.id}

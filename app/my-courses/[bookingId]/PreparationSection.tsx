@@ -171,6 +171,7 @@ export default function PreparationSection({
 
       <CourseParticipationStepper
         bookingId={bookingId}
+        visibleStepKeys={['PREPARATION', 'SUMMARY']}
         renderPreparation={({ participation, onComplete }) => (
           <PreparationStepContent
             bookingId={participation.booking.id}
