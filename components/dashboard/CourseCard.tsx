@@ -17,6 +17,7 @@ import {
 import { Box, Button, Chip, Paper, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import { colors } from '@/lib/design-tokens';
+import type { PaymentStatus } from '@/lib/types/booking';
 import InvoiceDownloadButton from './InvoiceDownloadButton';
 import TestimonialButton from './TestimonialButton';
 
@@ -32,7 +33,7 @@ export interface CourseCardProps {
   locationSlug: string | null;
   locationCity: string | null;
   hasParticipation: boolean;
-  paymentStatus: string;
+  paymentStatus: PaymentStatus;
   stripeInvoicePdfUrl: string | null;
   /** Which section this card is displayed in */
   sectionType: 'NEXT_SEMINAR' | 'UPCOMING' | 'COMPLETED' | 'NO_SHOW';
@@ -119,7 +120,7 @@ export const getLocationDisplayText = (
  */
 const shouldShowInvoiceButton = (
   _sectionType: CourseCardProps['sectionType'],
-  paymentStatus: string,
+  paymentStatus: PaymentStatus,
   _invoiceUrl: string | null
 ): boolean => {
   // Show invoice for all paid bookings, regardless of course status

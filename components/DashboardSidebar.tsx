@@ -29,12 +29,12 @@ const routes = [
   },
   {
     path: '/my-courses',
-    name: 'My Courses',
+    name: 'Meine Kurse',
     icon: SchoolIcon,
   },
   {
-    path: '/profile',
-    name: 'Profile',
+    path: '/user-profile',
+    name: 'Profil',
     icon: PersonIcon,
   },
 ];

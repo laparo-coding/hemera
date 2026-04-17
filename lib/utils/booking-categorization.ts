@@ -8,7 +8,7 @@
  * - Seminare ohne Teilnahme (past courses without participation)
  */
 
-import type { PaymentStatus } from '@prisma/client';
+import type { PaymentStatus } from '@/lib/types/booking';
 
 /**
  * Booking data required for categorization

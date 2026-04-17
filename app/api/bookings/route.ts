@@ -5,6 +5,8 @@ import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { logError } from '@/lib/errors';
 import { ErrorSeverity, reportError } from '@/lib/monitoring/rollbar-official';
+import type { PaymentStatus as ApiPaymentStatus } from '@/lib/types/booking';
+import type { ParticipationStatus as ApiParticipationStatus } from '@/lib/types/participation';
 import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
 
 const BookingQuerySchema = z.object({
@@ -80,7 +82,30 @@ type BookingRecord = {
   } | null;
 };
 
-function normalizeBookings(bookings: BookingRecord[], requestId: string) {
+type NormalizedBookingRecord = {
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  coursePrice: number;
+  currency: string;
+  paymentStatus: ApiPaymentStatus;
+  createdAt: string;
+  startDate: string | null;
+  endDate: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  locationName: string | null;
+  locationSlug: string | null;
+  locationCity: string | null;
+  hasParticipation: boolean;
+  participationStatus: ApiParticipationStatus | null;
+  stripeInvoicePdfUrl: string | null;
+};
+
+function normalizeBookings(
+  bookings: BookingRecord[],
+  requestId: string
+): NormalizedBookingRecord[] {
   return bookings.map(booking => {
     if (!booking.course) {
       reportError(
@@ -103,7 +128,7 @@ function normalizeBookings(bookings: BookingRecord[], requestId: string) {
       coursePrice: booking.amount ?? 0,
       currency: booking.currency ?? 'EUR',
       paymentStatus: booking.paymentStatus,
-      createdAt: booking.createdAt,
+      createdAt: booking.createdAt.toISOString(),
       // New fields for dashboard
       startDate: booking.course?.startDate?.toISOString() ?? null,
       endDate: booking.course?.endDate?.toISOString() ?? null,

@@ -10,6 +10,7 @@ import { Alert, Box, Typography } from '@mui/material';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type React from 'react';
 import DebriefingVideoCatalog from '@/components/participation/DebriefingVideoCatalog';
 import { requireAuthenticatedUser } from '@/lib/auth/helpers';
 import { getResolvedSummaryAssets } from '@/lib/db/courseParticipation';
@@ -29,7 +30,9 @@ interface PageProps {
   params: Promise<{ bookingId: string }>;
 }
 
-export default async function NachbereitungPage({ params }: PageProps) {
+export default async function NachbereitungPage({
+  params,
+}: PageProps): Promise<React.ReactElement> {
   const { bookingId } = await params;
   const user = await requireAuthenticatedUser();
 
@@ -79,26 +82,29 @@ export default async function NachbereitungPage({ params }: PageProps) {
 
   return (
     <Box sx={{ maxWidth: 960, mx: 'auto', px: { xs: 2, sm: 3 }, py: 4 }}>
-      <Link
+      <Box
+        component={Link}
         href='/dashboard'
-        style={{ textDecoration: 'none' }}
         aria-label='Zurück zum Dashboard'
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 0.5,
+          textDecoration: 'none',
+          color: colors.marsala,
+          fontFamily: typography.body,
+          fontSize: '0.875rem',
+          mb: 2,
+          borderRadius: '4px',
+          '&:focus-visible': {
+            outline: `2px solid ${colors.marsala}`,
+            outlineOffset: '2px',
+          },
+        }}
       >
-        <Box
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 0.5,
-            color: colors.marsala,
-            fontFamily: typography.body,
-            fontSize: '0.875rem',
-            mb: 2,
-          }}
-        >
-          <ArrowBackOutlined sx={{ fontSize: 18 }} />
-          Zurück zum Dashboard
-        </Box>
-      </Link>
+        <ArrowBackOutlined sx={{ fontSize: 18 }} />
+        Zurück zum Dashboard
+      </Box>
 
       <Typography
         component='h1'

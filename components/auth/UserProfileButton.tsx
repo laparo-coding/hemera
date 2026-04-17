@@ -70,7 +70,7 @@ export function UserProfileButton({
       path: '/dashboard',
     },
     {
-      label: 'My Courses',
+      label: 'Meine Kurse',
       icon: <Settings fontSize='small' />,
       path: '/my-courses',
     },

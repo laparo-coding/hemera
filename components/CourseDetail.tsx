@@ -200,6 +200,14 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
     return formatDate(course.startDate) ?? null;
   }, [course.startDate]);
 
+  const bookingButtonLinkProps =
+    bookNowHref && !isBookingDisabled
+      ? {
+          component: Link as React.ElementType,
+          href: bookNowHref,
+        }
+      : {};
+
   const formattedTime = useMemo(() => {
     if (!course.startTime || !course.endTime) return null;
     const startTime =
@@ -447,18 +455,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                   variant='contained'
                   size='large'
                   startIcon={<BookOnlineOutlinedIcon />}
-                  {...(bookNowHref
-                    ? {
-                        component: Link as React.ElementType,
-                        href: bookNowHref,
-                      }
-                    : {})}
+                  {...bookingButtonLinkProps}
                   onClick={
                     typeof onBookNow === 'function' ? handleBookNow : undefined
                   }
                   disabled={isBookingDisabled}
                   title={disableReason ?? undefined}
-                  aria-disabled={isBookingDisabled}
                   aria-busy={isBooking || undefined}
                   data-testid='course-detail-book-cta'
                 >

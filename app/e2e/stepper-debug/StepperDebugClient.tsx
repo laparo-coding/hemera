@@ -1,8 +1,8 @@
 'use client';
 
 import { Box, Typography } from '@mui/material';
-import type { ParticipationStatus } from '@prisma/client';
 import CourseProgressStepper from '@/components/dashboard/CourseProgressStepper';
+import type { ParticipationStatus } from '@/lib/types/participation';
 
 const statuses: (ParticipationStatus | null)[] = [
   null,
