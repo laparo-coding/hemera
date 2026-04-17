@@ -12,7 +12,6 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { ParticipationStatus, PaymentStatus } from '@prisma/client';
 import Link from 'next/link';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -20,6 +19,8 @@ import { z } from 'zod';
 import { TERMS } from '@/lib/constants';
 import { colors } from '@/lib/design-tokens';
 import { ErrorSeverity, reportError } from '@/lib/monitoring/rollbar-official';
+import { isPaymentStatus, type PaymentStatus } from '@/lib/types/booking';
+import { PARTICIPATION_STATUSES } from '@/lib/types/participation';
 import {
   type BookingForCategorization,
   categorizeBookings as categorizeBookingsUtil,
@@ -31,7 +32,14 @@ import {
   UserPageContainer,
 } from './dashboard';
 
-const participationStatusSchema = z.nativeEnum(ParticipationStatus).nullable();
+const participationStatusSchema = z.preprocess(
+  value => (value == null ? null : value),
+  z.union([z.enum(PARTICIPATION_STATUSES), z.null()])
+);
+
+const paymentStatusSchema = z.custom<PaymentStatus>(isPaymentStatus, {
+  message: 'Ungültiger paymentStatus',
+});
 
 const bookingSchema = z.object({
   id: z.string(),
@@ -39,7 +47,7 @@ const bookingSchema = z.object({
   courseTitle: z.string(),
   coursePrice: z.number(),
   currency: z.string(),
-  paymentStatus: z.nativeEnum(PaymentStatus),
+  paymentStatus: paymentStatusSchema,
   createdAt: z.string(),
   startDate: z.string().nullable(),
   endDate: z.string().nullable(),

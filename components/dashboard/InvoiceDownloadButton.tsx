@@ -37,7 +37,7 @@
 'use client';
 
 import { DescriptionOutlined } from '@mui/icons-material';
-import { CircularProgress, Link as MuiLink, Tooltip } from '@mui/material';
+import { Box, CircularProgress, Tooltip } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { colors, typography } from '@/lib/design-tokens';
 import { logClientError } from '@/lib/errors/client';
@@ -215,12 +215,11 @@ export default function InvoiceDownloadButton({
       : BUTTON_TEXT.DEFAULT;
 
   const link = (
-    <MuiLink
+    <Box
       component='button'
       type='button'
-      underline='hover'
       onClick={handleClick}
-      aria-disabled={buttonDisabled}
+      disabled={buttonDisabled}
       aria-label={buttonText}
       aria-busy={isLoading}
       sx={{
@@ -232,11 +231,12 @@ export default function InvoiceDownloadButton({
         fontWeight: 500,
         fontSize: '0.875rem',
         cursor: buttonDisabled ? 'not-allowed' : 'pointer',
-        pointerEvents: buttonDisabled ? 'none' : 'auto',
         opacity: buttonDisabled ? 0.5 : 1,
         border: 'none',
         background: 'none',
         p: 0,
+        textDecoration: 'underline',
+        textUnderlineOffset: '0.12em',
         '&:hover': {
           color: colors.bronze,
         },
@@ -253,7 +253,7 @@ export default function InvoiceDownloadButton({
         <DescriptionOutlined sx={{ fontSize: '1rem' }} />
       )}
       {compact ? null : buttonText}
-    </MuiLink>
+    </Box>
   );
 
   // Show tooltip on error

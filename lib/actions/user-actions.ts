@@ -79,7 +79,7 @@ export const updateProfileAction = async (
 
     // Revalidate user-related pages
     revalidatePath('/protected');
-    revalidatePath('/profile');
+    revalidatePath('/user-profile');
 
     return {
       success: true,
@@ -121,7 +121,7 @@ export const syncUserAction = withServerActionErrorHandling(
     const user = await getCurrentUserWithSync();
 
     revalidatePath('/protected');
-    revalidatePath('/profile');
+    revalidatePath('/user-profile');
 
     return user;
   }

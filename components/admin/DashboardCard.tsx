@@ -109,7 +109,6 @@ export function DashboardCard({ config }: DashboardCardProps) {
     return (
       <Card
         data-testid={`dashboard-card-${id}`}
-        aria-disabled='true'
         sx={{
           height: '100%',
           opacity: 0.6,

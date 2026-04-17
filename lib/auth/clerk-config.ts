@@ -212,7 +212,7 @@ export const clerkConfig = {
     return this.signUpFallbackRedirectUrl;
   },
   dashboardUrl: '/dashboard',
-  profileUrl: '/my-courses', // Use existing route instead of /protected/profile
+  profileUrl: '/user-profile', // Use dedicated localized profile route
 };
 
 /**

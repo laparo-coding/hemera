@@ -300,7 +300,7 @@ async function renderMockProfile(page: Page, role: 'user' | 'admin') {
     <html>
       <body>
         <main data-testid="profile-page">
-          <h1>Profile</h1>
+          <h1>Profil</h1>
           <p data-testid="user-role">${role}</p>
         </main>
       </body>
