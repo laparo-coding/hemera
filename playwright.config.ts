@@ -56,7 +56,10 @@ const e2eEnvAssignments = [
 const bypassToken =
   process.env.VERCEL_PROTECTION_BYPASS || process.env.VERCEL_BYPASS;
 const extraHTTPHeaders = bypassToken
-  ? { 'x-vercel-protection-bypass': bypassToken }
+  ? {
+      'x-vercel-protection-bypass': bypassToken,
+      'x-vercel-set-bypass-cookie': 'true',
+    }
   : undefined;
 const productionSmokeSpec = /production-smoke\.spec\.ts/;
 const authSetupSpec = /auth-setup\.ts/;
