@@ -4,6 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { serverInstance } from '../monitoring/rollbar-official';
 import { errorAnalytics } from '../services/error-analytics';
 import {
   getRequestContext,
@@ -191,7 +192,30 @@ function getStatusCodeForError(error: Error): number {
  * Error logging utility with structured format
  */
 export function logError(error: unknown, context?: Record<string, unknown>) {
-  logErrorWithContext(error, context);
+  void Promise.resolve()
+    .then(() => logErrorWithContext(error, context))
+    .catch(loggingError => {
+      try {
+        const requestId =
+          typeof context?.requestId === 'string'
+            ? context.requestId
+            : typeof context?.requestContext === 'object' &&
+                context.requestContext !== null &&
+                'id' in context.requestContext &&
+                typeof context.requestContext.id === 'string'
+              ? context.requestContext.id
+              : undefined;
+
+        serverInstance.error('[http-error-log-fallback]', {
+          requestId,
+          context,
+          originalError: error,
+          loggingError,
+        });
+      } catch {
+        // Logging must never break the caller when request context is unavailable.
+      }
+    });
 }
 
 /**

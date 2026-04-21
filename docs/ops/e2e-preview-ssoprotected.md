@@ -16,11 +16,13 @@ Preview sinnvoll durchlaufen können.
 Wenn Previews durch Vercel SSO geschützt sind, kannst du einen Protection-Bypass-Token verwenden:
 
 1. In Vercel → Project → Settings → Protection → „Bypass Tokens“ einen Token erzeugen.
-2. Diesen als Secret in GitHub hinterlegen, z. B. `VERCEL_PROTECTION_BYPASS`.
+2. Diesen als Secret in GitHub hinterlegen. Bevorzugt wird das zentrale Secret
+   `VERCEL_AUTOMATION_BYPASS_SECRET`; `VERCEL_PROTECTION_BYPASS` bleibt als Fallback unterstützt.
 3. Playwright sendet den Header automatisch, wenn die Env-Var gesetzt ist:
-   - Header: `x-vercel-protection-bypass: <TOKEN>`
-   - Local: `VERCEL_PROTECTION_BYPASS=<TOKEN> PLAYWRIGHT_BASE_URL=<Preview-URL> npx playwright test`
-   - CI: Das Workflow `E2E External` liest `VERCEL_PROTECTION_BYPASS` aus `secrets` aus.
+  Header: `x-vercel-protection-bypass: <TOKEN>`.
+  Local: `VERCEL_PROTECTION_BYPASS=<TOKEN> PLAYWRIGHT_BASE_URL=<Preview-URL> npx playwright test`.
+  CI: Der Workflow `E2E: External Smoke` nutzt zuerst `VERCEL_AUTOMATION_BYPASS_SECRET` und fällt
+  bei Bedarf auf `VERCEL_PROTECTION_BYPASS` zurück.
 
 Damit laufen E2E-Tests gegen geschützte Previews ohne SSO global abzuschalten.
 

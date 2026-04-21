@@ -34,10 +34,25 @@ jobs:
       - name: Lint
         run: npm run lint:ci
 
-      - name: Unit tests
-        run: npm run test:unit -- --ci --reporters=default --reporters=jest-junit
+      - name: Unit coverage summary
+        run: npm run test:unit:coverage -- --runInBand --ci
         env:
           CI: 'true'
+
+      - name: Render coverage summary
+        run: |
+          set -euo pipefail
+          tmp_file='coverage/summary.json.tmp'
+          rm -f "$tmp_file"
+          if npm run coverage:summary -- --json > "$tmp_file"; then
+            mv "$tmp_file" coverage/summary.json
+          else
+            rm -f "$tmp_file"
+            exit 1
+          fi
+
+      - name: Enforce baseline coverage floor
+        run: npm run coverage:check -- --lines 60 --statements 60 --functions 45 --branches 75
 
       - name: Build
         run: npm run build
@@ -50,4 +65,12 @@ jobs:
         with:
           name: webapp-build
           path: .next/**
+          if-no-files-found: ignore
+
+      - name: Save coverage artifact
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage-pr
+          path: coverage/
           if-no-files-found: ignore

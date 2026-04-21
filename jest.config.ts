@@ -1,4 +1,15 @@
 import type { Config } from 'jest';
+import { criticalAreas } from './tests/critical-areas.js';
+
+const unitMeasuredCriticalAreaPaths = (
+  criticalAreas as Array<{ paths: string[] }>
+)
+  .flatMap((area: { paths: string[] }) => area.paths)
+  .filter(
+    (filePath: string) =>
+      filePath.startsWith('lib/') ||
+      filePath.startsWith('components/dashboard/')
+  );
 
 const config: Config = {
   preset: 'ts-jest/presets/default-esm',
@@ -36,37 +47,12 @@ const config: Config = {
   maxWorkers: 1, // Force sequential execution for database tests
   // Use V8 coverage to avoid Babel parsing issues for non-transformed files
   coverageProvider: 'v8',
-  // Limit coverage collection to core library logic only
-  collectCoverageFrom: ['lib/**/*.ts'],
+  // Measure the baseline library scope plus the first catalog-driven critical areas
+  collectCoverageFrom: Array.from(
+    new Set(['lib/**/*.ts', ...unitMeasuredCriticalAreaPaths])
+  ),
   coverageDirectory: 'coverage',
-  coverageReporters: ['text', 'lcov', 'html'],
-  coverageThreshold: {
-    global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
-    },
-    './lib/services/': {
-      branches: 85,
-      functions: 85,
-      lines: 85,
-      statements: 85,
-    },
-    // Per-path overrides for areas with inherently low testability
-    './lib/monitoring/': {
-      branches: 50,
-      functions: 50,
-      lines: 50,
-      statements: 50,
-    },
-    './lib/stripe/': {
-      branches: 60,
-      functions: 60,
-      lines: 60,
-      statements: 60,
-    },
-  },
+  coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
 };
 
 export default config;

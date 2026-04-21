@@ -4,6 +4,7 @@
  */
 
 import { analytics } from '../analytics/request-analytics';
+import { findEnvByPrefix } from '../utils/env-prefix';
 import { deploymentAlerts } from './deployment-alerts';
 import { serverInstance } from './rollbar-official';
 
@@ -30,6 +31,21 @@ interface ServiceStatus {
   stripe: HealthCheck;
   rollbar: HealthCheck;
   analytics: HealthCheck;
+}
+
+function getRollbarEnvironment(
+  deploymentEnv: string,
+  nodeEnv: string | undefined
+): 'production' | 'preview' | 'development' {
+  if (deploymentEnv === 'production' || nodeEnv === 'production') {
+    return 'production';
+  }
+
+  if (deploymentEnv === 'preview') {
+    return 'preview';
+  }
+
+  return 'development';
 }
 
 export class DeploymentMonitor {
@@ -221,22 +237,77 @@ export class DeploymentMonitor {
     const startTime = Date.now();
 
     try {
-      const rollbarToken = process.env.ROLLBAR_SERVER_ACCESS_TOKEN;
-      if (!rollbarToken) {
-        throw new Error('Rollbar Access Token nicht konfiguriert');
+      const deploymentEnv = (
+        process.env.VERCEL_ENV ||
+        process.env.NEXT_PUBLIC_VERCEL_ENV ||
+        ''
+      ).toLowerCase();
+      const isDevelopmentEnvironment =
+        deploymentEnv !== 'production' &&
+        deploymentEnv !== 'preview' &&
+        process.env.NODE_ENV !== 'production';
+      const isExplicitlyEnabled =
+        process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '1' ||
+        process.env.ROLLBAR_ENABLED === '1';
+      const isExplicitlyDisabled =
+        process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
+        process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0' ||
+        process.env.ROLLBAR_ENABLED === '0';
+      const rollbarToken = findEnvByPrefix(
+        'ROLLBAR_HEMERA_SERVER_TOKEN',
+        'ROLLBAR_SERVER_TOKEN',
+        'ROLLBAR_AITHER_SERVER_TOKEN'
+      );
+
+      if (isExplicitlyDisabled) {
+        return {
+          name: 'rollbar',
+          status: 'warn',
+          responseTime: Date.now() - startTime,
+          details: { reason: 'Explizit deaktiviert', configured: false },
+          lastChecked: new Date().toISOString(),
+        };
       }
 
-      // Test-Message an Rollbar senden
-      serverInstance.info('Deployment Health Check', {
-        timestamp: new Date().toISOString(),
-        deployment: this.deploymentInfo,
-      });
+      if (!rollbarToken) {
+        return {
+          name: 'rollbar',
+          status: 'fail',
+          responseTime: Date.now() - startTime,
+          details: {
+            reason: 'Server-Token nicht konfiguriert',
+            configured: false,
+          },
+          lastChecked: new Date().toISOString(),
+        };
+      }
+
+      if (isDevelopmentEnvironment && !isExplicitlyEnabled) {
+        return {
+          name: 'rollbar',
+          status: 'warn',
+          responseTime: Date.now() - startTime,
+          details: {
+            reason:
+              'Development-Umgebung nicht aktiviert (ROLLBAR_ENABLED=1 fehlt)',
+            configured: true,
+          },
+          lastChecked: new Date().toISOString(),
+        };
+      }
 
       return {
         name: 'rollbar',
         status: 'pass',
         responseTime: Date.now() - startTime,
-        details: { provider: 'rollbar', configured: true },
+        details: {
+          provider: 'rollbar',
+          configured: true,
+          environment: getRollbarEnvironment(
+            deploymentEnv,
+            process.env.NODE_ENV
+          ),
+        },
         lastChecked: new Date().toISOString(),
       };
     } catch (error) {

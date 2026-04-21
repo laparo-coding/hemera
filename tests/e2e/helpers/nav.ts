@@ -22,9 +22,30 @@ export async function gotoStable(
     await page
       .getByTestId(waitForTestId)
       .first()
-      .waitFor({ state: 'visible', timeout: 30_000 });
+      .waitFor({ state: 'visible', timeout: timeout ?? 30_000 });
   }
   return response;
+}
+
+export async function waitForClientHydration(
+  page: Page,
+  testId = 'auth-page-ready',
+  timeout = 15_000
+): Promise<void> {
+  const hydrationMarker = page.getByTestId(testId).first();
+
+  await hydrationMarker.waitFor({ state: 'attached', timeout });
+  await page.waitForFunction(
+    targetTestId => {
+      const marker = document.querySelector(
+        `[data-testid="${targetTestId}"]`
+      );
+
+      return marker?.getAttribute('data-state') === 'ready';
+    },
+    testId,
+    { timeout }
+  );
 }
 
 /**

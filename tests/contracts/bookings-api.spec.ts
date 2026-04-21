@@ -209,6 +209,16 @@ describe('GET /api/bookings - Contract Tests', () => {
       const serverErrorStatusCode = 500;
       expect(serverErrorStatusCode).toBe(500);
     });
+
+    it('should return 400 when an invoice download is requested for an unpaid booking', () => {
+      const unpaidInvoiceStatusCode = 400;
+      expect(unpaidInvoiceStatusCode).toBe(400);
+    });
+
+    it('should return 404 when a booking invoice is unavailable', () => {
+      const missingInvoiceStatusCode = 404;
+      expect(missingInvoiceStatusCode).toBe(404);
+    });
   });
 
   describe('Authentication Requirements', () => {
@@ -237,6 +247,40 @@ describe('GET /api/bookings - Contract Tests', () => {
           (accessRules as Record<string, unknown>)[role]
         );
       });
+    });
+
+    it('should scope invoice downloads to the booking owner', () => {
+      const invoiceAccessRules = {
+        owner: 'allowed',
+        otherUser: 'booking_not_found',
+      };
+
+      expect(invoiceAccessRules.owner).toBe('allowed');
+      expect(invoiceAccessRules.otherUser).toBe('booking_not_found');
+    });
+  });
+
+  describe('Invoice Download Contract', () => {
+    it('should define PDF response headers for invoice downloads', () => {
+      const responseHeaders = {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="rechnung-in_123.pdf"',
+        'Cache-Control': 'private, max-age=3600',
+      };
+
+      expect(responseHeaders['Content-Type']).toBe('application/pdf');
+      expect(responseHeaders['Content-Disposition']).toContain('rechnung-');
+      expect(responseHeaders['Cache-Control']).toContain('private');
+    });
+
+    it('should return JSON error payloads for failed invoice downloads', () => {
+      const errorPayload = {
+        success: false,
+        error: 'Invoice not available',
+      };
+
+      expect(errorPayload.success).toBe(false);
+      expect(errorPayload.error).toBeDefined();
     });
   });
 

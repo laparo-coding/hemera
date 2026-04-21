@@ -3,6 +3,7 @@
 import { ErrorOutline, Refresh } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
 import React from 'react';
+import { isEnvFlagDisabled, isEnvFlagEnabled } from '../lib/utils/env-flags';
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -11,9 +12,9 @@ interface ErrorPageProps {
 
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
   const isRollbarDisabled =
-    process.env.E2E_TEST === '1' ||
-    process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
-    process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0';
+    isEnvFlagEnabled(process.env.NEXT_PUBLIC_E2E_TEST) ||
+    isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_ROLLBAR) ||
+    isEnvFlagDisabled(process.env.NEXT_PUBLIC_ROLLBAR_ENABLED);
 
   React.useEffect(() => {
     // Log the error to your error reporting service

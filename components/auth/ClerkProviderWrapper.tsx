@@ -33,6 +33,11 @@ interface ClerkProviderWrapperProps {
   children: ReactNode;
 }
 
+interface ClerkErrorBoundaryProps {
+  children: ReactNode;
+  fallback: ReactNode;
+}
+
 interface ClerkErrorBoundaryState {
   hasError: boolean;
   error?: Error;
@@ -42,10 +47,10 @@ interface ClerkErrorBoundaryState {
  * Error Boundary to catch Clerk initialization errors and provide graceful fallback
  */
 class ClerkErrorBoundary extends Component<
-  { children: ReactNode },
+  ClerkErrorBoundaryProps,
   ClerkErrorBoundaryState
 > {
-  constructor(props: { children: ReactNode }) {
+  constructor(props: ClerkErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
@@ -81,7 +86,7 @@ class ClerkErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       // Render children without Clerk (unauthenticated mode)
-      return this.props.children;
+      return this.props.fallback;
     }
 
     return this.props.children;
@@ -96,7 +101,7 @@ function shouldBypassClerk(publishableKey?: string): {
   reason?: string;
 } {
   const isE2E =
-    process.env.E2E_TEST === '1' ||
+    process.env.NEXT_PUBLIC_E2E_TEST === '1' ||
     process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
 
   if (isE2E) {
@@ -162,7 +167,7 @@ export default function ClerkProviderWrapper({
   }
 
   return (
-    <ClerkErrorBoundary>
+    <ClerkErrorBoundary fallback={children}>
       <ClerkProvider
         publishableKey={publishableKey!}
         localization={customDeDE}

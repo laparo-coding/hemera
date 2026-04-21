@@ -13,6 +13,42 @@ import {
 } from '../errors';
 import type { CurriculumModule } from '../schemas/admin/course';
 
+export const featuredCoursesTimeoutMs = 3_000;
+
+async function withTimeout<T>(
+  operation: Promise<T>,
+  timeoutMs: number,
+  timeoutMessage: string
+): Promise<T> {
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<T>((_, reject) => {
+        timeoutHandle = setTimeout(() => {
+          reject(new Error(timeoutMessage));
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle);
+    }
+  }
+}
+
+function logCourseApiError(
+  error: unknown,
+  context?: Record<string, unknown>
+): void {
+  try {
+    logError(error, context);
+  } catch {
+    // Ignore request-context logging failures so data fallbacks remain usable.
+  }
+}
+
 export interface CourseLocation {
   id: string;
   name: string;
@@ -141,7 +177,7 @@ export async function getPublishedCourses(): Promise<Course[]> {
 
     return enriched;
   } catch (error) {
-    logError(error, { operation: 'getPublishedCourses' });
+    logCourseApiError(error, { operation: 'getPublishedCourses' });
     throw error;
   }
 }
@@ -153,19 +189,23 @@ export async function getPublishedCourses(): Promise<Course[]> {
  */
 export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
   try {
-    const courses = await prisma.course.findMany({
-      where: {
-        isPublished: true,
-        isNonPublic: false, // Exclude Learning Path invite-only courses
-      },
-      include: {
-        location: {
-          select: courseLocationSelect,
+    const courses = await withTimeout(
+      prisma.course.findMany({
+        where: {
+          isPublished: true,
+          isNonPublic: false, // Exclude Learning Path invite-only courses
         },
-      },
-      orderBy: [{ startDate: 'asc' }, { createdAt: 'desc' }],
-      take: limit,
-    });
+        include: {
+          location: {
+            select: courseLocationSelect,
+          },
+        },
+        orderBy: [{ startDate: 'asc' }, { createdAt: 'desc' }],
+        take: limit,
+      }),
+      featuredCoursesTimeoutMs,
+      'Featured courses query timed out'
+    );
 
     // Map to consistent Course interface with location
     return courses.map(course => ({
@@ -198,7 +238,7 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
         : null,
     }));
   } catch (error) {
-    logError(error, { operation: 'getFeaturedCourses', limit });
+    logCourseApiError(error, { operation: 'getFeaturedCourses', limit });
     throw new DatabaseConnectionError(
       'fetching featured courses',
       error as Error
@@ -268,7 +308,7 @@ export async function getCourseById(id: string): Promise<Course> {
       throw error; // Re-throw our custom error
     }
 
-    logError(error, { operation: 'getCourseById', courseId: id });
+    logCourseApiError(error, { operation: 'getCourseById', courseId: id });
     throw new DatabaseConnectionError('fetching course by ID', error as Error);
   }
 }
@@ -342,7 +382,7 @@ export async function getCourseBySlug(slug: string): Promise<Course> {
       throw error; // Re-throw our custom errors
     }
 
-    logError(error, { operation: 'getCourseBySlug', slug });
+    logCourseApiError(error, { operation: 'getCourseBySlug', slug });
     throw new DatabaseConnectionError(
       'fetching course by slug',
       error as Error
@@ -367,7 +407,7 @@ export async function getAllCourses(): Promise<Course[]> {
       curriculum: course.curriculum as CurriculumModule[] | null,
     })) as Course[];
   } catch (error) {
-    logError(error, { operation: 'getAllCourses' });
+    logCourseApiError(error, { operation: 'getAllCourses' });
     throw new DatabaseConnectionError('fetching all courses', error as Error);
   }
 }
@@ -399,7 +439,7 @@ export async function getNextUpcomingCourse(): Promise<Course | null> {
       curriculum: course.curriculum as CurriculumModule[] | null,
     } as Course;
   } catch (error) {
-    logError(error, { operation: 'getNextUpcomingCourse' });
+    logCourseApiError(error, { operation: 'getNextUpcomingCourse' });
     throw new DatabaseConnectionError(
       'fetching next upcoming course',
       error as Error
@@ -427,7 +467,7 @@ export async function getCourseStats() {
       nonPublic,
     };
   } catch (error) {
-    logError(error, { operation: 'getCourseStats' });
+    logCourseApiError(error, { operation: 'getCourseStats' });
     throw new DatabaseConnectionError(
       'fetching course statistics',
       error as Error

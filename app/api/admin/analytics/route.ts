@@ -3,19 +3,20 @@
  * Provides analytics data for dashboard and monitoring
  */
 
-import { type NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { analytics } from '../../../../lib/analytics/request-analytics';
-import {
-  checkUserAdminStatus,
-  getCurrentUser,
-} from '../../../../lib/auth/helpers';
+import { requireAdminUser } from '../../../../lib/auth/helpers';
 import { createApiLogger } from '../../../../lib/utils/api-logger';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
 } from '../../../../lib/utils/api-response';
-import { getCorsHeaders } from '../../../../lib/utils/cors';
+import {
+  applyCorsHeaders,
+  createCorsPreflightResponse,
+  getCorsHeaders,
+} from '../../../../lib/utils/cors';
 import {
   createRequestContext,
   getOrCreateRequestId,
@@ -25,7 +26,7 @@ import {
 const corsHeaders = getCorsHeaders();
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+  return createCorsPreflightResponse(corsHeaders);
 }
 
 export async function GET(request: NextRequest) {
@@ -40,63 +41,15 @@ export async function GET(request: NextRequest) {
   try {
     logger.info('Analytics data request started');
 
-    // Authentication check — single Clerk call avoids redundant auth() + currentUser()
-    let userId: string | null = null;
-    let authenticatedUser: Awaited<ReturnType<typeof getCurrentUser>> = null;
-    try {
-      authenticatedUser = await getCurrentUser();
-      userId = authenticatedUser?.id ?? null;
-    } catch (authError) {
-      logger.warn('Auth failed', authError);
-      const errorResponse = createErrorResponse(
-        'Du bist nicht autorisiert',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-
-      // Add CORS headers to error response
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
+    const adminAuth = await requireAdminUser(requestId);
+    if (!adminAuth.authorized) {
+      logger.warn('Unauthorized analytics access attempt', {
+        userId: adminAuth.userId,
       });
-
-      return errorResponse;
+      return applyCorsHeaders(adminAuth.response, corsHeaders);
     }
 
-    if (!userId) {
-      logger.warn('Unauthorized analytics access attempt');
-      const errorResponse = createErrorResponse(
-        'Du bist nicht autorisiert',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-
-      // Add CORS headers to error response
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-
-      return errorResponse;
-    }
-
-    const isAdmin = await checkUserAdminStatus(authenticatedUser);
-    if (!isAdmin) {
-      logger.warn('Non-admin user attempted to access analytics', { userId });
-      const errorResponse = createErrorResponse(
-        'Admin privileges required',
-        ErrorCodes.FORBIDDEN,
-        requestId,
-        403
-      );
-
-      // Add CORS headers to error response
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-
-      return errorResponse;
-    }
+    const userId = adminAuth.userId;
 
     const { searchParams } = new URL(request.url);
     const timeframe = searchParams.get('timeframe') || '24h';
@@ -139,12 +92,7 @@ export async function GET(request: NextRequest) {
             400
           );
 
-          // Add CORS headers to error response
-          Object.entries(corsHeaders).forEach(([key, value]) => {
-            errorResponse.headers.set(key, value);
-          });
-
-          return errorResponse;
+          return applyCorsHeaders(errorResponse, corsHeaders);
         }
         responseData = {
           trace: analytics.getRequestTrace(traceRequestId),
@@ -160,12 +108,7 @@ export async function GET(request: NextRequest) {
           400
         );
 
-        // Add CORS headers to error response
-        Object.entries(corsHeaders).forEach(([key, value]) => {
-          errorResponse.headers.set(key, value);
-        });
-
-        return errorResponse;
+        return applyCorsHeaders(errorResponse, corsHeaders);
       }
     }
 
@@ -185,41 +128,36 @@ export async function GET(request: NextRequest) {
     // Track request completion
     logger.trackRequestCompletion(200);
 
-    const response = createSuccessResponse(
-      {
-        report: responseData,
-        metadata: {
-          timeframe,
-          reportType,
-          generatedAt: new Date().toISOString(),
-          requestId,
+    return applyCorsHeaders(
+      createSuccessResponse(
+        {
+          report: responseData,
+          metadata: {
+            timeframe,
+            reportType,
+            generatedAt: new Date().toISOString(),
+            requestId,
+          },
         },
-      },
-      requestId
+        requestId
+      ),
+      corsHeaders
     );
-
-    // Add CORS headers to response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      response.headers.set(key, value);
-    });
-
-    return response;
   } catch (error) {
-    logger.error('Error generating analytics report', error as Error);
+    const normalizedError =
+      error instanceof Error ? error : new Error(String(error));
+
+    logger.error('Error generating analytics report', normalizedError);
     logger.trackRequestCompletion(500);
 
-    const errorResponse = createErrorResponse(
-      'Failed to generate analytics report',
-      ErrorCodes.INTERNAL_ERROR,
-      requestId,
-      500
+    return applyCorsHeaders(
+      createErrorResponse(
+        'Failed to generate analytics report',
+        ErrorCodes.INTERNAL_ERROR,
+        requestId,
+        500
+      ),
+      corsHeaders
     );
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
-    });
-
-    return errorResponse;
   }
 }

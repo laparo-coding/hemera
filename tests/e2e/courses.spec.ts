@@ -11,13 +11,14 @@ test.describe('Courses Page', () => {
     // In production (external base), avoid 'networkidle' to reduce flakiness due to long-lived connections
     await gotoStable(page, '/courses', { waitForTestId: 'course-overview' });
 
-    // Mindestens eine Kurskarte oder der explizite Empty-State sichtbar
+    // Mindestens eine Kurskarte oder der explizite DB-Empty-State ist sichtbar.
     const cards = page.getByTestId('course-card');
+    const databaseEmptyState = page.getByTestId('e2e-courses-empty');
     const count = await cards.count();
     if (count > 0) {
       // Titeltext vorhanden (DB-gestützte Kursdaten)
       await expect(page.getByTestId('course-title').first()).toBeVisible();
-      await expect(page.getByTestId('e2e-courses-empty')).toHaveCount(0);
+      await expect(databaseEmptyState).toHaveCount(0);
     } else {
       // Kein Kurs gefunden
       // Lokal (E2E-Modus) verlangen wir den expliziten Empty-State mit Test-ID.
@@ -33,8 +34,8 @@ test.describe('Courses Page', () => {
         // Optional: prüfe noch, dass keine Karten erscheinen (bereits count==0)
         await expect(cards).toHaveCount(0);
       } else {
-        const emptyE2E = page.getByTestId('e2e-courses-empty');
-        await expect(emptyE2E).toBeVisible();
+        await databaseEmptyState.waitFor({ state: 'visible', timeout: 5000 });
+        await expect(databaseEmptyState).toBeVisible();
       }
     }
   });

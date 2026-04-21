@@ -25,6 +25,8 @@ const EnvSchema = z.object({
   NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN: z.string().optional(),
   ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
   NEXT_PUBLIC_ROLLBAR_ENABLED: z.enum(['0', '1']).optional(),
+  // Public E2E flag used by browser-executed test helpers and Playwright bootstrapping.
+  NEXT_PUBLIC_E2E_TEST: z.enum(['0', '1']).optional(),
 
   // Upstash Redis rate limiting (opt-in via UPSTASH_ENABLED=1)
   UPSTASH_ENABLED: z.enum(['0', '1']).optional(),

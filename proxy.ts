@@ -1,4 +1,4 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -7,7 +7,13 @@ const isE2EMode =
   process.env.E2E_TEST === '1' || process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
 
 // Prepare a Clerk middleware instance for non-E2E mode
-const clerkMw = clerkMiddleware();
+const isUserProfileRoute = createRouteMatcher(['/user-profile(.*)']);
+
+const clerkMw = clerkMiddleware(async (auth, request) => {
+  if (isUserProfileRoute(request)) {
+    await auth.protect();
+  }
+});
 
 // Custom proxy to enforce legacy redirects and then delegate to Clerk (when enabled)
 export default function proxy(request: NextRequest, event: NextFetchEvent) {

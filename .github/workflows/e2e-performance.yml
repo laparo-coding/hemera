@@ -1,0 +1,147 @@
+name: 'E2E: Performance'
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 5 * * 1'
+
+concurrency:
+  group: e2e-performance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: hemera_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d hemera_e2e"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 30
+          --health-start-period 20s
+
+    env:
+      DATABASE_URL: 'postgresql://postgres:postgres@127.0.0.1:5432/hemera_e2e'
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      E2E_CREATE_USERS: 'false'
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+      NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
+      NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /dashboard
+      NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: /dashboard
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Postgres client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Wait for Postgres to be ready
+        env:
+          PGPASSWORD: postgres
+          PGUSER: postgres
+          PGDATABASE: hemera_e2e
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+        run: |
+          echo 'Waiting for Postgres service...'
+          for i in {1..30}; do
+            if pg_isready -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE"; then
+              echo "Postgres is ready after $i attempts"
+              break
+            fi
+            echo "Waiting for Postgres... attempt $i/30"
+            sleep 2
+          done
+          psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE" -c 'SELECT 1;' || exit 1
+
+      - name: Setup database schema
+        env:
+          PRISMA_CONFIG_PATH: './prisma.config.ts'
+        run: |
+          echo "DATABASE_URL is set: $([[ -n $DATABASE_URL ]] && echo 'yes' || echo 'no')"
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx scripts/e2e-seed.ts
+
+      - name: Build Next.js app
+        env:
+          NODE_ENV: production
+          E2E_TEST: '1'
+          NEXT_PUBLIC_E2E_TEST: '1'
+          NEXT_PUBLIC_DISABLE_CLERK: '1'
+          NEXT_PUBLIC_DISABLE_ROLLBAR: '1'
+        run: npm run build
+
+      - name: Start Next.js server in background
+        env:
+          NODE_ENV: production
+          E2E_TEST: '1'
+          NEXT_PUBLIC_E2E_TEST: '1'
+          NEXT_PUBLIC_DISABLE_CLERK: '1'
+          NEXT_PUBLIC_DISABLE_ROLLBAR: '1'
+        run: |
+          npm run start > /tmp/nextjs.log 2>&1 &
+          SERVER_PID=$!
+          echo "Started Next.js server with PID $SERVER_PID"
+          echo 'Waiting for server to be ready...'
+          for i in {1..60}; do
+            if curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
+              echo "Server is ready after $((i*2)) seconds"
+              break
+            fi
+            if ! kill -0 $SERVER_PID 2>/dev/null; then
+              echo 'Server process died unexpectedly!'
+              cat /tmp/nextjs.log || true
+              exit 1
+            fi
+            echo "Waiting for server... attempt $i/60"
+            sleep 2
+          done
+          if ! curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
+            echo 'Server failed to start after 120 seconds'
+            cat /tmp/nextjs.log || true
+            exit 1
+          fi
+
+      - name: Run performance tests
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          E2E_TEST: '1'
+          NEXT_PUBLIC_E2E_TEST: '1'
+          NEXT_PUBLIC_DISABLE_CLERK: '1'
+          NEXT_PUBLIC_DISABLE_ROLLBAR: '1'
+        run: npx playwright test --project=performance
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-performance-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: warn

@@ -11,6 +11,10 @@ describe('Rollbar SDK Initialization', () => {
     jest.resetModules();
     // Clone env to avoid mutations (cast to any to allow NODE_ENV mutation in tests)
     process.env = { ...originalEnv } as any;
+    delete process.env.ROLLBAR_ENABLED;
+    delete process.env.NEXT_PUBLIC_ROLLBAR_ENABLED;
+    delete process.env.VERCEL_ENV;
+    delete process.env.NEXT_PUBLIC_VERCEL_ENV;
   });
 
   afterEach(() => {
@@ -19,6 +23,21 @@ describe('Rollbar SDK Initialization', () => {
   });
 
   describe('Token Validation', () => {
+    it('should prefer the newest suffixed server token from Vercel integration', async () => {
+      process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1769716944 =
+        'older-invalid-token';
+      process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1769717269 =
+        'newest-valid-server-token-with-sufficient-length-12345';
+      // @ts-expect-error - Mutating NODE_ENV for test purposes
+      process.env.NODE_ENV = 'production';
+
+      const { rollbarConfig } = await import('@/lib/monitoring/rollbar-official');
+
+      expect(rollbarConfig.accessToken).toBe(
+        'newest-valid-server-token-with-sufficient-length-12345'
+      );
+    });
+
     it('should not initialize Rollbar without server token', async () => {
       // Remove all Rollbar tokens (including Vercel-Rollbar integration suffixed keys)
       for (const key of Object.keys(process.env)) {
@@ -58,8 +77,8 @@ describe('Rollbar SDK Initialization', () => {
     });
 
     it('should initialize Rollbar with valid token', async () => {
-        process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
-          'valid-token-with-sufficient-length-12345';
+      process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
+        'valid-token-with-sufficient-length-12345';
       // @ts-expect-error - Mutating NODE_ENV for test purposes
       process.env.NODE_ENV = 'production';
 
@@ -116,6 +135,32 @@ describe('Rollbar SDK Initialization', () => {
       mod.reportError('Disabled test', { requestId: 'd1' }, 'error');
       expect(spy).not.toHaveBeenCalled();
       spy.mockRestore();
+    });
+
+    it('should keep development disabled without explicit opt-in', async () => {
+      process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
+        'valid-token-with-sufficient-length-12345';
+      delete process.env.JEST_WORKER_ID;
+      // @ts-expect-error - Mutating NODE_ENV for test purposes
+      process.env.NODE_ENV = 'development';
+
+      const mod = await import('@/lib/monitoring/rollbar-official');
+
+      expect(mod.rollbarConfig.enabled).toBe(false);
+      expect(mod.clientConfig.enabled).toBe(false);
+    });
+
+    it('should enable development when explicitly opted in', async () => {
+      process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
+        'valid-token-with-sufficient-length-12345';
+      process.env.ROLLBAR_ENABLED = '1';
+      delete process.env.JEST_WORKER_ID;
+      // @ts-expect-error - Mutating NODE_ENV for test purposes
+      process.env.NODE_ENV = 'development';
+
+      const mod = await import('@/lib/monitoring/rollbar-official');
+
+      expect(mod.rollbarConfig.enabled).toBe(true);
     });
   });
 

@@ -53,6 +53,35 @@ test.describe('User Dashboard E2E - Simplified', () => {
     }
   });
 
+  test('should expose the primary dashboard navigation links in CI fixture mode', async () => {
+    if (process.env.CI) {
+      await expect(page.locator('[data-testid="nav-dashboard"]')).toContainText(
+        'Dashboard'
+      );
+      await expect(page.locator('[data-testid="nav-courses"]')).toContainText(
+        'Courses'
+      );
+      await expect(page.locator('[data-testid="nav-billing"]')).toContainText(
+        'Billing'
+      );
+      return;
+    }
+
+    await expect(page.locator('[data-testid="user-dashboard"]')).toBeVisible();
+    await expect(page.locator('[data-testid="dashboard-title"]')).toBeVisible();
+
+    const dashboardSectionCount = await page
+      .locator('[data-testid^="section-"]')
+      .count();
+
+    if (dashboardSectionCount === 0) {
+      await expect(page.getByText('Beginne deine Lernreise')).toBeVisible();
+      return;
+    }
+
+    await expect(page.locator('[data-testid^="section-"]').first()).toBeVisible();
+  });
+
   // Simplified dashboard tests for CI compatibility
   const simplifiedTests = [
     'should display and manage booking history correctly',

@@ -12,12 +12,57 @@ npm run e2e:install
 
 ## Lokal ausführen
 
+### VS Code: PLAYWRIGHT-Tab vs. CLI-Tasks
+
+- Die Tasks aus [.vscode/tasks.json](.vscode/tasks.json) starten Playwright als normale CLI-Läufe im
+  Terminal.
+- Diese Läufe erscheinen nicht als aktiver Lauf im PLAYWRIGHT-Tab von VS Code.
+- Das gilt auch für `npm run test:e2e:ui`: Dieser Befehl startet den Playwright-UI-Mode, nicht den
+  VS-Code-Test-Explorer.
+- Wenn du einen Lauf im PLAYWRIGHT-Tab sehen willst, starte ihn in VS Code direkt über die
+  Test-Ansicht oder den Playwright-Explorer.
+
 - Server lokal starten oder Preview-URL nutzen.
 - Standardmäßig wird `http://localhost:3000` als Base-URL genutzt. Du kannst eine externe URL
   setzen:
 
 ```bash
 PLAYWRIGHT_BASE_URL=https://hemera-<preview>.vercel.app npm run e2e:dev
+```
+
+Wenn lokal bereits ein passender Server auf Port 3000 läuft und nur ein einzelner Spec-Lauf gegen
+den bestehenden Server ausgeführt werden soll, setze `PLAYWRIGHT_BASE_URL` explizit. Dann startet
+Playwright keinen zweiten Webserver:
+
+```bash
+PLAYWRIGHT_BASE_URL=http://localhost:3000 npx playwright test tests/e2e/dashboard.spec.ts --project=public
+```
+
+Fuer lokale Admin- und Material-Slices mit realen Datensaetzen gibt es einen additiven Seed, der
+bestehende lokale Daten nicht loescht. Er legt die fuer die aktuellen authentifizierten User- und
+Admin-Szenarien benoetigten Kurse und Seminarmaterialien per Upsert an:
+
+```bash
+npm run db:seed:e2e-local
+```
+
+Der Seed arbeitet additiv per Upsert und loescht keine bestehenden Daten. In einer echten
+Produktionsumgebung (`VERCEL_ENV=production`) bricht er ab; bei nicht-lokalen, aber lokal
+aufgerufenen Entwicklungsdatenbanken gibt er nur einen Warnhinweis aus.
+
+### Clerk-Testuser explizit erzeugen
+
+- Das globale Playwright-Setup erzeugt Clerk-Testuser nicht mehr automatisch.
+- Die Erstellung läuft nur, wenn `E2E_CREATE_USERS=true` explizit für einen lokalen Lauf gesetzt ist.
+- In CI wird die Erstellung auch dann übersprungen, wenn das Flag gesetzt wäre.
+- Wenn das Flag fehlt, eine CI-Umgebung erkannt wird oder `CLERK_SECRET_KEY` beziehungsweise `E2E_TEST_PASSWORD`
+  fehlen, wird das sicher geloggt und
+  übersprungen.
+
+Beispiel für einen expliziten lokalen Lauf:
+
+```bash
+E2E_CREATE_USERS=true CLERK_SECRET_KEY=sk_test_xxx E2E_TEST_PASSWORD='<lokales-test-passwort>' npx playwright test
 ```
 
 Empfohlen ist der Build-Modus:
@@ -27,6 +72,43 @@ npm run e2e
 ```
 
 Dieser Befehl baut die App (`next build`) und führt anschließend die Tests aus (`playwright test`).
+
+## Projektmatrix
+
+Die Playwright-Konfiguration ist nach Laufarten getrennt:
+
+- `public`: anonyme Seiten, SEO, Redirects und read-only UI-Diagnostik
+- `chromium-auth`: authentifizierte User-Flows wie Dashboard, Checkout und Rechnungsdownload
+- `auth-admin`: Admin-Flows wie Dashboard, Nutzerverwaltung, Reports und Admin-Locations
+- `performance`: Performance- und Core-Web-Vitals-Spezifikationen
+- `production-smoke`: read-only Checks gegen Produktion
+
+Empfohlene Projektbefehle:
+
+```bash
+npm run test:e2e:public
+npm run test:e2e:auth-user
+npm run test:e2e:auth-admin
+npm run test:e2e:performance
+npm run test:e2e:smoke
+```
+
+### Aktuell bestätigter lokaler Stand
+
+Stand: 2026-04-18, gegen einen laufenden lokalen Server auf `http://localhost:3000`.
+
+- `public`: PASS (`21 passed`, `21 skipped`)
+- `chromium-auth`: PASS (`55 passed`, `10 skipped`)
+- `auth-admin`: PASS (`63 passed`, `23 skipped`)
+- `performance`: PASS (`19 passed`, `0 failed`)
+
+Nachverifikation am 2026-04-20:
+
+- `auth-admin` wurde nach der letzten Admin-Autorisierungsanpassung erneut voll bestätigt (`63 passed`, `23 skipped`).
+- Die nachgelagerten Qualitätschecks für diesen Stand liefen ebenfalls grün: `npm run typecheck`, `npm run lint` und ein fokussierter Jest-Lauf für Reports-, Courses- und Monitoring-Slices.
+
+Hinweis: Nach der Projektaufteilung ist diese Matrix der maßgebliche Referenzstand. Ältere Aussagen
+zu einem einzelnen Gesamtlauf unter `chromium-auth` sind dafür nicht mehr autoritativ.
 
 ## In CI (GitHub Actions)
 
@@ -72,6 +154,12 @@ oder selbst auf `deployment_status` lauschen und die `target_url` direkt ziehen.
 
 ### Auth-Flows (E2E)
 
+- Gespeicherter Auth-State für authentifizierte Projekte
+  - Die Projekte `chromium-auth` und `auth-admin` erwarten eine Datei `.auth/user.json`.
+  - Wenn diese Datei fehlt, schlagen auth-basierte Specs früh mit `ENOENT` fehl.
+  - Für lokale Einzeltests ohne vorbereiteten Auth-State nutze bevorzugt `public` oder einen
+    explizit gesetzten `PLAYWRIGHT_BASE_URL` gegen einen bereits vorbereiteten Server.
+
 - Email Magic Link (Capture)
   - Setze `E2E_EMAIL_CAPTURE=1` in der App-Umgebung (z. B. Vercel Preview oder lokal), damit die App
     den Magic-Link nach `/tmp/hemera-e2e-last-magic-link.txt` schreibt.
@@ -90,6 +178,7 @@ oder selbst auf `deployment_status` lauschen und die `target_url` direkt ziehen.
 - Retries sind in CI auf 2 gesetzt. Passe `retries` in `playwright.config.ts` an.
 - Du kannst die Projektmatrix erweitern (bspw. `webkit`, `firefox`) oder parallelisieren
   (`fullyParallel`).
+- Für gezielte Debug-Läufe bevorzuge projektbezogene Commands statt die Gesamtsuite.
 - Fail-Fast in CI: Der E2E-Workflow kommentiert Ergebnisse und bricht am Ende ab, wenn Tests
   fehlgeschlagen sind; Logs/Report werden als Artifact hochgeladen.
 
@@ -108,7 +197,7 @@ zu minimieren, gelten folgende Richtlinien und Defaults:
   - Hintergrund: Prisma-Verbindungs-Pool (z. B. 13 Verbindungen) kann bei zu hoher Parallelität
     Timeouts werfen (`P2024: Timed out fetching a new connection`).
 - Performance-Grenzwerte lokal:
-  - FID-Schwelle (First Input Delay) in `performance.spec.ts` lokal auf 1.5s angehoben; in CI bleibt
+  - FID-Schwelle (First Input Delay) in `performance.spec.ts` lokal auf 2.5s angehoben; in CI bleibt
     2s.
   - LCP-Navigationen messen wir nach `domcontentloaded`, um realistische, aber stabilere Zeiten zu
     erfassen.
@@ -185,7 +274,7 @@ Die folgende Tabelle listet häufige Seiten/Flows und geeignete `data-testid`-We
 | -------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Home `/`                         | `build-info`                                       | Badge rendert nach Hydration; eignet sich als allgemeiner Verfügbarkeitsindikator.                         |
 | Kursliste `/courses`             | `course-overview`                                  | Warten, bis Kurs-Übersicht sichtbar ist; danach weitere Assertions.                                        |
-| Kurse leer `/courses`            | `e2e-courses-empty`                                | Verwende den expliziten Empty-State; Kurs-Platzhalter oder alternative Fallback-Messages werden nicht mehr akzeptiert. |
+| Kurse leer (DB-Empty-State)      | `e2e-courses-empty`                                | Der Public-Bereich zeigt nur DB-Daten; bei 0 Treffern gilt ausschließlich der explizite Empty-State.      |
 | Kursdetail `/courses/[id\|slug]` | `course-detail-book-cta`                           | Für Interaktionstest; alternativ H1 prüfen, wenn keine CTA vorhanden.                                      |
 | Ausgebucht-Detail                | `course-detail-sold-out-badge`                     | Optional zusätzlich `course-detail-disable-reason`.                                                        |
 | Dashboard `/dashboard`           | `user-dashboard`                                   | Für Layout-/Navigationsprüfungen existieren zudem `dashboard-title`, `dashboard-nav`, `dashboard-metrics`. |

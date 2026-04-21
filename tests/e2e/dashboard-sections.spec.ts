@@ -5,6 +5,41 @@
  */
 
 import { expect, test } from '@playwright/test';
+import { seedMockClerkSession } from './auth-helper';
+import { mockDashboardBookings } from './helpers/dashboard';
+import { clickAndWait, gotoStable } from './helpers/nav';
+
+const DASHBOARD_TIMEOUT = 90_000;
+
+test.describe.configure({ timeout: 120_000 });
+
+async function gotoDashboard(page: import('@playwright/test').Page) {
+  await gotoStable(page, '/dashboard', {
+    waitForTestId: 'user-dashboard',
+    timeout: DASHBOARD_TIMEOUT,
+  });
+}
+
+async function expectDashboardDataOrEmptyState(
+  page: import('@playwright/test').Page
+) {
+  const sectionCount = await page.locator('[data-testid^="section-"]').count();
+
+  if (sectionCount === 0) {
+    await expect(page.getByText('Beginne deine Lernreise')).toBeVisible();
+    return false;
+  }
+
+  await expect(page.locator('[data-testid^="section-"]').first()).toBeVisible();
+  return true;
+}
+
+test.beforeEach(async ({ page }) => {
+  if (!process.env.CI) {
+    await seedMockClerkSession(page, 'user');
+    await mockDashboardBookings(page);
+  }
+});
 
 test.describe('Dashboard Sections E2E', () => {
   test.describe('Dashboard page structure', () => {
@@ -33,19 +68,29 @@ test.describe('Dashboard Sections E2E', () => {
       // Dashboard title should be in German
       expect(title).toBeDefined();
     });
+
+    test('should protect the user profile route when signed out', async ({
+      page,
+    }) => {
+      await page.goto('/user-profile');
+
+      await expect(page).toHaveURL(/\/(user-profile|sign-in)/);
+    });
+
+    test('should expose the my-courses route or redirect to sign-in', async ({
+      page,
+    }) => {
+      await page.goto('/my-courses');
+
+      await expect(page).toHaveURL(/\/(my-courses|sign-in)/);
+    });
   });
 
   test.describe('Section layout', () => {
     test('should render sections in correct order', async ({ page }) => {
-      // Skip if not authenticated - this is a structure test
-      test.skip();
+      await gotoDashboard(page);
 
-      await page.goto('/dashboard');
-
-      // Get all section headings
       const headings = await page.locator('h2').allTextContents();
-
-      // Expected order (only visible sections will appear)
       const expectedSections = [
         'Nächstes Seminar',
         'Weitere gebuchte Seminare',
@@ -65,91 +110,91 @@ test.describe('Dashboard Sections E2E', () => {
     });
 
     test('should hide empty sections', async ({ page }) => {
-      // Skip if not authenticated
-      test.skip();
+      await gotoDashboard(page);
 
-      await page.goto('/dashboard');
+      if (!(await expectDashboardDataOrEmptyState(page))) {
+        return;
+      }
 
-      // Empty sections should not be visible
-      // This depends on the user's booking data
+      await expect(page.locator('[data-testid^="section-"]')).toHaveCount(4);
     });
   });
 
   test.describe('Course card display', () => {
     test('should display course information in card', async ({ page }) => {
-      test.skip();
+      await gotoDashboard(page);
 
-      await page.goto('/dashboard');
+      if (!(await expectDashboardDataOrEmptyState(page))) {
+        return;
+      }
 
-      // Find a course card
-      const courseCard = page.locator('[data-testid="course-card"]').first();
+      const courseCard = page.locator('[data-testid^="course-card-"]').first();
 
-      // Should display course title
-      await expect(courseCard.locator('h3')).toBeVisible();
-
-      // Should display date information
+      await expect(courseCard).toContainText(
+        /Fortgeschrittene Verhandlungsstrategien|Masterclass: Exzellenz in Verhandlungen|Grundlagen der Gehaltsverhandlung/
+      );
       await expect(courseCard.getByText(/\d{2}\.\d{2}\.\d{4}/)).toBeVisible();
     });
 
     test('should display location with link', async ({ page }) => {
-      test.skip();
+      await gotoDashboard(page);
 
-      await page.goto('/dashboard');
+      if (!(await expectDashboardDataOrEmptyState(page))) {
+        return;
+      }
 
-      // Find location link in course card
       const locationLink = page
-        .locator('[data-testid="course-card"]')
+        .locator('[data-testid^="course-card-"]')
         .first()
         .locator('a[href^="/locations/"]');
 
-      // If course has location, link should be visible
-      const hasLocation = await locationLink.count();
-      if (hasLocation > 0) {
-        await expect(locationLink).toBeVisible();
-      }
+      await expect(locationLink).toBeVisible();
+      await expect(locationLink).toContainText('Hemera Studio Wien');
     });
 
     test('should display time range in German format', async ({ page }) => {
-      test.skip();
+      await gotoDashboard(page);
 
-      await page.goto('/dashboard');
+      if (!(await expectDashboardDataOrEmptyState(page))) {
+        return;
+      }
 
-      // Time should be in format "HH:MM - HH:MM Uhr"
       const timePattern = /\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\s*Uhr/;
-      const hasTime = await page.getByText(timePattern).count();
-
-      // At least one course should have time if courses exist
-      expect(hasTime).toBeGreaterThanOrEqual(0);
+      await expect(page.getByText(timePattern).first()).toBeVisible();
     });
   });
 
   test.describe('Invoice download button', () => {
     test('should show invoice button for paid bookings', async ({ page }) => {
-      test.skip();
+      await gotoDashboard(page);
 
-      await page.goto('/dashboard');
+      const invoiceButton = page
+        .getByTestId('section-completed')
+        .locator('[data-testid^="invoice-download-"]')
+        .first();
 
-      // Find invoice download button
-      const invoiceButton = page.getByRole('button', {
-        name: /rechnung/i,
-      });
+      if ((await invoiceButton.count()) === 0) {
+        await expectDashboardDataOrEmptyState(page);
+        return;
+      }
 
-      // Should exist for paid bookings
-      const buttonCount = await invoiceButton.count();
-      expect(buttonCount).toBeGreaterThanOrEqual(0);
+      await expect(invoiceButton).toBeVisible({ timeout: DASHBOARD_TIMEOUT });
     });
 
     test('should have German label on invoice button', async ({ page }) => {
-      test.skip();
+      await gotoDashboard(page);
 
-      await page.goto('/dashboard');
+      const invoiceButton = page
+        .getByTestId('section-completed')
+        .locator('[data-testid^="invoice-download-"]')
+        .first();
 
-      // Look for German invoice button text
-      const invoiceButton = page.getByText('Rechnung herunterladen');
+      if ((await invoiceButton.count()) === 0) {
+        await expectDashboardDataOrEmptyState(page);
+        return;
+      }
 
-      const buttonCount = await invoiceButton.count();
-      // May or may not exist depending on booking data
-      expect(buttonCount).toBeGreaterThanOrEqual(0);
+      await expect(invoiceButton).toContainText('Rechnung herunterladen');
     });
   });
 
@@ -157,34 +202,68 @@ test.describe('Dashboard Sections E2E', () => {
     test('should navigate to course detail page on card click', async ({
       page,
     }) => {
-      test.skip();
+      await gotoDashboard(page);
 
-      await page.goto('/dashboard');
+      const preparationLink = page
+        .getByRole('link', { name: /vorbereitung/i })
+        .first();
 
-      // Find and click on a course card link
-      const courseLink = page
-        .locator('[data-testid="course-card"]')
-        .first()
-        .locator('a');
-
-      if ((await courseLink.count()) > 0) {
-        await courseLink.click();
-
-        // Should navigate to my-courses/[bookingId]
-        await expect(page).toHaveURL(/\/my-courses\/[a-z0-9-]+/);
+      if ((await preparationLink.count()) === 0) {
+        await expectDashboardDataOrEmptyState(page);
+        return;
       }
+
+      await clickAndWait(
+        page,
+        () => preparationLink,
+        { expectUrl: /\/my-courses\/[a-z0-9]+/, timeout: 30000 }
+      );
     });
 
     test('should support direct URL with anchor', async ({ page }) => {
-      test.skip();
+      test.skip(
+        process.env.PLAYWRIGHT_ENABLE_LOCAL_DB_SEED !== '1',
+        'Direktlink-Test benoetigt eine lokale seeded Datenbank.'
+      );
 
-      // Navigate directly to a section
-      const bookingId = 'test-booking-id';
-      await page.goto(`/my-courses/${bookingId}#ergebnisse`);
+      await page.unroute(/\/api\/bookings\/[^/]+\/invoice$/);
+      await page.unroute(/\/api\/bookings(?:\?.*)?$/);
 
-      // Should land on the page (may redirect if not authenticated)
-      const url = page.url();
-      expect(url).toBeDefined();
+      await gotoDashboard(page);
+
+      const seededCompletedCard = page
+        .getByTestId('section-completed')
+        .locator('[data-testid^="course-card-"]')
+        .filter({ hasText: 'Grundlagen der Gehaltsverhandlung' })
+        .first();
+
+      const completedInvoiceButton = seededCompletedCard.locator(
+        '[data-testid^="invoice-download-"]'
+      );
+
+      if ((await completedInvoiceButton.count()) === 0) {
+        await page.goto('/my-courses', { waitUntil: 'domcontentloaded' });
+        await expect(page).toHaveURL(/\/my-courses/);
+        return;
+      }
+
+      const bookingId = await completedInvoiceButton.evaluate(element =>
+        element
+          .getAttribute('data-testid')
+          ?.replace('invoice-download-', '')
+          .trim() || ''
+      );
+
+      expect(bookingId).not.toBe('');
+
+      await page.goto(`/my-courses/${bookingId}#ergebnisse`, {
+        waitUntil: 'domcontentloaded',
+      });
+
+      await expect(page).toHaveURL(
+        new RegExp(`/my-courses/${bookingId}#ergebnisse$`)
+      );
+      await expect(page.getByTestId('results-section')).toBeVisible();
     });
   });
 
@@ -195,9 +274,16 @@ test.describe('Dashboard Sections E2E', () => {
 
       await page.goto('/dashboard');
 
-      // Should not have horizontal scroll
-      const scrollWidth = await page.evaluate(() => document.body.scrollWidth);
-      const clientWidth = await page.evaluate(() => document.body.clientWidth);
+      // Measure the actual dashboard surface instead of the whole body so fixed
+      // dev/build overlays do not create false-positive overflow failures.
+      const dashboardSurface = page.locator('main').first();
+      await expect(dashboardSurface).toBeVisible();
+      const { scrollWidth, clientWidth } = await dashboardSurface.evaluate(
+        element => ({
+          scrollWidth: element.scrollWidth,
+          clientWidth: element.clientWidth,
+        })
+      );
 
       expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 10);
     });
@@ -235,20 +321,38 @@ test.describe('Dashboard Sections E2E', () => {
 
   test.describe('Error handling', () => {
     test('should handle API errors gracefully', async ({ page }) => {
-      test.skip();
+      await page.unroute(/\/api\/bookings\/[^/]+\/invoice$/);
+      await page.unroute(/\/api\/bookings(?:\?.*)?$/);
 
-      // This would require mocking API failures
-      await page.goto('/dashboard');
+      await page.route(/\/api\/bookings(?:\?.*)?$/, route =>
+        route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: false, error: 'Internal error' }),
+        })
+      );
 
-      // Should not show raw error messages to user
-      const errorMessage = page.getByText(/error|fehler/i);
-      const hasError = await errorMessage.count();
+      await gotoStable(page, '/dashboard', { waitForTestId: 'user-dashboard' });
 
-      // If error exists, it should be user-friendly German
-      if (hasError > 0) {
-        await expect(errorMessage).not.toContainText('undefined');
-        await expect(errorMessage).not.toContainText('null');
+      const errorAlert = page.getByTestId('user-dashboard').getByRole('alert');
+
+      if ((await errorAlert.count()) === 0) {
+        await expect(page.getByTestId('user-dashboard')).toBeVisible();
+
+        const emptyStateHeading = page.getByText('Beginne deine Lernreise');
+        if ((await emptyStateHeading.count()) > 0) {
+          await expect(emptyStateHeading).toBeVisible();
+        } else {
+          await expect(page.getByTestId('dashboard-title')).toContainText(
+            /Willkommen zurück/i
+          );
+        }
+        return;
       }
+
+      await expect(errorAlert).toContainText('HTTP 500: Failed to fetch bookings');
+      await expect(errorAlert).not.toContainText('undefined');
+      await expect(errorAlert).not.toContainText('null');
     });
   });
 
@@ -264,21 +368,10 @@ test.describe('Dashboard Sections E2E', () => {
     });
 
     test('should use informal Du form', async ({ page }) => {
-      test.skip();
+      await gotoDashboard(page);
 
-      await page.goto('/dashboard');
-
-      // Look for "Dein" or "Deine" (informal)
-      const informalText = page.getByText(/Dein|Deine/);
-
-      // Should use informal form if any personalized text exists
-      const informalCount = await informalText.count();
-      expect(informalCount).toBeGreaterThanOrEqual(0);
-
-      // Should NOT use formal "Ihr" or "Ihre"
-      const formalText = page.getByText(/Ihr Seminar|Ihre Buchung/);
-      const formalCount = await formalText.count();
-      expect(formalCount).toBe(0);
+      await expect(page.getByText(/deine seminare/i)).toBeVisible();
+      await expect(page.getByText(/ihr seminar|ihre buchung/i)).toHaveCount(0);
     });
   });
 });
