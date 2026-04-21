@@ -125,7 +125,8 @@ test.describe('Checkout Flow E2E', () => {
       });
 
       // Price should be displayed based on the active fixture catalog.
-      await expect(page.locator(`text=${E2E_TEST_COURSE.price}`)).toBeVisible({
+      const formattedPrice = `${Math.floor(E2E_TEST_COURSE.price)},${String(E2E_TEST_COURSE.price % 100).padStart(2, '0')} €`;
+      await expect(page.locator(`text=${formattedPrice}`)).toBeVisible({
         timeout: 5000,
       });
     });

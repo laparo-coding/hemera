@@ -55,6 +55,14 @@ function createLazyFailingPrismaClient(): PrismaClient {
         return () => undefined;
       }
 
+      // For special Prisma methods like $transaction, $queryRaw, $executeRaw, etc.,
+      // throw the proper error instead of returning an empty delegate
+      if (typeof prop === 'string' && prop.startsWith('$')) {
+        return () => {
+          throw createMissingDatabaseConfigurationError();
+        };
+      }
+
       return buildMissingConfigDelegate();
     },
   });

@@ -1,5 +1,5 @@
 /**
- * Restore course description for "Grundlagen der Gehaltsverhandlung"
+ * Restore the legacy base seminar description for the course with slug "basisseminar".
  *
  * Usage: npx tsx scripts/restore-course-description.ts
  */

@@ -124,6 +124,11 @@ function readJsonArray(backupDirectory, fileName) {
   return parsed;
 }
 
+/**
+ * Load course and location backup data from JSON files
+ * @param {string} backupPath - Path to backup directory or relative identifier
+ * @returns {Object} Object with backupLocations, backupCourses, cleanup, and resolvedPath
+ */
 export function loadCourseBackupData(backupPath) {
   const requestedBackupPath = resolveRequestedBackupPath(backupPath);
   const { cleanup, resolvedPath } = resolveBackupDirectory(requestedBackupPath);
@@ -307,12 +312,14 @@ export async function upsertCoursesFromBackup({
           locationIdBySlug.set(restoredLocation.slug, restoredLocation.id);
         }
 
+        const locationSlugById = new Map(
+          backupLocations.map(location => [location.id, location.slug])
+        );
+
         for (const course of backupCourses) {
           const courseWithLocationSlug = {
             ...course,
-            locationSlug: backupLocations.find(
-              location => location.id === course.locationId
-            )?.slug,
+            locationSlug: locationSlugById.get(course.locationId),
           };
 
           const normalizedCourse = normalizeCourse(

@@ -54,8 +54,6 @@ export default function CourseCard({
         />
       ) : (
         <Box
-          role='img'
-          aria-label={course.title}
           sx={{
             height: 200,
             display: 'flex',
