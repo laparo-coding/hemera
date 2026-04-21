@@ -13,7 +13,7 @@ import {
 } from '../errors';
 import type { CurriculumModule } from '../schemas/admin/course';
 
-export const FEATURED_COURSES_TIMEOUT_MS = 3_000;
+export const featuredCoursesTimeoutMs = 3_000;
 
 async function withTimeout<T>(
   operation: Promise<T>,
@@ -203,7 +203,7 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
         orderBy: [{ startDate: 'asc' }, { createdAt: 'desc' }],
         take: limit,
       }),
-      FEATURED_COURSES_TIMEOUT_MS,
+      featuredCoursesTimeoutMs,
       'Featured courses query timed out'
     );
 

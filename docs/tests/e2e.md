@@ -62,7 +62,7 @@ aufgerufenen Entwicklungsdatenbanken gibt er nur einen Warnhinweis aus.
 Beispiel für einen expliziten lokalen Lauf:
 
 ```bash
-E2E_CREATE_USERS=true CLERK_SECRET_KEY=sk_test_xxx E2E_TEST_PASSWORD='E2ETestPassword2024!SecureForTesting' npx playwright test
+E2E_CREATE_USERS=true CLERK_SECRET_KEY=sk_test_xxx E2E_TEST_PASSWORD='<lokales-test-passwort>' npx playwright test
 ```
 
 Empfohlen ist der Build-Modus:

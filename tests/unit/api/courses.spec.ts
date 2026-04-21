@@ -69,12 +69,12 @@ describe('Course API', () => {
       () => new Promise(() => undefined)
     );
 
-    const { FEATURED_COURSES_TIMEOUT_MS, getFeaturedCourses } = await import(
+    const { featuredCoursesTimeoutMs, getFeaturedCourses } = await import(
       '@/lib/api/courses'
     );
 
     const resultPromise = getFeaturedCourses(1);
-    await jest.advanceTimersByTimeAsync(FEATURED_COURSES_TIMEOUT_MS);
+    await jest.advanceTimersByTimeAsync(featuredCoursesTimeoutMs);
 
     await expect(resultPromise).resolves.toEqual([]);
   });

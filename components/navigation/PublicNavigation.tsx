@@ -52,10 +52,9 @@ export function PublicNavigation({
 }: {
   hideMyCourses?: boolean;
 }) {
-  const authNavFallback = (
+  const authNavButtons = (
     <Box
       data-testid='auth-nav-fallback'
-      aria-live='polite'
       sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
     >
       <Button
@@ -97,26 +96,36 @@ export function PublicNavigation({
       >
         Registrieren
       </Button>
-      <Box
-        component='span'
-        role='status'
-        aria-live='polite'
-        data-testid='auth-nav-ready'
-        data-state='loading'
-        sx={{
-          position: 'absolute',
-          width: 1,
-          height: 1,
-          p: 0,
-          m: -1,
-          overflow: 'hidden',
-          clip: 'rect(0 0 0 0)',
-          whiteSpace: 'nowrap',
-          border: 0,
-        }}
-      >
-        Kontonavigation wird geladen.
-      </Box>
+    </Box>
+  );
+
+  const authNavStatus = (state: 'loading' | 'ready', label: string) => (
+    <Box
+      component='span'
+      role='status'
+      aria-live='polite'
+      data-testid='auth-nav-ready'
+      data-state={state}
+      sx={{
+        position: 'absolute',
+        width: 1,
+        height: 1,
+        p: 0,
+        m: -1,
+        overflow: 'hidden',
+        clip: 'rect(0 0 0 0)',
+        whiteSpace: 'nowrap',
+        border: 0,
+      }}
+    >
+      {label}
+    </Box>
+  );
+
+  const renderAuthNav = (state: 'loading' | 'ready', label: string) => (
+    <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+      {authNavButtons}
+      {authNavStatus(state, label)}
     </Box>
   );
 
@@ -221,12 +230,25 @@ export function PublicNavigation({
             )}
             {/* Authentication Buttons - wrapped in ClientOnly to prevent hydration mismatch */}
             {useClerk ? (
-              <ClientOnly fallback={authNavFallback}>
-                <Box data-testid='auth-nav-ready' data-state='ready'>
-                  <SignedOut>{authNavFallback}</SignedOut>
+              <ClientOnly
+                fallback={renderAuthNav(
+                  'loading',
+                  'Kontonavigation wird geladen.'
+                )}
+              >
+                <SignedOut>
+                  {renderAuthNav('ready', 'Kontonavigation bereit.')}
+                </SignedOut>
 
-                  {/* User Menu for Authenticated Users */}
-                  <SignedIn>
+                {/* User Menu for Authenticated Users */}
+                <SignedIn>
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
                     {!hideMyCourses && (
                       <Button
                         variant='text'
@@ -251,12 +273,13 @@ export function PublicNavigation({
                       userProfileMode='modal'
                       data-testid='user-profile-button'
                     />
-                  </SignedIn>
-                </Box>
+                    {authNavStatus('ready', 'Kontonavigation bereit.')}
+                  </Box>
+                </SignedIn>
               </ClientOnly>
             ) : (
               /* Fallback buttons when Clerk is not configured or E2E */
-              authNavFallback
+              renderAuthNav('ready', 'Kontonavigation bereit.')
             )}
 
             {/* Role indicator for tests in E2E mode */}

@@ -114,7 +114,7 @@ async function findUserByEmail(email) {
   );
 
   if (result.status !== 200 || !Array.isArray(result.data)) {
-    throw new Error(`Could not query user ${email}: ${result.status}`);
+    throw new Error(`Could not query user: ${result.status}`);
   }
 
   return (
@@ -137,51 +137,63 @@ async function updateUser(userId, userData) {
   });
 }
 
+function logUserResult(action, role, status) {
+  const normalizedAction = action === 'updated' ? 'aktualisiert' : 'erstellt';
+  console.log(`✅ Testuser ${normalizedAction}`);
+  console.log(`   Rolle: ${role}`);
+  console.log(`   Status: ${status}`);
+}
+
+function logUserFailure(action, role, status, errorCode) {
+  const normalizedAction = action === 'updated' ? 'aktualisieren' : 'erstellen';
+  console.log(`❌ Testuser konnte nicht ${normalizedAction} werden`);
+  console.log(`   Rolle: ${role}`);
+  console.log(`   Status: ${status}`);
+  if (errorCode) {
+    console.log(`   Fehlercode: ${errorCode}`);
+  }
+}
+
 async function createAllUsers() {
   console.log('Creating test users in Clerk...');
 
   for (const userData of users) {
     try {
-      const email = userData.email_address[0];
-      console.log(`Ensuring user with email: ${email}`);
+      const role = userData.public_metadata.role;
+      console.log(`Ensuring ${role} test user`);
 
-      const existingUser = await findUserByEmail(email);
+      const existingUser = await findUserByEmail(userData.email_address[0]);
 
       if (existingUser) {
         const result = await updateUser(existingUser.id, userData);
 
         if (result.status === 200) {
-          console.log('✅ User updated successfully!');
-          console.log(`   Email: ${email}`);
-          console.log(`   User ID: ${existingUser.id}`);
-          console.log(`   Role: ${userData.public_metadata.role}`);
+          logUserResult('updated', role, result.status);
         } else {
-          console.log('❌ Failed to update user');
-          console.log(`   Status: ${result.status}`);
-          console.log(`   Response: ${JSON.stringify(result.data, null, 2)}`);
+          logUserFailure(
+            'updated',
+            role,
+            result.status,
+            result.data?.errors?.[0]?.code
+          );
         }
       } else {
         const result = await createUser(userData);
 
         if (result.status === 200 || result.status === 201) {
-          console.log('✅ User created successfully!');
-          console.log(
-            `   Email: ${result.data.email_addresses[0]?.email_address}`
-          );
-          console.log(`   User ID: ${result.data.id}`);
-          console.log(`   Role: ${userData.public_metadata.role}`);
+          logUserResult('created', role, result.status);
         } else {
-          console.log('❌ Failed to create user');
-          console.log(`   Status: ${result.status}`);
-          console.log(`   Response: ${JSON.stringify(result.data, null, 2)}`);
+          logUserFailure(
+            'created',
+            role,
+            result.status,
+            result.data?.errors?.[0]?.code
+          );
         }
       }
       console.log('');
     } catch (error) {
-      console.error(
-        `❌ Error creating user ${userData.email_address[0]}:`,
-        error.message
-      );
+      console.error('❌ Error creating test user:', error.message);
       console.log('');
     }
   }

@@ -20,7 +20,18 @@ function isMockAuthEnvironment(): boolean {
   return process.env.NODE_ENV === 'test' || isJestRunning;
 }
 
+function isProtectedDeploymentEnvironment(): boolean {
+  return (
+    process.env.VERCEL_ENV === 'production' ||
+    process.env.VERCEL_ENV === 'preview'
+  );
+}
+
 function shouldBypassClerkServerAuth(): boolean {
+  if (isProtectedDeploymentEnvironment()) {
+    return false;
+  }
+
   return (
     isEnvFlagEnabled(process.env.E2E_TEST) ||
     isEnvFlagEnabled(process.env.DISABLE_CLERK_SERVER_AUTH)
@@ -28,7 +39,7 @@ function shouldBypassClerkServerAuth(): boolean {
 }
 
 async function getCookieMockRole(): Promise<'user' | 'admin' | null> {
-  if (process.env.NODE_ENV === 'production') {
+  if (isProtectedDeploymentEnvironment() && !isMockAuthEnvironment()) {
     return null;
   }
 
@@ -49,7 +60,11 @@ async function getMockAuthRole(): Promise<'user' | 'admin' | null> {
       return cookieRole;
     }
 
-    return process.env.E2E_ADMIN === '1' ? 'admin' : 'user';
+    if (isMockAuthEnvironment()) {
+      return process.env.E2E_ADMIN === '1' ? 'admin' : 'user';
+    }
+
+    return 'user';
   }
 
   if (isMockAuthEnvironment()) {
@@ -151,8 +166,8 @@ export async function checkUserAdminStatus(
  * Require admin permissions
  */
 export async function requireAdmin() {
-  // In E2E/Clerk-disabled Modus rufen wir Clerk nicht auf,
-  // um Middleware-Fehler zu vermeiden. Nicht-Admins werden auf /dashboard umgeleitet.
+  // In E2E/Clerk-disabled Modus rufen wir Clerk nicht auf.
+  // Authentifizierte Nicht-Admins landen konsistent auf /dashboard.
   const mockRole = await getMockAuthRole();
   if (mockRole) {
     if (mockRole !== 'admin') {
@@ -165,7 +180,7 @@ export async function requireAdmin() {
   const user = await requireAuth();
 
   if (!(await isAdmin())) {
-    redirect('/sign-in');
+    redirect('/dashboard');
   }
 
   return user;
