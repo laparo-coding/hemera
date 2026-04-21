@@ -1,5 +1,5 @@
 import type { Config } from 'jest';
-import { criticalAreas } from './tests/coverage/critical-areas';
+import { criticalAreas } from './tests/coverage/critical-areas.js';
 
 const unitMeasuredCriticalAreaPaths = (
   criticalAreas as Array<{ paths: string[] }>
