@@ -74,13 +74,13 @@ if (isSafeForDestructiveOperations()) {
 
 ### 3. NPM Scripts Protection
 
-| Script | Behavior |
-|--------|----------|
-| `npm run db:seed` | Runs `db:check-env` first, then seeds |
-| `npm run db:migrate` | Runs `db:check-env` first |
-| `npm run db:reset` | **DISABLED** - Shows error message |
-| `npm run db:reset:force` | Requires `ALLOW_DESTRUCTIVE_DB_OPS=true` |
-| `npm run db:check-env` | Shows current database environment status |
+| Script                  | Behavior                                   |
+| ----------------------- | ------------------------------------------ |
+| `npm run db:seed`       | Runs `db:check-env` first, then seeds      |
+| `npm run db:migrate`    | Runs `db:check-env` first                  |
+| `npm run db:reset`      | **DISABLED** - Shows error message         |
+| `npm run db:reset:force`| Requires `ALLOW_DESTRUCTIVE_DB_OPS=true`   |
+| `npm run db:check-env`  | Shows current database environment status  |
 
 ## Override Mechanism
 
@@ -142,6 +142,7 @@ DATABASE_URL="file:./test.db" npm run test:e2e
 2. **Always run `db:check-env` before manual operations** - Verify you're on the right database
 3. **Use `db:deploy` for production** - It only applies pending migrations, never resets
 4. **Review CI/CD database URLs** - Ensure they point to the correct environments
+5. **Treat course restore as emergency-only** - A course restore is the manual recovery of course and location records after real data loss or corruption; it repopulates the database and must not be part of normal development or deployment flows. Placeholder catalogs are hardcoded or seeded runtime course lists, and automatic restore steps are scripts that silently rehydrate catalog data during seed/reset flows, for example `prisma/seed.ts` or `scripts/reset-courses.ts`. Use the documented restore entrypoints in [docs/ops/database-backup.md](docs/ops/database-backup.md) and [scripts/ops/restore-courses-from-backup.mjs](scripts/ops/restore-courses-from-backup.mjs), and avoid restore operations, placeholder catalogs, and automatic restore steps during normal workflows.
 
 ## Adding Protection to New Scripts
 

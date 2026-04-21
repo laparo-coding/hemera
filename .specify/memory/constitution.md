@@ -2,6 +2,28 @@
 
 <!--
 SYNC IMPACT REPORT - Constitution Amendment
+Version Change: 1.10.0 → 1.11.0
+Amendment Date: 2026-04-21
+Amendment Type: MINOR (Course data authority and no-placeholder rule added)
+
+Modified Sections:
+- Enhanced: Feature Development Workflow (course data authority)
+- Enhanced: Code Organization (database-only course sourcing)
+- Enhanced: Constitution Enforcement (course data compliance)
+
+Key Changes:
+- Development and Production course content must always come from the database
+- Placeholder or hardcoded course data is forbidden in runtime application flows
+- Missing database configuration must fail explicitly instead of falling back to placeholder clients
+- Backup restores for course recovery must preserve database authority
+
+Rationale: Course listings and detail content are business-critical and must never silently degrade
+to placeholders or mock data in runtime environments. Explicit database authority reduces hidden
+content drift and makes backup-based recovery reliable.
+-->
+
+<!--
+SYNC IMPACT REPORT - Constitution Amendment
 Version Change: 1.9.0 → 1.10.0
 Amendment Date: 2025-10-28
 Amendment Type: MINOR (Add Stripe Integration Fundamentals as a dedicated section)
@@ -285,6 +307,9 @@ Every feature follows a structured development process:
 - **Payment Integration**: All payment flows integrate with Stripe using secure webhook handling
 - **Authentication Integration**: All protected features integrate with Clerk authentication system
 - **Database Migration**: Schema changes require proper Prisma migrations with rollback strategy
+- **Course Data Authority**: Course content shown in Development and Production MUST be loaded from
+  the database as the single source of truth; runtime hardcoded, seeded placeholder, or mock course
+  data is forbidden outside explicit test fixtures
 - **Performance Testing**: Load testing for user-facing features, especially authentication and
   payment flows
 - **Payment Security Testing**: Stripe webhook validation and secure checkout flow testing
@@ -477,6 +502,14 @@ Constitutional rules for secure, reliable, and localized payment processing with
 - **Feature Folders**: Group related components, tests, and utilities by feature
 - **Shared Libraries**: Common utilities in `lib/` directory with proper TypeScript exports
 - **Database Layer**: Prisma ORM with type-safe database operations
+- **Database-Only Course Sourcing**: Public and admin course surfaces must read course content from
+  database-backed services. If the database is unavailable or misconfigured, the application must
+  fail explicitly or show an empty/error state rather than inventing placeholder course data or
+  placeholder database clients. Backup restores for course recovery must preserve database
+  authority by restoring the database as the only valid course source; restore flows must never
+  reactivate placeholder or hardcoded runtime course data, and they must fail explicitly or emit
+  operational alerts when the restored environment lacks valid database configuration after
+  recovery.
 - **API Routes**: Next.js API routes with proper error handling and validation
 - **Payment Processing**: Stripe integration with secure webhook endpoints and proper error handling
 - **Holistic Error Handling**: Comprehensive error management with prevention, detection, graceful
@@ -602,6 +635,8 @@ This constitution supersedes all other development practices and must be followe
   GitHub Actions exclusively
 - **Deployment Compliance**: Manual deployments are constitutional violations and must be
   immediately reported and reversed
+- **Course Data Compliance**: Any Development or Production code path that injects placeholder,
+  demo, or hardcoded runtime course data instead of database content is a constitutional violation
 - **Workflow Monitoring**: All deployment activities are logged and audited through GitHub Actions
   for compliance verification
 - **Exception Process**: Any deviation requires explicit justification and team approval - NO
@@ -656,4 +691,4 @@ Team wellness and code culture health checks ensure sustainable development prac
 - Repeated "quick fixes" without tests trigger technical debt discussion
 - Team member expressing frustration triggers one-on-one check-in
 
-**Version**: 1.7.0 | **Ratified**: 2025-10-04 | **Last Amended**: 2025-10-11
+**Version**: 1.11.0 | **Ratified**: 2025-10-04 | **Last Amended**: 2026-04-21

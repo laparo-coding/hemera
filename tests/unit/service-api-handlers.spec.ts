@@ -99,6 +99,10 @@ import { getUserRole } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
 import { NextRequest } from 'next/server';
+import {
+  createServiceApiCourse,
+  TEST_COURSE_ID,
+} from './fixtures/course-fixtures';
 
 // Route handlers
 import { GET as getCoursesHandler } from '@/app/api/service/courses/route';
@@ -115,7 +119,6 @@ const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<
 >;
 
 // Valid CUID test IDs (must match z.string().cuid() pattern)
-const TEST_COURSE_ID = 'cm1234567890abcdefghij123';
 const TEST_PARTICIPATION_ID = 'cm9876543210fedcba9876543';
 
 function createRequest(
@@ -183,15 +186,7 @@ describe('Service API Route Handlers', () => {
       setupAuth('svc_user_1', 'api-client');
 
       const mockCourses = [
-        {
-          id: TEST_COURSE_ID,
-          title: 'Grundkurs',
-          slug: 'grundkurs',
-          level: 'BEGINNER',
-          startDate: new Date('2026-03-01'),
-          endDate: new Date('2026-03-03'),
-          _count: { bookings: 2 },
-        },
+        createServiceApiCourse({ startDate: new Date('2026-03-01') }),
       ];
 
       (prisma.course.findMany as jest.Mock).mockResolvedValue(mockCourses);
@@ -272,12 +267,7 @@ describe('Service API Route Handlers', () => {
       setupAuth('svc_user_1', 'api-client');
 
       const mockCourse = {
-        id: TEST_COURSE_ID,
-        title: 'Grundkurs',
-        slug: 'grundkurs',
-        level: 'BEGINNER',
-        startDate: new Date('2026-03-01'),
-        endDate: new Date('2026-03-03'),
+        ...createServiceApiCourse({ startDate: new Date('2026-03-01') }),
         bookings: [
           {
             id: 'b1',

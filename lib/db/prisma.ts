@@ -22,6 +22,44 @@ const globalForPrisma = globalThis as unknown as {
 // Lazy-initialized client
 let _prismaClient: PrismaClient | undefined;
 
+function createMissingDatabaseConfigurationError(): Error {
+  return new Error(
+    'DATABASE_URL oder PRISMA_ACCELERATE_URL muss gesetzt sein. Kursdaten duerfen in Development und Production nicht ueber Platzhalterquellen geladen werden.'
+  );
+}
+
+function createLazyFailingPrismaClient(): PrismaClient {
+  const buildMissingConfigDelegate = () =>
+    new Proxy(
+      {},
+      {
+        get(_target, delegateProp) {
+          if (delegateProp === 'then') {
+            return undefined;
+          }
+
+          return () => {
+            throw createMissingDatabaseConfigurationError();
+          };
+        },
+      }
+    );
+
+  return new Proxy({} as PrismaClient, {
+    get(_target, prop) {
+      if (prop === '$disconnect' || prop === '$connect') {
+        return async () => undefined;
+      }
+
+      if (prop === '$on') {
+        return () => undefined;
+      }
+
+      return buildMissingConfigDelegate();
+    },
+  });
+}
+
 /**
  * Create and configure PrismaClient instance
  *
@@ -47,20 +85,8 @@ function createPrismaClient(): PrismaClient {
   // For tests/CI without Accelerate, use PG adapter with direct connection
   const databaseUrl = process.env.DATABASE_URL;
 
-  // During Next.js build (no DB available), we need to return a mock client
-  // This allows static page generation without actual DB access
   if (!databaseUrl) {
-    // Create a "dummy" pool with placeholder URL - operations will fail at runtime
-    // but module import succeeds during build
-    const placeholderPool = new Pool({
-      connectionString: 'postgresql://placeholder:5432/placeholder',
-    });
-    globalForPrisma.pool = placeholderPool;
-    const adapter = new PrismaPg(placeholderPool as any);
-    return new PrismaClient({
-      adapter,
-      log: ['error'],
-    });
+    return createLazyFailingPrismaClient();
   }
 
   const pool = new Pool({

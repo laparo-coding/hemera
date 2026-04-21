@@ -84,12 +84,10 @@ npm run dev
 
 ### Docker-Befehle
 
-| Befehl | Beschreibung |
-|--------|--------------|
-| `npm run db:docker:start` | Container starten (Port 5432) |
-| `npm run db:docker:stop` | Container stoppen (Daten bleiben erhalten) |
-| `npm run db:docker:reset` | Container und Daten löschen, neu starten |
-| `npm run db:docker:logs` | Container-Logs anzeigen |
+- `npm run db:docker:start`: Container starten auf Port 5432.
+- `npm run db:docker:stop`: Container stoppen, Daten bleiben erhalten.
+- `npm run db:docker:reset`: Container und Daten löschen, neu starten.
+- `npm run db:docker:logs`: Container-Logs anzeigen.
 
 ### Datenpersistenz
 
@@ -116,6 +114,22 @@ Falls Port 5432 bereits belegt ist:
 
 - `prisma/schema.prisma` → `datasource db` liest `env("DATABASE_URL")`.
 - Prisma Migrations und Seed verwenden dieselbe URL.
+- Die Laufzeit liest Kursdaten direkt aus der verbundenen Datenbank.
+- Development und Production dürfen Kursdaten nicht aus Platzhalterdaten oder automatischen Restore-Pfaden beziehen.
+
+## Kursdaten in den Umgebungen
+
+- Development: Nutzt die in der Entwicklungsumgebung gesetzte Datenbankverbindung.
+- Production: Nutzt die in der Produktionsumgebung gesetzte Datenbankverbindung.
+- Notfall-Restore: Nur manuell über `npm run db:restore:courses` oder ein vollständiges Restore-Script.
+
+- `npm run db:restore:courses`: Stellt Kurs- und Location-Daten gezielt aus einem JSON-Backup wieder her.
+  Voraussetzungen sind eine gültige Datenbankkonfiguration sowie ein entpacktes Backup-Verzeichnis
+  oder Archiv; typische Ausführung ist ein Dry-Run mit Ziel-DB-Prüfung vor dem echten Restore,
+  z. B. `npm run db:restore:courses -- ./backup_restore_temp/example/backup_2026-01-25 --dry-run`.
+  Der Implementationsort ist das npm-Skript `db:restore:courses` in `package.json`; im Normalbetrieb
+  sollte dieser Pfad nicht verwendet werden, weil Rollback und Sicherheit über den separaten
+  Backup-/Restore-Prozess laufen.
 
 ## Troubleshooting
 

@@ -2,6 +2,13 @@
 
 Diese Dokumentation beschreibt das automatische Backup-System für die Hemera PostgreSQL-Datenbank.
 
+## Kursdaten-Regel
+
+- Development liest Kursdaten immer aus der konfigurierten Development-Datenbank.
+- Production liest Kursdaten immer aus der konfigurierten Produktionsdatenbank.
+- Backup-Restores sind kein normaler Datenpfad für Kurse, sondern nur für echte Notfälle gedacht.
+- Runtime-Platzhalter oder automatisch wiederhergestellte Kursdaten sind für Development und Production ausgeschlossen.
+
 ## Übersicht
 
 Da Prisma Postgres (Free Plan) keine automatischen Backups enthält, nutzen wir GitHub Actions für tägliche Backups.
@@ -47,6 +54,9 @@ Das Backup enthält JSON-Dateien für jede Tabelle:
 
 ## Restore
 
+Restore ist ein manueller Notfallprozess. Im normalen Betrieb werden Kursdaten nicht aus Backups, Seeds
+oder Platzhalterquellen erzeugt, sondern direkt aus der jeweils verbundenen Datenbank gelesen.
+
 ### Backup herunterladen
 
 1. Gehe zu [Actions → Daily Database Backup](https://github.com/Laparo/hemera/actions/workflows/daily-backup.yml)
@@ -59,6 +69,9 @@ Das Backup enthält JSON-Dateien für jede Tabelle:
 ```bash
 # Im Projektverzeichnis
 ./scripts/ops/restore-db.sh hemera_backup_2025-01-04_03-00-00.tar.gz
+
+# Nur Kursdaten im Notfall aus einem JSON-Backup wiederherstellen
+npm run db:restore:courses -- ./backup_restore_temp/db-backup-123/backup_2026-01-25_03-35-59
 ```
 
 Das Script:
@@ -66,6 +79,11 @@ Das Script:
 - Fragt vor dem Überschreiben um Bestätigung
 - Löscht bestehende Daten und importiert das Backup
 - Beachtet die richtige Reihenfolge für Foreign Keys
+
+Der kursspezifische Restore:
+- ist nur für Notfälle gedacht
+- schreibt Kurse und Locations gezielt aus dem angegebenen Backup zurück
+- ersetzt keinen regulären Seed- oder Laufzeitpfad
 
 ### Manuelle Wiederherstellung
 
@@ -86,10 +104,8 @@ Zwei GitHub Secrets müssen konfiguriert sein (eines pro Umgebung):
 1. Gehe zu **Settings → Secrets and variables → Actions**
 2. Klicke **New repository secret**
 
-| Secret | Umgebung | Beschreibung |
-|--------|----------|-------------|
-| `DATABASE_URL` | **Production** | Prisma Postgres Verbindungs-URL (Produktion) |
-| `DEV_DATABASE_URL` | **Development** | Prisma Postgres Verbindungs-URL (Development) |
+- `DATABASE_URL`: **Production**. Prisma Postgres Verbindungs-URL für Produktion.
+- `DEV_DATABASE_URL`: **Development**. Prisma Postgres Verbindungs-URL für Development.
 
 Falls nur ein Secret konfiguriert ist, wird die andere Umgebung übersprungen (kein Fehler).
 

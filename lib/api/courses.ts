@@ -199,9 +199,10 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
     }));
   } catch (error) {
     logError(error, { operation: 'getFeaturedCourses', limit });
-    // Return empty array instead of throwing to prevent page crash
-    // The page will use static fallback data
-    return [];
+    throw new DatabaseConnectionError(
+      'fetching featured courses',
+      error as Error
+    );
   }
 }
 

@@ -185,7 +185,7 @@ Die folgende Tabelle listet häufige Seiten/Flows und geeignete `data-testid`-We
 | -------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Home `/`                         | `build-info`                                       | Badge rendert nach Hydration; eignet sich als allgemeiner Verfügbarkeitsindikator.                         |
 | Kursliste `/courses`             | `course-overview`                                  | Warten, bis Kurs-Übersicht sichtbar ist; danach weitere Assertions.                                        |
-| Kurse leer (E2E-Fallback)        | `e2e-courses-empty` oder `course-fallback-message` | Akzeptiere eines von beiden je nach Umgebung.                                                              |
+| Kurse leer `/courses`            | `e2e-courses-empty`                                | Verwende den expliziten Empty-State; Kurs-Platzhalter oder alternative Fallback-Messages werden nicht mehr akzeptiert. |
 | Kursdetail `/courses/[id\|slug]` | `course-detail-book-cta`                           | Für Interaktionstest; alternativ H1 prüfen, wenn keine CTA vorhanden.                                      |
 | Ausgebucht-Detail                | `course-detail-sold-out-badge`                     | Optional zusätzlich `course-detail-disable-reason`.                                                        |
 | Dashboard `/dashboard`           | `user-dashboard`                                   | Für Layout-/Navigationsprüfungen existieren zudem `dashboard-title`, `dashboard-nav`, `dashboard-metrics`. |
