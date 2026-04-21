@@ -117,6 +117,7 @@ jobs:
 
       - name: E2E (external)
         if: steps.resolve.outputs.base_url != ''
+        id: external
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.resolve.outputs.base_url }}
           # disable creating test users in external previews
@@ -130,6 +131,18 @@ jobs:
           NODE_ENV: test
           NEXT_TELEMETRY_DISABLED: '1'
         run: |
+          FINAL_URL=$(curl -sSIL -o /dev/null -w '%{url_effective}' \
+            -H "x-vercel-protection-bypass: $VERCEL_PROTECTION_BYPASS" \
+            -H "x-vercel-set-bypass-cookie: true" \
+            "$PLAYWRIGHT_BASE_URL/courses")
+
+          if [[ "$FINAL_URL" == https://vercel.com/login* ]] || [[ "$FINAL_URL" == https://vercel.com/sso-api* ]]; then
+            echo "Preview remains behind Vercel login despite configured bypass; skipping external smoke." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "resolved_url=$FINAL_URL" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           npx playwright test \
             --project='${{ github.event.inputs.project || 'public' }}' \
             --grep='${{ github.event.inputs.grep || '(seo|academy|courses|health)' }}'
