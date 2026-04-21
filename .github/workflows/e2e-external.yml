@@ -131,15 +131,14 @@ jobs:
           NODE_ENV: test
           NEXT_TELEMETRY_DISABLED: '1'
         run: |
-          FINAL_URL=$(curl -sSIL -o /dev/null -w '%{url_effective}' \
+          RESPONSE_BODY=$(curl -sSL \
             -H "x-vercel-protection-bypass: $VERCEL_PROTECTION_BYPASS" \
             -H "x-vercel-set-bypass-cookie: true" \
             "$PLAYWRIGHT_BASE_URL/courses")
 
-          if [[ "$FINAL_URL" == https://vercel.com/login* ]] || [[ "$FINAL_URL" == https://vercel.com/sso-api* ]]; then
+          if grep -Eq 'vercel\.com/(login|sso-api)' <<< "$RESPONSE_BODY"; then
             echo "Preview remains behind Vercel login despite configured bypass; skipping external smoke." \
               | tee -a "$GITHUB_STEP_SUMMARY"
-            echo "resolved_url=$FINAL_URL" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
