@@ -7,6 +7,7 @@
 
 import { clerkClient } from '@clerk/nextjs/server';
 import { Prisma } from '@prisma/client';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db/prisma';
 import type {
   AdminUserListItem,
@@ -14,6 +15,173 @@ import type {
   AdminUsersResponse,
   PaginationMeta,
 } from '@/lib/types/admin';
+import { isEnvFlagEnabled } from '@/lib/utils/env-flags';
+
+async function hasMockAdminUsersCookie(): Promise<boolean> {
+  if (process.env.NODE_ENV === 'production') {
+    return false;
+  }
+
+  try {
+    const cookieStore = await cookies();
+    const role = cookieStore.get('hemera-e2e-role')?.value;
+    return role === 'admin' || role === 'user';
+  } catch {
+    return false;
+  }
+}
+
+async function shouldBypassClerkUsers(): Promise<boolean> {
+  if (process.env.NODE_ENV === 'production') {
+    return false;
+  }
+
+  if (
+    isEnvFlagEnabled(process.env.E2E_TEST) ||
+    isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_CLERK) ||
+    isEnvFlagEnabled(process.env.NEXT_PUBLIC_E2E_TEST)
+  ) {
+    return true;
+  }
+
+  return await hasMockAdminUsersCookie();
+}
+
+function sortAdminUsers(
+  users: AdminUserListItem[],
+  sortBy: NonNullable<AdminUsersQueryParams['sortBy']>,
+  sortOrder: NonNullable<AdminUsersQueryParams['sortOrder']>
+): AdminUserListItem[] {
+  return [...users].sort((a, b) => {
+    let comparison = 0;
+    switch (sortBy) {
+      case 'name':
+        comparison = (a.fullName ?? '').localeCompare(b.fullName ?? '');
+        break;
+      case 'email':
+        comparison = a.email.localeCompare(b.email);
+        break;
+      case 'lastSignInAt':
+        comparison = (a.lastSignInAt ?? '').localeCompare(b.lastSignInAt ?? '');
+        break;
+      default:
+        comparison = a.createdAt.localeCompare(b.createdAt);
+    }
+
+    return sortOrder === 'desc' ? -comparison : comparison;
+  });
+}
+
+function paginateAdminUsers(
+  users: AdminUserListItem[],
+  page: number,
+  limit: number
+): AdminUsersResponse {
+  const totalItems = users.length;
+  const totalPages = Math.ceil(totalItems / limit);
+  const paginatedUsers = users.slice((page - 1) * limit, page * limit);
+
+  const pagination: PaginationMeta = {
+    page,
+    limit,
+    totalItems,
+    totalPages,
+    hasNextPage: page < totalPages,
+    hasPreviousPage: page > 1,
+  };
+
+  return {
+    users: paginatedUsers,
+    pagination,
+  };
+}
+
+function getMockAdminUsers(
+  params: Required<
+    Pick<
+      AdminUsersQueryParams,
+      | 'page'
+      | 'limit'
+      | 'outperformerOnly'
+      | 'adminOnly'
+      | 'sortBy'
+      | 'sortOrder'
+    >
+  > &
+    Pick<AdminUsersQueryParams, 'search'>
+): AdminUsersResponse {
+  const mockUsers: AdminUserListItem[] = [
+    {
+      id: 'mock-admin-id',
+      email: 'e2e.admin@example.com',
+      fullName: 'E2E Admin',
+      firstName: 'E2E',
+      lastName: 'Admin',
+      imageUrl: null,
+      isAdmin: true,
+      isOutperformer: false,
+      lastSignInAt: '2025-01-15T10:00:00.000Z',
+      createdAt: '2025-01-10T10:00:00.000Z',
+      bookingsCount: 0,
+      completedCoursesCount: 0,
+    },
+    {
+      id: 'mock-user-id',
+      email: 'e2e.test@example.com',
+      fullName: 'E2E User',
+      firstName: 'E2E',
+      lastName: 'User',
+      imageUrl: null,
+      isAdmin: false,
+      isOutperformer: false,
+      lastSignInAt: '2025-01-14T10:00:00.000Z',
+      createdAt: '2025-01-09T10:00:00.000Z',
+      bookingsCount: 1,
+      completedCoursesCount: 0,
+    },
+    {
+      id: 'mock-outperformer-id',
+      email: 'e2e.duplicate@example.com',
+      fullName: 'E2E Duplicate User',
+      firstName: 'E2E',
+      lastName: 'Duplicate User',
+      imageUrl: null,
+      isAdmin: false,
+      isOutperformer: true,
+      lastSignInAt: '2025-01-13T10:00:00.000Z',
+      createdAt: '2025-01-08T10:00:00.000Z',
+      bookingsCount: 2,
+      completedCoursesCount: 1,
+    },
+  ];
+
+  let users = mockUsers;
+
+  if (params.search) {
+    const searchLower = params.search.toLowerCase();
+    users = users.filter(
+      user =>
+        user.email.toLowerCase().includes(searchLower) ||
+        user.firstName?.toLowerCase().includes(searchLower) ||
+        user.lastName?.toLowerCase().includes(searchLower) ||
+        user.fullName?.toLowerCase().includes(searchLower)
+    );
+  }
+
+  if (params.adminOnly) {
+    users = users.filter(user => user.isAdmin);
+  }
+
+  if (params.outperformerOnly) {
+    users = users.filter(user => user.isOutperformer);
+  }
+
+  return paginateAdminUsers(
+    sortAdminUsers(users, params.sortBy, params.sortOrder),
+    params.page,
+    params.limit
+  );
+}
 
 /**
  * Get paginated list of users with optional filtering
@@ -35,6 +203,18 @@ export async function getAdminUsers(
   const safePage = Math.max(1, page);
   const safeLimit = Math.min(Math.max(1, limit), 100);
   const offset = (safePage - 1) * safeLimit;
+
+  if (await shouldBypassClerkUsers()) {
+    return getMockAdminUsers({
+      page: safePage,
+      limit: safeLimit,
+      search,
+      outperformerOnly,
+      adminOnly,
+      sortBy,
+      sortOrder,
+    });
+  }
 
   try {
     // Get all users from Clerk via pagination (iterative fetch)
@@ -122,34 +302,16 @@ export async function getAdminUsers(
         ? new Date(user.lastSignInAt).toISOString()
         : null,
       createdAt: new Date(user.createdAt).toISOString(),
+      bookingsCount: 0,
+      completedCoursesCount: 0,
     }));
 
-    // Sort
-    basicUsers.sort((a, b) => {
-      let comparison = 0;
-      switch (sortBy) {
-        case 'name':
-          comparison = (a.fullName ?? '').localeCompare(b.fullName ?? '');
-          break;
-        case 'email':
-          comparison = a.email.localeCompare(b.email);
-          break;
-        case 'lastSignInAt':
-          comparison = (a.lastSignInAt ?? '').localeCompare(
-            b.lastSignInAt ?? ''
-          );
-          break;
-        default:
-          // Default sort by createdAt
-          comparison = a.createdAt.localeCompare(b.createdAt);
-      }
-      return sortOrder === 'desc' ? -comparison : comparison;
-    });
+    const sortedUsers = sortAdminUsers(basicUsers, sortBy, sortOrder);
 
     // Paginate first, then fetch DB counts only for the current page
-    const totalItems = basicUsers.length;
+    const totalItems = sortedUsers.length;
     const totalPages = Math.ceil(totalItems / safeLimit);
-    const paginatedBasicUsers = basicUsers.slice(offset, offset + safeLimit);
+    const paginatedBasicUsers = sortedUsers.slice(offset, offset + safeLimit);
 
     // Fetch booking/completion counts only for paginated user IDs (bounded IN clause)
     const pageUserIds = paginatedBasicUsers.map(u => u.id);

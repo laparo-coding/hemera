@@ -203,12 +203,18 @@ export default async function CoursesPage() {
                 sx={{ py: 8 }}
                 data-testid='e2e-courses-empty'
               >
-                <Typography variant='h6' color='text.secondary' gutterBottom>
-                  Bald verfügbar!
+                <Typography
+                  variant='h6'
+                  color='text.secondary'
+                  gutterBottom
+                  data-testid='course-database-empty-message'
+                >
+                  Aktuell sind keine veroeffentlichten Seminare in der Datenbank
+                  verfuegbar.
                 </Typography>
                 <Typography variant='body1' color='text.secondary'>
-                  Neue Seminare kommen bald. Bleib dran für spannende
-                  Lernmöglichkeiten.
+                  Sobald Seminare veroeffentlicht sind, erscheinen sie hier
+                  automatisch aus der Datenbank.
                 </Typography>
               </Box>
             )}

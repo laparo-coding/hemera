@@ -2,11 +2,11 @@
  * Debug page to check admin authentication status
  */
 
-import { currentUser } from '@clerk/nextjs/server';
 import { Alert, Box, Card, CardContent, Typography } from '@mui/material';
+import { getCurrentUser } from '@/lib/auth/helpers';
 
 export default async function AdminDebugPage() {
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   return (
     <Box sx={{ p: 4 }}>

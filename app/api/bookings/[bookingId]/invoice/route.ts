@@ -33,8 +33,8 @@
  * to avoid repeated Stripe API calls. URLs are fetched on-demand if not cached.
  */
 
-import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
+import { getCurrentUser } from '@/lib/auth/helpers';
 import { prisma } from '../../../../../lib/db/prisma';
 import { logError } from '../../../../../lib/errors';
 import { validateInvoiceDownload } from '../../../../../lib/services/stripe-invoice';
@@ -96,7 +96,8 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
   try {
     // 1. Authentication check
-    const { userId } = await auth();
+    const user = await getCurrentUser();
+    const userId = user?.id ?? null;
     if (!userId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },

@@ -5,16 +5,42 @@ import {
   Box,
   Button,
   Container,
-  Skeleton,
   Toolbar,
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { userButtonClerkAppearance } from '@/components/auth/clerkAppearance';
 import { colors, typography } from '@/lib/design-tokens';
 import { TERMS } from '../../lib/constants/terminology';
 import { SignedIn, SignedOut, UserButton } from '../auth/ClerkComponents';
 import ClientOnly from '../ClientOnly';
+
+type E2ESessionUserRole = 'user' | 'admin' | 'unknown';
+
+function readE2ERole(): E2ESessionUserRole {
+  if (typeof window === 'undefined') {
+    return 'user';
+  }
+
+  try {
+    const raw = window.localStorage.getItem('clerk-session');
+    if (!raw) {
+      return 'user';
+    }
+
+    const parsed = JSON.parse(raw);
+    const role = parsed?.user?.role;
+
+    if (role === 'admin' || role === 'user') {
+      return role;
+    }
+
+    return 'unknown';
+  } catch {
+    return 'user';
+  }
+}
 
 /**
  * Public navigation component for non-protected pages
@@ -26,38 +52,92 @@ export function PublicNavigation({
 }: {
   hideMyCourses?: boolean;
 }) {
+  const authNavFallback = (
+    <Box
+      data-testid='auth-nav-fallback'
+      aria-live='polite'
+      sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
+    >
+      <Button
+        variant='outlined'
+        component={Link}
+        href='/sign-in'
+        data-testid='nav-login-button'
+        sx={{
+          textTransform: 'none',
+          px: 3,
+          color: colors.white,
+          borderColor: colors.white,
+          fontFamily: typography.body,
+          fontWeight: 500,
+          '&:hover': {
+            borderColor: colors.beige,
+            bgcolor: colors.whiteOverlay15,
+          },
+        }}
+      >
+        Anmelden
+      </Button>
+      <Button
+        variant='contained'
+        component={Link}
+        href='/sign-up'
+        data-testid='nav-signup-button'
+        sx={{
+          textTransform: 'none',
+          px: 3,
+          bgcolor: colors.marsala,
+          color: colors.white,
+          fontFamily: typography.body,
+          fontWeight: 600,
+          '&:hover': {
+            bgcolor: colors.marsalaDark,
+          },
+        }}
+      >
+        Registrieren
+      </Button>
+      <Box
+        component='span'
+        role='status'
+        aria-live='polite'
+        data-testid='auth-nav-ready'
+        data-state='loading'
+        sx={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          p: 0,
+          m: -1,
+          overflow: 'hidden',
+          clip: 'rect(0 0 0 0)',
+          whiteSpace: 'nowrap',
+          border: 0,
+        }}
+      >
+        Kontonavigation wird geladen.
+      </Box>
+    </Box>
+  );
+
   // Check if Clerk is configured AND not disabled for E2E
   const isClerkConfigured = Boolean(
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
   );
-  const isE2E = process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
+  const isE2E =
+    process.env.NEXT_PUBLIC_DISABLE_CLERK === '1' ||
+    process.env.NEXT_PUBLIC_E2E_TEST === '1';
   const useClerk = isClerkConfigured && !isE2E;
 
   // In E2E mode, pick up mocked role from localStorage (set by tests/auth-helper)
-  const [e2eRole, setE2eRole] = useState<'user' | 'admin' | 'unknown'>('user');
-  useLayoutEffect(() => {
+  const [e2eRole, setE2eRole] = useState<E2ESessionUserRole>('user');
+  useEffect(() => {
     if (!isE2E) return;
-    const readRole = () => {
-      try {
-        const raw = window.localStorage.getItem('clerk-session');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          const role = (parsed?.user?.role as string) || 'user';
-          setE2eRole(
-            role === 'admin' ? 'admin' : role === 'user' ? 'user' : 'unknown'
-          );
-          return;
-        }
-      } catch {
-        // ignore
-      }
-      setE2eRole('user');
-    };
-    // initial read pre-paint
-    readRole();
+    const syncRole = () => setE2eRole(readE2ERole());
+    syncRole();
     // subscribe to storage events so role changes reflect without reload
     const onStorage = (e: StorageEvent) => {
-      if (e.key === 'clerk-session') readRole();
+      if (e.key === 'clerk-session') syncRole();
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
@@ -79,6 +159,9 @@ export function PublicNavigation({
             py: 1,
             px: { xs: 2, sm: 3 },
             minHeight: '64px !important',
+            flexWrap: 'wrap',
+            rowGap: 1,
+            alignItems: { xs: 'flex-start', sm: 'center' },
           }}
         >
           {/* Logo/Brand */}
@@ -102,7 +185,19 @@ export function PublicNavigation({
           <Box sx={{ flexGrow: 1 }} />
 
           {/* Navigation Links */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'flex-end', sm: 'flex-start' },
+              flexWrap: 'wrap',
+              gap: 2,
+              width: {
+                xs: '100%',
+                sm: 'auto',
+              },
+            }}
+          >
             {/* Admin link visible in E2E mode when mocked as admin */}
             {/* Admin link visible in E2E mode when mocked as admin */}
             {isE2E && e2eRole === 'admin' && (
@@ -126,140 +221,42 @@ export function PublicNavigation({
             )}
             {/* Authentication Buttons - wrapped in ClientOnly to prevent hydration mismatch */}
             {useClerk ? (
-              <ClientOnly
-                fallback={
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Skeleton variant='rounded' width={100} height={36} />
-                    <Skeleton variant='rounded' width={110} height={36} />
-                  </Box>
-                }
-              >
-                <SignedOut>
-                  <Button
-                    variant='outlined'
-                    component={Link}
-                    href='/sign-in'
-                    data-testid='nav-login-button'
-                    sx={{
-                      textTransform: 'none',
-                      px: 3,
-                      color: colors.white,
-                      borderColor: colors.white,
-                      fontFamily: typography.body,
-                      fontWeight: 500,
-                      '&:hover': {
-                        borderColor: colors.beige,
-                        bgcolor: colors.whiteOverlay15,
-                      },
-                    }}
-                  >
-                    Anmelden
-                  </Button>
-                  <Button
-                    variant='contained'
-                    component={Link}
-                    href='/sign-up'
-                    data-testid='nav-signup-button'
-                    sx={{
-                      textTransform: 'none',
-                      px: 3,
-                      bgcolor: colors.marsala,
-                      color: colors.white,
-                      fontFamily: typography.body,
-                      fontWeight: 600,
-                      '&:hover': {
-                        bgcolor: colors.marsalaDark,
-                      },
-                    }}
-                  >
-                    Registrieren
-                  </Button>
-                </SignedOut>
+              <ClientOnly fallback={authNavFallback}>
+                <Box data-testid='auth-nav-ready' data-state='ready'>
+                  <SignedOut>{authNavFallback}</SignedOut>
 
-                {/* User Menu for Authenticated Users */}
-                <SignedIn>
-                  {!hideMyCourses && (
-                    <Button
-                      variant='text'
-                      component={Link}
-                      href='/dashboard'
-                      sx={{
-                        textTransform: 'none',
-                        mr: 1,
-                        color: colors.white,
-                        fontFamily: typography.body,
-                        fontWeight: 500,
-                        '&:hover': {
-                          bgcolor: colors.whiteOverlay15,
-                        },
-                      }}
-                    >
-                      {TERMS.myCourses}
-                    </Button>
-                  )}
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox: {
-                          width: '36px',
-                          height: '36px',
-                        },
-                        userButtonPopoverCard: {
-                          pointerEvents: 'initial',
-                        },
-                        modalBackdrop: {
-                          backgroundColor: 'transparent',
-                        },
-                      },
-                    }}
-                    userProfileMode='modal'
-                    data-testid='user-profile-button'
-                  />
-                </SignedIn>
+                  {/* User Menu for Authenticated Users */}
+                  <SignedIn>
+                    {!hideMyCourses && (
+                      <Button
+                        variant='text'
+                        component={Link}
+                        href='/dashboard'
+                        sx={{
+                          textTransform: 'none',
+                          mr: 1,
+                          color: colors.white,
+                          fontFamily: typography.body,
+                          fontWeight: 500,
+                          '&:hover': {
+                            bgcolor: colors.whiteOverlay15,
+                          },
+                        }}
+                      >
+                        {TERMS.myCourses}
+                      </Button>
+                    )}
+                    <UserButton
+                      appearance={userButtonClerkAppearance}
+                      userProfileMode='modal'
+                      data-testid='user-profile-button'
+                    />
+                  </SignedIn>
+                </Box>
               </ClientOnly>
             ) : (
               /* Fallback buttons when Clerk is not configured or E2E */
-              <>
-                <Button
-                  variant='outlined'
-                  component={Link}
-                  href='/sign-in'
-                  data-testid='nav-login-button'
-                  sx={{
-                    textTransform: 'none',
-                    px: 3,
-                    color: colors.white,
-                    borderColor: colors.white,
-                    fontFamily: typography.body,
-                    fontWeight: 500,
-                    '&:hover': {
-                      borderColor: colors.beige,
-                      bgcolor: colors.whiteOverlay15,
-                    },
-                  }}
-                >
-                  Anmelden
-                </Button>
-                <Button
-                  variant='contained'
-                  component={Link}
-                  href='/sign-up'
-                  data-testid='nav-signup-button'
-                  sx={{
-                    textTransform: 'none',
-                    px: 3,
-                    bgcolor: colors.marsala,
-                    color: colors.white,
-                    fontFamily: typography.body,
-                    fontWeight: 600,
-                    '&:hover': {
-                      bgcolor: colors.marsalaDark,
-                    },
-                  }}
-                >
-                  Registrieren
-                </Button>
-              </>
+              authNavFallback
             )}
 
             {/* Role indicator for tests in E2E mode */}

@@ -1,13 +1,14 @@
-import { currentUser } from '@clerk/nextjs/server';
 import { type ParticipationStatus, PaymentStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getCurrentUser } from '@/lib/auth/helpers';
 import { prisma } from '@/lib/db/prisma';
 import { logError } from '@/lib/errors';
 import { ErrorSeverity, reportError } from '@/lib/monitoring/rollbar-official';
 import type { PaymentStatus as ApiPaymentStatus } from '@/lib/types/booking';
 import type { ParticipationStatus as ApiParticipationStatus } from '@/lib/types/participation';
 import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
+import { getOrCreateRequestIdFromHeaders } from '@/lib/utils/request-id';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -152,7 +153,7 @@ export async function GET(request: Request) {
     const queryParams = Object.fromEntries(searchParams.entries());
     const validatedParams = BookingQuerySchema.parse(queryParams);
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user?.id) {
       // E2E test fallback: when Clerk is disabled, return 401 early
       if (isClerkDisabled()) {
@@ -262,8 +263,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const requestId = getOrCreateRequestIdFromHeaders(request.headers);
+
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user?.id) {
       // E2E test fallback: when Clerk is disabled, return 401 early
       if (isClerkDisabled()) {
@@ -353,6 +356,11 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    logError(error, {
+      operation: 'api/bookings#post',
+      requestId,
+    });
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

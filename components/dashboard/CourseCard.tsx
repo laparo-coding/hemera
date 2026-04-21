@@ -233,6 +233,7 @@ export default function CourseCard({
         '&:hover': {
           boxShadow: `0 4px 12px ${colors.tealAlpha12}`,
         },
+        overflow: 'hidden',
       }}
     >
       <Stack
@@ -240,10 +241,16 @@ export default function CourseCard({
         spacing={2}
         alignItems={{ xs: 'flex-start', md: 'center' }}
         justifyContent='space-between'
+        sx={{ width: '100%' }}
       >
         {/* Course Info */}
-        <Box sx={{ flex: 1 }}>
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 1 }}>
+        <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
+          <Stack
+            direction='row'
+            spacing={2}
+            alignItems='center'
+            sx={{ mb: 1, minWidth: 0 }}
+          >
             <SchoolOutlined sx={{ color: colors.marsala }} />
             <Typography
               sx={{
@@ -251,6 +258,8 @@ export default function CourseCard({
                 fontSize: '1rem',
                 fontWeight: 600,
                 color: colors.marsala,
+                minWidth: 0,
+                overflowWrap: 'anywhere',
               }}
             >
               {courseTitle}
@@ -261,7 +270,7 @@ export default function CourseCard({
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={{ xs: 1, sm: 3 }}
-            sx={{ ml: 5 }}
+            sx={{ ml: { xs: 0, sm: 5 }, minWidth: 0 }}
           >
             {/* Date */}
             <Stack direction='row' spacing={0.5} alignItems='center'>
@@ -274,6 +283,7 @@ export default function CourseCard({
                   fontSize: '0.875rem',
                   color: colors.lightBlack,
                   opacity: 0.7,
+                  overflowWrap: 'anywhere',
                 }}
               >
                 {dateText}
@@ -292,6 +302,7 @@ export default function CourseCard({
                     fontSize: '0.875rem',
                     color: colors.lightBlack,
                     opacity: 0.7,
+                    overflowWrap: 'anywhere',
                   }}
                 >
                   {timeText}
@@ -316,6 +327,7 @@ export default function CourseCard({
                         fontSize: '0.875rem',
                         color: colors.lightBlack,
                         opacity: 0.7,
+                        overflowWrap: 'anywhere',
                         '&:hover': {
                           opacity: 1,
                           textDecoration: 'underline',
@@ -332,6 +344,7 @@ export default function CourseCard({
                       fontSize: '0.875rem',
                       color: colors.lightBlack,
                       opacity: 0.7,
+                      overflowWrap: 'anywhere',
                     }}
                   >
                     {locationText}
@@ -343,14 +356,21 @@ export default function CourseCard({
 
           {/* Invoice Download - shown below date/time/location */}
           {showInvoice && (
-            <Box sx={{ ml: 5, mt: 1 }}>
+            <Box sx={{ ml: { xs: 0, sm: 5 }, mt: 1, minWidth: 0 }}>
               <InvoiceDownloadButton bookingId={bookingId} />
             </Box>
           )}
         </Box>
 
         {/* Actions */}
-        <Stack sx={{ flexShrink: 0, alignItems: 'flex-end' }} spacing={1}>
+        <Stack
+          sx={{
+            flexShrink: { xs: 1, md: 0 },
+            width: { xs: '100%', md: 'auto' },
+            alignItems: { xs: 'stretch', md: 'flex-end' },
+          }}
+          spacing={1}
+        >
           {getPrimaryAction()}
           {showTestimonialButton && userProfile && (
             <TestimonialButton

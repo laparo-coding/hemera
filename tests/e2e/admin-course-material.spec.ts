@@ -1,4 +1,18 @@
 import { expect, test } from '@playwright/test';
+import { seedMockClerkSession } from './auth-helper';
+import { gotoStable } from './helpers/nav';
+
+async function gotoMaterialPage(page: import('@playwright/test').Page) {
+  await gotoStable(page, '/admin/course-material', {
+    waitForTestId: 'admin-course-material-page',
+    timeout: 60_000,
+  });
+  await page
+    .waitForFunction(() => !document.querySelector('[role="progressbar"]'), {
+      timeout: 15_000,
+    })
+    .catch(() => undefined);
+}
 
 /**
  * Admin Course Material E2E Tests
@@ -11,11 +25,20 @@ import { expect, test } from '@playwright/test';
 test.describe('Admin Course Material Page', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
+
+    if (!process.env.CI) {
+      await seedMockClerkSession(page, 'admin');
+    }
   });
 
   test('GET /api/admin/course-material - should require authentication', async ({
     request,
   }) => {
+    test.skip(
+      test.info().project.name === 'chromium-auth',
+      'Unauthenticated admin contract is not meaningful in authenticated project runs'
+    );
+
     test.skip(
       !!process.env.E2E_TEST || !!process.env.NEXT_PUBLIC_DISABLE_CLERK,
       'Mock-Auth-Umgebung — alle Requests sind authentifiziert'
@@ -34,11 +57,7 @@ test.describe('Admin Course Material Page', () => {
   test('should display course material page with table', async ({ page }) => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
-    // Navigate to course material page
-    await page.goto('/admin/course-material');
-
-    // Wait for page to load
-    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
+    await gotoMaterialPage(page);
 
     // Check that no error alert is visible
     const errorAlert = page.locator('[role="alert"]').filter({ hasText: /Fehler|error/i });
@@ -46,13 +65,14 @@ test.describe('Admin Course Material Page', () => {
 
     // Check page title
     await expect(page.locator('[data-testid="admin-course-material-page"]')).toBeVisible();
-    await expect(page.getByText('Seminarmaterial')).toBeVisible();
+    await expect(
+      page.getByText(
+        'Erstelle und verwalte Seminarmaterialien, die du in deinen Kursen verwenden kannst.'
+      )
+    ).toBeVisible();
 
-    // Check that the material table container is present
-    const tableContainer = page.locator('table');
-    await expect(tableContainer).toBeVisible();
-
-    // Check for key table elements
+    const table = page.locator('table[aria-label="Seminarmaterial Tabelle"]');
+    await expect(table).toBeVisible();
     await expect(page.getByText('Titel')).toBeVisible();
     await expect(page.getByText('Kennung')).toBeVisible();
     await expect(page.getByText('Erstellt am')).toBeVisible();
@@ -62,15 +82,14 @@ test.describe('Admin Course Material Page', () => {
   test('should have working search and refresh functionality', async ({ page }) => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
-    await page.goto('/admin/course-material');
-    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
+    await gotoMaterialPage(page);
 
     // Check for search input field
     const searchInput = page.getByPlaceholder('Suchen nach Titel oder Kennung...');
     await expect(searchInput).toBeVisible();
 
     // Check for refresh button
-    const refreshButton = page.locator('button[title="Aktualisieren"]');
+    const refreshButton = page.getByRole('button', { name: /aktualisieren/i });
     await expect(refreshButton).toBeVisible();
 
     // Check for "Neues Material" button
@@ -81,8 +100,7 @@ test.describe('Admin Course Material Page', () => {
   test('should display empty state message when no materials exist', async ({ page }) => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
-    await page.goto('/admin/course-material');
-    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
+    await gotoMaterialPage(page);
 
     // Check if the table displays either empty message or has materials
     const emptyMessage = page.getByText(/Noch keine Seminarmaterialien vorhanden|Keine Materialien gefunden/);
@@ -93,14 +111,19 @@ test.describe('Admin Course Material Page', () => {
     const rowCount = await tableRows.count();
 
     expect(
-      (isEmpty && rowCount === 0) || (!isEmpty && rowCount > 0),
-      `Unexpected state: isEmpty=${isEmpty}, rowCount=${rowCount}. Expected empty message with 0 rows or no empty message with rows > 0`,
+      (isEmpty && rowCount >= 1) || (!isEmpty && rowCount > 0),
+      `Unexpected state: isEmpty=${isEmpty}, rowCount=${rowCount}. Expected empty message row or data rows`,
     ).toBe(true);
   });
 
   test('API /api/admin/course-material should return correct structure', async ({
     request,
   }) => {
+    test.skip(
+      test.info().project.name === 'chromium-auth',
+      'Unauthenticated admin contract is not meaningful in authenticated project runs'
+    );
+
     const response = await request.get('/api/admin/course-material', {
       headers: {
         Accept: 'application/json',
@@ -116,8 +139,7 @@ test.describe('Admin Course Material Page', () => {
   test('should navigate to material detail via table action', async ({ page }) => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
-    await page.goto('/admin/course-material');
-    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
+    await gotoMaterialPage(page);
 
     // Check if there are any materials in the table
     const tableRows = page.locator('table tbody tr');
@@ -154,15 +176,14 @@ test.describe('Admin Course Material Page', () => {
   test('should handle breadcrumb navigation', async ({ page }) => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
-    await page.goto('/admin/course-material');
-    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
+    await gotoMaterialPage(page);
 
     // Check for breadcrumb containing "Seminarmaterial"
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
     const breadcrumbVisible = await breadcrumb.isVisible();
 
     if (breadcrumbVisible) {
-      await expect(page.getByText('Seminarmaterial')).toBeVisible();
+      await expect(breadcrumb).toContainText('Seminarmaterial');
     } else {
       test.info().annotations.push({
         type: 'info',
@@ -174,8 +195,7 @@ test.describe('Admin Course Material Page', () => {
   test('should validate table pagination controls', async ({ page }) => {
     test.skip(!!process.env.CI, 'Requires authenticated session');
 
-    await page.goto('/admin/course-material');
-    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
+    await gotoMaterialPage(page);
 
     // Check for pagination controls
     const pagination = page.locator('[role="navigation"]').filter({ hasText: /Zeilen pro Seite|page/ });
@@ -199,8 +219,7 @@ test.describe('Admin Course Material Page', () => {
       }
     });
 
-    await page.goto('/admin/course-material');
-    await page.locator('[data-testid="admin-course-material-page"]').waitFor();
+    await gotoMaterialPage(page);
 
     // Check that no critical errors occurred
     const criticalErrors = consoleErrors.filter(

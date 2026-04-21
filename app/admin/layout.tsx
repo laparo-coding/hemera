@@ -7,10 +7,9 @@
  * Uses standardized 1280px max-width (lg).
  */
 
-import { currentUser } from '@clerk/nextjs/server';
 import { Box, Container } from '@mui/material';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+import { requireAdmin } from '@/lib/auth/helpers';
 import { PublicNavigation } from '../../components/navigation/PublicNavigation';
 
 export const metadata: Metadata = {
@@ -23,17 +22,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await currentUser();
-
-  if (!user) {
-    redirect('/sign-in?redirect=/admin');
-  }
-
-  const isAdmin = user.publicMetadata?.role === 'admin';
-
-  if (!isAdmin) {
-    redirect('/dashboard');
-  }
+  await requireAdmin();
 
   // ThemeRegistry ist ein Client Component Wrapper für MUI SSR/CSR-Styling
   const ThemeRegistry = (await import('../../components/ThemeRegistry'))

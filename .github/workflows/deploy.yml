@@ -128,12 +128,40 @@ jobs:
         run: npm run lint:ci
 
       - name: Run unit tests (with coverage)
-        # Coverage enforced in jest.config.ts but transient gaps don't block CI
-        # Critical paths (lib/services) have stricter thresholds; low-testability areas have overrides
-        continue-on-error: true
-        run: npm test -- --coverage
+        run: npm run test:unit:coverage -- --runInBand
         env:
           CI: 'true'
+
+      - name: Verify coverage scripts
+        run: |
+          node -e "const p=require('./package.json'); const scripts=p.scripts??{}; const missing=['coverage:summary','coverage:check'].filter(name => !scripts[name]); if(missing.length>0) throw new Error('Missing required coverage scripts: ' + missing.join(', '));"
+
+      - name: Render coverage summary
+        run: |
+          set -euo pipefail
+          summary_output="$(npm run coverage:summary -- --json)"
+          if [ -z "$summary_output" ]; then
+            echo 'coverage:summary produced no output' >&2
+            exit 1
+          fi
+          printf '%s\n' "$summary_output" > coverage/summary.raw.txt
+          node <<'NODE'
+          const fs = require('node:fs');
+          const raw = fs.readFileSync('coverage/summary.raw.txt', 'utf8').trim();
+          const start = raw.indexOf('{');
+          const end = raw.lastIndexOf('}');
+
+          if (start === -1 || end === -1 || end < start) {
+            throw new Error('coverage:summary did not emit a JSON object');
+          }
+
+          const jsonText = raw.slice(start, end + 1);
+          JSON.parse(jsonText);
+          fs.writeFileSync('coverage/summary.json', `${jsonText}\n`);
+          NODE
+
+      - name: Enforce deploy coverage gate
+        run: npm run coverage:check -- --lines 60 --statements 60 --functions 45 --branches 75
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v7

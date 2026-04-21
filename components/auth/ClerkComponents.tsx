@@ -11,11 +11,20 @@ interface AuthWrapperProps {
   children: ReactNode;
 }
 
+function shouldBypassClerk() {
+  return (
+    process.env.NEXT_PUBLIC_DISABLE_CLERK === '1' ||
+    process.env.NEXT_PUBLIC_E2E_TEST === '1'
+  );
+}
+
 /**
  * Safe wrapper for SignedIn that handles missing ClerkProvider
  * When Clerk is bypassed, this renders nothing (user is treated as signed out)
  */
 export function SignedIn({ children }: AuthWrapperProps) {
+  const bypassClerk = shouldBypassClerk();
+
   const [isClerkAvailable, setIsClerkAvailable] = useState<boolean | null>(
     null
   );
@@ -33,6 +42,10 @@ export function SignedIn({ children }: AuthWrapperProps) {
     return null;
   }
 
+  if (bypassClerk) {
+    return null;
+  }
+
   // Clerk is bypassed, treat user as signed out
   if (!isClerkAvailable) {
     return null;
@@ -46,6 +59,8 @@ export function SignedIn({ children }: AuthWrapperProps) {
  * When Clerk is bypassed, this renders children (user is treated as signed out)
  */
 export function SignedOut({ children }: AuthWrapperProps) {
+  const bypassClerk = shouldBypassClerk();
+
   const [isClerkAvailable, setIsClerkAvailable] = useState<boolean | null>(
     null
   );
@@ -63,6 +78,10 @@ export function SignedOut({ children }: AuthWrapperProps) {
     return null;
   }
 
+  if (bypassClerk) {
+    return <>{children}</>;
+  }
+
   // Clerk is bypassed, show signed-out content
   if (!isClerkAvailable) {
     return <>{children}</>;
@@ -78,6 +97,8 @@ export function SignedOut({ children }: AuthWrapperProps) {
 export function UserButton(
   props: React.ComponentProps<typeof ClerkUserButton>
 ) {
+  const bypassClerk = shouldBypassClerk();
+
   const [isClerkAvailable, setIsClerkAvailable] = useState<boolean | null>(
     null
   );
@@ -89,7 +110,7 @@ export function UserButton(
     setIsClerkAvailable(clerkAvailable);
   }, []);
 
-  if (isClerkAvailable === null || !isClerkAvailable) {
+  if (isClerkAvailable === null || bypassClerk || !isClerkAvailable) {
     return null;
   }
 

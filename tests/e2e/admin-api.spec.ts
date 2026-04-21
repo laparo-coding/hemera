@@ -11,6 +11,13 @@ import { expect, test } from '@playwright/test';
  */
 
 test.describe('Admin API Authentication & Authorization', () => {
+  test.beforeEach(async ({}, testInfo) => {
+    test.skip(
+      testInfo.project.name === 'chromium-auth',
+      'Unauthenticated contract is covered by non-authenticated projects only'
+    );
+  });
+
   test('GET /api/admin/users - should require authentication', async ({
     request,
   }) => {
@@ -22,7 +29,7 @@ test.describe('Admin API Authentication & Authorization', () => {
     const body = await response.json();
     expect(body.success).toBe(false);
     expect(body.error.code).toBe('UNAUTHORIZED');
-    expect(body.error.message).toContain('Du bist nicht autorisiert');
+    expect(body.error.message).toContain('Authentifizierung erforderlich');
   });
 
   test('GET /api/admin/courses - should require authentication', async ({
@@ -36,7 +43,7 @@ test.describe('Admin API Authentication & Authorization', () => {
     const body = await response.json();
     expect(body.success).toBe(false);
     expect(body.error.code).toBe('UNAUTHORIZED');
-    expect(body.error.message).toContain('Du bist nicht autorisiert');
+    expect(body.error.message).toContain('Authentifizierung erforderlich');
   });
 
   test('GET /api/admin/analytics - should require authentication', async ({
@@ -50,7 +57,7 @@ test.describe('Admin API Authentication & Authorization', () => {
     const body = await response.json();
     expect(body.success).toBe(false);
     expect(body.error.code).toBe('UNAUTHORIZED');
-    expect(body.error.message).toContain('Du bist nicht autorisiert');
+    expect(body.error.message).toContain('Authentifizierung erforderlich');
   });
 
   test('GET /api/admin/errors - should require authentication', async ({
@@ -64,7 +71,7 @@ test.describe('Admin API Authentication & Authorization', () => {
     const body = await response.json();
     expect(body.success).toBe(false);
     expect(body.error.code).toBe('UNAUTHORIZED');
-    expect(body.error.message).toContain('Unauthorized');
+    expect(body.error.message).toContain('Authentifizierung erforderlich');
   });
 });
 
@@ -76,8 +83,8 @@ test.describe('Admin API CORS Support', () => {
       method: 'OPTIONS',
     });
 
-    // Should return 200 OK
-    expect(response.status()).toBe(200);
+    // Standardized CORS preflight responses return 204 No Content.
+    expect(response.status()).toBe(204);
 
     // Should include CORS headers (origin is dynamic via getCorsHeaders)
     const headers = response.headers();
@@ -93,8 +100,8 @@ test.describe('Admin API CORS Support', () => {
       method: 'OPTIONS',
     });
 
-    // Should return 200 OK
-    expect(response.status()).toBe(200);
+    // Standardized CORS preflight responses return 204 No Content.
+    expect(response.status()).toBe(204);
 
     // Should include CORS headers (origin is dynamic via getCorsHeaders)
     const headers = response.headers();
@@ -110,8 +117,8 @@ test.describe('Admin API CORS Support', () => {
       method: 'OPTIONS',
     });
 
-    // Should return 200 OK
-    expect(response.status()).toBe(200);
+    // Standardized CORS preflight responses return 204 No Content.
+    expect(response.status()).toBe(204);
 
     // Should include CORS headers (origin is dynamic via getCorsHeaders)
     const headers = response.headers();
@@ -127,8 +134,8 @@ test.describe('Admin API CORS Support', () => {
       method: 'OPTIONS',
     });
 
-    // Should return 200 OK
-    expect(response.status()).toBe(200);
+    // Standardized CORS preflight responses return 204 No Content.
+    expect(response.status()).toBe(204);
 
     // Should include CORS headers (origin is dynamic via getCorsHeaders)
     const headers = response.headers();

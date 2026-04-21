@@ -31,6 +31,15 @@ export interface PrerequisiteResult {
   completedCourses: CompletedCourse[];
 }
 
+const ACCEPTED_LEVELS_BY_REQUIRED_LEVEL: Record<
+  'BEGINNER' | 'INTERMEDIATE',
+  CourseLevel[]
+> = {
+  // A higher completed course also satisfies a lower prerequisite.
+  BEGINNER: ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'],
+  INTERMEDIATE: ['INTERMEDIATE', 'ADVANCED'],
+};
+
 /**
  * Get the required prerequisite level for a target course level.
  */
@@ -93,18 +102,22 @@ async function getUserId(clerkUserId: string): Promise<string | null> {
  * Get completed courses for a user at a specific level.
  * A course is considered completed if:
  * - Booking with paymentStatus = 'PAID'
- * - And course.level matches the required level
+ * - And course.level satisfies the accepted prerequisite mapping
  */
 async function getCompletedCoursesAtLevel(
   userId: string,
-  level: CourseLevel
+  level: keyof typeof ACCEPTED_LEVELS_BY_REQUIRED_LEVEL
 ): Promise<CompletedCourse[]> {
+  const acceptedLevels = ACCEPTED_LEVELS_BY_REQUIRED_LEVEL[level];
+
   const bookings = await prisma.booking.findMany({
     where: {
       userId,
       paymentStatus: 'PAID',
       course: {
-        level,
+        level: {
+          in: acceptedLevels,
+        },
       },
     },
     include: {

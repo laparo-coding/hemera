@@ -1,4 +1,6 @@
 import type { Page } from '@playwright/test';
+import { isCiEnvironment, isEnvFlagEnabled } from '../../lib/utils/env-flags';
+import { waitForClientHydration } from './helpers/nav';
 
 // Test user credentials - must match what's created in create-test-user.js
 const _TEST_CREDENTIALS = {
@@ -13,6 +15,21 @@ const _TEST_CREDENTIALS = {
  */
 export class AuthHelper {
   constructor(private page: Page) {}
+
+  private getBaseUrl(): string {
+    return process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
+  }
+
+  private async seedMockRoleCookie(role: 'user' | 'admin'): Promise<void> {
+    await this.page.context().addCookies([
+      {
+        name: 'hemera-e2e-role',
+        value: role,
+        url: this.getBaseUrl(),
+        sameSite: 'Lax',
+      },
+    ]);
+  }
 
   /**
    * Prepare a clean authentication state by clearing cookies and storage
@@ -52,9 +69,9 @@ export class AuthHelper {
    */
   private shouldMockAuth(): boolean {
     return (
-      !!process.env.CI ||
-      process.env.E2E_TEST === '1' ||
-      process.env.NEXT_PUBLIC_DISABLE_CLERK === '1'
+      isCiEnvironment() ||
+      isEnvFlagEnabled(process.env.E2E_TEST) ||
+      isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_CLERK)
     );
   }
 
@@ -67,6 +84,8 @@ export class AuthHelper {
   ): Promise<void> {
     // console.log entfernt (Lint-Regel):
     // 🎭 Mocking authentication in CI for: ${email} with role: ${role}
+
+    await this.seedMockRoleCookie(role === 'admin' ? 'admin' : 'user');
 
     // Set mock authentication cookies/localStorage
     await this.page.addInitScript(
@@ -156,6 +175,8 @@ export class AuthHelper {
       // console.log entfernt (Lint-Regel):
       // 📍 Current page is not sign-in page: ${currentUrl}, proceeding...
     }
+
+    await waitForClientHydration(this.page);
 
     // Wait for Clerk sign-in form to be visible with multiple fallback selectors
     const signInSelectors = [
@@ -837,6 +858,70 @@ export class AuthHelper {
   }
 }
 
+export async function seedMockClerkSession(
+  page: Page,
+  role: 'user' | 'admin' = 'user'
+): Promise<void> {
+  const testUser = role === 'admin' ? TEST_USERS.ADMIN : TEST_USERS.DEFAULT;
+  const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
+  const sessionPayload = {
+    id: 'mock-session-id',
+    user: {
+      // Keep the browser session aligned with the server-side mock auth helper,
+      // which resolves the E2E user from the role cookie as `e2e_mock_user`.
+      id: 'e2e_mock_user',
+      email: testUser.email,
+      firstName: 'E2E',
+      lastName: role === 'admin' ? 'Admin' : 'User',
+      role,
+    },
+    authenticated: true,
+    expiresAt: Date.now() + 3600000,
+  };
+
+  await page.context().clearCookies();
+
+  await page.context().addCookies([
+    {
+      name: 'hemera-e2e-role',
+      value: role,
+      url: baseUrl,
+      sameSite: 'Lax',
+    },
+  ]);
+
+  await page.addInitScript(session => {
+    localStorage.setItem(
+      'clerk-session',
+      JSON.stringify(session)
+    );
+    localStorage.setItem('auth-state', 'authenticated');
+  }, sessionPayload);
+
+  // Seed the active origin as well when we are already on the app origin.
+  // Avoid a warm-up navigation here because a cold dev server can exceed the
+  // 60s hook timeout before the actual test navigation even begins.
+  const currentUrl = page.url();
+  if (currentUrl.startsWith('http://') || currentUrl.startsWith('https://')) {
+    await page.evaluate(session => {
+      const newValue = JSON.stringify(session);
+      const oldValue = window.localStorage.getItem('clerk-session');
+
+      window.localStorage.setItem('clerk-session', newValue);
+      window.localStorage.setItem('auth-state', 'authenticated');
+      window.dispatchEvent(
+        new StorageEvent('storage', {
+          key: 'clerk-session',
+          oldValue,
+          newValue,
+          storageArea: window.localStorage,
+          url: window.location.href,
+        })
+      );
+    }, sessionPayload);
+  }
+}
+
 /**
  * Test user credentials
  */
@@ -855,5 +940,10 @@ export const TEST_USERS = {
     email: 'e2e.dashboard@example.com',
     password: 'E2ETestPassword2024!SecureForTesting',
     name: 'E2E Dashboard User',
+  },
+  ADMIN: {
+    email: 'e2e.admin@example.com',
+    password: 'E2ETestPassword2024!SecureForTesting',
+    name: 'E2E Admin User',
   },
 } as const;

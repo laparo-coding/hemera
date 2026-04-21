@@ -59,6 +59,7 @@ export function UserBreadcrumb({ items }: UserBreadcrumbProps) {
           return (
             <Typography
               key={item.href}
+              aria-current='page'
               sx={{
                 display: 'flex',
                 alignItems: 'center',

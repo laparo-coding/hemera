@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
+import { isCiEnvironment, isEnvFlagEnabled } from '../../lib/utils/env-flags';
 import { AuthHelper } from './auth-helper';
-import { gotoStable } from './helpers/nav';
+import { gotoStable, waitForClientHydration } from './helpers/nav';
 
 /**
  * Checkout Flow E2E Tests
@@ -34,9 +35,9 @@ const STRIPE_TEST_CARDS = {
 // Detect if running in CI (where Clerk auth cannot be mocked)
 const isCI = (): boolean => {
   return (
-    !!process.env.CI ||
-    process.env.E2E_TEST === '1' ||
-    process.env.NEXT_PUBLIC_DISABLE_CLERK === '1'
+    isCiEnvironment() ||
+    isEnvFlagEnabled(process.env.E2E_TEST) ||
+    isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_CLERK)
   );
 };
 
@@ -46,7 +47,7 @@ const isProduction = (): boolean => {
   return (
     baseUrl.includes('hemera.academy') ||
     baseUrl.includes('vercel.app') ||
-    process.env.E2E_LIVE_MODE === 'true'
+    isEnvFlagEnabled(process.env.E2E_LIVE_MODE)
   );
 };
 
@@ -81,6 +82,7 @@ test.describe('Checkout Flow E2E', () => {
 
       // Should redirect to sign-in page
       await expect(page).toHaveURL(/sign-in/, { timeout: 15000 });
+      await waitForClientHydration(page);
 
       // Sign-in form should be visible (use specific Clerk element)
       await expect(

@@ -1,5 +1,24 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
+import { seedMockClerkSession } from './auth-helper';
+import { mockDashboardBookings } from './helpers/dashboard';
+import { gotoStable } from './helpers/nav';
+
+const INVOICE_TIMEOUT = 90_000;
+
+async function gotoDashboard(page: import('@playwright/test').Page) {
+  await gotoStable(page, '/dashboard', {
+    waitForTestId: 'user-dashboard',
+    timeout: INVOICE_TIMEOUT,
+  });
+}
+
+function completedInvoiceButton(page: import('@playwright/test').Page) {
+  return page
+    .getByTestId('section-completed')
+    .locator('[data-testid^="invoice-download-"]')
+    .first();
+}
 
 /**
  * Invoice Download E2E Tests
@@ -12,64 +31,60 @@ import fs from 'node:fs';
  * - User must have at least one paid booking with Stripe invoice
  */
 test.describe('Invoice Download', () => {
-  // Skip entire suite if auth state file doesn't exist (no E2E credentials in CI)
-  test.skip(!fs.existsSync('.auth/user.json'), 'Skipping auth-required tests - no auth state available');
-  
-  test.use({ storageState: '.auth/user.json' });
+  test.skip(
+    !!process.env.CI && !fs.existsSync('.auth/user.json'),
+    'Skipping auth-required tests - no auth state available'
+  );
+
+  test.use(
+    !!process.env.CI && fs.existsSync('.auth/user.json')
+      ? { storageState: '.auth/user.json' }
+      : {}
+  );
 
   test.beforeEach(async ({ page, request }) => {
+    if (!process.env.CI) {
+      await seedMockClerkSession(page, 'user');
+      await mockDashboardBookings(page);
+    }
+
     // Warmup: Hit health endpoint first
-    await request.get('/api/health', { timeout: 30000 });
+    try {
+      await request.get('/api/health', { timeout: 60000 });
+    } catch {
+      test.info().annotations.push({
+        type: 'info',
+        description: 'Health warmup timed out; continuing with dashboard assertions',
+      });
+    }
   });
 
   test('authenticated user can see invoice button on dashboard', async ({
     page,
   }) => {
-    // Navigate to dashboard
-    await page.goto('/dashboard');
-    await page.waitForLoadState('domcontentloaded');
+    await gotoDashboard(page);
 
-    // Check for dashboard content
-    await expect(page.getByRole('heading').first()).toBeVisible({
-      timeout: 15000,
-    });
-
-    // Look for invoice button or link - may not exist if user has no paid bookings
-    const invoiceElements = page.locator(
-      '[data-testid="invoice-download"], [aria-label*="Rechnung"], button:has-text("Rechnung"), a:has-text("Rechnung")'
-    );
-
-    const invoiceCount = await invoiceElements.count();
-
-    // Log whether invoices are available (informational, not a failure)
-    if (invoiceCount > 0) {
-      await expect(invoiceElements.first()).toBeVisible();
-    } else {
-      // This is expected if test user has no paid bookings
-      test.info().annotations.push({
-        type: 'info',
-        description: 'No invoice buttons found - user may have no paid bookings',
-      });
+    if ((await completedInvoiceButton(page).count()) === 0) {
+      await expect(page.getByText('Beginne deine Lernreise')).toBeVisible();
+      return;
     }
+
+    await expect(completedInvoiceButton(page)).toBeVisible({
+      timeout: INVOICE_TIMEOUT,
+    });
   });
 
   test('clicking invoice button downloads PDF', async ({ page }) => {
-    // Navigate to my-courses page where invoice buttons are located
-    await page.goto('/dashboard');
-    await page.waitForLoadState('domcontentloaded');
+    await gotoDashboard(page);
 
-    // Find invoice download button/link
-    const invoiceButton = page
-      .locator(
-        '[data-testid="invoice-download"], [aria-label*="Rechnung"], button:has-text("Rechnung"), a:has-text("Rechnung")'
-      )
-      .first();
+    const invoiceButton = completedInvoiceButton(page);
 
-    // Skip if no invoice button exists
     if ((await invoiceButton.count()) === 0) {
-      test.skip(true, 'No invoice button found - user has no paid bookings');
+      await expect(page.getByText('Beginne deine Lernreise')).toBeVisible();
       return;
     }
+
+    await expect(invoiceButton).toBeVisible({ timeout: INVOICE_TIMEOUT });
 
     // Listen for download event
     const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
@@ -90,34 +105,34 @@ test.describe('Invoice Download', () => {
   });
 
   test('invoice API returns correct content type', async ({ page, request }) => {
-    // Navigate to dashboard to get booking context
-    await page.goto('/dashboard');
-    await page.waitForLoadState('domcontentloaded');
+    await gotoDashboard(page);
 
-    // Find invoice link to extract booking/invoice ID
-    const invoiceLink = page
-      .locator('a[href*="invoice"], a[href*="rechnung"]')
-      .first();
-
-    if ((await invoiceLink.count()) === 0) {
-      test.skip(true, 'No invoice link found');
+    if ((await completedInvoiceButton(page).count()) === 0) {
+      await expect(page.getByText('Beginne deine Lernreise')).toBeVisible();
       return;
     }
 
-    const href = await invoiceLink.getAttribute('href');
-    if (!href) {
-      test.skip(true, 'No href attribute on invoice link');
-      return;
-    }
+    const bookingId = await completedInvoiceButton(page)
+      .evaluate(
+        element =>
+          element.getAttribute('data-testid')?.replace('invoice-download-', '') ||
+          ''
+      );
 
-    // Make API request to invoice endpoint
-    const response = await request.get(href);
+    expect(bookingId).not.toBe('');
 
-    // Verify response
-    expect(response.status()).toBe(200);
+    const result = await page.evaluate(async currentBookingId => {
+      const response = await fetch(`/api/bookings/${currentBookingId}/invoice`, {
+        credentials: 'include',
+      });
+      return {
+        status: response.status,
+        contentType: response.headers.get('content-type'),
+      };
+    }, bookingId);
 
-    const contentType = response.headers()['content-type'];
-    expect(contentType).toMatch(/application\/pdf|application\/octet-stream/);
+    expect(result.status).toBe(200);
+    expect(result.contentType).toMatch(/application\/pdf|application\/octet-stream/);
   });
 });
 

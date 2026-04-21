@@ -17,18 +17,100 @@ import {
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
 import { sanitizeAuditLogDetails } from '@/lib/utils/log-sanitizer';
+import { getOrCreateRequestId } from '@/lib/utils/request-id';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
 };
 
 /**
+ * DELETE /api/admin/course-material/[id]
+ * Delete a course material
+ */
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  // Extract id before try block so it's available in catch for logging
+  const { id } = await params;
+  const requestId = getOrCreateRequestId(request);
+
+  let userId: string | null = null;
+  try {
+    const auth = await requireAdminUser(requestId);
+    if (!auth.authorized) return auth.response;
+    userId = auth.userId;
+
+    const material = await getMaterialById(id);
+
+    if (!material) {
+      return NextResponse.json(
+        { error: 'not_found', message: 'Material nicht gefunden' },
+        { status: 404 }
+      );
+    }
+
+    // Delete blob file (only SLIDE_CONTROL and CONTENT materials with a blobUrl)
+    if (material.blobUrl) {
+      try {
+        await del(material.blobUrl);
+      } catch {
+        // Log but continue with DB deletion
+        serverInstance.warning('Failed to delete blob file', {
+          requestId,
+          blobUrl: material.blobUrl,
+        });
+      }
+    }
+
+    // Delete database record
+    await deleteMaterial(id);
+
+    // Log successful deletion
+    logAuditEvent(
+      'COURSE_MATERIAL_DELETE',
+      userId,
+      id,
+      'course-material',
+      'success',
+      {
+        details: {
+          identifier: material.identifier,
+          title: material.title,
+        },
+      }
+    );
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    const auditUserId = userId ?? 'unknown';
+    logAuditEvent(
+      'COURSE_MATERIAL_DELETE',
+      auditUserId,
+      id,
+      'course-material',
+      'failure',
+      {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    );
+    serverInstance.error('Failed to delete course material', {
+      requestId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+    return NextResponse.json(
+      { error: 'internal_error', message: 'Fehler beim Löschen des Materials' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * GET /api/admin/course-material/[id]
  * Get a single course material
  */
-export async function GET(_request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
+  const requestId = getOrCreateRequestId(request);
+
   try {
-    const auth = await requireAdminUser();
+    const auth = await requireAdminUser(requestId);
     if (!auth.authorized) return auth.response;
 
     const { id } = await params;
@@ -54,6 +136,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     serverInstance.error('Failed to get course material', {
+      requestId,
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(
@@ -71,10 +154,11 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   // Extract id before try block so it's available in catch for logging
   const { id } = await params;
+  const requestId = getOrCreateRequestId(request);
 
   let userId: string | null = null;
   try {
-    const auth = await requireAdminUser();
+    const auth = await requireAdminUser(requestId);
     if (!auth.authorized) return auth.response;
     userId = auth.userId;
 
@@ -102,9 +186,21 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     if (isFormData) {
-      return await handleFormDataPut(request, id, existingMaterial, userId);
+      return await handleFormDataPut(
+        request,
+        id,
+        existingMaterial,
+        userId,
+        requestId
+      );
     }
-    return await handleJsonPut(request, id, existingMaterial, userId);
+    return await handleJsonPut(
+      request,
+      id,
+      existingMaterial,
+      userId,
+      requestId
+    );
   } catch (error) {
     const auditUserId = userId ?? 'unknown';
     logAuditEvent(
@@ -118,6 +214,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       }
     );
     serverInstance.error('Failed to update course material', {
+      requestId,
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(
@@ -137,7 +234,8 @@ async function handleFormDataPut(
   request: NextRequest,
   id: string,
   existingMaterial: NonNullable<Awaited<ReturnType<typeof getMaterialById>>>,
-  userId: string | null
+  userId: string | null,
+  requestId: string
 ) {
   const formData = await request.formData();
   const titleValue = formData.get('title');
@@ -225,6 +323,7 @@ async function handleFormDataPut(
       });
     } catch (blobError) {
       serverInstance.error('Blob upload failed during SLIDE_CONTROL update', {
+        requestId,
         identifier: newIdentifier,
         error: blobError instanceof Error ? blobError.message : 'Unknown error',
       });
@@ -243,6 +342,7 @@ async function handleFormDataPut(
         await del(existingMaterial.blobUrl);
       } catch (deleteError) {
         serverInstance.warning('Failed to delete old blob during update', {
+          requestId,
           blobUrl: existingMaterial.blobUrl,
           error:
             deleteError instanceof Error
@@ -302,7 +402,8 @@ async function handleJsonPut(
   request: NextRequest,
   id: string,
   existingMaterial: NonNullable<Awaited<ReturnType<typeof getMaterialById>>>,
-  userId: string | null
+  userId: string | null,
+  requestId: string
 ) {
   let body;
   try {
@@ -417,6 +518,7 @@ async function handleJsonPut(
         }
       );
       serverInstance.error('Blob upload failed during update', {
+        requestId,
         identifier: newIdentifier,
         blobPathname,
         contentLength: sanitizedHtml.length,
@@ -442,6 +544,7 @@ async function handleJsonPut(
       } catch (deleteError) {
         // Log but don't fail - old blob will be orphaned but new content is safe
         serverInstance.warning('Failed to delete old blob during update', {
+          requestId,
           blobUrl: existingMaterial.blobUrl,
           error:
             deleteError instanceof Error
@@ -496,80 +599,4 @@ async function handleJsonPut(
     createdAt: material.createdAt.toISOString(),
     updatedAt: material.updatedAt.toISOString(),
   });
-}
-
-/**
- * DELETE /api/admin/course-material/[id]
- * Delete a course material
- */
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  // Extract id before try block so it's available in catch for logging
-  const { id } = await params;
-
-  let userId: string | null = null;
-  try {
-    const auth = await requireAdminUser();
-    if (!auth.authorized) return auth.response;
-    userId = auth.userId;
-
-    const material = await getMaterialById(id);
-
-    if (!material) {
-      return NextResponse.json(
-        { error: 'not_found', message: 'Material nicht gefunden' },
-        { status: 404 }
-      );
-    }
-
-    // Delete blob file (only SLIDE_CONTROL and CONTENT materials with a blobUrl)
-    if (material.blobUrl) {
-      try {
-        await del(material.blobUrl);
-      } catch {
-        // Log but continue with DB deletion
-        serverInstance.warning('Failed to delete blob file', {
-          blobUrl: material.blobUrl,
-        });
-      }
-    }
-
-    // Delete database record
-    await deleteMaterial(id);
-
-    // Log successful deletion
-    logAuditEvent(
-      'COURSE_MATERIAL_DELETE',
-      userId,
-      id,
-      'course-material',
-      'success',
-      {
-        details: {
-          identifier: material.identifier,
-          title: material.title,
-        },
-      }
-    );
-
-    return new NextResponse(null, { status: 204 });
-  } catch (error) {
-    const auditUserId = userId ?? 'unknown';
-    logAuditEvent(
-      'COURSE_MATERIAL_DELETE',
-      auditUserId,
-      id,
-      'course-material',
-      'failure',
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }
-    );
-    serverInstance.error('Failed to delete course material', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-    return NextResponse.json(
-      { error: 'internal_error', message: 'Fehler beim Löschen des Materials' },
-      { status: 500 }
-    );
-  }
 }

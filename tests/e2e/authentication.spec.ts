@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
+import { isCiEnvironment, isEnvFlagEnabled } from '../../lib/utils/env-flags';
 import { AuthHelper, TEST_USERS } from './auth-helper';
-import { gotoStable } from './helpers/nav';
+import { gotoStable, waitForClientHydration } from './helpers/nav';
 
 /**
  * Authentication Flow Validation
@@ -9,9 +10,9 @@ import { gotoStable } from './helpers/nav';
 
 test.describe('Authentication Flow', () => {
   const isMockMode =
-    !!process.env.CI ||
-    process.env.E2E_TEST === '1' ||
-    process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
+    isCiEnvironment() ||
+    isEnvFlagEnabled(process.env.E2E_TEST) ||
+    isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_CLERK);
   test('should redirect unauthenticated users to sign-in', async ({ page }) => {
     if (isMockMode) {
       await renderMockSignIn(page);
@@ -26,6 +27,7 @@ test.describe('Authentication Flow', () => {
     // Should redirect to sign-in page - be more flexible for CI
     // Local environment with full Clerk integration
     await expect(page).toHaveURL(/\/sign-in/);
+    await waitForClientHydration(page);
 
     // Should preserve return URL for post-authentication redirect
     const currentUrl = page.url();
@@ -87,6 +89,7 @@ test.describe('Authentication Flow', () => {
 
     // Test invalid credentials
     await gotoStable(page, '/sign-in');
+    await waitForClientHydration(page);
 
     // Wait for Clerk component to load
     await page.waitForSelector('input[name="identifier"]', { timeout: 10000 });
@@ -144,6 +147,7 @@ test.describe('Authentication Flow', () => {
     // Verify session is cleared - attempting to access protected area should redirect
     await gotoStable(page, '/dashboard');
     await expect(page).toHaveURL(/\/sign-in/, { timeout: 10000 });
+    await waitForClientHydration(page);
   });
 
   test('should maintain session across page refreshes', async ({ page }) => {

@@ -39,7 +39,7 @@ export async function createBooking(
     userId,
     courseId,
     amount,
-    currency = 'USD',
+    currency = 'EUR',
     stripeSessionId,
     stripePaymentIntentId,
     paymentStatus: initialPaymentStatus,

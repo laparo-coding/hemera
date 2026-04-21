@@ -43,9 +43,48 @@ const isExplicitlyDisabled =
   process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
   process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0' ||
   process.env.ROLLBAR_ENABLED === '0';
+const isExplicitlyEnabled =
+  process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '1' ||
+  process.env.ROLLBAR_ENABLED === '1';
 
 /** Minimum length for Rollbar tokens to be considered valid */
 const MIN_TOKEN_LENGTH = 20;
+
+/**
+ * Determine the Rollbar environment based on deployment context.
+ * - production: Vercel production deployment or explicit production runtime
+ * - preview: Vercel preview deployment (PRs, branches)
+ * - development: Local development, test, or fallback
+ */
+function getRollbarEnvironment(): 'development' | 'preview' | 'production' {
+  const vercelEnv = (
+    process.env.VERCEL_ENV ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV ||
+    ''
+  ).toLowerCase();
+
+  if (vercelEnv === 'production') {
+    return 'production';
+  }
+
+  if (vercelEnv === 'preview') {
+    return 'preview';
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    return 'production';
+  }
+
+  return 'development';
+}
+
+/**
+ * Local development requires an explicit opt-in to avoid sending telemetry
+ * from machines that only happen to have tokens configured.
+ */
+function requiresDevelopmentOptIn(): boolean {
+  return getRollbarEnvironment() === 'development' && !isTestMode;
+}
 
 /**
  * Validate that a Rollbar token is present, non-empty, and meets minimum length
@@ -114,6 +153,16 @@ function shouldEnableRollbar(): boolean {
     return false;
   }
 
+  if (requiresDevelopmentOptIn() && !isExplicitlyEnabled) {
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint: Configuration info in development
+      console.info(
+        '[rollbar] Development telemetry is disabled by default. Set ROLLBAR_ENABLED=1 or NEXT_PUBLIC_ROLLBAR_ENABLED=1 to enable the Rollbar development environment.'
+      );
+    }
+    return false;
+  }
+
   return true;
 }
 
@@ -122,23 +171,6 @@ function readNumberEnv(name: string, fallback: number): number {
   if (!v) return fallback;
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
-}
-
-/**
- * Determine the Rollbar environment based on Vercel deployment context.
- * - production: Vercel production deployment
- * - preview: Vercel preview deployment (PRs, branches)
- * - development: Local development or fallback
- */
-function getRollbarEnvironment(): string {
-  // Server-side: VERCEL_ENV is set by Vercel
-  // Client-side: NEXT_PUBLIC_VERCEL_ENV is the public version
-  return (
-    process.env.VERCEL_ENV ||
-    process.env.NEXT_PUBLIC_VERCEL_ENV ||
-    process.env.NODE_ENV ||
-    'development'
-  );
 }
 
 const rollbarEnabled = shouldEnableRollbar();
@@ -204,9 +236,9 @@ const noOpInstance: RollbarTestInstance = {
 };
 
 // Server-side instance (for API routes and server components)
-// Only initialize Rollbar if enabled and token is valid
-// In test mode, use effectiveEnabled to allow testing even without token
-const instanceEnabled = isTestMode ? effectiveEnabled : rollbarEnabled;
+// Never construct the real SDK in Jest to avoid process listeners and
+// background handles affecting deterministic test teardown.
+const instanceEnabled = !isTestMode && rollbarEnabled;
 export const serverInstance: Rollbar | RollbarTestInstance = instanceEnabled
   ? new Rollbar({
       accessToken: findEnvByPrefix(

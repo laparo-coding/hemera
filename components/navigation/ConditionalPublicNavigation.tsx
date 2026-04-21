@@ -9,7 +9,7 @@ const PROTECTED_PREFIXES = ['/my-courses', '/admin', '/bookings'];
 export default function ConditionalPublicNavigation() {
   const pathname = usePathname() || '/';
   const isE2E =
-    process.env.E2E_TEST === '1' ||
+    process.env.NEXT_PUBLIC_E2E_TEST === '1' ||
     process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
 
   const isDashboard =
