@@ -124,7 +124,7 @@ jobs:
           # Optional: provide a Vercel Protection Bypass token to run against SSO-protected previews.
           # Prefer the shared automation secret already used by Lighthouse, but keep the older
           # repo/org secret name as a fallback for backwards compatibility.
-          VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS || secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET || secrets.VERCEL_PROTECTION_BYPASS }}
           # SSO tolerant mode: tests should only hit public pages by default via grep
           PLAYWRIGHT_SSO_TOLERANT: '1'
           NODE_ENV: test
