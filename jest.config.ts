@@ -1,10 +1,12 @@
 import type { Config } from 'jest';
-import { criticalAreas } from './tests/coverage/critical-areas.js';
+import { criticalAreas } from './tests/coverage/critical-areas';
 
-const unitMeasuredCriticalAreaPaths = criticalAreas
-  .flatMap(area => area.paths)
+const unitMeasuredCriticalAreaPaths = (
+  criticalAreas as Array<{ paths: string[] }>
+)
+  .flatMap((area: { paths: string[] }) => area.paths)
   .filter(
-    filePath =>
+    (filePath: string) =>
       filePath.startsWith('lib/') ||
       filePath.startsWith('components/dashboard/')
   );
