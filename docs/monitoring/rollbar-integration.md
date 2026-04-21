@@ -55,8 +55,8 @@ Preview- und Production-Deployments nutzen weiter die jeweilige Deployment-Umgeb
 1. Registriere dich bei [rollbar.com](https://rollbar.com)
 2. Erstelle getrennte Projekte oder getrennte Access-Tokens für development und production
 3. Kopiere die Access Tokens:
-  - **Server Access Token**: Für Server-side Error Reporting
-  - **Client Access Token**: Für Browser-side Error Reporting
+   - **Server Access Token**: Für Server-side Error Reporting
+   - **Client Access Token**: Für Browser-side Error Reporting
 4. Verwende lokal ausschließlich die Development-Tokens
 
 ### 3. Vercel Deployment
