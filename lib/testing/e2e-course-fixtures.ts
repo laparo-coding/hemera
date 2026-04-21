@@ -103,9 +103,9 @@ export const E2E_TEST_COURSE_FIXTURES: RawE2ECourseFixture[] = [
 ];
 
 export const E2E_CHECKOUT_COURSE = {
-  slug: E2E_TEST_COURSE_FIXTURES[0].slug,
-  title: E2E_TEST_COURSE_FIXTURES[0].title,
-  price: E2E_TEST_COURSE_FIXTURES[0].price / CENTS_PER_EURO,
+  slug: E2E_TEST_COURSE_FIXTURES[0]!.slug,
+  title: E2E_TEST_COURSE_FIXTURES[0]!.title,
+  price: E2E_TEST_COURSE_FIXTURES[0]!.price / CENTS_PER_EURO,
 } as const;
 
 export function createE2ELocationData(description: string): E2ELocation {
