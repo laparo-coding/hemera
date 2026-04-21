@@ -167,7 +167,7 @@ export default function ClerkProviderWrapper({
   }
 
   return (
-    <ClerkErrorBoundary fallback={<>{children}</>}>
+    <ClerkErrorBoundary fallback={children}>
       <ClerkProvider
         publishableKey={publishableKey!}
         localization={customDeDE}
