@@ -25,6 +25,8 @@ export default function CourseProgressionSection({
   courses,
   showProgression = true,
 }: CourseProgressionSectionProps) {
+  const hasCourses = courses.length > 0;
+
   return (
     <Box
       component='section'
@@ -80,24 +82,54 @@ export default function CourseProgressionSection({
             alignItems: 'stretch',
           }}
         >
-          {courses.map((course, index) => (
+          {hasCourses ? (
+            courses.map((course, index) => (
+              <Box
+                key={course.courseId}
+                sx={{
+                  gridColumn: showProgression
+                    ? {
+                        xs: 'span 1',
+                        md: index === 0 ? '1' : index === 1 ? '3' : '5',
+                      }
+                    : 'span 1',
+                }}
+              >
+                <CourseCard {...course} />
+              </Box>
+            ))
+          ) : (
             <Box
-              key={course.courseId}
+              data-testid='course-database-empty'
               sx={{
-                gridColumn: showProgression
-                  ? {
-                      xs: 'span 1',
-                      md: index === 0 ? '1' : index === 1 ? '3' : '5',
-                    }
-                  : 'span 1',
+                gridColumn: '1 / -1',
+                textAlign: 'center',
+                py: 6,
               }}
             >
-              <CourseCard {...course} />
+              <Typography
+                variant='h6'
+                sx={{ color: colors.marsala, mb: 1 }}
+                gutterBottom
+              >
+                Aktuell sind keine veroeffentlichten Seminare in der Datenbank
+                verfuegbar.
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: '"Inter", sans-serif',
+                  color: colors.lightBlack,
+                  opacity: 0.8,
+                }}
+              >
+                Sobald Seminare veroeffentlicht sind, erscheinen sie hier
+                automatisch aus der Datenbank.
+              </Typography>
             </Box>
-          ))}
+          )}
 
           {/* Progression arrows (desktop only) */}
-          {showProgression && (
+          {showProgression && hasCourses && (
             <>
               <Box
                 sx={{

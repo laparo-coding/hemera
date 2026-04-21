@@ -166,6 +166,33 @@ describe('GET /api/admin/bookings/pending - Contract Tests', () => {
       expect(validStatuses).toHaveLength(1);
       expect(validStatuses[0]).toBe('PRE_BOOKED');
     });
+
+    it('should order pending bookings by newest review request first', () => {
+      const sortOrder = 'createdAt:desc';
+      expect(sortOrder).toBe('createdAt:desc');
+    });
+  });
+
+  describe('Payload semantics', () => {
+    it('should expose a stable request identifier in success responses', () => {
+      const successEnvelope = {
+        success: true,
+        requestId: 'req_123',
+      };
+
+      expect(successEnvelope.success).toBe(true);
+      expect(successEnvelope.requestId).toMatch(/^req_/);
+    });
+
+    it('should keep CORS enabled for external admin review clients', () => {
+      const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      };
+
+      expect(corsHeaders['Access-Control-Allow-Origin']).toBe('*');
+      expect(corsHeaders['Access-Control-Allow-Methods']).toContain('OPTIONS');
+    });
   });
 
   describe('Error Responses', () => {

@@ -2,12 +2,13 @@
 // It is only accessible when E2E_TEST is true; otherwise it returns 404.
 
 import { notFound } from 'next/navigation';
+import { isEnvFlagEnabled } from '@/lib/utils/env-flags';
 
 export const dynamic = 'force-dynamic';
 
 export default function CrashPage() {
   // Only allow access during E2E tests
-  if (process.env.E2E_TEST !== 'true') {
+  if (!isEnvFlagEnabled(process.env.E2E_TEST)) {
     notFound();
   }
 

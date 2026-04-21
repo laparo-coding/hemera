@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { isEnvFlagEnabled } from '../../lib/utils/env-flags';
+import { seedMockClerkSession } from './auth-helper';
+import { waitForClientHydration } from './helpers/nav';
 
 /**
  * Production Smoke Tests
@@ -50,8 +53,8 @@ test.describe('Production Smoke Tests', () => {
     expect(response?.status()).toBe(200);
 
     // Verify page has loaded with structural content
-    // Use body as the primary indicator - it's always present and unique
-    await expect(page.locator('body')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('sign-in-page')).toBeVisible({ timeout: 5000 });
+    await waitForClientHydration(page);
 
     test.info().annotations.push({
       type: 'info',
@@ -77,38 +80,46 @@ test.describe('Production Smoke Tests', () => {
 
     test.skip(!email || !password, 'E2E_TEST_EMAIL and E2E_TEST_PASSWORD required');
 
-    // Login
-    await page.goto('/sign-in');
+    if (
+      isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_CLERK) ||
+      isEnvFlagEnabled(process.env.E2E_TEST)
+    ) {
+      await seedMockClerkSession(page, 'user');
+    } else {
+      await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
+      await waitForClientHydration(page);
 
-    // Fill email
-    const emailInput = page.locator('input[name="identifier"]').or(
-      page.locator('input[type="email"]')
-    );
-    await emailInput.fill(email!);
+      const emailInput = page.locator('input[name="identifier"]').or(
+        page.locator('input[type="email"]')
+      );
+      const passwordInput = page
+        .locator('input[name="password"]')
+        .or(page.locator('input[type="password"]'));
+      const submitButton = page
+        .locator('button:visible')
+        .filter({ hasText: /fortsetzen|anmelden/i })
+        .first();
 
-    // Continue
-    await page.getByRole('button', { name: /weiter|continue/i }).click();
+      await emailInput.fill(email!);
 
-    // Fill password
-    const passwordInput = page.locator('input[type="password"]');
-    await passwordInput.waitFor({ timeout: 10000 });
-    await passwordInput.fill(password!);
+      if (!(await passwordInput.first().isVisible())) {
+        await submitButton.click();
+        await passwordInput.first().waitFor({ timeout: 10000 });
+      }
 
-    // Sign in
-    await page.getByRole('button', { name: /anmelden|sign in/i }).click();
+      await passwordInput.fill(password!);
+      await submitButton.click();
 
-    // Wait for redirect
-    await expect(page).toHaveURL(/\/(dashboard)?/, { timeout: 30000 });
+      await expect(page).toHaveURL(/\/(dashboard)?/, { timeout: 30000 });
+    }
 
     // Navigate to dashboard
     await page.goto('/dashboard');
 
     // Verify dashboard content
     await expect(page).toHaveURL(/dashboard/);
-    await expect(
-      page.getByRole('heading').first().or(
-        page.getByText(/willkommen|dashboard|meine/i).first()
-      )
-    ).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('[data-testid="dashboard-title"]')).toBeVisible({
+      timeout: 15000,
+    });
   });
 });

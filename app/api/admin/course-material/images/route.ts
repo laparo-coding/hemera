@@ -13,6 +13,7 @@ import { requireAdminUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { validateImageFile } from '@/lib/utils/file-validator';
+import { getOrCreateRequestId } from '@/lib/utils/request-id';
 
 const ALLOWED_IMAGE_TYPES = [
   'image/jpeg',
@@ -24,10 +25,10 @@ const ALLOWED_IMAGE_TYPES = [
 const MAX_FILE_SIZE = 4.4 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
-  const requestId = request.headers.get('x-request-id') || crypto.randomUUID();
+  const requestId = getOrCreateRequestId(request);
   let userId: string | null = null;
   try {
-    const auth = await requireAdminUser();
+    const auth = await requireAdminUser(requestId);
     if (!auth.authorized) return auth.response;
     userId = auth.userId;
 

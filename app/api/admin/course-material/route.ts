@@ -18,6 +18,7 @@ import {
 import { logAuditEvent } from '@/lib/utils/audit-logging';
 import { sanitizeHtml, validateHtmlContent } from '@/lib/utils/html-sanitizer';
 import { sanitizeBlobUrlField } from '@/lib/utils/log-sanitizer';
+import { getOrCreateRequestId } from '@/lib/utils/request-id';
 
 /**
  * Validate and resolve identifier: generate if not provided, check length, check uniqueness
@@ -64,9 +65,11 @@ async function validateAndResolveIdentifier(
  * GET /api/admin/course-material
  * List all course materials
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const requestId = getOrCreateRequestId(request);
+
   try {
-    const auth = await requireAdminUser();
+    const auth = await requireAdminUser(requestId);
     if (!auth.authorized) return auth.response;
 
     const materials = await getAllMaterials();
@@ -84,6 +87,7 @@ export async function GET() {
     });
   } catch (error) {
     serverInstance.error('Failed to list course materials', {
+      requestId,
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     return NextResponse.json(
@@ -102,9 +106,10 @@ export async function GET() {
  * Supports JSON (CONTENT type) and FormData (SLIDE_CONTROL type)
  */
 export async function POST(request: NextRequest) {
+  const requestId = getOrCreateRequestId(request);
   let userId: string | null = null;
   try {
-    const auth = await requireAdminUser();
+    const auth = await requireAdminUser(requestId);
     if (!auth.authorized) return auth.response;
     userId = auth.userId;
 

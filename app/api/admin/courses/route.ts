@@ -1,10 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import {
-  checkUserAdminStatus,
-  getCurrentUser,
-} from '../../../../lib/auth/helpers';
+import { requireAdminUser } from '../../../../lib/auth/helpers';
 import { prisma } from '../../../../lib/db/prisma';
 import { serverInstance as rollbar } from '../../../../lib/monitoring/rollbar-official';
 import {
@@ -15,61 +12,27 @@ import {
   createErrorResponse,
   ErrorCodes,
 } from '../../../../lib/utils/api-response';
-import { getCorsHeaders } from '../../../../lib/utils/cors';
+import {
+  applyCorsHeaders,
+  createCorsPreflightResponse,
+  getCorsHeaders,
+} from '../../../../lib/utils/cors';
 import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
 
 // CORS headers for admin API access (origin restricted via getCorsHeaders)
 const corsHeaders = getCorsHeaders();
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+  return createCorsPreflightResponse(corsHeaders);
 }
 
 export async function GET(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);
 
   try {
-    // Authentication check (uses test-friendly helpers to avoid Clerk calls in Jest)
-    let userId: string | null = null;
-    try {
-      const user = await getCurrentUser();
-      userId = user?.id ?? null;
-    } catch (_e) {
-      userId = null;
-    }
-
-    if (!userId) {
-      const errorResponse = createErrorResponse(
-        'Du bist nicht autorisiert',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-
-      // Add CORS headers to error response
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-
-      return errorResponse;
-    }
-
-    // Admin authorization check
-    const isAdmin = await checkUserAdminStatus();
-    if (!isAdmin) {
-      const errorResponse = createErrorResponse(
-        'Du brauchst Admin-Rechte',
-        ErrorCodes.FORBIDDEN,
-        requestId,
-        403
-      );
-
-      // Add CORS headers to error response
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-
-      return errorResponse;
+    const adminAuth = await requireAdminUser(requestId);
+    if (!adminAuth.authorized) {
+      return applyCorsHeaders(adminAuth.response, corsHeaders);
     }
 
     // Parse query params for filtering
@@ -94,25 +57,25 @@ export async function GET(request: NextRequest) {
 
     // Historically this endpoint returned a plain array for contract tests.
     // Return the courses array directly to preserve contract expectations.
-    const res = NextResponse.json(courses, { status: 200 });
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      res.headers.set(key, value);
-    });
-    return res;
-  } catch (_error) {
-    const errorResponse = createErrorResponse(
-      'Failed to fetch courses',
-      ErrorCodes.INTERNAL_ERROR,
-      requestId,
-      500
+    return applyCorsHeaders(
+      NextResponse.json(courses, { status: 200 }),
+      corsHeaders
     );
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
+  } catch (error) {
+    rollbar.error(error instanceof Error ? error : new Error(String(error)), {
+      requestId,
+      route: 'GET /api/admin/courses',
     });
 
-    return errorResponse;
+    return applyCorsHeaders(
+      createErrorResponse(
+        'Failed to fetch courses',
+        ErrorCodes.INTERNAL_ERROR,
+        requestId,
+        500
+      ),
+      corsHeaders
+    );
   }
 }
 
@@ -124,41 +87,9 @@ export async function POST(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);
 
   try {
-    // Authentication check (test-friendly)
-    let userId: string | null = null;
-    try {
-      const user = await getCurrentUser();
-      userId = user?.id ?? null;
-    } catch (_e) {
-      userId = null;
-    }
-
-    if (!userId) {
-      const errorResponse = createErrorResponse(
-        'Du bist nicht autorisiert',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
-    }
-
-    // Admin authorization check
-    const isAdmin = await checkUserAdminStatus();
-    if (!isAdmin) {
-      const errorResponse = createErrorResponse(
-        'Du brauchst Admin-Rechte',
-        ErrorCodes.FORBIDDEN,
-        requestId,
-        403
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
+    const adminAuth = await requireAdminUser(requestId);
+    if (!adminAuth.authorized) {
+      return applyCorsHeaders(adminAuth.response, corsHeaders);
     }
 
     // Parse and validate body
@@ -166,18 +97,15 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch (_err) {
-      const errorResponse = createErrorResponse(
-        'Ungültiges JSON im Request Body',
-        ErrorCodes.VALIDATION_ERROR,
-        requestId,
-        400
+      return applyCorsHeaders(
+        createErrorResponse(
+          'Ungültiges JSON im Request Body',
+          ErrorCodes.VALIDATION_ERROR,
+          requestId,
+          400
+        ),
+        corsHeaders
       );
-
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-
-      return errorResponse;
     }
 
     let parsed: CourseCreateInput;
@@ -196,17 +124,16 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        const validationError = createErrorResponse(
-          'Ungültige Eingaben beim Erstellen des Kurses',
-          ErrorCodes.VALIDATION_ERROR,
-          requestId,
-          400,
-          { issues: zErr.issues }
+        return applyCorsHeaders(
+          createErrorResponse(
+            'Ungültige Eingaben beim Erstellen des Kurses',
+            ErrorCodes.VALIDATION_ERROR,
+            requestId,
+            400,
+            { issues: zErr.issues }
+          ),
+          corsHeaders
         );
-        Object.entries(corsHeaders).forEach(([key, value]) => {
-          validationError.headers.set(key, value);
-        });
-        return validationError;
       }
       throw zErr;
     }
@@ -293,48 +220,45 @@ export async function POST(request: NextRequest) {
         }
       );
 
-      const retryError = createErrorResponse(
-        'Konnte Kurs nicht erstellen',
-        ErrorCodes.INTERNAL_ERROR,
-        requestId,
-        500
+      return applyCorsHeaders(
+        createErrorResponse(
+          'Konnte Kurs nicht erstellen',
+          ErrorCodes.INTERNAL_ERROR,
+          requestId,
+          500
+        ),
+        corsHeaders
       );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        retryError.headers.set(key, value);
-      });
-      return retryError;
     }
 
     // New course has zero enrollments immediately after creation — avoid extra DB roundtrip
     const enrollmentCount = 0;
 
-    const successResponse = NextResponse.json(
-      {
-        ...createdCourse,
-        enrollmentCount,
-        requestId,
-      },
-      { status: 201 }
+    return applyCorsHeaders(
+      NextResponse.json(
+        {
+          ...createdCourse,
+          enrollmentCount,
+          requestId,
+        },
+        { status: 201 }
+      ),
+      corsHeaders
     );
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      successResponse.headers.set(key, value);
-    });
-    return successResponse;
   } catch (_error) {
     rollbar.error('Failed to create course (unexpected)', _error as Error, {
       requestId,
       route: '/api/admin/courses',
     });
 
-    const catchError = createErrorResponse(
-      'Konnte Kurs nicht erstellen',
-      ErrorCodes.INTERNAL_ERROR,
-      requestId,
-      500
+    return applyCorsHeaders(
+      createErrorResponse(
+        'Konnte Kurs nicht erstellen',
+        ErrorCodes.INTERNAL_ERROR,
+        requestId,
+        500
+      ),
+      corsHeaders
     );
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      catchError.headers.set(key, value);
-    });
-    return catchError;
   }
 }

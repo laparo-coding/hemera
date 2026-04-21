@@ -1,4 +1,5 @@
 import { test as setup, expect } from '@playwright/test';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,6 +19,13 @@ const authFile = path.join(__dirname, '../../.auth/user.json');
 setup('authenticate', async ({ page }) => {
   const email = process.env.E2E_TEST_EMAIL;
   const password = process.env.E2E_TEST_PASSWORD;
+  const passwordInput = page
+    .locator('input[name="password"]')
+    .or(page.locator('input[type="password"]'));
+  const submitButton = page
+    .locator('button:visible')
+    .filter({ hasText: /fortsetzen|anmelden/i })
+    .first();
 
   if (!email || !password) {
     setup.skip(
@@ -28,7 +36,7 @@ setup('authenticate', async ({ page }) => {
   }
 
   // Navigate to sign-in page
-  await page.goto('/sign-in');
+  await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
 
   // Wait for Clerk's sign-in form to load
   await page.waitForSelector('[data-clerk-root]', { timeout: 15000 }).catch(() => {
@@ -41,18 +49,16 @@ setup('authenticate', async ({ page }) => {
   );
   await emailInput.fill(email);
 
-  // Click continue button (Clerk two-step flow)
-  const continueButton = page.getByRole('button', { name: /weiter|continue/i });
-  await continueButton.click();
+  // Some sign-in surfaces show the password field immediately, others only after the first submit.
+  if (!(await passwordInput.first().isVisible())) {
+    await submitButton.click();
+    await passwordInput.first().waitFor({ timeout: 10000 });
+  }
 
-  // Wait for password field
-  const passwordInput = page.locator('input[type="password"]');
-  await passwordInput.waitFor({ timeout: 10000 });
-  await passwordInput.fill(password);
+  await passwordInput.first().fill(password);
 
-  // Submit login
-  const signInButton = page.getByRole('button', { name: /anmelden|sign in/i });
-  await signInButton.click();
+  // Submit the active sign-in action regardless of whether the UI labels it Continue or Sign in.
+  await submitButton.click();
 
   // Wait for successful redirect to dashboard or home
   await expect(page).toHaveURL(/\/(dashboard|$)/, { timeout: 30000 });
@@ -67,5 +73,6 @@ setup('authenticate', async ({ page }) => {
   ).toBeVisible({ timeout: 10000 });
 
   // Save auth state to file
+  await fs.mkdir(path.dirname(authFile), { recursive: true });
   await page.context().storageState({ path: authFile });
 });

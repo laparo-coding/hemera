@@ -7,8 +7,9 @@ import type { User } from '@clerk/nextjs/server';
 
 // Store the original env values
 const originalEnvValues = {
-  NEXT_PUBLIC_DISABLE_CLERK: process.env.NEXT_PUBLIC_DISABLE_CLERK,
+  DISABLE_CLERK_SERVER_AUTH: process.env.DISABLE_CLERK_SERVER_AUTH,
   E2E_TEST: process.env.E2E_TEST,
+  E2E_ADMIN: process.env.E2E_ADMIN,
   NODE_ENV: process.env.NODE_ENV,
 };
 
@@ -58,8 +59,9 @@ describe('Auth Helpers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset environment variables to simulate real auth environment
-    delete process.env.NEXT_PUBLIC_DISABLE_CLERK;
+    delete process.env.DISABLE_CLERK_SERVER_AUTH;
     delete process.env.E2E_TEST;
+    delete process.env.E2E_ADMIN;
     // Keep NODE_ENV as 'test' but that's checked in the isMockAuthEnvironment
   });
 
@@ -74,8 +76,8 @@ describe('Auth Helpers', () => {
   });
 
   describe('Mock Auth Environment', () => {
-    it('should return mock user when NEXT_PUBLIC_DISABLE_CLERK is set', async () => {
-      process.env.NEXT_PUBLIC_DISABLE_CLERK = '1';
+    it('should return mock user when DISABLE_CLERK_SERVER_AUTH is set', async () => {
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
 
       const user = await getCurrentUser();
 
@@ -93,27 +95,46 @@ describe('Auth Helpers', () => {
       expect(user?.id).toBe('e2e_mock_user');
     });
 
+    it('should return mock user when DISABLE_CLERK_SERVER_AUTH is set for requireAuth', async () => {
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
+
+      const user = await requireAuth();
+
+      expect(user).toBeDefined();
+      expect(user.id).toBe('e2e_mock_user');
+      expect(mockCurrentUser).not.toHaveBeenCalled();
+    });
+
     it('should return true for isAuthenticated in mock environment', async () => {
-      process.env.NEXT_PUBLIC_DISABLE_CLERK = '1';
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
 
       const result = await isAuthenticated();
 
       expect(result).toBe(true);
     });
 
-    it('should return true for isAdmin in mock environment', async () => {
-      process.env.NEXT_PUBLIC_DISABLE_CLERK = '1';
+    it('should return false for isAdmin in disabled-Clerk user mode', async () => {
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
 
       const result = await isAdmin();
 
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
 
-    it('should return mock admin user for requireAdmin in mock environment', async () => {
-      process.env.NEXT_PUBLIC_DISABLE_CLERK = '1';
+    it('should redirect non-admin users away from admin-only guards in disabled-Clerk mode', async () => {
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
 
+      await expect(requireAdmin()).rejects.toThrow('REDIRECT:/dashboard');
+    });
+
+    it('should return mock admin user when explicit admin mock mode is enabled', async () => {
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
+      process.env.E2E_ADMIN = '1';
+
+      const result = await isAdmin();
       const user = await requireAdmin();
 
+      expect(result).toBe(true);
       expect(user).toBeDefined();
       expect(user.publicMetadata?.role).toBe('admin');
     });
@@ -166,13 +187,19 @@ describe('Auth Helpers', () => {
       expect(result).toBe(true);
     });
 
-    it('in test environment, isAdmin returns true', async () => {
+    it('in test environment, isAdmin defaults to non-admin mock role', async () => {
       const result = await isAdmin();
 
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
 
-    it('in test environment, requireAdmin returns mock admin user', async () => {
+    it('in test environment, requireAdmin redirects without explicit admin mock role', async () => {
+      await expect(requireAdmin()).rejects.toThrow('REDIRECT:/dashboard');
+    });
+
+    it('in test environment, requireAdmin returns mock admin user with explicit admin mock role', async () => {
+      process.env.E2E_ADMIN = '1';
+
       const user = await requireAdmin();
 
       expect(user.id).toBe('e2e_mock_user');

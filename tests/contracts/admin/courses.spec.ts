@@ -14,6 +14,7 @@
  * They will be skipped in CI environments where no server is available.
  */
 
+import { execFileSync } from 'node:child_process';
 import {
   afterAll,
   afterEach,
@@ -24,20 +25,43 @@ import {
   it,
 } from '@jest/globals';
 import { prisma } from '../../../lib/db/prisma';
+import { isCiEnvironment } from '../../../lib/utils/env-flags';
 
 // Check if server is available before running HTTP-based tests
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-// More robust CI detection: check multiple common CI environment variables
-const isCI =
-  process.env.CI === 'true' ||
-  process.env.GITHUB_ACTIONS === 'true' ||
-  process.env.CI === '1' ||
-  Boolean(process.env.GITHUB_ACTIONS) ||
-  Boolean(process.env.RUNNER_OS);
+const isCI = isCiEnvironment();
+
+function isServerAvailable(baseUrl: string): boolean {
+  try {
+    execFileSync(
+      process.execPath,
+      [
+        '-e',
+        `fetch(${JSON.stringify(baseUrl)}, { method: 'HEAD', redirect: 'manual' }).then(response => process.exit(response.status < 500 ? 0 : 1)).catch(() => process.exit(1));`,
+      ],
+      {
+        stdio: 'ignore',
+        timeout: 3000,
+      }
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const hasServer = isCI ? false : isServerAvailable(BASE_URL);
+
+if (!isCI && !hasServer) {
+  // biome-ignore lint/suspicious/noConsole: helpful local test skip hint
+  console.warn(
+    `Skipping admin course HTTP contract tests because no server is reachable at ${BASE_URL}.`
+  );
+}
 
 // Skip these tests in CI since they require a running server
-const describeWithServer = isCI ? describe.skip : describe;
+const describeWithServer = isCI || !hasServer ? describe.skip : describe;
 
 describeWithServer('Admin Course API - Contract Tests', () => {
   const API_BASE = `${BASE_URL}/api/admin/courses`;
@@ -59,6 +83,7 @@ describeWithServer('Admin Course API - Contract Tests', () => {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        Cookie: 'hemera-e2e-role=admin',
         ...options.headers,
       },
     });
@@ -292,10 +317,11 @@ describeWithServer('Admin Course API - Contract Tests', () => {
   });
 
   describe('POST /api/admin/courses - Create Course', () => {
+    // Public admin API accepts Euro decimal input and persists integer cents.
     const validCourseData = {
       title: '[CONTRACT-TEST] New Course',
       description: 'Test course creation with all required fields',
-      price: 9999,
+      price: 99.99,
       startTime: new Date(Date.now() + 86400000).toISOString(),
       duration: 4,
       instructor: 'Test Instructor',
@@ -320,6 +346,8 @@ describeWithServer('Admin Course API - Contract Tests', () => {
       expect(result.id).toBeDefined();
       expect(result.title).toBe(validCourseData.title);
       expect(result.slug).toBeDefined();
+      // Response remains in persisted integer cents.
+      expect(Number(result.price)).toBe(9999);
 
       // Cleanup
       _testCourseId = result.id;
@@ -403,7 +431,7 @@ describeWithServer('Admin Course API - Contract Tests', () => {
     it('should update course with valid data and return 200', async () => {
       const updateData = {
         title: '[CONTRACT-TEST] Updated Title',
-        price: 14999,
+        price: 149.99,
         updatedAt: courseUpdatedAt.toISOString(),
       };
 
@@ -415,7 +443,8 @@ describeWithServer('Admin Course API - Contract Tests', () => {
       expect(response.status).toBe(200);
       const result = await response.json();
       expect(result.data.title).toBe(updateData.title);
-      expect(Number(result.data.price)).toBe(updateData.price);
+      // PATCH accepts Euro decimal input and returns persisted integer cents.
+      expect(Number(result.data.price)).toBe(14999);
     });
 
     it('should return 409 with CONCURRENT_EDIT_CONFLICT for stale updatedAt', async () => {
@@ -479,7 +508,7 @@ describeWithServer('Admin Course API - Contract Tests', () => {
       });
 
       const partialUpdate = {
-        price: 19999,
+        price: 199.99,
         updatedAt: courseUpdatedAt.toISOString(),
       };
 
@@ -491,8 +520,8 @@ describeWithServer('Admin Course API - Contract Tests', () => {
       expect(response.status).toBe(200);
       const result = await response.json();
 
-      // Price should be updated
-      expect(Number(result.data.price)).toBe(partialUpdate.price);
+      // Price should be updated and remain serialized as integer cents.
+      expect(Number(result.data.price)).toBe(19999);
 
       // Title should remain unchanged
       expect(result.data.title).toBe(originalCourse?.title);

@@ -1,4 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { seedMockClerkSession } from './auth-helper';
+import { clickAndWait, gotoStable } from './helpers/nav';
 
 /**
  * Admin Dashboard E2E Tests
@@ -7,11 +9,15 @@ import { expect, test } from '@playwright/test';
  * Validates the admin dashboard UI and navigation.
  */
 
-test.describe('Admin Dashboard - Layout & Navigation', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 720 });
-  });
+test.beforeEach(async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
 
+  if (!process.env.CI) {
+    await seedMockClerkSession(page, 'admin');
+  }
+});
+
+test.describe('Admin Dashboard - Layout & Navigation', () => {
   test('should display dashboard with 6 cards in 3-column grid', async ({
     page,
   }) => {
@@ -28,12 +34,12 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
     await expect(cards).toHaveCount(6);
 
     // Verify card titles are in German
-    await expect(page.getByText('Benutzer')).toBeVisible();
-    await expect(page.getByText('Seminare')).toBeVisible();
-    await expect(page.getByText('Material')).toBeVisible();
-    await expect(page.getByText('Veranstaltungsorte')).toBeVisible();
-    await expect(page.getByText('Erfahrungsberichte')).toBeVisible();
-    await expect(page.getByText('Berichte & Analysen')).toBeVisible();
+    await expect(page.getByTestId('dashboard-card-users')).toContainText('Benutzer');
+    await expect(page.getByTestId('dashboard-card-courses')).toContainText('Seminare');
+    await expect(page.getByTestId('dashboard-card-course-material')).toContainText('Material');
+    await expect(page.getByTestId('dashboard-card-locations')).toContainText('Veranstaltungsorte');
+    await expect(page.getByTestId('dashboard-card-testimonials')).toContainText('Erfahrungsberichte');
+    await expect(page.getByTestId('dashboard-card-reports')).toContainText('Berichte & Analysen');
   });
 
   test('should have consistent max-width of 1280px', async ({ page }) => {
@@ -50,11 +56,16 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
 
   test('should navigate to user management page', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin');
+    await gotoStable(page, '/admin', {
+      waitForTestId: 'admin-dashboard-grid',
+    });
 
     // Click on user management card
-    await page.click('[data-testid="dashboard-card-users"]');
-    await expect(page).toHaveURL(/\/admin\/users/);
+    await clickAndWait(page, () => page.getByTestId('dashboard-card-users'), {
+      expectUrl: /\/admin\/users/,
+      waitForTestId: 'admin-users-page',
+      timeout: 30_000,
+    });
 
     // Verify breadcrumb navigation
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
@@ -65,11 +76,15 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
 
   test('should navigate to reports page', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin');
+    await gotoStable(page, '/admin', {
+      waitForTestId: 'admin-dashboard-grid',
+    });
 
-    // Click on reports card
-    await page.click('[data-testid="dashboard-card-reports"]');
-    await expect(page).toHaveURL(/\/admin\/reports/);
+    await clickAndWait(page, () => page.getByTestId('dashboard-card-reports'), {
+      expectUrl: /\/admin\/reports/,
+      waitForTestId: 'admin-reports-page',
+      timeout: 30_000,
+    });
 
     // Verify breadcrumb
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
@@ -78,20 +93,25 @@ test.describe('Admin Dashboard - Layout & Navigation', () => {
 
   test('should not display footer on admin pages', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin');
+    await gotoStable(page, '/admin', {
+      waitForTestId: 'admin-dashboard-grid',
+    });
 
     // Footer should not be visible
-    const footer = page.locator('footer');
-    await expect(footer).not.toBeVisible();
+    await expect(page.locator('footer')).toHaveCount(0);
   });
 
   test('should not display welcome message', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin');
+    await gotoStable(page, '/admin', {
+      waitForTestId: 'admin-dashboard-grid',
+    });
 
-    // No "Willkommen" or welcome text
-    const welcomeText = page.getByText(/willkommen/i);
-    await expect(welcomeText).not.toBeVisible();
+    // Admin dashboard should show generic intro text, not user-specific greeting.
+    await expect(
+      page.getByText('Willkommen im Administrationsbereich.')
+    ).toBeVisible();
+    await expect(page.getByText(/willkommen zurück/i)).not.toBeVisible();
   });
 });
 
@@ -100,7 +120,9 @@ test.describe('Admin Dashboard - Breadcrumb Navigation', () => {
     page,
   }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/courses');
+    await gotoStable(page, '/admin/courses', {
+      waitForTestId: 'admin-courses-page',
+    });
 
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
     await expect(breadcrumb).toBeVisible();
@@ -116,11 +138,21 @@ test.describe('Admin Dashboard - Breadcrumb Navigation', () => {
 
   test('should navigate back to dashboard via breadcrumb', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/users');
+    await gotoStable(page, '/admin/users', {
+      waitForTestId: 'admin-users-page',
+      timeout: 60_000,
+    });
 
     // Click on dashboard breadcrumb
-    await page.click('[data-testid="admin-breadcrumb"] a:has-text("Admin Dashboard")');
-    await expect(page).toHaveURL(/\/admin$/);
+    await clickAndWait(
+      page,
+      () => page.locator('[data-testid="admin-breadcrumb"] a:has-text("Admin Dashboard")'),
+      {
+        expectUrl: /\/admin$/,
+        waitForTestId: 'admin-dashboard-grid',
+        timeout: 30_000,
+      }
+    );
   });
 });
 

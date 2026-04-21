@@ -48,6 +48,10 @@ jest.mock('@mui/material/styles', () => ({
 
 import TestimonialDrawer from '../../../components/dashboard/TestimonialDrawer';
 
+type TestWindow = Window & {
+  __clerk_publishable_key?: string;
+};
+
 const baseProps = {
   open: true,
   onClose: jest.fn(),
@@ -62,7 +66,31 @@ const baseProps = {
 };
 
 describe('TestimonialDrawer', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    window.localStorage.clear();
+    window.localStorage.setItem(
+      'clerk-session',
+      JSON.stringify({
+        user: {
+          id: 'user-1',
+          firstName: 'Anna',
+          lastName: 'Müller',
+          role: 'user',
+        },
+      })
+    );
+    (window as TestWindow).__clerk_publishable_key = 'pk_test_123';
+    mockUseUser.mockReturnValue({
+      isSignedIn: true,
+      isLoaded: true,
+      user: { id: 'user-1' },
+    });
+  });
+
+  afterEach(() => {
+    delete (window as TestWindow).__clerk_publishable_key;
+  });
 
   it('renders drawer when open=true', () => {
     render(<TestimonialDrawer {...baseProps} />);
@@ -74,15 +102,20 @@ describe('TestimonialDrawer', () => {
     expect(screen.queryByText('Erfahrungsbericht')).not.toBeInTheDocument();
   });
 
-  it('shows TestimonialForm inside drawer', () => {
+  it('shows TestimonialForm inside drawer', async () => {
     render(<TestimonialDrawer {...baseProps} />);
-    expect(screen.getByTestId('testimonial-form')).toBeInTheDocument();
+    expect(await screen.findByTestId('testimonial-form')).toBeInTheDocument();
   });
 
-  it('passes bookingId and courseName to form', () => {
+  it('passes bookingId and courseName to form', async () => {
     render(<TestimonialDrawer {...baseProps} />);
-    expect(screen.getByTestId('form-booking-id')).toHaveTextContent('booking-123');
-    expect(screen.getByTestId('form-course-name')).toHaveTextContent('Gehaltsverhandlung Kompakt');
+    await screen.findByTestId('testimonial-form');
+    expect(screen.getByTestId('form-booking-id')).toHaveTextContent(
+      'booking-123'
+    );
+    expect(screen.getByTestId('form-course-name')).toHaveTextContent(
+      'Gehaltsverhandlung Kompakt'
+    );
   });
 
   it('calls onClose on X button click', () => {
@@ -99,7 +132,8 @@ describe('TestimonialDrawer', () => {
   });
 
   it('shows error alert when user is not authenticated', () => {
-    mockUseUser.mockReturnValueOnce({ isSignedIn: false, isLoaded: true, user: null });
+    window.localStorage.removeItem('clerk-session');
+    mockUseUser.mockReturnValue({ isSignedIn: false, isLoaded: true, user: null });
     render(<TestimonialDrawer {...baseProps} />);
     expect(screen.getByText(/Du musst angemeldet sein/)).toBeInTheDocument();
     expect(screen.queryByTestId('testimonial-form')).not.toBeInTheDocument();

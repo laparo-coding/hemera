@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getMaterialById } from '@/lib/api/course-material';
 import { requireAdminUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { getOrCreateRequestId } from '@/lib/utils/request-id';
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -12,9 +13,10 @@ type RouteParams = {
  * Get the HTML content of a course material
  * Fetches the content from Vercel Blob
  */
-export async function GET(_request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const auth = await requireAdminUser();
+    const requestId = getOrCreateRequestId(request);
+    const auth = await requireAdminUser(requestId);
     if (!auth.authorized) return auth.response;
 
     const { id } = await params;

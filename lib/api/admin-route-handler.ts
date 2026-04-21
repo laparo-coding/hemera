@@ -6,31 +6,23 @@
  * for all admin API routes. Reduces boilerplate across admin endpoints.
  */
 
-import { auth } from '@clerk/nextjs/server';
-import { type NextRequest, NextResponse } from 'next/server';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
+import type { NextRequest, NextResponse } from 'next/server';
+import { requireAdminUser } from '@/lib/auth/helpers';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
-import { getCorsHeaders } from '@/lib/utils/cors';
+import {
+  applyCorsHeaders,
+  createCorsPreflightResponse,
+} from '@/lib/utils/cors';
 import { getOrCreateRequestId } from '@/lib/utils/request-id';
-
-const corsHeaders = getCorsHeaders();
-
-/** Applies CORS headers to a response */
-function withCors(response: Response): Response {
-  for (const [key, value] of Object.entries(corsHeaders)) {
-    response.headers.set(key, value);
-  }
-  return response;
-}
 
 /** OPTIONS handler for CORS preflight */
 export function adminOptions(): NextResponse {
-  return NextResponse.json({}, { headers: corsHeaders });
+  return createCorsPreflightResponse();
 }
 
 interface AdminHandlerOptions {
@@ -66,60 +58,25 @@ export function createAdminHandler(
   handler: (requestId: string, request?: NextRequest) => Promise<unknown>,
   options: AdminHandlerOptions
 ) {
-  return async (request: NextRequest): Promise<Response> => {
+  return async (request: NextRequest): Promise<NextResponse> => {
     const requestId = getOrCreateRequestId(request);
 
     try {
-      // Authentication check
-      let userId: string | null = null;
-      try {
-        const authResult = await auth();
-        userId = authResult.userId;
-      } catch (_authError) {
-        return withCors(
-          createErrorResponse(
-            'Nicht autorisierter Zugriff',
-            ErrorCodes.UNAUTHORIZED,
-            requestId,
-            401
-          )
-        );
-      }
-
-      if (!userId) {
-        return withCors(
-          createErrorResponse(
-            'Nicht autorisierter Zugriff',
-            ErrorCodes.UNAUTHORIZED,
-            requestId,
-            401
-          )
-        );
-      }
-
-      // Admin authorization check
-      const isAdmin = await checkUserAdminStatus();
-      if (!isAdmin) {
-        return withCors(
-          createErrorResponse(
-            'Admin-Berechtigung erforderlich',
-            ErrorCodes.FORBIDDEN,
-            requestId,
-            403
-          )
-        );
+      const adminAuth = await requireAdminUser(requestId);
+      if (!adminAuth.authorized) {
+        return applyCorsHeaders(adminAuth.response);
       }
 
       // Execute service logic - pass request if needed
       const data = await handler(requestId, request);
-      return withCors(createSuccessResponse(data, requestId));
+      return applyCorsHeaders(createSuccessResponse(data, requestId));
     } catch (error) {
       serverInstance.error(options.errorMessage, {
         context: options.context,
         requestId,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      return withCors(
+      return applyCorsHeaders(
         createErrorResponse(
           options.errorMessage,
           ErrorCodes.INTERNAL_ERROR,

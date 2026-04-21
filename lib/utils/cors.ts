@@ -6,6 +6,8 @@
  * Restricts to same origin for security (no wildcard).
  */
 
+import { NextResponse } from 'next/server';
+
 /**
  * Get CORS headers for API responses
  * Restricts Access-Control-Allow-Origin to the application domain for security
@@ -28,11 +30,20 @@ export function getCorsHeaders(): Record<string, string> {
  * Helper function to reduce boilerplate in API route handlers
  */
 export function applyCorsHeaders(
-  response: Response,
+  response: NextResponse<unknown>,
   corsHeaders: Record<string, string> = getCorsHeaders()
-): Response {
+): NextResponse<unknown> {
   Object.entries(corsHeaders).forEach(([key, value]) => {
     response.headers.set(key, value);
   });
   return response;
+}
+
+/**
+ * Create a standardized CORS preflight response for API routes.
+ */
+export function createCorsPreflightResponse(
+  corsHeaders: Record<string, string> = getCorsHeaders()
+): NextResponse<unknown> {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
