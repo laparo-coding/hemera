@@ -1,81 +1,93 @@
-jest.mock('@/lib/db/prisma', () => ({
-  prisma: {
-    course: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-    },
-    booking: {
-      findMany: jest.fn(),
-    },
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+
+const mockPrisma = {
+  course: {
+    findMany: jest.fn(),
   },
+};
+
+const mockLogError = jest.fn();
+
+jest.mock('@/lib/db/prisma', () => ({
+  prisma: mockPrisma,
 }));
 
+jest.mock('@/lib/errors', () => {
+  const actual = jest.requireActual('@/lib/errors');
+  return {
+    ...actual,
+    logError: (...args: unknown[]) => mockLogError(...args),
+  };
+});
+
+import { getFeaturedCourses } from '@/lib/api/courses';
+import { DatabaseConnectionError } from '@/lib/errors';
+
 describe('Course API', () => {
-  const originalEnv = process.env;
-
   beforeEach(() => {
-    jest.resetModules();
     jest.clearAllMocks();
-    jest.useRealTimers();
-    process.env = { ...originalEnv } as NodeJS.ProcessEnv;
   });
 
-  afterEach(() => {
-    process.env = originalEnv;
-    jest.useRealTimers();
-  });
+  describe('getFeaturedCourses', () => {
+    it('reads featured courses from the database query only', async () => {
+      mockPrisma.course.findMany.mockResolvedValue([
+        {
+          id: 'course-1',
+          title: 'Grundkurs',
+          description: 'Beschreibung',
+          teaser: 'Teaser',
+          slug: 'grundkurs',
+          price: 30000,
+          currency: 'EUR',
+          capacity: 6,
+          startDate: new Date('2026-06-19T00:00:00Z'),
+          startTime: new Date('2026-06-19T08:00:00Z'),
+          endTime: new Date('2026-06-19T18:15:00Z'),
+          isPublished: true,
+          createdAt: new Date('2026-01-01T00:00:00Z'),
+          updatedAt: new Date('2026-01-02T00:00:00Z'),
+          level: 'BEGINNER',
+          thumbnailUrl: null,
+          location: {
+            id: 'location-1',
+            name: 'Gartenhotel Fette Henne',
+            slug: 'gartenhotel-fette-henne',
+            city: 'Erkrath',
+          },
+        },
+      ]);
 
-  it('returns featured courses when the query succeeds', async () => {
-    const { prisma } = await import('@/lib/db/prisma');
-    (prisma.course.findMany as jest.Mock).mockResolvedValue([
-      {
-        id: 'course-1',
-        title: 'Testkurs',
-        description: 'Beschreibung',
-        teaser: 'Teaser',
-        slug: 'testkurs',
-        price: 499,
-        currency: 'EUR',
-        capacity: 10,
-        startDate: null,
-        startTime: null,
-        endTime: null,
-        isPublished: true,
-        createdAt: new Date('2026-01-01T00:00:00.000Z'),
-        updatedAt: new Date('2026-01-02T00:00:00.000Z'),
-        level: 'BEGINNER',
-        thumbnailUrl: null,
-        location: null,
-      },
-    ]);
+      const result = await getFeaturedCourses(2);
 
-    const { getFeaturedCourses } = await import('@/lib/api/courses');
+      expect(mockPrisma.course.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            isPublished: true,
+            isNonPublic: false,
+          },
+          take: 2,
+        })
+      );
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        slug: 'grundkurs',
+        location: {
+          slug: 'gartenhotel-fette-henne',
+        },
+      });
+    });
 
-    await expect(getFeaturedCourses(1)).resolves.toEqual([
-      expect.objectContaining({
-        id: 'course-1',
-        title: 'Testkurs',
-        slug: 'testkurs',
-        currency: 'EUR',
-      }),
-    ]);
-  });
+    it('rethrows database failures as DatabaseConnectionError', async () => {
+      const dbError = new Error('database offline');
+      mockPrisma.course.findMany.mockRejectedValue(dbError);
 
-  it('returns an empty array when the featured query times out', async () => {
-    jest.useFakeTimers();
+      const result = getFeaturedCourses();
 
-    const { prisma } = await import('@/lib/db/prisma');
-    (prisma.course.findMany as jest.Mock).mockImplementation(
-      () => new Promise(() => undefined)
-    );
-
-    const { featuredCoursesTimeoutMs, getFeaturedCourses } = await import(
-      '@/lib/api/courses'
-    );
-
-    const resultPromise = getFeaturedCourses(1);
-    await jest.advanceTimersByTimeAsync(featuredCoursesTimeoutMs);
-
-    await expect(resultPromise).resolves.toEqual([]);
+      await expect(result).rejects.toBeInstanceOf(DatabaseConnectionError);
+      expect(mockLogError).toHaveBeenCalledWith(dbError, {
+        operation: 'getFeaturedCourses',
+        limit: 3,
+      });
+    });
   });
 });

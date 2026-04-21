@@ -53,6 +53,7 @@
     "db:reset": "echo '🚨 db:reset is DISABLED for safety. Use db:reset:force with ALLOW_DESTRUCTIVE_DB_OPS=true' && exit 1",
     "db:reset:force": "npm run db:check-env && dotenv -e .env.local -- npx prisma migrate reset",
     "db:list:courses": "dotenv -e .env.local -- node scripts/debug/list-courses.mjs",
+    "db:restore:courses": "npm run db:check-env && node scripts/ops/restore-courses-from-backup.mjs",
     "db:docker:start": "docker compose up -d postgres && echo '✅ PostgreSQL started on localhost:5432'",
     "db:docker:stop": "docker compose stop postgres",
     "db:docker:reset": "docker compose down -v && docker compose up -d postgres && echo '✅ Database reset complete'",

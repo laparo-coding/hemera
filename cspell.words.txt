@@ -108,6 +108,7 @@ Daten
 Datenbankvalidierung
 Datenvalidierung
 davecgh
+diese
 DBNAME
 dein
 deployen
@@ -139,6 +140,7 @@ elif
 Endpunkt
 ENOTFOUND
 entdecken
+entpacktes
 Entitätsbeschreibungen
 entwicklen
 Entwickler
@@ -308,6 +310,7 @@ Kursdetailsseite
 Kurse
 kurse
 Kursen
+kursspezifische
 Landingpages
 Laparo
 laparo
@@ -423,6 +426,8 @@ pkill
 planetscale
 Plattformverwaltung
 Platzhalterinhalte
+Platzhalterdaten
+Platzhalterquellen
 Playfair
 playfair
 Plätze

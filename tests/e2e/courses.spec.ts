@@ -16,7 +16,7 @@ test.describe('Courses Page', () => {
     const databaseEmptyState = page.getByTestId('e2e-courses-empty');
     const count = await cards.count();
     if (count > 0) {
-      // Titeltext vorhanden (nutzt den Mock aus getPublishedCourses bei E2E)
+      // Titeltext vorhanden (DB-gestützte Kursdaten)
       await expect(page.getByTestId('course-title').first()).toBeVisible();
       await expect(databaseEmptyState).toHaveCount(0);
     } else {

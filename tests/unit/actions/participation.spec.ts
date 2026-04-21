@@ -71,6 +71,7 @@ import {
 } from '@/lib/actions/participation';
 import { prisma } from '@/lib/db/prisma';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { UNIT_TEST_COURSE } from '../fixtures/course-fixtures';
 
 const mockAuth = auth as jest.MockedFunction<typeof auth>;
 
@@ -100,10 +101,8 @@ const mockParticipation = {
     userId: 'user-123',
     paymentStatus: 'CONFIRMED',
     course: {
+      ...UNIT_TEST_COURSE,
       id: 'course-123',
-      title: 'Grundlagen der Gehaltsverhandlung',
-      slug: 'grundkurs',
-      startDate: new Date('2026-01-15'),
     },
   },
   documents: [],

@@ -239,9 +239,10 @@ export async function getFeaturedCourses(limit = 3): Promise<Course[]> {
     }));
   } catch (error) {
     logCourseApiError(error, { operation: 'getFeaturedCourses', limit });
-    // Return an empty DB-driven result instead of throwing so the caller can
-    // render an explicit empty state without inventing placeholder seminars.
-    return [];
+    throw new DatabaseConnectionError(
+      'fetching featured courses',
+      error as Error
+    );
   }
 }
 
