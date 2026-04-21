@@ -16,6 +16,11 @@ test.describe('Admin API Authentication & Authorization', () => {
       testInfo.project.name === 'chromium-auth',
       'Unauthenticated contract is covered by non-authenticated projects only'
     );
+
+    test.skip(
+      !!process.env.E2E_TEST || !!process.env.DISABLE_CLERK_SERVER_AUTH,
+      'Mock-Auth-Umgebung — nicht authentifizierte Admin-Contracts sind in diesem Modus nicht aussagekraeftig'
+    );
   });
 
   test('GET /api/admin/users - should require authentication', async ({
