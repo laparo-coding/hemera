@@ -11,6 +11,9 @@ on:
 
 jobs:
   pr_agent_job:
+    concurrency:
+      group: qodo-pr-agent-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
+      cancel-in-progress: true
     if: ${{ github.event.sender.type != 'Bot' && (github.event_name == 'pull_request' || github.event_name == 'pull_request_review' || github.event_name == 'pull_request_review_comment' || github.event.issue.pull_request) }}
     runs-on: ubuntu-latest
     permissions:
@@ -32,11 +35,12 @@ jobs:
           github_action_config.auto_update_changelog: 'false'
           github_action_config.auto_questions: 'false'
           # Configure which PR events trigger the action
-          github_action_config.pr_actions: '["opened", "reopened", "synchronize", "ready_for_review", "review_requested"]'
+          github_action_config.pr_actions: '["opened", "reopened", "ready_for_review", "review_requested"]'
           # Custom review instructions for TypeScript/Next.js project
           pr_reviewer.extra_instructions: 'Focus on TypeScript best practices, Next.js 15.5.6 App Router patterns, React 18 hooks usage, Prisma ORM queries, Material-UI components, security vulnerabilities, and performance issues. Check for proper error handling, async/await patterns, and adherence to project constitution requirements.'
           # Language-specific settings for TypeScript
           pr_code_suggestions.num_code_suggestions: '6'
+          pr_code_suggestions.persistent_comment: 'true'
           pr_code_suggestions.suggestions_score_threshold: '7'
           # Performance optimization for the repository
           config.large_patch_policy: 'clip'
