@@ -107,4 +107,6 @@ Respond concisely and operationally with exactly these points:
 - ignore open review threads
 - downplay branch protection
 - present a bypass as a standard path
-- run broad checklists before focused verification without need <!-- EOF -->
+- run broad checklists before focused verification without need
+
+<!-- EOF -->
