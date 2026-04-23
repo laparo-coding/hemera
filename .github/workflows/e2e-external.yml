@@ -131,12 +131,19 @@ jobs:
           NODE_ENV: test
           NEXT_TELEMETRY_DISABLED: '1'
         run: |
+          if [ -z "$VERCEL_PROTECTION_BYPASS" ]; then
+            echo "No Vercel bypass token available for this run. Probing preview in SSO-tolerant mode." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
           RESPONSE_BODY=$(curl -sSL \
             -H "x-vercel-protection-bypass: $VERCEL_PROTECTION_BYPASS" \
             -H "x-vercel-set-bypass-cookie: true" \
             "$PLAYWRIGHT_BASE_URL/courses")
 
-          if grep -Eq 'vercel\.com/(login|sso-api)' <<< "$RESPONSE_BODY"; then
+          # Detect common Vercel protection/login responses and skip gracefully.
+          # Dependabot runs can execute without org secrets, which otherwise creates false red checks.
+          if grep -Eqi '(vercel\.com/(login|sso-api)|authentication required|protected by vercel|security checkpoint|verify you are human|access denied)' <<< "$RESPONSE_BODY"; then
             echo "Preview remains behind Vercel login despite configured bypass; skipping external smoke." \
               | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
