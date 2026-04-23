@@ -243,7 +243,11 @@ export default function CourseList({
                         <IconButton
                           size='small'
                           component={Link}
-                          href={`/courses/${course.id}`}
+                          href={`/courses/${
+                            course.slug.trim().length > 0
+                              ? course.slug
+                              : course.id
+                          }`}
                           aria-label={`${course.title} ansehen`}
                         >
                           <VisibilityIcon fontSize='small' />

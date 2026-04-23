@@ -129,10 +129,41 @@ export class StripeConfigurationError extends InfrastructureError {
 export class UnauthorizedError extends AuthError {
   readonly errorCode = 'UNAUTHORIZED';
 
-  constructor(resource?: string) {
+  constructor(resource?: string, message?: string) {
     super(
-      resource ? `Unauthorized access to ${resource}` : 'Unauthorized access'
+      message ??
+        (resource
+          ? `Unauthorized access to ${resource}`
+          : 'Unauthorized access'),
+      resource ? { resource } : undefined
     );
+  }
+}
+
+export class ParticipationNotFoundError extends BusinessError {
+  readonly errorCode = 'PARTICIPATION_NOT_FOUND';
+  override readonly statusCode = 404;
+
+  constructor(
+    identifier: string,
+    lookupField: 'bookingId' | 'id' = 'bookingId',
+    message = 'Teilnahme nicht gefunden'
+  ) {
+    super(message, {
+      identifier,
+      lookupField,
+    });
+  }
+}
+
+export class ParticipationCreationError extends InfrastructureError {
+  readonly errorCode = 'PARTICIPATION_CREATION_FAILED';
+
+  constructor(
+    bookingId: string,
+    message = 'Teilnahme konnte nicht erstellt werden'
+  ) {
+    super(message, { bookingId });
   }
 }
 

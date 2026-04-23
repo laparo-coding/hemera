@@ -5,13 +5,36 @@ import {
   getCourseById,
   getCourseBySlug,
 } from '../../../lib/api/courses';
+import {
+  CourseNotFoundError,
+  CourseNotPublishedError,
+} from '../../../lib/errors';
 import { SITE_CONFIG } from '../../../lib/seo/constants';
 import {
   generateSEOMetadata,
   truncateDescription,
 } from '../../../lib/seo/metadata';
+import { isLikelyCourseId } from '../../../lib/utils/courseIdentifier';
 
 // Note: Default layout component only needs to render children. Avoid over-typing props to satisfy Next's validator types.
+
+function shouldRetryCourseLookup(error: unknown): boolean {
+  if (error instanceof CourseNotFoundError) {
+    return true;
+  }
+
+  if (error instanceof CourseNotPublishedError) {
+    return false;
+  }
+
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  // Last-resort fallback for generic wrappers (for example Prisma P2025 surfaces)
+  // that do not preserve a dedicated not-found error type.
+  return /not found|no record/i.test(error.message);
+}
 
 export async function generateMetadata({
   params,
@@ -20,15 +43,25 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id: identifier } = await params;
 
+  const likelyCourseId = isLikelyCourseId(identifier);
+
   try {
     // Fetch course data directly via DB helpers instead of self-fetching an API route
     // (relative fetch causes a server deadlock in dev because the server calls itself)
     let course: Course;
 
     try {
-      course = await getCourseBySlug(identifier);
-    } catch {
-      course = await getCourseById(identifier);
+      course = likelyCourseId
+        ? await getCourseById(identifier)
+        : await getCourseBySlug(identifier);
+    } catch (error) {
+      if (!shouldRetryCourseLookup(error)) {
+        throw error;
+      }
+
+      course = likelyCourseId
+        ? await getCourseBySlug(identifier)
+        : await getCourseById(identifier);
     }
 
     const title = course.title ?? 'Kurs';

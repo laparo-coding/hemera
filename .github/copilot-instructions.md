@@ -24,7 +24,7 @@ Auto-generated from all feature plans. Last updated: 2025-01-15
 - TypeScript 5.9, Next.js 16, React 19, Node.js 20+ + Jest 30, ts-jest, Playwright, @testing-library/react, (028-test-coverage)
 - N/A for planning artifacts; existing PostgreSQL via Prisma remains contextual only (028-test-coverage)
 
-- TypeScript 5.x, Next.js 15.5.6, React 18+ + MUI v5+, Clerk (auth), Rollbar (monitoring), Prisma
+- TypeScript 6.0, Next.js 16.2, React 19 + MUI v7, Clerk (auth), Rollbar (monitoring), Prisma
   (ORM)
 
 ## Project Structure
@@ -43,7 +43,7 @@ npm test npm run lint
 
 ## Code Style
 
-TypeScript 5.x, Next.js 15.5.6, React 18+: Follow standard conventions
+TypeScript 6.0, Next.js 16.2, React 19: Follow standard conventions
 
 ## Database Naming Convention
 
