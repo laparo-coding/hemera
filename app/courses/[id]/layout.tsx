@@ -5,6 +5,10 @@ import {
   getCourseById,
   getCourseBySlug,
 } from '../../../lib/api/courses';
+import {
+  CourseNotFoundError,
+  CourseNotPublishedError,
+} from '../../../lib/errors';
 import { SITE_CONFIG } from '../../../lib/seo/constants';
 import {
   generateSEOMetadata,
@@ -13,6 +17,22 @@ import {
 
 // Note: Default layout component only needs to render children. Avoid over-typing props to satisfy Next's validator types.
 
+function shouldRetryCourseLookup(error: unknown): boolean {
+  if (error instanceof CourseNotFoundError) {
+    return true;
+  }
+
+  if (error instanceof CourseNotPublishedError) {
+    return false;
+  }
+
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return /not found|no record/i.test(error.message);
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -20,15 +40,25 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id: identifier } = await params;
 
+  const isLikelyCourseId = /^c[a-z0-9]{20,}$/i.test(identifier);
+
   try {
     // Fetch course data directly via DB helpers instead of self-fetching an API route
     // (relative fetch causes a server deadlock in dev because the server calls itself)
     let course: Course;
 
     try {
-      course = await getCourseBySlug(identifier);
-    } catch {
-      course = await getCourseById(identifier);
+      course = isLikelyCourseId
+        ? await getCourseById(identifier)
+        : await getCourseBySlug(identifier);
+    } catch (error) {
+      if (!shouldRetryCourseLookup(error)) {
+        throw error;
+      }
+
+      course = isLikelyCourseId
+        ? await getCourseBySlug(identifier)
+        : await getCourseById(identifier);
     }
 
     const title = course.title ?? 'Kurs';

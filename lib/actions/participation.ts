@@ -40,6 +40,12 @@ import {
 } from '../db/courseParticipation';
 import { prisma } from '../db/prisma';
 import {
+  BaseError,
+  BookingNotFoundError,
+  InvalidBookingStatusError,
+  UnauthorizedError,
+} from '../errors';
+import {
   type ServerActionResult,
   withParameterizedServerAction,
   withServerActionErrorHandling,
@@ -53,6 +59,47 @@ import {
 } from '../utils/resumeUpload';
 
 const STRICT_ISO_8601_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+function normalizeParticipationActionError(error: unknown): Error {
+  if (error instanceof Error) {
+    return error;
+  }
+
+  const detail = (() => {
+    if (typeof error === 'string') {
+      return error;
+    }
+
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return String(error);
+    }
+  })();
+
+  return new Error(`Non-Error thrown: ${detail}`, { cause: error });
+}
+
+function reportParticipationActionError(
+  action: string,
+  error: unknown,
+  context: Record<string, unknown>
+): void {
+  if (
+    error instanceof UnauthorizedError ||
+    error instanceof BookingNotFoundError ||
+    error instanceof InvalidBookingStatusError ||
+    error instanceof BaseError
+  ) {
+    return;
+  }
+
+  serverInstance.error(
+    action,
+    normalizeParticipationActionError(error),
+    context
+  );
+}
 
 // ============================================================================
 // Types
@@ -103,7 +150,7 @@ async function verifyParticipationOwnership(
   const { userId } = await auth();
 
   if (!userId) {
-    throw new Error('Nicht authentifiziert');
+    throw new UnauthorizedError('Teilnahme');
   }
 
   const participation = await getParticipationByBookingId(bookingId);
@@ -120,7 +167,7 @@ async function verifyParticipationOwnership(
       participationId: participation.id,
       ownerId: participation.booking.userId,
     });
-    throw new Error('Keine Berechtigung für diese Teilnahme');
+    throw new UnauthorizedError('Teilnahme');
   }
 
   return { userId, participation };
@@ -139,7 +186,7 @@ export const getMyEnrollmentsAction = withServerActionErrorHandling(
     const { userId } = await auth();
 
     if (!userId) {
-      throw new Error('Nicht authentifiziert');
+      throw new UnauthorizedError('Teilnahmen');
     }
 
     // Get all paid/confirmed bookings for the user
@@ -197,7 +244,7 @@ export const startParticipationAction = withParameterizedServerAction(
     const { userId } = await auth();
 
     if (!userId) {
-      throw new Error('Nicht authentifiziert');
+      throw new UnauthorizedError('Teilnahme');
     }
 
     // Check if booking exists and belongs to user
@@ -216,15 +263,15 @@ export const startParticipationAction = withParameterizedServerAction(
     });
 
     if (!booking) {
-      throw new Error('Buchung nicht gefunden');
+      throw new BookingNotFoundError(bookingId);
     }
 
     if (booking.userId !== userId) {
-      throw new Error('Keine Berechtigung für diese Buchung');
+      throw new UnauthorizedError('Buchung');
     }
 
     if (!['PAID', 'CONFIRMED'].includes(booking.paymentStatus)) {
-      throw new Error('Buchung ist nicht bezahlt');
+      throw new InvalidBookingStatusError(booking.paymentStatus, 'PAID');
     }
 
     // Check if participation already exists
@@ -267,7 +314,7 @@ export const getMyParticipationsAction = withServerActionErrorHandling(
     const { userId } = await auth();
 
     if (!userId) {
-      throw new Error('Nicht authentifiziert');
+      throw new UnauthorizedError('Teilnahmen');
     }
 
     const participations = await getParticipationsByUserId(userId);
@@ -344,7 +391,7 @@ export async function savePreparationAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to save preparation', error as Error, {
+    reportParticipationActionError('Failed to save preparation', error, {
       bookingId,
     });
     return {
@@ -384,7 +431,7 @@ export async function completePreparationAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to complete preparation', error as Error, {
+    reportParticipationActionError('Failed to complete preparation', error, {
       bookingId,
     });
     return {
@@ -436,7 +483,7 @@ export async function markSummaryViewedAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to mark summary viewed', error as Error, {
+    reportParticipationActionError('Failed to mark summary viewed', error, {
       bookingId,
     });
     return {
@@ -473,7 +520,7 @@ export async function completeSummaryAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to complete summary', error as Error, {
+    reportParticipationActionError('Failed to complete summary', error, {
       bookingId,
     });
     return {
@@ -515,7 +562,7 @@ export async function saveDebriefingAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to save debriefing', error as Error, {
+    reportParticipationActionError('Failed to save debriefing', error, {
       bookingId,
     });
     return {
@@ -554,7 +601,7 @@ export async function completeDebriefingAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to complete debriefing', error as Error, {
+    reportParticipationActionError('Failed to complete debriefing', error, {
       bookingId,
     });
     return {
@@ -596,7 +643,7 @@ export async function saveResultAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to save result', error as Error, {
+    reportParticipationActionError('Failed to save result', error, {
       bookingId,
     });
     return {
@@ -636,7 +683,7 @@ export async function completeResultAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to complete result', error as Error, {
+    reportParticipationActionError('Failed to complete result', error, {
       bookingId,
     });
     return {
@@ -765,7 +812,7 @@ export async function saveNegotiationResultAction(params: {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to save negotiation result', error as Error, {
+    reportParticipationActionError('Failed to save negotiation result', error, {
       bookingId: params.bookingId,
     });
     return {
@@ -848,7 +895,7 @@ export async function uploadResumeAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to upload résumé', error as Error, {
+    reportParticipationActionError('Failed to upload résumé', error, {
       bookingId,
     });
     return {
@@ -907,7 +954,7 @@ export async function deleteResumeAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    serverInstance.error('Failed to delete résumé', error as Error, {
+    reportParticipationActionError('Failed to delete résumé', error, {
       bookingId,
     });
     return {

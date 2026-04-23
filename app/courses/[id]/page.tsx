@@ -45,6 +45,16 @@ interface PageProps {
 }
 
 /**
+ * Treat course IDs as CUID-like values such as "cm4x7n2qk0001abc123def456".
+ * The regexp /^c[a-z0-9]{20,}$/i enforces a leading "c" plus at least 20
+ * alphanumeric characters; update this comment if the ID specification changes
+ * so the regex intent stays obvious to future maintainers.
+ */
+function isLikelyCourseId(value: string): boolean {
+  return /^c[a-z0-9]{20,}$/i.test(value);
+}
+
+/**
  * Map API level string to typed level
  */
 function mapLevel(
@@ -67,7 +77,11 @@ export default async function CourseDetailPage({ params }: PageProps) {
   let course: Awaited<ReturnType<typeof getCourseBySlug>> | null = null;
 
   try {
-    course = await getCourseBySlug(identifier);
+    if (isLikelyCourseId(identifier)) {
+      course = await getCourseById(identifier);
+    } else {
+      course = await getCourseBySlug(identifier);
+    }
   } catch (error) {
     if (error instanceof CourseNotPublishedError) {
       notFound();
@@ -75,7 +89,11 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
     if (error instanceof CourseNotFoundError) {
       try {
-        course = await getCourseById(identifier);
+        if (isLikelyCourseId(identifier)) {
+          course = await getCourseBySlug(identifier);
+        } else {
+          course = await getCourseById(identifier);
+        }
       } catch (innerError) {
         if (
           innerError instanceof CourseNotFoundError ||
