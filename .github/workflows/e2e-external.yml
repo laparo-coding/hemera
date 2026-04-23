@@ -143,7 +143,7 @@ jobs:
 
           # Detect common Vercel protection/login responses and skip gracefully.
           # Dependabot runs can execute without org secrets, which otherwise creates false red checks.
-          if grep -Eqi '(vercel\.com/(login|sso-api)|authentication required|protected by vercel|security checkpoint|verify you are human|access denied)' <<< "$RESPONSE_BODY"; then
+          if grep -Eqi '(vercel\.com/(login|sso-api)|protected by vercel|security checkpoint|verify you are human)' <<< "$RESPONSE_BODY"; then
             echo "Preview remains behind Vercel login despite configured bypass; skipping external smoke." \
               | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0

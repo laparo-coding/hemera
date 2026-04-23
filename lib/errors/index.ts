@@ -24,6 +24,8 @@ export {
   DatabaseValidationError,
   FieldValidationError,
   InvalidBookingStatusError,
+  ParticipationCreationError,
+  ParticipationNotFoundError,
   PaymentProcessingError,
   SessionExpiredError,
   StripeConfigurationError,

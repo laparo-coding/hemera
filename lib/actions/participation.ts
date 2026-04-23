@@ -43,6 +43,8 @@ import {
   BaseError,
   BookingNotFoundError,
   InvalidBookingStatusError,
+  ParticipationCreationError,
+  ParticipationNotFoundError,
   UnauthorizedError,
 } from '../errors';
 import {
@@ -84,9 +86,7 @@ function createLocalizedUnauthorizedError(
   resource: string,
   message: string
 ): UnauthorizedError {
-  const error = new UnauthorizedError(resource);
-  error.message = message;
-  return error;
+  return new UnauthorizedError(resource, message);
 }
 
 function reportParticipationActionError(
@@ -94,12 +94,7 @@ function reportParticipationActionError(
   error: unknown,
   context: Record<string, unknown>
 ): void {
-  if (
-    error instanceof UnauthorizedError ||
-    error instanceof BookingNotFoundError ||
-    error instanceof InvalidBookingStatusError ||
-    error instanceof BaseError
-  ) {
+  if (error instanceof BaseError) {
     return;
   }
 
@@ -168,7 +163,7 @@ async function verifyParticipationOwnership(
   const participation = await getParticipationByBookingId(bookingId);
 
   if (!participation) {
-    throw new Error('Teilnahme nicht gefunden');
+    throw new ParticipationNotFoundError(bookingId);
   }
 
   // Verify the booking belongs to the current user
@@ -312,7 +307,7 @@ export const startParticipationAction = withParameterizedServerAction(
     }
 
     if (!participation) {
-      throw new Error('Teilnahme konnte nicht erstellt werden');
+      throw new ParticipationCreationError(bookingId);
     }
 
     const hasAssets = await hasSummaryAssets(participation.courseId);

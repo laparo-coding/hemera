@@ -14,6 +14,7 @@ import {
   generateSEOMetadata,
   truncateDescription,
 } from '../../../lib/seo/metadata';
+import { isLikelyCourseId } from '../../../lib/utils/courseIdentifier';
 
 // Note: Default layout component only needs to render children. Avoid over-typing props to satisfy Next's validator types.
 
@@ -30,6 +31,8 @@ function shouldRetryCourseLookup(error: unknown): boolean {
     return false;
   }
 
+  // Last-resort fallback for generic wrappers (for example Prisma P2025 surfaces)
+  // that do not preserve a dedicated not-found error type.
   return /not found|no record/i.test(error.message);
 }
 
@@ -40,7 +43,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id: identifier } = await params;
 
-  const isLikelyCourseId = /^c[a-z0-9]{20,}$/i.test(identifier);
+  const likelyCourseId = isLikelyCourseId(identifier);
 
   try {
     // Fetch course data directly via DB helpers instead of self-fetching an API route
@@ -48,7 +51,7 @@ export async function generateMetadata({
     let course: Course;
 
     try {
-      course = isLikelyCourseId
+      course = likelyCourseId
         ? await getCourseById(identifier)
         : await getCourseBySlug(identifier);
     } catch (error) {
@@ -56,7 +59,7 @@ export async function generateMetadata({
         throw error;
       }
 
-      course = isLikelyCourseId
+      course = likelyCourseId
         ? await getCourseBySlug(identifier)
         : await getCourseById(identifier);
     }

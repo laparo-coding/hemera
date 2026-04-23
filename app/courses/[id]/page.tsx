@@ -13,6 +13,7 @@ import {
   generateOrganizationSchema as genOrgSchema,
   generateWebPageSchema as genWebPageSchema,
 } from '../../../lib/seo/schemas';
+import { isLikelyCourseId } from '../../../lib/utils/courseIdentifier';
 import { generateMetadata as genMetadata } from './layout';
 
 export { genMetadata as generateMetadata };
@@ -42,16 +43,6 @@ function ensureCurriculumArray(curriculum: unknown): CurriculumModule[] {
 
 interface PageProps {
   params: Promise<{ id: string }>;
-}
-
-/**
- * Treat course IDs as CUID-like values such as "cm4x7n2qk0001abc123def456".
- * The regexp /^c[a-z0-9]{20,}$/i enforces a leading "c" plus at least 20
- * alphanumeric characters; update this comment if the ID specification changes
- * so the regex intent stays obvious to future maintainers.
- */
-function isLikelyCourseId(value: string): boolean {
-  return /^c[a-z0-9]{20,}$/i.test(value);
 }
 
 /**
