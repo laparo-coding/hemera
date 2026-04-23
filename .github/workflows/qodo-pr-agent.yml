@@ -22,9 +22,10 @@ jobs:
       contents: write
     name: Run PR Agent on every pull request, respond to user comments
     steps:
+      # qodo-ai/pr-agent v0.34 pinned to an immutable commit SHA.
       - name: PR Agent action step
         id: pragent
-        uses: qodo-ai/pr-agent@v0.34
+        uses: qodo-ai/pr-agent@d82f7d3e696cd00822694aaa3096265d3889f3f1
         env:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
