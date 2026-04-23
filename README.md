@@ -22,6 +22,12 @@ Run `nvm use` to switch to the correct Node version automatically.
 
 See `.github/prompts/*.prompt.md` and `.specify/templates/*` for automation guidance.
 
+PR governance assets are available here:
+
+- Skill: `.github/skills/pr-operations-governance/SKILL.md`
+- Agent: `.github/agents/pr-operations-governance.agent.md`
+- Prompt: `.github/prompts/pr-operations-governance.prompt.md`
+
 ## Quality Gates (Docs)
 
 Automated checks run on pull requests and on main:
@@ -116,10 +122,10 @@ LOOPS_API_KEY=loops_xxxxx  # Get from Loops.so Dashboard → API
 
 Create the following templates in your Loops.so dashboard:
 
-| Template ID | Purpose | Variables |
-|-------------|---------|-----------|
-| `prerequisite-review` | Admin notification for PRE_BOOKED booking | `customerName`, `courseTitle`, `adminUrl` |
-| `booking-rejected` | Customer rejection notice | `firstName`, `courseTitle` |
+| Template ID            | Purpose                                      | Variables                                 |
+| ---------------------- | -------------------------------------------- | ----------------------------------------- |
+| `prerequisite-review`  | Admin notification for PRE_BOOKED booking    | `customerName`, `courseTitle`, `adminUrl` |
+| `booking-rejected`     | Customer rejection notice                    | `firstName`, `courseTitle`                |
 
 ### Feature Behavior
 

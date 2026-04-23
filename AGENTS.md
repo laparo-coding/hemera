@@ -63,6 +63,12 @@ npm run db:migrate # Prisma migrations against local env
 - **Branch naming**: Align with spec IDs (`021-learning-path`, etc.) and delete merged branches per
   `docs/ops/branch-hygiene.md` after production deploy.
 
+## PR Governance Automation
+
+- PR governance skill: `.github/skills/pr-operations-governance/SKILL.md`
+- PR governance agent: `.github/agents/pr-operations-governance.agent.md`
+- PR governance prompt: `.github/prompts/pr-operations-governance.prompt.md`
+
 ---
 
 ## 🎯 Repository Overview
@@ -133,19 +139,17 @@ hemera/
 
 ### Key Files to Know
 
-| File | Purpose | When You'd Touch It |
-|------|---------|---------------------|
-| `app/page.tsx` | Landing page fetching featured courses | Update marketing hero or data mapping |
-| `app/api/health/route.ts` | Health endpoint exposing build/version metadata | Monitor uptime probes or add diagnostics |
-| `lib/api/courses.ts` | Server-side course data access helpers | Modify fetching, availability, curriculum logic |
-| `lib/db/prisma.ts` | Prisma client factory (Accelerate vs pg adapter) | Adjust DB connection strategy or close hooks |
-| `lib/env.ts` | Centralized env schema/validation | Add new env vars or tighten validation |
-| `prisma/schema.prisma` | Data model + relations | Introduce fields/entities before running migrations |
-| `scripts/deploy-migrations.mjs` | Build gate ensuring DB migrations are applied | Update migration rollout before `npm run build` |
-| `tests/setup.ts` | Jest global hooks (DB cleanup, env toggles) | Extend test fixtures or teardown logic |
-| `playwright.config.ts` | E2E runner config (workers, retries, env) | Calibrate E2E reliability or base URL |
-| `docs/ops/branch-hygiene.md` | Branch cleanup process | Reference after merges/deploys |
-| `README.md` | Specs-first workflow + ops guardrails | Onboard newcomers or adjust workflow narrative |
+- `app/page.tsx`: Landing page fetching featured courses. Touch when updating the marketing hero or featured course mapping.
+- `app/api/health/route.ts`: Health endpoint exposing build and version metadata. Touch when extending uptime diagnostics.
+- `lib/api/courses.ts`: Server-side course data access helpers. Touch when changing fetching, availability, or curriculum logic.
+- `lib/db/prisma.ts`: Prisma client factory for Accelerate versus pg adapter flows. Touch when adjusting connection strategy or shutdown behavior.
+- `lib/env.ts`: Centralized environment schema and validation. Touch when adding or tightening env configuration.
+- `prisma/schema.prisma`: Data model and relations. Touch when introducing entities or fields before migrations.
+- `scripts/deploy-migrations.mjs`: Build gate for unapplied migrations. Touch when rollout behavior before `npm run build` changes.
+- `tests/setup.ts`: Jest global hooks for DB cleanup and env toggles. Touch when extending fixtures or teardown behavior.
+- `playwright.config.ts`: E2E runner configuration for workers, retries, and environment wiring. Touch when calibrating E2E reliability or base URL.
+- `docs/ops/branch-hygiene.md`: Branch cleanup process. Touch when merge and cleanup workflow guidance changes.
+- `README.md`: Specs-first workflow and ops guardrails. Touch when onboarding or workflow guidance changes.
 
 ---
 
