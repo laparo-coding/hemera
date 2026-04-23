@@ -19,10 +19,22 @@ export async function gotoStable(
   const response = await page.goto(path, { waitUntil, timeout });
 
   if (waitForTestId) {
-    await page
-      .getByTestId(waitForTestId)
-      .first()
-      .waitFor({ state: 'visible', timeout: timeout ?? 30_000 });
+    const marker = page.getByTestId(waitForTestId).first();
+    const waitTimeout = timeout ?? 30_000;
+    const ssoTolerant = process.env.PLAYWRIGHT_SSO_TOLERANT === '1';
+
+    if (!ssoTolerant) {
+      await marker.waitFor({ state: 'visible', timeout: waitTimeout });
+    } else {
+      try {
+        await marker.waitFor({ state: 'visible', timeout: waitTimeout });
+      } catch (error) {
+        // External preview smoke may hit an SSO/login wall; continue so tests can soft-skip.
+        if (!(error instanceof Error) || !/Timeout/i.test(error.message)) {
+          throw error;
+        }
+      }
+    }
   }
   return response;
 }
