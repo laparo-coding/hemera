@@ -80,6 +80,15 @@ function normalizeParticipationActionError(error: unknown): Error {
   return new Error(`Non-Error thrown: ${detail}`, { cause: error });
 }
 
+function createLocalizedUnauthorizedError(
+  resource: string,
+  message: string
+): UnauthorizedError {
+  const error = new UnauthorizedError(resource);
+  error.message = message;
+  return error;
+}
+
 function reportParticipationActionError(
   action: string,
   error: unknown,
@@ -150,7 +159,10 @@ async function verifyParticipationOwnership(
   const { userId } = await auth();
 
   if (!userId) {
-    throw new UnauthorizedError('Teilnahme');
+    throw createLocalizedUnauthorizedError(
+      'Teilnahme',
+      'Nicht authentifiziert'
+    );
   }
 
   const participation = await getParticipationByBookingId(bookingId);
@@ -167,7 +179,10 @@ async function verifyParticipationOwnership(
       participationId: participation.id,
       ownerId: participation.booking.userId,
     });
-    throw new UnauthorizedError('Teilnahme');
+    throw createLocalizedUnauthorizedError(
+      'Teilnahme',
+      'Keine Berechtigung für diese Teilnahme'
+    );
   }
 
   return { userId, participation };
@@ -186,7 +201,10 @@ export const getMyEnrollmentsAction = withServerActionErrorHandling(
     const { userId } = await auth();
 
     if (!userId) {
-      throw new UnauthorizedError('Teilnahmen');
+      throw createLocalizedUnauthorizedError(
+        'Teilnahmen',
+        'Nicht authentifiziert'
+      );
     }
 
     // Get all paid/confirmed bookings for the user
@@ -244,7 +262,10 @@ export const startParticipationAction = withParameterizedServerAction(
     const { userId } = await auth();
 
     if (!userId) {
-      throw new UnauthorizedError('Teilnahme');
+      throw createLocalizedUnauthorizedError(
+        'Teilnahme',
+        'Nicht authentifiziert'
+      );
     }
 
     // Check if booking exists and belongs to user
@@ -267,7 +288,10 @@ export const startParticipationAction = withParameterizedServerAction(
     }
 
     if (booking.userId !== userId) {
-      throw new UnauthorizedError('Buchung');
+      throw createLocalizedUnauthorizedError(
+        'Buchung',
+        'Keine Berechtigung für diese Buchung'
+      );
     }
 
     if (!['PAID', 'CONFIRMED'].includes(booking.paymentStatus)) {
@@ -314,7 +338,10 @@ export const getMyParticipationsAction = withServerActionErrorHandling(
     const { userId } = await auth();
 
     if (!userId) {
-      throw new UnauthorizedError('Teilnahmen');
+      throw createLocalizedUnauthorizedError(
+        'Teilnahmen',
+        'Nicht authentifiziert'
+      );
     }
 
     const participations = await getParticipationsByUserId(userId);
