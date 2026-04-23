@@ -4,5 +4,5 @@
  * followed by exactly 24 lowercase alphanumeric characters.
  */
 export function isLikelyCourseId(value: string): boolean {
-  return /^c[a-z0-9]{24}$/i.test(value);
+  return /^c[a-z0-9]{24}$/.test(value);
 }

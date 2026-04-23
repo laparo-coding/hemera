@@ -95,6 +95,10 @@ function reportParticipationActionError(
   context: Record<string, unknown>
 ): void {
   if (error instanceof BaseError) {
+    serverInstance.info(`${action} (handled domain error)`, {
+      ...context,
+      errorCode: error.errorCode,
+    });
     return;
   }
 
