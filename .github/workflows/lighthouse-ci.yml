@@ -163,6 +163,15 @@ jobs:
               const bp = pct(c['best-practices'] ?? c["best-practices"]);
               const seo = pct(c.seo);
               const url = lhr.requestedUrl;
+              const notes = [];
+              const crawlabilitySources = lhr.audits['is-crawlable']?.details?.items ?? [];
+              if (crawlabilitySources.some(item => item.source === 'x-robots-tag: noindex')) {
+                notes.push('SEO includes preview noindex from x-robots-tag.');
+              }
+              const consoleItems = lhr.audits['errors-in-console']?.details?.items ?? [];
+              if (consoleItems.some(item => String(item.description ?? '').includes('x-vercel-protection-bypass'))) {
+                notes.push('Best-Practices includes preview bypass header CORS noise.');
+              }
               const md = `\n## Lighthouse Summary\n\nURL: ${url}\nScores: Performance ${perf} | Accessibility ${acc} | Best-Practices ${bp} | SEO ${seo}\n`;
               await core.summary.addRaw(md).write();
               const body = [
@@ -173,6 +182,7 @@ jobs:
                 `- Accessibility: ${acc}`,
                 `- Best-Practices: ${bp}`,
                 `- SEO: ${seo}`,
+                ...(notes.length ? ['', `Notes:`, ...notes.map(note => `- ${note}`)] : []),
                 ``,
                 `Artifacts: download the 'lighthouse-report' artifact from this workflow run for the full HTML report.`,
               ].join('\n');
@@ -191,10 +201,7 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
-            if (context.eventName === 'pull_request') {
-              core.setOutput('number', context.payload.pull_request.number.toString());
-            } else if (context.eventName === 'deployment_status') {
-              const sha = context.payload.deployment?.sha;
+            async function resolveBySha(sha) {
               if (!sha) return;
               const { owner, repo } = context.repo;
               const res = await github.rest.repos.listPullRequestsAssociatedWithCommit({ owner, repo, commit_sha: sha });
@@ -202,6 +209,14 @@ jobs:
                 const pr = res.data.find(p => p.state === 'open') || res.data[0];
                 core.setOutput('number', pr.number.toString());
               }
+            }
+
+            if (context.eventName === 'pull_request') {
+              core.setOutput('number', context.payload.pull_request.number.toString());
+            } else if (context.eventName === 'deployment_status') {
+              await resolveBySha(context.payload.deployment?.sha);
+            } else if (context.eventName === 'workflow_dispatch') {
+              await resolveBySha(context.sha);
             }
 
       - name: Post sticky PR comment with Lighthouse summary
