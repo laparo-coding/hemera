@@ -11,13 +11,13 @@ const ENV_DEVELOPMENT = 'development';
 const ENV_TEST = 'test';
 
 describe('shouldUnlockFutureCourseStepsInDevelopment', () => {
-  it('unlocks future steps in development after seminar start', () => {
+  it('does not unlock already-started steps in development', () => {
     expect(
       shouldUnlockFutureCourseStepsInDevelopment(
         STARTED_DATE,
         ENV_DEVELOPMENT
       )
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('unlocks future steps in development before seminar start', () => {
@@ -44,6 +44,18 @@ describe('hasCourseStarted', () => {
   it('returns false for future seminars', () => {
     expect(hasCourseStarted(FUTURE_DATE)).toBe(false);
   });
+
+  it('returns false when courseStartDate is null', () => {
+    expect(hasCourseStarted(null)).toBe(false);
+  });
+
+  it('returns false when courseStartDate is undefined', () => {
+    expect(hasCourseStarted(undefined)).toBe(false);
+  });
+
+  it('returns false when courseStartDate is an invalid date string', () => {
+    expect(hasCourseStarted('not-a-date')).toBe(false);
+  });
 });
 
 describe('shouldLockCourseStepsUntilSeminarStart', () => {
@@ -62,6 +74,18 @@ describe('shouldLockCourseStepsUntilSeminarStart', () => {
   it('does not lock started seminar steps outside development mode', () => {
     expect(
       shouldLockCourseStepsUntilSeminarStart(STARTED_DATE, ENV_TEST)
+    ).toBe(false);
+  });
+
+  it('does not lock when courseStartDate is null', () => {
+    expect(
+      shouldLockCourseStepsUntilSeminarStart(null, ENV_TEST)
+    ).toBe(false);
+  });
+
+  it('does not lock when courseStartDate is undefined', () => {
+    expect(
+      shouldLockCourseStepsUntilSeminarStart(undefined, ENV_TEST)
     ).toBe(false);
   });
 });

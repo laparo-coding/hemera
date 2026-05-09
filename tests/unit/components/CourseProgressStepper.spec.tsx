@@ -142,17 +142,19 @@ describe('CourseProgressStepper', () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
 
-    render(
-      <CourseProgressStepper
-        bookingId={BOOKING_ID}
-        participationStatus="PREPARATION"
-        courseStartDate={FUTURE_COURSE_START_DATE}
-      />,
-    );
+    try {
+      render(
+        <CourseProgressStepper
+          bookingId={BOOKING_ID}
+          participationStatus="PREPARATION"
+          courseStartDate={FUTURE_COURSE_START_DATE}
+        />,
+      );
 
-    expect(screen.getAllByRole('link')).toHaveLength(4);
-
-    process.env.NODE_ENV = originalNodeEnv;
+      expect(screen.getAllByRole('link')).toHaveLength(4);
+    } finally {
+      process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 
   it('vorbereitung step links to correct URL', () => {

@@ -3,7 +3,7 @@ export function hasCourseStarted(
   now = Date.now()
 ): boolean {
   if (!courseStartDate) {
-    return true;
+    return false;
   }
 
   const start =
@@ -12,7 +12,7 @@ export function hasCourseStarted(
       : new Date(courseStartDate);
 
   if (Number.isNaN(start.getTime())) {
-    return true;
+    return false;
   }
 
   return start.getTime() <= now;
@@ -20,7 +20,8 @@ export function hasCourseStarted(
 
 export function shouldUnlockFutureCourseStepsInDevelopment(
   courseStartDate: string | Date | null | undefined,
-  nodeEnv = process.env.NODE_ENV
+  nodeEnv = process.env.NODE_ENV,
+  now = Date.now()
 ): boolean {
   if (nodeEnv !== 'development' || !courseStartDate) {
     return false;
@@ -35,7 +36,7 @@ export function shouldUnlockFutureCourseStepsInDevelopment(
     return false;
   }
 
-  return true;
+  return !hasCourseStarted(start, now);
 }
 
 export function shouldLockCourseStepsUntilSeminarStart(
@@ -43,8 +44,14 @@ export function shouldLockCourseStepsUntilSeminarStart(
   nodeEnv = process.env.NODE_ENV,
   now = Date.now()
 ): boolean {
+  if (!courseStartDate) {
+    return false;
+  }
   return (
-    !shouldUnlockFutureCourseStepsInDevelopment(courseStartDate, nodeEnv) &&
-    !hasCourseStarted(courseStartDate, now)
+    !shouldUnlockFutureCourseStepsInDevelopment(
+      courseStartDate,
+      nodeEnv,
+      now
+    ) && !hasCourseStarted(courseStartDate, now)
   );
 }
