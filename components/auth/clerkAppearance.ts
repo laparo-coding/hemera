@@ -2,6 +2,10 @@ import type { SignUpProps, UserButtonProps } from '@clerk/shared/types';
 import { authForm, buttonStyles, colors } from '@/lib/design-tokens';
 
 export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
+  layout: {
+    socialButtonsPlacement: 'top',
+    socialButtonsVariant: 'blockButton',
+  },
   variables: {
     colorPrimary: colors.marsala,
     colorTextOnPrimaryBackground: colors.beige,
@@ -25,16 +29,9 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
     card: {
       boxShadow: 'none',
       border: 'none',
-      borderBottomLeftRadius: 0,
-      borderBottomRightRadius: 0,
     },
     footer: {
-      marginTop: 0,
-      padding: '1.25rem 2rem 1rem',
       backgroundColor: authForm.cardBackground,
-      borderTop: `1px solid ${authForm.footerBorderColor}`,
-      borderBottomLeftRadius: authForm.inputBorderRadius,
-      borderBottomRightRadius: authForm.inputBorderRadius,
       color: authForm.textColor,
       '& p': {
         color: authForm.subtleTextColor,
@@ -44,8 +41,6 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       },
     },
     footerAction: {
-      marginTop: 0,
-      paddingTop: 0,
       borderTop: 'none',
     },
     footerActionText: {
