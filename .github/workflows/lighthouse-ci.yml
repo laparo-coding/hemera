@@ -82,13 +82,32 @@ jobs:
         if: steps.target.outputs.url != ''
         env:
           LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
+          # Local workflow validator flags the preferred automation secret as invalid
+          # in this repository context, so this workflow reads the legacy name.
+          VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
         run: |
-          # Add Vercel protection bypass header if secret is available
-          EXTRA_HEADERS=""
-          if [ -n "${{ secrets.VERCEL_PROTECTION_BYPASS }}" ]; then
-            EXTRA_HEADERS="--extra-headers.x-vercel-protection-bypass=${{ secrets.VERCEL_PROTECTION_BYPASS }}"
+          BYPASS_TOKEN="$VERCEL_PROTECTION_BYPASS"
+
+          CURL_ARGS=(-sSL)
+          LHCI_ARGS=(--url "${{ steps.target.outputs.url }}" --config=.lighthouserc.json)
+
+          if [ -n "$BYPASS_TOKEN" ]; then
+            EXTRA_HEADERS=$(printf '{"x-vercel-protection-bypass":"%s","x-vercel-set-bypass-cookie":"true"}' "$BYPASS_TOKEN")
+            CURL_ARGS+=(
+              -H "x-vercel-protection-bypass: $BYPASS_TOKEN"
+              -H "x-vercel-set-bypass-cookie: true"
+            )
+            LHCI_ARGS+=(--settings.extraHeaders="$EXTRA_HEADERS")
           fi
-          lhci collect --url "${{ steps.target.outputs.url }}" --config=.lighthouserc.json $EXTRA_HEADERS
+
+          RESPONSE_BODY=$(curl "${CURL_ARGS[@]}" "${{ steps.target.outputs.url }}")
+          if bash scripts/detect-vercel-protection.sh <<< "$RESPONSE_BODY"; then
+            echo "Preview URL still resolves to Vercel protection/login. Aborting Lighthouse to avoid a false-green report." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          lhci collect "${LHCI_ARGS[@]}"
 
       - name: Generate HTML report
         if: steps.target.outputs.url != ''
