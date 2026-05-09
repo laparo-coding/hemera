@@ -64,29 +64,32 @@ export default async function VorbereitungPage({
 
   return (
     <Box sx={{ maxWidth: 960, mx: 'auto', px: { xs: 2, sm: 3 }, py: 4 }}>
-      <Box
-        component={Link}
+      <Link
         href='/dashboard'
         aria-label='Zurück zum Dashboard'
-        sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 0.5,
-          textDecoration: 'none',
-          color: colors.marsala,
-          fontFamily: typography.body,
-          fontSize: '0.875rem',
-          mb: 2,
-          borderRadius: '4px',
-          '&:focus-visible': {
-            outline: `2px solid ${colors.marsala}`,
-            outlineOffset: '2px',
-          },
-        }}
+        style={{ textDecoration: 'none' }}
       >
-        <ArrowBackOutlined sx={{ fontSize: 18 }} />
-        Zurück zum Dashboard
-      </Box>
+        <Box
+          component='span'
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.5,
+            color: colors.marsala,
+            fontFamily: typography.body,
+            fontSize: '0.875rem',
+            mb: 2,
+            borderRadius: '4px',
+            '&:focus-visible': {
+              outline: `2px solid ${colors.marsala}`,
+              outlineOffset: '2px',
+            },
+          }}
+        >
+          <ArrowBackOutlined sx={{ fontSize: 18 }} />
+          Zurück zum Dashboard
+        </Box>
+      </Link>
 
       <Typography
         component='h1'

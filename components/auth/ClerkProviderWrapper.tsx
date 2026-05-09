@@ -24,9 +24,6 @@ const clerkFallbackTranslations = new Map([
     'Zu viele Anfragen. Bitte versuche es in einem Moment erneut.',
   ],
 ]);
-const clerkFallbackSourceMessages = Array.from(
-  clerkFallbackTranslations.keys()
-);
 
 // Custom German localization with overrides
 const customDeDE = {
@@ -227,14 +224,6 @@ function translateClerkFallbackMessages(root: ParentNode) {
 
     node = walker.nextNode();
   }
-}
-
-function includesClerkFallbackSourceMessage(text: string | null | undefined) {
-  if (!text) {
-    return false;
-  }
-
-  return clerkFallbackSourceMessages.some(message => text.includes(message));
 }
 
 export default function ClerkProviderWrapper({

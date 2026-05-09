@@ -65,7 +65,7 @@ export default function CourseForm({
     watch,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
-    resolver: zodResolver(courseCreateSchema),
+    resolver: zodResolver(courseCreateSchema, undefined, { raw: true }),
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',
