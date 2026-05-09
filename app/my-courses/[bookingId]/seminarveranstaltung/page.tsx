@@ -17,7 +17,10 @@ import { CurriculumSection } from '@/components/course-detail/CurriculumSection'
 import { requireAuthenticatedUser } from '@/lib/auth/helpers';
 import { prisma } from '@/lib/db/prisma';
 import { colors, typography } from '@/lib/design-tokens';
-import { shouldUnlockFutureCourseStepsInDevelopment } from '@/lib/utils/course-step-access';
+import {
+  shouldLockCourseStepsUntilSeminarStart,
+  shouldUnlockFutureCourseStepsInDevelopment,
+} from '@/lib/utils/course-step-access';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -75,6 +78,10 @@ export default async function SeminarveranstaltungPage({
   });
 
   if (!booking) {
+    notFound();
+  }
+
+  if (shouldLockCourseStepsUntilSeminarStart(booking.course.startDate)) {
     notFound();
   }
 

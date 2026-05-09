@@ -17,7 +17,10 @@ import { getResolvedSummaryAssets } from '@/lib/db/courseParticipation';
 import { prisma } from '@/lib/db/prisma';
 import { colors, typography } from '@/lib/design-tokens';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
-import { shouldUnlockFutureCourseStepsInDevelopment } from '@/lib/utils/course-step-access';
+import {
+  shouldLockCourseStepsUntilSeminarStart,
+  shouldUnlockFutureCourseStepsInDevelopment,
+} from '@/lib/utils/course-step-access';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -60,6 +63,10 @@ export default async function NachbereitungPage({
   });
 
   if (!booking) {
+    notFound();
+  }
+
+  if (shouldLockCourseStepsUntilSeminarStart(booking.course.startDate)) {
     notFound();
   }
 
