@@ -17,6 +17,7 @@ import { CurriculumSection } from '@/components/course-detail/CurriculumSection'
 import { requireAuthenticatedUser } from '@/lib/auth/helpers';
 import { prisma } from '@/lib/db/prisma';
 import { colors, typography } from '@/lib/design-tokens';
+import { serverInstance } from '@/lib/monitoring/rollbar-official';
 import {
   shouldLockCourseStepsUntilSeminarStart,
   shouldUnlockFutureCourseStepsInDevelopment,
@@ -81,7 +82,21 @@ export default async function SeminarveranstaltungPage({
     notFound();
   }
 
-  if (shouldLockCourseStepsUntilSeminarStart(booking.course.startDate)) {
+  const shouldLock = shouldLockCourseStepsUntilSeminarStart(
+    booking.course.startDate
+  );
+
+  // Diagnostic logging for seminar access gating
+  serverInstance.debug('Seminarveranstaltung page access attempt', {
+    bookingId,
+    userId: user.id,
+    courseStartDate: booking.course.startDate
+      ? booking.course.startDate.toISOString()
+      : null,
+    shouldLock,
+  });
+
+  if (shouldLock) {
     notFound();
   }
 

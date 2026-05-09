@@ -61,8 +61,32 @@ export function shouldLockCourseStepsUntilSeminarStart(
     return true;
   }
 
-  return (
+  const hasStarted = hasCourseStarted(start, now);
+  const shouldLock =
     !shouldUnlockFutureCourseStepsInDevelopment(start, nodeEnv, now) &&
-    !hasCourseStarted(start, now)
-  );
+    !hasStarted;
+
+  // Diagnostic logging for debugging access gating issues
+  if (process.env.NODE_ENV === 'production' && shouldLock === false) {
+    try {
+      const { serverInstance } = require('@/lib/monitoring/rollbar-official');
+      serverInstance.debug(
+        'Seminar step access: UNLOCKING because course has started or dev preview',
+        {
+          courseStartDate:
+            courseStartDate instanceof Date
+              ? courseStartDate.toISOString()
+              : courseStartDate,
+          now: new Date(now).toISOString(),
+          hasStarted,
+          nodeEnv,
+          shouldLock,
+        }
+      );
+    } catch {
+      // Monitoring unavailable, skip logging
+    }
+  }
+
+  return shouldLock;
 }
