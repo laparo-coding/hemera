@@ -154,7 +154,7 @@ async function reportParticipationActionError(
 ): Promise<void> {
   if (error instanceof BaseError) {
     await retryWithBackoff(() => {
-      return serverInstance.info(`${action} (handled domain error)`, {
+      void serverInstance.info(`${action} (handled domain error)`, {
         ...context,
         errorCode: error.errorCode,
       });
@@ -165,7 +165,7 @@ async function reportParticipationActionError(
   const normalizedError = normalizeParticipationActionError(error);
 
   await retryWithBackoff(() => {
-    return serverInstance.error(action, normalizedError, context);
+    void serverInstance.error(action, normalizedError, context);
   });
 }
 
