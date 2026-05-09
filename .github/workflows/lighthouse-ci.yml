@@ -55,7 +55,8 @@ jobs:
           fi
 
           case "$URL" in
-            https://github.com/*|http://github.com/*|https://api.github.com/*|http://api.github.com/*)
+              https://github.com|http://github.com|https://api.github.com|http://api.github.com|\
+              https://github.com/*|http://github.com/*|https://api.github.com/*|http://api.github.com/*)
               echo "Deployment status URL points to GitHub, not preview site; skipping."
               exit 0
               ;;
