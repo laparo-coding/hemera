@@ -1,6 +1,5 @@
 import type { UserResource } from '@clerk/shared/types';
 import { Box, Tab, Tabs } from '@mui/material';
-import Link from 'next/link';
 
 interface ProtectedNavigationProps {
   'data-testid'?: string;
@@ -57,7 +56,7 @@ export function ProtectedNavigation({
             key={navItem.route}
             label={navItem.label}
             value={navItem.route}
-            component={Link}
+            component='a'
             href={navItem.route}
             sx={{ minHeight: 48 }}
             data-testid={navItem.testId}
