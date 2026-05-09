@@ -210,12 +210,16 @@ function translateClerkFallbackMessages(root: ParentNode) {
   let node = walker.nextNode();
 
   while (node) {
-    const translatedMessage = clerkFallbackTranslations.get(
-      node.textContent?.trim() ?? ''
-    );
+    const originalText = node.textContent ?? '';
+    const trimmedText = originalText.trim();
+    const translatedMessage = clerkFallbackTranslations.get(trimmedText);
 
     if (translatedMessage) {
-      node.textContent = translatedMessage;
+      const whitespaceMatch = originalText.match(/^(\s*)(.*?)(\s*)$/s);
+      const leadingWhitespace = whitespaceMatch?.[1] ?? '';
+      const trailingWhitespace = whitespaceMatch?.[3] ?? '';
+
+      node.textContent = `${leadingWhitespace}${translatedMessage}${trailingWhitespace}`;
     }
 
     node = walker.nextNode();
