@@ -11,6 +11,8 @@ const originalEnvValues = {
   E2E_TEST: process.env.E2E_TEST,
   E2E_ADMIN: process.env.E2E_ADMIN,
   NODE_ENV: process.env.NODE_ENV,
+  VERCEL_ENV: process.env.VERCEL_ENV,
+  VERCEL: process.env.VERCEL,
 };
 
 /**
@@ -30,6 +32,14 @@ function restoreEnv() {
 // Mock Clerk
 jest.mock('@clerk/nextjs/server', () => ({
   currentUser: jest.fn(),
+}));
+
+const mockCookiesGet = jest.fn();
+
+jest.mock('next/headers', () => ({
+  cookies: jest.fn(async () => ({
+    get: mockCookiesGet,
+  })),
 }));
 
 // Mock next/navigation
@@ -58,10 +68,15 @@ const mockRedirect = redirect as jest.MockedFunction<typeof redirect>;
 describe('Auth Helpers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCurrentUser.mockReset();
+    mockCookiesGet.mockReset();
+    mockCookiesGet.mockReturnValue(undefined);
     // Reset environment variables to simulate real auth environment
     delete process.env.DISABLE_CLERK_SERVER_AUTH;
     delete process.env.E2E_TEST;
     delete process.env.E2E_ADMIN;
+    delete process.env.VERCEL_ENV;
+    delete process.env.VERCEL;
     // Keep NODE_ENV as 'test' but that's checked in the isMockAuthEnvironment
   });
 
@@ -146,6 +161,65 @@ describe('Auth Helpers', () => {
       const user = await requireAuth();
 
       expect(user.id).toBe('e2e_mock_user');
+      expect(mockCurrentUser).not.toHaveBeenCalled();
+    });
+
+    it('should honor mock role cookie outside jest-style auth mode when bypass is enabled', async () => {
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
+      process.env.NODE_ENV = 'development';
+      delete process.env.VERCEL_ENV;
+      mockCookiesGet.mockImplementation((name: string) => {
+        if (name === 'hemera-e2e-role') {
+          return { value: 'admin' };
+        }
+
+        return undefined;
+      });
+
+      const result = await isAdmin();
+      const user = await requireAdmin();
+
+      expect(result).toBe(true);
+      expect(user.publicMetadata?.role).toBe('admin');
+      expect(mockCurrentUser).not.toHaveBeenCalled();
+    });
+
+    it('should allow explicit bypass in local preview-mode dev without hosted Vercel runtime', async () => {
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
+      process.env.NODE_ENV = 'development';
+      process.env.VERCEL_ENV = 'preview';
+      delete process.env.VERCEL;
+      mockCookiesGet.mockImplementation((name: string) => {
+        if (name === 'hemera-e2e-role') {
+          return { value: 'admin' };
+        }
+
+        return undefined;
+      });
+
+      const user = await requireAdmin();
+
+      expect(user.publicMetadata?.role).toBe('admin');
+      expect(mockCurrentUser).not.toHaveBeenCalled();
+    });
+
+    it('should ignore the mock role cookie on hosted Vercel preview deployments', async () => {
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
+      process.env.NODE_ENV = 'development';
+      process.env.VERCEL_ENV = 'preview';
+      process.env.VERCEL = '1';
+      mockCookiesGet.mockImplementation((name: string) => {
+        if (name === 'hemera-e2e-role') {
+          return { value: 'admin' };
+        }
+
+        return undefined;
+      });
+
+      const user = await requireAuth();
+
+      expect(user.id).toBe('e2e_mock_user');
+      expect(user.publicMetadata?.role).toBe('user');
       expect(mockCurrentUser).not.toHaveBeenCalled();
     });
   });

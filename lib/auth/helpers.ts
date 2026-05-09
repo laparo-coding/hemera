@@ -20,10 +20,15 @@ function isMockAuthEnvironment(): boolean {
   return process.env.NODE_ENV === 'test' || isJestRunning;
 }
 
+function isHostedVercelRuntime(): boolean {
+  return isEnvFlagEnabled(process.env.VERCEL);
+}
+
 function isProtectedDeploymentEnvironment(): boolean {
   return (
-    process.env.VERCEL_ENV === 'production' ||
-    process.env.VERCEL_ENV === 'preview'
+    isHostedVercelRuntime() &&
+    (process.env.VERCEL_ENV === 'production' ||
+      process.env.VERCEL_ENV === 'preview')
   );
 }
 
@@ -47,7 +52,7 @@ function shouldBypassClerkServerAuth(): boolean {
 }
 
 async function getCookieMockRole(): Promise<'user' | 'admin' | null> {
-  if (!isMockAuthEnvironment() || isProtectedDeploymentEnvironment()) {
+  if (isProtectedDeploymentEnvironment()) {
     return null;
   }
 

@@ -137,18 +137,34 @@ jobs:
               | tee -a "$GITHUB_STEP_SUMMARY"
           fi
 
-          RESPONSE_BODY=$(curl -sSL \
+          RESPONSE_HEADERS_FILE=$(mktemp)
+          RESPONSE_BODY_FILE=$(mktemp)
+          CURL_EXIT=0
+
+          curl -sSL --max-redirs 10 --max-time 30 \
             -H "x-vercel-protection-bypass: $BYPASS_TOKEN" \
             -H "x-vercel-set-bypass-cookie: true" \
-            "$PLAYWRIGHT_BASE_URL/courses")
+            -D "$RESPONSE_HEADERS_FILE" \
+            -o "$RESPONSE_BODY_FILE" \
+            "$PLAYWRIGHT_BASE_URL/courses" || CURL_EXIT=$?
+
+          RESPONSE_SIGNAL=$(cat "$RESPONSE_HEADERS_FILE"; printf '\n'; cat "$RESPONSE_BODY_FILE")
+
+          rm -f "$RESPONSE_HEADERS_FILE" "$RESPONSE_BODY_FILE"
 
           # Trusted markers come from Vercel login/protection pages.
           # Generic phrases like "verify you are human" only count when paired with Vercel-specific markers.
           # Dependabot runs can execute without org secrets, which otherwise creates false red checks.
-          if bash scripts/detect-vercel-protection.sh <<< "$RESPONSE_BODY"; then
+          if bash scripts/detect-vercel-protection.sh <<< "$RESPONSE_SIGNAL"; then
             echo "Preview remains behind Vercel login despite configured bypass; skipping external smoke." \
               | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
+          fi
+
+          if [ "$CURL_EXIT" -ne 0 ]; then
+            echo "Preview probe failed before Playwright start (curl exit $CURL_EXIT)." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit "$CURL_EXIT"
           fi
 
           npx playwright test \
