@@ -55,6 +55,9 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       '& a': {
         color: authForm.textColor,
       },
+      // Clerk renders two footer children: the action link (keep) and a
+      // secondary wrapper (privacy/TOS). Hide the second element regardless
+      // of its DOM position to avoid duplicating footer content on auth pages.
       '& > :nth-of-type(2)': {
         backgroundColor: authForm.cardBackground,
         display: 'none',

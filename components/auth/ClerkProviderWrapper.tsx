@@ -205,17 +205,31 @@ function shouldBypassForRuntimeError(value: unknown): string | null {
     : null;
 }
 
+function includesClerkFallbackSourceMessage(
+  textContent: string | null
+): boolean {
+  if (!textContent) return false;
+  for (const key of clerkFallbackTranslations.keys()) {
+    if (textContent.includes(key)) return true;
+  }
+  return false;
+}
+
 function translateClerkFallbackMessages(root: ParentNode) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let node = walker.nextNode();
 
   while (node) {
-    const translatedMessage = clerkFallbackTranslations.get(
-      node.textContent?.trim() ?? ''
-    );
+    const originalText = node.textContent ?? '';
+    const trimmedText = originalText.trim();
+    const translatedMessage = clerkFallbackTranslations.get(trimmedText);
 
     if (translatedMessage) {
-      node.textContent = translatedMessage;
+      const whitespaceMatch = originalText.match(/^(\s*)(.*?)(\s*)$/s);
+      const leadingWhitespace = whitespaceMatch?.[1] ?? '';
+      const trailingWhitespace = whitespaceMatch?.[3] ?? '';
+
+      node.textContent = `${leadingWhitespace}${translatedMessage}${trailingWhitespace}`;
     }
 
     node = walker.nextNode();
@@ -282,22 +296,35 @@ export default function ClerkProviderWrapper({
       return;
     }
 
-    translateClerkFallbackMessages(document.body);
+    if (includesClerkFallbackSourceMessage(document.body.textContent)) {
+      translateClerkFallbackMessages(document.body);
+    }
 
-    const observer = new MutationObserver(mutations => {
+    const observer = new MutationObserver((mutations: MutationRecord[]) => {
       for (const mutation of mutations) {
-        if (mutation.type === 'characterData' && mutation.target.parentNode) {
+        if (
+          mutation.type === 'characterData' &&
+          mutation.target.parentNode &&
+          includesClerkFallbackSourceMessage(mutation.target.textContent)
+        ) {
           translateClerkFallbackMessages(mutation.target.parentNode);
           continue;
         }
 
         for (const addedNode of mutation.addedNodes) {
-          if (addedNode.nodeType === Node.TEXT_NODE && addedNode.parentNode) {
+          if (
+            addedNode.nodeType === Node.TEXT_NODE &&
+            addedNode.parentNode &&
+            includesClerkFallbackSourceMessage(addedNode.textContent)
+          ) {
             translateClerkFallbackMessages(addedNode.parentNode);
             continue;
           }
 
-          if (addedNode.nodeType === Node.ELEMENT_NODE) {
+          if (
+            addedNode.nodeType === Node.ELEMENT_NODE &&
+            includesClerkFallbackSourceMessage(addedNode.textContent)
+          ) {
             translateClerkFallbackMessages(addedNode as ParentNode);
           }
         }
