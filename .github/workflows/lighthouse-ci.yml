@@ -27,18 +27,6 @@ jobs:
       (github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success')
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-
-      - name: Install Lighthouse CI
-        run: |
-          npm i -g @lhci/cli
-
       - name: Extract preview URL from deployment_status
         if: github.event_name == 'deployment_status'
         run: |
@@ -83,6 +71,21 @@ jobs:
             echo "No URL provided (INPUT_URL/PREVIEW_URL). Skipping Lighthouse."
             echo "url=" >> $GITHUB_OUTPUT
           fi
+
+      - name: Checkout
+        if: steps.target.outputs.url != ''
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        if: steps.target.outputs.url != ''
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install Lighthouse CI
+        if: steps.target.outputs.url != ''
+        run: |
+          npm i -g @lhci/cli
 
       - name: Run Lighthouse CI (collect)
         if: steps.target.outputs.url != ''
