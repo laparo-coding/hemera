@@ -300,7 +300,7 @@ export default function ClerkProviderWrapper({
       translateClerkFallbackMessages(document.body);
     }
 
-    const observer = new MutationObserver(mutations => {
+    const observer = new MutationObserver((mutations: MutationRecord[]) => {
       for (const mutation of mutations) {
         if (
           mutation.type === 'characterData' &&
