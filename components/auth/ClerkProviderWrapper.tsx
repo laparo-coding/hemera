@@ -205,6 +205,16 @@ function shouldBypassForRuntimeError(value: unknown): string | null {
     : null;
 }
 
+function includesClerkFallbackSourceMessage(
+  textContent: string | null
+): boolean {
+  if (!textContent) return false;
+  for (const key of clerkFallbackTranslations.keys()) {
+    if (textContent.includes(key)) return true;
+  }
+  return false;
+}
+
 function translateClerkFallbackMessages(root: ParentNode) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let node = walker.nextNode();
