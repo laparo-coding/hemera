@@ -87,6 +87,8 @@ jobs:
           VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
         run: |
           BYPASS_TOKEN="${VERCEL_AUTOMATION_BYPASS_SECRET:-$VERCEL_PROTECTION_BYPASS}"
+          COOKIE_JAR="$(mktemp)"
+          trap 'rm -f "$COOKIE_JAR"' EXIT
 
           CURL_ARGS=(-sSL)
           LHCI_ARGS=(--url "${{ steps.target.outputs.url }}" --config=.lighthouserc.json)
@@ -99,6 +101,8 @@ jobs:
 
           EXTRA_HEADERS=$(printf '{"x-vercel-protection-bypass":"%s","x-vercel-set-bypass-cookie":"true"}' "$BYPASS_TOKEN")
           CURL_ARGS+=(
+            -c "$COOKIE_JAR"
+            -b "$COOKIE_JAR"
             -H "x-vercel-protection-bypass: $BYPASS_TOKEN"
             -H "x-vercel-set-bypass-cookie: true"
           )
