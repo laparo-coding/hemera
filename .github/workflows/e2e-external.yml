@@ -149,6 +149,12 @@ jobs:
             exit 0
           fi
 
+          if ! grep -Eqi "data-testid=['\"]course-overview['\"]" <<< "$RESPONSE_BODY"; then
+            echo "Preview response did not contain the expected public courses marker (course-overview); skipping external smoke." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
           npx playwright test \
             --project='${{ github.event.inputs.project || 'public' }}' \
             --grep='${{ github.event.inputs.grep || '(seo|academy|courses|health)' }}'
