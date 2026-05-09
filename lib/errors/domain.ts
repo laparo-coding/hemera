@@ -77,7 +77,7 @@ export class InvalidBookingStatusError extends ValidationError {
 
   constructor(currentStatus: string, attemptedStatus: string) {
     super(
-      `Cannot change booking status from ${currentStatus} to ${attemptedStatus}`,
+      `Du kannst den Buchungsstatus nicht von ${currentStatus} zu ${attemptedStatus} andern`,
       {
         currentStatus,
         attemptedStatus,
@@ -126,16 +126,26 @@ export class StripeConfigurationError extends InfrastructureError {
 }
 
 // ===== AUTH ERRORS =====
+interface RequestScopedErrorOptions {
+  message?: string;
+  requestId?: string;
+  identifier?: string;
+  lookupField?: 'bookingId' | 'id';
+  bookingId?: string;
+}
+
 export class UnauthorizedError extends AuthError {
   readonly errorCode = 'UNAUTHORIZED';
 
-  constructor(resource?: string, message?: string) {
+  constructor(resource?: string, message?: string, requestId?: string) {
     super(
-      message ??
-        (resource
-          ? `Unauthorized access to ${resource}`
-          : 'Unauthorized access'),
-      resource ? { resource } : undefined
+      message ?? 'Zugriff nicht autorisiert',
+      resource || requestId
+        ? {
+            ...(resource ? { resource } : {}),
+            ...(requestId ? { requestId } : {}),
+          }
+        : undefined
     );
   }
 }
@@ -144,26 +154,68 @@ export class ParticipationNotFoundError extends BusinessError {
   readonly errorCode = 'PARTICIPATION_NOT_FOUND';
   override readonly statusCode = 404;
 
+  constructor(options?: RequestScopedErrorOptions);
   constructor(
-    identifier: string,
-    lookupField: 'bookingId' | 'id' = 'bookingId',
-    message = 'Teilnahme nicht gefunden'
+    _identifier: string,
+    requestedLookupField?: 'bookingId' | 'id',
+    message?: string
+  );
+  constructor(
+    optionsOrIdentifier: RequestScopedErrorOptions | string = {},
+    requestedLookupField?: 'bookingId' | 'id',
+    message?: string
   ) {
-    super(message, {
-      identifier,
-      lookupField,
-    });
+    const identifier =
+      typeof optionsOrIdentifier === 'string'
+        ? optionsOrIdentifier
+        : optionsOrIdentifier.identifier;
+    const lookupField =
+      typeof optionsOrIdentifier === 'string'
+        ? (requestedLookupField ?? 'bookingId')
+        : optionsOrIdentifier.lookupField;
+    const options =
+      typeof optionsOrIdentifier === 'string'
+        ? { message }
+        : optionsOrIdentifier;
+
+    super(
+      options.message ?? 'Teilnahme nicht gefunden',
+      options.requestId || identifier || lookupField
+        ? {
+            ...(options.requestId ? { requestId: options.requestId } : {}),
+            ...(identifier ? { identifier } : {}),
+            ...(lookupField ? { lookupField } : {}),
+          }
+        : undefined
+    );
   }
 }
 
 export class ParticipationCreationError extends InfrastructureError {
   readonly errorCode = 'PARTICIPATION_CREATION_FAILED';
 
+  constructor(options?: RequestScopedErrorOptions);
+  constructor(_bookingId: string, message?: string);
   constructor(
-    bookingId: string,
-    message = 'Teilnahme konnte nicht erstellt werden'
+    optionsOrBookingId: RequestScopedErrorOptions | string = {},
+    message?: string
   ) {
-    super(message, { bookingId });
+    const bookingId =
+      typeof optionsOrBookingId === 'string'
+        ? optionsOrBookingId
+        : optionsOrBookingId.bookingId;
+    const options =
+      typeof optionsOrBookingId === 'string' ? { message } : optionsOrBookingId;
+
+    super(
+      options.message ?? 'Teilnahme konnte nicht erstellt werden',
+      options.requestId || bookingId
+        ? {
+            ...(options.requestId ? { requestId: options.requestId } : {}),
+            ...(bookingId ? { bookingId } : {}),
+          }
+        : undefined
+    );
   }
 }
 

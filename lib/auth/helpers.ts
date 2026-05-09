@@ -20,10 +20,22 @@ function isMockAuthEnvironment(): boolean {
   return process.env.NODE_ENV === 'test' || isJestRunning;
 }
 
+function isHostedVercelRuntime(): boolean {
+  return isEnvFlagEnabled(process.env.VERCEL);
+}
+
 function isProtectedDeploymentEnvironment(): boolean {
   return (
-    process.env.VERCEL_ENV === 'production' ||
-    process.env.VERCEL_ENV === 'preview'
+    isHostedVercelRuntime() &&
+    (process.env.VERCEL_ENV === 'production' ||
+      process.env.VERCEL_ENV === 'preview')
+  );
+}
+
+function hasExplicitServerAuthBypass(): boolean {
+  return (
+    isEnvFlagEnabled(process.env.E2E_TEST) ||
+    isEnvFlagEnabled(process.env.DISABLE_CLERK_SERVER_AUTH)
   );
 }
 
@@ -32,14 +44,15 @@ function shouldBypassClerkServerAuth(): boolean {
     return false;
   }
 
-  return (
-    isEnvFlagEnabled(process.env.E2E_TEST) ||
-    isEnvFlagEnabled(process.env.DISABLE_CLERK_SERVER_AUTH)
-  );
+  if (hasExplicitServerAuthBypass()) {
+    return true;
+  }
+
+  return false;
 }
 
 async function getCookieMockRole(): Promise<'user' | 'admin' | null> {
-  if (isProtectedDeploymentEnvironment() && !isMockAuthEnvironment()) {
+  if (isProtectedDeploymentEnvironment()) {
     return null;
   }
 
@@ -64,7 +77,7 @@ async function getMockAuthRole(): Promise<'user' | 'admin' | null> {
       return process.env.E2E_ADMIN === '1' ? 'admin' : 'user';
     }
 
-    return 'user';
+    return process.env.E2E_ADMIN === '1' ? 'admin' : 'user';
   }
 
   if (isMockAuthEnvironment()) {

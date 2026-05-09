@@ -122,34 +122,58 @@ jobs:
           PLAYWRIGHT_BASE_URL: ${{ steps.resolve.outputs.base_url }}
           # disable creating test users in external previews
           E2E_CREATE_USERS: 'false'
-          # Optional: provide a Vercel Protection Bypass token to run against SSO-protected previews.
-          # Prefer the shared automation secret already used by Lighthouse, but keep the older
-          # repo/org secret name as a fallback for backwards compatibility.
-          VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET || secrets.VERCEL_PROTECTION_BYPASS }}
+          # Accept both the shared automation secret and the legacy fallback.
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
           # SSO tolerant mode: tests should only hit public pages by default via grep
           PLAYWRIGHT_SSO_TOLERANT: '1'
           NODE_ENV: test
           NEXT_TELEMETRY_DISABLED: '1'
         run: |
-          if [ -z "$VERCEL_PROTECTION_BYPASS" ]; then
+          BYPASS_TOKEN="${VERCEL_AUTOMATION_BYPASS_SECRET:-$VERCEL_PROTECTION_BYPASS}"
+
+          if [ -z "$BYPASS_TOKEN" ]; then
             echo "No Vercel bypass token available for this run. Probing preview in SSO-tolerant mode." \
               | tee -a "$GITHUB_STEP_SUMMARY"
           fi
 
-          RESPONSE_BODY=$(curl -sSL \
-            -H "x-vercel-protection-bypass: $VERCEL_PROTECTION_BYPASS" \
-            -H "x-vercel-set-bypass-cookie: true" \
-            "$PLAYWRIGHT_BASE_URL/courses")
+          RESPONSE_HEADERS_FILE=$(mktemp)
+          RESPONSE_BODY_FILE=$(mktemp)
+          CURL_EXIT=0
 
-          # Detect common Vercel protection/login responses and skip gracefully.
+          curl -sSL --max-redirs 10 --max-time 30 \
+            -H "x-vercel-protection-bypass: $BYPASS_TOKEN" \
+            -H "x-vercel-set-bypass-cookie: true" \
+            -D "$RESPONSE_HEADERS_FILE" \
+            -o "$RESPONSE_BODY_FILE" \
+            "$PLAYWRIGHT_BASE_URL/courses" || CURL_EXIT=$?
+
+          RESPONSE_SIGNAL=$(cat "$RESPONSE_HEADERS_FILE"; printf '\n'; cat "$RESPONSE_BODY_FILE")
+
+          rm -f "$RESPONSE_HEADERS_FILE" "$RESPONSE_BODY_FILE"
+
+          # Trusted markers come from Vercel login/protection pages.
+          # Generic phrases like "verify you are human" only count when paired with Vercel-specific markers.
           # Dependabot runs can execute without org secrets, which otherwise creates false red checks.
-          if grep -Eqi '(vercel\.com/(login|sso-api)|protected by vercel|security checkpoint|verify you are human)' <<< "$RESPONSE_BODY"; then
+          if bash scripts/detect-vercel-protection.sh <<< "$RESPONSE_SIGNAL"; then
             echo "Preview remains behind Vercel login despite configured bypass; skipping external smoke." \
               | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
-          if ! grep -Eqi "data-testid=['\"]course-overview['\"]" <<< "$RESPONSE_BODY"; then
+          if [ "$CURL_EXIT" -eq 47 ] && [ "$PLAYWRIGHT_SSO_TOLERANT" = '1' ]; then
+            echo "Preview probe hit redirect loop (curl exit 47), likely due to Vercel protection or SSO. Skipping external smoke." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "$CURL_EXIT" -ne 0 ]; then
+            echo "Preview probe failed before Playwright start (curl exit $CURL_EXIT)." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit "$CURL_EXIT"
+          fi
+
+          if ! grep -Eqi "data-testid=['\"]course-overview['\"]" <<< "$RESPONSE_SIGNAL"; then
             echo "Preview response did not contain the expected public courses marker (course-overview); skipping external smoke." \
               | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0

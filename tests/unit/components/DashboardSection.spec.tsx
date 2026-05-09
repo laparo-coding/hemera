@@ -5,35 +5,10 @@
  */
 
 import { describe, expect, it } from '@jest/globals';
-import { TERMS } from '../../../lib/constants/terminology';
-
-// Types for the DashboardSection component props
-interface DashboardSectionProps {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-  isEmpty?: boolean;
-  emptyMessage?: string;
-}
-
-// Section visibility logic
-const shouldShowSection = (
-  isEmpty: boolean,
-  hideWhenEmpty: boolean = true
-): boolean => {
-  if (isEmpty && hideWhenEmpty) {
-    return false;
-  }
-  return true;
-};
-
-// Section titles (German localization) - use TERMS for consistency
-const SECTION_TITLES = {
-  NEXT_SEMINAR: `Nächstes ${TERMS.course}`,
-  UPCOMING: `Weitere gebuchte ${TERMS.courses}`,
-  COMPLETED: `Absolvierte ${TERMS.courses}`,
-  NO_SHOW: `${TERMS.courses} ohne Teilnahme`,
-} as const;
+import {
+  SECTION_TITLES,
+  shouldShowSection,
+} from '@/components/dashboard/DashboardSection';
 
 describe('DashboardSection Component', () => {
   describe('Section visibility', () => {

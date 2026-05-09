@@ -64,6 +64,8 @@ jobs:
 
       - name: Determine target URL
         id: target
+        env:
+          INPUT_URL: ${{ github.event.inputs.url }}
         run: |
           # Preferred: workflow_dispatch input is available as env var INPUT_URL
           if [ -n "$INPUT_URL" ]; then
@@ -78,35 +80,73 @@ jobs:
 
       - name: Run Lighthouse CI (collect)
         if: steps.target.outputs.url != ''
+        id: collect
         env:
           LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
+          # Accept both the preferred shared secret name and the legacy fallback.
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
         run: |
-          # Add Vercel protection bypass header if secret is available
-          EXTRA_HEADERS=""
-          if [ -n "${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" ]; then
-            EXTRA_HEADERS="--extra-headers.x-vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}"
+          BYPASS_TOKEN="${VERCEL_AUTOMATION_BYPASS_SECRET:-$VERCEL_PROTECTION_BYPASS}"
+          COOKIE_JAR="$(mktemp)"
+          trap 'rm -f "$COOKIE_JAR"' EXIT
+
+          CURL_ARGS=(-sSL --max-time 30 --fail-with-body)
+          LHCI_ARGS=(--url "${{ steps.target.outputs.url }}" --config=.lighthouserc.json)
+
+          if [ -z "$BYPASS_TOKEN" ]; then
+            echo "Missing Vercel preview bypass secret. Configure VERCEL_AUTOMATION_BYPASS_SECRET or VERCEL_PROTECTION_BYPASS in GitHub Actions secrets." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "skip_vercel_preview=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
-          lhci collect --url "${{ steps.target.outputs.url }}" --config=.lighthouserc.json $EXTRA_HEADERS
+
+          echo "skip_vercel_preview=false" >> "$GITHUB_OUTPUT"
+
+          EXTRA_HEADERS=$(jq -cn --arg token "$BYPASS_TOKEN" '{
+            "x-vercel-protection-bypass": $token,
+            "x-vercel-set-bypass-cookie": "true"
+          }')
+          CURL_ARGS+=(
+            -c "$COOKIE_JAR"
+            -b "$COOKIE_JAR"
+            -H "x-vercel-protection-bypass: $BYPASS_TOKEN"
+            -H "x-vercel-set-bypass-cookie: true"
+          )
+          LHCI_ARGS+=(--settings.extraHeaders="$EXTRA_HEADERS")
+
+          if ! RESPONSE_BODY=$(curl "${CURL_ARGS[@]}" "${{ steps.target.outputs.url }}"); then
+            echo "Failed to fetch preview URL with bypass headers. Check URL and bypass secret." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          if bash scripts/detect-vercel-protection.sh <<< "$RESPONSE_BODY"; then
+            echo "Preview URL still resolves to Vercel protection/login. Aborting Lighthouse to avoid a false-green report." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          lhci collect "${LHCI_ARGS[@]}"
 
       - name: Generate HTML report
-        if: steps.target.outputs.url != ''
+        if: steps.target.outputs.url != '' && steps.collect.outputs.skip_vercel_preview != 'true'
         run: |
           lhci upload --target=filesystem --outputDir=./lhci-report
 
       - name: Upload Lighthouse report artifact
-        if: always() && steps.target.outputs.url != ''
+        if: always() && steps.target.outputs.url != '' && steps.collect.outputs.skip_vercel_preview != 'true'
         uses: actions/upload-artifact@v7
         with:
           name: lighthouse-report
           path: ./lhci-report
 
       - name: Assert thresholds
-        if: steps.target.outputs.url != ''
+        if: steps.target.outputs.url != '' && steps.collect.outputs.skip_vercel_preview != 'true'
         run: |
           lhci assert --config=.lighthouserc.json
 
       - name: Summarize Lighthouse results
-        if: always() && steps.target.outputs.url != ''
+        if: always() && steps.target.outputs.url != '' && steps.collect.outputs.skip_vercel_preview != 'true'
         id: summarize
         uses: actions/github-script@v9
         with:
@@ -134,6 +174,15 @@ jobs:
               const bp = pct(c['best-practices'] ?? c["best-practices"]);
               const seo = pct(c.seo);
               const url = lhr.requestedUrl;
+              const notes = [];
+              const crawlabilitySources = lhr.audits['is-crawlable']?.details?.items ?? [];
+              if (crawlabilitySources.some(item => item.source === 'x-robots-tag: noindex')) {
+                notes.push('SEO includes preview noindex from x-robots-tag.');
+              }
+              const consoleItems = lhr.audits['errors-in-console']?.details?.items ?? [];
+              if (consoleItems.some(item => String(item.description ?? '').includes('x-vercel-protection-bypass'))) {
+                notes.push('Best-Practices includes preview bypass header CORS noise.');
+              }
               const md = `\n## Lighthouse Summary\n\nURL: ${url}\nScores: Performance ${perf} | Accessibility ${acc} | Best-Practices ${bp} | SEO ${seo}\n`;
               await core.summary.addRaw(md).write();
               const body = [
@@ -144,6 +193,7 @@ jobs:
                 `- Accessibility: ${acc}`,
                 `- Best-Practices: ${bp}`,
                 `- SEO: ${seo}`,
+                ...(notes.length ? ['', `Notes:`, ...notes.map(note => `- ${note}`)] : []),
                 ``,
                 `Artifacts: download the 'lighthouse-report' artifact from this workflow run for the full HTML report.`,
               ].join('\n');
@@ -162,10 +212,7 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
-            if (context.eventName === 'pull_request') {
-              core.setOutput('number', context.payload.pull_request.number.toString());
-            } else if (context.eventName === 'deployment_status') {
-              const sha = context.payload.deployment?.sha;
+            async function resolveBySha(sha) {
               if (!sha) return;
               const { owner, repo } = context.repo;
               const res = await github.rest.repos.listPullRequestsAssociatedWithCommit({ owner, repo, commit_sha: sha });
@@ -173,6 +220,14 @@ jobs:
                 const pr = res.data.find(p => p.state === 'open') || res.data[0];
                 core.setOutput('number', pr.number.toString());
               }
+            }
+
+            if (context.eventName === 'pull_request') {
+              core.setOutput('number', context.payload.pull_request.number.toString());
+            } else if (context.eventName === 'deployment_status') {
+              await resolveBySha(context.payload.deployment?.sha);
+            } else if (context.eventName === 'workflow_dispatch') {
+              await resolveBySha(context.sha);
             }
 
       - name: Post sticky PR comment with Lighthouse summary

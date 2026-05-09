@@ -6,7 +6,7 @@
  */
 
 import { ArrowBackOutlined } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
+import { Alert, Box, Typography } from '@mui/material';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -18,6 +18,7 @@ import { loadNegotiationResult } from '@/lib/db/courseParticipation';
 import { prisma } from '@/lib/db/prisma';
 import { colors, typography } from '@/lib/design-tokens';
 import { isNegotiationPartner } from '@/lib/types/participation';
+import { shouldUnlockFutureCourseStepsInDevelopment } from '@/lib/utils/course-step-access';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -46,6 +47,7 @@ export default async function VerhandlungsergebnisPage({
       id: true,
       course: {
         select: {
+          startDate: true,
           title: true,
         },
       },
@@ -66,6 +68,9 @@ export default async function VerhandlungsergebnisPage({
     : null;
 
   const courseTitle = booking.course.title;
+  const isDevelopmentPreview = shouldUnlockFutureCourseStepsInDevelopment(
+    booking.course.startDate
+  );
 
   const initialValues: NegotiationResultFormProps['initialValues'] =
     existingResult
@@ -130,6 +135,13 @@ export default async function VerhandlungsergebnisPage({
       >
         {courseTitle}
       </Typography>
+
+      {isDevelopmentPreview && (
+        <Alert severity='info' sx={{ borderRadius: '8px', mb: 3 }}>
+          Entwicklungsmodus: Dieser Schritt ist vor Seminarbeginn nur lokal zur
+          Vorschau freigeschaltet.
+        </Alert>
+      )}
 
       <NegotiationResultForm
         bookingId={bookingId}

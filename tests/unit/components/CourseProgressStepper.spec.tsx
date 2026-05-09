@@ -32,6 +32,9 @@ jest.mock('@mui/material/styles', () => {
   return {
     ...actual,
     useTheme: () => ({
+      breakpoints: {
+        down: () => '@media (max-width:599.95px)',
+      },
       palette: {
         primary: { main: '#884143' },
         text: { secondary: '#666', disabled: '#999' },

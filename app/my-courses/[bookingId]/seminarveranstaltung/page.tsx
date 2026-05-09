@@ -7,7 +7,7 @@
  */
 
 import { ArrowBackOutlined } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
+import { Alert, Box, Typography } from '@mui/material';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -17,6 +17,7 @@ import { CurriculumSection } from '@/components/course-detail/CurriculumSection'
 import { requireAuthenticatedUser } from '@/lib/auth/helpers';
 import { prisma } from '@/lib/db/prisma';
 import { colors, typography } from '@/lib/design-tokens';
+import { shouldUnlockFutureCourseStepsInDevelopment } from '@/lib/utils/course-step-access';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -65,6 +66,7 @@ export default async function SeminarveranstaltungPage({
     select: {
       course: {
         select: {
+          startDate: true,
           title: true,
           curriculum: true,
         },
@@ -78,6 +80,9 @@ export default async function SeminarveranstaltungPage({
 
   const courseTitle = booking.course.title;
   const modules = parseCurriculumModules(booking.course.curriculum);
+  const isDevelopmentPreview = shouldUnlockFutureCourseStepsInDevelopment(
+    booking.course.startDate
+  );
 
   return (
     <Box sx={{ maxWidth: 960, mx: 'auto', px: { xs: 2, sm: 3 }, py: 4 }}>
@@ -129,6 +134,12 @@ export default async function SeminarveranstaltungPage({
       >
         {courseTitle}
       </Typography>
+
+      {isDevelopmentPreview && (
+        <Alert severity='info' sx={{ borderRadius: '8px', mb: 3 }}>
+          Entwicklungsmodus: Vorschau nur lokal verfugbar.
+        </Alert>
+      )}
 
       {modules.length > 0 ? (
         <CurriculumSection modules={modules} />

@@ -328,6 +328,7 @@ export default async function UserCourseDetailPage({ params }: PageProps) {
         <PreparationSection
           bookingId={booking.id}
           hasParticipation={hasParticipation}
+          paymentStatus={booking.paymentStatus}
         />
       )}
 
