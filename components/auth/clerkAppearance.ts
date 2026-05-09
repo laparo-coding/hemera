@@ -25,14 +25,20 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
     cardBox: {
       width: '100%',
       maxWidth: `${authForm.cardMaxWidth}px`,
+      padding: '0 16px',
     },
     card: {
-      boxShadow: 'none',
-      border: 'none',
+      boxShadow: authForm.cardShadow,
+      border: `1px solid ${authForm.inputBorderColor}`,
+      borderRadius: '12px',
+      padding: '32px 28px',
     },
     footer: {
       backgroundColor: authForm.cardBackground,
       color: authForm.textColor,
+      borderTop: `1px solid ${authForm.footerBorderColor}`,
+      marginTop: '24px',
+      paddingTop: '24px',
       '& p': {
         color: authForm.subtleTextColor,
       },
@@ -45,12 +51,14 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
     },
     footerActionText: {
       color: authForm.subtleTextColor,
+      fontSize: '0.95rem',
     },
     identityPreviewText: {
       color: authForm.textColor,
     },
     identityPreviewEditButton: {
       color: authForm.textColor,
+      fontWeight: 600,
       '&:hover': {
         color: colors.bronze,
       },
@@ -59,6 +67,8 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       fontFamily: '"Playfair Display", serif',
       color: authForm.textColor,
       fontSize: '1.75rem',
+      fontWeight: 700,
+      marginBottom: '8px',
     },
     headerSubtitle: {
       display: 'none',
@@ -67,6 +77,13 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       backgroundColor: buttonStyles.bronzeFilled.backgroundColor,
       color: buttonStyles.bronzeFilled.textColor,
       fontWeight: 600,
+      fontSize: '1rem',
+      fontFamily: '"Inter", sans-serif',
+      textTransform: 'none',
+      padding: '12px 24px',
+      minHeight: '48px',
+      borderRadius: '8px',
+      transition: 'all 0.2s ease-in-out',
       '&:hover': {
         backgroundColor: buttonStyles.bronzeFilled.hoverBackgroundColor,
       },
@@ -78,6 +95,10 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
     },
     formFieldInput: {
       borderRadius: authForm.inputBorderRadius,
+      fontSize: '1rem',
+      fontFamily: '"Inter", sans-serif',
+      minHeight: '48px',
+      padding: '12px 16px',
       // Clerk injects highly specific input selectors across multiple wrappers.
       // Keep forced overrides until cross-browser checks prove a narrower rule.
       border: `1px solid ${authForm.inputBorderColor} !important`,
@@ -90,6 +111,7 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       boxShadow: `0 0 0 1px ${authForm.inputBorderColor} !important`,
       WebkitBoxShadow: `0 0 0 1px ${authForm.inputBorderColor} !important`,
       outline: 'none',
+      transition: 'all 0.2s ease-in-out',
       '&::placeholder': {
         color: authForm.subtleTextColor,
         WebkitTextFillColor: authForm.subtleTextColor,
@@ -99,12 +121,15 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       // auth views and both focus states need the same override.
       '&:is(:focus, :focus-within)': {
         border: `1px solid ${authForm.inputBorderColorFocus} !important`,
-        boxShadow: `0 0 0 1px ${authForm.inputBorderColorFocus} !important`,
-        WebkitBoxShadow: `0 0 0 1px ${authForm.inputBorderColorFocus} !important`,
+        boxShadow: `0 0 0 2px rgba(136, 65, 67, 0.1) !important`,
+        WebkitBoxShadow: `0 0 0 2px rgba(136, 65, 67, 0.1) !important`,
       },
     },
     formFieldLabel: {
       color: authForm.textColor,
+      fontWeight: 600,
+      fontSize: '0.95rem',
+      fontFamily: '"Inter", sans-serif',
     },
     formFieldInputShowPasswordButton: {
       color: authForm.textColor,
@@ -122,6 +147,12 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       color: authForm.textColor,
       justifyContent: 'flex-start',
       gap: '0.75rem',
+      minHeight: '48px',
+      padding: '12px 16px',
+      fontSize: '1rem',
+      fontWeight: 500,
+      fontFamily: '"Inter", sans-serif',
+      transition: 'all 0.2s ease-in-out',
       '&:hover': {
         borderColor: colors.marsala,
         backgroundColor: colors.sageLight,
@@ -131,7 +162,9 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       borderColor: authForm.inputBorderColor,
       backgroundColor: authForm.socialButtonBackground,
       color: authForm.textColor,
-      minHeight: '4rem',
+      minHeight: '48px',
+      padding: '12px 16px',
+      transition: 'all 0.2s ease-in-out',
       '&:hover': {
         borderColor: colors.marsala,
         backgroundColor: colors.sageLight,
@@ -165,12 +198,14 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       color: authForm.textColor,
       fontWeight: 600,
       textAlign: 'left',
+      fontSize: '1rem',
     },
     dividerLine: {
       backgroundColor: authForm.inputBorderColor,
     },
     dividerText: {
       color: authForm.textColor,
+      fontSize: '0.95rem',
     },
   },
 };
