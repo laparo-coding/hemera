@@ -91,7 +91,9 @@ describe('CourseForm', () => {
     expect(priceInput).toHaveValue(300);
 
     // Submit the form
-    fireEvent.submit(screen.getByRole('button', { name: /speichern/i }).closest('form')!);
+    const form = screen.getByRole('button', { name: /speichern/i }).closest('form');
+    if (!form) throw new Error('Form element not found');
+    fireEvent.submit(form);
 
     await waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
 

@@ -81,9 +81,9 @@ describe('EditCourseForm', () => {
     expect(priceInput).toHaveValue(300);
 
     // Submit the form
-    fireEvent.submit(
-      screen.getByRole('button', { name: /aktualisieren/i }).closest('form')!
-    );
+    const form = screen.getByRole('button', { name: /aktualisieren/i }).closest('form');
+    if (!form) throw new Error('Form element not found');
+    fireEvent.submit(form);
 
     await waitFor(() => expect(mockUpdateCourseAction).toHaveBeenCalled());
 
@@ -104,9 +104,9 @@ describe('EditCourseForm', () => {
 
     render(<EditCourseForm course={baseCourse} locations={[]} />);
 
-    fireEvent.submit(
-      screen.getByRole('button', { name: /aktualisieren/i }).closest('form')!
-    );
+    const form2 = screen.getByRole('button', { name: /aktualisieren/i }).closest('form');
+    if (!form2) throw new Error('Form element not found');
+    fireEvent.submit(form2);
 
     await waitFor(() =>
       expect(
