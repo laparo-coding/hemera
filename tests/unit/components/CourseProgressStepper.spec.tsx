@@ -46,6 +46,7 @@ jest.mock('@mui/material/styles', () => {
 import CourseProgressStepper from '@/components/dashboard/CourseProgressStepper';
 
 const BOOKING_ID = 'booking-123';
+const FUTURE_COURSE_START_DATE = '2099-06-15T12:00:00.000Z';
 
 function formatTimelineDate(date: Date): string {
   return date.toLocaleDateString('de-DE', {
@@ -108,7 +109,7 @@ describe('CourseProgressStepper', () => {
     expect(completedIcons).toHaveLength(4);
   });
 
-  it('all steps are clickable links', () => {
+  it('all steps are clickable links when seminar date is unlocked', () => {
     render(
       <CourseProgressStepper
         bookingId={BOOKING_ID}
@@ -118,6 +119,40 @@ describe('CourseProgressStepper', () => {
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(4);
+  });
+
+  it('locks steps after preparation before seminar start in production-like environments', () => {
+    render(
+      <CourseProgressStepper
+        bookingId={BOOKING_ID}
+        participationStatus="PREPARATION"
+        courseStartDate={FUTURE_COURSE_START_DATE}
+      />,
+    );
+
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(1);
+
+    expect(screen.getByText('Seminarveranstaltung').closest('a')).toBeNull();
+    expect(screen.getByText('Nachbereitung Seminar').closest('a')).toBeNull();
+    expect(screen.getByText('Verhandlungsergebnis').closest('a')).toBeNull();
+  });
+
+  it('keeps later steps clickable in development before seminar start', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+
+    render(
+      <CourseProgressStepper
+        bookingId={BOOKING_ID}
+        participationStatus="PREPARATION"
+        courseStartDate={FUTURE_COURSE_START_DATE}
+      />,
+    );
+
+    expect(screen.getAllByRole('link')).toHaveLength(4);
+
+    process.env.NODE_ENV = originalNodeEnv;
   });
 
   it('vorbereitung step links to correct URL', () => {

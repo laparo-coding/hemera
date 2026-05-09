@@ -18,7 +18,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Link from 'next/link';
 import { colors, typography } from '@/lib/design-tokens';
 import type { ParticipationStatus } from '@/lib/types/participation';
-import { shouldUnlockFutureCourseStepsInDevelopment } from '@/lib/utils/course-step-access';
+import {
+  shouldLockCourseStepsUntilSeminarStart,
+  shouldUnlockFutureCourseStepsInDevelopment,
+} from '@/lib/utils/course-step-access';
 
 export type { ParticipationStatus } from '@/lib/types/participation';
 
@@ -197,6 +200,8 @@ export default function CourseProgressStepper({
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const unlockFutureSteps =
     shouldUnlockFutureCourseStepsInDevelopment(courseStartDate);
+  const shouldLockFutureSteps =
+    shouldLockCourseStepsUntilSeminarStart(courseStartDate);
   const stepStates = DASHBOARD_STEPS.map(step =>
     getStepState(step, participationStatus)
   );
@@ -269,6 +274,79 @@ export default function CourseProgressStepper({
             unlockFutureSteps &&
             step.key !== 'VORBEREITUNG' &&
             state === 'available';
+          const isLockedUntilSeminarStart =
+            shouldLockFutureSteps && step.key !== 'VORBEREITUNG';
+
+          const label = (
+            <StepLabel
+              StepIconComponent={props => (
+                <NumberedStepIcon {...props} unlocked={isDevUnlocked} />
+              )}
+              sx={{
+                cursor: isLockedUntilSeminarStart ? 'default' : 'pointer',
+                '& .MuiStepLabel-labelContainer': {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  minHeight: 52,
+                },
+                '& .MuiStepLabel-label': {
+                  display: 'block',
+                  fontFamily: typography.body,
+                  fontSize: '1rem',
+                  fontWeight: 400,
+                  whiteSpace: { xs: 'normal', md: 'nowrap' },
+                  overflowWrap: 'anywhere',
+                  color:
+                    state === 'active'
+                      ? colors.marsala
+                      : state === 'completed'
+                        ? colors.statusHealthy
+                        : isDevUnlocked
+                          ? colors.marsala
+                          : colors.lightBlack,
+                  mt: 0.5,
+                  lineHeight: 1.2,
+                  textAlign: 'center',
+                },
+                '& .MuiStepLabel-label.MuiStepLabel-alternativeLabel': {
+                  marginTop: ALTERNATIVE_LABEL_MARGIN_TOP,
+                },
+                '& .MuiStepLabel-label.Mui-active': {
+                  color: colors.marsala,
+                  fontWeight: 400,
+                  mt: 0.5,
+                },
+                '& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel':
+                  {
+                    marginTop: ALTERNATIVE_LABEL_MARGIN_TOP,
+                  },
+                '& .MuiStepLabel-label.Mui-completed': {
+                  color: colors.statusHealthy,
+                  fontWeight: 400,
+                },
+                '& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel':
+                  {
+                    marginTop: ALTERNATIVE_LABEL_MARGIN_TOP,
+                  },
+              }}
+            >
+              {step.label}
+              <Typography
+                sx={{
+                  fontFamily: typography.body,
+                  fontSize: '0.85rem',
+                  color: colors.lightBlack,
+                  opacity: 0.6,
+                  mt: 0.25,
+                  lineHeight: 1.2,
+                }}
+              >
+                {timelineDate ?? step.timelineLabel}
+              </Typography>
+            </StepLabel>
+          );
 
           return (
             <Step
@@ -276,85 +354,32 @@ export default function CourseProgressStepper({
               completed={state === 'completed'}
               active={state === 'active'}
             >
-              <Link
-                href={href}
-                style={{
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  display: isMobile ? 'block' : 'inline',
-                  width: isMobile ? '100%' : 'auto',
-                }}
-                aria-label={`${step.label} – ${timelineDate ?? step.timelineLabel}`}
-              >
-                <StepLabel
-                  StepIconComponent={props => (
-                    <NumberedStepIcon {...props} unlocked={isDevUnlocked} />
-                  )}
+              {isLockedUntilSeminarStart ? (
+                <Box
+                  aria-disabled='true'
                   sx={{
-                    cursor: 'pointer',
-                    '& .MuiStepLabel-labelContainer': {
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
-                      minHeight: 52,
-                    },
-                    '& .MuiStepLabel-label': {
-                      display: 'block',
-                      fontFamily: typography.body,
-                      fontSize: '1rem',
-                      fontWeight: 400,
-                      whiteSpace: { xs: 'normal', md: 'nowrap' },
-                      overflowWrap: 'anywhere',
-                      color:
-                        state === 'active'
-                          ? colors.marsala
-                          : state === 'completed'
-                            ? colors.statusHealthy
-                            : isDevUnlocked
-                              ? colors.marsala
-                              : colors.lightBlack,
-                      mt: 0.5,
-                      lineHeight: 1.2,
-                      textAlign: 'center',
-                    },
-                    '& .MuiStepLabel-label.MuiStepLabel-alternativeLabel': {
-                      marginTop: ALTERNATIVE_LABEL_MARGIN_TOP,
-                    },
-                    '& .MuiStepLabel-label.Mui-active': {
-                      color: colors.marsala,
-                      fontWeight: 400,
-                      mt: 0.5,
-                    },
-                    '& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel':
-                      {
-                        marginTop: ALTERNATIVE_LABEL_MARGIN_TOP,
-                      },
-                    '& .MuiStepLabel-label.Mui-completed': {
-                      color: colors.statusHealthy,
-                      fontWeight: 400,
-                    },
-                    '& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel':
-                      {
-                        marginTop: ALTERNATIVE_LABEL_MARGIN_TOP,
-                      },
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    display: isMobile ? 'block' : 'inline',
+                    width: isMobile ? '100%' : 'auto',
                   }}
                 >
-                  {step.label}
-                  <Typography
-                    sx={{
-                      fontFamily: typography.body,
-                      fontSize: '0.85rem',
-                      color: colors.lightBlack,
-                      opacity: 0.6,
-                      mt: 0.25,
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {timelineDate ?? step.timelineLabel}
-                  </Typography>
-                </StepLabel>
-              </Link>
+                  {label}
+                </Box>
+              ) : (
+                <Link
+                  href={href}
+                  style={{
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    display: isMobile ? 'block' : 'inline',
+                    width: isMobile ? '100%' : 'auto',
+                  }}
+                  aria-label={`${step.label} – ${timelineDate ?? step.timelineLabel}`}
+                >
+                  {label}
+                </Link>
+              )}
             </Step>
           );
         })}
