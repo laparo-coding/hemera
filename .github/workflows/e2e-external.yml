@@ -161,6 +161,12 @@ jobs:
             exit 0
           fi
 
+          if [ "$CURL_EXIT" -eq 47 ] && [ "$PLAYWRIGHT_SSO_TOLERANT" = '1' ]; then
+            echo "Preview probe hit redirect loop (curl exit 47), likely due to Vercel protection or SSO. Skipping external smoke." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
           if [ "$CURL_EXIT" -ne 0 ]; then
             echo "Preview probe failed before Playwright start (curl exit $CURL_EXIT)." \
               | tee -a "$GITHUB_STEP_SUMMARY"
