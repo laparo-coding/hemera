@@ -40,9 +40,6 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
         color: authForm.textColor,
       },
     },
-    footerAction: {
-      borderTop: 'none',
-    },
     footerActionText: {
       color: authForm.subtleTextColor,
     },
