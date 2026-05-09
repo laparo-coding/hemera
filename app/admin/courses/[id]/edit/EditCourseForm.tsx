@@ -76,12 +76,14 @@ export default function EditCourseForm({
     } else {
       if (result.error?.includes('CONCURRENT_EDIT_CONFLICT')) {
         setError(
-          'This course was modified by another user. Please refresh and try again.'
+          'Dieser Kurs wurde von einem anderen Benutzer bearbeitet. Bitte lade die Seite neu und versuche es erneut.'
         );
       } else if (result.error?.includes('CAPACITY_BELOW_ENROLLMENTS')) {
-        setError('Cannot reduce capacity below current enrollment count.');
+        setError(
+          'Die Kapazität kann nicht unter die aktuelle Teilnehmerzahl reduziert werden.'
+        );
       } else {
-        setError(result.error || 'Failed to update course');
+        setError(result.error || 'Kurs konnte nicht aktualisiert werden.');
       }
     }
   };

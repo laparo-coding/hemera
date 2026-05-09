@@ -1,7 +1,7 @@
 /** @jest-environment jsdom */
 
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, expect, it, jest } from '@jest/globals';
 import CourseForm from '@/components/admin/CourseForm';
 
@@ -59,5 +59,44 @@ describe('CourseForm', () => {
     expect(screen.getByTestId('curriculum-editor')).toHaveTextContent(
       'Curriculum modules: 1'
     );
+  });
+
+  it('submits raw euro price without double-converting to cents', async () => {
+    // Regression test: zodResolver with { raw: true } must not apply the schema
+    // transform (euros → cents) before onSubmit. The server action applies the
+    // conversion once; a second conversion would produce 100× the correct value.
+    const mockOnSubmit = jest.fn().mockResolvedValue(undefined);
+
+    render(
+      <CourseForm
+        initialData={{
+          title: 'Preistest',
+          description: 'Beschreibung für den Preistest',
+          // price passed as cents (from DB), form converts to euros for display
+          price: 30000,
+          startDate: new Date('2026-06-01T00:00:00.000Z'),
+          startTime: new Date('2026-06-01T09:00:00.000Z'),
+          endTime: new Date('2026-06-01T17:00:00.000Z'),
+          instructor: 'Max Mustermann',
+          level: 'BEGINNER',
+          capacity: 10,
+        }}
+        locations={[]}
+        onSubmit={mockOnSubmit}
+      />
+    );
+
+    // The price input should display 300 (euros), not 30000 (cents)
+    const priceInput = screen.getByLabelText(/Preis/i);
+    expect(priceInput).toHaveValue(300);
+
+    // Submit the form
+    fireEvent.submit(screen.getByRole('button', { name: /speichern/i }).closest('form')!);
+
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
+
+    // onSubmit must receive the raw euro value (300), not the transformed cent value (30000)
+    const submittedData = mockOnSubmit.mock.calls[0]?.[0] as { price: number };
+    expect(submittedData.price).toBe(300);
   });
 });
