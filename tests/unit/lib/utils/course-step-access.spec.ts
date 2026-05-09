@@ -77,15 +77,21 @@ describe('shouldLockCourseStepsUntilSeminarStart', () => {
     ).toBe(false);
   });
 
-  it('does not lock when courseStartDate is null', () => {
+  it('locks when courseStartDate is null outside development mode', () => {
     expect(
       shouldLockCourseStepsUntilSeminarStart(null, ENV_TEST)
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  it('does not lock when courseStartDate is undefined', () => {
+  it('locks when courseStartDate is invalid outside development mode', () => {
     expect(
-      shouldLockCourseStepsUntilSeminarStart(undefined, ENV_TEST)
+      shouldLockCourseStepsUntilSeminarStart('not-a-date', ENV_TEST)
+    ).toBe(true);
+  });
+
+  it('does not lock when courseStartDate is missing in development mode', () => {
+    expect(
+      shouldLockCourseStepsUntilSeminarStart(null, ENV_DEVELOPMENT)
     ).toBe(false);
   });
 });

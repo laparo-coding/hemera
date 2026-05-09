@@ -44,14 +44,25 @@ export function shouldLockCourseStepsUntilSeminarStart(
   nodeEnv = process.env.NODE_ENV,
   now = Date.now()
 ): boolean {
-  if (!courseStartDate) {
+  if (nodeEnv === 'development') {
     return false;
   }
+
+  if (!courseStartDate) {
+    return true;
+  }
+
+  const start =
+    courseStartDate instanceof Date
+      ? courseStartDate
+      : new Date(courseStartDate);
+
+  if (Number.isNaN(start.getTime())) {
+    return true;
+  }
+
   return (
-    !shouldUnlockFutureCourseStepsInDevelopment(
-      courseStartDate,
-      nodeEnv,
-      now
-    ) && !hasCourseStarted(courseStartDate, now)
+    !shouldUnlockFutureCourseStepsInDevelopment(start, nodeEnv, now) &&
+    !hasCourseStarted(start, now)
   );
 }

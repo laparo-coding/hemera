@@ -276,6 +276,7 @@ export default function CourseProgressStepper({
             state === 'available';
           const isLockedUntilSeminarStart =
             shouldLockFutureSteps && step.key !== 'VORBEREITUNG';
+          const stepAriaLabel = `${step.label} – ${timelineDate ?? step.timelineLabel}`;
 
           const label = (
             <StepLabel
@@ -375,7 +376,7 @@ export default function CourseProgressStepper({
                     display: isMobile ? 'block' : 'inline',
                     width: isMobile ? '100%' : 'auto',
                   }}
-                  aria-label={`${step.label} – ${timelineDate ?? step.timelineLabel}`}
+                  aria-label={stepAriaLabel}
                 >
                   {label}
                 </Link>

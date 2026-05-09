@@ -46,7 +46,8 @@ jest.mock('@mui/material/styles', () => {
 import CourseProgressStepper from '@/components/dashboard/CourseProgressStepper';
 
 const BOOKING_ID = 'booking-123';
-const FUTURE_COURSE_START_DATE = '2099-06-15T12:00:00.000Z';
+const futureCourseStartDate = '2099-06-15T12:00:00.000Z';
+const startedCourseStartDate = '2020-06-15T12:00:00.000Z';
 
 function formatTimelineDate(date: Date): string {
   return date.toLocaleDateString('de-DE', {
@@ -114,6 +115,7 @@ describe('CourseProgressStepper', () => {
       <CourseProgressStepper
         bookingId={BOOKING_ID}
         participationStatus="PREPARATION"
+        courseStartDate={startedCourseStartDate}
       />,
     );
 
@@ -126,7 +128,7 @@ describe('CourseProgressStepper', () => {
       <CourseProgressStepper
         bookingId={BOOKING_ID}
         participationStatus="PREPARATION"
-        courseStartDate={FUTURE_COURSE_START_DATE}
+        courseStartDate={futureCourseStartDate}
       />,
     );
 
@@ -140,14 +142,13 @@ describe('CourseProgressStepper', () => {
 
   it('keeps later steps clickable in development before seminar start', () => {
     const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
-
     try {
+      process.env.NODE_ENV = 'development';
       render(
         <CourseProgressStepper
           bookingId={BOOKING_ID}
           participationStatus="PREPARATION"
-          courseStartDate={FUTURE_COURSE_START_DATE}
+          courseStartDate={futureCourseStartDate}
         />,
       );
 
@@ -174,6 +175,7 @@ describe('CourseProgressStepper', () => {
       <CourseProgressStepper
         bookingId={BOOKING_ID}
         participationStatus="SUMMARY"
+        courseStartDate={startedCourseStartDate}
       />,
     );
 
@@ -186,6 +188,7 @@ describe('CourseProgressStepper', () => {
       <CourseProgressStepper
         bookingId={BOOKING_ID}
         participationStatus="DEBRIEFING"
+        courseStartDate={startedCourseStartDate}
       />,
     );
 
@@ -198,6 +201,7 @@ describe('CourseProgressStepper', () => {
       <CourseProgressStepper
         bookingId={BOOKING_ID}
         participationStatus="RESULT"
+        courseStartDate={startedCourseStartDate}
       />,
     );
 
