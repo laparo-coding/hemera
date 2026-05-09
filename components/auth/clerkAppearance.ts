@@ -1,5 +1,5 @@
 import type { SignUpProps, UserButtonProps } from '@clerk/shared/types';
-import { authForm, buttonStyles, colors } from '@/lib/design-tokens';
+import { authForm, colors } from '@/lib/design-tokens';
 
 export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
   layout: {
@@ -25,26 +25,48 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
     cardBox: {
       width: '100%',
       maxWidth: `${authForm.cardMaxWidth}px`,
-      padding: '0 16px',
+      padding: 0,
+      backgroundColor: authForm.cardBackground,
+      border: 'none',
+      borderRadius: '12px',
+      boxShadow: authForm.cardShadow,
+      overflow: 'hidden',
     },
     card: {
-      boxShadow: authForm.cardShadow,
-      border: `1px solid ${authForm.inputBorderColor}`,
-      borderRadius: '12px',
+      backgroundColor: 'transparent',
+      boxShadow: 'none',
+      border: 'none',
+      borderRadius: 0,
       padding: '32px 28px',
     },
     footer: {
       backgroundColor: authForm.cardBackground,
       color: authForm.textColor,
-      borderTop: `1px solid ${authForm.footerBorderColor}`,
-      marginTop: '24px',
-      paddingTop: '24px',
+      borderTop: 'none',
+      marginTop: 0,
+      width: '100%',
+      padding: 0,
+      '& > *': {
+        backgroundColor: authForm.cardBackground,
+      },
       '& p': {
         color: authForm.subtleTextColor,
       },
       '& a': {
         color: authForm.textColor,
       },
+      '& > :nth-of-type(2)': {
+        backgroundColor: authForm.cardBackground,
+        display: 'none',
+      },
+    },
+    footerAction: {
+      backgroundColor: authForm.cardBackground,
+      borderTop: 'none',
+      width: '100%',
+      margin: 0,
+      padding: '16px 28px 24px',
+      justifyContent: 'center',
     },
     footerActionText: {
       color: authForm.subtleTextColor,
@@ -71,8 +93,8 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       display: 'none',
     },
     formButtonPrimary: {
-      backgroundColor: buttonStyles.bronzeFilled.backgroundColor,
-      color: buttonStyles.bronzeFilled.textColor,
+      backgroundColor: colors.marsala,
+      color: colors.white,
       fontWeight: 600,
       fontSize: '1rem',
       fontFamily: '"Inter", sans-serif',
@@ -82,11 +104,11 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       borderRadius: '8px',
       transition: 'all 0.2s ease-in-out',
       '&:hover': {
-        backgroundColor: buttonStyles.bronzeFilled.hoverBackgroundColor,
+        backgroundColor: colors.marsalaDark,
       },
       '&:disabled': {
-        backgroundColor: buttonStyles.bronzeFilled.disabledBackgroundColor,
-        color: buttonStyles.bronzeFilled.disabledTextColor,
+        backgroundColor: colors.rosyBrown,
+        color: colors.white,
         opacity: 0.6,
       },
     },
@@ -98,15 +120,15 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       padding: '12px 16px',
       // Clerk injects highly specific input selectors across multiple wrappers.
       // Keep forced overrides until cross-browser checks prove a narrower rule.
-      border: `1px solid ${authForm.inputBorderColor} !important`,
+      border: `1px solid ${authForm.footerBorderColor} !important`,
       backgroundColor: authForm.cardBackground,
       color: authForm.textColor,
       WebkitTextFillColor: authForm.textColor,
       caretColor: authForm.textColor,
       WebkitAppearance: 'none',
       appearance: 'none',
-      boxShadow: `0 0 0 1px ${authForm.inputBorderColor} !important`,
-      WebkitBoxShadow: `0 0 0 1px ${authForm.inputBorderColor} !important`,
+      boxShadow: 'none !important',
+      WebkitBoxShadow: 'none !important',
       outline: 'none',
       transition: 'all 0.2s ease-in-out',
       '&::placeholder': {
@@ -114,12 +136,31 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
         WebkitTextFillColor: authForm.subtleTextColor,
         opacity: 1,
       },
+      '&:hover': {
+        border: `1px solid ${authForm.inputBorderColor} !important`,
+      },
       // Keep both selectors because Clerk mounts different input wrappers across
       // auth views and both focus states need the same override.
       '&:is(:focus, :focus-within)': {
         border: `1px solid ${authForm.inputBorderColorFocus} !important`,
-        boxShadow: `0 0 0 2px rgba(136, 65, 67, 0.1) !important`,
-        WebkitBoxShadow: `0 0 0 2px rgba(136, 65, 67, 0.1) !important`,
+        boxShadow: 'none !important',
+        WebkitBoxShadow: 'none !important',
+      },
+    },
+    formFieldInputGroup: {
+      borderRadius: authForm.inputBorderRadius,
+      border: `1px solid ${authForm.footerBorderColor} !important`,
+      boxShadow: 'none !important',
+      WebkitBoxShadow: 'none !important',
+      backgroundColor: authForm.cardBackground,
+      transition: 'all 0.2s ease-in-out',
+      '&:hover': {
+        border: `1px solid ${authForm.inputBorderColor} !important`,
+      },
+      '&:is(:focus, :focus-within)': {
+        border: `1px solid ${authForm.inputBorderColorFocus} !important`,
+        boxShadow: 'none !important',
+        WebkitBoxShadow: 'none !important',
       },
     },
     formFieldLabel: {
@@ -210,6 +251,12 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
 export const userButtonClerkAppearance: NonNullable<
   UserButtonProps['appearance']
 > = {
+  variables: {
+    colorBackground: colors.white,
+    colorForeground: authForm.textColor,
+    colorMutedForeground: authForm.subtleTextColor,
+    colorNeutral: authForm.inputBorderColor,
+  },
   elements: {
     avatarBox: {
       width: '36px',
@@ -217,6 +264,42 @@ export const userButtonClerkAppearance: NonNullable<
     },
     userButtonPopoverCard: {
       pointerEvents: 'auto',
+      backgroundColor: colors.white,
+      color: authForm.textColor,
+    },
+    userButtonPopoverMain: {
+      backgroundColor: colors.white,
+    },
+    userButtonOuterIdentifier: {
+      color: authForm.textColor,
+    },
+    userButtonPopoverActions: {
+      backgroundColor: colors.white,
+    },
+    userButtonPopoverActionButton: {
+      color: authForm.textColor,
+      backgroundColor: colors.white,
+      '&:hover': {
+        backgroundColor: authForm.socialButtonBackground,
+      },
+    },
+    userButtonPopoverActionButtonIcon: {
+      color: authForm.textColor,
+    },
+    userButtonPopoverActionButtonIconBox: {
+      color: authForm.textColor,
+    },
+    userPreviewMainIdentifier: {
+      color: authForm.textColor,
+    },
+    userPreviewSecondaryIdentifier: {
+      color: authForm.subtleTextColor,
+    },
+    userButtonPopoverFooter: {
+      display: 'none',
+    },
+    userButtonPopoverFooterPagesLink: {
+      display: 'none',
     },
     modalBackdrop: {
       backgroundColor: 'transparent',

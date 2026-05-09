@@ -18,6 +18,13 @@ const clerkRuntimeBypassMessages = [
   'Clerk instance keys do not match',
 ] as const;
 
+const clerkFallbackTranslations = new Map([
+  [
+    'Too many requests. Please try again in a bit.',
+    'Zu viele Anfragen. Bitte versuche es in einem Moment erneut.',
+  ],
+]);
+
 // Custom German localization with overrides
 const customDeDE = {
   ...deDE,
@@ -27,7 +34,7 @@ const customDeDE = {
     start: {
       ...deDE.signIn?.start,
       title: 'Bei Hemera anmelden',
-      actionText: 'Kein Account?',
+      actionText: 'Kein Konto?',
       actionLink: 'Registrieren',
     },
   },
@@ -198,6 +205,23 @@ function shouldBypassForRuntimeError(value: unknown): string | null {
     : null;
 }
 
+function translateClerkFallbackMessages(root: ParentNode) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+
+  while (node) {
+    const translatedMessage = clerkFallbackTranslations.get(
+      node.textContent?.trim() ?? ''
+    );
+
+    if (translatedMessage) {
+      node.textContent = translatedMessage;
+    }
+
+    node = walker.nextNode();
+  }
+}
+
 export default function ClerkProviderWrapper({
   children,
   forcedBypassReason = null,
@@ -252,6 +276,44 @@ export default function ClerkProviderWrapper({
   const clerkBypassed = Boolean(
     forcedBypassReason || bypass || runtimeBypassReason
   );
+
+  useEffect(() => {
+    if (clerkBypassed) {
+      return;
+    }
+
+    translateClerkFallbackMessages(document.body);
+
+    const observer = new MutationObserver(mutations => {
+      for (const mutation of mutations) {
+        if (mutation.type === 'characterData' && mutation.target.parentNode) {
+          translateClerkFallbackMessages(mutation.target.parentNode);
+          continue;
+        }
+
+        for (const addedNode of mutation.addedNodes) {
+          if (addedNode.nodeType === Node.TEXT_NODE && addedNode.parentNode) {
+            translateClerkFallbackMessages(addedNode.parentNode);
+            continue;
+          }
+
+          if (addedNode.nodeType === Node.ELEMENT_NODE) {
+            translateClerkFallbackMessages(addedNode as ParentNode);
+          }
+        }
+      }
+    });
+
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [clerkBypassed]);
 
   if (clerkBypassed) {
     const bypassReason = forcedBypassReason ?? runtimeBypassReason ?? reason;
