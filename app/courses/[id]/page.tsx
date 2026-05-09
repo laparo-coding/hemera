@@ -13,7 +13,6 @@ import {
   generateOrganizationSchema as genOrgSchema,
   generateWebPageSchema as genWebPageSchema,
 } from '../../../lib/seo/schemas';
-import { isLikelyCourseId } from '../../../lib/utils/courseIdentifier';
 import { generateMetadata as genMetadata } from './layout';
 
 export { genMetadata as generateMetadata };
@@ -68,35 +67,27 @@ export default async function CourseDetailPage({ params }: PageProps) {
   let course: Awaited<ReturnType<typeof getCourseBySlug>> | null = null;
 
   try {
-    if (isLikelyCourseId(identifier)) {
-      course = await getCourseById(identifier);
-    } else {
-      course = await getCourseBySlug(identifier);
-    }
+    course = await getCourseBySlug(identifier);
   } catch (error) {
     if (error instanceof CourseNotPublishedError) {
       notFound();
     }
 
-    if (error instanceof CourseNotFoundError) {
-      try {
-        if (isLikelyCourseId(identifier)) {
-          course = await getCourseBySlug(identifier);
-        } else {
-          course = await getCourseById(identifier);
-        }
-      } catch (innerError) {
-        if (
-          innerError instanceof CourseNotFoundError ||
-          innerError instanceof CourseNotPublishedError
-        ) {
-          notFound();
-        }
-
-        throw innerError;
-      }
-    } else {
+    if (!(error instanceof CourseNotFoundError)) {
       throw error;
+    }
+
+    try {
+      course = await getCourseById(identifier);
+    } catch (innerError) {
+      if (
+        innerError instanceof CourseNotFoundError ||
+        innerError instanceof CourseNotPublishedError
+      ) {
+        notFound();
+      }
+
+      throw innerError;
     }
   }
 

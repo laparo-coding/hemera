@@ -158,13 +158,14 @@ test.describe('Admin Reports - Health Status', () => {
     }
   });
 
-  test('should display build information', async ({ page }) => {
+  test('should display build information only in system status', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await gotoReports(page);
 
-    const buildInfo = page.locator('[data-testid="build-info"]');
-    await expect(buildInfo).toBeVisible();
-    await expect(buildInfo).toContainText(/(v\d+\.\d+\.\d+|preview)/i);
+    await expect(page.locator('[data-testid="build-info"]')).toHaveCount(0);
+    const healthSection = page.locator('[data-testid="reports-health-section"]');
+    await expect(healthSection).toContainText(/Systemstatus/i);
+    await expect(healthSection).toContainText(/(v\d+\.\d+\.\d+|preview|unknown)/i);
   });
 });
 

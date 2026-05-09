@@ -32,6 +32,9 @@ jest.mock('@mui/material/styles', () => {
   return {
     ...actual,
     useTheme: () => ({
+      breakpoints: {
+        down: () => '@media (max-width:599.95px)',
+      },
       palette: {
         primary: { main: '#884143' },
         text: { secondary: '#666', disabled: '#999' },
@@ -41,6 +44,7 @@ jest.mock('@mui/material/styles', () => {
 });
 
 import CourseProgressStepper from '@/components/dashboard/CourseProgressStepper';
+import { shouldUnlockFutureCourseStepsInDevelopment } from '@/lib/utils/course-step-access';
 
 const BOOKING_ID = 'booking-123';
 
@@ -202,5 +206,23 @@ describe('CourseProgressStepper', () => {
     expect(screen.getByText(formatTimelineDate(start))).toBeInTheDocument();
     expect(screen.getByText(formatTimelineDate(threeDaysAfter))).toBeInTheDocument();
     expect(screen.getByText(formatTimelineDate(eightWeeksLater))).toBeInTheDocument();
+  });
+
+  it('unlocks future steps in development for seminars that have not started yet', () => {
+    expect(
+      shouldUnlockFutureCourseStepsInDevelopment(
+        '2099-06-15T12:00:00.000Z',
+        'development'
+      )
+    ).toBe(true);
+  });
+
+  it('does not unlock future steps outside development mode', () => {
+    expect(
+      shouldUnlockFutureCourseStepsInDevelopment(
+        '2099-06-15T12:00:00.000Z',
+        'test'
+      )
+    ).toBe(false);
   });
 });

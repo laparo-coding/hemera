@@ -1,10 +1,17 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { getClerkKeyMismatchReason } from './lib/auth/clerk-key-validation';
+import { serverInstance } from './lib/monitoring/rollbar-official';
 
 // In E2E test mode, bypass Clerk middleware entirely
 const isE2EMode =
   process.env.E2E_TEST === '1' || process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
+const clerkKeyMismatchReason = getClerkKeyMismatchReason(
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  process.env.CLERK_SECRET_KEY
+);
+let hasLoggedClerkKeyMismatch = false;
 
 // Prepare a Clerk middleware instance for non-E2E mode
 const isUserProfileRoute = createRouteMatcher(['/user-profile(.*)']);
@@ -14,6 +21,18 @@ const clerkMw = clerkMiddleware(async (auth, request) => {
     await auth.protect();
   }
 });
+
+function logClerkKeyMismatch(reason: string, request: NextRequest): void {
+  if (hasLoggedClerkKeyMismatch) {
+    return;
+  }
+
+  hasLoggedClerkKeyMismatch = true;
+  serverInstance.error('[auth] Clerk proxy bypass due to key mismatch', {
+    pathname: request.nextUrl.pathname,
+    reason,
+  });
+}
 
 // Custom proxy to enforce legacy redirects and then delegate to Clerk (when enabled)
 export default function proxy(request: NextRequest, event: NextFetchEvent) {
@@ -26,6 +45,20 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
 
   // Service API routes must always go through auth (even in E2E mode)
   if (/^\/api\/service(\/|$)/.test(pathname)) {
+    if (clerkKeyMismatchReason) {
+      logClerkKeyMismatch(clerkKeyMismatchReason, request);
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: {
+            code: 'AUTH_CONFIGURATION_ERROR',
+            message: 'Authentication service is temporarily unavailable.',
+          },
+        }),
+        { status: 503, headers: { 'content-type': 'application/json' } }
+      );
+    }
+
     // Allow CORS preflight (OPTIONS) requests through without auth
     if (request.method === 'OPTIONS') {
       return NextResponse.next();
@@ -62,6 +95,11 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
 
   // In E2E mode bypass Clerk to reduce flakiness for non-service routes
   if (isE2EMode) {
+    return NextResponse.next();
+  }
+
+  if (clerkKeyMismatchReason) {
+    logClerkKeyMismatch(clerkKeyMismatchReason, request);
     return NextResponse.next();
   }
 

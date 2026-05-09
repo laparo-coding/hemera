@@ -1,3 +1,4 @@
+import type { User as ClerkUser } from '@clerk/nextjs/server';
 import { type ParticipationStatus, PaymentStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -145,6 +146,50 @@ function normalizeBookings(
   });
 }
 
+async function resolveSyncedUserId(
+  user: ClerkUser,
+  requestId: string
+): Promise<string> {
+  const { syncUserFromClerk } = await import('../../../lib/api/users');
+
+  try {
+    const syncedUser = await syncUserFromClerk(user);
+    return syncedUser.id;
+  } catch (syncError) {
+    const email = user.primaryEmailAddress?.emailAddress ?? null;
+    const fallbackUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ id: user.id }, ...(email ? [{ email }] : [])],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (fallbackUser) {
+      reportError(
+        new Error('Recovered bookings user resolution after sync failure'),
+        {
+          requestId,
+          additionalData: sanitizeForErrorReporting({
+            clerkUserId: user.id,
+            email,
+            syncError:
+              syncError instanceof Error
+                ? syncError.message
+                : String(syncError),
+          }),
+        },
+        ErrorSeverity.WARNING
+      );
+
+      return fallbackUser.id;
+    }
+
+    throw syncError;
+  }
+}
+
 export async function GET(request: Request) {
   const _requestId = crypto.randomUUID();
 
@@ -174,12 +219,11 @@ export async function GET(request: Request) {
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    const { syncUserFromClerk } = await import('../../../lib/api/users');
-    const syncedUser = await syncUserFromClerk(user);
+    const syncedUserId = await resolveSyncedUserId(user, _requestId);
 
     // Get user's bookings with pagination (use synced DB user ID, not Clerk ID)
     const where = {
-      userId: syncedUser.id,
+      userId: syncedUserId,
       ...(validatedParams.status && { paymentStatus: validatedParams.status }),
     };
 
@@ -305,13 +349,12 @@ export async function POST(request: Request) {
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    const { syncUserFromClerk } = await import('../../../lib/api/users');
-    const syncedUser = await syncUserFromClerk(user);
+    const syncedUserId = await resolveSyncedUserId(user, requestId);
 
     // Check if user already has a booking for this course
     const existingBooking = await prisma.booking.findFirst({
       where: {
-        userId: syncedUser.id,
+        userId: syncedUserId,
         courseId: validatedData.courseId,
       },
     });
@@ -326,7 +369,7 @@ export async function POST(request: Request) {
     // Create the booking
     const booking = await prisma.booking.create({
       data: {
-        userId: syncedUser.id,
+        userId: syncedUserId,
         courseId: validatedData.courseId,
         paymentStatus: PaymentStatus.PENDING,
         amount: course.price,

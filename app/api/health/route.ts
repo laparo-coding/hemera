@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server';
+import { getClerkKeyMismatchReason } from '../../../lib/auth/clerk-key-validation';
 import { getBuildInfo } from '../../../lib/buildInfo';
 import { createApiLogger } from '../../../lib/utils/api-logger';
 import { createSuccessResponse } from '../../../lib/utils/api-response';
@@ -13,6 +14,10 @@ export async function GET(request: NextRequest) {
   const logger = createApiLogger(context);
 
   const info = getBuildInfo();
+  const clerkBypassReason = getClerkKeyMismatchReason(
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    process.env.CLERK_SECRET_KEY
+  );
   const healthData = {
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -21,6 +26,14 @@ export async function GET(request: NextRequest) {
     commitSha: info.commitSha,
     shortSha: info.shortSha,
     buildTime: info.buildTime,
+    auth: {
+      clerk: {
+        configured:
+          Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
+          Boolean(process.env.CLERK_SECRET_KEY),
+        bypassed: clerkBypassReason !== null,
+      },
+    },
   } as const;
 
   logger.info('Health check completed', healthData);

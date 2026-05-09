@@ -27,19 +27,31 @@ function isProtectedDeploymentEnvironment(): boolean {
   );
 }
 
-function shouldBypassClerkServerAuth(): boolean {
-  if (isProtectedDeploymentEnvironment()) {
-    return false;
-  }
-
+function hasExplicitServerAuthBypass(): boolean {
   return (
     isEnvFlagEnabled(process.env.E2E_TEST) ||
     isEnvFlagEnabled(process.env.DISABLE_CLERK_SERVER_AUTH)
   );
 }
 
+function shouldBypassClerkServerAuth(): boolean {
+  if (hasExplicitServerAuthBypass()) {
+    return true;
+  }
+
+  if (isProtectedDeploymentEnvironment()) {
+    return false;
+  }
+
+  return false;
+}
+
 async function getCookieMockRole(): Promise<'user' | 'admin' | null> {
-  if (isProtectedDeploymentEnvironment() && !isMockAuthEnvironment()) {
+  if (
+    isProtectedDeploymentEnvironment() &&
+    !isMockAuthEnvironment() &&
+    !hasExplicitServerAuthBypass()
+  ) {
     return null;
   }
 
@@ -64,7 +76,7 @@ async function getMockAuthRole(): Promise<'user' | 'admin' | null> {
       return process.env.E2E_ADMIN === '1' ? 'admin' : 'user';
     }
 
-    return 'user';
+    return null;
   }
 
   if (isMockAuthEnvironment()) {

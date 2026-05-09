@@ -11,6 +11,8 @@ import {
   BookingNotFoundError,
   BookingAlreadyExistsError,
   InvalidBookingStatusError,
+  ParticipationCreationError,
+  ParticipationNotFoundError,
   UserNotFoundError,
   UserEmailAlreadyExistsError,
   PaymentProcessingError,
@@ -95,6 +97,42 @@ describe('Domain Errors', () => {
         attemptedStatus: 'CONFIRMED',
       });
     });
+
+    it('ParticipationNotFoundError should use the German default message', () => {
+      const error = new ParticipationNotFoundError({ requestId: 'req-123' });
+
+      expect(error.statusCode).toBe(404);
+      expect(error.errorCode).toBe('PARTICIPATION_NOT_FOUND');
+      expect(error.message).toBe('Teilnahme nicht gefunden');
+      expect(error.context).toEqual({ requestId: 'req-123' });
+    });
+
+    it('ParticipationNotFoundError should preserve lookup context', () => {
+      const error = new ParticipationNotFoundError(
+        'booking-123',
+        'bookingId'
+      );
+
+      expect(error.context).toEqual({
+        identifier: 'booking-123',
+        lookupField: 'bookingId',
+      });
+    });
+
+    it('ParticipationCreationError should use the German default message', () => {
+      const error = new ParticipationCreationError({ requestId: 'req-123' });
+
+      expect(error.statusCode).toBe(503);
+      expect(error.errorCode).toBe('PARTICIPATION_CREATION_FAILED');
+      expect(error.message).toBe('Teilnahme konnte nicht erstellt werden');
+      expect(error.context).toEqual({ requestId: 'req-123' });
+    });
+
+    it('ParticipationCreationError should preserve booking context', () => {
+      const error = new ParticipationCreationError('booking-123');
+
+      expect(error.context).toEqual({ bookingId: 'booking-123' });
+    });
   });
 
   describe('User Errors', () => {
@@ -136,18 +174,22 @@ describe('Domain Errors', () => {
 
   describe('Auth Errors', () => {
     it('UnauthorizedError should have correct properties', () => {
-      const error = new UnauthorizedError('admin panel');
+      const error = new UnauthorizedError('admin panel', undefined, 'req-123');
 
       expect(error.statusCode).toBe(401);
       expect(error.errorCode).toBe('UNAUTHORIZED');
       expect(error.category).toBe('auth');
-      expect(error.message).toContain('admin panel');
+      expect(error.message).toBe('Zugriff nicht autorisiert');
+      expect(error.context).toEqual({
+        resource: 'admin panel',
+        requestId: 'req-123',
+      });
     });
 
     it('UnauthorizedError without resource', () => {
       const error = new UnauthorizedError();
 
-      expect(error.message).toBe('Unauthorized access');
+      expect(error.message).toBe('Zugriff nicht autorisiert');
     });
 
     it('SessionExpiredError should have correct properties', () => {

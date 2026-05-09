@@ -27,15 +27,21 @@ import {
 import type { ParticipationSummary } from '../../../lib/actions/participation';
 import { startParticipationAction } from '../../../lib/actions/participation';
 import type { PreparationInput } from '../../../lib/db/courseParticipation';
+import type { PaymentStatus } from '../../../lib/types/booking';
 
 interface PreparationSectionProps {
   bookingId: string;
   hasParticipation: boolean;
+  paymentStatus: PaymentStatus;
 }
+
+export const canStartPreparation = (paymentStatus: PaymentStatus): boolean =>
+  ['PAID', 'CONFIRMED'].includes(paymentStatus);
 
 export default function PreparationSection({
   bookingId,
   hasParticipation: initialHasParticipation,
+  paymentStatus,
 }: PreparationSectionProps) {
   const [hasParticipation, setHasParticipation] = useState(
     initialHasParticipation
@@ -43,6 +49,7 @@ export default function PreparationSection({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const isPreparationAvailable = canStartPreparation(paymentStatus);
 
   // Start participation when user clicks the button
   const handleStartPreparation = async () => {
@@ -102,40 +109,53 @@ export default function PreparationSection({
           </Alert>
         )}
 
-        <Typography
-          sx={{
-            fontFamily: '"Inter", sans-serif',
-            color: colors.lightBlack,
-            opacity: 0.8,
-            mb: 3,
-          }}
-        >
-          Starte jetzt deine Vorbereitung, um das Beste aus deinem Seminar
-          herauszuholen.
-        </Typography>
+        {!isPreparationAvailable && (
+          <Alert severity='info' sx={{ mb: 3 }}>
+            Deine Zahlung ist noch ausstehend. Du kannst die Vorbereitung
+            starten, sobald deine Buchung bezahlt oder bestätigt ist.
+          </Alert>
+        )}
 
-        <Button
-          variant='contained'
-          startIcon={
-            isPending || loading ? (
-              <CircularProgress size={16} color='inherit' />
-            ) : (
-              <PlayArrowIcon />
-            )
-          }
-          disabled={isPending || loading}
-          onClick={handleStartPreparation}
-          sx={{
-            backgroundColor: colors.bronze,
-            color: colors.marsala,
-            '&:hover': {
-              backgroundColor: colors.marsala,
-              color: colors.white,
-            },
-          }}
-        >
-          {isPending || loading ? 'Wird gestartet...' : 'Vorbereitung starten'}
-        </Button>
+        {isPreparationAvailable && (
+          <Typography
+            sx={{
+              fontFamily: '"Inter", sans-serif',
+              color: colors.lightBlack,
+              opacity: 0.8,
+              mb: 3,
+            }}
+          >
+            Starte jetzt deine Vorbereitung, um das Beste aus deinem Seminar
+            herauszuholen.
+          </Typography>
+        )}
+
+        {isPreparationAvailable && (
+          <Button
+            variant='contained'
+            startIcon={
+              isPending || loading ? (
+                <CircularProgress size={16} color='inherit' />
+              ) : (
+                <PlayArrowIcon />
+              )
+            }
+            disabled={isPending || loading}
+            onClick={handleStartPreparation}
+            sx={{
+              backgroundColor: colors.bronze,
+              color: colors.marsala,
+              '&:hover': {
+                backgroundColor: colors.marsala,
+                color: colors.white,
+              },
+            }}
+          >
+            {isPending || loading
+              ? 'Wird gestartet...'
+              : 'Vorbereitung starten'}
+          </Button>
+        )}
       </Paper>
     );
   }

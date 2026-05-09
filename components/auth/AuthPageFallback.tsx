@@ -1,10 +1,10 @@
 import { Box, Button, Stack, Typography } from '@mui/material';
-import Link from 'next/link';
-import { colors, typography } from '@/lib/design-tokens';
+import { authForm, colors, typography } from '@/lib/design-tokens';
 
 type AuthPageFallbackProps = {
   mode: 'sign-in' | 'sign-up';
   hydrated: boolean;
+  showFallback?: boolean;
 };
 
 const srOnlyStyles = {
@@ -19,7 +19,11 @@ const srOnlyStyles = {
   border: 0,
 } as const;
 
-export function AuthPageFallback({ mode, hydrated }: AuthPageFallbackProps) {
+export function AuthPageFallback({
+  mode,
+  hydrated,
+  showFallback = !hydrated,
+}: AuthPageFallbackProps) {
   const isSignIn = mode === 'sign-in';
   const title = isSignIn ? 'Anmelden' : 'Registrieren';
   const description = isSignIn
@@ -33,9 +37,14 @@ export function AuthPageFallback({ mode, hydrated }: AuthPageFallbackProps) {
       <Box
         data-testid={mode === 'sign-in' ? 'sign-in-page' : 'sign-up-page'}
         data-auth-hydrated={hydrated ? 'true' : 'false'}
-        sx={{ width: '100%', maxWidth: 520, px: 2 }}
+        sx={{
+          display: showFallback ? 'block' : 'none',
+          width: '100%',
+          maxWidth: authForm.cardMaxWidth,
+          px: 2,
+        }}
       >
-        {!hydrated && (
+        {showFallback && (
           <Box
             component='section'
             aria-labelledby={`${mode}-fallback-title`}
@@ -43,9 +52,9 @@ export function AuthPageFallback({ mode, hydrated }: AuthPageFallbackProps) {
             aria-busy='true'
             data-testid='auth-page-fallback'
             sx={{
-              bgcolor: colors.white,
+              bgcolor: authForm.cardBackground,
               borderRadius: 2,
-              boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+              boxShadow: authForm.cardShadow,
               p: { xs: 3, md: 4 },
             }}
           >
@@ -72,7 +81,6 @@ export function AuthPageFallback({ mode, hydrated }: AuthPageFallbackProps) {
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                 <Button
-                  component={Link}
                   href={alternateHref}
                   variant='outlined'
                   sx={{
@@ -84,7 +92,6 @@ export function AuthPageFallback({ mode, hydrated }: AuthPageFallbackProps) {
                   {alternateLabel}
                 </Button>
                 <Button
-                  component={Link}
                   href='/'
                   variant='text'
                   sx={{ textTransform: 'none', color: colors.marsala }}

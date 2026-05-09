@@ -54,6 +54,7 @@ import {
 } from '../middleware/server-action-error-handling';
 import { serverInstance } from '../monitoring/rollbar-official';
 import { isNegotiationPartner } from '../types/participation';
+import { generateRequestId } from '../utils/request-id';
 import {
   deleteResume,
   type ResumeUploadResult,
@@ -61,6 +62,9 @@ import {
 } from '../utils/resumeUpload';
 
 const STRICT_ISO_8601_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const PARTICIPATION_LOG_RETRY_ATTEMPTS = 3;
+// Keep logging retries low-latency because these failures should not materially delay user-facing actions.
+const PARTICIPATION_LOG_INITIAL_DELAY_MS = 20;
 
 function normalizeParticipationActionError(error: unknown): Error {
   if (error instanceof Error) {
@@ -86,27 +90,83 @@ function createLocalizedUnauthorizedError(
   resource: string,
   message: string
 ): UnauthorizedError {
-  return new UnauthorizedError(resource, message);
+  return new UnauthorizedError(
+    resource,
+    localizeInformalGermanMessage(message),
+    generateRequestId()
+  );
 }
 
-function reportParticipationActionError(
+function localizeInformalGermanMessage(message: string): string {
+  const directMappings: Record<string, string> = {
+    'Nicht authentifiziert': 'Du bist nicht angemeldet',
+    'Keine Berechtigung': 'Du hast keine Berechtigung',
+    'Keine Berechtigung für diese Teilnahme':
+      'Du hast keine Berechtigung für diese Teilnahme',
+    'Keine Berechtigung für diese Buchung':
+      'Du hast keine Berechtigung für diese Buchung',
+  };
+
+  if (directMappings[message]) {
+    return directMappings[message];
+  }
+
+  return message
+    .replace(/^Nicht authentifiziert$/i, 'Du bist nicht angemeldet')
+    .replace(/^Keine Berechtigung$/i, 'Du hast keine Berechtigung')
+    .replace(/^Sie sind /i, 'Du bist ')
+    .replace(/^Sie haben /i, 'Du hast ')
+    .replace(/\bIhre\b/g, 'deine')
+    .replace(/\bIhnen\b/g, 'dir');
+}
+
+async function retryWithBackoff(
+  operation: () => void | Promise<void>,
+  attempts = PARTICIPATION_LOG_RETRY_ATTEMPTS,
+  initialDelayMs = PARTICIPATION_LOG_INITIAL_DELAY_MS
+): Promise<void> {
+  let delayMs = initialDelayMs;
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      await operation();
+      return;
+    } catch (error) {
+      lastError = normalizeParticipationActionError(error);
+
+      if (attempt === attempts) {
+        // biome-ignore lint/suspicious/noConsole: logging failures must stay visible even when telemetry transport is broken
+        console.warn('[participation] Logging retry exhausted', lastError);
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      delayMs *= 2;
+    }
+  }
+}
+
+async function reportParticipationActionError(
   action: string,
   error: unknown,
   context: Record<string, unknown>
-): void {
+): Promise<void> {
   if (error instanceof BaseError) {
-    serverInstance.info(`${action} (handled domain error)`, {
-      ...context,
-      errorCode: error.errorCode,
+    await retryWithBackoff(() => {
+      return serverInstance.info(`${action} (handled domain error)`, {
+        ...context,
+        errorCode: error.errorCode,
+      });
     });
     return;
   }
 
-  serverInstance.error(
-    action,
-    normalizeParticipationActionError(error),
-    context
-  );
+  const normalizedError = normalizeParticipationActionError(error);
+
+  await retryWithBackoff(() => {
+    return serverInstance.error(action, normalizedError, context);
+  });
 }
 
 // ============================================================================
@@ -167,7 +227,7 @@ async function verifyParticipationOwnership(
   const participation = await getParticipationByBookingId(bookingId);
 
   if (!participation) {
-    throw new ParticipationNotFoundError(bookingId);
+    throw new ParticipationNotFoundError({ requestId: generateRequestId() });
   }
 
   // Verify the booking belongs to the current user
@@ -294,7 +354,10 @@ export const startParticipationAction = withParameterizedServerAction(
     }
 
     if (!['PAID', 'CONFIRMED'].includes(booking.paymentStatus)) {
-      throw new InvalidBookingStatusError(booking.paymentStatus, 'PAID');
+      throw new InvalidBookingStatusError(
+        booking.paymentStatus,
+        'PAID or CONFIRMED'
+      );
     }
 
     // Check if participation already exists
@@ -311,7 +374,7 @@ export const startParticipationAction = withParameterizedServerAction(
     }
 
     if (!participation) {
-      throw new ParticipationCreationError(bookingId);
+      throw new ParticipationCreationError({ requestId: generateRequestId() });
     }
 
     const hasAssets = await hasSummaryAssets(participation.courseId);
@@ -417,7 +480,7 @@ export async function savePreparationAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to save preparation', error, {
+    await reportParticipationActionError('Failed to save preparation', error, {
       bookingId,
     });
     return {
@@ -457,9 +520,11 @@ export async function completePreparationAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to complete preparation', error, {
-      bookingId,
-    });
+    await reportParticipationActionError(
+      'Failed to complete preparation',
+      error,
+      { bookingId }
+    );
     return {
       success: false,
       error: {
@@ -509,9 +574,13 @@ export async function markSummaryViewedAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to mark summary viewed', error, {
-      bookingId,
-    });
+    await reportParticipationActionError(
+      'Failed to mark summary viewed',
+      error,
+      {
+        bookingId,
+      }
+    );
     return {
       success: false,
       error: {
@@ -546,7 +615,7 @@ export async function completeSummaryAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to complete summary', error, {
+    await reportParticipationActionError('Failed to complete summary', error, {
       bookingId,
     });
     return {
@@ -588,7 +657,7 @@ export async function saveDebriefingAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to save debriefing', error, {
+    await reportParticipationActionError('Failed to save debriefing', error, {
       bookingId,
     });
     return {
@@ -627,9 +696,13 @@ export async function completeDebriefingAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to complete debriefing', error, {
-      bookingId,
-    });
+    await reportParticipationActionError(
+      'Failed to complete debriefing',
+      error,
+      {
+        bookingId,
+      }
+    );
     return {
       success: false,
       error: {
@@ -669,7 +742,7 @@ export async function saveResultAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to save result', error, {
+    await reportParticipationActionError('Failed to save result', error, {
       bookingId,
     });
     return {
@@ -709,7 +782,7 @@ export async function completeResultAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to complete result', error, {
+    await reportParticipationActionError('Failed to complete result', error, {
       bookingId,
     });
     return {
@@ -838,9 +911,11 @@ export async function saveNegotiationResultAction(params: {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to save negotiation result', error, {
-      bookingId: params.bookingId,
-    });
+    await reportParticipationActionError(
+      'Failed to save negotiation result',
+      error,
+      { bookingId: params.bookingId }
+    );
     return {
       success: false,
       error: {
@@ -921,7 +996,7 @@ export async function uploadResumeAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to upload résumé', error, {
+    await reportParticipationActionError('Failed to upload résumé', error, {
       bookingId,
     });
     return {
@@ -980,7 +1055,7 @@ export async function deleteResumeAction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unbekannter Fehler';
-    reportParticipationActionError('Failed to delete résumé', error, {
+    await reportParticipationActionError('Failed to delete résumé', error, {
       bookingId,
     });
     return {

@@ -496,6 +496,18 @@ export default function ReportsPage() {
           <Typography variant='body2' color='text.secondary'>
             Zuletzt aktualisiert: {lastCheckedLabel}
           </Typography>
+
+          <Box sx={{ mt: 1.5 }}>
+            <Typography variant='body2' color='text.secondary'>
+              Version: {health.build.version || 'unknown'}
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Umgebung: {health.build.environment || 'unknown'}
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Commit: {health.build.commitSha || 'unknown'}
+            </Typography>
+          </Box>
         </CardContent>
       </Card>
     </AdminPageContainer>

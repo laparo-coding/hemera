@@ -576,7 +576,7 @@ TOCTOU
 toggleable
 Tracke
 tracken
-trainerin
+Seminarleiter
 Transaktionale
 transaktionale
 Transparente

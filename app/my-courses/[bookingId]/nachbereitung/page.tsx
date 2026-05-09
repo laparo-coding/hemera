@@ -17,6 +17,7 @@ import { getResolvedSummaryAssets } from '@/lib/db/courseParticipation';
 import { prisma } from '@/lib/db/prisma';
 import { colors, typography } from '@/lib/design-tokens';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
+import { shouldUnlockFutureCourseStepsInDevelopment } from '@/lib/utils/course-step-access';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -46,6 +47,7 @@ export default async function NachbereitungPage({
       course: {
         select: {
           id: true,
+          startDate: true,
           title: true,
         },
       },
@@ -62,6 +64,9 @@ export default async function NachbereitungPage({
   }
 
   const courseTitle = booking.course.title;
+  const isDevelopmentPreview = shouldUnlockFutureCourseStepsInDevelopment(
+    booking.course.startDate
+  );
   let assets: Awaited<ReturnType<typeof getResolvedSummaryAssets>> = [];
 
   if (booking.participation) {
@@ -119,7 +124,14 @@ export default async function NachbereitungPage({
         Nachbereitung Seminar
       </Typography>
 
-      {!booking.participation && (
+      {isDevelopmentPreview && (
+        <Alert severity='info' sx={{ borderRadius: '8px', mb: 2 }}>
+          Entwicklungsmodus: Dieser Schritt ist vor Seminarbeginn nur lokal zur
+          Vorschau freigeschaltet.
+        </Alert>
+      )}
+
+      {!booking.participation && !isDevelopmentPreview && (
         <Alert severity='info' sx={{ borderRadius: '8px', mb: 2 }}>
           Deine Teilnahme wurde noch nicht freigeschaltet. Bitte wende dich an
           den Support.

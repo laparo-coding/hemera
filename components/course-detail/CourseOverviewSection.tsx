@@ -148,7 +148,7 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
                 letterSpacing: 1,
               }}
             >
-              Trainerin
+              Seminarleiter
             </Typography>
             <Typography
               variant='h6'

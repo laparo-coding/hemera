@@ -17,7 +17,11 @@ type SignInPageClientProps = {
 };
 
 export function SignInPageClient({ redirectUrl }: SignInPageClientProps) {
+  const shouldRenderClerkSignIn =
+    process.env.NEXT_PUBLIC_E2E_TEST !== '1' &&
+    process.env.NEXT_PUBLIC_DISABLE_CLERK !== '1';
   const [hydrated, setHydrated] = useState(false);
+  const clerkReady = hydrated && shouldRenderClerkSignIn;
 
   useEffect(() => {
     setHydrated(true);
@@ -32,11 +36,17 @@ export function SignInPageClient({ redirectUrl }: SignInPageClientProps) {
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'center',
-        pt: { xs: 12, md: 16 },
+        px: 2,
+        pt: { xs: 10, md: 14 },
+        pb: { xs: 4, md: 6 },
       }}
     >
-      <AuthPageFallback mode='sign-in' hydrated={hydrated} />
-      {hydrated ? (
+      <AuthPageFallback
+        mode='sign-in'
+        hydrated={hydrated}
+        showFallback={!clerkReady}
+      />
+      {clerkReady ? (
         <SignIn
           forceRedirectUrl={redirectUrl}
           signUpUrl='/sign-up'

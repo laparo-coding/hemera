@@ -46,6 +46,11 @@ export interface CourseCardProps {
   };
 }
 
+export const shouldShowTestimonialButton = (
+  sectionType: CourseCardProps['sectionType'],
+  userProfile?: CourseCardProps['userProfile']
+): boolean => sectionType !== 'NO_SHOW' && userProfile != null;
+
 /**
  * Format date range for display
  */
@@ -118,7 +123,7 @@ export const getLocationDisplayText = (
 /**
  * Check if invoice download should be visible
  */
-const shouldShowInvoiceButton = (
+export const shouldShowInvoiceButton = (
   _sectionType: CourseCardProps['sectionType'],
   paymentStatus: PaymentStatus,
   _invoiceUrl: string | null
@@ -147,8 +152,10 @@ export default function CourseCard({
   sectionType,
   userProfile,
 }: CourseCardProps) {
-  const showTestimonialButton =
-    sectionType === 'COMPLETED' && userProfile != null;
+  const showTestimonialButton = shouldShowTestimonialButton(
+    sectionType,
+    userProfile
+  );
   const dateText = formatDateRange(startDate, endDate);
   const timeText = formatTimeRange(startTime, endTime);
   const locationText = getLocationDisplayText(locationName, locationCity);

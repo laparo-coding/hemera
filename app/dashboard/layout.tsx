@@ -83,7 +83,10 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
           window.localStorage.getItem('clerk-session');
         if (raw) {
           const parsed = JSON.parse(raw as string);
-          const role = (parsed?.user?.role as string) || 'user';
+          const role =
+            (parsed?.user?.role as string | undefined) ||
+            (parsed?.role as string | undefined) ||
+            'user';
           setUserRole(role === 'admin' ? 'admin' : 'user');
           return;
         }

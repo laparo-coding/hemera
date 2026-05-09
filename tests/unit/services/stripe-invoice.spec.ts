@@ -25,7 +25,7 @@ const mockStripe = {
 
 jest.mock('stripe', () => {
   return jest.fn().mockImplementation(() => mockStripe);
-});
+}, { virtual: true });
 
 // Local implementation for testing
 const getInvoicePdfUrl = async (invoiceId: string): Promise<string | null> => {

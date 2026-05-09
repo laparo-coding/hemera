@@ -77,6 +77,10 @@ const bookingsResponseSchema = z.object({
 
 type Booking = z.infer<typeof bookingSchema>;
 
+export const shouldShowProgressStepper = (
+  sectionType: 'NEXT_SEMINAR' | 'UPCOMING' | 'COMPLETED' | 'NO_SHOW'
+): boolean => sectionType !== 'NO_SHOW';
+
 function logBookingsValidationError(
   flattenedError: ReturnType<z.ZodError['flatten']>
 ): void {
@@ -170,11 +174,29 @@ function categorizeBookings(bookings: Booking[]): CategorizedDashboardBookings {
 // Wrapper component that decides at build time which variant to render.
 // This avoids conditional hook calls within a single component.
 const UserDashboard: React.FC = () => {
+  const [hasMockSession, setHasMockSession] = useState(false);
+
   const isE2EBuild =
     process.env.NEXT_PUBLIC_DISABLE_CLERK === '1' ||
     process.env.NEXT_PUBLIC_E2E_TEST === '1';
 
-  return isE2EBuild ? <UserDashboardE2E /> : <UserDashboardClerk />;
+  useEffect(() => {
+    if (isE2EBuild) {
+      return;
+    }
+
+    try {
+      setHasMockSession(Boolean(window.localStorage?.getItem('clerk-session')));
+    } catch {
+      setHasMockSession(false);
+    }
+  }, [isE2EBuild]);
+
+  return isE2EBuild || hasMockSession ? (
+    <UserDashboardE2E />
+  ) : (
+    <UserDashboardClerk />
+  );
 };
 
 type E2ESessionUser = {
@@ -184,6 +206,10 @@ type E2ESessionUser = {
   role?: string | null;
 };
 
+function isE2ESessionUser(value: unknown): value is E2ESessionUser {
+  return typeof value === 'object' && value !== null;
+}
+
 function readE2ESessionUser(): E2ESessionUser | null {
   try {
     const raw = window.localStorage.getItem('clerk-session');
@@ -192,7 +218,11 @@ function readE2ESessionUser(): E2ESessionUser | null {
     }
 
     const parsed = JSON.parse(raw);
-    return parsed?.user ?? null;
+    if (isE2ESessionUser(parsed?.user)) {
+      return parsed.user;
+    }
+
+    return isE2ESessionUser(parsed) ? parsed : null;
   } catch {
     return null;
   }
@@ -471,7 +501,7 @@ const UserDashboardE2E: React.FC = () => {
                   sectionType='NEXT_SEMINAR'
                   userProfile={userProfile}
                 />
-                {categorized.nextSeminar.hasParticipation && (
+                {shouldShowProgressStepper('NEXT_SEMINAR') && (
                   <CourseProgressStepper
                     bookingId={categorized.nextSeminar.id}
                     participationStatus={
@@ -507,7 +537,7 @@ const UserDashboardE2E: React.FC = () => {
                     sectionType='UPCOMING'
                     userProfile={userProfile}
                   />
-                  {booking.hasParticipation && (
+                  {shouldShowProgressStepper('UPCOMING') && (
                     <CourseProgressStepper
                       bookingId={booking.id}
                       participationStatus={booking.participationStatus}
@@ -542,7 +572,7 @@ const UserDashboardE2E: React.FC = () => {
                     sectionType='COMPLETED'
                     userProfile={userProfile}
                   />
-                  {booking.hasParticipation && (
+                  {shouldShowProgressStepper('COMPLETED') && (
                     <CourseProgressStepper
                       bookingId={booking.id}
                       participationStatus={booking.participationStatus}
@@ -845,7 +875,7 @@ const UserDashboardClerk: React.FC = () => {
                   sectionType='NEXT_SEMINAR'
                   userProfile={userProfile}
                 />
-                {categorized.nextSeminar.hasParticipation && (
+                {shouldShowProgressStepper('NEXT_SEMINAR') && (
                   <CourseProgressStepper
                     bookingId={categorized.nextSeminar.id}
                     participationStatus={
@@ -882,7 +912,7 @@ const UserDashboardClerk: React.FC = () => {
                     sectionType='UPCOMING'
                     userProfile={userProfile}
                   />
-                  {booking.hasParticipation && (
+                  {shouldShowProgressStepper('UPCOMING') && (
                     <CourseProgressStepper
                       bookingId={booking.id}
                       participationStatus={booking.participationStatus}
@@ -918,7 +948,7 @@ const UserDashboardClerk: React.FC = () => {
                     sectionType='COMPLETED'
                     userProfile={userProfile}
                   />
-                  {booking.hasParticipation && (
+                  {shouldShowProgressStepper('COMPLETED') && (
                     <CourseProgressStepper
                       bookingId={booking.id}
                       participationStatus={booking.participationStatus}

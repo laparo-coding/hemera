@@ -2,13 +2,25 @@
 
 import { deDE } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Component, type ErrorInfo, type ReactNode } from 'react';
+import {
+  Component,
+  type ErrorInfo,
+  type ReactNode,
+  useEffect,
+  useState,
+} from 'react';
 import { clerkConfig } from '../../lib/auth/clerk-config';
 import { logClientError, logClientWarning } from '../../lib/errors/client';
+
+const CLERK_RUNTIME_BYPASS_MESSAGES = [
+  'Refreshing the session token resulted in an infinite redirect loop',
+  'Clerk instance keys do not match',
+] as const;
 
 // Custom German localization with overrides
 const customDeDE = {
   ...deDE,
+  formFieldInputPlaceholder__signUpPassword: 'Passwort erstellen',
   signIn: {
     ...deDE.signIn,
     start: {
@@ -31,6 +43,7 @@ const customDeDE = {
 
 interface ClerkProviderWrapperProps {
   children: ReactNode;
+  forcedBypassReason?: string | null;
 }
 
 interface ClerkErrorBoundaryProps {
@@ -147,20 +160,106 @@ function shouldBypassClerk(publishableKey?: string): {
   return { bypass: false };
 }
 
+function extractRuntimeErrorMessage(value: unknown): string | null {
+  if (value instanceof Error) {
+    return value.message;
+  }
+
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    'message' in value &&
+    typeof value.message === 'string'
+  ) {
+    return value.message;
+  }
+
+  return null;
+}
+
+function shouldBypassForRuntimeError(value: unknown): string | null {
+  const message = extractRuntimeErrorMessage(value);
+
+  if (!message) {
+    return null;
+  }
+
+  return CLERK_RUNTIME_BYPASS_MESSAGES.some(fragment =>
+    message.includes(fragment)
+  )
+    ? message
+    : null;
+}
+
 export default function ClerkProviderWrapper({
   children,
+  forcedBypassReason = null,
 }: ClerkProviderWrapperProps) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   const { bypass, reason } = shouldBypassClerk(publishableKey);
+  const [runtimeBypassReason, setRuntimeBypassReason] = useState<string | null>(
+    null
+  );
 
-  if (bypass) {
-    if (reason) {
+  useEffect(() => {
+    if (bypass) {
+      return;
+    }
+
+    const handleRuntimeBypass = (errorLike: unknown) => {
+      const message = shouldBypassForRuntimeError(errorLike);
+
+      if (!message) {
+        return;
+      }
+
+      setRuntimeBypassReason(currentReason => {
+        if (currentReason === message) {
+          return currentReason;
+        }
+
+        logClientWarning(
+          '[ClerkProviderWrapper] Clerk runtime error detected, disabling provider',
+          { reason: message }
+        );
+
+        return message;
+      });
+    };
+
+    const onError = (event: ErrorEvent) => {
+      handleRuntimeBypass(event.error ?? event.message);
+    };
+
+    const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+      handleRuntimeBypass(event.reason);
+    };
+
+    window.addEventListener('error', onError);
+    window.addEventListener('unhandledrejection', onUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', onError);
+      window.removeEventListener('unhandledrejection', onUnhandledRejection);
+    };
+  }, [bypass]);
+
+  if (forcedBypassReason || bypass || runtimeBypassReason) {
+    const bypassReason = forcedBypassReason ?? runtimeBypassReason ?? reason;
+
+    if (bypassReason) {
       // Only log in development - this is expected behavior in test mode
       if (
         process.env.NODE_ENV === 'development' &&
-        reason !== 'E2E test mode'
+        bypassReason !== 'E2E test mode'
       ) {
-        logClientWarning('[ClerkProviderWrapper] Clerk bypassed', { reason });
+        logClientWarning('[ClerkProviderWrapper] Clerk bypassed', {
+          reason: bypassReason,
+        });
       }
     }
     return <>{children}</>;

@@ -6,6 +6,10 @@
 
 import { auth } from '@clerk/nextjs/server';
 
+jest.mock('next/headers', () => ({
+  headers: jest.fn().mockResolvedValue(new Headers()),
+}));
+
 // Mock Clerk auth
 jest.mock('@clerk/nextjs/server', () => ({
   auth: jest.fn(),
@@ -31,6 +35,9 @@ jest.mock('@/lib/db/prisma', () => ({
     },
     participationSummaryOverride: {
       findMany: jest.fn(),
+    },
+    booking: {
+      findUnique: jest.fn(),
     },
     $transaction: jest.fn(fn =>
       fn({
@@ -68,6 +75,7 @@ import {
   saveDebriefingAction,
   savePreparationAction,
   saveResultAction,
+  startParticipationAction,
 } from '@/lib/actions/participation';
 import { prisma } from '@/lib/db/prisma';
 import { serverInstance } from '@/lib/monitoring/rollbar-official';
@@ -123,7 +131,7 @@ describe('Participation Server Actions', () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error?.message).toContain('authentifiziert');
+      expect(result.error?.message).toBe('Du bist nicht angemeldet');
     });
 
     it('returns error when participation is not found', async () => {
@@ -137,7 +145,7 @@ describe('Participation Server Actions', () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error?.message).toContain('nicht gefunden');
+      expect(result.error?.message).toBe('Teilnahme nicht gefunden');
     });
 
     it('returns error when user does not own the participation', async () => {
@@ -315,6 +323,84 @@ describe('Participation Server Actions', () => {
         expect.any(Error),
         expect.objectContaining({ bookingId: 'booking-123' })
       );
+    });
+
+    it('swallows logging failures after retrying error logs', async () => {
+      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      (prisma.courseParticipation.findUnique as jest.Mock).mockRejectedValue(
+        new Error('Database error')
+      );
+      (serverInstance.error as jest.Mock)
+        .mockImplementationOnce(() => {
+          throw new Error('logger unavailable');
+        })
+        .mockImplementation(() => undefined);
+
+      const result = await savePreparationAction('booking-123', {
+        preparationIntent: 'Test intent',
+      });
+
+      expect(result.success).toBe(false);
+      expect(serverInstance.error).toHaveBeenCalledTimes(2);
+    });
+
+    it('retries async logger rejections before swallowing them', async () => {
+      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      (prisma.courseParticipation.findUnique as jest.Mock).mockRejectedValue(
+        new Error('Database error')
+      );
+      (serverInstance.error as jest.Mock)
+        .mockRejectedValueOnce(new Error('logger unavailable'))
+        .mockResolvedValue(undefined);
+
+      const result = await savePreparationAction('booking-123', {
+        preparationIntent: 'Test intent',
+      });
+
+      expect(result.success).toBe(false);
+      expect(serverInstance.error).toHaveBeenCalledTimes(2);
+    });
+
+    it('swallows logging failures after retrying handled domain logs', async () => {
+      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      (prisma.courseParticipation.findUnique as jest.Mock).mockResolvedValue(
+        null
+      );
+      (serverInstance.info as jest.Mock)
+        .mockImplementationOnce(() => {
+          throw new Error('logger unavailable');
+        })
+        .mockImplementation(() => undefined);
+
+      const result = await savePreparationAction('booking-123', {
+        preparationIntent: 'Test intent',
+      });
+
+      expect(result.success).toBe(false);
+      expect(serverInstance.info).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('Booking status validation', () => {
+    it('reports all accepted payment statuses in the error message', async () => {
+      mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
+      (prisma.booking.findUnique as jest.Mock).mockResolvedValue({
+        id: 'booking-123',
+        userId: 'user-123',
+        courseId: 'course-123',
+        paymentStatus: 'PENDING',
+        course: {
+          id: 'course-123',
+          title: 'Grundkurs',
+          slug: 'grundkurs',
+          startDate: null,
+        },
+      });
+
+      const result = await startParticipationAction('booking-123');
+
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain('PAID or CONFIRMED');
     });
   });
 

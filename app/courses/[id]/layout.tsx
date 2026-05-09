@@ -8,7 +8,9 @@ import {
 import {
   CourseNotFoundError,
   CourseNotPublishedError,
+  DatabaseConnectionError,
 } from '../../../lib/errors';
+import { serverInstance } from '../../../lib/monitoring/rollbar-official';
 import { SITE_CONFIG } from '../../../lib/seo/constants';
 import {
   generateSEOMetadata,
@@ -18,12 +20,43 @@ import { isLikelyCourseId } from '../../../lib/utils/courseIdentifier';
 
 // Note: Default layout component only needs to render children. Avoid over-typing props to satisfy Next's validator types.
 
+function hasCourseLookupErrorInChain(
+  error: unknown,
+  matcher: (candidate: Error) => boolean
+): boolean {
+  const seen = new Set<Error>();
+  let current = error;
+
+  while (current instanceof Error && !seen.has(current)) {
+    if (matcher(current)) {
+      return true;
+    }
+
+    seen.add(current);
+    current = current.cause;
+  }
+
+  return false;
+}
+
 function shouldRetryCourseLookup(error: unknown): boolean {
-  if (error instanceof CourseNotFoundError) {
+  if (
+    hasCourseLookupErrorInChain(
+      error,
+      candidate => candidate instanceof CourseNotFoundError
+    )
+  ) {
     return true;
   }
 
-  if (error instanceof CourseNotPublishedError) {
+  if (
+    hasCourseLookupErrorInChain(
+      error,
+      candidate =>
+        candidate instanceof CourseNotPublishedError ||
+        candidate instanceof DatabaseConnectionError
+    )
+  ) {
     return false;
   }
 
@@ -31,9 +64,27 @@ function shouldRetryCourseLookup(error: unknown): boolean {
     return false;
   }
 
-  // Last-resort fallback for generic wrappers (for example Prisma P2025 surfaces)
-  // that do not preserve a dedicated not-found error type.
-  return /not found|no record/i.test(error.message);
+  // Last-resort fallback for generic wrappers that lose the typed cause.
+  const matchesRegex = /(^|[\s:])(?:not found|no record)(?:$|[\s.])/i.test(
+    error.message
+  );
+
+  if (matchesRegex) {
+    serverInstance.warning('Course lookup retry fell back to regex detection', {
+      errorMessage: error.message,
+      errorStack: error.stack,
+      errorCause:
+        error.cause instanceof Error
+          ? {
+              name: error.cause.name,
+              message: error.cause.message,
+              stack: error.cause.stack,
+            }
+          : (error.cause ?? undefined),
+    });
+  }
+
+  return matchesRegex;
 }
 
 export async function generateMetadata({

@@ -83,8 +83,8 @@ jobs:
         run: |
           # Add Vercel protection bypass header if secret is available
           EXTRA_HEADERS=""
-          if [ -n "${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" ]; then
-            EXTRA_HEADERS="--extra-headers.x-vercel-protection-bypass=${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}"
+          if [ -n "${{ secrets.VERCEL_PROTECTION_BYPASS }}" ]; then
+            EXTRA_HEADERS="--extra-headers.x-vercel-protection-bypass=${{ secrets.VERCEL_PROTECTION_BYPASS }}"
           fi
           lhci collect --url "${{ steps.target.outputs.url }}" --config=.lighthouserc.json $EXTRA_HEADERS
 

@@ -18,11 +18,16 @@ const MonitoringInit = dynamic(() => import('./MonitoringInit'), {
 type ProvidersProps = {
   children: React.ReactNode;
   isE2E: boolean;
+  clerkBypassReason: string | null;
 };
 
-export default function Providers({ children, isE2E }: ProvidersProps) {
+export default function Providers({
+  children,
+  isE2E,
+  clerkBypassReason,
+}: ProvidersProps) {
   return (
-    <ClerkProviderWrapper>
+    <ClerkProviderWrapper forcedBypassReason={clerkBypassReason}>
       {isE2E ? (
         // In E2E mode: skip Rollbar/Stripe to reduce overhead and flakiness
         <ThemeRegistry>

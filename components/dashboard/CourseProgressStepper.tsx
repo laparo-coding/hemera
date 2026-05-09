@@ -14,9 +14,11 @@ import { Check } from '@mui/icons-material';
 import { Box, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import type { StepIconProps } from '@mui/material/StepIcon';
 import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import Link from 'next/link';
 import { colors, typography } from '@/lib/design-tokens';
 import type { ParticipationStatus } from '@/lib/types/participation';
+import { shouldUnlockFutureCourseStepsInDevelopment } from '@/lib/utils/course-step-access';
 
 export type { ParticipationStatus } from '@/lib/types/participation';
 
@@ -129,7 +131,12 @@ export interface CourseProgressStepperProps {
   courseStartDate?: string | null;
 }
 
-function NumberedStepIcon({ icon, active, completed }: StepIconProps) {
+function NumberedStepIcon({
+  icon,
+  active,
+  completed,
+  unlocked = false,
+}: StepIconProps & { unlocked?: boolean }) {
   const theme = useTheme();
   const stepNumber = typeof icon === 'number' ? icon : 0;
 
@@ -138,8 +145,11 @@ function NumberedStepIcon({ icon, active, completed }: StepIconProps) {
     ? colors.statusHealthy
     : isActive
       ? theme.palette.primary.main
-      : colors.lightGray;
-  const textColor = completed || isActive ? colors.white : colors.lightBlack;
+      : unlocked
+        ? colors.marsala
+        : colors.lightGray;
+  const textColor =
+    completed || isActive || unlocked ? colors.white : colors.lightBlack;
 
   return (
     <Box
@@ -181,6 +191,10 @@ export default function CourseProgressStepper({
   participationStatus,
   courseStartDate,
 }: CourseProgressStepperProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const unlockFutureSteps =
+    shouldUnlockFutureCourseStepsInDevelopment(courseStartDate);
   const stepStates = DASHBOARD_STEPS.map(step =>
     getStepState(step, participationStatus)
   );
@@ -221,14 +235,20 @@ export default function CourseProgressStepper({
       )}
 
       <Stepper
-        orientation='horizontal'
-        alternativeLabel
+        orientation={isMobile ? 'vertical' : 'horizontal'}
+        alternativeLabel={!isMobile}
         activeStep={computedActiveStep}
         aria-label='Dein Fortschritt'
         sx={{
+          '& .MuiStepper-root': {
+            overflowX: 'hidden',
+          },
           '& .MuiStepConnector-line': {
             borderTopWidth: 3,
             borderColor: colors.lightGray,
+          },
+          '& .MuiStep-root': {
+            minWidth: 0,
           },
           '& .MuiStepConnector-root.Mui-active .MuiStepConnector-line': {
             borderColor: colors.marsala,
@@ -245,6 +265,10 @@ export default function CourseProgressStepper({
           );
           const state = stepStates[index];
           const timelineDate = timelineDates[index];
+          const isDevUnlocked =
+            unlockFutureSteps &&
+            step.key !== 'VORBEREITUNG' &&
+            state === 'available';
 
           return (
             <Step
@@ -254,34 +278,66 @@ export default function CourseProgressStepper({
             >
               <Link
                 href={href}
-                style={{ textDecoration: 'none', color: 'inherit' }}
+                style={{
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  display: isMobile ? 'block' : 'inline',
+                  width: isMobile ? '100%' : 'auto',
+                }}
                 aria-label={`${step.label} – ${timelineDate ?? step.timelineLabel}`}
               >
                 <StepLabel
-                  StepIconComponent={NumberedStepIcon}
+                  StepIconComponent={props => (
+                    <NumberedStepIcon {...props} unlocked={isDevUnlocked} />
+                  )}
                   sx={{
                     cursor: 'pointer',
+                    '& .MuiStepLabel-labelContainer': {
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      minHeight: 52,
+                    },
                     '& .MuiStepLabel-label': {
+                      display: 'block',
                       fontFamily: typography.body,
                       fontSize: '1rem',
                       fontWeight: 400,
+                      whiteSpace: { xs: 'normal', md: 'nowrap' },
+                      overflowWrap: 'anywhere',
                       color:
                         state === 'active'
                           ? colors.marsala
                           : state === 'completed'
                             ? colors.statusHealthy
-                            : colors.lightBlack,
+                            : isDevUnlocked
+                              ? colors.marsala
+                              : colors.lightBlack,
                       mt: 0.5,
+                      lineHeight: 1.2,
+                      textAlign: 'center',
+                    },
+                    '& .MuiStepLabel-label.MuiStepLabel-alternativeLabel': {
+                      marginTop: '4px',
                     },
                     '& .MuiStepLabel-label.Mui-active': {
                       color: colors.marsala,
                       fontWeight: 400,
                       mt: 0.5,
                     },
+                    '& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel':
+                      {
+                        marginTop: '4px',
+                      },
                     '& .MuiStepLabel-label.Mui-completed': {
                       color: colors.statusHealthy,
                       fontWeight: 400,
                     },
+                    '& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel':
+                      {
+                        marginTop: '4px',
+                      },
                   }}
                 >
                   {step.label}

@@ -141,6 +141,29 @@ export const spacing = {
   containerMaxWidth: 'lg' as const,
 } as const;
 
+export const authForm = {
+  cardMaxWidth: 520,
+  cardBackground: colors.white,
+  cardShadow: `0 4px 16px ${colors.tealAlpha12}`,
+  textColor: colors.marsala,
+  subtleTextColor: colors.lightBlack,
+  inputBorderRadius: '8px',
+  inputBorderColor: colors.rosyBrown,
+  inputBorderColorFocus: colors.marsala,
+  footerBorderColor: colors.lightGray,
+  socialButtonBackground: colors.white,
+} as const;
+
+export const buttonStyles = {
+  bronzeFilled: {
+    backgroundColor: colors.bronze,
+    textColor: colors.white,
+    hoverBackgroundColor: colors.bronzeHover,
+    disabledBackgroundColor: colors.rosyBrown,
+    disabledTextColor: colors.white,
+  },
+} as const;
+
 // ============================================
 // COURSE LEVEL COLORS
 // ============================================
