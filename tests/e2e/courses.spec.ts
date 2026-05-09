@@ -11,14 +11,14 @@ test.describe('Courses Page', () => {
     // In production (external base), avoid 'networkidle' to reduce flakiness due to long-lived connections
     await gotoStable(page, '/courses', { waitForTestId: 'course-overview' });
 
-    // Mindestens eine Kurskarte ODER E2E-Fallback sichtbar
+    // Mindestens eine Kurskarte oder der explizite DB-Empty-State ist sichtbar.
     const cards = page.getByTestId('course-card');
+    const databaseEmptyState = page.getByTestId('e2e-courses-empty');
     const count = await cards.count();
     if (count > 0) {
-      // Titeltext vorhanden (nutzt den Mock aus getPublishedCourses bei E2E)
+      // Titeltext vorhanden (DB-gestützte Kursdaten)
       await expect(page.getByTestId('course-title').first()).toBeVisible();
-      // Fallback nicht sichtbar
-      await expect(page.getByTestId('course-fallback-message')).toHaveCount(0);
+      await expect(databaseEmptyState).toHaveCount(0);
     } else {
       // Kein Kurs gefunden
       // Lokal (E2E-Modus) verlangen wir den expliziten Empty-State mit Test-ID.
@@ -34,23 +34,8 @@ test.describe('Courses Page', () => {
         // Optional: prüfe noch, dass keine Karten erscheinen (bereits count==0)
         await expect(cards).toHaveCount(0);
       } else {
-        // In production/preview we may see either the dedicated e2e fallback or the public fallback.
-        // Accept both to be robust against different rendering strategies in previews.
-        const emptyE2E = page.getByTestId('e2e-courses-empty');
-        const emptyPublic = page.getByTestId('course-fallback-message');
-        // Wait for either to be visible (short timeout)
-        await Promise.race([
-          emptyE2E.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {
-            /* Ignore timeout errors */
-          }),
-          emptyPublic.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {
-            /* Ignore timeout errors */
-          }),
-        ]);
-        // Assert at least one is present
-        const visibleE2E = await emptyE2E.count().then(c => c > 0);
-        const visiblePublic = await emptyPublic.count().then(c => c > 0);
-        await expect(visibleE2E || visiblePublic).toBeTruthy();
+        await databaseEmptyState.waitFor({ state: 'visible', timeout: 5000 });
+        await expect(databaseEmptyState).toBeVisible();
       }
     }
   });

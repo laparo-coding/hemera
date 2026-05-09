@@ -1,4 +1,23 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+import { seedMockClerkSession } from './auth-helper';
+import { gotoStable } from './helpers/nav';
+
+const REPORTS_TIMEOUT = 60_000;
+
+async function gotoReports(page: Page) {
+  await gotoStable(page, '/admin/reports', {
+    waitForTestId: 'admin-reports-page',
+    timeout: REPORTS_TIMEOUT,
+  });
+}
+
+test.beforeEach(async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+
+  if (!process.env.CI) {
+    await seedMockClerkSession(page, 'admin');
+  }
+});
 
 /**
  * Admin Reports & Health Status E2E Tests
@@ -14,7 +33,7 @@ test.describe('Admin Reports - Dashboard Stats', () => {
 
   test('should display reports page with all sections', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     // Main sections should be visible
     await expect(page.locator('[data-testid="reports-health-section"]')).toBeVisible();
@@ -25,7 +44,7 @@ test.describe('Admin Reports - Dashboard Stats', () => {
 
   test('should display booking statistics', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     const bookingsSection = page.locator('[data-testid="reports-bookings-section"]');
     await expect(bookingsSection).toBeVisible();
@@ -38,7 +57,7 @@ test.describe('Admin Reports - Dashboard Stats', () => {
 
   test('should display course utilization chart', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     const utilizationSection = page.locator('[data-testid="reports-utilization-section"]');
     await expect(utilizationSection).toBeVisible();
@@ -47,7 +66,7 @@ test.describe('Admin Reports - Dashboard Stats', () => {
 
   test('should display user growth statistics', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     const growthSection = page.locator('[data-testid="reports-growth-section"]');
     await expect(growthSection).toBeVisible();
@@ -63,7 +82,7 @@ test.describe('Admin Reports - Health Status', () => {
 
   test('should display system health panel', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     const healthSection = page.locator('[data-testid="reports-health-section"]');
     await expect(healthSection).toBeVisible();
@@ -72,7 +91,7 @@ test.describe('Admin Reports - Health Status', () => {
 
   test('should show individual service statuses in German', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     const healthSection = page.locator('[data-testid="reports-health-section"]');
 
@@ -85,7 +104,7 @@ test.describe('Admin Reports - Health Status', () => {
 
   test('should show health status indicators', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     // Health status chips should be visible (data-testid="health-status-{service}")
     const healthSection = page.locator('[data-testid="reports-health-section"]');
@@ -98,7 +117,7 @@ test.describe('Admin Reports - Health Status', () => {
 
   test('should have manual refresh button', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     // Refresh button should be visible
     const refreshButton = page.locator('[data-testid="health-refresh-button"]');
@@ -108,28 +127,44 @@ test.describe('Admin Reports - Health Status', () => {
 
   test('should refresh health status on button click', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
-
-    // Click refresh
-    const refreshButton = page.locator('[data-testid="health-refresh-button"]');
-    await refreshButton.click();
-
-    // Should show loading state
-    await expect(refreshButton).toBeDisabled();
-
-    // Wait for refresh to complete
-    await expect(refreshButton).toBeEnabled({ timeout: 5000 });
-  });
-
-  test('should display build information', async ({ page }) => {
-    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     const healthSection = page.locator('[data-testid="reports-health-section"]');
+    const refreshButton = page.getByTestId('health-refresh-button');
 
-    // Build info should be visible
-    await expect(healthSection).toContainText(/Version/i);
-    await expect(healthSection).toContainText(/Commit/i);
+    await page.route('**/api/admin/reports/health', async route => {
+      await new Promise(resolve => setTimeout(resolve, 150));
+      await route.continue();
+    });
+
+    try {
+      const refreshResponsePromise = page.waitForResponse(
+        response =>
+          response.url().includes('/api/admin/reports/health') &&
+          response.request().method() === 'GET' &&
+          response.status() === 200,
+        { timeout: REPORTS_TIMEOUT }
+      );
+
+      await refreshButton.click();
+      await expect(refreshButton).toBeDisabled();
+      await refreshResponsePromise;
+      await expect(refreshButton).toBeVisible();
+      await expect(refreshButton).toBeEnabled();
+
+      await expect(healthSection).toContainText(/Zuletzt aktualisiert/i);
+    } finally {
+      await page.unroute('**/api/admin/reports/health');
+    }
+  });
+
+  test('should display build information only in system status', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
+    await gotoReports(page);
+
+    await expect(page.locator('[data-testid="build-info"]')).toHaveCount(0);
+    const healthSection = page.locator('[data-testid="reports-health-section"]');
+    await expect(healthSection).toContainText(/(v\d+\.\d+\.\d+|preview|unknown)/i);
   });
 });
 
@@ -140,7 +175,7 @@ test.describe('Admin Reports - Breadcrumb', () => {
 
   test('should display correct breadcrumb path', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     const breadcrumb = page.locator('[data-testid="admin-breadcrumb"]');
     await expect(breadcrumb).toBeVisible();
@@ -154,7 +189,7 @@ test.describe('Admin Reports - Responsive', () => {
   test('should adapt layout for tablet viewport', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     // Sections should still be visible
     await expect(page.locator('[data-testid="reports-health-section"]')).toBeVisible();
@@ -164,7 +199,7 @@ test.describe('Admin Reports - Responsive', () => {
   test('should stack sections on mobile viewport', async ({ page }) => {
     test.skip(!!process.env.CI, 'Erfordert authentifizierte Session');
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('/admin/reports');
+    await gotoReports(page);
 
     // All sections should still be visible, just stacked
     await expect(page.locator('[data-testid="reports-health-section"]')).toBeVisible();

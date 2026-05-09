@@ -18,11 +18,18 @@ const MonitoringInit = dynamic(() => import('./MonitoringInit'), {
 type ProvidersProps = {
   children: React.ReactNode;
   isE2E: boolean;
+  // `clerkBypassReason` is optional and carries the resolved server-side Clerk
+  // bypass reason when auth is intentionally disabled or misconfigured.
+  clerkBypassReason?: string | null;
 };
 
-export default function Providers({ children, isE2E }: ProvidersProps) {
+export default function Providers({
+  children,
+  isE2E,
+  clerkBypassReason = null,
+}: ProvidersProps) {
   return (
-    <ClerkProviderWrapper>
+    <ClerkProviderWrapper forcedBypassReason={clerkBypassReason}>
       {isE2E ? (
         // In E2E mode: skip Rollbar/Stripe to reduce overhead and flakiness
         <ThemeRegistry>

@@ -561,12 +561,23 @@ export default function CourseForm({
         name='curriculum'
         control={control}
         render={({ field }) => (
-          <CurriculumEditor
-            value={field.value as CurriculumModule[] | null | undefined}
-            onChange={field.onChange}
-            disabled={isLoading || isSubmitting}
-            courseId={courseId}
-          />
+          <Box
+            component='section'
+            aria-label='Curriculum'
+            sx={{
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 1,
+              p: 2,
+            }}
+          >
+            <CurriculumEditor
+              value={field.value as CurriculumModule[] | null | undefined}
+              onChange={field.onChange}
+              disabled={isLoading || isSubmitting}
+              courseId={courseId}
+            />
+          </Box>
         )}
       />
 

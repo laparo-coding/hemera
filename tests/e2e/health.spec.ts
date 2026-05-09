@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+const HEALTH_ENDPOINT_TIMEOUT_MS = 10_000;
+
 /**
  * Health Endpoint Validation
  *
@@ -22,7 +24,9 @@ test('health endpoint returns ok', async ({ request }) => {
     return;
   }
 
-  const res = await request.get('/api/health');
+  const res = await request.get('/api/health', {
+    timeout: HEALTH_ENDPOINT_TIMEOUT_MS,
+  });
   expect(res.ok()).toBeTruthy();
   const body = await res.json();
 

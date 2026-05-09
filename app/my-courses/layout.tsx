@@ -5,11 +5,10 @@
  * with Clerk authentication and navigation.
  */
 
-import { currentUser } from '@clerk/nextjs/server';
 import { Box } from '@mui/material';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import { PublicNavigation } from '../../components/navigation/PublicNavigation';
+import { requireAuthenticatedUser } from '../../lib/auth/helpers';
 
 export const metadata: Metadata = {
   title: 'Meine Seminare | Hemera',
@@ -21,11 +20,7 @@ export default async function MyCoursesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await currentUser();
-
-  if (!user) {
-    redirect('/sign-in?redirect=/my-courses');
-  }
+  await requireAuthenticatedUser();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

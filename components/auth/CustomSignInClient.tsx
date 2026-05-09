@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type FormEvent, useMemo, useState } from 'react';
+import { buttonStyles } from '@/lib/design-tokens';
 
 export default function CustomSignInClient() {
   const { signIn, fetchStatus } = useSignIn();
@@ -117,7 +118,21 @@ export default function CustomSignInClient() {
           variant='contained'
           size='large'
           disabled={!isLoaded || submitting}
-          sx={{ mt: 1 }}
+          sx={{
+            mt: 1,
+            bgcolor: buttonStyles.bronzeFilled.backgroundColor,
+            color: buttonStyles.bronzeFilled.textColor,
+            fontWeight: 600,
+            textTransform: 'none',
+            '&:hover': {
+              bgcolor: buttonStyles.bronzeFilled.hoverBackgroundColor,
+            },
+            '&:disabled': {
+              bgcolor: buttonStyles.bronzeFilled.disabledBackgroundColor,
+              color: buttonStyles.bronzeFilled.disabledTextColor,
+              opacity: 0.6,
+            },
+          }}
         >
           {submitting ? 'Wird angemeldet…' : 'Anmelden'}
         </Button>

@@ -2,13 +2,26 @@
 
 import { deDE } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Component, type ErrorInfo, type ReactNode } from 'react';
+import {
+  Component,
+  createContext,
+  type ErrorInfo,
+  type ReactNode,
+  useEffect,
+  useState,
+} from 'react';
 import { clerkConfig } from '../../lib/auth/clerk-config';
 import { logClientError, logClientWarning } from '../../lib/errors/client';
+
+const clerkRuntimeBypassMessages = [
+  'Refreshing the session token resulted in an infinite redirect loop',
+  'Clerk instance keys do not match',
+] as const;
 
 // Custom German localization with overrides
 const customDeDE = {
   ...deDE,
+  formFieldInputPlaceholder__signUpPassword: 'Passwort erstellen',
   signIn: {
     ...deDE.signIn,
     start: {
@@ -31,6 +44,12 @@ const customDeDE = {
 
 interface ClerkProviderWrapperProps {
   children: ReactNode;
+  forcedBypassReason?: string | null;
+}
+
+interface ClerkErrorBoundaryProps {
+  children: ReactNode;
+  fallback: ReactNode;
 }
 
 interface ClerkErrorBoundaryState {
@@ -38,14 +57,18 @@ interface ClerkErrorBoundaryState {
   error?: Error;
 }
 
+export const ClerkAvailabilityContext = createContext({
+  clerkBypassed: false,
+});
+
 /**
  * Error Boundary to catch Clerk initialization errors and provide graceful fallback
  */
 class ClerkErrorBoundary extends Component<
-  { children: ReactNode },
+  ClerkErrorBoundaryProps,
   ClerkErrorBoundaryState
 > {
-  constructor(props: { children: ReactNode }) {
+  constructor(props: ClerkErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
@@ -81,7 +104,7 @@ class ClerkErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       // Render children without Clerk (unauthenticated mode)
-      return this.props.children;
+      return this.props.fallback;
     }
 
     return this.props.children;
@@ -96,7 +119,7 @@ function shouldBypassClerk(publishableKey?: string): {
   reason?: string;
 } {
   const isE2E =
-    process.env.E2E_TEST === '1' ||
+    process.env.NEXT_PUBLIC_E2E_TEST === '1' ||
     process.env.NEXT_PUBLIC_DISABLE_CLERK === '1';
 
   if (isE2E) {
@@ -142,39 +165,131 @@ function shouldBypassClerk(publishableKey?: string): {
   return { bypass: false };
 }
 
+function extractRuntimeErrorMessage(value: unknown): string | null {
+  if (value instanceof Error) {
+    return value.message;
+  }
+
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    'message' in value &&
+    typeof value.message === 'string'
+  ) {
+    return value.message;
+  }
+
+  return null;
+}
+
+function shouldBypassForRuntimeError(value: unknown): string | null {
+  const message = extractRuntimeErrorMessage(value);
+
+  if (!message) {
+    return null;
+  }
+
+  return clerkRuntimeBypassMessages.some(fragment => message.includes(fragment))
+    ? message
+    : null;
+}
+
 export default function ClerkProviderWrapper({
   children,
+  forcedBypassReason = null,
 }: ClerkProviderWrapperProps) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   const { bypass, reason } = shouldBypassClerk(publishableKey);
+  const [runtimeBypassReason, setRuntimeBypassReason] = useState<string | null>(
+    null
+  );
 
-  if (bypass) {
-    if (reason) {
+  useEffect(() => {
+    if (bypass) {
+      return;
+    }
+
+    const handleRuntimeBypass = (errorLike: unknown) => {
+      const message = shouldBypassForRuntimeError(errorLike);
+
+      if (!message) {
+        return;
+      }
+
+      if (runtimeBypassReason !== message) {
+        logClientWarning(
+          '[ClerkProviderWrapper] Clerk runtime error detected, disabling provider',
+          { reason: message }
+        );
+      }
+
+      setRuntimeBypassReason(currentReason =>
+        currentReason === message ? currentReason : message
+      );
+    };
+
+    const onError = (event: ErrorEvent) => {
+      handleRuntimeBypass(event.error ?? event.message);
+    };
+
+    const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+      handleRuntimeBypass(event.reason);
+    };
+
+    window.addEventListener('error', onError);
+    window.addEventListener('unhandledrejection', onUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', onError);
+      window.removeEventListener('unhandledrejection', onUnhandledRejection);
+    };
+  }, [bypass, runtimeBypassReason]);
+
+  const clerkBypassed = Boolean(
+    forcedBypassReason || bypass || runtimeBypassReason
+  );
+
+  if (clerkBypassed) {
+    const bypassReason = forcedBypassReason ?? runtimeBypassReason ?? reason;
+
+    if (bypassReason) {
       // Only log in development - this is expected behavior in test mode
       if (
         process.env.NODE_ENV === 'development' &&
-        reason !== 'E2E test mode'
+        bypassReason !== 'E2E test mode'
       ) {
-        logClientWarning('[ClerkProviderWrapper] Clerk bypassed', { reason });
+        logClientWarning('[ClerkProviderWrapper] Clerk bypassed', {
+          reason: bypassReason,
+        });
       }
     }
-    return <>{children}</>;
+    return (
+      <ClerkAvailabilityContext.Provider value={{ clerkBypassed: true }}>
+        {children}
+      </ClerkAvailabilityContext.Provider>
+    );
   }
 
   return (
-    <ClerkErrorBoundary>
-      <ClerkProvider
-        publishableKey={publishableKey!}
-        localization={customDeDE}
-        signInUrl={clerkConfig.signInUrl}
-        signUpUrl={clerkConfig.signUpUrl}
-        signInFallbackRedirectUrl={clerkConfig.signInFallbackRedirectUrl}
-        signUpFallbackRedirectUrl={clerkConfig.signUpFallbackRedirectUrl}
-        signInForceRedirectUrl={clerkConfig.signInForceRedirectUrl}
-        signUpForceRedirectUrl={clerkConfig.signUpForceRedirectUrl}
-      >
-        {children}
-      </ClerkProvider>
-    </ClerkErrorBoundary>
+    <ClerkAvailabilityContext.Provider value={{ clerkBypassed: false }}>
+      <ClerkErrorBoundary fallback={children}>
+        <ClerkProvider
+          publishableKey={publishableKey!}
+          localization={customDeDE}
+          signInUrl={clerkConfig.signInUrl}
+          signUpUrl={clerkConfig.signUpUrl}
+          signInFallbackRedirectUrl={clerkConfig.signInFallbackRedirectUrl}
+          signUpFallbackRedirectUrl={clerkConfig.signUpFallbackRedirectUrl}
+          signInForceRedirectUrl={clerkConfig.signInForceRedirectUrl}
+          signUpForceRedirectUrl={clerkConfig.signUpForceRedirectUrl}
+        >
+          {children}
+        </ClerkProvider>
+      </ClerkErrorBoundary>
+    </ClerkAvailabilityContext.Provider>
   );
 }

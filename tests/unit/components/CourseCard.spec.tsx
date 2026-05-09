@@ -5,6 +5,10 @@
  */
 
 import { describe, expect, it } from '@jest/globals';
+import {
+  shouldShowInvoiceButton,
+  shouldShowTestimonialButton,
+} from '@/components/dashboard/CourseCard';
 
 // Types for the CourseCard component props
 interface CourseCardProps {
@@ -151,67 +155,18 @@ describe('CourseCard Component', () => {
   });
 
   describe('Invoice button visibility', () => {
-    it('should show invoice button when PDF URL exists', () => {
-      const props: CourseCardProps = {
-        id: 'booking-1',
-        courseTitle: 'Test Kurs',
-        startDate: '2026-02-15T00:00:00Z',
-        endDate: null,
-        startTime: '2026-02-15T09:00:00Z',
-        endTime: '2026-02-15T17:00:00Z',
-        locationName: 'Test Location',
-        locationSlug: 'test-location',
-        locationCity: 'Berlin',
-        hasParticipation: false,
-        paymentStatus: 'PAID',
-        stripeInvoicePdfUrl: 'https://invoice.stripe.com/test/pdf',
-      };
-
-      const showInvoiceButton =
-        props.paymentStatus === 'PAID' && props.stripeInvoicePdfUrl !== null;
-      expect(showInvoiceButton).toBe(true);
+    it('should show invoice button for paid bookings even without cached PDF URL', () => {
+      expect(shouldShowInvoiceButton('NEXT_SEMINAR', 'PAID', null)).toBe(true);
     });
 
     it('should hide invoice button when not paid', () => {
-      const props: CourseCardProps = {
-        id: 'booking-1',
-        courseTitle: 'Test Kurs',
-        startDate: null,
-        endDate: null,
-        startTime: null,
-        endTime: null,
-        locationName: null,
-        locationSlug: null,
-        locationCity: null,
-        hasParticipation: false,
-        paymentStatus: 'PENDING',
-        stripeInvoicePdfUrl: null,
-      };
-
-      const showInvoiceButton =
-        props.paymentStatus === 'PAID' && props.stripeInvoicePdfUrl !== null;
-      expect(showInvoiceButton).toBe(false);
+      expect(shouldShowInvoiceButton('UPCOMING', 'PENDING', null)).toBe(false);
     });
 
-    it('should hide invoice button when no PDF URL', () => {
-      const props: CourseCardProps = {
-        id: 'booking-1',
-        courseTitle: 'Test Kurs',
-        startDate: null,
-        endDate: null,
-        startTime: null,
-        endTime: null,
-        locationName: null,
-        locationSlug: null,
-        locationCity: null,
-        hasParticipation: false,
-        paymentStatus: 'PAID',
-        stripeInvoicePdfUrl: null,
-      };
-
-      const showInvoiceButton =
-        props.paymentStatus === 'PAID' && props.stripeInvoicePdfUrl !== null;
-      expect(showInvoiceButton).toBe(false);
+    it('should show invoice button for confirmed legacy bookings without cached PDF URL', () => {
+      expect(shouldShowInvoiceButton('COMPLETED', 'CONFIRMED', null)).toBe(
+        true
+      );
     });
   });
 
@@ -238,6 +193,33 @@ describe('CourseCard Component', () => {
 
       const showPreparationButton = isUpcoming && !hasParticipation;
       expect(showPreparationButton).toBe(false);
+    });
+  });
+
+  describe('Testimonial button visibility', () => {
+    const userProfile = {
+      firstName: 'Max',
+      lastName: 'Mustermann',
+      imageUrl: undefined,
+      city: 'Berlin',
+    };
+
+    it('should only show Erfahrungsbericht for completed cards', () => {
+      expect(shouldShowTestimonialButton('COMPLETED', userProfile)).toBe(true);
+    });
+
+    it('should hide Erfahrungsbericht for next seminar cards', () => {
+      expect(shouldShowTestimonialButton('NEXT_SEMINAR', userProfile)).toBe(
+        false
+      );
+    });
+
+    it('should hide Erfahrungsbericht for upcoming cards', () => {
+      expect(shouldShowTestimonialButton('UPCOMING', userProfile)).toBe(false);
+    });
+
+    it('should hide Erfahrungsbericht for no-show cards', () => {
+      expect(shouldShowTestimonialButton('NO_SHOW', userProfile)).toBe(false);
     });
   });
 

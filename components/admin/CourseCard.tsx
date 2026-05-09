@@ -44,13 +44,29 @@ export default function CourseCard({
         flexDirection: 'column',
       }}
     >
-      <CardMedia
-        component='img'
-        height='200'
-        image={course.thumbnailUrl || '/placeholder-course.jpg'}
-        alt={course.title}
-        sx={{ objectFit: 'cover' }}
-      />
+      {course.thumbnailUrl ? (
+        <CardMedia
+          component='img'
+          height='200'
+          image={course.thumbnailUrl}
+          alt={course.title}
+          sx={{ objectFit: 'cover' }}
+        />
+      ) : (
+        <Box
+          sx={{
+            height: 200,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            px: 2,
+            bgcolor: 'grey.100',
+            color: 'text.secondary',
+          }}
+        >
+          <Typography variant='body2'>Kein Kursbild verfügbar</Typography>
+        </Box>
+      )}
 
       <CardContent sx={{ flexGrow: 1 }}>
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>

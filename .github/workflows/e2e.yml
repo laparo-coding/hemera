@@ -1,17 +1,17 @@
-name: 'E2E: Tests'
+name: 'E2E: Functional Tests'
 
 on:
   workflow_dispatch:
     inputs:
-      url:
-        description: 'Base URL for E2E (e.g., https://hemera-<preview>.vercel.app)'
-        required: false
       ref:
         description: 'Git ref or branch to checkout'
         required: false
   pull_request:
     types: [opened, synchronize, reopened]
-  deployment_status:
+
+concurrency:
+  group: e2e-functional-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check-frontend-changes:
@@ -71,8 +71,7 @@ jobs:
     needs: [check-frontend-changes]
     if: |
       (github.event_name == 'pull_request' && needs.check-frontend-changes.result == 'success' && needs.check-frontend-changes.outputs.has_frontend_changes == 'true') ||
-      (github.event_name == 'workflow_dispatch') ||
-      (github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success')
+      (github.event_name == 'workflow_dispatch')
     timeout-minutes: 30
 
     services:
@@ -95,6 +94,7 @@ jobs:
       DATABASE_URL: 'postgresql://postgres:postgres@127.0.0.1:5432/hemera_e2e'
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      E2E_CREATE_USERS: 'false'
       NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
       NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
       NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /dashboard
@@ -133,8 +133,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Install jq and Postgres client
-        run: sudo apt-get update && sudo apt-get install -y jq postgresql-client
+      - name: Install Postgres client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
       - name: Wait for Postgres to be ready
         env:
@@ -155,52 +155,6 @@ jobs:
           done
           psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE" -c "SELECT 1;" || exit 1
 
-      - name: Determine Base URL
-        id: base
-        run: |
-          if [ -n "${{ inputs.url }}" ]; then
-            echo "base=${{ inputs.url }}" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event_name }}" = "deployment_status" ]; then
-            ENV_URL=$(jq -r '.deployment_status.environment_url // empty' "$GITHUB_EVENT_PATH")
-            TARGET=$(jq -r '.deployment_status.target_url // empty' "$GITHUB_EVENT_PATH")
-            URL="${ENV_URL:-$TARGET}"
-            if [ -n "$URL" ]; then
-              if echo "$URL" | grep -qE 'vercel\.app|vercel\.com'; then
-                echo "base=http://localhost:3000" >> "$GITHUB_OUTPUT"
-              else
-                echo "base=$URL" >> "$GITHUB_OUTPUT"
-              fi
-            else
-              echo "base=http://localhost:3000" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            echo "base=http://localhost:3000" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Check base reachability
-        id: basecheck
-        run: |
-          RAW_BASE="${{ steps.base.outputs.base }}"
-          RAW_BASE=${RAW_BASE%/}
-          CHECK_URL_API="$RAW_BASE/api/health"
-          echo "Checking reachability: $CHECK_URL_API"
-          STATUS_API=$(curl -s -o /dev/null -w "%{http_code}" "$CHECK_URL_API" --connect-timeout 5) || STATUS_API=000
-          echo "API status: $STATUS_API"
-          USE_LOCAL=0
-          FINAL_BASE="$RAW_BASE"
-          # Status 000 means connection failed, treat as unreachable
-          if [ "$STATUS_API" = "000" ] || [ "$STATUS_API" -lt 200 ] || [ "$STATUS_API" -ge 400 ]; then
-            echo "URL unreachable (status=$STATUS_API). Using local server."
-            USE_LOCAL=1
-            FINAL_BASE="http://localhost:3000"
-          fi
-          echo "use_local=$USE_LOCAL" >> "$GITHUB_OUTPUT"
-          echo "final_base=$FINAL_BASE" >> "$GITHUB_OUTPUT"
-
-      - name: Selected base URL
-        run: |
-          echo "Using base URL: ${{ steps.basecheck.outputs.final_base }} (use_local=${{ steps.basecheck.outputs.use_local }})"
-
       - name: Setup database schema
         env:
           # Prisma 7 uses prisma.config.ts for datasource configuration
@@ -217,7 +171,6 @@ jobs:
           npx prisma db execute --stdin <<< "SELECT COUNT(*) AS published_count FROM courses WHERE is_published = true;"
 
       - name: Start Next.js server in background
-        if: steps.basecheck.outputs.use_local == '1'
         run: |
           npm run dev > /tmp/nextjs.log 2>&1 &
           SERVER_PID=$!
@@ -244,30 +197,22 @@ jobs:
         env:
           NODE_ENV: development
           E2E_TEST: '1'
+          NEXT_PUBLIC_E2E_TEST: '1'
           NEXT_PUBLIC_DISABLE_CLERK: '1'
           NEXT_PUBLIC_DISABLE_ROLLBAR: '1'
 
       - name: Run E2E tests
         id: e2e
         continue-on-error: true
-        # Secrets are optional - gracefully handle missing credentials to avoid flaky tests
         env:
-          PLAYWRIGHT_BASE_URL: ${{ steps.basecheck.outputs.final_base }}
-          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL || '' }}
-          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD || '' }}
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
           E2E_TEST: '1'
+          NEXT_PUBLIC_E2E_TEST: '1'
           NEXT_PUBLIC_DISABLE_CLERK: '1'
           NEXT_PUBLIC_DISABLE_ROLLBAR: '1'
         run: |
-          if [ -z "$E2E_TEST_EMAIL" ] || [ -z "$E2E_TEST_PASSWORD" ]; then
-            echo "⚠️  WARNING: E2E credentials not configured (E2E_TEST_EMAIL, E2E_TEST_PASSWORD)"
-            echo "   Running authenticated tests: SKIPPED (chromium-no-auth only)"
-            echo "   Set secrets in repository settings to enable full test coverage"
-            npx playwright test --project=chromium-no-auth
-          else
-            echo "✓ E2E credentials available - running full test suite (all projects)"
-            npm run e2e:dev
-          fi
+          echo 'Running functional E2E suite in CI mock mode'
+          npm run test:e2e:functional
 
       - name: Debug - Check course data
         if: always()
@@ -293,7 +238,7 @@ jobs:
         continue-on-error: true
         uses: actions/github-script@v9
         env:
-          BASE_URL: ${{ steps.basecheck.outputs.final_base }}
+          BASE_URL: http://localhost:3000
           OUTCOME: ${{ steps.e2e.outcome }}
         with:
           script: |

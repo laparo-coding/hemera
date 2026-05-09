@@ -2,9 +2,13 @@
  * Simple E2E Test Seed Script for SQLite
  *
  * This script is used for E2E testing with SQLite.
- * It uses a plain PrismaClient without the PostgreSQL adapter.
+ * It creates deterministic, produktionsnahe Testdaten nur fuer die Testdatenbank.
  */
 import { PrismaClient } from '@prisma/client';
+import {
+  createE2ECourseData,
+  createE2ELocationData,
+} from '../lib/testing/e2e-course-fixtures';
 
 // For SQLite, we use a simple PrismaClient without adapters
 const prisma = new PrismaClient({
@@ -14,49 +18,20 @@ const prisma = new PrismaClient({
 async function main() {
   console.log('🌱 Starting simple E2E seed...');
 
-  // Clear existing data
   await prisma.booking.deleteMany();
   await prisma.course.deleteMany();
+  await prisma.location.deleteMany();
 
-  // Create minimal test courses
-  const courses = await prisma.course.createMany({
-    data: [
-      {
-        title: 'Grundlagen der Persönlichkeitsentwicklung',
-        description: 'Entdecken Sie die Basics der persönlichen Entwicklung.',
-        slug: 'grundlagen-persoenlichkeitsentwicklung',
-        price: 100,
-        currency: 'EUR',
-        capacity: 20,
-        startDate: new Date('2025-11-15T10:00:00Z'),
-        isPublished: true,
-      },
-      {
-        title: 'Selbstvertrauen in 30 Minuten',
-        description: 'Schnelle Techniken zur Stärkung Ihres Selbstvertrauens.',
-        slug: 'selbstvertrauen-30-minuten',
-        price: 100,
-        currency: 'EUR',
-        capacity: 25,
-        startDate: new Date('2025-11-20T14:00:00Z'),
-        isPublished: true,
-      },
-      {
-        title: 'Stressabbau für Anfänger',
-        description: 'Einfache Methoden zum Stressabbau.',
-        slug: 'stressabbau-anfaenger',
-        price: 100,
-        currency: 'EUR',
-        capacity: 30,
-        startDate: new Date('2025-11-25T16:00:00Z'),
-        isPublished: true,
-      },
-    ],
+  const location = await prisma.location.create({
+    data: createE2ELocationData('SQLite E2E-Test-Location'),
   });
 
-  console.log(`✅ Created ${courses.count} courses`);
+  const courses = await prisma.course.createMany({
+    data: createE2ECourseData(location.id),
+  });
 
-  // Verify
+  console.log(`✅ Created ${courses.count} SQLite E2E courses`);
+
   const publishedCount = await prisma.course.count({
     where: { isPublished: true },
   });

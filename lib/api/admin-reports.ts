@@ -6,6 +6,7 @@
  */
 
 import { clerkClient } from '@clerk/nextjs/server';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db/prisma';
 import type {
   AdminReportsResponse,
@@ -17,12 +18,68 @@ import type {
   ServiceHealth,
   UserGrowthStats,
 } from '@/lib/types/admin';
+import { isEnvFlagEnabled } from '@/lib/utils/env-flags';
 import { findEnvByPrefix } from '@/lib/utils/env-prefix';
+
+const CLERK_REPORTS_TIMEOUT_MS = 5_000;
+
+async function withTimeout<T>(
+  operation: Promise<T>,
+  timeoutMs: number,
+  timeoutMessage: string
+): Promise<T> {
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<T>((_, reject) => {
+        timeoutHandle = setTimeout(() => {
+          reject(new Error(timeoutMessage));
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeoutHandle) {
+      clearTimeout(timeoutHandle);
+    }
+  }
+}
+
+async function hasMockAdminReportsCookie(): Promise<boolean> {
+  if (process.env.NODE_ENV === 'production') {
+    return false;
+  }
+
+  try {
+    const cookieStore = await cookies();
+    const role = cookieStore.get('hemera-e2e-role')?.value;
+    return role === 'admin' || role === 'user';
+  } catch {
+    return false;
+  }
+}
+
+async function shouldBypassClerkAnalytics(): Promise<boolean> {
+  if (
+    isEnvFlagEnabled(process.env.E2E_TEST) ||
+    isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_CLERK) ||
+    isEnvFlagEnabled(process.env.NEXT_PUBLIC_E2E_TEST)
+  ) {
+    return true;
+  }
+
+  return await hasMockAdminReportsCookie();
+}
 
 /**
  * Helper: Fetch all users from Clerk via pagination
  */
 async function getAllClerkUsers() {
+  if (await shouldBypassClerkAnalytics()) {
+    return [];
+  }
+
   const clerk = await clerkClient();
   let allUsers: Awaited<ReturnType<typeof clerk.users.getUserList>>['data'] =
     [];
@@ -33,10 +90,14 @@ async function getAllClerkUsers() {
   let page = 0;
 
   while (hasMore && page < maxPages) {
-    const response = await clerk.users.getUserList({
-      limit,
-      offset,
-    });
+    const response = await withTimeout(
+      clerk.users.getUserList({
+        limit,
+        offset,
+      }),
+      CLERK_REPORTS_TIMEOUT_MS,
+      'Clerk user list timed out'
+    );
     allUsers = allUsers.concat(response.data);
     offset += limit;
     hasMore = response.data.length === limit;
@@ -399,9 +460,24 @@ async function checkDatabaseHealth(): Promise<ServiceHealth> {
 
 async function checkClerkHealth(): Promise<ServiceHealth> {
   const startTime = Date.now();
+
+  if (await shouldBypassClerkAnalytics()) {
+    return {
+      name: 'clerk',
+      nameDe: 'Authentifizierung',
+      status: 'degraded',
+      message: 'E2E-/Mock-Modus aktiv',
+      lastChecked: new Date().toISOString(),
+    };
+  }
+
   try {
     const clerk = await clerkClient();
-    await clerk.users.getUserList({ limit: 1 });
+    await withTimeout(
+      clerk.users.getUserList({ limit: 1 }),
+      CLERK_REPORTS_TIMEOUT_MS,
+      'Clerk health check timed out'
+    );
     return {
       name: 'clerk',
       nameDe: 'Authentifizierung',
@@ -458,7 +534,18 @@ async function checkStripeHealth(): Promise<ServiceHealth> {
 }
 
 async function checkRollbarHealth(): Promise<ServiceHealth> {
-  // Rollbar uses opt-out: it is enabled unless explicitly disabled
+  const deploymentEnv = (
+    process.env.VERCEL_ENV ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV ||
+    ''
+  ).toLowerCase();
+  const isDevelopmentEnvironment =
+    deploymentEnv !== 'production' &&
+    deploymentEnv !== 'preview' &&
+    process.env.NODE_ENV !== 'production';
+  const isExplicitlyEnabled =
+    process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '1' ||
+    process.env.ROLLBAR_ENABLED === '1';
   const isExplicitlyDisabled =
     process.env.NEXT_PUBLIC_DISABLE_ROLLBAR === '1' ||
     process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '0' ||
@@ -483,11 +570,30 @@ async function checkRollbarHealth(): Promise<ServiceHealth> {
     'ROLLBAR_AITHER_SERVER_TOKEN'
   );
 
+  if (!rollbarToken) {
+    return {
+      name: 'rollbar',
+      nameDe: 'Fehlerüberwachung',
+      status: 'degraded',
+      message: 'Server-Token nicht konfiguriert',
+      lastChecked: new Date().toISOString(),
+    };
+  }
+
+  if (isDevelopmentEnvironment && !isExplicitlyEnabled) {
+    return {
+      name: 'rollbar',
+      nameDe: 'Fehlerüberwachung',
+      status: 'degraded',
+      message: 'Development-Umgebung nicht aktiviert (ROLLBAR_ENABLED=1 fehlt)',
+      lastChecked: new Date().toISOString(),
+    };
+  }
+
   return {
     name: 'rollbar',
     nameDe: 'Fehlerüberwachung',
-    status: rollbarToken ? 'healthy' : 'degraded',
-    message: rollbarToken ? undefined : 'Server-Token nicht konfiguriert',
+    status: 'healthy',
     lastChecked: new Date().toISOString(),
   };
 }

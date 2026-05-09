@@ -30,6 +30,20 @@ export interface CreateUserData {
   image?: string | null;
 }
 
+export interface SessionUserLike {
+  id: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  fullName?: string | null;
+  imageUrl?: string | null;
+  primaryEmailAddress?: {
+    emailAddress?: string | null;
+  } | null;
+  emailAddresses?: Array<{
+    emailAddress?: string | null;
+  }>;
+}
+
 export interface UpdateUserData {
   name?: string | null;
   email?: string;
@@ -266,6 +280,36 @@ export async function syncClerkUserToDatabase(
     update: { name, email, image },
     create: { id: clerkId, name, email, image },
   });
+}
+
+export async function syncSessionUserToDatabase(
+  sessionUser: SessionUserLike
+): Promise<User> {
+  if (!sessionUser?.id) {
+    throw new UserValidationError('Invalid authenticated user provided');
+  }
+
+  const email =
+    sessionUser.primaryEmailAddress?.emailAddress ||
+    sessionUser.emailAddresses?.[0]?.emailAddress ||
+    null;
+
+  if (!email) {
+    throw new UserValidationError(
+      'Authenticated user is missing a primary email address'
+    );
+  }
+  const fullName =
+    sessionUser.fullName ||
+    [sessionUser.firstName, sessionUser.lastName].filter(Boolean).join(' ') ||
+    null;
+
+  return syncClerkUserToDatabase(
+    sessionUser.id,
+    email,
+    fullName,
+    sessionUser.imageUrl || null
+  );
 }
 
 /**

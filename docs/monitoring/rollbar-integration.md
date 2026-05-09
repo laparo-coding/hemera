@@ -1,7 +1,8 @@
 # Rollbar Error Monitoring Integration
 
-Umfassende Rollbar-Integration für Production Error Monitoring in der Hemera Academy mit
-@rollbar/react.
+Rollbar ist in Hemera für getrennte Environments konfiguriert: development, preview und production.
+Local development nutzt ein eigenes Rollbar-Development-Environment und bleibt standardmäßig aus,
+bis es explizit aktiviert wird.
 
 ## 🎯 Übersicht
 
@@ -13,12 +14,14 @@ Rollbar ist vollständig in das Hemera Error Handling System integriert und biet
 - **React Integration**: @rollbar/react für optimierte React Error Boundaries
 - **Client & Server**: Vollständige Coverage für Frontend und Backend
 - **Smart Categorization**: Automatische Severity-Klassifizierung
+- **Environment Separation**: Development, Preview und Production bleiben voneinander getrennt
+- **Development Opt-in**: Lokale Telemetrie ist nur mit explizitem Enable-Flag aktiv
 - **Production Ready**: Optimiert für Vercel Deployment
 
 ## 📦 Installierte Pakete
 
 ```bash
-npm install rollbar@^2.26.4 @rollbar/react
+npm install rollbar@4.53.0 @rollbar/react@0.12.0
 ```
 
 - **rollbar**: Core Rollbar library für Server und Client
@@ -32,22 +35,29 @@ Füge zu deiner `.env.local` Datei hinzu:
 
 ```bash
 # Rollbar Configuration
-ROLLBAR_SERVER_ACCESS_TOKEN=your_rollbar_server_access_token_here
-ROLLBAR_CLIENT_ACCESS_TOKEN=your_rollbar_client_access_token_here
-ROLLBAR_ENABLED=true
+# Verwende lokal ausschließlich Development-Tokens.
+ROLLBAR_HEMERA_SERVER_TOKEN=your_rollbar_development_server_token
+NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN=your_rollbar_development_client_token
 
-# Optional: Client-side Token (für Browser-Errors)
-NEXT_PUBLIC_ROLLBAR_CLIENT_ACCESS_TOKEN=your_rollbar_client_token
-NEXT_PUBLIC_ROLLBAR_ENABLED=true
+# Development ist Default-off und braucht explizites Opt-in.
+ROLLBAR_ENABLED=1
+NEXT_PUBLIC_ROLLBAR_ENABLED=1
+
+# Optional: Für lokale Doku-/Debug-Szenarien, Vercel setzt diesen Wert selbst.
+NEXT_PUBLIC_VERCEL_ENV=development
 ```
+
+Ohne gültigen Server-Token oder ohne Enable-Flag bleibt Rollbar in lokaler Entwicklung deaktiviert.
+Preview- und Production-Deployments nutzen weiter die jeweilige Deployment-Umgebung.
 
 ### 2. Rollbar Dashboard Setup
 
 1. Registriere dich bei [rollbar.com](https://rollbar.com)
-2. Erstelle ein neues Projekt
+2. Erstelle getrennte Projekte oder getrennte Access-Tokens für development und production
 3. Kopiere die Access Tokens:
    - **Server Access Token**: Für Server-side Error Reporting
    - **Client Access Token**: Für Browser-side Error Reporting
+4. Verwende lokal ausschließlich die Development-Tokens
 
 ### 3. Vercel Deployment
 
@@ -60,6 +70,42 @@ VERCEL_URL              # Deployment URL
 VERCEL_DEPLOYMENT_ID    # Unique Deployment ID
 VERCEL_REGION          # Region Information
 ```
+
+Die Environment-Zuordnung in Hemera ist:
+
+- `production`: `VERCEL_ENV=production` oder produktiver Runtime-Kontext
+- `preview`: `VERCEL_ENV=preview`
+- `development`: lokales Development oder Fallback ohne Vercel-Deployment-Kontext
+
+## 🔒 Aktivierungsregeln
+
+Rollbar initialisiert nur, wenn alle folgenden Bedingungen erfüllt sind:
+
+1. Kein E2E-Lauf aktiv ist
+2. Rollbar nicht explizit deaktiviert wurde
+3. Ein gültiger Server-Token vorhanden ist
+4. In local development zusätzlich ein explizites Enable-Flag gesetzt ist
+
+Disable-Flags:
+
+```bash
+NEXT_PUBLIC_DISABLE_ROLLBAR=1
+NEXT_PUBLIC_ROLLBAR_ENABLED=0
+ROLLBAR_ENABLED=0
+```
+
+Enable-Flags für lokales Development:
+
+```bash
+ROLLBAR_ENABLED=1
+NEXT_PUBLIC_ROLLBAR_ENABLED=1
+```
+
+Empfehlung:
+
+- Setze serverseitig mindestens `ROLLBAR_ENABLED=1`.
+- Setze `NEXT_PUBLIC_ROLLBAR_ENABLED=1`, wenn auch Browser-Fehler im Development-Environment landen sollen.
+- Verwende niemals Production-Tokens in `.env.local`.
 
 ## 🔧 Verwendung
 
@@ -287,7 +333,7 @@ captureUnhandledRejections = true;
 maxItems = 1000;
 
 // Development
-ROLLBAR_ENABLED = false;
+ROLLBAR_ENABLED = true;
 verbose = true;
 reportLevel = debug;
 ```

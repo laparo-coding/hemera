@@ -1,10 +1,11 @@
-name: 'E2E: External'
+name: 'E2E: External Smoke'
 
 # This workflow uses optional secrets:
 # - PLAYWRIGHT_BASE_URL: Optional base URL for testing (fallback logic in place)
 # - VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_ORG_ID: Optional Vercel API access
 
 on:
+  deployment_status:
   workflow_dispatch:
     inputs:
       base_url:
@@ -19,10 +20,8 @@ on:
       project:
         description: 'Playwright project name'
         required: false
-        default: 'chromium'
+        default: 'public'
         type: string
-  pull_request:
-    branches: [main]
 
 concurrency:
   group: e2e-ext-${{ github.ref }}
@@ -31,6 +30,9 @@ concurrency:
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success')
     timeout-minutes: 45
     # Job-level env for optional secrets (avoids step-level validation warnings)
     env:
@@ -40,10 +42,10 @@ jobs:
       VERCEL_ORG_ID_SECRET: ${{ secrets.VERCEL_ORG_ID }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node.js 20
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -64,6 +66,8 @@ jobs:
         run: |
           # Priority: workflow input > secrets
           if [ -n "$BASE_URL_INPUT" ]; then BASE_URL="$BASE_URL_INPUT";
+          elif [ "${{ github.event_name }}" = 'deployment_status' ]; then
+            BASE_URL=$(node -e "const fs=require('fs'); const event=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')); process.stdout.write(event.deployment_status?.environment_url || event.deployment_status?.target_url || '')")
           elif [ -n "$BASE_URL_SECRET" ]; then BASE_URL="$BASE_URL_SECRET";
           else BASE_URL=""; fi
 
@@ -76,8 +80,8 @@ jobs:
               export VERCEL_TOKEN="$VERCEL_TOKEN_SECRET"
               export VERCEL_PROJECT_ID="$VERCEL_PROJECT_ID_SECRET"
               export VERCEL_ORG_ID="$VERCEL_ORG_ID_SECRET"
-              export SHA='${{ github.event.pull_request.head.sha || github.sha }}'
-              export PR='${{ github.event.pull_request.number || '' }}'
+              export SHA='${{ github.sha }}'
+              export PR=''
               curl -sSf -H "Authorization: Bearer $VERCEL_TOKEN" \
                 "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&target=preview&limit=50&state=READY" \
                 -o deployments.json || true
@@ -113,25 +117,72 @@ jobs:
 
       - name: E2E (external)
         if: steps.resolve.outputs.base_url != ''
+        id: external
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.resolve.outputs.base_url }}
-          # Optional: provide a Vercel Protection Bypass token to run against SSO-protected previews
-          # Generate/manage in Vercel Project > Settings > Protection > Bypass Tokens
-          # Add it as repo/org secret VERCEL_PROTECTION_BYPASS
+          # disable creating test users in external previews
+          E2E_CREATE_USERS: 'false'
+          # Accept both the shared automation secret and the legacy fallback.
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
           # SSO tolerant mode: tests should only hit public pages by default via grep
           PLAYWRIGHT_SSO_TOLERANT: '1'
           NODE_ENV: test
           NEXT_TELEMETRY_DISABLED: '1'
         run: |
+          BYPASS_TOKEN="${VERCEL_AUTOMATION_BYPASS_SECRET:-$VERCEL_PROTECTION_BYPASS}"
+
+          if [ -z "$BYPASS_TOKEN" ]; then
+            echo "No Vercel bypass token available for this run. Probing preview in SSO-tolerant mode." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+          RESPONSE_HEADERS_FILE=$(mktemp)
+          RESPONSE_BODY_FILE=$(mktemp)
+          CURL_EXIT=0
+
+          curl -sSL --max-redirs 10 --max-time 30 \
+            -H "x-vercel-protection-bypass: $BYPASS_TOKEN" \
+            -H "x-vercel-set-bypass-cookie: true" \
+            -D "$RESPONSE_HEADERS_FILE" \
+            -o "$RESPONSE_BODY_FILE" \
+            "$PLAYWRIGHT_BASE_URL/courses" || CURL_EXIT=$?
+
+          RESPONSE_SIGNAL=$(cat "$RESPONSE_HEADERS_FILE"; printf '\n'; cat "$RESPONSE_BODY_FILE")
+
+          rm -f "$RESPONSE_HEADERS_FILE" "$RESPONSE_BODY_FILE"
+
+          # Trusted markers come from Vercel login/protection pages.
+          # Generic phrases like "verify you are human" only count when paired with Vercel-specific markers.
+          # Dependabot runs can execute without org secrets, which otherwise creates false red checks.
+          if bash scripts/detect-vercel-protection.sh <<< "$RESPONSE_SIGNAL"; then
+            echo "Preview remains behind Vercel login despite configured bypass; skipping external smoke." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "$CURL_EXIT" -eq 47 ] && [ "$PLAYWRIGHT_SSO_TOLERANT" = '1' ]; then
+            echo "Preview probe hit redirect loop (curl exit 47), likely due to Vercel protection or SSO. Skipping external smoke." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "$CURL_EXIT" -ne 0 ]; then
+            echo "Preview probe failed before Playwright start (curl exit $CURL_EXIT)." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit "$CURL_EXIT"
+          fi
+
           npx playwright test \
-            --project='${{ github.event.inputs.project || 'chromium' }}' \
+            --project='${{ github.event.inputs.project || 'public' }}' \
             --grep='${{ github.event.inputs.grep || '(seo|academy|courses|health)' }}'
 
       - name: Upload Playwright report
         if: always() && steps.resolve.outputs.base_url != ''
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report
+          name: playwright-external-smoke-report
+          path: |
+            playwright-report
+            test-results
           if-no-files-found: ignore

@@ -108,6 +108,7 @@ Daten
 Datenbankvalidierung
 Datenvalidierung
 davecgh
+diese
 DBNAME
 dein
 deployen
@@ -139,6 +140,7 @@ elif
 Endpunkt
 ENOTFOUND
 entdecken
+entpacktes
 Entitätsbeschreibungen
 entwicklen
 Entwickler
@@ -218,6 +220,8 @@ Googlebot
 googlecloud
 gopkg
 groesse
+fortbildung
+Fkurs
 Grundkurs
 Groot
 Behaviour
@@ -227,6 +231,7 @@ gegatted
 helmignore
 kube
 kubeconfig
+nvmrc
 pycache
 renv
 rlib
@@ -275,6 +280,8 @@ innen
 Instagram
 instagram
 Integrationen
+rztliche
+spater
 Interaktionstest
 Interner
 Invalidierung
@@ -307,6 +314,7 @@ Kursdetailsseite
 Kurse
 kurse
 Kursen
+kursspezifische
 Landingpages
 Laparo
 laparo
@@ -422,6 +430,8 @@ pkill
 planetscale
 Plattformverwaltung
 Platzhalterinhalte
+Platzhalterdaten
+Platzhalterquellen
 Playfair
 playfair
 Plätze
@@ -504,6 +514,7 @@ seeden
 sein
 semgrep
 seminare
+Seminarleiter
 Sequenzdiagramm
 serialisierbar
 Serialisierungszeit
@@ -570,7 +581,6 @@ TOCTOU
 toggleable
 Tracke
 tracken
-trainerin
 Transaktionale
 transaktionale
 Transparente
@@ -606,6 +616,7 @@ VARCHAR
 Verbindungs
 Vercel
 vercel
+verfugbar
 verfügbare
 Verfügbarkeit
 Verfügbarkeitsfilter
@@ -626,6 +637,7 @@ Voraussetzungs
 Voraussetzungsnachweis
 Voraussetzungsprüfung
 Vorbereitungs
+vorubergehend
 waitlist
 Warteschlangen
 Warteschlisten
@@ -657,3 +669,24 @@ zwar
 übergeben
 Überschriftenstruktur
 Überwachbarkeit
+Autorisierungsanpassung
+ENOENT
+gegated
+Integrationsspecs
+kataloggestützte
+kataloggestützten
+matcht
+Nachverifikation
+Nachverifikationen
+projektbedingt
+Regressionslaeufe
+Revalidierung
+Workstream
+workstream
+workstreams
+Sigint
+veröffentlich
+buchung
+nendobj
+Interaktionsprüfungen
+interactable

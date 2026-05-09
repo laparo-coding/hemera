@@ -5,7 +5,19 @@ export const runtime = 'nodejs';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { Box, Container, Typography } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
+import { ClerkAvailabilityContext } from '../../components/auth/ClerkProviderWrapper';
+import { isEnvFlagEnabled } from '../../lib/utils/env-flags';
+
+const isE2EFlagEnabled = isEnvFlagEnabled(
+  process.env.NEXT_PUBLIC_DISABLE_CLERK
+);
 
 function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
@@ -68,22 +80,9 @@ function DashboardLayoutClerk({ children }: { children: React.ReactNode }) {
 function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
   const _pathname = usePathname() || '/';
   const router = useRouter();
-  const [userRole, setUserRole] = useState<'user' | 'admin'>(() => {
-    try {
-      const raw =
-        typeof window !== 'undefined' &&
-        window.localStorage.getItem('clerk-session');
-      if (raw) {
-        const parsed = JSON.parse(raw as string);
-        const role = (parsed?.user?.role as string) || 'user';
-        return role === 'admin' ? 'admin' : 'user';
-      }
-    } catch {
-      // Ignore parsing errors, return default
-    }
-    return 'user';
-  }); // Read role from localStorage and react to changes
-  useEffect(() => {
+  const [userRole, setUserRole] = useState<'user' | 'admin'>('user');
+
+  useLayoutEffect(() => {
     const readRole = () => {
       try {
         const raw =
@@ -91,7 +90,10 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
           window.localStorage.getItem('clerk-session');
         if (raw) {
           const parsed = JSON.parse(raw as string);
-          const role = (parsed?.user?.role as string) || 'user';
+          const role =
+            (parsed?.user?.role as string | undefined) ||
+            (parsed?.role as string | undefined) ||
+            'user';
           setUserRole(role === 'admin' ? 'admin' : 'user');
           return;
         }
@@ -112,19 +114,6 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
-  // Safety: set role before first paint if data is present
-  useLayoutEffect(() => {
-    try {
-      const raw = window.localStorage.getItem('clerk-session');
-      if (raw) {
-        const parsed = JSON.parse(raw as string);
-        const role = (parsed?.user?.role as string) || 'user';
-        setUserRole(role === 'admin' ? 'admin' : 'user');
-      }
-    } catch {
-      // Ignore parsing errors
-    }
-  }, []);
   const handleSignOut = useCallback(() => {
     try {
       // Clear local mock session
@@ -183,21 +172,42 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Determine E2E mode on the client:
-  // - Prefer public env flag NEXT_PUBLIC_DISABLE_CLERK=1
-  // - Fallback: detect presence of mocked clerk-session in localStorage (set by tests)
-  let isE2E = false;
-  try {
-    // Public env flag available on client
-    if (process.env.NEXT_PUBLIC_DISABLE_CLERK === '1') {
-      isE2E = true;
-    } else if (typeof window !== 'undefined') {
-      const raw = window.localStorage?.getItem('clerk-session');
-      if (raw) isE2E = true;
+  const { clerkBypassed } = useContext(ClerkAvailabilityContext);
+  const allowMockSessionFallback =
+    process.env.NEXT_PUBLIC_ENABLE_MOCK_SESSION === '1';
+  const [hasMockSession, setHasMockSession] = useState(() => {
+    if (
+      isE2EFlagEnabled ||
+      !allowMockSessionFallback ||
+      typeof window === 'undefined'
+    ) {
+      return false;
     }
-  } catch {
-    // Ignore localStorage errors
+
+    return window.localStorage.getItem('clerk-session') !== null;
+  });
+
+  useEffect(() => {
+    if (isE2EFlagEnabled || !allowMockSessionFallback) {
+      return;
+    }
+
+    try {
+      setHasMockSession(Boolean(window.localStorage?.getItem('clerk-session')));
+    } catch {
+      setHasMockSession(false);
+    }
+  }, [allowMockSessionFallback]);
+
+  if (clerkBypassed && !isE2EFlagEnabled && !hasMockSession) {
+    return (
+      <Container component='main' maxWidth='lg' sx={{ py: 6 }}>
+        <Typography>Dashboard ist vorubergehend nicht verfugbar.</Typography>
+      </Container>
+    );
   }
+
+  const isE2E = isE2EFlagEnabled || hasMockSession;
 
   return isE2E ? (
     <DashboardLayoutE2E>{children}</DashboardLayoutE2E>

@@ -20,17 +20,20 @@ Auto-generated from all feature plans. Last updated: 2025-01-15
 - PostgreSQL 16 via Docker container with optional persistent volumes (020-docker-postgres)
 - TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Prisma ORM, Material-UI v5, Clerk auth, Loops.so SDK (new), Rollbar (021-learning-path)
 - PostgreSQL via Prisma (existing schema extension) (021-learning-path)
-- TypeScript 5.9, Next.js 16, React 19 + Jest, Playwright, @testing-library/react, Rollbar (022-test-coverage)
-- PostgreSQL via Prisma 7.5.0 (022-test-coverage)
 - TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, Clerk SDK, Prisma ORM (024-admin-dashboard)
+- TypeScript 5.9, Next.js 16, React 19, Node.js 20+ + Jest 30, ts-jest, Playwright, @testing-library/react, (028-test-coverage)
+- N/A for planning artifacts; existing PostgreSQL via Prisma remains contextual only (028-test-coverage)
 
-- TypeScript 5.x, Next.js 15.5.6, React 18+ + MUI v5+, Clerk (auth), Rollbar (monitoring), Prisma
+- TypeScript 6.0, Next.js 16.2, React 19 + MUI v7, Clerk (auth), Rollbar (monitoring), Prisma
   (ORM)
 
 ## Project Structure
 
 ```
-src/
+app/
+components/
+lib/
+prisma/
 tests/
 ```
 
@@ -40,7 +43,7 @@ npm test npm run lint
 
 ## Code Style
 
-TypeScript 5.x, Next.js 15.5.6, React 18+: Follow standard conventions
+TypeScript 6.0, Next.js 16.2, React 19: Follow standard conventions
 
 ## Database Naming Convention
 
@@ -76,9 +79,9 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
+- 028-test-coverage: Added TypeScript 5.9, Next.js 16, React 19, Node.js 20+ + Jest 30, ts-jest, Playwright, @testing-library/react
 - 026-course-material-integration: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, PostgreSQL via Prisma 7.5.0 ORM, Vercel Blob storage (@vercel/blob), HTML sanitization (sanitize-html)
 - 024-admin-dashboard: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, Clerk SDK, Prisma ORM
-- 022-test-coverage: Added TypeScript 5.9, Next.js 16, React 19 + Jest, Playwright, @testing-library/react, Rollbar
 
 ## PR Review Process
 

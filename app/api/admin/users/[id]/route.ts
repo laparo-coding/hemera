@@ -1,7 +1,6 @@
-import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { deleteUser, updateUserRole } from '../../../../../lib/api/admin-users';
-import { checkUserAdminStatus } from '../../../../../lib/auth/helpers';
+import { requireAdminUser } from '../../../../../lib/auth/helpers';
 import { prisma } from '../../../../../lib/db/prisma';
 import { serverInstance } from '../../../../../lib/monitoring/rollbar-official';
 import { userPatchSchema } from '../../../../../lib/schemas/admin/user';
@@ -10,7 +9,10 @@ import {
   createSuccessResponse,
   ErrorCodes,
 } from '../../../../../lib/utils/api-response';
-import { getCorsHeaders } from '../../../../../lib/utils/cors';
+import {
+  applyCorsHeaders,
+  getCorsHeaders,
+} from '../../../../../lib/utils/cors';
 import { getOrCreateRequestId } from '../../../../../lib/utils/request-id';
 
 // CORS headers restricted to same origin (not wildcard)
@@ -50,50 +52,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
       return errorResponse;
     }
 
-    // Authentication check
-    let userId: string | null = null;
-    try {
-      const authResult = await auth();
-      userId = authResult.userId;
-    } catch (_authError) {
-      const errorResponse = createErrorResponse(
-        'Nicht autorisierter Zugriff',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
-    }
-
-    if (!userId) {
-      const errorResponse = createErrorResponse(
-        'Nicht autorisierter Zugriff',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
-    }
-
-    // Admin authorization check
-    const isAdmin = await checkUserAdminStatus();
-    if (!isAdmin) {
-      const errorResponse = createErrorResponse(
-        'Admin-Berechtigung erforderlich',
-        ErrorCodes.FORBIDDEN,
-        requestId,
-        403
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
+    const adminAuth = await requireAdminUser(requestId);
+    if (!adminAuth.authorized) {
+      return applyCorsHeaders(adminAuth.response, corsHeaders);
     }
 
     // Fetch user
@@ -175,51 +136,12 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       return errorResponse;
     }
 
-    // Authentication check
-    let userId: string | null = null;
-    try {
-      const authResult = await auth();
-      userId = authResult.userId;
-    } catch (_authError) {
-      const errorResponse = createErrorResponse(
-        'Nicht autorisierter Zugriff',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
+    const adminAuth = await requireAdminUser(requestId);
+    if (!adminAuth.authorized) {
+      return applyCorsHeaders(adminAuth.response, corsHeaders);
     }
 
-    if (!userId) {
-      const errorResponse = createErrorResponse(
-        'Nicht autorisierter Zugriff',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
-    }
-
-    // Admin authorization check
-    const isAdmin = await checkUserAdminStatus();
-    if (!isAdmin) {
-      const errorResponse = createErrorResponse(
-        'Admin-Berechtigung erforderlich',
-        ErrorCodes.FORBIDDEN,
-        requestId,
-        403
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
-    }
+    const userId = adminAuth.userId;
 
     // Parse and validate request body
     let body: unknown;
@@ -391,51 +313,12 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return errorResponse;
     }
 
-    // Authentication check
-    let userId: string | null = null;
-    try {
-      const authResult = await auth();
-      userId = authResult.userId;
-    } catch (_authError) {
-      const errorResponse = createErrorResponse(
-        'Nicht autorisierter Zugriff',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
+    const adminAuth = await requireAdminUser(requestId);
+    if (!adminAuth.authorized) {
+      return applyCorsHeaders(adminAuth.response, corsHeaders);
     }
 
-    if (!userId) {
-      const errorResponse = createErrorResponse(
-        'Nicht autorisierter Zugriff',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
-    }
-
-    // Admin authorization check
-    const isAdmin = await checkUserAdminStatus();
-    if (!isAdmin) {
-      const errorResponse = createErrorResponse(
-        'Admin-Berechtigung erforderlich',
-        ErrorCodes.FORBIDDEN,
-        requestId,
-        403
-      );
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
-    }
+    const userId = adminAuth.userId;
 
     // Prevent self-deletion
     if (userId === targetUserId) {

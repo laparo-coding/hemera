@@ -1,6 +1,8 @@
 import { expect, type Page, test } from '@playwright/test';
+import { E2E_CHECKOUT_COURSE as E2E_TEST_COURSE } from '../../lib/testing/e2e-course-fixtures';
+import { isCiEnvironment, isEnvFlagEnabled } from '../../lib/utils/env-flags';
 import { AuthHelper } from './auth-helper';
-import { gotoStable } from './helpers/nav';
+import { gotoStable, waitForClientHydration } from './helpers/nav';
 
 /**
  * Checkout Flow E2E Tests
@@ -11,18 +13,11 @@ import { gotoStable } from './helpers/nav';
  * - Test Mode (CI): Uses fixtures for form validation, real auth tests in non-CI
  * - Live Mode (Production): Only validates UI elements, NO real transactions
  *
- * NOTE: Uses E2E seed course slugs (matching production):
- * - grundkurs (149 EUR)
- * - fortgeschrittene (299 EUR)
- * - masterclass (499 EUR)
+ * NOTE: Uses backup-restored course slugs from the production-identical catalog:
+ * - grundkurs (300 EUR)
+ * - fortgeschrittene (500 EUR)
+ * - masterclass (700 EUR)
  */
-
-// E2E Test Course (from e2e-seed.ts)
-const E2E_TEST_COURSE = {
-  slug: 'grundkurs',
-  title: 'Grundlagen der Gehaltsverhandlung',
-  price: 149,
-};
 
 // Stripe Test Card Numbers (only work in Stripe Test Mode)
 const STRIPE_TEST_CARDS = {
@@ -31,12 +26,21 @@ const STRIPE_TEST_CARDS = {
   REQUIRES_AUTH: '4000002500003155',
 };
 
+const formatEuroPrice = (price: number, currency = 'EUR'): string =>
+  price.toLocaleString('de-DE', {
+    style: 'currency',
+    currency,
+  });
+
+const getPaymentButtonLabel = (price: number, currency = 'EUR'): string =>
+  `${formatEuroPrice(price, currency)} zahlen`;
+
 // Detect if running in CI (where Clerk auth cannot be mocked)
 const isCI = (): boolean => {
   return (
-    !!process.env.CI ||
-    process.env.E2E_TEST === '1' ||
-    process.env.NEXT_PUBLIC_DISABLE_CLERK === '1'
+    isCiEnvironment() ||
+    isEnvFlagEnabled(process.env.E2E_TEST) ||
+    isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_CLERK)
   );
 };
 
@@ -46,7 +50,7 @@ const isProduction = (): boolean => {
   return (
     baseUrl.includes('hemera.academy') ||
     baseUrl.includes('vercel.app') ||
-    process.env.E2E_LIVE_MODE === 'true'
+    isEnvFlagEnabled(process.env.E2E_LIVE_MODE)
   );
 };
 
@@ -81,6 +85,7 @@ test.describe('Checkout Flow E2E', () => {
 
       // Should redirect to sign-in page
       await expect(page).toHaveURL(/sign-in/, { timeout: 15000 });
+      await waitForClientHydration(page);
 
       // Sign-in form should be visible (use specific Clerk element)
       await expect(
@@ -121,8 +126,9 @@ test.describe('Checkout Flow E2E', () => {
         timeout: 10000,
       });
 
-      // Price should be displayed (100€ for E2E test course)
-      await expect(page.locator(`text=${E2E_TEST_COURSE.price}`)).toBeVisible({
+      // Price should be displayed based on the active fixture catalog.
+      const formattedPrice = `${Math.floor(E2E_TEST_COURSE.price)},${String(E2E_TEST_COURSE.price % 100).padStart(2, '0')} €`;
+      await expect(page.locator(`text=${formattedPrice}`)).toBeVisible({
         timeout: 5000,
       });
     });
@@ -215,7 +221,7 @@ test.describe('Checkout Flow E2E', () => {
       ).toBeVisible();
       await expect(
         page.locator('[data-testid="payment-button"]')
-      ).toContainText('zahlen');
+      ).toContainText(getPaymentButtonLabel(E2E_TEST_COURSE.price));
     });
   });
 
@@ -510,7 +516,7 @@ async function renderCheckoutFixture(
             <div data-testid="payment-element">
               <input placeholder="Kartennummer" />
             </div>
-            <button data-testid="payment-button" type="submit">100,00 € zahlen</button>
+            <button data-testid="payment-button" type="submit">${getPaymentButtonLabel(course.price, course.currency)}</button>
           </form>
         </main>
       </body>
@@ -557,7 +563,7 @@ async function renderStripeFormFixture(page: Page): Promise<void> {
               <label>CVC</label>
               <input placeholder="CVC" />
             </div>
-            <button data-testid="payment-button" type="submit">100,00 € zahlen</button>
+            <button data-testid="payment-button" type="submit">${getPaymentButtonLabel(E2E_TEST_COURSE.price)}</button>
           </form>
         </main>
       </body>

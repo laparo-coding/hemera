@@ -33,6 +33,112 @@ import type {
   ServiceHealth,
 } from '@/lib/types/admin';
 
+const REPORTS_FETCH_TIMEOUT_MS = 10_000;
+
+function createFetchTimeoutSignal(timeoutMs: number): AbortSignal {
+  if (typeof AbortSignal.timeout === 'function') {
+    return AbortSignal.timeout(timeoutMs);
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  controller.signal.addEventListener('abort', () => clearTimeout(timeoutId), {
+    once: true,
+  });
+  return controller.signal;
+}
+
+function createFallbackServiceHealth(
+  name: ServiceHealth['name'],
+  nameDe: string,
+  message: string,
+  lastChecked = new Date().toISOString()
+): ServiceHealth {
+  return {
+    name,
+    nameDe,
+    status: 'degraded',
+    message,
+    lastChecked,
+  };
+}
+
+function createFallbackHealth(message: string): HealthStatus {
+  const lastChecked = new Date().toISOString();
+
+  return {
+    overall: 'degraded',
+    services: {
+      database: createFallbackServiceHealth(
+        'database',
+        'Datenbank',
+        message,
+        lastChecked
+      ),
+      clerk: createFallbackServiceHealth(
+        'clerk',
+        'Authentifizierung',
+        message,
+        lastChecked
+      ),
+      stripe: createFallbackServiceHealth(
+        'stripe',
+        'Zahlungen',
+        message,
+        lastChecked
+      ),
+      rollbar: createFallbackServiceHealth(
+        'rollbar',
+        'Fehlerüberwachung',
+        message,
+        lastChecked
+      ),
+    },
+    build: {
+      version: '',
+      commitSha: '',
+      buildTime: '',
+      environment: '',
+    },
+    lastChecked,
+  };
+}
+
+function createInitialHealthState(): HealthStatus {
+  return {
+    overall: 'degraded',
+    services: {
+      database: createFallbackServiceHealth(
+        'database',
+        'Datenbank',
+        'Systemstatus wird geladen'
+      ),
+      clerk: createFallbackServiceHealth(
+        'clerk',
+        'Authentifizierung',
+        'Systemstatus wird geladen'
+      ),
+      stripe: createFallbackServiceHealth(
+        'stripe',
+        'Zahlungen',
+        'Systemstatus wird geladen'
+      ),
+      rollbar: createFallbackServiceHealth(
+        'rollbar',
+        'Fehlerüberwachung',
+        'Systemstatus wird geladen'
+      ),
+    },
+    build: {
+      version: '',
+      commitSha: '',
+      buildTime: '',
+      environment: '',
+    },
+    lastChecked: '',
+  };
+}
+
 const STATUS_LABELS: Record<string, string> = {
   healthy: ADMIN_LABELS.healthy,
   degraded: ADMIN_LABELS.degraded,
@@ -103,14 +209,16 @@ function StatCard({
 
 export default function ReportsPage() {
   const [reports, setReports] = useState<AdminReportsResponse | null>(null);
-  const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [health, setHealth] = useState<HealthStatus>(createInitialHealthState);
   const [loading, setLoading] = useState(true);
   const [healthLoading, setHealthLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchReports = useCallback(async () => {
     try {
-      const response = await fetch('/api/admin/reports/stats');
+      const response = await fetch('/api/admin/reports/stats', {
+        signal: createFetchTimeoutSignal(REPORTS_FETCH_TIMEOUT_MS),
+      });
       if (!response.ok) throw new Error('Fehler beim Laden der Statistiken');
       const data = await response.json();
       setReports(data.data);
@@ -123,13 +231,17 @@ export default function ReportsPage() {
   const fetchHealth = useCallback(async () => {
     setHealthLoading(true);
     try {
-      const response = await fetch('/api/admin/reports/health');
+      const response = await fetch('/api/admin/reports/health', {
+        signal: createFetchTimeoutSignal(REPORTS_FETCH_TIMEOUT_MS),
+      });
       if (!response.ok) throw new Error('Fehler beim Laden des Health-Status');
       const data = await response.json();
       setHealth(data.data);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+      const message = err instanceof Error ? err.message : 'Unbekannter Fehler';
+      setHealth(createFallbackHealth(message));
+      setError(message);
     } finally {
       setHealthLoading(false);
     }
@@ -148,18 +260,13 @@ export default function ReportsPage() {
     fetchHealth();
   };
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   const stats = reports?.stats;
   const bookings = reports?.bookings;
   const courseUtilization = reports?.courseUtilization ?? [];
   const userGrowth = reports?.userGrowth;
+  const lastCheckedLabel = health.lastChecked
+    ? new Date(health.lastChecked).toLocaleString('de-DE')
+    : 'Wird geladen';
 
   // Calculate summary stats from utilization data
   const fullCourses = courseUtilization.filter(
@@ -181,6 +288,16 @@ export default function ReportsPage() {
       breadcrumbs={[{ label: ADMIN_LABELS.reports, href: '/admin/reports' }]}
       titleProps={{ 'data-testid': 'admin-reports-page' }}
     >
+      {loading && (
+        <Box
+          aria-live='polite'
+          role='status'
+          sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}
+        >
+          <CircularProgress aria-label='Reports werden geladen' size={24} />
+        </Box>
+      )}
+
       {error && (
         <Alert severity='error' sx={{ mb: 3 }}>
           {error}
@@ -348,48 +465,49 @@ export default function ReportsPage() {
 
           <Divider sx={{ mb: 2 }} />
 
-          {health && (
-            <>
-              <Box
-                sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
-              >
-                <Typography
-                  variant='body2'
-                  color='text.secondary'
-                  component='span'
-                >
-                  Gesamtstatus:
-                </Typography>
-                <Chip
-                  label={getStatusLabel(health.overall)}
-                  size='small'
-                  sx={{ fontWeight: 500, ...getStatusStyle(health.overall) }}
-                />
-              </Box>
+          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant='body2' color='text.secondary' component='span'>
+              Gesamtstatus:
+            </Typography>
+            <Chip
+              label={getStatusLabel(health.overall)}
+              size='small'
+              sx={{ fontWeight: 500, ...getStatusStyle(health.overall) }}
+            />
+          </Box>
 
-              <Box
-                sx={{
-                  mb: 2,
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: 0.5,
-                }}
-              >
-                <Typography variant='body2' component='span' sx={{ mr: 0.5 }}>
-                  Dienste:
-                </Typography>
-                {Object.values(health.services).map(service => (
-                  <ServiceHealthChip key={service.name} service={service} />
-                ))}
-              </Box>
+          <Box
+            sx={{
+              mb: 2,
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 0.5,
+            }}
+          >
+            <Typography variant='body2' component='span' sx={{ mr: 0.5 }}>
+              Dienste:
+            </Typography>
+            {Object.values(health.services).map(service => (
+              <ServiceHealthChip key={service.name} service={service} />
+            ))}
+          </Box>
 
-              <Typography variant='body2' color='text.secondary'>
-                Zuletzt aktualisiert:{' '}
-                {new Date(health.lastChecked).toLocaleString('de-DE')}
-              </Typography>
-            </>
-          )}
+          <Typography variant='body2' color='text.secondary'>
+            Zuletzt aktualisiert: {lastCheckedLabel}
+          </Typography>
+
+          <Box sx={{ mt: 1.5 }}>
+            <Typography variant='body2' color='text.secondary'>
+              Version: {health?.build?.version || 'unbekannt'}
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Umgebung: {health?.build?.environment || 'unbekannt'}
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Commit: {health?.build?.commitSha || 'unbekannt'}
+            </Typography>
+          </Box>
         </CardContent>
       </Card>
     </AdminPageContainer>

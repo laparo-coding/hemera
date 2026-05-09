@@ -1,13 +1,15 @@
-import { currentUser } from '@clerk/nextjs/server';
+import type { User as ClerkUser } from '@clerk/nextjs/server';
 import { type ParticipationStatus, PaymentStatus } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getCurrentUser } from '@/lib/auth/helpers';
 import { prisma } from '@/lib/db/prisma';
 import { logError } from '@/lib/errors';
 import { ErrorSeverity, reportError } from '@/lib/monitoring/rollbar-official';
 import type { PaymentStatus as ApiPaymentStatus } from '@/lib/types/booking';
 import type { ParticipationStatus as ApiParticipationStatus } from '@/lib/types/participation';
 import { isClerkDisabled } from '@/lib/utils/clerk-disabled-check';
+import { getOrCreateRequestIdFromHeaders } from '@/lib/utils/request-id';
 
 const BookingQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -144,15 +146,111 @@ function normalizeBookings(
   });
 }
 
+async function resolveSyncedUserId(
+  user: ClerkUser,
+  requestId: string
+): Promise<string> {
+  let syncUserFromClerk: typeof import('../../../lib/api/users').syncUserFromClerk;
+
+  try {
+    ({ syncUserFromClerk } = await import('../../../lib/api/users'));
+  } catch (importError) {
+    reportError(
+      new Error('Failed to load Clerk user sync module for bookings route'),
+      {
+        requestId,
+        additionalData: sanitizeForErrorReporting({
+          clerkUserId: user.id,
+          importError:
+            importError instanceof Error
+              ? importError.message
+              : String(importError),
+        }),
+      },
+      ErrorSeverity.ERROR
+    );
+
+    throw importError;
+  }
+
+  try {
+    const syncedUser = await syncUserFromClerk(user);
+    return syncedUser.id;
+  } catch (syncError) {
+    const email = user.primaryEmailAddress?.emailAddress ?? null;
+    // If Clerk sync fails transiently, retry against the DB by Clerk user ID.
+    // This covers temporary Clerk/API issues or eventual consistency when the
+    // user record was already created in a previous request.
+    const fallbackUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        id: true,
+      },
+    });
+
+    if (fallbackUser) {
+      reportError(
+        new Error('Recovered bookings user resolution after sync failure'),
+        {
+          requestId,
+          additionalData: sanitizeForErrorReporting({
+            clerkUserId: user.id,
+            hasEmail: email !== null,
+            syncError:
+              syncError instanceof Error
+                ? syncError.message
+                : String(syncError),
+          }),
+        },
+        ErrorSeverity.WARNING
+      );
+
+      return fallbackUser.id;
+    }
+
+    if (email) {
+      const emailMatchedUser = await prisma.user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+        },
+      });
+
+      if (emailMatchedUser) {
+        reportError(
+          new Error(
+            'Blocked bookings user resolution by email after sync failure'
+          ),
+          {
+            requestId,
+            additionalData: sanitizeForErrorReporting({
+              clerkUserId: user.id,
+              hasEmail: true,
+              matchedUserId: emailMatchedUser.id,
+              syncError:
+                syncError instanceof Error
+                  ? syncError.message
+                  : String(syncError),
+            }),
+          },
+          ErrorSeverity.WARNING
+        );
+      }
+    }
+
+    throw syncError;
+  }
+}
+
 export async function GET(request: Request) {
-  const _requestId = crypto.randomUUID();
+  const _requestId = getOrCreateRequestIdFromHeaders(request.headers);
 
   try {
     const { searchParams } = new URL(request.url);
     const queryParams = Object.fromEntries(searchParams.entries());
     const validatedParams = BookingQuerySchema.parse(queryParams);
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user?.id) {
       // E2E test fallback: when Clerk is disabled, return 401 early
       if (isClerkDisabled()) {
@@ -173,12 +271,11 @@ export async function GET(request: Request) {
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    const { syncUserFromClerk } = await import('../../../lib/api/users');
-    const syncedUser = await syncUserFromClerk(user);
+    const syncedUserId = await resolveSyncedUserId(user, _requestId);
 
     // Get user's bookings with pagination (use synced DB user ID, not Clerk ID)
     const where = {
-      userId: syncedUser.id,
+      userId: syncedUserId,
       ...(validatedParams.status && { paymentStatus: validatedParams.status }),
     };
 
@@ -262,8 +359,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const requestId = getOrCreateRequestIdFromHeaders(request.headers);
+
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user?.id) {
       // E2E test fallback: when Clerk is disabled, return 401 early
       if (isClerkDisabled()) {
@@ -302,13 +401,12 @@ export async function POST(request: Request) {
     }
 
     // Ensure the user exists in our database (upsert from Clerk)
-    const { syncUserFromClerk } = await import('../../../lib/api/users');
-    const syncedUser = await syncUserFromClerk(user);
+    const syncedUserId = await resolveSyncedUserId(user, requestId);
 
     // Check if user already has a booking for this course
     const existingBooking = await prisma.booking.findFirst({
       where: {
-        userId: syncedUser.id,
+        userId: syncedUserId,
         courseId: validatedData.courseId,
       },
     });
@@ -323,7 +421,7 @@ export async function POST(request: Request) {
     // Create the booking
     const booking = await prisma.booking.create({
       data: {
-        userId: syncedUser.id,
+        userId: syncedUserId,
         courseId: validatedData.courseId,
         paymentStatus: PaymentStatus.PENDING,
         amount: course.price,
@@ -353,6 +451,11 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    logError(error, {
+      operation: 'api/bookings#post',
+      requestId,
+    });
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

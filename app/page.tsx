@@ -26,9 +26,9 @@ import { formatDate, formatTime } from '../lib/utils/date-format';
 
 export const metadata: Metadata = generateLandingPageMetadata();
 
-// Force dynamic rendering since we fetch courses from DB
-// This prevents static generation during build when DATABASE_URL is unavailable
-export const dynamic = 'force-dynamic';
+// Revalidate periodically so the homepage stays cacheable in production while
+// still picking up updated featured courses.
+export const revalidate = 300;
 
 // Content in German, informal "Du" form
 const heroContent = {

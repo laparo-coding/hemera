@@ -1,80 +1,33 @@
-import { auth } from '@clerk/nextjs/server';
-import { type NextRequest, NextResponse } from 'next/server';
-import { checkUserAdminStatus } from '@/lib/auth/helpers';
+import type { NextRequest } from 'next/server';
+import { requireAdminUser } from '@/lib/auth/helpers';
 import { prisma } from '@/lib/db/prisma';
+import { serverInstance as rollbar } from '@/lib/monitoring/rollbar-official';
 import {
   createErrorResponse,
   createSuccessResponse,
   ErrorCodes,
 } from '@/lib/utils/api-response';
-import { getCorsHeaders } from '@/lib/utils/cors';
+import {
+  applyCorsHeaders,
+  createCorsPreflightResponse,
+  getCorsHeaders,
+} from '@/lib/utils/cors';
 import { getOrCreateRequestId } from '@/lib/utils/request-id';
 
 // CORS headers restricted to same origin (not wildcard)
 const corsHeaders = getCorsHeaders();
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+  return createCorsPreflightResponse(corsHeaders);
 }
 
 export async function GET(request: NextRequest) {
   const requestId = getOrCreateRequestId(request);
 
   try {
-    // Authentication check
-    let userId: string | null = null;
-    try {
-      const authResult = await auth();
-      userId = authResult.userId;
-    } catch (_authError) {
-      // In E2E test mode, auth() might fail, return 401
-      const errorResponse = createErrorResponse(
-        'Du bist nicht autorisiert',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-
-      // Add CORS headers to error response
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-
-      return errorResponse;
-    }
-
-    if (!userId) {
-      const errorResponse = createErrorResponse(
-        'Du bist nicht autorisiert',
-        ErrorCodes.UNAUTHORIZED,
-        requestId,
-        401
-      );
-
-      // Add CORS headers to error response
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-
-      return errorResponse;
-    }
-
-    // Admin authorization check
-    const isAdmin = await checkUserAdminStatus();
-    if (!isAdmin) {
-      const errorResponse = createErrorResponse(
-        'Admin privileges required',
-        ErrorCodes.FORBIDDEN,
-        requestId,
-        403
-      );
-
-      // Add CORS headers to error response
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-
-      return errorResponse;
+    const adminAuth = await requireAdminUser(requestId);
+    if (!adminAuth.authorized) {
+      return applyCorsHeaders(adminAuth.response, corsHeaders);
     }
 
     // Parse query parameters for enhanced filtering (024-admin-dashboard)
@@ -114,11 +67,10 @@ export async function GET(request: NextRequest) {
         sortOrder: sortOrder as 'asc' | 'desc',
       });
 
-      const response = createSuccessResponse(result, requestId);
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        response.headers.set(key, value);
-      });
-      return response;
+      return applyCorsHeaders(
+        createSuccessResponse(result, requestId),
+        corsHeaders
+      );
     }
 
     // Legacy mode: return Prisma users
@@ -135,33 +87,34 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const response = createSuccessResponse(
-      {
-        users,
-        total: users.length,
-      },
-      requestId
+    return applyCorsHeaders(
+      createSuccessResponse(
+        {
+          users,
+          total: users.length,
+        },
+        requestId
+      ),
+      corsHeaders
     );
+  } catch (error) {
+    try {
+      rollbar.error(error instanceof Error ? error : new Error(String(error)), {
+        requestId,
+        route: 'GET /api/admin/users',
+      });
+    } catch {
+      // Rollbar reporting must never block the API response.
+    }
 
-    // Add CORS headers to response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      response.headers.set(key, value);
-    });
-
-    return response;
-  } catch (_error) {
-    const errorResponse = createErrorResponse(
-      'Failed to fetch users',
-      ErrorCodes.INTERNAL_ERROR,
-      requestId,
-      500
+    return applyCorsHeaders(
+      createErrorResponse(
+        'Failed to fetch users',
+        ErrorCodes.INTERNAL_ERROR,
+        requestId,
+        500
+      ),
+      corsHeaders
     );
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
-    });
-
-    return errorResponse;
   }
 }

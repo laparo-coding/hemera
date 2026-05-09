@@ -2,6 +2,8 @@
  * Standardized API response utilities
  */
 
+import { NextResponse } from 'next/server';
+
 export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
@@ -26,7 +28,7 @@ export function createErrorResponse(
   requestId?: string,
   httpStatus?: number,
   details?: Record<string, unknown>
-): Response {
+): NextResponse<ApiResponse<never>> {
   const errorResponse: ApiResponse<never> = {
     success: false,
     error: {
@@ -41,7 +43,7 @@ export function createErrorResponse(
     },
   };
 
-  return Response.json(errorResponse, {
+  return NextResponse.json(errorResponse, {
     status: httpStatus || 500,
     headers: {
       'Content-Type': 'application/json',
@@ -57,7 +59,7 @@ export function createSuccessResponse<T>(
   data: T,
   requestId?: string,
   httpStatus?: number
-): Response {
+): NextResponse<ApiResponse<T>> {
   const successResponse: ApiResponse<T> = {
     success: true,
     data,
@@ -68,7 +70,7 @@ export function createSuccessResponse<T>(
     },
   };
 
-  return Response.json(successResponse, {
+  return NextResponse.json(successResponse, {
     status: httpStatus || 200,
     headers: {
       'Content-Type': 'application/json',

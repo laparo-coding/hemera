@@ -3,82 +3,30 @@
  * Provides error metrics and logs for monitoring dashboard
  */
 
-import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkUserAdminStatus } from '../../../../lib/auth/helpers';
+import { requireAdminUser } from '../../../../lib/auth/helpers';
 import { withErrorHandling } from '../../../../lib/errors';
 import { errorAnalytics } from '../../../../lib/services/error-analytics';
 import {
-  createErrorResponse,
-  ErrorCodes,
-} from '../../../../lib/utils/api-response';
-import { getCorsHeaders } from '../../../../lib/utils/cors';
+  applyCorsHeaders,
+  createCorsPreflightResponse,
+  getCorsHeaders,
+} from '../../../../lib/utils/cors';
 import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
 
 // CORS headers for admin API access (origin restricted via getCorsHeaders)
 const corsHeaders = getCorsHeaders();
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
+  return createCorsPreflightResponse(corsHeaders);
 }
 
 export const GET = withErrorHandling(async (request: NextRequest) => {
   const requestId = getOrCreateRequestId(request);
 
-  // Authentication check
-  let userId: string | null = null;
-  try {
-    const authResult = await auth();
-    userId = authResult.userId;
-  } catch (_authError) {
-    // In E2E test mode, auth() might fail, return 401
-    const errorResponse = createErrorResponse(
-      'Unauthorized access',
-      ErrorCodes.UNAUTHORIZED,
-      requestId,
-      401
-    );
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
-    });
-
-    return errorResponse;
-  }
-
-  if (!userId) {
-    const errorResponse = createErrorResponse(
-      'Unauthorized access',
-      ErrorCodes.UNAUTHORIZED,
-      requestId,
-      401
-    );
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
-    });
-
-    return errorResponse;
-  }
-
-  // Admin authorization check
-  const isAdmin = await checkUserAdminStatus();
-  if (!isAdmin) {
-    const errorResponse = createErrorResponse(
-      'Admin privileges required',
-      ErrorCodes.FORBIDDEN,
-      requestId,
-      403
-    );
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
-    });
-
-    return errorResponse;
+  const adminAuth = await requireAdminUser(requestId);
+  if (!adminAuth.authorized) {
+    return applyCorsHeaders(adminAuth.response, corsHeaders);
   }
 
   const { searchParams } = new URL(request.url);
@@ -122,60 +70,9 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const requestId = getOrCreateRequestId(request);
 
-  // Authentication check
-  let userId: string | null = null;
-  try {
-    const authResult = await auth();
-    userId = authResult.userId;
-  } catch (_authError) {
-    // In E2E test mode, auth() might fail, return 401
-    const errorResponse = createErrorResponse(
-      'Unauthorized access',
-      ErrorCodes.UNAUTHORIZED,
-      requestId,
-      401
-    );
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
-    });
-
-    return errorResponse;
-  }
-
-  if (!userId) {
-    const errorResponse = createErrorResponse(
-      'Unauthorized access',
-      ErrorCodes.UNAUTHORIZED,
-      requestId,
-      401
-    );
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
-    });
-
-    return errorResponse;
-  }
-
-  // Admin authorization check
-  const isAdmin = await checkUserAdminStatus();
-  if (!isAdmin) {
-    const errorResponse = createErrorResponse(
-      'Admin privileges required',
-      ErrorCodes.FORBIDDEN,
-      requestId,
-      403
-    );
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
-    });
-
-    return errorResponse;
+  const adminAuth = await requireAdminUser(requestId);
+  if (!adminAuth.authorized) {
+    return applyCorsHeaders(adminAuth.response, corsHeaders);
   }
 
   const { searchParams } = new URL(request.url);

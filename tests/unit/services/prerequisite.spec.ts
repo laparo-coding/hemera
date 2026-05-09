@@ -6,7 +6,28 @@
  * These tests define the expected behavior and should FAIL until implementation.
  */
 
-import { describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+
+const mockPrisma = {
+  user: {
+    findUnique: jest.fn(),
+  },
+  booking: {
+    findMany: jest.fn(),
+  },
+};
+
+const mockReportError = jest.fn();
+
+jest.mock('../../../lib/db/prisma', () => ({
+  prisma: mockPrisma,
+}));
+
+jest.mock('../../../lib/monitoring/rollbar-official', () => ({
+  reportError: mockReportError,
+}));
+
+import { checkPrerequisite } from '../../../lib/services/prerequisite';
 
 // Mock types for testing (service not yet implemented)
 interface PrerequisiteResult {
@@ -20,6 +41,17 @@ interface PrerequisiteResult {
 }
 
 type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+
+function createBooking(level: CourseLevel, suffix: string) {
+  return {
+    course: {
+      id: `course_${level.toLowerCase()}_${suffix}`,
+      title: `${level} Course ${suffix}`,
+      level,
+    },
+    createdAt: new Date('2026-01-10T10:00:00.000Z'),
+  };
+}
 
 describe('PrerequisiteService', () => {
   describe('checkPrerequisite', () => {
@@ -281,6 +313,190 @@ describe('PrerequisiteService', () => {
         expect(result.completedCourses[0]).toHaveProperty('level');
         expect(result.completedCourses[0]).toHaveProperty('completedAt');
       });
+    });
+  });
+
+  describe('actual service behavior', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+      mockPrisma.user.findUnique.mockImplementation(async ({ select }) => {
+        if (select?.isOutperformer) {
+          return { isOutperformer: false };
+        }
+
+        return { id: 'user_local_123' };
+      });
+    });
+
+    it('uses the acceptedLevels mapping for prerequisite queries', async () => {
+      mockPrisma.booking.findMany.mockResolvedValue([]);
+
+      await checkPrerequisite('clerk_user_123', 'INTERMEDIATE');
+      await checkPrerequisite('clerk_user_123', 'ADVANCED');
+
+      expect(mockPrisma.booking.findMany).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          where: expect.objectContaining({
+            course: {
+              level: {
+                in: ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'],
+              },
+            },
+          }),
+        })
+      );
+      expect(mockPrisma.booking.findMany).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({
+          where: expect.objectContaining({
+            course: {
+              level: {
+                in: ['INTERMEDIATE', 'ADVANCED'],
+              },
+            },
+          }),
+        })
+      );
+    });
+
+    it.each([
+      {
+        targetLevel: 'BEGINNER' as CourseLevel,
+        completedLevel: 'BEGINNER' as CourseLevel,
+        expectedQualified: true,
+        expectedMissingLevel: null,
+        returnsCompletedCourses: false,
+      },
+      {
+        targetLevel: 'BEGINNER' as CourseLevel,
+        completedLevel: 'INTERMEDIATE' as CourseLevel,
+        expectedQualified: true,
+        expectedMissingLevel: null,
+        returnsCompletedCourses: false,
+      },
+      {
+        targetLevel: 'BEGINNER' as CourseLevel,
+        completedLevel: 'ADVANCED' as CourseLevel,
+        expectedQualified: true,
+        expectedMissingLevel: null,
+        returnsCompletedCourses: false,
+      },
+      {
+        targetLevel: 'INTERMEDIATE' as CourseLevel,
+        completedLevel: 'BEGINNER' as CourseLevel,
+        expectedQualified: true,
+        expectedMissingLevel: null,
+        returnsCompletedCourses: true,
+      },
+      {
+        targetLevel: 'INTERMEDIATE' as CourseLevel,
+        completedLevel: 'INTERMEDIATE' as CourseLevel,
+        expectedQualified: true,
+        expectedMissingLevel: null,
+        returnsCompletedCourses: true,
+      },
+      {
+        targetLevel: 'INTERMEDIATE' as CourseLevel,
+        completedLevel: 'ADVANCED' as CourseLevel,
+        expectedQualified: true,
+        expectedMissingLevel: null,
+        returnsCompletedCourses: true,
+      },
+      {
+        targetLevel: 'ADVANCED' as CourseLevel,
+        completedLevel: 'BEGINNER' as CourseLevel,
+        expectedQualified: false,
+        expectedMissingLevel: 'INTERMEDIATE' as const,
+        returnsCompletedCourses: true,
+      },
+      {
+        targetLevel: 'ADVANCED' as CourseLevel,
+        completedLevel: 'INTERMEDIATE' as CourseLevel,
+        expectedQualified: true,
+        expectedMissingLevel: null,
+        returnsCompletedCourses: true,
+      },
+      {
+        targetLevel: 'ADVANCED' as CourseLevel,
+        completedLevel: 'ADVANCED' as CourseLevel,
+        expectedQualified: true,
+        expectedMissingLevel: null,
+        returnsCompletedCourses: true,
+      },
+    ])(
+      'returns $expectedQualified for target $targetLevel with completed $completedLevel',
+      async ({
+        targetLevel,
+        completedLevel,
+        expectedQualified,
+        expectedMissingLevel,
+        returnsCompletedCourses,
+      }) => {
+        const completedBooking = createBooking(completedLevel, 'done');
+
+        mockPrisma.booking.findMany.mockImplementation(async ({ where }) => {
+          if (!where?.course) {
+            return [completedBooking];
+          }
+
+          const acceptedLevels = where.course.level.in as CourseLevel[];
+
+          return acceptedLevels.includes(completedLevel)
+            ? [completedBooking]
+            : [];
+        });
+
+        const result = await checkPrerequisite('clerk_user_123', targetLevel);
+
+        expect(result.qualified).toBe(expectedQualified);
+        expect(result.missingLevel).toBe(expectedMissingLevel);
+
+        if (returnsCompletedCourses) {
+          expect(result.completedCourses).toHaveLength(1);
+          expect(result.completedCourses[0]?.level).toBe(completedLevel);
+        } else {
+          expect(result.completedCourses).toEqual([]);
+        }
+      }
+    );
+
+    it.each([
+      {
+        targetLevel: 'INTERMEDIATE' as CourseLevel,
+        expectedMissingLevel: 'BEGINNER' as const,
+      },
+      {
+        targetLevel: 'ADVANCED' as CourseLevel,
+        expectedMissingLevel: 'INTERMEDIATE' as const,
+      },
+    ])(
+      'returns missing prerequisite when no accepted completion exists for $targetLevel',
+      async ({ targetLevel, expectedMissingLevel }) => {
+        mockPrisma.booking.findMany.mockResolvedValue([]);
+
+        const result = await checkPrerequisite('clerk_user_123', targetLevel);
+
+        expect(result.qualified).toBe(false);
+        expect(result.missingLevel).toBe(expectedMissingLevel);
+        expect(result.completedCourses).toEqual([]);
+      }
+    );
+
+    it('always qualifies BEGINNER even without a local user lookup', async () => {
+      mockPrisma.user.findUnique.mockImplementation(async ({ select }) => {
+        if (select?.isOutperformer) {
+          return { isOutperformer: false };
+        }
+
+        return null;
+      });
+
+      const result = await checkPrerequisite('clerk_user_123', 'BEGINNER');
+
+      expect(result.qualified).toBe(true);
+      expect(result.missingLevel).toBeNull();
+      expect(mockPrisma.booking.findMany).not.toHaveBeenCalled();
     });
   });
 });
