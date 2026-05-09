@@ -72,6 +72,9 @@ temp-*
 # Tool-specific directories
 .qodo/
 .playwright-mcp/
+.agents/
+skills-lock.json
+backup_restore_temp/
 
 # Documentation artifacts (use docs/ instead)
 *-BERICHT.md

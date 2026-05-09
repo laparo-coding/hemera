@@ -54,6 +54,13 @@ jobs:
             exit 0
           fi
 
+          case "$URL" in
+            https://github.com/*|http://github.com/*|https://api.github.com/*|http://api.github.com/*)
+              echo "Deployment status URL points to GitHub, not preview site; skipping."
+              exit 0
+              ;;
+          esac
+
           if [ -n "$URL" ]; then
             echo "PREVIEW_URL=$URL" >> $GITHUB_ENV
             echo "Using URL from deployment_status: $URL"
@@ -176,7 +183,7 @@ jobs:
             }
 
       - name: Post sticky PR comment with Lighthouse summary
-        if: always() && steps.prnum.outputs.number != '' && steps.target.outputs.url != ''
+        if: always() && steps.prnum.outputs.number != '' && steps.target.outputs.url != '' && hashFiles('lhci-comment.md') != ''
         uses: marocchino/sticky-pull-request-comment@v3
         with:
           number: ${{ steps.prnum.outputs.number }}
