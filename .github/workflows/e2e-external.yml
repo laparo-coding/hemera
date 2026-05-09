@@ -122,22 +122,23 @@ jobs:
           PLAYWRIGHT_BASE_URL: ${{ steps.resolve.outputs.base_url }}
           # disable creating test users in external previews
           E2E_CREATE_USERS: 'false'
-          # Optional: provide a Vercel Protection Bypass token to run against SSO-protected previews.
-          # This workflow reads the legacy secret name because the local workflow validator
-          # flags the newer automation secret reference as invalid in this repository context.
+          # Accept both the shared automation secret and the legacy fallback.
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
           # SSO tolerant mode: tests should only hit public pages by default via grep
           PLAYWRIGHT_SSO_TOLERANT: '1'
           NODE_ENV: test
           NEXT_TELEMETRY_DISABLED: '1'
         run: |
-          if [ -z "$VERCEL_PROTECTION_BYPASS" ]; then
+          BYPASS_TOKEN="${VERCEL_AUTOMATION_BYPASS_SECRET:-$VERCEL_PROTECTION_BYPASS}"
+
+          if [ -z "$BYPASS_TOKEN" ]; then
             echo "No Vercel bypass token available for this run. Probing preview in SSO-tolerant mode." \
               | tee -a "$GITHUB_STEP_SUMMARY"
           fi
 
           RESPONSE_BODY=$(curl -sSL \
-            -H "x-vercel-protection-bypass: $VERCEL_PROTECTION_BYPASS" \
+            -H "x-vercel-protection-bypass: $BYPASS_TOKEN" \
             -H "x-vercel-set-bypass-cookie: true" \
             "$PLAYWRIGHT_BASE_URL/courses")
 

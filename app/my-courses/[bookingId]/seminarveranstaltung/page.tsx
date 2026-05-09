@@ -137,8 +137,7 @@ export default async function SeminarveranstaltungPage({
 
       {isDevelopmentPreview && (
         <Alert severity='info' sx={{ borderRadius: '8px', mb: 3 }}>
-          Entwicklungsmodus: Dieser Schritt ist vor Seminarbeginn nur lokal zur
-          Vorschau freigeschaltet.
+          Entwicklungsmodus: Vorschau nur lokal verfugbar.
         </Alert>
       )}
 

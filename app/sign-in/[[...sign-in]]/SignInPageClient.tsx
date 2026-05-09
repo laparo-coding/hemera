@@ -12,14 +12,15 @@ const SignIn = dynamic(
   { ssr: false }
 );
 
+const shouldRenderClerkSignIn =
+  process.env.NEXT_PUBLIC_E2E_TEST !== '1' &&
+  process.env.NEXT_PUBLIC_DISABLE_CLERK !== '1';
+
 type SignInPageClientProps = {
   redirectUrl: string;
 };
 
 export function SignInPageClient({ redirectUrl }: SignInPageClientProps) {
-  const shouldRenderClerkSignIn =
-    process.env.NEXT_PUBLIC_E2E_TEST !== '1' &&
-    process.env.NEXT_PUBLIC_DISABLE_CLERK !== '1';
   const [hydrated, setHydrated] = useState(false);
   const clerkReady = hydrated && shouldRenderClerkSignIn;
 

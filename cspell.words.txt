@@ -220,6 +220,8 @@ Googlebot
 googlecloud
 gopkg
 groesse
+fortbildung
+Fkurs
 Grundkurs
 Groot
 Behaviour
@@ -278,6 +280,8 @@ innen
 Instagram
 instagram
 Integrationen
+rztliche
+spater
 Interaktionstest
 Interner
 Invalidierung
@@ -510,6 +514,7 @@ seeden
 sein
 semgrep
 seminare
+Seminarleiter
 Sequenzdiagramm
 serialisierbar
 Serialisierungszeit
@@ -576,7 +581,6 @@ TOCTOU
 toggleable
 Tracke
 tracken
-Seminarleiter
 Transaktionale
 transaktionale
 Transparente
@@ -612,6 +616,7 @@ VARCHAR
 Verbindungs
 Vercel
 vercel
+verfugbar
 verfügbare
 Verfügbarkeit
 Verfügbarkeitsfilter
@@ -632,6 +637,7 @@ Voraussetzungs
 Voraussetzungsnachweis
 Voraussetzungsprüfung
 Vorbereitungs
+vorubergehend
 waitlist
 Warteschlangen
 Warteschlisten

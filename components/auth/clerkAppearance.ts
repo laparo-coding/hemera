@@ -83,6 +83,8 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
     },
     formFieldInput: {
       borderRadius: authForm.inputBorderRadius,
+      // Clerk injects highly specific input selectors across multiple wrappers.
+      // Keep forced overrides until cross-browser checks prove a narrower rule.
       border: `1px solid ${authForm.inputBorderColor} !important`,
       backgroundColor: authForm.cardBackground,
       color: authForm.textColor,
@@ -98,12 +100,9 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
         WebkitTextFillColor: authForm.subtleTextColor,
         opacity: 1,
       },
-      '&:focus': {
-        border: `1px solid ${authForm.inputBorderColorFocus} !important`,
-        boxShadow: `0 0 0 1px ${authForm.inputBorderColorFocus} !important`,
-        WebkitBoxShadow: `0 0 0 1px ${authForm.inputBorderColorFocus} !important`,
-      },
-      '&:focus-within': {
+      // Keep both selectors because Clerk mounts different input wrappers across
+      // auth views and both focus states need the same override.
+      '&:is(:focus, :focus-within)': {
         border: `1px solid ${authForm.inputBorderColorFocus} !important`,
         boxShadow: `0 0 0 1px ${authForm.inputBorderColorFocus} !important`,
         WebkitBoxShadow: `0 0 0 1px ${authForm.inputBorderColorFocus} !important`,
@@ -144,6 +143,9 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       },
     },
     socialButtonsProviderIcon: {
+      // Clerk social icons rely on masked wrappers across Blink/WebKit, so both
+      // standard and prefixed mask properties remain aligned. Apple keeps a
+      // solid fill via explicit color override.
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -161,7 +163,7 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       maskSize: 'contain',
       WebkitMaskSize: 'contain',
       '&.cl-providerIcon__apple': {
-        backgroundColor: colors.success,
+        backgroundColor: authForm.appleIconColor,
       },
     },
     socialButtonsBlockButtonText: {

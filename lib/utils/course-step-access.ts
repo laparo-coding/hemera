@@ -16,5 +16,5 @@ export function shouldUnlockFutureCourseStepsInDevelopment(
     return false;
   }
 
-  return start.getTime() > now;
+  return start.getTime() <= now;
 }

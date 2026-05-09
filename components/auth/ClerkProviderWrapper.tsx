@@ -4,6 +4,7 @@ import { deDE } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 import {
   Component,
+  createContext,
   type ErrorInfo,
   type ReactNode,
   useEffect,
@@ -12,7 +13,7 @@ import {
 import { clerkConfig } from '../../lib/auth/clerk-config';
 import { logClientError, logClientWarning } from '../../lib/errors/client';
 
-const CLERK_RUNTIME_BYPASS_MESSAGES = [
+const clerkRuntimeBypassMessages = [
   'Refreshing the session token resulted in an infinite redirect loop',
   'Clerk instance keys do not match',
 ] as const;
@@ -55,6 +56,10 @@ interface ClerkErrorBoundaryState {
   hasError: boolean;
   error?: Error;
 }
+
+export const ClerkAvailabilityContext = createContext({
+  clerkBypassed: false,
+});
 
 /**
  * Error Boundary to catch Clerk initialization errors and provide graceful fallback
@@ -188,9 +193,7 @@ function shouldBypassForRuntimeError(value: unknown): string | null {
     return null;
   }
 
-  return CLERK_RUNTIME_BYPASS_MESSAGES.some(fragment =>
-    message.includes(fragment)
-  )
+  return clerkRuntimeBypassMessages.some(fragment => message.includes(fragment))
     ? message
     : null;
 }
@@ -217,18 +220,16 @@ export default function ClerkProviderWrapper({
         return;
       }
 
-      setRuntimeBypassReason(currentReason => {
-        if (currentReason === message) {
-          return currentReason;
-        }
-
+      if (runtimeBypassReason !== message) {
         logClientWarning(
           '[ClerkProviderWrapper] Clerk runtime error detected, disabling provider',
           { reason: message }
         );
+      }
 
-        return message;
-      });
+      setRuntimeBypassReason(currentReason =>
+        currentReason === message ? currentReason : message
+      );
     };
 
     const onError = (event: ErrorEvent) => {
@@ -246,9 +247,13 @@ export default function ClerkProviderWrapper({
       window.removeEventListener('error', onError);
       window.removeEventListener('unhandledrejection', onUnhandledRejection);
     };
-  }, [bypass]);
+  }, [bypass, runtimeBypassReason]);
 
-  if (forcedBypassReason || bypass || runtimeBypassReason) {
+  const clerkBypassed = Boolean(
+    forcedBypassReason || bypass || runtimeBypassReason
+  );
+
+  if (clerkBypassed) {
     const bypassReason = forcedBypassReason ?? runtimeBypassReason ?? reason;
 
     if (bypassReason) {
@@ -262,23 +267,29 @@ export default function ClerkProviderWrapper({
         });
       }
     }
-    return <>{children}</>;
+    return (
+      <ClerkAvailabilityContext.Provider value={{ clerkBypassed: true }}>
+        {children}
+      </ClerkAvailabilityContext.Provider>
+    );
   }
 
   return (
-    <ClerkErrorBoundary fallback={children}>
-      <ClerkProvider
-        publishableKey={publishableKey!}
-        localization={customDeDE}
-        signInUrl={clerkConfig.signInUrl}
-        signUpUrl={clerkConfig.signUpUrl}
-        signInFallbackRedirectUrl={clerkConfig.signInFallbackRedirectUrl}
-        signUpFallbackRedirectUrl={clerkConfig.signUpFallbackRedirectUrl}
-        signInForceRedirectUrl={clerkConfig.signInForceRedirectUrl}
-        signUpForceRedirectUrl={clerkConfig.signUpForceRedirectUrl}
-      >
-        {children}
-      </ClerkProvider>
-    </ClerkErrorBoundary>
+    <ClerkAvailabilityContext.Provider value={{ clerkBypassed: false }}>
+      <ClerkErrorBoundary fallback={children}>
+        <ClerkProvider
+          publishableKey={publishableKey!}
+          localization={customDeDE}
+          signInUrl={clerkConfig.signInUrl}
+          signUpUrl={clerkConfig.signUpUrl}
+          signInFallbackRedirectUrl={clerkConfig.signInFallbackRedirectUrl}
+          signUpFallbackRedirectUrl={clerkConfig.signUpFallbackRedirectUrl}
+          signInForceRedirectUrl={clerkConfig.signInForceRedirectUrl}
+          signUpForceRedirectUrl={clerkConfig.signUpForceRedirectUrl}
+        >
+          {children}
+        </ClerkProvider>
+      </ClerkErrorBoundary>
+    </ClerkAvailabilityContext.Provider>
   );
 }

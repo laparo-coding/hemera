@@ -204,10 +204,18 @@ describe('CourseCard Component', () => {
       city: 'Berlin',
     };
 
-    it('should show Erfahrungsbericht for next seminar cards', () => {
+    it('should only show Erfahrungsbericht for completed cards', () => {
+      expect(shouldShowTestimonialButton('COMPLETED', userProfile)).toBe(true);
+    });
+
+    it('should hide Erfahrungsbericht for next seminar cards', () => {
       expect(shouldShowTestimonialButton('NEXT_SEMINAR', userProfile)).toBe(
-        true
+        false
       );
+    });
+
+    it('should hide Erfahrungsbericht for upcoming cards', () => {
+      expect(shouldShowTestimonialButton('UPCOMING', userProfile)).toBe(false);
     });
 
     it('should hide Erfahrungsbericht for no-show cards', () => {

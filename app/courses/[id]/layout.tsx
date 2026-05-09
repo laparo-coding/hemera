@@ -65,12 +65,13 @@ function shouldRetryCourseLookup(error: unknown): boolean {
   }
 
   // Last-resort fallback for generic wrappers that lose the typed cause.
-  const matchesRegex = /(^|[\s:])(?:not found|no record)(?:$|[\s.])/i.test(
-    error.message
-  );
+  const matchesRegex =
+    /(^|[\s:])(?:not found|no record)(?:$|[\s.])/i.test(error.message) ||
+    /\b(?:not found|no record)\b/i.test(error.message);
 
   if (matchesRegex) {
     serverInstance.warning('Course lookup retry fell back to regex detection', {
+      errorName: error.name,
       errorMessage: error.message,
       errorStack: error.stack,
       errorCause:
@@ -80,7 +81,7 @@ function shouldRetryCourseLookup(error: unknown): boolean {
               message: error.cause.message,
               stack: error.cause.stack,
             }
-          : (error.cause ?? undefined),
+          : error.cause,
     });
   }
 
@@ -105,14 +106,30 @@ export async function generateMetadata({
       course = likelyCourseId
         ? await getCourseById(identifier)
         : await getCourseBySlug(identifier);
-    } catch (error) {
-      if (!shouldRetryCourseLookup(error)) {
-        throw error;
+    } catch (firstError) {
+      if (!shouldRetryCourseLookup(firstError)) {
+        throw firstError;
       }
 
-      course = likelyCourseId
-        ? await getCourseBySlug(identifier)
-        : await getCourseById(identifier);
+      try {
+        course = likelyCourseId
+          ? await getCourseBySlug(identifier)
+          : await getCourseById(identifier);
+      } catch (retryError) {
+        throw new Error(
+          `Course lookup retry failed for ${identifier}: ${
+            retryError instanceof Error
+              ? retryError.message
+              : String(retryError)
+          }`,
+          {
+            cause:
+              firstError instanceof Error
+                ? firstError
+                : new Error(String(firstError)),
+          }
+        );
+      }
     }
 
     const title = course.title ?? 'Kurs';

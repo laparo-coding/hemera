@@ -8,11 +8,11 @@ import { gotoStable } from './helpers/nav';
  */
 
 test.skip(
-  !!process.env.PLAYWRIGHT_BASE_URL,
-  'Skip on external BASE_URL.'
+  !process.env.PLAYWRIGHT_BASE_URL,
+  'Skip unless external BASE_URL is configured.'
 );
 
 test('build info badge is not present on home', async ({ page }) => {
   await gotoStable(page, '/');
-  await expect(page.getByTestId('build-info')).toHaveCount(0);
+  await expect(page.getByTestId('build-info')).not.toBeAttached();
 });

@@ -53,6 +53,10 @@ import {
   withServerActionErrorHandling,
 } from '../middleware/server-action-error-handling';
 import { serverInstance } from '../monitoring/rollbar-official';
+import {
+  canStartPreparationForStatus,
+  PREPARATION_PAYMENT_STATUSES,
+} from '../types/booking';
 import { isNegotiationPartner } from '../types/participation';
 import { generateRequestId } from '../utils/request-id';
 import {
@@ -61,10 +65,10 @@ import {
   uploadResume,
 } from '../utils/resumeUpload';
 
-const STRICT_ISO_8601_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-const PARTICIPATION_LOG_RETRY_ATTEMPTS = 3;
+const strictIso8601Regex = /^\d{4}-\d{2}-\d{2}$/;
+const participationLogRetryAttempts = 3;
 // Keep logging retries low-latency because these failures should not materially delay user-facing actions.
-const PARTICIPATION_LOG_INITIAL_DELAY_MS = 20;
+const participationLogInitialDelayMs = 20;
 
 function normalizeParticipationActionError(error: unknown): Error {
   if (error instanceof Error) {
@@ -122,8 +126,8 @@ function localizeInformalGermanMessage(message: string): string {
 
 async function retryWithBackoff(
   operation: () => void | Promise<void>,
-  attempts = PARTICIPATION_LOG_RETRY_ATTEMPTS,
-  initialDelayMs = PARTICIPATION_LOG_INITIAL_DELAY_MS
+  attempts = participationLogRetryAttempts,
+  initialDelayMs = participationLogInitialDelayMs
 ): Promise<void> {
   let delayMs = initialDelayMs;
   let lastError: Error | null = null;
@@ -153,10 +157,15 @@ async function reportParticipationActionError(
   context: Record<string, unknown>
 ): Promise<void> {
   if (error instanceof BaseError) {
-    await retryWithBackoff(() => {
-      void serverInstance.info(`${action} (handled domain error)`, {
+    const domainContext = error.context ?? {};
+
+    await retryWithBackoff(async () => {
+      await serverInstance.info(`${action} (handled domain error)`, {
         ...context,
+        ...domainContext,
         errorCode: error.errorCode,
+        errorMessage: error.message,
+        errorContext: error.context,
       });
     });
     return;
@@ -164,8 +173,8 @@ async function reportParticipationActionError(
 
   const normalizedError = normalizeParticipationActionError(error);
 
-  await retryWithBackoff(() => {
-    void serverInstance.error(action, normalizedError, context);
+  await retryWithBackoff(async () => {
+    await serverInstance.error(action, normalizedError, context);
   });
 }
 
@@ -227,7 +236,12 @@ async function verifyParticipationOwnership(
   const participation = await getParticipationByBookingId(bookingId);
 
   if (!participation) {
-    throw new ParticipationNotFoundError({ requestId: generateRequestId() });
+    throw new ParticipationNotFoundError({
+      requestId: generateRequestId(),
+      identifier: bookingId,
+      lookupField: 'bookingId',
+      bookingId,
+    });
   }
 
   // Verify the booking belongs to the current user
@@ -267,10 +281,10 @@ export const getMyEnrollmentsAction = withServerActionErrorHandling(
     }
 
     // Get all paid/confirmed bookings for the user
-    const bookings = await prisma.booking.findMany({
+    const bookings = (await prisma.booking.findMany({
       where: {
         userId,
-        paymentStatus: { in: ['PAID', 'CONFIRMED'] },
+        paymentStatus: { in: [...PREPARATION_PAYMENT_STATUSES] },
       },
       include: {
         course: {
@@ -283,7 +297,7 @@ export const getMyEnrollmentsAction = withServerActionErrorHandling(
         },
       },
       orderBy: { createdAt: 'desc' },
-    });
+    })) as BookingWithCourse[];
 
     // Get existing participations for these bookings
     const participations = await getParticipationsByUserId(userId);
@@ -353,10 +367,10 @@ export const startParticipationAction = withParameterizedServerAction(
       );
     }
 
-    if (!['PAID', 'CONFIRMED'].includes(booking.paymentStatus)) {
+    if (!canStartPreparationForStatus(booking.paymentStatus)) {
       throw new InvalidBookingStatusError(
         booking.paymentStatus,
-        'PAID or CONFIRMED'
+        PREPARATION_PAYMENT_STATUSES.join(' oder ')
       );
     }
 
@@ -374,7 +388,10 @@ export const startParticipationAction = withParameterizedServerAction(
     }
 
     if (!participation) {
-      throw new ParticipationCreationError({ requestId: generateRequestId() });
+      throw new ParticipationCreationError({
+        requestId: generateRequestId(),
+        bookingId,
+      });
     }
 
     const hasAssets = await hasSummaryAssets(participation.courseId);
@@ -831,7 +848,7 @@ export async function saveNegotiationResultAction(params: {
 
     let parsedDate: Date | null = null;
     if (params.resultDate) {
-      if (!STRICT_ISO_8601_REGEX.test(params.resultDate)) {
+      if (!strictIso8601Regex.test(params.resultDate)) {
         return {
           success: false,
           error: {

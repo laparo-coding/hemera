@@ -150,17 +150,39 @@ async function resolveSyncedUserId(
   user: ClerkUser,
   requestId: string
 ): Promise<string> {
-  const { syncUserFromClerk } = await import('../../../lib/api/users');
+  let syncUserFromClerk: typeof import('../../../lib/api/users').syncUserFromClerk;
+
+  try {
+    ({ syncUserFromClerk } = await import('../../../lib/api/users'));
+  } catch (importError) {
+    reportError(
+      new Error('Failed to load Clerk user sync module for bookings route'),
+      {
+        requestId,
+        additionalData: sanitizeForErrorReporting({
+          clerkUserId: user.id,
+          importError:
+            importError instanceof Error
+              ? importError.message
+              : String(importError),
+        }),
+      },
+      ErrorSeverity.ERROR
+    );
+
+    throw importError;
+  }
 
   try {
     const syncedUser = await syncUserFromClerk(user);
     return syncedUser.id;
   } catch (syncError) {
     const email = user.primaryEmailAddress?.emailAddress ?? null;
-    const fallbackUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ id: user.id }, ...(email ? [{ email }] : [])],
-      },
+    // If Clerk sync fails transiently, retry against the DB by Clerk user ID.
+    // This covers temporary Clerk/API issues or eventual consistency when the
+    // user record was already created in a previous request.
+    const fallbackUser = await prisma.user.findUnique({
+      where: { id: user.id },
       select: {
         id: true,
       },
@@ -173,7 +195,7 @@ async function resolveSyncedUserId(
           requestId,
           additionalData: sanitizeForErrorReporting({
             clerkUserId: user.id,
-            email,
+            hasEmail: email !== null,
             syncError:
               syncError instanceof Error
                 ? syncError.message
@@ -186,12 +208,42 @@ async function resolveSyncedUserId(
       return fallbackUser.id;
     }
 
+    if (email) {
+      const emailMatchedUser = await prisma.user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+        },
+      });
+
+      if (emailMatchedUser) {
+        reportError(
+          new Error(
+            'Blocked bookings user resolution by email after sync failure'
+          ),
+          {
+            requestId,
+            additionalData: sanitizeForErrorReporting({
+              clerkUserId: user.id,
+              hasEmail: true,
+              matchedUserId: emailMatchedUser.id,
+              syncError:
+                syncError instanceof Error
+                  ? syncError.message
+                  : String(syncError),
+            }),
+          },
+          ErrorSeverity.WARNING
+        );
+      }
+    }
+
     throw syncError;
   }
 }
 
 export async function GET(request: Request) {
-  const _requestId = crypto.randomUUID();
+  const _requestId = getOrCreateRequestIdFromHeaders(request.headers);
 
   try {
     const { searchParams } = new URL(request.url);

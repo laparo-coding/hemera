@@ -25,4 +25,20 @@ describe('isLikelyCourseId', () => {
   it('rejects empty strings', () => {
     expect(isLikelyCourseId('')).toBe(false);
   });
+
+  it('rejects null values', () => {
+    expect(isLikelyCourseId(null as never)).toBe(false);
+  });
+
+  it('rejects undefined values', () => {
+    expect(isLikelyCourseId(undefined as never)).toBe(false);
+  });
+
+  it('accepts digit-only suffixes when the cuid shape still matches', () => {
+    expect(isLikelyCourseId(`c${'1'.repeat(24)}`)).toBe(true);
+  });
+
+  it('rejects overly long strings', () => {
+    expect(isLikelyCourseId(`c${'a'.repeat(50)}`)).toBe(false);
+  });
 });

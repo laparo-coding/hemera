@@ -174,7 +174,11 @@ describe('Domain Errors', () => {
 
   describe('Auth Errors', () => {
     it('UnauthorizedError should have correct properties', () => {
-      const error = new UnauthorizedError('admin panel', undefined, 'req-123');
+      const error = new UnauthorizedError(
+        'admin panel',
+        'Zugriff nicht autorisiert',
+        'req-123'
+      );
 
       expect(error.statusCode).toBe(401);
       expect(error.errorCode).toBe('UNAUTHORIZED');

@@ -5,7 +5,14 @@ export const runtime = 'nodejs';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { Box, Container, Typography } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
+import { ClerkAvailabilityContext } from '../../components/auth/ClerkProviderWrapper';
 import { isEnvFlagEnabled } from '../../lib/utils/env-flags';
 
 const isE2EFlagEnabled = isEnvFlagEnabled(
@@ -165,10 +172,23 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [hasMockSession, setHasMockSession] = useState(false);
+  const { clerkBypassed } = useContext(ClerkAvailabilityContext);
+  const allowMockSessionFallback =
+    process.env.NEXT_PUBLIC_ENABLE_MOCK_SESSION === '1';
+  const [hasMockSession, setHasMockSession] = useState(() => {
+    if (
+      isE2EFlagEnabled ||
+      !allowMockSessionFallback ||
+      typeof window === 'undefined'
+    ) {
+      return false;
+    }
+
+    return window.localStorage.getItem('clerk-session') !== null;
+  });
 
   useEffect(() => {
-    if (isE2EFlagEnabled) {
+    if (isE2EFlagEnabled || !allowMockSessionFallback) {
       return;
     }
 
@@ -177,7 +197,15 @@ export default function DashboardLayout({
     } catch {
       setHasMockSession(false);
     }
-  }, []);
+  }, [allowMockSessionFallback]);
+
+  if (clerkBypassed && !isE2EFlagEnabled && !hasMockSession) {
+    return (
+      <Container component='main' maxWidth='lg' sx={{ py: 6 }}>
+        <Typography>Dashboard ist vorubergehend nicht verfugbar.</Typography>
+      </Container>
+    );
+  }
 
   const isE2E = isE2EFlagEnabled || hasMockSession;
 

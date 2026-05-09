@@ -33,6 +33,8 @@ import ClerkProviderWrapper from '../../../components/auth/ClerkProviderWrapper'
 describe('ClerkProviderWrapper', () => {
   const originalPublishableKey =
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const originalDisableClerk = process.env.NEXT_PUBLIC_DISABLE_CLERK;
+  const originalE2ETest = process.env.NEXT_PUBLIC_E2E_TEST;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -44,6 +46,8 @@ describe('ClerkProviderWrapper', () => {
 
   afterAll(() => {
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = originalPublishableKey;
+    process.env.NEXT_PUBLIC_DISABLE_CLERK = originalDisableClerk;
+    process.env.NEXT_PUBLIC_E2E_TEST = originalE2ETest;
   });
 
   it('falls back to children when Clerk reports the key mismatch redirect loop', async () => {

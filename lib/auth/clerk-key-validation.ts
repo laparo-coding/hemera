@@ -1,35 +1,30 @@
 type ClerkKeyMode = 'test' | 'live';
 
-function getPublishableKeyMode(key?: string): ClerkKeyMode | null {
+function getKeyMode(
+  key: string | undefined,
+  prefixes: { test: string; live: string }
+): ClerkKeyMode | null {
   if (!key) {
     return null;
   }
 
-  if (key.startsWith('pk_test_')) {
+  if (key.startsWith(prefixes.test)) {
     return 'test';
   }
 
-  if (key.startsWith('pk_live_')) {
+  if (key.startsWith(prefixes.live)) {
     return 'live';
   }
 
   return null;
 }
 
+function getPublishableKeyMode(key?: string): ClerkKeyMode | null {
+  return getKeyMode(key, { test: 'pk_test_', live: 'pk_live_' });
+}
+
 function getSecretKeyMode(key?: string): ClerkKeyMode | null {
-  if (!key) {
-    return null;
-  }
-
-  if (key.startsWith('sk_test_')) {
-    return 'test';
-  }
-
-  if (key.startsWith('sk_live_')) {
-    return 'live';
-  }
-
-  return null;
+  return getKeyMode(key, { test: 'sk_test_', live: 'sk_live_' });
 }
 
 export function getClerkKeyMismatchReason(
@@ -47,5 +42,9 @@ export function getClerkKeyMismatchReason(
     return null;
   }
 
-  return `Clerk deaktiviert: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY (${publishableMode}) und CLERK_SECRET_KEY (${secretMode}) passen nicht zusammen.`;
+  return (
+    'Clerk deaktiviert: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ' +
+    `(${publishableMode}) und CLERK_SECRET_KEY (${secretMode}) ` +
+    'passen nicht zusammen.'
+  );
 }

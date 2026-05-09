@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import type { NextFetchEvent } from 'next/server';
 import { NextRequest } from 'next/server';
 
 const mockClerkHandler = jest.fn();
@@ -26,7 +27,7 @@ describe('proxy', () => {
     process.env.NEXT_PUBLIC_DISABLE_CLERK = '0';
   });
 
-  afterAll(() => {
+  afterEach(() => {
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = originalPublishableKey;
     process.env.CLERK_SECRET_KEY = originalSecretKey;
   });
@@ -36,9 +37,12 @@ describe('proxy', () => {
     process.env.CLERK_SECRET_KEY = 'sk_live_secret456';
 
     const { default: proxy } = await import('@/proxy');
+    const mockNextFetchEvent = {
+      waitUntil: jest.fn(),
+    } as unknown as NextFetchEvent;
     const response = proxy(
       new NextRequest('http://localhost:3000/api/service/courses'),
-      {} as never
+      mockNextFetchEvent
     );
     const json = await response.json();
 
@@ -47,7 +51,9 @@ describe('proxy', () => {
       success: false,
       error: {
         code: 'AUTH_CONFIGURATION_ERROR',
-        message: 'Authentication service is temporarily unavailable.',
+        message:
+          'Der Authentifizierungsdienst steht vorubergehend nicht zur ' +
+          'Verfugung. Bitte versuche es spater erneut.',
       },
     });
     expect(mockServerError).toHaveBeenCalledWith(

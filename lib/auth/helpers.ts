@@ -35,23 +35,19 @@ function hasExplicitServerAuthBypass(): boolean {
 }
 
 function shouldBypassClerkServerAuth(): boolean {
-  if (hasExplicitServerAuthBypass()) {
-    return true;
-  }
-
   if (isProtectedDeploymentEnvironment()) {
     return false;
+  }
+
+  if (hasExplicitServerAuthBypass()) {
+    return true;
   }
 
   return false;
 }
 
 async function getCookieMockRole(): Promise<'user' | 'admin' | null> {
-  if (
-    isProtectedDeploymentEnvironment() &&
-    !isMockAuthEnvironment() &&
-    !hasExplicitServerAuthBypass()
-  ) {
+  if (!isMockAuthEnvironment() || isProtectedDeploymentEnvironment()) {
     return null;
   }
 
@@ -76,7 +72,7 @@ async function getMockAuthRole(): Promise<'user' | 'admin' | null> {
       return process.env.E2E_ADMIN === '1' ? 'admin' : 'user';
     }
 
-    return null;
+    return process.env.E2E_ADMIN === '1' ? 'admin' : 'user';
   }
 
   if (isMockAuthEnvironment()) {

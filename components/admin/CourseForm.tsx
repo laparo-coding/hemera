@@ -563,7 +563,7 @@ export default function CourseForm({
         render={({ field }) => (
           <Box
             component='section'
-            aria-label={TERMS.courseProgress}
+            aria-label='Curriculum'
             sx={{
               border: '1px solid',
               borderColor: 'divider',

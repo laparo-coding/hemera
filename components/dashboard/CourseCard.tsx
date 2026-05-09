@@ -49,7 +49,7 @@ export interface CourseCardProps {
 export const shouldShowTestimonialButton = (
   sectionType: CourseCardProps['sectionType'],
   userProfile?: CourseCardProps['userProfile']
-): boolean => sectionType !== 'NO_SHOW' && userProfile != null;
+): boolean => sectionType === 'COMPLETED' && userProfile != null;
 
 /**
  * Format date range for display

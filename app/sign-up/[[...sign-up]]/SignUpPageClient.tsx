@@ -12,10 +12,12 @@ const SignUp = dynamic(
   { ssr: false }
 );
 
+const NEXT_PUBLIC_E2E_TEST = process.env.NEXT_PUBLIC_E2E_TEST;
+const NEXT_PUBLIC_DISABLE_CLERK = process.env.NEXT_PUBLIC_DISABLE_CLERK;
+const shouldRenderClerkSignUp =
+  NEXT_PUBLIC_E2E_TEST !== '1' && NEXT_PUBLIC_DISABLE_CLERK !== '1';
+
 export function SignUpPageClient() {
-  const shouldRenderClerkSignUp =
-    process.env.NEXT_PUBLIC_E2E_TEST !== '1' &&
-    process.env.NEXT_PUBLIC_DISABLE_CLERK !== '1';
   const [hydrated, setHydrated] = useState(false);
   const clerkReady = hydrated && shouldRenderClerkSignUp;
 
@@ -42,7 +44,7 @@ export function SignUpPageClient() {
         hydrated={hydrated}
         showFallback={!clerkReady}
       />
-      {clerkReady ? <SignUp appearance={authPageClerkAppearance} /> : null}
+      {clerkReady && <SignUp appearance={authPageClerkAppearance} />}
     </Box>
   );
 }

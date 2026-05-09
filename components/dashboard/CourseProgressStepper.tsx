@@ -78,6 +78,8 @@ const DASHBOARD_STEPS: DashboardStep[] = [
   },
 ];
 
+const ALTERNATIVE_LABEL_MARGIN_TOP = '4px';
+
 function getStepState(
   step: DashboardStep,
   status: ParticipationStatus | null
@@ -240,9 +242,7 @@ export default function CourseProgressStepper({
         activeStep={computedActiveStep}
         aria-label='Dein Fortschritt'
         sx={{
-          '& .MuiStepper-root': {
-            overflowX: 'hidden',
-          },
+          overflowX: 'hidden',
           '& .MuiStepConnector-line': {
             borderTopWidth: 3,
             borderColor: colors.lightGray,
@@ -319,7 +319,7 @@ export default function CourseProgressStepper({
                       textAlign: 'center',
                     },
                     '& .MuiStepLabel-label.MuiStepLabel-alternativeLabel': {
-                      marginTop: '4px',
+                      marginTop: ALTERNATIVE_LABEL_MARGIN_TOP,
                     },
                     '& .MuiStepLabel-label.Mui-active': {
                       color: colors.marsala,
@@ -328,7 +328,7 @@ export default function CourseProgressStepper({
                     },
                     '& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel':
                       {
-                        marginTop: '4px',
+                        marginTop: ALTERNATIVE_LABEL_MARGIN_TOP,
                       },
                     '& .MuiStepLabel-label.Mui-completed': {
                       color: colors.statusHealthy,
@@ -336,7 +336,7 @@ export default function CourseProgressStepper({
                     },
                     '& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel':
                       {
-                        marginTop: '4px',
+                        marginTop: ALTERNATIVE_LABEL_MARGIN_TOP,
                       },
                   }}
                 >

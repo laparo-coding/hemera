@@ -37,7 +37,7 @@ describe('GET /api/health', () => {
     process.env.CLERK_SECRET_KEY = originalSecretKey;
   });
 
-  it('marks Clerk as bypassed when test/live keys do not match', async () => {
+  it('keeps Clerk bypass diagnostics out of the public response', async () => {
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_test_public123';
     process.env.CLERK_SECRET_KEY = 'sk_live_secret456';
 
@@ -49,10 +49,7 @@ describe('GET /api/health', () => {
 
     expect(response.status).toBe(200);
     expect(json.success).toBe(true);
-    expect(json.data.auth.clerk).toEqual({
-      configured: true,
-      bypassed: true,
-    });
+    expect(json.data.auth).toBeUndefined();
     expect(mockLoggerInfo).toHaveBeenCalledWith(
       'Health check completed',
       expect.objectContaining({

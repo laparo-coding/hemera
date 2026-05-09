@@ -95,10 +95,10 @@ function createFallbackHealth(message: string): HealthStatus {
       ),
     },
     build: {
-      version: 'preview',
-      commitSha: 'unknown',
-      buildTime: lastChecked,
-      environment: 'development',
+      version: '',
+      commitSha: '',
+      buildTime: '',
+      environment: '',
     },
     lastChecked,
   };
@@ -130,10 +130,10 @@ function createInitialHealthState(): HealthStatus {
       ),
     },
     build: {
-      version: 'preview',
-      commitSha: 'unknown',
+      version: '',
+      commitSha: '',
       buildTime: '',
-      environment: 'development',
+      environment: '',
     },
     lastChecked: '',
   };
@@ -499,13 +499,13 @@ export default function ReportsPage() {
 
           <Box sx={{ mt: 1.5 }}>
             <Typography variant='body2' color='text.secondary'>
-              Version: {health.build.version || 'unknown'}
+              Version: {health?.build?.version || 'unbekannt'}
             </Typography>
             <Typography variant='body2' color='text.secondary'>
-              Umgebung: {health.build.environment || 'unknown'}
+              Umgebung: {health?.build?.environment || 'unbekannt'}
             </Typography>
             <Typography variant='body2' color='text.secondary'>
-              Commit: {health.build.commitSha || 'unknown'}
+              Commit: {health?.build?.commitSha || 'unbekannt'}
             </Typography>
           </Box>
         </CardContent>

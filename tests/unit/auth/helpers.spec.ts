@@ -138,6 +138,16 @@ describe('Auth Helpers', () => {
       expect(user).toBeDefined();
       expect(user.publicMetadata?.role).toBe('admin');
     });
+
+    it('should not fall through to Clerk on explicit bypass outside the test runtime', async () => {
+      process.env.DISABLE_CLERK_SERVER_AUTH = '1';
+      process.env.NODE_ENV = 'production';
+
+      const user = await requireAuth();
+
+      expect(user.id).toBe('e2e_mock_user');
+      expect(mockCurrentUser).not.toHaveBeenCalled();
+    });
   });
 
   describe('Real Auth Environment', () => {

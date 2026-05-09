@@ -6,6 +6,10 @@ describe('UserDashboard progress stepper visibility', () => {
     expect(shouldShowProgressStepper('NEXT_SEMINAR')).toBe(true);
   });
 
+  it('shows the dashboard stepper for upcoming bookings', () => {
+    expect(shouldShowProgressStepper('UPCOMING')).toBe(true);
+  });
+
   it('shows the dashboard stepper for completed bookings', () => {
     expect(shouldShowProgressStepper('COMPLETED')).toBe(true);
   });

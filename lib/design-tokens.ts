@@ -152,9 +152,20 @@ export const authForm = {
   inputBorderColorFocus: colors.marsala,
   footerBorderColor: colors.lightGray,
   socialButtonBackground: colors.white,
+  appleIconColor: colors.success,
 } as const;
 
-export const buttonStyles = {
+export type ButtonStyle = {
+  backgroundColor: string;
+  textColor: string;
+  hoverBackgroundColor: string;
+  disabledBackgroundColor: string;
+  disabledTextColor: string;
+};
+
+export type ButtonStyleKey = 'bronzeFilled';
+
+export const buttonStyles: Record<ButtonStyleKey, ButtonStyle> = {
   bronzeFilled: {
     backgroundColor: colors.bronze,
     textColor: colors.white,

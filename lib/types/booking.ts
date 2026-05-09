@@ -14,6 +14,11 @@ export const PAYMENT_STATUSES = [
   'CONFIRMED',
 ] as const satisfies readonly PrismaPaymentStatus[];
 
+export const PREPARATION_PAYMENT_STATUSES = [
+  'PAID',
+  'CONFIRMED',
+] as const satisfies readonly PrismaPaymentStatus[];
+
 export type PaymentStatus = PrismaPaymentStatus;
 
 type MissingPaymentStatuses = Exclude<
@@ -39,5 +44,13 @@ export function isPaymentStatus(value: unknown): value is PaymentStatus {
   return (
     typeof value === 'string' &&
     (PAYMENT_STATUSES as readonly string[]).includes(value)
+  );
+}
+
+export function canStartPreparationForStatus(
+  paymentStatus: PaymentStatus
+): boolean {
+  return (PREPARATION_PAYMENT_STATUSES as readonly PaymentStatus[]).includes(
+    paymentStatus
   );
 }

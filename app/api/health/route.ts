@@ -14,10 +14,23 @@ export async function GET(request: NextRequest) {
   const logger = createApiLogger(context);
 
   const info = getBuildInfo();
-  const clerkBypassReason = getClerkKeyMismatchReason(
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-    process.env.CLERK_SECRET_KEY
-  );
+  const clerkConfigured =
+    Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
+    Boolean(process.env.CLERK_SECRET_KEY);
+  let clerkBypassReason: string | null = null;
+
+  try {
+    clerkBypassReason = getClerkKeyMismatchReason(
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+      process.env.CLERK_SECRET_KEY
+    );
+  } catch (error) {
+    logger.error(
+      'Failed to evaluate Clerk key mismatch for health check',
+      error instanceof Error ? error : new Error(String(error))
+    );
+  }
+
   const healthData = {
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -26,17 +39,17 @@ export async function GET(request: NextRequest) {
     commitSha: info.commitSha,
     shortSha: info.shortSha,
     buildTime: info.buildTime,
+  } as const;
+
+  logger.info('Health check completed', {
+    ...healthData,
     auth: {
       clerk: {
-        configured:
-          Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
-          Boolean(process.env.CLERK_SECRET_KEY),
+        configured: clerkConfigured,
         bypassed: clerkBypassReason !== null,
       },
     },
-  } as const;
-
-  logger.info('Health check completed', healthData);
+  });
   logger.trackRequestCompletion(200);
 
   return createSuccessResponse(healthData, requestId);

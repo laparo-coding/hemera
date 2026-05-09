@@ -27,7 +27,10 @@ import {
 import type { ParticipationSummary } from '../../../lib/actions/participation';
 import { startParticipationAction } from '../../../lib/actions/participation';
 import type { PreparationInput } from '../../../lib/db/courseParticipation';
-import type { PaymentStatus } from '../../../lib/types/booking';
+import {
+  canStartPreparationForStatus,
+  type PaymentStatus,
+} from '../../../lib/types/booking';
 
 interface PreparationSectionProps {
   bookingId: string;
@@ -36,7 +39,7 @@ interface PreparationSectionProps {
 }
 
 export const canStartPreparation = (paymentStatus: PaymentStatus): boolean =>
-  ['PAID', 'CONFIRMED'].includes(paymentStatus);
+  canStartPreparationForStatus(paymentStatus);
 
 export default function PreparationSection({
   bookingId,
@@ -46,14 +49,12 @@ export default function PreparationSection({
   const [hasParticipation, setHasParticipation] = useState(
     initialHasParticipation
   );
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const isPreparationAvailable = canStartPreparation(paymentStatus);
 
   // Start participation when user clicks the button
   const handleStartPreparation = async () => {
-    setLoading(true);
     setError(null);
     startTransition(async () => {
       try {
@@ -67,8 +68,6 @@ export default function PreparationSection({
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
-      } finally {
-        setLoading(false);
       }
     });
   };
@@ -134,13 +133,13 @@ export default function PreparationSection({
           <Button
             variant='contained'
             startIcon={
-              isPending || loading ? (
+              isPending ? (
                 <CircularProgress size={16} color='inherit' />
               ) : (
                 <PlayArrowIcon />
               )
             }
-            disabled={isPending || loading}
+            disabled={isPending}
             onClick={handleStartPreparation}
             sx={{
               backgroundColor: colors.bronze,
@@ -151,9 +150,7 @@ export default function PreparationSection({
               },
             }}
           >
-            {isPending || loading
-              ? 'Wird gestartet...'
-              : 'Vorbereitung starten'}
+            {isPending ? 'Wird gestartet...' : 'Vorbereitung starten'}
           </Button>
         )}
       </Paper>

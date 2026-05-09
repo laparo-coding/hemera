@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { TERMS } from '@/lib/constants';
 import { colors } from '@/lib/design-tokens';
@@ -24,6 +24,7 @@ import {
   type BookingForCategorization,
   categorizeBookings as categorizeBookingsUtil,
 } from '@/lib/utils/booking-categorization';
+import { ClerkAvailabilityContext } from './auth/ClerkProviderWrapper';
 import {
   CourseCard,
   CourseProgressStepper,
@@ -76,6 +77,21 @@ const bookingsResponseSchema = z.object({
 });
 
 type Booking = z.infer<typeof bookingSchema>;
+
+const e2eSessionUserSchema = z.object({
+  id: z.string().optional(),
+  email: z.string().optional(),
+  firstName: z.string().nullable().optional(),
+  lastName: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  role: z.string().nullable().optional(),
+});
+
+const e2eSessionEnvelopeSchema = z.object({
+  authenticated: z.literal(true),
+  expiresAt: z.number().finite(),
+  user: e2eSessionUserSchema,
+});
 
 export const shouldShowProgressStepper = (
   sectionType: 'NEXT_SEMINAR' | 'UPCOMING' | 'COMPLETED' | 'NO_SHOW'
@@ -174,23 +190,44 @@ function categorizeBookings(bookings: Booking[]): CategorizedDashboardBookings {
 // Wrapper component that decides at build time which variant to render.
 // This avoids conditional hook calls within a single component.
 const UserDashboard: React.FC = () => {
-  const [hasMockSession, setHasMockSession] = useState(false);
-
+  const { clerkBypassed } = useContext(ClerkAvailabilityContext);
   const isE2EBuild =
     process.env.NEXT_PUBLIC_DISABLE_CLERK === '1' ||
     process.env.NEXT_PUBLIC_E2E_TEST === '1';
+  const canUseMockSessionFallback =
+    process.env.NEXT_PUBLIC_ENABLE_MOCK_SESSION === '1';
+  const [hasMockSession, setHasMockSession] = useState<boolean | null>(
+    isE2EBuild || !canUseMockSessionFallback ? false : null
+  );
 
   useEffect(() => {
-    if (isE2EBuild) {
+    if (isE2EBuild || !canUseMockSessionFallback) {
+      setHasMockSession(false);
       return;
     }
 
     try {
-      setHasMockSession(Boolean(window.localStorage?.getItem('clerk-session')));
+      setHasMockSession(readE2ESessionUser() !== null);
     } catch {
       setHasMockSession(false);
     }
-  }, [isE2EBuild]);
+  }, [canUseMockSessionFallback, isE2EBuild]);
+
+  if (!isE2EBuild && hasMockSession === null) {
+    return (
+      <Box data-testid='user-dashboard-loading' sx={{ p: 3 }}>
+        <Skeleton variant='rounded' height={120} />
+      </Box>
+    );
+  }
+
+  if (clerkBypassed && !isE2EBuild && !hasMockSession) {
+    return (
+      <Alert severity='warning'>
+        Dein Dashboard ist vorubergehend nicht verfugbar.
+      </Alert>
+    );
+  }
 
   return isE2EBuild || hasMockSession ? (
     <UserDashboardE2E />
@@ -200,6 +237,8 @@ const UserDashboard: React.FC = () => {
 };
 
 type E2ESessionUser = {
+  id?: string;
+  email?: string;
   firstName?: string | null;
   lastName?: string | null;
   imageUrl?: string | null;
@@ -207,7 +246,7 @@ type E2ESessionUser = {
 };
 
 function isE2ESessionUser(value: unknown): value is E2ESessionUser {
-  return typeof value === 'object' && value !== null;
+  return e2eSessionUserSchema.safeParse(value).success;
 }
 
 function readE2ESessionUser(): E2ESessionUser | null {
@@ -218,8 +257,13 @@ function readE2ESessionUser(): E2ESessionUser | null {
     }
 
     const parsed = JSON.parse(raw);
-    if (isE2ESessionUser(parsed?.user)) {
-      return parsed.user;
+    const envelopeResult = e2eSessionEnvelopeSchema.safeParse(parsed);
+    if (envelopeResult.success) {
+      if (envelopeResult.data.expiresAt <= Date.now()) {
+        return null;
+      }
+
+      return envelopeResult.data.user;
     }
 
     return isE2ESessionUser(parsed) ? parsed : null;

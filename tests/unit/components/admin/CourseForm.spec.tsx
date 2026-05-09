@@ -3,7 +3,6 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, jest } from '@jest/globals';
-import type { ReactNode } from 'react';
 import CourseForm from '@/components/admin/CourseForm';
 
 jest.mock('@/components/admin/FileUpload', () => ({
@@ -22,6 +21,8 @@ jest.mock('@/components/admin/CurriculumEditor', () => ({
 
 describe('CourseForm', () => {
   it('renders the curriculum section without duplicating wrapper copy', () => {
+    const mockOnSubmit = jest.fn();
+
     render(
       <CourseForm
         initialData={{
@@ -50,13 +51,11 @@ describe('CourseForm', () => {
           ],
         }}
         locations={[]}
-        onSubmit={async () => {}}
+        onSubmit={mockOnSubmit}
       />
     );
 
-    expect(
-      screen.getByRole('region', { name: 'Seminarablauf' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Curriculum' })).toBeInTheDocument();
     expect(screen.getByTestId('curriculum-editor')).toHaveTextContent(
       'Curriculum modules: 1'
     );

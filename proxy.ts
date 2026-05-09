@@ -11,7 +11,6 @@ const clerkKeyMismatchReason = getClerkKeyMismatchReason(
   process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   process.env.CLERK_SECRET_KEY
 );
-let hasLoggedClerkKeyMismatch = false;
 
 // Prepare a Clerk middleware instance for non-E2E mode
 const isUserProfileRoute = createRouteMatcher(['/user-profile(.*)']);
@@ -23,11 +22,6 @@ const clerkMw = clerkMiddleware(async (auth, request) => {
 });
 
 function logClerkKeyMismatch(reason: string, request: NextRequest): void {
-  if (hasLoggedClerkKeyMismatch) {
-    return;
-  }
-
-  hasLoggedClerkKeyMismatch = true;
   serverInstance.error('[auth] Clerk proxy bypass due to key mismatch', {
     pathname: request.nextUrl.pathname,
     reason,
@@ -52,7 +46,9 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
           success: false,
           error: {
             code: 'AUTH_CONFIGURATION_ERROR',
-            message: 'Authentication service is temporarily unavailable.',
+            message:
+              'Der Authentifizierungsdienst steht vorubergehend nicht zur ' +
+              'Verfugung. Bitte versuche es spater erneut.',
           },
         }),
         { status: 503, headers: { 'content-type': 'application/json' } }
@@ -100,7 +96,18 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
 
   if (clerkKeyMismatchReason) {
     logClerkKeyMismatch(clerkKeyMismatchReason, request);
-    return NextResponse.next();
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: 'AUTH_CONFIGURATION_ERROR',
+          message:
+            'Der Authentifizierungsdienst steht vorubergehend nicht zur ' +
+            'Verfugung. Bitte versuche es spater erneut.',
+        },
+      },
+      { status: 503 }
+    );
   }
 
   // Delegate to Clerk middleware for auth handling for all other matched routes

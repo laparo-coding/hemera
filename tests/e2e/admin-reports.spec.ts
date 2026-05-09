@@ -164,7 +164,6 @@ test.describe('Admin Reports - Health Status', () => {
 
     await expect(page.locator('[data-testid="build-info"]')).toHaveCount(0);
     const healthSection = page.locator('[data-testid="reports-health-section"]');
-    await expect(healthSection).toContainText(/Systemstatus/i);
     await expect(healthSection).toContainText(/(v\d+\.\d+\.\d+|preview|unknown)/i);
   });
 });

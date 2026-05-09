@@ -8,7 +8,18 @@ import { isEnvFlagEnabled } from '../lib/utils/env-flags';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
-let hasLoggedClerkKeyMismatch = false;
+const isE2E =
+  isEnvFlagEnabled(process.env.E2E_TEST) ||
+  isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_CLERK);
+const clerkBypassReason = getClerkKeyMismatchReason(
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  process.env.CLERK_SECRET_KEY
+);
+
+if (clerkBypassReason && process.env.NODE_ENV !== 'test') {
+  // biome-ignore lint/suspicious/noConsole: startup configuration errors must be visible in server logs
+  console.error(`[auth] ${clerkBypassReason}`);
+}
 
 export const metadata: Metadata = {
   title: {
@@ -32,24 +43,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const isE2E =
-    isEnvFlagEnabled(process.env.E2E_TEST) ||
-    isEnvFlagEnabled(process.env.NEXT_PUBLIC_DISABLE_CLERK);
-  const clerkBypassReason = getClerkKeyMismatchReason(
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-    process.env.CLERK_SECRET_KEY
-  );
-
-  if (
-    clerkBypassReason &&
-    process.env.NODE_ENV !== 'test' &&
-    !hasLoggedClerkKeyMismatch
-  ) {
-    hasLoggedClerkKeyMismatch = true;
-    // biome-ignore lint/suspicious/noConsole: startup configuration errors must be visible in server logs
-    console.error(`[auth] ${clerkBypassReason}`);
-  }
-
   return (
     <html lang='de' suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>

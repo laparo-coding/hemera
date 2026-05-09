@@ -77,7 +77,7 @@ export class InvalidBookingStatusError extends ValidationError {
 
   constructor(currentStatus: string, attemptedStatus: string) {
     super(
-      `Cannot change booking status from ${currentStatus} to ${attemptedStatus}`,
+      `Du kannst den Buchungsstatus nicht von ${currentStatus} zu ${attemptedStatus} andern`,
       {
         currentStatus,
         attemptedStatus,
@@ -157,12 +157,12 @@ export class ParticipationNotFoundError extends BusinessError {
   constructor(options?: RequestScopedErrorOptions);
   constructor(
     _identifier: string,
-    _lookupField?: 'bookingId' | 'id',
+    requestedLookupField?: 'bookingId' | 'id',
     message?: string
   );
   constructor(
     optionsOrIdentifier: RequestScopedErrorOptions | string = {},
-    _lookupField?: 'bookingId' | 'id',
+    requestedLookupField?: 'bookingId' | 'id',
     message?: string
   ) {
     const identifier =
@@ -171,7 +171,7 @@ export class ParticipationNotFoundError extends BusinessError {
         : optionsOrIdentifier.identifier;
     const lookupField =
       typeof optionsOrIdentifier === 'string'
-        ? (_lookupField ?? 'bookingId')
+        ? (requestedLookupField ?? 'bookingId')
         : optionsOrIdentifier.lookupField;
     const options =
       typeof optionsOrIdentifier === 'string'

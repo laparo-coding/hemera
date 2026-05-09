@@ -380,7 +380,7 @@ test.describe('Auth Performance Validation (T019)', () => {
  * Tests for deferred loading, lazy loading, and script prioritization.
  */
 test.describe('Deferred Loading Optimization', () => {
-  test('monitoring scripts should NOT block initial page render', async ({
+  test('monitoring scripts should NOT block warmed initial page render', async ({
     page,
     request,
   }) => {
@@ -399,7 +399,7 @@ test.describe('Deferred Loading Optimization', () => {
       networkRequests.push(request.url());
     });
 
-    // Warm up homepage to avoid first-hit compile/network noise in local dev.
+    // Measure warmed FCP in local dev to reduce first-hit compile noise.
     const warmupResp = await request.get('http://localhost:3000/');
     expect([200, 302, 307]).toContain(warmupResp.status());
 

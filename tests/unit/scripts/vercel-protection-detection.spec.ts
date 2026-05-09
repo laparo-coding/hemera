@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { describe, expect, it } from '@jest/globals';
 
-const workspaceRoot = process.cwd();
+const workspaceRoot = path.resolve(__dirname, '../../..');
 const detectorScript = path.join(
   workspaceRoot,
   'scripts/detect-vercel-protection.sh'

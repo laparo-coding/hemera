@@ -378,11 +378,25 @@ describe('Participation Server Actions', () => {
 
       expect(result.success).toBe(false);
       expect(serverInstance.info).toHaveBeenCalledTimes(2);
+      expect(serverInstance.info).toHaveBeenCalledWith(
+        'Failed to save preparation (handled domain error)',
+        expect.objectContaining({
+          bookingId: 'booking-123',
+          identifier: 'booking-123',
+          lookupField: 'bookingId',
+          errorCode: 'PARTICIPATION_NOT_FOUND',
+          errorMessage: 'Teilnahme nicht gefunden',
+          errorContext: expect.objectContaining({
+            identifier: 'booking-123',
+            lookupField: 'bookingId',
+          }),
+        })
+      );
     });
   });
 
   describe('Booking status validation', () => {
-    it('reports all accepted payment statuses in the error message', async () => {
+    it('reports all accepted payment statuses in a localized error message', async () => {
       mockAuth.mockResolvedValue({ userId: 'user-123' } as any);
       (prisma.booking.findUnique as jest.Mock).mockResolvedValue({
         id: 'booking-123',
@@ -400,7 +414,10 @@ describe('Participation Server Actions', () => {
       const result = await startParticipationAction('booking-123');
 
       expect(result.success).toBe(false);
-      expect(result.error?.message).toContain('PAID or CONFIRMED');
+      expect(result.error?.message).toContain(
+        'Du kannst den Buchungsstatus nicht von PENDING zu'
+      );
+      expect(result.error?.message).toContain('PAID oder CONFIRMED');
     });
   });
 
