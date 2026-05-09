@@ -64,6 +64,8 @@ jobs:
 
       - name: Determine target URL
         id: target
+        env:
+          INPUT_URL: ${{ github.event.inputs.url }}
         run: |
           # Preferred: workflow_dispatch input is available as env var INPUT_URL
           if [ -n "$INPUT_URL" ]; then
