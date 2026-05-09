@@ -24,6 +24,9 @@ const clerkFallbackTranslations = new Map([
     'Zu viele Anfragen. Bitte versuche es in einem Moment erneut.',
   ],
 ]);
+const clerkFallbackSourceMessages = Array.from(
+  clerkFallbackTranslations.keys()
+);
 
 // Custom German localization with overrides
 const customDeDE = {
@@ -226,6 +229,14 @@ function translateClerkFallbackMessages(root: ParentNode) {
   }
 }
 
+function includesClerkFallbackSourceMessage(text: string | null | undefined) {
+  if (!text) {
+    return false;
+  }
+
+  return clerkFallbackSourceMessages.some(message => text.includes(message));
+}
+
 export default function ClerkProviderWrapper({
   children,
   forcedBypassReason = null,
@@ -286,22 +297,35 @@ export default function ClerkProviderWrapper({
       return;
     }
 
-    translateClerkFallbackMessages(document.body);
+    if (includesClerkFallbackSourceMessage(document.body.textContent)) {
+      translateClerkFallbackMessages(document.body);
+    }
 
     const observer = new MutationObserver(mutations => {
       for (const mutation of mutations) {
-        if (mutation.type === 'characterData' && mutation.target.parentNode) {
+        if (
+          mutation.type === 'characterData' &&
+          mutation.target.parentNode &&
+          includesClerkFallbackSourceMessage(mutation.target.textContent)
+        ) {
           translateClerkFallbackMessages(mutation.target.parentNode);
           continue;
         }
 
         for (const addedNode of mutation.addedNodes) {
-          if (addedNode.nodeType === Node.TEXT_NODE && addedNode.parentNode) {
+          if (
+            addedNode.nodeType === Node.TEXT_NODE &&
+            addedNode.parentNode &&
+            includesClerkFallbackSourceMessage(addedNode.textContent)
+          ) {
             translateClerkFallbackMessages(addedNode.parentNode);
             continue;
           }
 
-          if (addedNode.nodeType === Node.ELEMENT_NODE) {
+          if (
+            addedNode.nodeType === Node.ELEMENT_NODE &&
+            includesClerkFallbackSourceMessage(addedNode.textContent)
+          ) {
             translateClerkFallbackMessages(addedNode as ParentNode);
           }
         }
