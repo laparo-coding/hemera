@@ -108,8 +108,8 @@ export async function createCourseAction(
         success: false,
         error:
           errorMessage === 'AUTH_INSUFFICIENT_PERMISSIONS'
-            ? 'Admin role required'
-            : 'Authentication required',
+            ? 'Admin-Rolle erforderlich'
+            : 'Authentifizierung erforderlich',
         code: errorMessage,
       };
     }
@@ -121,7 +121,7 @@ export async function createCourseAction(
 
     return {
       success: false,
-      error: 'Failed to create course',
+      error: 'Kurs konnte nicht erstellt werden',
       code: 'COURSE_CREATE_FAILED',
     };
   }
@@ -169,8 +169,8 @@ export async function updateCourseAction(
         success: false,
         error:
           errorMessage === 'AUTH_INSUFFICIENT_PERMISSIONS'
-            ? 'Admin role required'
-            : 'Authentication required',
+            ? 'Admin-Rolle erforderlich'
+            : 'Authentifizierung erforderlich',
         code: errorMessage,
       };
     }
@@ -178,7 +178,7 @@ export async function updateCourseAction(
     if (errorMessage === 'COURSE_NOT_FOUND') {
       return {
         success: false,
-        error: 'Course not found',
+        error: 'Kurs nicht gefunden',
         code: 'COURSE_NOT_FOUND',
       };
     }
@@ -191,7 +191,7 @@ export async function updateCourseAction(
       return {
         success: false,
         error:
-          'Course was modified by another admin. Please refresh and try again.',
+          'Dieser Kurs wurde von einem anderen Admin bearbeitet. Bitte lade die Seite neu und versuche es erneut.',
         code: 'CONCURRENT_EDIT_CONFLICT',
       };
     }
@@ -209,7 +209,7 @@ export async function updateCourseAction(
       });
       return {
         success: false,
-        error: `Capacity cannot be less than current enrollment count (${enrollmentCount ?? 'unknown'})`,
+        error: `Die Kapazität kann nicht kleiner als die aktuelle Teilnehmerzahl sein (${enrollmentCount ?? 'unbekannt'})`,
         code: 'CAPACITY_BELOW_ENROLLMENTS',
       };
     }
@@ -222,7 +222,7 @@ export async function updateCourseAction(
 
     return {
       success: false,
-      error: 'Failed to update course',
+      error: 'Kurs konnte nicht aktualisiert werden',
       code: 'COURSE_UPDATE_FAILED',
     };
   }
@@ -265,8 +265,8 @@ export async function deleteCourseAction(
         success: false,
         error:
           errorMessage === 'AUTH_INSUFFICIENT_PERMISSIONS'
-            ? 'Admin role required'
-            : 'Authentication required',
+            ? 'Admin-Rolle erforderlich'
+            : 'Authentifizierung erforderlich',
         code: errorMessage,
       };
     }
@@ -279,7 +279,7 @@ export async function deleteCourseAction(
       });
       return {
         success: false,
-        error: `Cannot delete course with ${count ?? 'some'} active enrollments. Transfer students first.`,
+        error: `Kurs mit ${count ?? 'einigen'} aktiven Buchungen kann nicht gelöscht werden. Bitte übertrage zuerst die Teilnehmer.`,
         code: 'ACTIVE_ENROLLMENTS_EXIST',
       };
     }
@@ -292,7 +292,7 @@ export async function deleteCourseAction(
 
     return {
       success: false,
-      error: 'Failed to delete course',
+      error: 'Kurs konnte nicht gelöscht werden',
       code: 'COURSE_DELETE_FAILED',
     };
   }
@@ -315,7 +315,7 @@ export async function transferEnrollmentsAction(
     if (sourceCourseId === targetCourseId) {
       return {
         success: false,
-        error: 'Cannot transfer to the same course',
+        error: 'Es ist nicht möglich, in denselben Kurs zu übertragen',
         code: 'INVALID_TRANSFER_TARGET',
       };
     }
@@ -355,8 +355,8 @@ export async function transferEnrollmentsAction(
         success: false,
         error:
           errorMessage === 'AUTH_INSUFFICIENT_PERMISSIONS'
-            ? 'Admin role required'
-            : 'Authentication required',
+            ? 'Admin-Rolle erforderlich'
+            : 'Authentifizierung erforderlich',
         code: errorMessage,
       };
     }
@@ -364,7 +364,7 @@ export async function transferEnrollmentsAction(
     if (errorMessage === 'TARGET_COURSE_NOT_FOUND') {
       return {
         success: false,
-        error: 'Target course not found',
+        error: 'Zielkurs nicht gefunden',
         code: 'TARGET_COURSE_NOT_FOUND',
       };
     }
@@ -381,7 +381,7 @@ export async function transferEnrollmentsAction(
       });
       return {
         success: false,
-        error: `Target course has insufficient capacity (${available ?? '?'} slots available, ${transfer ?? '?'} needed)`,
+        error: `Der Zielkurs hat nicht ausreichend Kapazität (${available ?? '?'} Plätze verfügbar, ${transfer ?? '?'} benötigt)`,
         code: 'INSUFFICIENT_CAPACITY',
       };
     }
@@ -394,7 +394,7 @@ export async function transferEnrollmentsAction(
 
     return {
       success: false,
-      error: 'Failed to transfer enrollments',
+      error: 'Teilnehmer konnten nicht übertragen werden',
       code: 'TRANSFER_FAILED',
     };
   }
