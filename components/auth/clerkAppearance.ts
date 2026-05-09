@@ -2,7 +2,7 @@ import type { SignUpProps, UserButtonProps } from '@clerk/shared/types';
 import { authForm, buttonStyles, colors } from '@/lib/design-tokens';
 
 export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
-  layout: {
+  options: {
     socialButtonsPlacement: 'top',
     socialButtonsVariant: 'blockButton',
   },
