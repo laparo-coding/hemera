@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
+import { userButtonClerkAppearance } from '@/components/auth/clerkAppearance';
 import { colors, typography } from '@/lib/design-tokens';
 import { TERMS } from '../../lib/constants/terminology';
 
@@ -95,13 +96,12 @@ export function DashboardNavigation() {
 
             <UserButton
               appearance={{
+                ...userButtonClerkAppearance,
                 elements: {
+                  ...userButtonClerkAppearance.elements,
                   avatarBox: {
                     width: '32px',
                     height: '32px',
-                  },
-                  modalBackdrop: {
-                    backgroundColor: 'transparent',
                   },
                 },
               }}
