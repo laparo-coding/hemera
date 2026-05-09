@@ -82,11 +82,11 @@ jobs:
         if: steps.target.outputs.url != ''
         env:
           LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
-          # Local workflow validator flags the preferred automation secret as invalid
-          # in this repository context, so this workflow reads the legacy name.
+          # Accept both the preferred shared secret name and the legacy fallback.
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
         run: |
-          BYPASS_TOKEN="$VERCEL_PROTECTION_BYPASS"
+          BYPASS_TOKEN="${VERCEL_AUTOMATION_BYPASS_SECRET:-$VERCEL_PROTECTION_BYPASS}"
 
           CURL_ARGS=(-sSL)
           LHCI_ARGS=(--url "${{ steps.target.outputs.url }}" --config=.lighthouserc.json)
