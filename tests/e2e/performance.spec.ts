@@ -380,8 +380,9 @@ test.describe('Auth Performance Validation (T019)', () => {
  * Tests for deferred loading, lazy loading, and script prioritization.
  */
 test.describe('Deferred Loading Optimization', () => {
-  test('monitoring scripts should NOT block initial page render', async ({
+  test('monitoring scripts should NOT block warmed initial page render', async ({
     page,
+    request,
   }) => {
     // Skip in CI as real performance metrics require actual page render
     if (process.env.CI) {
@@ -398,12 +399,25 @@ test.describe('Deferred Loading Optimization', () => {
       networkRequests.push(request.url());
     });
 
+    // Measure warmed FCP in local dev to reduce first-hit compile noise.
+    const warmupResp = await request.get('http://localhost:3000/');
+    expect([200, 302, 307]).toContain(warmupResp.status());
+
     // Navigate and capture FCP timing
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     // Get FCP from Performance API
     const fcp = await page.evaluate(() => {
       return new Promise<number>(resolve => {
+        const existingEntry = performance.getEntriesByName(
+          'first-contentful-paint'
+        )[0];
+
+        if (existingEntry) {
+          resolve(existingEntry.startTime);
+          return;
+        }
+
         const observer = new PerformanceObserver(list => {
           for (const entry of list.getEntries()) {
             if (entry.name === 'first-contentful-paint') {

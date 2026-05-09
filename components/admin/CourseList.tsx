@@ -38,6 +38,10 @@ import { useEffect, useState } from 'react';
 import { TERMS } from '../../lib/constants';
 import type { CourseWithEnrollmentCount } from '../../lib/types/admin';
 import { getLevelLabel } from '../../lib/utils/course-level';
+import {
+  getAdminCourseEditUrl,
+  getCourseUrl,
+} from '../../lib/utils/course-url';
 import { formatShortDate, formatTimeRange } from '../../lib/utils/date-format';
 import { normalizeForSearch } from '../../lib/utils/searchNormalization';
 import { PublishSwitch } from './PublishSwitch';
@@ -243,11 +247,7 @@ export default function CourseList({
                         <IconButton
                           size='small'
                           component={Link}
-                          href={`/courses/${
-                            course.slug.trim().length > 0
-                              ? course.slug
-                              : course.id
-                          }`}
+                          href={getCourseUrl(course)}
                           aria-label={`${course.title} ansehen`}
                         >
                           <VisibilityIcon fontSize='small' />
@@ -257,7 +257,7 @@ export default function CourseList({
                         <IconButton
                           size='small'
                           component={Link}
-                          href={`/admin/courses/${course.id}/edit`}
+                          href={getAdminCourseEditUrl(course.id)}
                           aria-label={`${course.title} bearbeiten`}
                         >
                           <EditIcon fontSize='small' />

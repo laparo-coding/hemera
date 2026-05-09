@@ -79,7 +79,7 @@ describe('CourseOverviewSection', () => {
     it('displays instructor label', () => {
       render(<CourseOverviewSection {...defaultProps} />);
 
-      expect(screen.getByText(/trainerin|instructor/i)).toBeInTheDocument();
+      expect(screen.getByText(/seminarleitung|instructor/i)).toBeInTheDocument();
     });
   });
 });

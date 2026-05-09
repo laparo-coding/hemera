@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type FormEvent, useMemo, useState } from 'react';
-import { colors } from '@/lib/design-tokens';
+import { buttonStyles, colors } from '@/lib/design-tokens';
 
 export default function CustomSignUpClient() {
   const { signUp, fetchStatus } = useSignUp();
@@ -266,18 +266,18 @@ export default function CustomSignUpClient() {
               sx={{
                 mt: 1,
                 py: 1.5,
-                bgcolor: colors.bronze,
-                color: colors.marsala,
+                bgcolor: buttonStyles.bronzeFilled.backgroundColor,
+                color: buttonStyles.bronzeFilled.textColor,
                 fontWeight: 600,
                 fontSize: '1rem',
                 textTransform: 'none',
                 borderRadius: '8px',
                 '&:hover': {
-                  bgcolor: '#C99545',
+                  bgcolor: buttonStyles.bronzeFilled.hoverBackgroundColor,
                 },
                 '&:disabled': {
-                  bgcolor: colors.rosyBrown,
-                  color: colors.marsala,
+                  bgcolor: buttonStyles.bronzeFilled.disabledBackgroundColor,
+                  color: buttonStyles.bronzeFilled.disabledTextColor,
                   opacity: 0.6,
                 },
               }}

@@ -42,6 +42,7 @@ export default async function VorbereitungPage({
     },
     select: {
       id: true,
+      paymentStatus: true,
       course: {
         select: {
           title: true,
@@ -115,6 +116,7 @@ export default async function VorbereitungPage({
       <PreparationSection
         bookingId={booking.id}
         hasParticipation={hasParticipation}
+        paymentStatus={booking.paymentStatus}
       />
     </Box>
   );

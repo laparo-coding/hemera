@@ -43,15 +43,25 @@ export default function TestimonialButton({
     <>
       <Button
         variant='outlined'
-        color='primary'
         startIcon={<RateReviewOutlined />}
         onClick={() => setOpen(true)}
         sx={theme => ({
-          typography: 'button',
+          fontFamily: theme.typography.body2.fontFamily,
+          fontWeight: theme.typography.body2.fontWeight ?? 600,
+          fontSize: theme.typography.body2.fontSize,
+          lineHeight: theme.typography.body2.lineHeight,
           textTransform: 'none',
-          borderRadius: theme.shape.borderRadius,
-          px: 3,
-          py: 1,
+          borderRadius:
+            typeof theme.shape.borderRadius === 'number'
+              ? theme.shape.borderRadius * 2
+              : `calc(${theme.shape.borderRadius} * 2)`,
+          minHeight: theme.spacing(5),
+          gap: theme.spacing(1),
+          px: theme.spacing(3),
+          py: theme.spacing(1),
+          '& .MuiButton-startIcon': {
+            margin: 0,
+          },
         })}
       >
         Erfahrungsbericht

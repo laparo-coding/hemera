@@ -1,63 +1,181 @@
 import type { SignUpProps, UserButtonProps } from '@clerk/shared/types';
-import { colors } from '@/lib/design-tokens';
+import { authForm, buttonStyles, colors } from '@/lib/design-tokens';
 
 export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
   variables: {
     colorPrimary: colors.marsala,
     colorTextOnPrimaryBackground: colors.beige,
-    colorBackground: colors.white,
-    colorInputBackground: colors.white,
-    colorInputText: colors.marsala,
-    borderRadius: '8px',
+    colorBackground: authForm.cardBackground,
+    colorText: authForm.textColor,
+    colorTextSecondary: authForm.subtleTextColor,
+    colorInputBackground: authForm.cardBackground,
+    colorInputText: authForm.textColor,
+    borderRadius: authForm.inputBorderRadius,
   },
   elements: {
+    rootBox: {
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+    },
+    cardBox: {
+      width: '100%',
+      maxWidth: `${authForm.cardMaxWidth}px`,
+    },
     card: {
       boxShadow: 'none',
       border: 'none',
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+    },
+    footer: {
+      marginTop: 0,
+      padding: '1.25rem 2rem 1rem',
+      backgroundColor: authForm.cardBackground,
+      borderTop: `1px solid ${authForm.footerBorderColor}`,
+      borderBottomLeftRadius: authForm.inputBorderRadius,
+      borderBottomRightRadius: authForm.inputBorderRadius,
+      color: authForm.textColor,
+      '& p': {
+        color: authForm.subtleTextColor,
+      },
+      '& a': {
+        color: authForm.textColor,
+      },
+    },
+    footerAction: {
+      marginTop: 0,
+      paddingTop: 0,
+      borderTop: 'none',
+    },
+    footerActionText: {
+      color: authForm.subtleTextColor,
+    },
+    identityPreviewText: {
+      color: authForm.textColor,
+    },
+    identityPreviewEditButton: {
+      color: authForm.textColor,
+      '&:hover': {
+        color: colors.bronze,
+      },
     },
     headerTitle: {
       fontFamily: '"Playfair Display", serif',
-      color: colors.marsala,
+      color: authForm.textColor,
       fontSize: '1.75rem',
     },
     headerSubtitle: {
       display: 'none',
     },
     formButtonPrimary: {
-      backgroundColor: colors.bronze,
-      color: colors.marsala,
+      backgroundColor: buttonStyles.bronzeFilled.backgroundColor,
+      color: buttonStyles.bronzeFilled.textColor,
       fontWeight: 600,
       '&:hover': {
-        backgroundColor: colors.bronzeHover,
+        backgroundColor: buttonStyles.bronzeFilled.hoverBackgroundColor,
+      },
+      '&:disabled': {
+        backgroundColor: buttonStyles.bronzeFilled.disabledBackgroundColor,
+        color: buttonStyles.bronzeFilled.disabledTextColor,
+        opacity: 0.6,
       },
     },
     formFieldInput: {
-      borderRadius: '8px',
-      borderColor: colors.rosyBrown,
-      '&:focus': {
-        borderColor: colors.marsala,
+      borderRadius: authForm.inputBorderRadius,
+      // Clerk injects highly specific input selectors across multiple wrappers.
+      // Keep forced overrides until cross-browser checks prove a narrower rule.
+      border: `1px solid ${authForm.inputBorderColor} !important`,
+      backgroundColor: authForm.cardBackground,
+      color: authForm.textColor,
+      WebkitTextFillColor: authForm.textColor,
+      caretColor: authForm.textColor,
+      WebkitAppearance: 'none',
+      appearance: 'none',
+      boxShadow: `0 0 0 1px ${authForm.inputBorderColor} !important`,
+      WebkitBoxShadow: `0 0 0 1px ${authForm.inputBorderColor} !important`,
+      outline: 'none',
+      '&::placeholder': {
+        color: authForm.subtleTextColor,
+        WebkitTextFillColor: authForm.subtleTextColor,
+        opacity: 1,
+      },
+      // Keep both selectors because Clerk mounts different input wrappers across
+      // auth views and both focus states need the same override.
+      '&:is(:focus, :focus-within)': {
+        border: `1px solid ${authForm.inputBorderColorFocus} !important`,
+        boxShadow: `0 0 0 1px ${authForm.inputBorderColorFocus} !important`,
+        WebkitBoxShadow: `0 0 0 1px ${authForm.inputBorderColorFocus} !important`,
       },
     },
+    formFieldLabel: {
+      color: authForm.textColor,
+    },
+    formFieldInputShowPasswordButton: {
+      color: authForm.textColor,
+    },
     footerActionLink: {
-      color: colors.marsala,
+      color: authForm.textColor,
       fontWeight: 600,
       '&:hover': {
         color: colors.bronze,
       },
     },
     socialButtonsBlockButton: {
-      borderColor: colors.rosyBrown,
-      color: colors.marsala,
+      borderColor: authForm.inputBorderColor,
+      backgroundColor: authForm.socialButtonBackground,
+      color: authForm.textColor,
+      justifyContent: 'flex-start',
+      gap: '0.75rem',
       '&:hover': {
         borderColor: colors.marsala,
         backgroundColor: colors.sageLight,
       },
     },
+    socialButtonsIconButton: {
+      borderColor: authForm.inputBorderColor,
+      backgroundColor: authForm.socialButtonBackground,
+      color: authForm.textColor,
+      minHeight: '4rem',
+      '&:hover': {
+        borderColor: colors.marsala,
+        backgroundColor: colors.sageLight,
+      },
+    },
+    socialButtonsProviderIcon: {
+      // Clerk social icons rely on masked wrappers across Blink/WebKit, so both
+      // standard and prefixed mask properties remain aligned. Apple keeps a
+      // solid fill via explicit color override.
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '1.25rem',
+      height: '1.25rem',
+      flexShrink: 0,
+      backgroundColor: 'transparent',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      backgroundSize: 'contain',
+      maskRepeat: 'no-repeat',
+      WebkitMaskRepeat: 'no-repeat',
+      maskPosition: 'center',
+      WebkitMaskPosition: 'center',
+      maskSize: 'contain',
+      WebkitMaskSize: 'contain',
+      '&.cl-providerIcon__apple': {
+        backgroundColor: authForm.appleIconColor,
+      },
+    },
+    socialButtonsBlockButtonText: {
+      color: authForm.textColor,
+      fontWeight: 600,
+      textAlign: 'left',
+    },
     dividerLine: {
-      backgroundColor: colors.rosyBrown,
+      backgroundColor: authForm.inputBorderColor,
     },
     dividerText: {
-      color: colors.marsala,
+      color: authForm.textColor,
     },
   },
 };
