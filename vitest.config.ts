@@ -27,6 +27,11 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./tests/setup.ts'],
+    // These four integration specs still rely on environment and lifecycle
+    // assumptions that are intentionally not part of the shared Vitest path yet.
+    // Re-evaluate once the migration follow-up task in
+    // specs/029-jest-to-vitest-migration/tasks.md restores deterministic
+    // coverage for the participant-flow and summary-visibility paths.
     exclude: [
       'tests/e2e/**',
       'tests/integration/participant-flow.spec.ts',
@@ -34,8 +39,15 @@ export default defineConfig({
       'tests/integration/016-course-assignments/participant-flow.spec.ts',
       'tests/integration/016-course-assignments/summary-visibility.spec.ts',
     ],
+    // Keep generous global timeouts while integration suites still spin up
+    // shared infrastructure and Prisma/Testcontainers setup inside the unified
+    // runner. Follow-up profiling should move slow paths to per-suite or
+    // per-test timeouts instead of keeping this as a silent default forever.
     testTimeout: 90000,
     hookTimeout: 90000,
+    // Keep the runner fully sequential until the remaining DB-backed and
+    // shared-state suites are profiled and isolated. This avoids reintroducing
+    // order-dependent flakes during the migration close-out.
     maxWorkers: 1,
     sequence: {
       concurrent: false,

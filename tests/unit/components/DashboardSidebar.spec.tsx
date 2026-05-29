@@ -4,7 +4,7 @@
 
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, jest } from '@/tests/vitest/jest-globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import type { ReactNode } from 'react';
 
 vi.mock('next/link', () => {

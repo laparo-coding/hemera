@@ -28,7 +28,7 @@ Expected result:
 - no TypeScript errors
 - no Biome failures unrelated to the migration feature
 
-### 2. Validate the Current Non-E2E Baseline by Scope
+### 2. Validate the Current Jest-Backed Non-E2E Baseline by Scope
 
 ```bash
 npm run test:unit
@@ -38,8 +38,8 @@ npm run test:integration
 ```
 
 Expected result:
-- the current Vitest-backed scopes establish the post-migration baseline
-- failures, skips, ignored specs, and coverage artifacts are recorded against the new runner
+- the current Jest-backed scopes establish the pre-migration baseline
+- failures, skips, ignored specs, and coverage artifacts are recorded against the existing runner
 
 ### 3. Confirm Playwright Remains Separate
 

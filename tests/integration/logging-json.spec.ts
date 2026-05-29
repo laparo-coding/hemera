@@ -1,4 +1,10 @@
-import { beforeEach, describe, expect, it } from '@/tests/vitest/jest-globals';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from '@/tests/vitest/jest-globals';
 
 // We will capture Rollbar.info payloads via the serverInstance mock (no-op in tests)
 import { serverInstance } from '../../lib/monitoring/rollbar-official';

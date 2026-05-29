@@ -17,7 +17,7 @@ import {
 // import { geocodeAddress, GeocodeResult } from '@/lib/utils/geocoding'
 
 // Mock fetch globally
-const mockFetch = vi.fn() as jest.MockedFunction<typeof fetch>;
+const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>;
 global.fetch = mockFetch;
 
 describe('Geocoding Utility', () => {
@@ -26,7 +26,7 @@ describe('Geocoding Utility', () => {
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('T018: geocodeAddress', () => {

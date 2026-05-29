@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
+import { beforeEach, describe, expect, it, vi } from '@/tests/vitest/jest-globals';
 
 const ORIGINAL_ENV = process.env;
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-🟡 Draft
+✅ Implemented
 
 ## Overview
 
@@ -202,23 +202,23 @@ CI confidence.
 
 ## Acceptance Criteria
 
-- [ ] A feature spec exists at specs/029-jest-to-vitest-migration/spec.md.
-- [ ] The spec is written in English and follows the repository spec style.
-- [ ] The spec states that non-E2E tests migrate from Jest and ts-jest to
+- [x] A feature spec exists at specs/029-jest-to-vitest-migration/spec.md.
+- [x] The spec is written in English and follows the repository spec style.
+- [x] The spec states that non-E2E tests migrate from Jest and ts-jest to
   Vitest.
-- [ ] The spec states that Playwright remains the E2E framework and is outside
+- [x] The spec states that Playwright remains the E2E framework and is outside
   the migration scope.
-- [ ] The spec captures the current Jest-based reality, including repository
+- [x] The spec captures the current Jest-based reality, including repository
   scripts, separate non-E2E config entry points, and Jest-specific helper or
   mocking usage patterns.
-- [ ] The spec requires preservation of unit, contract, and integration test
+- [x] The spec requires preservation of unit, contract, and integration test
   scopes.
-- [ ] The spec requires preservation of shared setup hooks and environment
+- [x] The spec requires preservation of shared setup hooks and environment
   setup behavior used by non-E2E suites.
-- [ ] The spec requires repository alias compatibility for migrated non-E2E
+- [x] The spec requires repository alias compatibility for migrated non-E2E
   tests.
-- [ ] The spec requires continuity of coverage outputs and CI entry points.
-- [ ] The spec contains explicit non-goals for Playwright E2E rewrites and for
+- [x] The spec requires continuity of coverage outputs and CI entry points.
+- [x] The spec contains explicit non-goals for Playwright E2E rewrites and for
   unrelated product behavior.
 
 ## Dependencies
@@ -241,11 +241,11 @@ CI confidence.
 - Most migration work will focus on preserving current validation behavior
   rather than redefining what the tests are intended to prove.
 
-## Open Questions
+## Resolved Decisions
 
-- Should the repository preserve the current command names exactly after the
-  migration, or is limited command-surface cleanup acceptable if CI and
-  contributor documentation are updated in the same feature?
-- Should the migration preserve the current coverage artifact set exactly, or
-  is an equivalent artifact set acceptable if downstream consumers continue to
-  receive the information they need?
+- The repository command surface was preserved as implemented in package.json and
+  CI workflows: `test:unit`, `test:unit:coverage`, `test:contracts`, and
+  `test:integration` remain the supported non-E2E entry points.
+- Coverage artifact parity is defined and implemented as the equivalent output
+  set `text`, `lcov`, `html`, and `json-summary`, as documented in
+  `vitest.config.ts` and `specs/029-jest-to-vitest-migration/contracts/coverage-and-reporting.md`.

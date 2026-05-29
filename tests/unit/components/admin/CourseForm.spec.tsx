@@ -2,7 +2,7 @@
 
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, expect, it, jest } from '@/tests/vitest/jest-globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import CourseForm from '@/components/admin/CourseForm';
 
 vi.mock('@/components/admin/FileUpload', () => ({

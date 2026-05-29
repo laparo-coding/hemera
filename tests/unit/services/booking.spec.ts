@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from '@/tests/vitest/jest-globals';
 import { PaymentStatus } from '@prisma/client';
 
 const { mockPrisma } = vi.hoisted(() => ({

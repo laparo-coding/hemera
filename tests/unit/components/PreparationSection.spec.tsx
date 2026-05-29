@@ -1,6 +1,4 @@
-/** @jest-environment jsdom */
-
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import { render, screen } from '@testing-library/react';
 import PreparationSection, {
   canStartPreparation,

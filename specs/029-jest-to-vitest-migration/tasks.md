@@ -50,6 +50,7 @@
 - [ ] T015 Remove obsolete Jest-only config or dependency surface in `jest.config.ts`, `jest.contract.config.ts`, `jest.integration.config.ts`, and `package.json` once Vitest parity is proven
 - [ ] T016 Update migration guidance and execution steps in `specs/029-jest-to-vitest-migration/quickstart.md` and any repository docs that mention Jest-only non-E2E execution
 - [ ] T017 Run and record the final validation sequence: `npm run typecheck`, `npm run lint`, `npm run test:unit`, `npm run test:unit:coverage`, `npm run test:contracts`, and `npm run test:integration`
+- [ ] T018 Profile slow or stateful Vitest suites and replace the current global `testTimeout`, `hookTimeout`, and sequential runner defaults with targeted per-suite overrides where safe
 
 ## Dependencies
 

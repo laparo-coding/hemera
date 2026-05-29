@@ -4,7 +4,7 @@
  * Tests for step visibility, progress states, and summary step hiding logic.
  */
 
-import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
+import { beforeEach, describe, expect, it } from '@/tests/vitest/jest-globals';
 
 // Mock the server actions
 vi.mock('@/lib/actions/participation', () => ({
