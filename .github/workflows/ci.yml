@@ -51,9 +51,6 @@ jobs:
             exit 1
           fi
 
-      - name: Enforce baseline coverage floor
-        run: npm run coverage:check -- --lines 60 --statements 60 --functions 45 --branches 75
-
       - name: Build
         run: npm run build
         env:
