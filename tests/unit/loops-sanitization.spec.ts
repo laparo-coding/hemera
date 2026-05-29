@@ -2,7 +2,7 @@
  * Unit tests for Loops email service sanitization and guards
  */
 
-import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
+import { beforeEach, describe, expect, it } from '@/tests/vitest/jest-globals';
 import {
   isLoopsConfigured,
   sendBookingRejectedEmail,

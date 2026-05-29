@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
+import { beforeEach, describe, expect, it } from '@/tests/vitest/jest-globals';
 import { NextRequest } from 'next/server';
 
 const mockGetCurrentUser = vi.fn();

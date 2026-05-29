@@ -500,7 +500,8 @@ describe('Booking Orchestrator', () => {
       ];
 
       for (const invalidEmail of invalidEmails) {
-        vi.clearAllMocks();
+        mockSendEmail.mockClear();
+        mockCreateBooking.mockClear();
         mockCreateBooking.mockResolvedValue({
           id: 'booking_new123',
           userId: testUser.id,
