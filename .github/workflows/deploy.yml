@@ -128,7 +128,7 @@ jobs:
         run: npm run lint:ci
 
       - name: Run unit tests (with coverage)
-        run: npm run test:unit:coverage -- --runInBand
+        run: npm run test:unit:coverage
         env:
           CI: 'true'
 
