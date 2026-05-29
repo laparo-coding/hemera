@@ -135,13 +135,13 @@ Create the following templates in your Loops.so dashboard:
 
 ## Tests & Troubleshooting
 
-- Jest not exiting? Check for open handles:
+- Tests not exiting? Check for open handles:
   - Run tests with `--detectOpenHandles` to identify hanging timers/handles.
   - This repo had a global auto-cleanup interval in `lib/analytics/request-analytics.ts`. It is
     disabled in test/E2E environments and can be explicitly stopped via
     `stopRequestAnalyticsScheduler()`.
-  - If you introduce global timers, ensure they are gated during tests (`NODE_ENV === 'test'` or
-    `JEST_WORKER_ID`) or cleaned up in a teardown.
+  - If you introduce global timers, ensure they are gated during tests (`NODE_ENV === 'test'`,
+    `VITEST`, or `JEST_WORKER_ID`) or cleaned up in a teardown.
   - Database/containers: If you use Testcontainers, ensure proper teardown (`afterAll`) and call
     `closeDb()` from `lib/db/prisma` after DB tests for clean pool shutdown.
 

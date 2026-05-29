@@ -6,14 +6,14 @@
 import type { User } from '@clerk/nextjs/server';
 
 // Mock Clerk
-jest.mock('@clerk/nextjs/server', () => ({
-  currentUser: jest.fn(),
-  clerkClient: jest.fn(),
+vi.mock('@clerk/nextjs/server', () => ({
+  currentUser: vi.fn(),
+  clerkClient: vi.fn(),
 }));
 
 // Mock Rollbar
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
-  reportError: jest.fn(),
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
+  reportError: vi.fn(),
   ErrorSeverity: {
     CRITICAL: 'critical',
     ERROR: 'error',
@@ -41,7 +41,7 @@ const mockReportError = reportError as jest.MockedFunction<typeof reportError>;
 
 describe('Permissions Helpers', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getUserRole', () => {
@@ -135,7 +135,7 @@ describe('Permissions Helpers', () => {
 
     describe('with userId parameter', () => {
       it('should return role from clerkClient when provided', async () => {
-        const getUser = jest.fn().mockResolvedValue({ publicMetadata: { role: 'api-client' } });
+        const getUser = vi.fn().mockResolvedValue({ publicMetadata: { role: 'api-client' } });
         mockClerkClient.mockResolvedValue({ users: { getUser } } as any);
         // ensure currentUser would not be used
         mockCurrentUser.mockResolvedValue({ publicMetadata: { role: 'user' } } as unknown as User);
@@ -148,7 +148,7 @@ describe('Permissions Helpers', () => {
       });
 
       it('should fallback to user when clerkClient returns no role', async () => {
-        const getUser = jest.fn().mockResolvedValue({ publicMetadata: {} });
+        const getUser = vi.fn().mockResolvedValue({ publicMetadata: {} });
         mockClerkClient.mockResolvedValue({ users: { getUser } } as any);
         mockCurrentUser.mockResolvedValue({ publicMetadata: { role: 'admin' } } as unknown as User);
 
@@ -160,7 +160,7 @@ describe('Permissions Helpers', () => {
       });
 
       it('should normalize and trim role from clerkClient', async () => {
-        const getUser = jest.fn().mockResolvedValue({ publicMetadata: { role: '  API-CLIENT  ' } });
+        const getUser = vi.fn().mockResolvedValue({ publicMetadata: { role: '  API-CLIENT  ' } });
         mockClerkClient.mockResolvedValue({ users: { getUser } } as any);
         mockCurrentUser.mockResolvedValue(null);
 
@@ -174,7 +174,7 @@ describe('Permissions Helpers', () => {
       it('should fallback to user role when clerkClient throws error', async () => {
         mockClerkClient.mockResolvedValue({
           users: {
-            getUser: jest.fn().mockRejectedValue(new Error('Clerk API error')),
+            getUser: vi.fn().mockRejectedValue(new Error('Clerk API error')),
           },
         } as any);
         // Ensure currentUser also returns null so we get the safe default

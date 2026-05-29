@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('Contract: GET/PUT /api/my-courses/[bookingId]/preparation', () => {
   const endpoint = '/api/my-courses/[bookingId]/preparation';

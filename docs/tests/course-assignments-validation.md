@@ -6,6 +6,10 @@
 
 ## Summary
 
+Historischer Hinweis: Dieser Validierungsreport dokumentiert den Stand vom 2025-01-13. Die damals
+verwendeten Jest-Kommandos sind als Zeitkontext korrekt; der aktuelle Repo-Runner fuer non-E2E
+Tests ist inzwischen Vitest.
+
 All validation steps completed successfully. The Course Assignments feature is ready for
 deployment.
 
@@ -22,7 +26,7 @@ npx biome check components/participation/ app/api/my-courses/ app/my-courses/ li
 The warning is intentional – `userId` is passed for future extension but not currently
 used in the component.
 
-### 2. Unit Tests (Jest)
+### 2. Unit Tests (historisch: Jest, aktuell: Vitest)
 
 ```bash
 npm test -- tests/unit/components/CourseParticipationStepper.spec.ts tests/unit/actions/participation.spec.ts
@@ -49,9 +53,9 @@ npm test -- tests/unit/components/CourseParticipationStepper.spec.ts tests/unit/
 - Data normalization for preparation, debriefing, result
 - Rollbar logging on success, step completion, and errors
 
-### 3. Jest Configuration Fix
+### 3. Historische Runner-Konfigurationsanpassung
 
-During validation, discovered that `jest.config.ts` was not finding tests in subdirectories
+During validation, discovered that the then-active Jest configuration was not finding tests in subdirectories
 of `tests/unit/`. Fixed by changing:
 
 ```diff
@@ -59,7 +63,7 @@ of `tests/unit/`. Fixed by changing:
 + '<rootDir>/tests/unit/**/*.spec.ts',
 ```
 
-This allows Jest to find tests in `tests/unit/components/` and `tests/unit/actions/`.
+This allowed Jest to find tests in `tests/unit/components/` and `tests/unit/actions/` at that time.
 
 ### 4. Integration Tests (Playwright)
 
@@ -93,8 +97,8 @@ npx playwright test --grep "course participation"  # In another terminal
 | `lib/actions/participation.ts` | Server actions |
 | `lib/db/courseParticipation.ts` | Data access layer |
 | `lib/utils/resumeUpload.ts` | Blob upload utilities |
-| `tests/unit/components/CourseParticipationStepper.spec.ts` | Jest tests |
-| `tests/unit/actions/participation.spec.ts` | Jest tests |
+| `tests/unit/components/CourseParticipationStepper.spec.ts` | Unit tests |
+| `tests/unit/actions/participation.spec.ts` | Unit tests |
 | `docs/features/course-assignments.md` | Feature documentation |
 
 ### Modified Files
@@ -103,7 +107,7 @@ npx playwright test --grep "course participation"  # In another terminal
 |------|---------|
 | `prisma/schema.prisma` | Added CourseParticipation, ParticipationDocument, CourseSummaryAsset, ParticipationSummaryOverride models |
 | `app/my-courses/page.tsx` | Refactored to server component |
-| `jest.config.ts` | Fixed testMatch pattern for subdirectories |
+| `jest.config.ts` | Historical testMatch fix for subdirectories |
 | `.github/copilot-instructions.md` | Updated with 016 technologies |
 
 ## Known Issues

@@ -3,7 +3,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
-jest.mock('@/components/admin/AdminPageContainer', () => ({
+vi.mock('@/components/admin/AdminPageContainer', () => ({
   AdminPageContainer: ({ children, title }: { children: React.ReactNode; title: string }) => (
     <div data-testid='admin-page-container'>
       <h1>{title}</h1>
@@ -14,7 +14,7 @@ jest.mock('@/components/admin/AdminPageContainer', () => ({
 
 import ReportsPage from '@/app/admin/reports/page';
 
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 
 const reportsPayload = {
   data: {
@@ -94,7 +94,7 @@ describe('Admin Reports Page', () => {
   const originalFetch = global.fetch;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     global.fetch = mockFetch as unknown as typeof fetch;
   });
 

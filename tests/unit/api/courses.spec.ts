@@ -1,19 +1,22 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@/tests/vitest/jest-globals';
 
-const mockPrisma = {
-  course: {
-    findMany: jest.fn(),
+const { mockPrisma, mockLogError } = vi.hoisted(() => ({
+  mockPrisma: {
+    course: {
+      findMany: vi.fn(),
+    },
   },
-};
+  mockLogError: vi.fn(),
+}));
 
-const mockLogError = jest.fn();
-
-jest.mock('@/lib/db/prisma', () => ({
+vi.mock('@/lib/db/prisma', () => ({
   prisma: mockPrisma,
 }));
 
-jest.mock('@/lib/errors', () => {
-  const actual = jest.requireActual('@/lib/errors');
+vi.mock('@/lib/errors', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/errors')>(
+    '@/lib/errors'
+  );
   return {
     ...actual,
     logError: (...args: unknown[]) => mockLogError(...args),
@@ -25,7 +28,7 @@ import { DatabaseConnectionError } from '@/lib/errors';
 
 describe('Course API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getFeaturedCourses', () => {

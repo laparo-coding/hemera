@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@/tests/vitest/jest-globals';
 
 // We will capture Rollbar.info payloads via the serverInstance mock (no-op in tests)
 import { serverInstance } from '../../lib/monitoring/rollbar-official';
@@ -7,13 +7,19 @@ import type { RequestContext } from '../../lib/utils/request-id';
 
 describe('Integration: Structured JSON logging with requestId', () => {
   const calls: Array<{ message: string; payload: any }> = [];
+  const originalNodeEnv = process.env.NODE_ENV;
 
   beforeEach(() => {
     calls.length = 0;
+    process.env.NODE_ENV = 'development';
     // Patch info to capture the structured payload the ApiLogger sends
     (serverInstance as any).info = (message: string, payload: any) => {
       calls.push({ message, payload });
     };
+  });
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
   });
 
   it('logs info with requestId, timestamp and message', () => {

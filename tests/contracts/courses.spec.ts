@@ -23,7 +23,7 @@ import {
   describe,
   expect,
   it,
-} from '@jest/globals';
+} from '@/tests/vitest/jest-globals';
 import { prisma } from '../../lib/db/prisma';
 import { isCiEnvironment } from '../../lib/utils/env-flags';
 

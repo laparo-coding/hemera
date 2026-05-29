@@ -6,7 +6,7 @@
  * These tests define the expected behavior and should FAIL until implementation.
  */
 
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 // Mock types for testing (service not yet implemented)
 interface EmailResult {

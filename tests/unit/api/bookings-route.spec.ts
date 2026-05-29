@@ -1,43 +1,43 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 import { NextRequest } from 'next/server';
 
-const mockGetCurrentUser = jest.fn();
-const mockSyncUserFromClerk = jest.fn();
-const mockLogError = jest.fn();
-const mockReportError = jest.fn();
+const mockGetCurrentUser = vi.fn();
+const mockSyncUserFromClerk = vi.fn();
+const mockLogError = vi.fn();
+const mockReportError = vi.fn();
 
 const mockPrisma = {
   user: {
-    findUnique: jest.fn(),
+    findUnique: vi.fn(),
   },
   booking: {
-    findMany: jest.fn(),
-    count: jest.fn(),
-    findFirst: jest.fn(),
-    create: jest.fn(),
+    findMany: vi.fn(),
+    count: vi.fn(),
+    findFirst: vi.fn(),
+    create: vi.fn(),
   },
   course: {
-    findUnique: jest.fn(),
+    findUnique: vi.fn(),
   },
 };
 
-jest.mock('@/lib/auth/helpers', () => ({
+vi.mock('@/lib/auth/helpers', () => ({
   getCurrentUser: () => mockGetCurrentUser(),
 }));
 
-jest.mock('@/lib/api/users', () => ({
+vi.mock('@/lib/api/users', () => ({
   syncUserFromClerk: (user: unknown) => mockSyncUserFromClerk(user),
 }));
 
-jest.mock('@/lib/db/prisma', () => ({
+vi.mock('@/lib/db/prisma', () => ({
   prisma: mockPrisma,
 }));
 
-jest.mock('@/lib/errors', () => ({
+vi.mock('@/lib/errors', () => ({
   logError: (...args: unknown[]) => mockLogError(...args),
 }));
 
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
   ErrorSeverity: {
     ERROR: 'error',
     WARNING: 'warning',
@@ -45,13 +45,13 @@ jest.mock('@/lib/monitoring/rollbar-official', () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
 }));
 
-jest.mock('@/lib/utils/clerk-disabled-check', () => ({
+vi.mock('@/lib/utils/clerk-disabled-check', () => ({
   isClerkDisabled: () => false,
 }));
 
 describe('GET /api/bookings', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('falls back to an existing DB user after a recoverable Clerk sync failure', async () => {

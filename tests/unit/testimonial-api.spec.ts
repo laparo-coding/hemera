@@ -5,41 +5,48 @@
  * Tests for GET/POST /api/courses/[id]/testimonials
  */
 
-// Mock Prisma
-const mockPrisma = {
-  course: {
-    findFirst: jest.fn(),
+const {
+  mockCreateTestimonial,
+  mockCurrentUser,
+  mockGetPublishedTestimonialsForCourse,
+  mockPrisma,
+  mockSyncUserFromClerk,
+} = vi.hoisted(() => ({
+  mockPrisma: {
+    course: {
+      findFirst: vi.fn(),
+    },
+    testimonial: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+    },
+    courseParticipation: {
+      findFirst: vi.fn(),
+    },
   },
-  testimonial: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    create: jest.fn(),
-  },
-  courseParticipation: {
-    findFirst: jest.fn(),
-  },
-};
+  mockCurrentUser: vi.fn(),
+  mockSyncUserFromClerk: vi.fn(),
+  mockCreateTestimonial: vi.fn(),
+  mockGetPublishedTestimonialsForCourse: vi.fn(),
+}));
 
-jest.mock('@/lib/db/prisma', () => ({
+vi.mock('@/lib/db/prisma', () => ({
   prisma: mockPrisma,
 }));
 
 // Mock Clerk
-const mockCurrentUser = jest.fn();
-jest.mock('@clerk/nextjs/server', () => ({
+vi.mock('@clerk/nextjs/server', () => ({
   currentUser: () => mockCurrentUser(),
 }));
 
 // Mock syncUserFromClerk
-const mockSyncUserFromClerk = jest.fn();
-jest.mock('@/lib/api/users', () => ({
+vi.mock('@/lib/api/users', () => ({
   syncUserFromClerk: (user: unknown) => mockSyncUserFromClerk(user),
 }));
 
 // Mock testimonial service for POST tests
-const mockCreateTestimonial = jest.fn();
-const mockGetPublishedTestimonialsForCourse = jest.fn();
-jest.mock('@/lib/services/testimonial', () => ({
+vi.mock('@/lib/services/testimonial', () => ({
   createTestimonial: (data: unknown) => mockCreateTestimonial(data),
   getPublishedTestimonialsForCourse: (courseId: string, limit: number) =>
     mockGetPublishedTestimonialsForCourse(courseId, limit),
@@ -54,7 +61,7 @@ const POST: any = undefined;
 
 describe('GET /api/courses/[id]/testimonials', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 400 for empty course ID (invalid input)', async () => {
@@ -235,7 +242,7 @@ describe('GET /api/courses/[id]/testimonials', () => {
 // Re-enable when POST export is added to app/api/courses/[id]/testimonials/route.ts
 describe.skip('POST /api/courses/[id]/testimonials', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 when not authenticated', async () => {

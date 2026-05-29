@@ -5,8 +5,14 @@
  * including data fetching, categorization, and rendering.
  */
 
-import { afterAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { ParticipationStatus, PaymentStatus } from '@prisma/client';
+import {
+  afterAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from '@/tests/vitest/jest-globals';
 import { closeDb, prisma } from '../../lib/db/prisma';
 
 describe('Dashboard Sections Integration', () => {

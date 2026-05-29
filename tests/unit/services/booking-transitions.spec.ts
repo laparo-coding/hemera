@@ -6,21 +6,21 @@
  * multiple PRE_BOOKED entries and enforce valid status transitions.
  */
 
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 import { PaymentStatus } from '@prisma/client';
 import { prisma } from '../../../lib/db/prisma';
 import { createBooking } from '../../../lib/services/booking';
 
 // Mock Prisma
-jest.mock('../../../lib/db/prisma', () => ({
+vi.mock('../../../lib/db/prisma', () => ({
   prisma: {
     booking: {
-      findUnique: jest.fn(),
-      upsert: jest.fn(),
-      update: jest.fn(),
+      findUnique: vi.fn(),
+      upsert: vi.fn(),
+      update: vi.fn(),
     },
     course: {
-      findUnique: jest.fn(),
+      findUnique: vi.fn(),
     },
   },
 }));
@@ -41,7 +41,7 @@ describe('Booking Status Transitions', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Default mock: Course exists and is published
     mockPrisma.course.findUnique.mockResolvedValue(testCourse as any);

@@ -6,30 +6,39 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock TestimonialForm
-jest.mock('../../../components/testimonial/TestimonialForm', () => {
-  return function MockTestimonialForm(props: Record<string, unknown>) {
-    return (
-      <div data-testid="testimonial-form">
-        <span data-testid="form-booking-id">{String(props.bookingId)}</span>
-        <span data-testid="form-course-name">{String(props.courseName)}</span>
-      </div>
-    );
+vi.mock('../../../components/testimonial/TestimonialForm', () => {
+  return {
+    default: function MockTestimonialForm(props: Record<string, unknown>) {
+      return (
+        <div data-testid="testimonial-form">
+          <span data-testid="form-booking-id">{String(props.bookingId)}</span>
+          <span data-testid="form-course-name">{String(props.courseName)}</span>
+        </div>
+      );
+    },
   };
 });
 
 // Mock Clerk useUser
-const mockUseUser = jest.fn().mockReturnValue({
-  isSignedIn: true,
-  isLoaded: true,
-  user: { id: 'user-1' },
-});
-jest.mock('@clerk/nextjs', () => ({
+const { mockUseUser } = vi.hoisted(() => ({
+  mockUseUser: vi.fn().mockReturnValue({
+    isSignedIn: true,
+    isLoaded: true,
+    user: { id: 'user-1' },
+  }),
+}));
+vi.mock('@clerk/nextjs', () => ({
   useUser: () => mockUseUser(),
 }));
 
 // Mock MUI useTheme
-jest.mock('@mui/material/styles', () => ({
-  ...jest.requireActual('@mui/material/styles'),
+vi.mock('@mui/material/styles', async () => {
+  const actual = await vi.importActual<typeof import('@mui/material/styles')>(
+    '@mui/material/styles'
+  );
+
+  return {
+    ...actual,
   useTheme: () => ({
     breakpoints: {
       up: (bp: string) => {
@@ -44,7 +53,8 @@ jest.mock('@mui/material/styles', () => ({
       },
     },
   }),
-}));
+  };
+});
 
 import TestimonialDrawer from '../../../components/dashboard/TestimonialDrawer';
 
@@ -54,7 +64,7 @@ type TestWindow = Window & {
 
 const baseProps = {
   open: true,
-  onClose: jest.fn(),
+  onClose: vi.fn(),
   bookingId: 'booking-123',
   courseName: 'Gehaltsverhandlung Kompakt',
   userProfile: {
@@ -65,9 +75,32 @@ const baseProps = {
   },
 };
 
+const storageState = new Map<string, string>();
+
+const localStorageStub = {
+  clear: vi.fn(() => {
+    storageState.clear();
+  }),
+  getItem: vi.fn((key: string) => storageState.get(key) ?? null),
+  key: vi.fn((index: number) => Array.from(storageState.keys())[index] ?? null),
+  removeItem: vi.fn((key: string) => {
+    storageState.delete(key);
+  }),
+  setItem: vi.fn((key: string, value: string) => {
+    storageState.set(key, value);
+  }),
+  get length() {
+    return storageState.size;
+  },
+};
+
 describe('TestimonialDrawer', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      value: localStorageStub,
+    });
     window.localStorage.clear();
     window.localStorage.setItem(
       'clerk-session',

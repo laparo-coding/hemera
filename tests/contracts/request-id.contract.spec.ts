@@ -1,5 +1,5 @@
-import { describe, expect, it } from '@jest/globals';
 import { NextRequest } from 'next/server';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import { GET as healthGet } from '../../app/api/health/route';
 
 describe('Contract: Request-ID propagation and response headers', () => {

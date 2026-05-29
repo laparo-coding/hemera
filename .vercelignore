@@ -42,7 +42,6 @@ debug-*.png
 .prettierignore
 biome.json
 eslint.config.mjs
-jest.config.ts
 playwright.config.ts
 # tsconfig.json - benötigt für path aliases
 cspell.config.yaml

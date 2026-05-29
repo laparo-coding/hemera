@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@/tests/vitest/jest-globals';
 
 const ORIGINAL_ENV = process.env;
 
@@ -8,7 +8,7 @@ describe('Integration: Rollbar enabled/disabled behavior', () => {
     delete process.env.NEXT_PUBLIC_DISABLE_ROLLBAR;
     delete process.env.NEXT_PUBLIC_ROLLBAR_ENABLED;
     delete process.env.ROLLBAR_ENABLED;
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it('does not send when explicitly disabled', async () => {

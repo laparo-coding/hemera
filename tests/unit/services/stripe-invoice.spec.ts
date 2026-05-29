@@ -4,7 +4,7 @@
  * Tests for the Stripe invoice PDF URL retrieval service.
  */
 
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 
 // Service function types
 interface StripeInvoice {
@@ -15,7 +15,7 @@ interface StripeInvoice {
 }
 
 // Mock Stripe SDK with proper typing
-const mockRetrieve = jest.fn<(invoiceId: string) => Promise<StripeInvoice>>();
+const mockRetrieve = vi.fn<(invoiceId: string) => Promise<StripeInvoice>>();
 
 const mockStripe = {
   invoices: {
@@ -23,8 +23,8 @@ const mockStripe = {
   },
 };
 
-jest.mock('stripe', () => {
-  return jest.fn().mockImplementation(() => mockStripe);
+vi.mock('stripe', () => {
+  return vi.fn().mockImplementation(() => mockStripe);
 }, { virtual: true });
 
 // Local implementation for testing
@@ -48,7 +48,7 @@ const getInvoicePdfUrl = async (invoiceId: string): Promise<string | null> => {
 
 describe('getInvoicePdfUrl Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Input validation', () => {

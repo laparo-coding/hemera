@@ -105,7 +105,7 @@ Stand: 2026-04-18, gegen einen laufenden lokalen Server auf `http://localhost:30
 Nachverifikation am 2026-04-20:
 
 - `auth-admin` wurde nach der letzten Admin-Autorisierungsanpassung erneut voll bestätigt (`63 passed`, `23 skipped`).
-- Die nachgelagerten Qualitätschecks für diesen Stand liefen ebenfalls grün: `npm run typecheck`, `npm run lint` und ein fokussierter Jest-Lauf für Reports-, Courses- und Monitoring-Slices.
+- Die nachgelagerten Qualitätschecks für diesen Stand liefen ebenfalls grün: `npm run typecheck`, `npm run lint` und ein fokussierter Vitest-Lauf für Reports-, Courses- und Monitoring-Slices.
 
 Hinweis: Nach der Projektaufteilung ist diese Matrix der maßgebliche Referenzstand. Ältere Aussagen
 zu einem einzelnen Gesamtlauf unter `chromium-auth` sind dafür nicht mehr autoritativ.

@@ -4,18 +4,18 @@
  * Tasks: T017, T019
  */
 
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 
 // Mock Prisma client with proper typing
 const mockPrisma = {
   location: {
-    findMany: jest.fn<() => Promise<unknown>>(),
-    findUnique: jest.fn<() => Promise<unknown>>(),
-    findFirst: jest.fn<() => Promise<unknown>>(),
-    create: jest.fn<() => Promise<unknown>>(),
-    update: jest.fn<() => Promise<unknown>>(),
-    delete: jest.fn<() => Promise<unknown>>(),
-    count: jest.fn<() => Promise<number>>(),
+    findMany: vi.fn<() => Promise<unknown>>(),
+    findUnique: vi.fn<() => Promise<unknown>>(),
+    findFirst: vi.fn<() => Promise<unknown>>(),
+    create: vi.fn<() => Promise<unknown>>(),
+    update: vi.fn<() => Promise<unknown>>(),
+    delete: vi.fn<() => Promise<unknown>>(),
+    count: vi.fn<() => Promise<number>>(),
   },
 };
 
@@ -24,7 +24,7 @@ const mockPrisma = {
 
 describe('LocationService', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('T017: CRUD operations', () => {

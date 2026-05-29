@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import { isLikelyCourseId } from '@/lib/utils/courseIdentifier';
 
 describe('isLikelyCourseId', () => {

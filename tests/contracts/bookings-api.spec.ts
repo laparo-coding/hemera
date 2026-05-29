@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('GET /api/bookings - Contract Tests', () => {
   const _BOOKINGS_ENDPOINT = '/api/bookings';

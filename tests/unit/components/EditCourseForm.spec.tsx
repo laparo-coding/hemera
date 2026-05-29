@@ -11,24 +11,24 @@
 
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, expect, it, jest, beforeEach } from '@jest/globals';
+import { describe, expect, it, jest, beforeEach } from '@/tests/vitest/jest-globals';
 
 // --- mocks ---------------------------------------------------------------
 
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn(), refresh: jest.fn() }),
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }));
 
-jest.mock('@/lib/actions/admin/courses', () => ({
-  updateCourseAction: jest.fn(),
+vi.mock('@/lib/actions/admin/courses', () => ({
+  updateCourseAction: vi.fn(),
 }));
 
-jest.mock('@/components/admin/FileUpload', () => ({
+vi.mock('@/components/admin/FileUpload', () => ({
   __esModule: true,
   default: () => <div data-testid='file-upload'>FileUpload</div>,
 }));
 
-jest.mock('@/components/admin/CurriculumEditor', () => ({
+vi.mock('@/components/admin/CurriculumEditor', () => ({
   __esModule: true,
   default: () => <div data-testid='curriculum-editor'>CurriculumEditor</div>,
 }));

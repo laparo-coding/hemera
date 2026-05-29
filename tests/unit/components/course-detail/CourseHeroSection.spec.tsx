@@ -12,17 +12,23 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { CourseHeroSection } from '../../../../components/course-detail/CourseHeroSection';
 
 // Mock next/dynamic to return the component directly
-jest.mock(
+vi.mock(
   'next/dynamic',
-  () => (fn: () => Promise<{ default: React.ComponentType<unknown> }>) => {
-    const Component = jest.requireActual('react').lazy(fn);
-    Component.preload = jest.fn();
-    return Component;
+  async () => {
+    const react = await vi.importActual<typeof import('react')>('react');
+
+    return {
+      default: (fn: () => Promise<{ default: React.ComponentType<unknown> }>) => {
+        const Component = react.lazy(fn);
+        (Component as typeof Component & { preload: ReturnType<typeof vi.fn> }).preload = vi.fn();
+        return Component;
+      },
+    };
   }
 );
 
 // Mock MuxPlayer
-jest.mock('@mux/mux-player-react', () => ({
+vi.mock('@mux/mux-player-react', () => ({
   __esModule: true,
   default: ({ playbackId }: { playbackId: string }) => (
     <div data-testid='mux-player' data-playback-id={playbackId}>

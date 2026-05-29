@@ -4,20 +4,20 @@
  * Tests for step visibility, progress states, and summary step hiding logic.
  */
 
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 
 // Mock the server actions
-jest.mock('@/lib/actions/participation', () => ({
-  getParticipationAction: jest.fn(),
-  completePreparationAction: jest.fn(),
-  completeSummaryAction: jest.fn(),
-  completeDebriefingAction: jest.fn(),
-  completeResultAction: jest.fn(),
+vi.mock('@/lib/actions/participation', () => ({
+  getParticipationAction: vi.fn(),
+  completePreparationAction: vi.fn(),
+  completeSummaryAction: vi.fn(),
+  completeDebriefingAction: vi.fn(),
+  completeResultAction: vi.fn(),
 }));
 
 describe('CourseParticipationStepper', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Step visibility logic', () => {

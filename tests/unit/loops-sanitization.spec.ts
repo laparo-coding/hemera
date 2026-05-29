@@ -2,7 +2,7 @@
  * Unit tests for Loops email service sanitization and guards
  */
 
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 import {
   isLoopsConfigured,
   sendBookingRejectedEmail,
@@ -10,20 +10,20 @@ import {
 } from '../../lib/services/loops';
 
 // Mock Rollbar
-jest.mock('../../lib/monitoring/rollbar-official', () => ({
+vi.mock('../../lib/monitoring/rollbar-official', () => ({
   serverInstance: {
-    error: jest.fn(),
-    warn: jest.fn(),
-    info: jest.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
   },
-  reportError: jest.fn(),
+  reportError: vi.fn(),
 }));
 
 describe('Loops Email Service Guards', () => {
   const originalEnv = process.env.LOOPS_API_KEY;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {

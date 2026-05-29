@@ -4,10 +4,10 @@
 
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 import type { ReactNode } from 'react';
 
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
   return {
     __esModule: true,
     default: ({
@@ -26,7 +26,7 @@ jest.mock('next/link', () => {
   };
 });
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   usePathname: () => '/dashboard',
 }));
 

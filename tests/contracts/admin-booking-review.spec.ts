@@ -6,11 +6,11 @@
  * These tests define the API contract and should FAIL until implementation.
  */
 
-import { describe, expect, it } from '@jest/globals';
 import type {
   BookingReviewInput,
   BookingReviewResponse,
 } from '@/lib/schemas/admin/booking';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('PATCH /api/admin/bookings/{id}/review - Contract Tests', () => {
   const _ENDPOINT = '/api/admin/bookings/:id/review';

@@ -2,15 +2,15 @@
 
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 import CourseForm from '@/components/admin/CourseForm';
 
-jest.mock('@/components/admin/FileUpload', () => ({
+vi.mock('@/components/admin/FileUpload', () => ({
   __esModule: true,
   default: () => <div data-testid='file-upload'>FileUpload</div>,
 }));
 
-jest.mock('@/components/admin/CurriculumEditor', () => ({
+vi.mock('@/components/admin/CurriculumEditor', () => ({
   __esModule: true,
   default: ({ value }: { value: Array<unknown> | null | undefined }) => (
     <div data-testid='curriculum-editor'>
@@ -21,7 +21,7 @@ jest.mock('@/components/admin/CurriculumEditor', () => ({
 
 describe('CourseForm', () => {
   it('renders the curriculum section without duplicating wrapper copy', () => {
-    const mockOnSubmit = jest.fn();
+    const mockOnSubmit = vi.fn();
 
     render(
       <CourseForm
@@ -65,7 +65,7 @@ describe('CourseForm', () => {
     // Regression test: zodResolver with { raw: true } must not apply the schema
     // transform (euros → cents) before onSubmit. The server action applies the
     // conversion once; a second conversion would produce 100× the correct value.
-    const mockOnSubmit = jest.fn().mockResolvedValue(undefined);
+    const mockOnSubmit = vi.fn().mockResolvedValue(undefined);
 
     render(
       <CourseForm

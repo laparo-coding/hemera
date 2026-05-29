@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('POST /api/stripe/webhook - Contract Tests', () => {
   const _WEBHOOK_ENDPOINT = '/api/stripe/webhook';

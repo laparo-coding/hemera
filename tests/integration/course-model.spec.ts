@@ -5,7 +5,7 @@ import {
   describe,
   expect,
   it,
-} from '@jest/globals';
+} from '@/tests/vitest/jest-globals';
 import { closeDb, prisma } from '../../lib/db/prisma';
 
 describe('Course Model Validations', () => {

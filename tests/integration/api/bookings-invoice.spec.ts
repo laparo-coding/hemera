@@ -4,8 +4,14 @@
  * Tests for the invoice download endpoint that redirects to Stripe PDF URL.
  */
 
-import { afterAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { PaymentStatus } from '@prisma/client';
+import {
+  afterAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from '@/tests/vitest/jest-globals';
 import { closeDb, prisma } from '../../../lib/db/prisma';
 
 describe('GET /api/bookings/[bookingId]/invoice - Contract', () => {

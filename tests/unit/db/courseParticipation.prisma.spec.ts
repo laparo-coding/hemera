@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('Prisma schema: Course Participation models', () => {
   const schemaPath = join(process.cwd(), 'prisma', 'schema.prisma');

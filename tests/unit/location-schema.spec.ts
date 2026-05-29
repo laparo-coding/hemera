@@ -4,7 +4,7 @@
  * Tasks: T013-T016
  */
 
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import {
   geocodeRequestSchema,
   locationCreateSchema,

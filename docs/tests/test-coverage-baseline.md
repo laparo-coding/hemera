@@ -7,6 +7,9 @@ Stand: 2026-04-18
 Diese Kommandos dokumentieren die historische Ausgangslage zu Beginn von Feature 028, also vor der
 späteren Aufteilung der Playwright-Läufe in eine getrennte Projektmatrix.
 
+Historischer Hinweis: Die unten dokumentierten Jest-Kommandos beschreiben bewusst den damaligen
+Ausgangspunkt. Der aktuelle non-E2E-Runner im Repository ist inzwischen Vitest.
+
 ```bash
 npm run typecheck
 npm run lint

@@ -310,7 +310,7 @@ export function getNewSdkInstance() {
 
 **Checks:**
 1. Verify test mode: `echo $NODE_ENV` (should be `test`)
-2. Check Jest worker: `echo $JEST_WORKER_ID` (should be set during tests)
+2. Check test worker env: `echo $VITEST` or `echo $JEST_WORKER_ID` (one test signal should be set during tests)
 3. Review SDK initialization logs in test output
 
 ### Related Resources

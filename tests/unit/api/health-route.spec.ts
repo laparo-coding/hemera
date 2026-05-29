@@ -1,16 +1,16 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 import { NextRequest } from 'next/server';
 
-const mockInfo = jest.fn();
-const mockTrackRequestCompletion = jest.fn();
-const mockLoggerInfo = jest.fn();
+const mockInfo = vi.fn();
+const mockTrackRequestCompletion = vi.fn();
+const mockLoggerInfo = vi.fn();
 
-jest.mock('@/lib/buildInfo', () => ({
+vi.mock('@/lib/buildInfo', () => ({
   getBuildInfo: () => mockInfo(),
 }));
 
-jest.mock('@/lib/utils/api-logger', () => ({
-  createApiLogger: jest.fn().mockReturnValue({
+vi.mock('@/lib/utils/api-logger', () => ({
+  createApiLogger: vi.fn().mockReturnValue({
     info: (...args: unknown[]) => mockLoggerInfo(...args),
     trackRequestCompletion: (...args: unknown[]) =>
       mockTrackRequestCompletion(...args),
@@ -22,7 +22,7 @@ describe('GET /api/health', () => {
   const originalSecretKey = process.env.CLERK_SECRET_KEY;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockInfo.mockReturnValue({
       environment: 'development',
       version: '1.2.3',

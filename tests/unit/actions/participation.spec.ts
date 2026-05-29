@@ -6,44 +6,44 @@
 
 import { auth } from '@clerk/nextjs/server';
 
-jest.mock('next/headers', () => ({
-  headers: jest.fn().mockResolvedValue(new Headers()),
+vi.mock('next/headers', () => ({
+  headers: vi.fn().mockResolvedValue(new Headers()),
 }));
 
 // Mock Clerk auth
-jest.mock('@clerk/nextjs/server', () => ({
-  auth: jest.fn(),
+vi.mock('@clerk/nextjs/server', () => ({
+  auth: vi.fn(),
 }));
 
 // Mock Prisma
-jest.mock('@/lib/db/prisma', () => ({
+vi.mock('@/lib/db/prisma', () => ({
   prisma: {
     courseParticipation: {
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
     },
     participationDocument: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
     },
     courseSummaryAsset: {
-      findMany: jest.fn(),
-      count: jest.fn(),
+      findMany: vi.fn(),
+      count: vi.fn(),
     },
     participationSummaryOverride: {
-      findMany: jest.fn(),
+      findMany: vi.fn(),
     },
     booking: {
-      findUnique: jest.fn(),
+      findUnique: vi.fn(),
     },
-    $transaction: jest.fn(fn =>
+    $transaction: vi.fn(fn =>
       fn({
         participationDocument: {
-          update: jest.fn(),
-          create: jest.fn(),
+          update: vi.fn(),
+          create: vi.fn(),
         },
       })
     ),
@@ -51,23 +51,23 @@ jest.mock('@/lib/db/prisma', () => ({
 }));
 
 // Mock Rollbar
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
   serverInstance: {
-    info: jest.fn(),
-    warning: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 // Mock next/cache
-jest.mock('next/cache', () => ({
-  revalidatePath: jest.fn(),
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
 }));
 
 // Mock resumeUpload
-jest.mock('@/lib/utils/resumeUpload', () => ({
-  uploadResume: jest.fn(),
-  deleteResume: jest.fn(),
+vi.mock('@/lib/utils/resumeUpload', () => ({
+  uploadResume: vi.fn(),
+  deleteResume: vi.fn(),
 }));
 
 import {
@@ -119,7 +119,7 @@ const mockParticipation = {
 
 describe('Participation Server Actions', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Authorization', () => {

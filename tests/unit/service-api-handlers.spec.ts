@@ -7,49 +7,49 @@
 
 // ─── Mocks (must be before imports) ───────────────────────────────────────────
 
-jest.mock('@clerk/nextjs/server', () => ({
-  auth: jest.fn(),
-  currentUser: jest.fn(),
-  clerkClient: jest.fn(),
+vi.mock('@clerk/nextjs/server', () => ({
+  auth: vi.fn(),
+  currentUser: vi.fn(),
+  clerkClient: vi.fn(),
 }));
 
-jest.mock('@/lib/auth/permissions', () => ({
-  getUserRole: jest.fn(),
+vi.mock('@/lib/auth/permissions', () => ({
+  getUserRole: vi.fn(),
 }));
 
-jest.mock('@/lib/db/prisma', () => ({
+vi.mock('@/lib/db/prisma', () => ({
   prisma: {
     course: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      count: jest.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      count: vi.fn(),
     },
     courseParticipation: {
-      findUnique: jest.fn(),
-      update: jest.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
     },
-    $transaction: jest.fn(),
+    $transaction: vi.fn(),
   },
 }));
 
-jest.mock('@/lib/middleware/rate-limit', () => ({
-  checkRateLimit: jest.fn().mockResolvedValue(null),
-  getRateLimitHeaders: jest.fn().mockReturnValue({}),
+vi.mock('@/lib/middleware/rate-limit', () => ({
+  checkRateLimit: vi.fn().mockResolvedValue(null),
+  getRateLimitHeaders: vi.fn().mockReturnValue({}),
 }));
 
-jest.mock('@/lib/monitoring/service-api-logger', () => ({
-  logServiceApiCall: jest.fn(),
-  extractIpAddress: jest.fn().mockReturnValue('127.0.0.1'),
+vi.mock('@/lib/monitoring/service-api-logger', () => ({
+  logServiceApiCall: vi.fn(),
+  extractIpAddress: vi.fn().mockReturnValue('127.0.0.1'),
 }));
 
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
   serverInstance: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    warning: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    warning: vi.fn(),
+    error: vi.fn(),
   },
-  reportError: jest.fn(),
+  reportError: vi.fn(),
   ErrorSeverity: {
     CRITICAL: 'critical',
     ERROR: 'error',
@@ -59,29 +59,29 @@ jest.mock('@/lib/monitoring/rollbar-official', () => ({
   },
 }));
 
-jest.mock('@/lib/logging/audit', () => ({
-  persistServiceApiLog: jest.fn().mockResolvedValue(undefined),
+vi.mock('@/lib/logging/audit', () => ({
+  persistServiceApiLog: vi.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('@/lib/analytics/request-analytics', () => ({
+vi.mock('@/lib/analytics/request-analytics', () => ({
   analytics: {
-    trackRequest: jest.fn(),
-    trackEvent: jest.fn(),
-    trackPerformance: jest.fn(),
+    trackRequest: vi.fn(),
+    trackEvent: vi.fn(),
+    trackPerformance: vi.fn(),
   },
 }));
 
 // Mock api-logger to prevent transitive ESM import issues in CI
 // (api-logger imports analytics + rollbar-official; ESM module mocking
 //  may not propagate to transitive deps in all environments)
-jest.mock('@/lib/utils/api-logger', () => ({
-  createApiLogger: jest.fn().mockReturnValue({
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-    trackRequestCompletion: jest.fn(),
-    trackBusinessEvent: jest.fn(),
+vi.mock('@/lib/utils/api-logger', () => ({
+  createApiLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    trackRequestCompletion: vi.fn(),
+    trackBusinessEvent: vi.fn(),
   }),
   LogLevel: {
     ERROR: 'error',
@@ -93,7 +93,7 @@ jest.mock('@/lib/utils/api-logger', () => ({
 
 // ─── Imports ──────────────────────────────────────────────────────────────────
 
-import { describe, expect, it, beforeEach } from '@jest/globals';
+import { describe, expect, it, beforeEach } from '@/tests/vitest/jest-globals';
 import { auth } from '@clerk/nextjs/server';
 import { getUserRole } from '@/lib/auth/permissions';
 import { prisma } from '@/lib/db/prisma';
@@ -149,7 +149,7 @@ function setupAuth(userId: string | null, role: string = 'api-client') {
 
 describe('Service API Route Handlers', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCheckRateLimit.mockResolvedValue(null);
   });
 
@@ -391,8 +391,8 @@ describe('Service API Route Handlers', () => {
       (prisma.$transaction as jest.Mock).mockImplementation(async (cb: (tx: unknown) => unknown) => {
         const tx = {
           courseParticipation: {
-            findUnique: jest.fn().mockResolvedValue(null),
-            update: jest.fn(),
+            findUnique: vi.fn().mockResolvedValue(null),
+            update: vi.fn(),
           },
         };
         return cb(tx);
@@ -427,11 +427,11 @@ describe('Service API Route Handlers', () => {
       (prisma.$transaction as jest.Mock).mockImplementation(async (cb: (tx: unknown) => unknown) => {
         const tx = {
           courseParticipation: {
-            findUnique: jest.fn().mockResolvedValue({
+            findUnique: vi.fn().mockResolvedValue({
               id: TEST_PARTICIPATION_ID,
               status: 'PREPARATION',
             }),
-            update: jest.fn().mockImplementation((args: unknown) => {
+            update: vi.fn().mockImplementation((args: unknown) => {
               capturedUpdateArgs = args;
               return Promise.resolve({
                 id: TEST_PARTICIPATION_ID,
@@ -465,11 +465,11 @@ describe('Service API Route Handlers', () => {
       (prisma.$transaction as jest.Mock).mockImplementation(async (cb: (tx: unknown) => unknown) => {
         const tx = {
           courseParticipation: {
-            findUnique: jest.fn().mockResolvedValue({
+            findUnique: vi.fn().mockResolvedValue({
               id: TEST_PARTICIPATION_ID,
               status: 'PREPARATION',
             }),
-            update: jest.fn().mockImplementation((args: unknown) => {
+            update: vi.fn().mockImplementation((args: unknown) => {
               capturedUpdateArgs = args;
               return Promise.resolve({
                 id: TEST_PARTICIPATION_ID,
@@ -504,11 +504,11 @@ describe('Service API Route Handlers', () => {
       (prisma.$transaction as jest.Mock).mockImplementation(async (cb: (tx: unknown) => unknown) => {
         const tx = {
           courseParticipation: {
-            findUnique: jest.fn().mockResolvedValue({
+            findUnique: vi.fn().mockResolvedValue({
               id: TEST_PARTICIPATION_ID,
               status: 'PREPARATION',
             }),
-            update: jest.fn().mockImplementation((args: unknown) => {
+            update: vi.fn().mockImplementation((args: unknown) => {
               capturedUpdateArgs = args;
               return Promise.resolve({
                 id: TEST_PARTICIPATION_ID,

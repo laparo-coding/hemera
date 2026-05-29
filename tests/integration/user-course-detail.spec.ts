@@ -4,8 +4,14 @@
  * Tests for the user course detail flow and related routes.
  */
 
-import { afterAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { ParticipationStatus, PaymentStatus } from '@prisma/client';
+import {
+  afterAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from '@/tests/vitest/jest-globals';
 import { closeDb, prisma } from '../../lib/db/prisma';
 
 describe('User Course Detail Page Integration', () => {
