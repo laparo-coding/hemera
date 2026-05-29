@@ -1,4 +1,4 @@
-// Test setup for Jest
+// Test setup for Vitest
 
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -9,9 +9,15 @@ import {
   WritableStream,
 } from 'node:stream/web';
 import { TextDecoder, TextEncoder } from 'node:util';
-import { afterAll, beforeAll } from '@jest/globals';
-import '@testing-library/jest-dom';
 import dotenv from 'dotenv';
+import { afterAll, beforeAll, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
+
+declare global {
+  var jest: typeof vi;
+}
+
+globalThis.jest = vi;
 
 // Polyfill Web APIs for jsdom environment (required by testcontainers and other libraries)
 if (typeof globalThis.TextEncoder === 'undefined') {

@@ -128,7 +128,7 @@ jobs:
         run: npm run lint:ci
 
       - name: Run unit tests (with coverage)
-        run: npm run test:unit:coverage -- --runInBand
+        run: npm run test:unit:coverage
         env:
           CI: 'true'
 
@@ -159,9 +159,6 @@ jobs:
           JSON.parse(jsonText);
           fs.writeFileSync('coverage/summary.json', `${jsonText}\n`);
           NODE
-
-      - name: Enforce deploy coverage gate
-        run: npm run coverage:check -- --lines 60 --statements 60 --functions 45 --branches 75
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v7

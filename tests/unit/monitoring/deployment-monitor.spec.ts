@@ -1,20 +1,20 @@
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
   serverInstance: {
-    info: jest.fn(),
-    warning: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
-jest.mock('@/lib/analytics/request-analytics', () => ({
+vi.mock('@/lib/analytics/request-analytics', () => ({
   analytics: {
-    trackEvent: jest.fn(),
+    trackEvent: vi.fn(),
   },
 }));
 
-jest.mock('@/lib/monitoring/deployment-alerts', () => ({
+vi.mock('@/lib/monitoring/deployment-alerts', () => ({
   deploymentAlerts: {
-    evaluateHealthChecks: jest.fn(),
+    evaluateHealthChecks: vi.fn(),
   },
 }));
 
@@ -62,8 +62,8 @@ describe('DeploymentMonitor Rollbar health', () => {
     >;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.resetModules();
+    vi.clearAllMocks();
+    vi.resetModules();
     process.env = { ...originalEnv } as NodeJS.ProcessEnv;
     for (const key of Object.keys(process.env)) {
       if (

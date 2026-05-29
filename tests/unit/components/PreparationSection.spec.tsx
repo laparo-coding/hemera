@@ -1,16 +1,14 @@
-/** @jest-environment jsdom */
-
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import { render, screen } from '@testing-library/react';
 import PreparationSection, {
   canStartPreparation,
 } from '@/app/my-courses/[bookingId]/PreparationSection';
 
-jest.mock('@/lib/actions/participation', () => ({
-  startParticipationAction: jest.fn(),
+vi.mock('@/lib/actions/participation', () => ({
+  startParticipationAction: vi.fn(),
 }));
 
-jest.mock('@/components/participation', () => ({
+vi.mock('@/components/participation', () => ({
   CourseParticipationStepper: () => null,
   ResumeUploader: () => null,
   SummaryAssetList: () => null,

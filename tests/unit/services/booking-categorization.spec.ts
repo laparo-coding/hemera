@@ -8,7 +8,7 @@
  * - Seminare ohne Teilnahme
  */
 
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import {
   type BookingForCategorization,
   categorizeBookings,

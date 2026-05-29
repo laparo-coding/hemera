@@ -5,25 +5,30 @@
  * Contract tests for course material API endpoints
  */
 
-// Mock Prisma
-const mockPrisma = {
-  courseMaterial: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    findFirst: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
-};
+const { mockDel, mockPrisma, mockPut, mockRequireAdminUser } = vi.hoisted(
+  () => ({
+    mockPrisma: {
+      courseMaterial: {
+        findMany: vi.fn(),
+        findUnique: vi.fn(),
+        findFirst: vi.fn(),
+        create: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
+      },
+    },
+    mockRequireAdminUser: vi.fn(),
+    mockPut: vi.fn(),
+    mockDel: vi.fn(),
+  })
+);
 
-jest.mock('@/lib/db/prisma', () => ({
+vi.mock('@/lib/db/prisma', () => ({
   prisma: mockPrisma,
 }));
 
 // Mock Auth helpers — routes use requireAdminUser() from @/lib/auth/helpers
-const mockRequireAdminUser = jest.fn();
-jest.mock('@/lib/auth/helpers', () => ({
+vi.mock('@/lib/auth/helpers', () => ({
   requireAdminUser: () => mockRequireAdminUser(),
 }));
 
@@ -48,21 +53,19 @@ function mockAuthenticatedAdmin(userId = 'admin_123') {
 }
 
 // Mock Vercel Blob
-const mockPut = jest.fn();
-const mockDel = jest.fn();
-jest.mock('@vercel/blob', () => ({
+vi.mock('@vercel/blob', () => ({
   put: (...args: unknown[]) => mockPut(...args),
   del: (...args: unknown[]) => mockDel(...args),
 }));
 
 // Mock Rollbar
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
   serverInstance: {
-    error: jest.fn(),
-    warning: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn(),
-    log: jest.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+    log: vi.fn(),
   },
 }));
 
@@ -81,7 +84,7 @@ const createParams = (id: string) => Promise.resolve({ id });
 
 describe('GET /api/admin/course-material', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 for unauthenticated request', async () => {
@@ -136,7 +139,7 @@ describe('GET /api/admin/course-material', () => {
 
 describe('POST /api/admin/course-material', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 for unauthenticated request', async () => {
@@ -243,7 +246,7 @@ describe('POST /api/admin/course-material', () => {
 
 describe('GET /api/admin/course-material/[id]', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 for unauthenticated request', async () => {
@@ -305,7 +308,7 @@ describe('GET /api/admin/course-material/[id]', () => {
 
 describe('PUT /api/admin/course-material/[id]', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 for unauthenticated request', async () => {
@@ -446,7 +449,7 @@ describe('PUT /api/admin/course-material/[id]', () => {
 
 describe('DELETE /api/admin/course-material/[id]', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 for unauthenticated request', async () => {
@@ -516,7 +519,7 @@ describe('DELETE /api/admin/course-material/[id]', () => {
 
 describe('GET /api/admin/course-material/[id]/content', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 for unauthenticated request', async () => {
@@ -565,7 +568,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
     // Mock global fetch for blob content
     const originalFetch = global.fetch;
     try {
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         text: () => Promise.resolve('<p>Test HTML content</p>'),
       });
@@ -589,7 +592,7 @@ describe('GET /api/admin/course-material/[id]/content', () => {
 
 describe('POST /api/admin/course-material/images', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 for unauthenticated request', async () => {
@@ -680,7 +683,7 @@ describe('POST /api/admin/course-material/images', () => {
 
 describe('026: GET /api/admin/course-material — type field', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('includes type field in materials list response', async () => {
@@ -717,7 +720,7 @@ describe('026: GET /api/admin/course-material — type field', () => {
 
 describe('026: GET /api/admin/course-material/[id] — type + blob fields', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('includes type, blobUrl, blobPathname in single material response', async () => {
@@ -755,7 +758,7 @@ describe('026: GET /api/admin/course-material/[id] — type + blob fields', () =
 
 describe('026: POST /api/admin/course-material — FormData SLIDE_CONTROL', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('creates SLIDE_CONTROL material from FormData with .html file', async () => {
@@ -899,7 +902,7 @@ describe('026: POST /api/admin/course-material — FormData SLIDE_CONTROL', () =
 
 describe('026: POST /api/admin/course-material — FormData identifier', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('auto-generates slug from title when no identifier provided', async () => {
@@ -971,7 +974,7 @@ describe('026: POST /api/admin/course-material — FormData identifier', () => {
 
 describe('026: PUT /api/admin/course-material/[id] — FormData + type mismatch', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('replaces blob when FormData sent for SLIDE_CONTROL material', async () => {

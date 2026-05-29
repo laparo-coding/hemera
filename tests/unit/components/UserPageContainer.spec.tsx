@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 import { render, screen, within } from '@testing-library/react';
 import type { AnchorHTMLAttributes, PropsWithChildren } from 'react';
 
@@ -8,7 +8,7 @@ type MockLinkProps = PropsWithChildren<
   AnchorHTMLAttributes<HTMLAnchorElement> & { href?: string }
 >;
 
-jest.mock('next/link', () => ({
+vi.mock('next/link', () => ({
   __esModule: true,
   default: ({ children, href, ...props }: MockLinkProps) => (
     <a href={href} {...props}>

@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import { getAdminCourseEditUrl, getCourseUrl } from '@/lib/utils/course-url';
 
 describe('getCourseUrl', () => {

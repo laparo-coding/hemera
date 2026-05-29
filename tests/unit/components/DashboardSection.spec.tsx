@@ -4,7 +4,7 @@
  * Tests for the reusable dashboard section wrapper component.
  */
 
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import {
   SECTION_TITLES,
   shouldShowSection,

@@ -21,7 +21,8 @@ Auto-generated from all feature plans. Last updated: 2025-01-15
 - TypeScript 5.x, Next.js 15.5.6 (App Router), React 18+ + Prisma ORM, Material-UI v5, Clerk auth, Loops.so SDK (new), Rollbar (021-learning-path)
 - PostgreSQL via Prisma (existing schema extension) (021-learning-path)
 - TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, Clerk SDK, Prisma ORM (024-admin-dashboard)
-- TypeScript 5.9, Next.js 16, React 19, Node.js 20+ + Jest 30, ts-jest, Playwright, @testing-library/react, (028-test-coverage)
+- TypeScript 5.9, Next.js 16, React 19, Node.js 20+ + Jest 30, ts-jest, Playwright, @testing-library/react, as historical pre-migration baseline for 028-test-coverage
+- TypeScript 6.0, Next.js 16.2, React 19, Node.js 20+ + Vitest 3.x, Playwright, @testing-library/react, jsdom (029-jest-to-vitest-migration)
 - N/A for planning artifacts; existing PostgreSQL via Prisma remains contextual only (028-test-coverage)
 
 - TypeScript 6.0, Next.js 16.2, React 19 + MUI v7, Clerk (auth), Rollbar (monitoring), Prisma
@@ -79,7 +80,8 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
-- 028-test-coverage: Added TypeScript 5.9, Next.js 16, React 19, Node.js 20+ + Jest 30, ts-jest, Playwright, @testing-library/react
+- 029-jest-to-vitest-migration: Replaced Jest/ts-jest non-E2E execution with Vitest, kept Playwright unchanged, and added Vitest compatibility/setup infrastructure
+- 028-test-coverage: Established the pre-migration coverage baseline on Jest/ts-jest before the later Vitest switch in 029
 - 026-course-material-integration: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, PostgreSQL via Prisma 7.5.0 ORM, Vercel Blob storage (@vercel/blob), HTML sanitization (sanitize-html)
 - 024-admin-dashboard: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, Clerk SDK, Prisma ORM
 

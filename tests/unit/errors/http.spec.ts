@@ -8,9 +8,9 @@ import { toHttpError, withErrorHandling } from '@/lib/errors/http';
 import { BaseError } from '@/lib/errors/base';
 
 // Mock modules
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
-  createErrorContext: jest.fn(() => ({ additionalData: {} })),
-  reportError: jest.fn(),
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
+  createErrorContext: vi.fn(() => ({ additionalData: {} })),
+  reportError: vi.fn(),
   ErrorSeverity: {
     INFO: 'info',
     WARNING: 'warning',
@@ -19,19 +19,19 @@ jest.mock('@/lib/monitoring/rollbar-official', () => ({
   },
 }));
 
-jest.mock('@/lib/services/error-analytics', () => ({
+vi.mock('@/lib/services/error-analytics', () => ({
   errorAnalytics: {
-    recordError: jest.fn(),
+    recordError: vi.fn(),
   },
 }));
 
-jest.mock('@/lib/utils/request-context', () => ({
-  getRequestId: jest.fn().mockResolvedValue('test-req-id'),
-  getRequestContext: jest.fn().mockResolvedValue({
+vi.mock('@/lib/utils/request-context', () => ({
+  getRequestId: vi.fn().mockResolvedValue('test-req-id'),
+  getRequestContext: vi.fn().mockResolvedValue({
     userAgent: 'TestAgent',
     ip: '127.0.0.1',
   }),
-  logErrorWithContext: jest.fn(),
+  logErrorWithContext: vi.fn(),
 }));
 
 // Test error class

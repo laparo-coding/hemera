@@ -30,21 +30,21 @@ function restoreEnv() {
 }
 
 // Mock Clerk
-jest.mock('@clerk/nextjs/server', () => ({
-  currentUser: jest.fn(),
+vi.mock('@clerk/nextjs/server', () => ({
+  currentUser: vi.fn(),
 }));
 
-const mockCookiesGet = jest.fn();
+const mockCookiesGet = vi.fn();
 
-jest.mock('next/headers', () => ({
-  cookies: jest.fn(async () => ({
+vi.mock('next/headers', () => ({
+  cookies: vi.fn(async () => ({
     get: mockCookiesGet,
   })),
 }));
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  redirect: jest.fn((path: string) => {
+vi.mock('next/navigation', () => ({
+  redirect: vi.fn((path: string) => {
     throw new Error(`REDIRECT:${path}`);
   }),
 }));
@@ -67,7 +67,7 @@ const mockRedirect = redirect as jest.MockedFunction<typeof redirect>;
 
 describe('Auth Helpers', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCurrentUser.mockReset();
     mockCookiesGet.mockReset();
     mockCookiesGet.mockReturnValue(undefined);
@@ -77,7 +77,7 @@ describe('Auth Helpers', () => {
     delete process.env.E2E_ADMIN;
     delete process.env.VERCEL_ENV;
     delete process.env.VERCEL;
-    // Keep NODE_ENV as 'test' but that's checked in the isMockAuthEnvironment
+    process.env.NODE_ENV = 'test';
   });
 
   afterEach(() => {

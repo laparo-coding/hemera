@@ -7,9 +7,9 @@ import { errorAnalytics } from '@/lib/services/error-analytics';
 import { BaseError } from '@/lib/errors/base';
 
 // Mock the rollbar module to prevent actual reporting
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
-  createErrorContext: jest.fn(() => ({ additionalData: {} })),
-  reportError: jest.fn(),
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
+  createErrorContext: vi.fn(() => ({ additionalData: {} })),
+  reportError: vi.fn(),
   ErrorSeverity: {
     INFO: 'info',
     WARNING: 'warning',

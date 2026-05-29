@@ -5,48 +5,49 @@
  * Contract tests for testimonial API endpoints
  */
 
-// Mock Prisma
-const mockPrisma = {
-  booking: {
-    findFirst: jest.fn(),
-    findUnique: jest.fn(),
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    booking: {
+      findFirst: vi.fn(),
+      findUnique: vi.fn(),
+    },
+    testimonial: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
   },
-  testimonial: {
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
-};
+}));
 
-jest.mock('@/lib/db/prisma', () => ({
+vi.mock('@/lib/db/prisma', () => ({
   prisma: mockPrisma,
 }));
 
 // Mock Clerk auth
-const mockAuth = jest.fn();
-const mockCurrentUser = jest.fn();
-jest.mock('@clerk/nextjs/server', () => ({
+const mockAuth = vi.fn();
+const mockCurrentUser = vi.fn();
+vi.mock('@clerk/nextjs/server', () => ({
   auth: () => mockAuth(),
   currentUser: () => mockCurrentUser(),
 }));
 
 // Mock testimonial service
-const mockGetTestimonialsByUserId = jest.fn();
-const mockCreateTestimonial = jest.fn();
-jest.mock('@/lib/services/testimonial', () => ({
+const mockGetTestimonialsByUserId = vi.fn();
+const mockCreateTestimonial = vi.fn();
+vi.mock('@/lib/services/testimonial', () => ({
   getTestimonialsByUserId: (userId: string) =>
     mockGetTestimonialsByUserId(userId),
   createTestimonial: (input: unknown, profile: unknown) =>
     mockCreateTestimonial(input, profile),
-  toTestimonialWithCourseApiResponse: jest.fn(t => t),
-  toTestimonialApiResponse: jest.fn(t => t),
+  toTestimonialWithCourseApiResponse: vi.fn(t => t),
+  toTestimonialApiResponse: vi.fn(t => t),
 }));
 
-jest.mock('@/lib/types/testimonial', () => ({
-  toTestimonialWithCourseApiResponse: jest.fn(t => t),
-  toTestimonialApiResponse: jest.fn(t => t),
+vi.mock('@/lib/types/testimonial', () => ({
+  toTestimonialWithCourseApiResponse: vi.fn(t => t),
+  toTestimonialApiResponse: vi.fn(t => t),
 }));
 
 import { NextRequest } from 'next/server';
@@ -54,7 +55,7 @@ import { GET, POST } from '@/app/api/testimonials/route';
 
 describe('GET /api/testimonials', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 for unauthenticated request', async () => {
@@ -112,7 +113,7 @@ describe('POST /api/testimonials', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns 401 for unauthenticated request', async () => {

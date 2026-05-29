@@ -6,7 +6,7 @@
  * These tests verify end-to-end behavior and should FAIL until implementation.
  */
 
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('Admin Review Workflow - Integration Tests', () => {
   describe('Admin Approval Flow', () => {

@@ -1,3 +1,4 @@
+import { PaymentStatus } from '@prisma/client';
 import {
   afterAll,
   afterEach,
@@ -5,8 +6,7 @@ import {
   describe,
   expect,
   it,
-} from '@jest/globals';
-import { PaymentStatus } from '@prisma/client';
+} from '@/tests/vitest/jest-globals';
 import { closeDb, prisma } from '../../lib/db/prisma';
 
 describe('Booking Model Validations', () => {

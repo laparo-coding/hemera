@@ -27,9 +27,9 @@ import {
 } from '@/lib/errors/domain';
 
 // Mock the rollbar module
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
-  createErrorContext: jest.fn(() => ({ additionalData: {} })),
-  reportError: jest.fn(),
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
+  createErrorContext: vi.fn(() => ({ additionalData: {} })),
+  reportError: vi.fn(),
   ErrorSeverity: {
     INFO: 'info',
     WARNING: 'warning',

@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('Contract: GET /api/my-courses/[bookingId]/summary', () => {
   it('provides merged course default and booking override assets', () => {

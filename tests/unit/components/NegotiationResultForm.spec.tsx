@@ -4,10 +4,10 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 // Mock the server action
-const mockSaveAction = jest.fn().mockResolvedValue({ success: true });
+const mockSaveAction = vi.fn().mockResolvedValue({ success: true });
 
 // Mock date pickers — render a simplified version
-jest.mock('@mui/x-date-pickers/StaticDatePicker', () => ({
+vi.mock('@mui/x-date-pickers/StaticDatePicker', () => ({
   StaticDatePicker: (props: Record<string, unknown>) => (
     <div data-testid="static-date-picker">
       {props.value instanceof Date && (
@@ -28,13 +28,13 @@ jest.mock('@mui/x-date-pickers/StaticDatePicker', () => ({
   ),
 }));
 
-jest.mock('@mui/x-date-pickers/LocalizationProvider', () => ({
+vi.mock('@mui/x-date-pickers/LocalizationProvider', () => ({
   LocalizationProvider: ({ children }: { children: ReactNode }) => (
     <>{children}</>
   ),
 }));
 
-jest.mock('@mui/x-date-pickers/AdapterDateFns', () => ({
+vi.mock('@mui/x-date-pickers/AdapterDateFns', () => ({
   AdapterDateFns: class {},
 }));
 

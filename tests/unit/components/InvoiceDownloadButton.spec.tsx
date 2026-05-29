@@ -4,7 +4,7 @@
  * Tests for the invoice download button with error handling.
  */
 
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 // Types for the InvoiceDownloadButton component (prepared for future use)
 // biome-ignore lint/correctness/noUnusedVariables: prepared for future use

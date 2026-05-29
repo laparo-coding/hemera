@@ -6,8 +6,8 @@
  * These tests define the API contract and should FAIL until implementation.
  */
 
-import { describe, expect, it } from '@jest/globals';
 import type { PendingBooking } from '@/lib/schemas/admin/booking';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('GET /api/admin/bookings/pending - Contract Tests', () => {
   const ENDPOINT = '/api/admin/bookings/pending';

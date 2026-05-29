@@ -4,7 +4,6 @@
  *
  * Tests the API contract for admin user management endpoints.
  */
-import { describe, expect, it } from '@jest/globals';
 
 import type {
   AdminApiError,
@@ -14,6 +13,7 @@ import type {
   AdminUserUpdateRequest,
   PaginationMeta,
 } from '@/lib/types/admin';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('GET /api/admin/users - Contract Tests', () => {
   describe('Request Schema Validation', () => {

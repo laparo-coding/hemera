@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import { coverageTargets } from '../coverage/coverage-targets';
 import { criticalAreas } from '../coverage/critical-areas';
 import { qualityGates } from '../coverage/quality-gates';

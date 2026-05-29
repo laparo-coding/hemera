@@ -4,7 +4,6 @@
  *
  * Tests the API contract for admin reports and health status endpoints.
  */
-import { describe, expect, it } from '@jest/globals';
 
 import type {
   AdminApiError,
@@ -17,6 +16,7 @@ import type {
   ServiceHealth,
   UserGrowthStats,
 } from '@/lib/types/admin';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('GET /api/admin/reports/stats - Contract Tests', () => {
   describe('Response Schema Validation', () => {

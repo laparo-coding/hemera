@@ -1,16 +1,16 @@
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest } from 'next/server';
 
-const mockClerkHandler = jest.fn();
-const mockServerError = jest.fn();
+const mockClerkHandler = vi.fn();
+const mockServerError = vi.fn();
 
-jest.mock('@clerk/nextjs/server', () => ({
-  clerkMiddleware: jest.fn(() => mockClerkHandler),
-  createRouteMatcher: jest.fn(() => () => false),
+vi.mock('@clerk/nextjs/server', () => ({
+  clerkMiddleware: vi.fn(() => mockClerkHandler),
+  createRouteMatcher: vi.fn(() => () => false),
 }));
 
-jest.mock('@/lib/monitoring/rollbar-official', () => ({
+vi.mock('@/lib/monitoring/rollbar-official', () => ({
   serverInstance: {
     error: (...args: unknown[]) => mockServerError(...args),
   },
@@ -21,8 +21,8 @@ describe('proxy', () => {
   const originalSecretKey = process.env.CLERK_SECRET_KEY;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.resetModules();
+    vi.clearAllMocks();
+    vi.resetModules();
     process.env.E2E_TEST = '0';
     process.env.NEXT_PUBLIC_DISABLE_CLERK = '0';
   });
@@ -38,7 +38,7 @@ describe('proxy', () => {
 
     const { default: proxy } = await import('@/proxy');
     const mockNextFetchEvent = {
-      waitUntil: jest.fn(),
+      waitUntil: vi.fn(),
     } as unknown as NextFetchEvent;
     const response = proxy(
       new NextRequest('http://localhost:3000/api/service/courses'),

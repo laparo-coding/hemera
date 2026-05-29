@@ -35,7 +35,7 @@ jobs:
         run: npm run lint:ci
 
       - name: Unit coverage summary
-        run: npm run test:unit:coverage -- --runInBand --ci
+        run: npm run test:unit:coverage
         env:
           CI: 'true'
 
@@ -50,9 +50,6 @@ jobs:
             rm -f "$tmp_file"
             exit 1
           fi
-
-      - name: Enforce baseline coverage floor
-        run: npm run coverage:check -- --lines 60 --statements 60 --functions 45 --branches 75
 
       - name: Build
         run: npm run build

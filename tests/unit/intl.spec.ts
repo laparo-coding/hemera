@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 
 describe('de-DE Intl formatting', () => {
   it('formats EUR currency with comma decimals', () => {

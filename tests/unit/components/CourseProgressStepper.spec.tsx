@@ -10,25 +10,29 @@
 
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import type { ReactNode } from 'react';
 
 // Mock next/link
-jest.mock('next/link', () => {
-  return ({
-    children,
-    href,
-    ...props
-  }: { children: ReactNode; href: string; [key: string]: unknown }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  );
+vi.mock('next/link', () => {
+  return {
+    default: ({
+      children,
+      href,
+      ...props
+    }: { children: ReactNode; href: string; [key: string]: unknown }) => (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    ),
+  };
 });
 
 // Mock MUI ThemeProvider
-jest.mock('@mui/material/styles', () => {
-  const actual = jest.requireActual('@mui/material/styles');
+vi.mock('@mui/material/styles', async () => {
+  const actual = await vi.importActual<typeof import('@mui/material/styles')>(
+    '@mui/material/styles'
+  );
   return {
     ...actual,
     useTheme: () => ({

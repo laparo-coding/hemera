@@ -10,7 +10,7 @@ Feature 028 erhöht die messbare Testabdeckung in drei ersten Critical Areas:
 - API-Verhalten rund um Buchungen und Pending-Reviews
 - Authenticated dashboard journeys und ihre zentralen Komponenten
 
-Die Steuerung erfolgt bewusst nicht mehr über starre Alt-Thresholds direkt in Jest, sondern über:
+Die Steuerung erfolgt bewusst nicht mehr über starre Alt-Thresholds direkt im Runner, sondern über:
 
 1. kataloggestützte Coverage-Slices unter `tests/coverage/`
 2. `coverage/coverage-summary.json` als maschinenlesbare Quelle
@@ -20,7 +20,7 @@ Die Steuerung erfolgt bewusst nicht mehr über starre Alt-Thresholds direkt in J
 ## Lokale Kommandos
 
 ```bash
-npm run test:unit:coverage -- --runInBand
+npm run test:unit:coverage
 npm run coverage:summary -- --json
 npm run coverage:check -- --lines 60 --statements 60 --functions 45 --branches 75
 ```
@@ -40,8 +40,8 @@ npm run coverage:check -- --lines 60 --statements 60 --functions 45 --branches 7
 Hinweis:
 
 - Die neue Contract- und Integration-Konfiguration trennt die Runner sauber vom Unit-Setup.
-- Playwright-basierte Dateien unter `tests/integration/` werden im Jest-Integration-Runner explizit
-  ignoriert, damit nur echte Jest-Integrationsspecs dort laufen.
+- Nicht zur Vitest-Integration-Suite gehörende Dateien werden in `vitest.config.ts` explizit
+  ausgeschlossen, damit dort nur die beabsichtigten Integrationsspecs laufen.
 - Die getrennte Playwright-Matrix ist lokal bereits fuer `public`, `chromium-auth`, `auth-admin`
   und `performance` bestaetigt; verwende fuer Debug- und Regressionslaeufe bevorzugt den kleinsten
   passenden Slice statt eines breiten Gesamtlaufs.
@@ -61,10 +61,13 @@ werden.
 
 ## CI-Verhalten
 
-- Pull Requests erzeugen eine Unit-Coverage-Summary und prüfen einen baseline-basierten Mindestwert.
-- Deployments erzeugen dieselbe Summary erneut und blocken bei Unterschreitung der Gate-Werte.
-- Die Gate-Werte sind bewusst konservativ an der real gemessenen Ausgangslage ausgerichtet und nicht
-  frei geraten.
+- Pull Requests erzeugen eine Unit-Coverage-Summary und stellen die Coverage-Artefakte fuer spaetere
+  Auswertung bereit.
+- Deployments erzeugen dieselbe Summary erneut und laden sie ebenfalls als Artefakt hoch.
+- Der alte globale Hard-Gate mit festen Runner-Thresholds ist derzeit bewusst nicht aktiviert,
+  weil `tests/coverage/coverage-targets.ts` globale Floors weiterhin nur als `proposed` fuehrt.
+- Verbindliche Gates bleiben vorerst catalog- und baseline-basiert; `npm run coverage:check`
+  steht fuer gezielte lokale oder spaetere Workflow-Anbindung weiter bereit.
 
 ## Aktuell priorisierte Critical Areas
 

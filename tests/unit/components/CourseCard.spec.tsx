@@ -4,7 +4,7 @@
  * Tests for the enhanced course card that displays date/time/location.
  */
 
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import {
   shouldShowInvoiceButton,
   shouldShowTestimonialButton,

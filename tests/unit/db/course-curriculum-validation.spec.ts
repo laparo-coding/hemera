@@ -11,8 +11,8 @@
 import { CurriculumValidationError } from '../../../lib/errors/domain';
 
 // Mock reportError before importing courses module
-jest.mock('../../../lib/monitoring/rollbar-official', () => ({
-  reportError: jest.fn(),
+vi.mock('../../../lib/monitoring/rollbar-official', () => ({
+  reportError: vi.fn(),
   ErrorSeverity: {
     CRITICAL: 'critical',
     ERROR: 'error',
@@ -23,15 +23,15 @@ jest.mock('../../../lib/monitoring/rollbar-official', () => ({
 }));
 
 // We need to mock prisma before importing the module
-jest.mock('../../../lib/db/prisma', () => ({
+vi.mock('../../../lib/db/prisma', () => ({
   prisma: {
     course: {
-      create: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
     },
     booking: {
-      count: jest.fn(),
+      count: vi.fn(),
     },
   },
 }));
@@ -45,7 +45,7 @@ const mockReportError = reportError as jest.Mock;
 
 describe('Course DB Layer - Curriculum Validation', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('createCourse', () => {
@@ -238,7 +238,7 @@ describe('Course DB Layer - Curriculum Validation', () => {
     };
 
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue({
         updatedAt: new Date('2026-01-25T10:00:00'),
       });

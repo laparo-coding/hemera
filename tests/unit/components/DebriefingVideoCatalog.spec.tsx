@@ -1,16 +1,19 @@
 /** @jest-environment jsdom */
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import { render, screen } from '@testing-library/react';
 
 // Mock MuxPlayer dynamic import
-jest.mock('next/dynamic', () => {
-  return () => {
-    const MockMuxPlayer = (
-      props: { playbackId?: string }
-    ) => (
-      <div data-testid="mux-player" data-playback-id={props.playbackId} />
-    );
-    MockMuxPlayer.displayName = 'MockMuxPlayer';
-    return MockMuxPlayer;
+vi.mock('next/dynamic', () => {
+  return {
+    default: () => {
+      const MockMuxPlayer = (
+        props: { playbackId?: string }
+      ) => (
+        <div data-testid="mux-player" data-playback-id={props.playbackId} />
+      );
+      MockMuxPlayer.displayName = 'MockMuxPlayer';
+      return MockMuxPlayer;
+    },
   };
 });
 

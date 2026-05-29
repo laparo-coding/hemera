@@ -6,24 +6,25 @@
  * These tests define the expected behavior and should FAIL until implementation.
  */
 
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 
-const mockPrisma = {
-  user: {
-    findUnique: jest.fn(),
+const { mockPrisma, mockReportError } = vi.hoisted(() => ({
+  mockPrisma: {
+    user: {
+      findUnique: vi.fn(),
+    },
+    booking: {
+      findMany: vi.fn(),
+    },
   },
-  booking: {
-    findMany: jest.fn(),
-  },
-};
+  mockReportError: vi.fn(),
+}));
 
-const mockReportError = jest.fn();
-
-jest.mock('../../../lib/db/prisma', () => ({
+vi.mock('../../../lib/db/prisma', () => ({
   prisma: mockPrisma,
 }));
 
-jest.mock('../../../lib/monitoring/rollbar-official', () => ({
+vi.mock('../../../lib/monitoring/rollbar-official', () => ({
   reportError: mockReportError,
 }));
 
@@ -318,7 +319,7 @@ describe('PrerequisiteService', () => {
 
   describe('actual service behavior', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       mockPrisma.user.findUnique.mockImplementation(async ({ select }) => {
         if (select?.isOutperformer) {
           return { isOutperformer: false };

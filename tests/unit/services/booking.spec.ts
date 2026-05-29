@@ -1,17 +1,19 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@/tests/vitest/jest-globals';
 import { PaymentStatus } from '@prisma/client';
 
-const mockPrisma = {
-  booking: {
-    findUnique: jest.fn(),
-    upsert: jest.fn(),
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    booking: {
+      findUnique: vi.fn(),
+      upsert: vi.fn(),
+    },
+    course: {
+      findUnique: vi.fn(),
+    },
   },
-  course: {
-    findUnique: jest.fn(),
-  },
-};
+}));
 
-jest.mock('../../../lib/db/prisma', () => ({
+vi.mock('../../../lib/db/prisma', () => ({
   prisma: mockPrisma,
 }));
 
@@ -19,7 +21,7 @@ import { createBooking } from '../../../lib/services/booking';
 
 describe('Booking service regression coverage', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockPrisma.booking.findUnique.mockResolvedValue(null);
     mockPrisma.course.findUnique.mockResolvedValue({
       id: 'course_123',

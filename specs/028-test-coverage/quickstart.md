@@ -38,10 +38,10 @@ Expected result:
 - no TypeScript errors
 - no Biome failures
 
-### 2. Capture the Current Jest Coverage Baseline
+### 2. Capture the Current Coverage Baseline
 
 ```bash
-npm test -- --coverage --runInBand
+npm run test:unit:coverage
 ```
 
 Expected result:
@@ -52,12 +52,12 @@ Expected result:
 ### 3. Validate the Existing Unit and Contract Layers
 
 ```bash
-npm run test:unit -- --runInBand
-npm run test:contracts -- --runInBand
+npm run test:unit
+npm run test:contracts
 ```
 
 Expected result:
-- current Jest-backed test layers run successfully
+- current Vitest-backed test layers run successfully
 - candidate gaps can be identified from failures, skips, or low-signal areas
 
 ### 4. Validate Current E2E Infrastructure

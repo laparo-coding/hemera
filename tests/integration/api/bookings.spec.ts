@@ -5,8 +5,14 @@
  * participation status, and invoice fields for dashboard display.
  */
 
-import { afterAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { PaymentStatus } from '@prisma/client';
+import {
+  afterAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from '@/tests/vitest/jest-globals';
 import { closeDb, prisma } from '../../../lib/db/prisma';
 
 describe('GET /api/bookings - Enhanced Response Contract', () => {

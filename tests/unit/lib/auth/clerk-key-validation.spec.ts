@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from '@/tests/vitest/jest-globals';
 import { getClerkKeyMismatchReason } from '@/lib/auth/clerk-key-validation';
 
 describe('getClerkKeyMismatchReason', () => {

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, vi } from '@/tests/vitest/jest-globals';
 
 const ORIGINAL_ENV = process.env;
 
@@ -21,7 +21,7 @@ describe('Unit: Rollbar sampling logic', () => {
     delete process.env.ROLLBAR_ENABLED;
     process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
       'valid-token-with-sufficient-length-12345';
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it('samples non-errors at ~5% by default and errors at 100%', async () => {
@@ -29,7 +29,7 @@ describe('Unit: Rollbar sampling logic', () => {
     // For first INFO pick -> include: 0.01 (<0.05), 0.5 (<1)
     // For second INFO pick -> drop: 0.9 (>0.05), 0.5 (<1)
     const rnd = makeDeterministicRandom([0.01, 0.5, 0.9, 0.5]);
-    const spy = jest.spyOn(Math, 'random').mockImplementation(rnd);
+    const spy = vi.spyOn(Math, 'random').mockImplementation(rnd);
 
     const mod = await import('../../lib/monitoring/rollbar-official');
 
@@ -75,7 +75,7 @@ describe('Unit: Rollbar sampling logic', () => {
       ROLLBAR_SAMPLE_RATE_CRITICAL: '1',
     } as NodeJS.ProcessEnv;
 
-    const rndSpy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+    const rndSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
 
     const mod = await import('../../lib/monitoring/rollbar-official');
 

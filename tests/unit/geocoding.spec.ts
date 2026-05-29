@@ -11,7 +11,7 @@ import {
   expect,
   it,
   jest,
-} from '@jest/globals';
+} from '@/tests/vitest/jest-globals';
 
 // Will be implemented in T023
 // import { geocodeAddress, GeocodeResult } from '@/lib/utils/geocoding'

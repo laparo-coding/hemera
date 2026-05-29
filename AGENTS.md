@@ -26,10 +26,10 @@ npm run build
 npm run start
 
 # Quality gates
-npm run lint      # Biome lints & formats
-npm run typecheck # tsc --noEmit
-npm run test      # Jest unit + contract suite
-npm run test:e2e  # Playwright UI/E2E suite
+npm run lint       # Biome lints & formats
+npm run typecheck  # tsc --noEmit
+npm run test       # Vitest unit + contract + integration suite
+npm run test:e2e   # Playwright UI/E2E suite
 npm run db:migrate # Prisma migrations against local env
 ```
 
@@ -39,18 +39,19 @@ npm run db:migrate # Prisma migrations against local env
 - **File naming**: App routes follow the directory-as-route convention (e.g., `app/courses/[slug]`),
   React components are `PascalCase.tsx`, tests are `*.spec.ts`.
 - **Function/variable naming**: camelCase for functions/constants, UPPER_SNAKE for env toggles.
-- **Linting**: Biome handles lint + format (`npm run lint`, `npm run format`). Jest/Playwright configs
-  live at repo root for deterministic imports.
+- **Linting**: Biome handles lint + format (`npm run lint`, `npm run format`). Vitest and Playwright
+  configs live at repo root for deterministic imports.
 
 ## Testing Guidelines
 
-- **Frameworks**: Jest (unit + contract) with `ts-jest` ESM preset, Playwright for E2E/UX, Prisma
-  Testcontainers for DB-heavy specs.
+- **Frameworks**: Vitest (unit, contract, integration), Playwright for E2E/UX, Prisma Testcontainers
+  for DB-heavy specs.
 - **Test files**: `tests/unit/**/*.spec.ts`, `tests/contracts/**/*.spec.ts`, and
   `tests/e2e/**/*.spec.ts` (Playwright auto-discovers).
 - **Running tests**: `npm run test`, `npm run test:contracts`, `npm run test:e2e`, or targeted
   `npx playwright test tests/e2e/dashboard.spec.ts`.
-- **Coverage**: Jest collects V8 coverage for `lib/**`; Playwright stores traces/videos on failure.
+- **Coverage**: Vitest collects V8 coverage for the configured critical areas; Playwright stores
+  traces/videos on failure.
 
 ## Commit & Pull Request Guidelines
 
@@ -102,8 +103,8 @@ and API handlers (`app/api/*`) that expose booking, payment, monitoring, and hea
 `lib/services`, `lib/analytics`) plus env, monitoring, and middleware utilities.
 - **Data access (`prisma/`, `lib/db/prisma.ts`):** Prisma 7 client with Accelerate in production and
 a pg adapter fallback for CI/local flows; seeds and migrations align with specs-first deliverables.
-- **Quality + Ops (`tests/`, `docs/`, `scripts/`):** Jest + Playwright suites, ops runbooks, and task
-scripts that enforce deploy readiness and tooling automation.
+- **Quality + Ops (`tests/`, `docs/`, `scripts/`):** Vitest + Playwright suites, ops runbooks, and
+  task scripts that enforce deploy readiness and tooling automation.
 
 ### Data Flow
 
@@ -134,7 +135,7 @@ hemera/
 ├── specs/                  # Specs-first feature folders (001-021 ...)
 ├── tests/                  # unit/, contracts/, e2e/ suites w/ Playwright helpers
 ├── public/                 # Static assets served by Next.js
-└── types/, cspell.config.*, biome.json, jest.config.ts, playwright.config.ts
+└── types/, cspell.config.*, biome.json, vitest.config.ts, playwright.config.ts
 ```
 
 ### Key Files to Know
@@ -146,7 +147,7 @@ hemera/
 - `lib/env.ts`: Centralized environment schema and validation. Touch when adding or tightening env configuration.
 - `prisma/schema.prisma`: Data model and relations. Touch when introducing entities or fields before migrations.
 - `scripts/deploy-migrations.mjs`: Build gate for unapplied migrations. Touch when rollout behavior before `npm run build` changes.
-- `tests/setup.ts`: Jest global hooks for DB cleanup and env toggles. Touch when extending fixtures or teardown behavior.
+- `tests/setup.ts`: Vitest global hooks for DB cleanup and env toggles. Touch when extending fixtures or teardown behavior.
 - `playwright.config.ts`: E2E runner configuration for workers, retries, and environment wiring. Touch when calibrating E2E reliability or base URL.
 - `docs/ops/branch-hygiene.md`: Branch cleanup process. Touch when merge and cleanup workflow guidance changes.
 - `README.md`: Specs-first workflow and ops guardrails. Touch when onboarding or workflow guidance changes.
@@ -166,7 +167,7 @@ hemera/
 
 - **Clerk (`@clerk/nextjs`):** Authentication + user profiles across app/admin areas.
 - **Stripe (`@stripe/stripe-js`, `stripe`):** Checkout + webhooks for paid courses.
-- **Playwright + Jest:** High-signal E2E and unit/contract verification.
+- **Playwright + Vitest:** High-signal E2E and non-E2E verification.
 - **Rollbar / web-vitals / next-video:** Monitoring, performance analytics, and video asset support.
 - **Loops SDK:** Transactional email automation for learning-path workflows.
 

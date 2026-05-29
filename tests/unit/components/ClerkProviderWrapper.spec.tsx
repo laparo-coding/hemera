@@ -3,13 +3,13 @@
 import React from 'react';
 import { act, render, screen, waitFor } from '@testing-library/react';
 
-jest.mock('@clerk/nextjs', () => ({
+vi.mock('@clerk/nextjs', () => ({
   ClerkProvider: ({ children }: { children: React.ReactNode }) => (
     <div data-testid='clerk-provider'>{children}</div>
   ),
 }));
 
-jest.mock('../../../lib/auth/clerk-config', () => ({
+vi.mock('../../../lib/auth/clerk-config', () => ({
   clerkConfig: {
     signInUrl: '/sign-in',
     signUpUrl: '/sign-up',
@@ -20,10 +20,10 @@ jest.mock('../../../lib/auth/clerk-config', () => ({
   },
 }));
 
-const logClientError = jest.fn();
-const logClientWarning = jest.fn();
+const logClientError = vi.fn();
+const logClientWarning = vi.fn();
 
-jest.mock('../../../lib/errors/client', () => ({
+vi.mock('../../../lib/errors/client', () => ({
   logClientError: (...args: unknown[]) => logClientError(...args),
   logClientWarning: (...args: unknown[]) => logClientWarning(...args),
 }));
@@ -37,7 +37,7 @@ describe('ClerkProviderWrapper', () => {
   const originalE2ETest = process.env.NEXT_PUBLIC_E2E_TEST;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY =
       'pk_test_example123456';
     process.env.NEXT_PUBLIC_DISABLE_CLERK = '0';

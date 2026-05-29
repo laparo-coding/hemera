@@ -11,13 +11,15 @@ import { isEnvFlagEnabled } from '@/lib/utils/env-flags';
 
 /**
  * Detects if we are running in a unit test environment.
- * - Only returns true for actual unit tests (NODE_ENV=test or JEST_WORKER_ID is set)
+ * - Only returns true for actual unit tests (NODE_ENV=test, Jest, or Vitest)
  * - Returns false for E2E tests (which need explicit server-side bypass flags)
  */
 function isMockAuthEnvironment(): boolean {
   // Jest sets JEST_WORKER_ID when running tests
   const isJestRunning = !!process.env.JEST_WORKER_ID;
-  return process.env.NODE_ENV === 'test' || isJestRunning;
+  const isVitestRunning = !!process.env.VITEST;
+
+  return process.env.NODE_ENV === 'test' || isJestRunning || isVitestRunning;
 }
 
 function isHostedVercelRuntime(): boolean {

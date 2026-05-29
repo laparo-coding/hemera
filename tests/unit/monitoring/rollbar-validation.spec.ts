@@ -8,7 +8,7 @@ describe('Rollbar SDK Initialization', () => {
 
   beforeEach(() => {
     // Reset modules to ensure fresh imports
-    jest.resetModules();
+    vi.resetModules();
     // Clone env to avoid mutations (cast to any to allow NODE_ENV mutation in tests)
     process.env = { ...originalEnv } as any;
     delete process.env.ROLLBAR_ENABLED;
@@ -57,7 +57,7 @@ describe('Rollbar SDK Initialization', () => {
       // Should be no-op instance
       expect(mod.serverInstance).toBeDefined();
       // Ensure calling reportError does not trigger network calls
-      const spy = jest.spyOn(mod.serverInstance as any, 'error');
+      const spy = vi.spyOn(mod.serverInstance as any, 'error');
       mod.reportError('TestError', { requestId: 't1' }, 'error');
       expect(spy).not.toHaveBeenCalled();
       spy.mockRestore();
@@ -131,7 +131,7 @@ describe('Rollbar SDK Initialization', () => {
       const mod = await import('@/lib/monitoring/rollbar-official');
       // Should be no-op instance when explicitly disabled
       expect(mod.serverInstance).toBeDefined();
-      const spy = jest.spyOn(mod.serverInstance as any, 'error');
+      const spy = vi.spyOn(mod.serverInstance as any, 'error');
       mod.reportError('Disabled test', { requestId: 'd1' }, 'error');
       expect(spy).not.toHaveBeenCalled();
       spy.mockRestore();

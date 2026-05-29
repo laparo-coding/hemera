@@ -6,7 +6,7 @@
  * PRE_BOOKED creation, and admin notifications.
  */
 
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@/tests/vitest/jest-globals';
 import { PaymentStatus } from '@prisma/client';
 import { createBooking } from '../../../lib/services/booking';
 import {
@@ -22,19 +22,19 @@ import {
 import { checkPrerequisite } from '../../../lib/services/prerequisite';
 
 // Mock dependencies
-jest.mock('../../../lib/services/prerequisite');
-jest.mock('../../../lib/services/booking');
-jest.mock('../../../lib/services/loops', () => ({
-  getAdminEmails: jest.fn(),
-  isLoopsConfigured: jest.fn(),
-  isValidEmail: jest.fn(),
-  sendPrerequisiteReviewEmail: jest.fn(),
+vi.mock('../../../lib/services/prerequisite');
+vi.mock('../../../lib/services/booking');
+vi.mock('../../../lib/services/loops', () => ({
+  getAdminEmails: vi.fn(),
+  isLoopsConfigured: vi.fn(),
+  isValidEmail: vi.fn(),
+  sendPrerequisiteReviewEmail: vi.fn(),
 }));
-jest.mock('../../../lib/monitoring/rollbar-official', () => ({
+vi.mock('../../../lib/monitoring/rollbar-official', () => ({
   serverInstance: {
-    error: jest.fn(),
-    warn: jest.fn(),
-    info: jest.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
   },
 }));
 
@@ -70,7 +70,7 @@ describe('Booking Orchestrator', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock isLoopsConfigured to return true by default
     (
       isLoopsConfigured as jest.MockedFunction<typeof isLoopsConfigured>
@@ -500,7 +500,8 @@ describe('Booking Orchestrator', () => {
       ];
 
       for (const invalidEmail of invalidEmails) {
-        jest.clearAllMocks();
+        mockSendEmail.mockClear();
+        mockCreateBooking.mockClear();
         mockCreateBooking.mockResolvedValue({
           id: 'booking_new123',
           userId: testUser.id,
