@@ -13,7 +13,11 @@ import dotenv from 'dotenv';
 import { afterAll, beforeAll, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
-globalThis.jest = vi as typeof globalThis.jest;
+declare global {
+  var jest: typeof vi;
+}
+
+globalThis.jest = vi;
 
 // Polyfill Web APIs for jsdom environment (required by testcontainers and other libraries)
 if (typeof globalThis.TextEncoder === 'undefined') {

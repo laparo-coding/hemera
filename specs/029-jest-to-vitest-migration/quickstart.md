@@ -80,14 +80,14 @@ npm run test:unit
 Expected result:
 - `@jest/globals` imports are gone from migrated scopes
 - `jest.*` mocks and spies have approved Vitest replacements
-- jsdom-marked files still execute in jsdom and Node files stay on Node by default
+- component specs that need a DOM still run under jsdom and non-DOM unit tests continue to pass under the shared Vitest unit runner
 
 ### 6. Validate Scope-by-Scope Migration
 
 Unit slice:
 
 ```bash
-npm run test:unit -- --runInBand
+npm run test:unit -- --no-file-parallelism
 npm run test:unit:coverage
 ```
 

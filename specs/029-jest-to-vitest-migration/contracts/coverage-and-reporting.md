@@ -40,6 +40,6 @@ Vitest for non-E2E tests.
 
 ## Acceptance Signals
 
-- `npm run test:unit:coverage -- --runInBand`
+- `npm run test:unit:coverage -- --no-file-parallelism`
 - presence of coverage output in the expected repository location
 - repository scripts or checks that consume coverage artifacts continue to operate

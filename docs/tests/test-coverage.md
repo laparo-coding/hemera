@@ -61,10 +61,13 @@ werden.
 
 ## CI-Verhalten
 
-- Pull Requests erzeugen eine Unit-Coverage-Summary und prüfen einen baseline-basierten Mindestwert.
-- Deployments erzeugen dieselbe Summary erneut und blocken bei Unterschreitung der Gate-Werte.
-- Die Gate-Werte sind bewusst konservativ an der real gemessenen Ausgangslage ausgerichtet und nicht
-  frei geraten.
+- Pull Requests erzeugen eine Unit-Coverage-Summary und stellen die Coverage-Artefakte fuer spaetere
+  Auswertung bereit.
+- Deployments erzeugen dieselbe Summary erneut und laden sie ebenfalls als Artefakt hoch.
+- Der alte globale Hard-Gate mit festen Runner-Thresholds ist derzeit bewusst nicht aktiviert,
+  weil `tests/coverage/coverage-targets.ts` globale Floors weiterhin nur als `proposed` fuehrt.
+- Verbindliche Gates bleiben vorerst catalog- und baseline-basiert; `npm run coverage:check`
+  steht fuer gezielte lokale oder spaetere Workflow-Anbindung weiter bereit.
 
 ## Aktuell priorisierte Critical Areas
 

@@ -5,20 +5,21 @@
  * Contract tests for testimonial API endpoints
  */
 
-// Mock Prisma
-const mockPrisma = {
-  booking: {
-    findFirst: vi.fn(),
-    findUnique: vi.fn(),
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    booking: {
+      findFirst: vi.fn(),
+      findUnique: vi.fn(),
+    },
+    testimonial: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
   },
-  testimonial: {
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
-};
+}));
 
 vi.mock('@/lib/db/prisma', () => ({
   prisma: mockPrisma,
