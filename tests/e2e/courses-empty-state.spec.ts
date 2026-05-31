@@ -30,7 +30,7 @@ test.describe('Courses empty state', () => {
     await expect(page.getByTestId('e2e-courses-empty')).toBeVisible();
     await expect(
       page.getByText(
-        /Aktuell sind keine veroeffentlichten Seminare in der Datenbank verfuegbar\./i
+        /Aktuell sind keine veröffentlichten Seminare in der Datenbank verfügbar\./i
       )
     ).toBeVisible();
   });

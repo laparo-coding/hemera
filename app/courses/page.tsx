@@ -209,11 +209,11 @@ export default async function CoursesPage() {
                   gutterBottom
                   data-testid='course-database-empty-message'
                 >
-                  Aktuell sind keine veroeffentlichten Seminare in der Datenbank
-                  verfuegbar.
+                  Aktuell sind keine veröffentlichten Seminare in der Datenbank
+                  verfügbar.
                 </Typography>
                 <Typography variant='body1' color='text.secondary'>
-                  Sobald Seminare veroeffentlicht sind, erscheinen sie hier
+                  Sobald Seminare veröffentlicht sind, erscheinen sie hier
                   automatisch aus der Datenbank.
                 </Typography>
               </Box>
