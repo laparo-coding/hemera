@@ -1,33 +1,31 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+import { AuthHelper } from './auth-helper';
+import {
+  TEST_LOCATION,
+  TEST_LOCATION_SLUG,
+  cleanupTestLocations,
+  createTestLocation,
+} from './locations-test-utils';
 
 const skipInCI = !!process.env.CI || process.env.E2E_TEST === '1';
-
-const TEST_LOCATION = {
-  name: '[E2E-TEST] Yoga Studio Wien',
-  address: 'Mariahilfer Straße 100',
-  city: 'Wien',
-  zipCode: '1070',
-  email: 'test@yoga-studio.at',
-  phone: '+43 1 1234567',
-  website: 'https://yoga-studio.at',
-};
-
-const TEST_LOCATION_SLUG = 'e2e-test-yoga-studio-wien';
 
 test.describe('Public Location Landing Page', () => {
   test.skip(() => skipInCI, 'Requires API authentication - skipped in CI');
 
-  test.beforeEach(async ({ request }) => {
-    await request.post('/api/locations', {
-      data: TEST_LOCATION,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  let authHelper: AuthHelper;
+
+  test.beforeEach(async ({ page }) => {
+    authHelper = new AuthHelper(page);
+    await authHelper.prepareCleanAuthState();
+    await authHelper.signIn(
+      'e2e.admin@example.com',
+      'E2ETestPassword2024!SecureForTesting'
+    );
+    await createTestLocation(page);
   });
 
-  test.afterEach(async ({ request }) => {
-    await cleanupTestLocations(request);
+  test.afterEach(async ({ page }) => {
+    await cleanupTestLocations(page);
   });
 
   test('should display location details on landing page', async ({ page }) => {
@@ -105,17 +103,20 @@ test.describe('Location Mobile Responsiveness', () => {
 
   test.use({ viewport: { width: 375, height: 667 } });
 
-  test.beforeEach(async ({ request }) => {
-    await request.post('/api/locations', {
-      data: TEST_LOCATION,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  let authHelper: AuthHelper;
+
+  test.beforeEach(async ({ page }) => {
+    authHelper = new AuthHelper(page);
+    await authHelper.prepareCleanAuthState();
+    await authHelper.signIn(
+      'e2e.admin@example.com',
+      'E2ETestPassword2024!SecureForTesting'
+    );
+    await createTestLocation(page);
   });
 
-  test.afterEach(async ({ request }) => {
-    await cleanupTestLocations(request);
+  test.afterEach(async ({ page }) => {
+    await cleanupTestLocations(page);
   });
 
   test('should display correctly on mobile viewport', async ({ page }) => {
@@ -140,27 +141,3 @@ test.describe('Location Mobile Responsiveness', () => {
     expect(box?.width).toBeGreaterThanOrEqual(100);
   });
 });
-
-async function cleanupTestLocations(request: {
-  get: (url: string) => Promise<{
-    ok: () => boolean;
-    json: () => Promise<{ locations?: Array<{ id: string; name: string }> }>;
-  }>;
-  delete: (url: string) => Promise<unknown>;
-}) {
-  try {
-    const response = await request.get('/api/locations');
-    if (response.ok()) {
-      const data = await response.json();
-      const testLocations = data.locations?.filter(location =>
-        location.name.includes('[E2E-TEST]')
-      );
-
-      for (const location of testLocations || []) {
-        await request.delete(`/api/locations/${location.id}`);
-      }
-    }
-  } catch {
-    // Ignore cleanup errors in tests.
-  }
-}
