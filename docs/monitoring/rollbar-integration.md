@@ -4,6 +4,9 @@ Rollbar ist in Hemera für getrennte Environments konfiguriert: development, pre
 Local development nutzt ein eigenes Rollbar-Development-Environment und bleibt standardmäßig aus,
 bis es explizit aktiviert wird.
 
+Für die verifizierte lokale Soll-Konfiguration von Gaia, Hemera und Aither siehe auch
+`docs/monitoring/rollbar-local-checklist.md`.
+
 ## 🎯 Übersicht
 
 Rollbar ist vollständig in das Hemera Error Handling System integriert und bietet:

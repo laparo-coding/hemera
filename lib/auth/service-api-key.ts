@@ -7,16 +7,73 @@
  *
  * Security:
  * - Der Key wird über die Env-Variable `HEMERA_SERVICE_API_KEY` konfiguriert
+ * - Mehrere aktive Keys können für einfache Rotation comma-separated gesetzt werden
  * - Timing-sichere Vergleiche über `crypto.timingSafeEqual`
  * - Der zugehörige Service-User-ID wird über `HEMERA_SERVICE_USER_ID` aufgelöst
  */
 
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { timingSafeEqual } from 'node:crypto';
 import type { UserRole } from './permissions';
 
 export interface ServiceApiKeyResult {
   userId: string;
   role: UserRole;
+}
+
+let hasLoggedDiscardedApiKeysWarning = false;
+let hasLoggedEmptyApiKeysWarning = false;
+
+function logApiKeyConfigurationWarning(
+  message: string,
+  context: { configValue: string; rejectedEntries: string[] }
+): void {
+  // biome-ignore lint/suspicious/noConsole: One-time configuration diagnostics for service API keys
+  console.warn(`[service-api-key] ${message}`, context);
+}
+
+function parseConfiguredApiKeys(configValue: string | undefined): string[] {
+  if (!configValue) {
+    return [];
+  }
+
+  const parsedValues = configValue.split(',').map(value => value.trim());
+  const rejectedEntries = parsedValues.filter(value => value.length < 32);
+  const validEntries = parsedValues.filter(value => value.length >= 32);
+
+  if (rejectedEntries.length > 0 && !hasLoggedDiscardedApiKeysWarning) {
+    hasLoggedDiscardedApiKeysWarning = true;
+    logApiKeyConfigurationWarning(
+      'Discarded malformed/short service API key entries.',
+      {
+        configValue,
+        rejectedEntries,
+      }
+    );
+  }
+
+  if (validEntries.length === 0 && !hasLoggedEmptyApiKeysWarning) {
+    hasLoggedEmptyApiKeysWarning = true;
+    logApiKeyConfigurationWarning(
+      'No valid service API keys remain after parsing configuration.',
+      {
+        configValue,
+        rejectedEntries,
+      }
+    );
+  }
+
+  return validEntries;
+}
+
+function constantTimeEquals(candidate: string, expected: string): boolean {
+  const candidateBuffer = Buffer.from(candidate);
+  const expectedBuffer = Buffer.from(expected);
+
+  if (candidateBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(candidateBuffer, expectedBuffer);
 }
 
 /**
@@ -28,23 +85,20 @@ export function validateServiceApiKey(
 ): ServiceApiKeyResult | null {
   if (!apiKey || apiKey.length < 32 || apiKey.length > 256) return null;
 
-  const expectedKey = process.env.HEMERA_SERVICE_API_KEY;
+  const expectedKeys = parseConfiguredApiKeys(
+    process.env.HEMERA_SERVICE_API_KEY
+  );
   const serviceUserId = process.env.HEMERA_SERVICE_USER_ID;
 
-  if (!expectedKey || !serviceUserId) {
+  if (expectedKeys.length === 0 || !serviceUserId) {
     return null;
   }
 
-  // Timing-sichere Prüfung: beide Keys werden gehasht und dann verglichen,
-  // um Timing-Angriffe + Length-Leaks zu vermeiden
-  const hashA = createHmac('sha256', 'hemera-service-api')
-    .update(apiKey)
-    .digest();
-  const hashB = createHmac('sha256', 'hemera-service-api')
-    .update(expectedKey)
-    .digest();
+  const isValid = expectedKeys.some(expectedKey =>
+    constantTimeEquals(apiKey, expectedKey)
+  );
 
-  if (!timingSafeEqual(hashA, hashB)) {
+  if (!isValid) {
     return null;
   }
 

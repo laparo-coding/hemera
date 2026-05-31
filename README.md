@@ -104,6 +104,10 @@ Failure to monitor constitutes a process violation per the constitution
   `.env.local`:
   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY`
   - `CLERK_SECRET_KEY=YOUR_SECRET_KEY`
+- Service API integrations use `HEMERA_SERVICE_API_KEY` plus `HEMERA_SERVICE_USER_ID`.
+  `HEMERA_SERVICE_API_KEY` accepts either one active key or a comma-separated list for short-lived
+  key rotation.
+  Example: `HEMERA_SERVICE_API_KEY=old_key_32_chars_min,new_key_32_chars_min`
 
   Do not commit real keys. `.gitignore` already excludes `.env*` files.
 

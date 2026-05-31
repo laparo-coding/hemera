@@ -24,6 +24,15 @@ describe('Rollbar SDK Initialization', () => {
 
   describe('Token Validation', () => {
     it('should prefer the newest suffixed server token from Vercel integration', async () => {
+      for (const key of Object.keys(process.env)) {
+        if (
+          key.startsWith('ROLLBAR_HEMERA_SERVER_TOKEN') ||
+          key.startsWith('ROLLBAR_SERVER_TOKEN')
+        ) {
+          delete process.env[key];
+        }
+      }
+
       process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1769716944 =
         'older-invalid-token';
       process.env.ROLLBAR_HEMERA_SERVER_TOKEN_1769717269 =
@@ -92,6 +101,34 @@ describe('Rollbar SDK Initialization', () => {
   });
 
   describe('Environment-based Disabling', () => {
+    it('should prefer ROLLBAR_SERVER_ROOT when configured', async () => {
+      process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
+        'valid-token-with-sufficient-length-12345';
+      process.env.ROLLBAR_SERVER_ROOT = './custom-rollbar-root';
+      // @ts-expect-error - Mutating NODE_ENV for test purposes
+      process.env.NODE_ENV = 'production';
+
+      const { rollbarConfig } = await import(
+        '@/lib/monitoring/rollbar-official'
+      );
+
+      expect(rollbarConfig.root).toBe('./custom-rollbar-root');
+    });
+
+    it('should fall back to process.cwd() when ROLLBAR_SERVER_ROOT is unset', async () => {
+      process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
+        'valid-token-with-sufficient-length-12345';
+      delete process.env.ROLLBAR_SERVER_ROOT;
+      // @ts-expect-error - Mutating NODE_ENV for test purposes
+      process.env.NODE_ENV = 'production';
+
+      const { rollbarConfig } = await import(
+        '@/lib/monitoring/rollbar-official'
+      );
+
+      expect(rollbarConfig.root).toBe(process.cwd());
+    });
+
     it('should disable Rollbar in test mode', async () => {
       process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
         'valid-token-with-sufficient-length-12345';

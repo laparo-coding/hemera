@@ -38,7 +38,7 @@ Playwright keinen zweiten Webserver:
 PLAYWRIGHT_BASE_URL=http://localhost:3000 npx playwright test tests/e2e/dashboard.spec.ts --project=public
 ```
 
-Fuer lokale Admin- und Material-Slices mit realen Datensaetzen gibt es einen additiven Seed, der
+Für lokale Admin- und Material-Slices mit realen Datensaetzen gibt es einen additiven Seed, der
 bestehende lokale Daten nicht loescht. Er legt die fuer die aktuellen authentifizierten User- und
 Admin-Szenarien benoetigten Kurse und Seminarmaterialien per Upsert an:
 
