@@ -21,6 +21,20 @@ const clerkMw = clerkMiddleware(async (auth, request) => {
   }
 });
 
+function extractBearerToken(authorizationHeader: string | null): string | null {
+  if (!authorizationHeader) {
+    return null;
+  }
+
+  const match = authorizationHeader.match(/^Bearer\s+(.+)$/i);
+  if (!match) {
+    return null;
+  }
+
+  const token = match[1]?.trim();
+  return token ? token : null;
+}
+
 function logClerkKeyMismatch(reason: string, request: NextRequest): void {
   serverInstance.error('[auth] Clerk proxy bypass due to key mismatch', {
     pathname: request.nextUrl.pathname,
@@ -68,8 +82,10 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
       return NextResponse.next();
     }
 
-    // Fail fast if request has no auth header and no cookies at all
-    const hasAuthHeader = !!request.headers.get('authorization');
+    // Fail fast if request has no usable auth material at all.
+    const authorizationHeader = request.headers.get('authorization');
+    const bearerToken = extractBearerToken(authorizationHeader);
+    const hasAuthHeader = !!bearerToken;
     const cookieValue = request.headers.get('cookie');
     const hasCookie = !!cookieValue && cookieValue.trim().length > 0;
     if (!hasAuthHeader && !hasCookie) {

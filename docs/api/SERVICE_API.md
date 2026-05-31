@@ -14,6 +14,27 @@ Alle Service-API-Endpunkte erfordern einen gültigen Clerk Session Token im `Aut
 Authorization: Bearer <clerk-session-jwt>
 ```
 
+### API key authentication for service-to-service access
+
+Service clients can also authenticate with the `X-API-Key` header for `/api/service/*` endpoints:
+
+```http
+X-API-Key: <service-api-key>
+```
+
+Configuration:
+
+- `HEMERA_SERVICE_API_KEY` contains the active service API key.
+- `HEMERA_SERVICE_USER_ID` resolves the request to the internal service user.
+- For simple rotation, `HEMERA_SERVICE_API_KEY` may temporarily contain multiple comma-separated
+  keys. Keep the overlap window short, then remove the old key.
+
+Example rotation value:
+
+```bash
+HEMERA_SERVICE_API_KEY=old_key_32_chars_min,new_key_32_chars_min
+```
+
 ### Erforderliche Rolle
 
 Der authentifizierte User muss eine der folgenden Rollen haben:

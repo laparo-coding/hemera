@@ -173,7 +173,18 @@ function readNumberEnv(name: string, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function resolveServerRoot(): string | undefined {
+  const configuredRoot = process.env.ROLLBAR_SERVER_ROOT?.trim();
+  if (configuredRoot) {
+    return configuredRoot;
+  }
+
+  const currentWorkingDirectory = process.cwd().trim();
+  return currentWorkingDirectory || undefined;
+}
+
 const rollbarEnabled = shouldEnableRollbar();
+const rollbarServerRoot = resolveServerRoot();
 
 // In test mode, we re-check enabled status at runtime to handle env changes between tests
 // This allows validation tests (that delete tokens) to work while sampling tests can still run
@@ -184,6 +195,7 @@ const baseConfig = {
   captureUnhandledRejections: true,
   environment: getRollbarEnvironment(),
   enabled: effectiveEnabled,
+  root: rollbarServerRoot,
   // Sampling defaults: 100% errors, ~5% non-errors (overridable)
   // Rollbar's server SDK supports 'reportLevel' and custom filtering via payload handlers,
   // we emulate simple sampling by filtering in our helpers (see below).

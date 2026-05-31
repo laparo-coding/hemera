@@ -1,5 +1,8 @@
 # Rollbar-Dashboard Setup für Hemera-Projekt
 
+Für die verifizierten lokalen Token-Namen und Minimalchecks siehe auch
+`docs/monitoring/rollbar-local-checklist.md`.
+
 ## Monitoring-Konfiguration
 
 ### 1. Dashboard-Übersicht
