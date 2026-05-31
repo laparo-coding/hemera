@@ -1,17 +1,12 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { AuthHelper } from './auth-helper';
+import {
+  TEST_LOCATION,
+  cleanupTestLocations,
+  createTestLocation,
+} from './locations-test-utils';
 
 const skipInCI = !!process.env.CI || process.env.E2E_TEST === '1';
-
-const TEST_LOCATION = {
-  name: '[E2E-TEST] Yoga Studio Wien',
-  address: 'Mariahilfer Straße 100',
-  city: 'Wien',
-  zipCode: '1070',
-  email: 'test@yoga-studio.at',
-  phone: '+43 1 1234567',
-  website: 'https://yoga-studio.at',
-};
 
 test.describe('Admin Location Management E2E', () => {
   test.skip(() => skipInCI, 'Requires Clerk authentication - skipped in CI');
@@ -23,8 +18,8 @@ test.describe('Admin Location Management E2E', () => {
     await authHelper.prepareCleanAuthState();
   });
 
-  test.afterEach(async ({ request }) => {
-    await cleanupTestLocations(request);
+  test.afterEach(async ({ page }) => {
+    await cleanupTestLocations(page);
   });
 
   test.describe('Location creation', () => {
@@ -94,9 +89,8 @@ test.describe('Admin Location Management E2E', () => {
 
     test('should show disabled delete button when location has courses', async ({
       page,
-      request,
     }) => {
-      const createResponse = await request.post('/api/locations', {
+      const createResponse = await page.request.post('/api/locations', {
         data: TEST_LOCATION,
         headers: {
           'Content-Type': 'application/json',
@@ -114,20 +108,14 @@ test.describe('Admin Location Management E2E', () => {
         const deleteButton = locationRow.getByRole('button', {
           name: /löschen/i,
         });
-        await expect(deleteButton).toBeDefined();
+        await expect(deleteButton).toBeVisible();
       }
     });
 
     test('should show confirmation dialog before deleting', async ({
       page,
-      request,
     }) => {
-      await request.post('/api/locations', {
-        data: TEST_LOCATION,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      await createTestLocation(page);
 
       await page.goto('/admin/locations');
 
@@ -152,18 +140,12 @@ test.describe('Admin Location Management E2E', () => {
   });
 
   test.describe('Location edit', () => {
-    test.beforeEach(async ({ request }) => {
-      await request.post('/api/locations', {
-        data: TEST_LOCATION,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
+    test.beforeEach(async ({ page }) => {
       await authHelper.signIn(
         'e2e.admin@example.com',
         'E2ETestPassword2024!SecureForTesting'
       );
+      await createTestLocation(page);
     });
 
     test('should navigate to edit page and update location', async ({
@@ -195,27 +177,3 @@ test.describe('Admin Location Management E2E', () => {
     });
   });
 });
-
-async function cleanupTestLocations(request: {
-  get: (url: string) => Promise<{
-    ok: () => boolean;
-    json: () => Promise<{ locations?: Array<{ id: string; name: string }> }>;
-  }>;
-  delete: (url: string) => Promise<unknown>;
-}) {
-  try {
-    const response = await request.get('/api/locations');
-    if (response.ok()) {
-      const data = await response.json();
-      const testLocations = data.locations?.filter(location =>
-        location.name.includes('[E2E-TEST]')
-      );
-
-      for (const location of testLocations || []) {
-        await request.delete(`/api/locations/${location.id}`);
-      }
-    }
-  } catch {
-    // Ignore cleanup errors in tests.
-  }
-}
