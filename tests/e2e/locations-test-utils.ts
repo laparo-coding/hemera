@@ -1,4 +1,5 @@
 import type { Page } from '@playwright/test';
+import { locationListResponseSchema } from '../../lib/schemas/location-schema';
 
 export const TEST_LOCATION = {
   name: '[E2E-TEST] Yoga Studio Wien',
@@ -21,7 +22,9 @@ export async function createTestLocation(page: Page): Promise<void> {
   });
 
   if (!response.ok()) {
-    throw new Error('Failed to create test location');
+    throw new Error(
+      `Failed to create test location: ${response.status()} ${await response.text()}`
+    );
   }
 }
 
@@ -29,8 +32,12 @@ export async function cleanupTestLocations(page: Page): Promise<void> {
   try {
     const response = await page.request.get('/api/locations');
     if (response.ok()) {
-      const data = await response.json();
-      const testLocations = data.locations?.filter((location: { name: string }) =>
+      const parsed = locationListResponseSchema.safeParse(await response.json());
+      if (!parsed.success) {
+        return;
+      }
+
+      const testLocations = parsed.data.locations.filter(location =>
         location.name.includes('[E2E-TEST]')
       );
 
