@@ -182,9 +182,10 @@ describe('Rollbar SDK Initialization', () => {
       process.env.NODE_ENV = 'development';
 
       const mod = await import('@/lib/monitoring/rollbar-official');
+      const clientMod = await import('@/lib/monitoring/rollbar-client-config');
 
       expect(mod.rollbarConfig.enabled).toBe(false);
-      expect(mod.clientConfig.enabled).toBe(false);
+      expect(clientMod.clientConfig.enabled).toBe(false);
     });
 
     it('should enable development when explicitly opted in', async () => {
@@ -208,7 +209,7 @@ describe('Rollbar SDK Initialization', () => {
       process.env.NODE_ENV = 'production';
 
       const { clientConfig } = await import(
-        '@/lib/monitoring/rollbar-official'
+        '@/lib/monitoring/rollbar-client-config'
       );
 
       expect(clientConfig.accessToken).toBeUndefined();
@@ -225,7 +226,7 @@ describe('Rollbar SDK Initialization', () => {
       process.env.NODE_ENV = 'production';
 
       const { clientConfig } = await import(
-        '@/lib/monitoring/rollbar-official'
+        '@/lib/monitoring/rollbar-client-config'
       );
 
       expect(clientConfig.accessToken).toBe(validToken);

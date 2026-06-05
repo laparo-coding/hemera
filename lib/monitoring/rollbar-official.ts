@@ -8,7 +8,11 @@
  * 3. Valid access token is present (prevents accidental initialization)
  *
  * This prevents secret misuse and unexpected network calls in serverless/edge contexts.
+ *
+ * NOTE: This module is server-only. Client-side config is in rollbar-client-config.ts
  */
+
+import 'server-only';
 
 import Rollbar from 'rollbar';
 import { findEnvByPrefix } from '@/lib/utils/env-prefix';
@@ -46,6 +50,25 @@ const isExplicitlyDisabled =
 const isExplicitlyEnabled =
   process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '1' ||
   process.env.ROLLBAR_ENABLED === '1';
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+/**
+ * Browser/bundler-safe check for absolute paths.
+ * Handles Unix paths (/...), Windows drive letters (C:/...), and UNC paths (\\... or //).
+ */
+function isAbsolutePath(p: string): boolean {
+  if (!p || p.length === 0) return false;
+  // Windows UNC path (\\server\share or //server/share)
+  if (p.startsWith('\\\\') || p.startsWith('//')) return true;
+  // Windows absolute drive path (C:\ or C:/)
+  if (/^[a-zA-Z]:[\\/]/.test(p)) return true;
+  // Unix absolute path
+  if (p.startsWith('/')) return true;
+  return false;
+}
 
 /** Minimum length for Rollbar tokens to be considered valid */
 const MIN_TOKEN_LENGTH = 20;
@@ -175,12 +198,31 @@ function readNumberEnv(name: string, fallback: number): number {
 
 function resolveServerRoot(): string | undefined {
   const configuredRoot = process.env.ROLLBAR_SERVER_ROOT?.trim();
-  if (configuredRoot) {
+  if (configuredRoot && configuredRoot.length > 0) {
     return configuredRoot;
   }
 
-  const currentWorkingDirectory = process.cwd().trim();
-  return currentWorkingDirectory || undefined;
+  // Try process.cwd() first (available in Node.js; Edge Runtime may not have it)
+  try {
+    const cwdPath = process.cwd();
+    if (cwdPath && cwdPath.length > 0 && isAbsolutePath(cwdPath)) {
+      return cwdPath;
+    }
+  } catch {
+    // process.cwd() may not be available in Edge Runtime; fall through to PWD
+  }
+
+  // Fallback to PWD environment variable
+  const envWorkingDirectory = process.env.PWD?.trim();
+  if (
+    envWorkingDirectory &&
+    envWorkingDirectory.length > 0 &&
+    isAbsolutePath(envWorkingDirectory)
+  ) {
+    return envWorkingDirectory;
+  }
+
+  return undefined;
 }
 
 const rollbarEnabled = shouldEnableRollbar();
@@ -201,19 +243,8 @@ const baseConfig = {
   // we emulate simple sampling by filtering in our helpers (see below).
 };
 
-// Client-side configuration (for React components)
-// Uses Vercel-Rollbar integration token name
-// Only include token if validation passes
-export const clientConfig = {
-  accessToken: hasValidClientToken()
-    ? findEnvByPrefix(
-        'NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN',
-        'NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN'
-      )
-    : undefined,
-  ...baseConfig,
-  enabled: rollbarEnabled && hasValidClientToken(),
-};
+// Client-side configuration is now in rollbar-client-config.ts
+// This avoids bundling server-only code (like node:crypto) into client bundles
 
 // ============================================================================
 // Server-side Instance (Lazy Initialization)
@@ -327,11 +358,20 @@ export function createErrorContext(
   };
 }
 
-export function reportError(
+// Helper function to get secure random int from node:crypto
+// Server-only: This is safe because the parent module is marked 'server-only'
+async function getRandomIntFromCrypto(): Promise<
+  (min: number, max: number) => number
+> {
+  const crypto = await import('node:crypto');
+  return crypto.randomInt;
+}
+
+export async function reportError(
   error: Error | string,
   context?: ErrorContext,
   severity: ErrorSeverityType = ErrorSeverity.ERROR
-): void {
+): Promise<void> {
   // Never report in E2E mode to avoid polluting production telemetry
   if (isE2EMode) return;
 
@@ -344,15 +384,22 @@ export function reportError(
   if (!currentlyEnabled) return;
 
   try {
-    // Simple sampling: allow configuring rate per severity (0..1)
+    // Get randomInt function - uses crypto on server only
+    // Safe because this entire module is marked 'server-only'
+    const randomInt = await getRandomIntFromCrypto();
+
+    // Build sample rates from environment
     const rateAll = readNumberEnv('ROLLBAR_SAMPLE_RATE_ALL', 1);
     const rateInfo = readNumberEnv('ROLLBAR_SAMPLE_RATE_INFO', 0.05);
     const rateWarn = readNumberEnv('ROLLBAR_SAMPLE_RATE_WARN', 0.05);
     const rateError = readNumberEnv('ROLLBAR_SAMPLE_RATE_ERROR', 1);
     const rateCritical = readNumberEnv('ROLLBAR_SAMPLE_RATE_CRITICAL', 1);
 
+    // Sampling: rate-based with both rate and global rate thresholds
+    // Use crypto.randomInt for better randomness instead of Math.random()
+    const randomSample = randomInt(0, 10000) / 10000;
     const pick = (rate: number) =>
-      Math.random() < Math.max(0, Math.min(1, rate)) && Math.random() < rateAll;
+      randomSample < clamp01(rate) && randomSample < clamp01(rateAll);
 
     const includePII = isTelemetryConsentGranted();
 

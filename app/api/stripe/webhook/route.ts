@@ -8,6 +8,7 @@ import {
   reportError,
 } from '../../../../lib/monitoring/rollbar-official';
 import { STRIPE_API_VERSION } from '../../../../lib/stripe/config';
+import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
 
 // Skip Stripe initialization during build process
 const isBuildTime =
@@ -72,7 +73,7 @@ setInterval(
  * - Audit logging
  */
 export async function POST(request: NextRequest) {
-  const requestId = `webhook_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const requestId = getOrCreateRequestId(request);
   let eventId: string | undefined;
 
   try {

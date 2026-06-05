@@ -86,7 +86,7 @@ export const toggleBookmarkAction = withOptimisticUpdate(
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Toggle bookmark logic
+    // Toggle bookmark logic - 50% chance to be bookmarked
     const isBookmarked = Math.random() > 0.5;
 
     return { isBookmarked };
@@ -97,8 +97,8 @@ export const toggleBookmarkAction = withOptimisticUpdate(
 // Example 5: Server action with retry logic
 export const syncExternalDataAction = withRetry(
   async (_context: ServerActionContext) => {
-    // Simulate external API call that might fail
-    if (Math.random() > 0.7) {
+    // Simulate external API call that might fail (~30% failure rate)
+    if (Math.random() < 0.3) {
       throw new Error('External API temporarily unavailable');
     }
 

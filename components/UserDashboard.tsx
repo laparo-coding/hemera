@@ -17,7 +17,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { TERMS } from '@/lib/constants';
 import { colors } from '@/lib/design-tokens';
-import { ErrorSeverity, reportError } from '@/lib/monitoring/rollbar-official';
+import { logClientError } from '@/lib/errors/client';
 import { isPaymentStatus, type PaymentStatus } from '@/lib/types/booking';
 import { PARTICIPATION_STATUSES } from '@/lib/types/participation';
 import {
@@ -107,16 +107,11 @@ function logBookingsValidationError(
 
   if (!isRollbarDisabled) {
     try {
-      reportError(
-        new Error('Invalid bookings response'),
-        {
-          additionalData: {
-            source: 'UserDashboard.fetchBookings',
-            validationErrors: flattenedError,
-          },
-        },
-        ErrorSeverity.WARNING
-      );
+      // Use client-side error logger for client components
+      logClientError(new Error('Invalid bookings response'), {
+        source: 'UserDashboard.fetchBookings',
+        validationErrors: flattenedError,
+      });
     } catch {
       if (process.env.NODE_ENV !== 'production') {
         // biome-ignore lint/suspicious/noConsole: Development fallback when monitoring is unavailable

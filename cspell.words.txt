@@ -689,3 +689,10 @@ buchung
 nendobj
 Interaktionsprüfungen
 interactable
+Codacy
+codacy
+dangerouslysetinnerhtml
+ssrf
+trivy
+msgbox
+vascript

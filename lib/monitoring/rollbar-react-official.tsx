@@ -7,7 +7,7 @@
 
 import { Provider as RollbarProvider } from '@rollbar/react';
 import type React from 'react';
-import { clientConfig } from './rollbar-official';
+import { clientConfig } from './rollbar-client-config';
 
 interface RollbarProviderWrapperProps {
   children: React.ReactNode;

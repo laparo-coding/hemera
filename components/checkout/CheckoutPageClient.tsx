@@ -40,6 +40,13 @@ interface PaymentIntentData {
   bookingId: string;
 }
 
+interface BookingReviewResponse {
+  requiresReview: true;
+  bookingId: string;
+  message?: string;
+  missingPrerequisite?: 'BEGINNER' | 'INTERMEDIATE';
+}
+
 function CheckoutContent() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
@@ -58,7 +65,23 @@ function CheckoutContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  const [authLoadTimedOut, setAuthLoadTimedOut] = useState(false);
   const stripeEnabled = STRIPE_ENABLED;
+
+  useEffect(() => {
+    if (isLoaded) {
+      setAuthLoadTimedOut(false);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setAuthLoadTimedOut(true);
+    }, 8000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [isLoaded]);
 
   // Handle authentication redirect
   useEffect(() => {
@@ -91,6 +114,7 @@ function CheckoutContent() {
       try {
         setLoading(true);
         setError(null);
+        setErrorCode(null);
 
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
@@ -109,25 +133,81 @@ function CheckoutContent() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          if (errorData.errorCode) {
-            setErrorCode(errorData.errorCode);
+          const receivedErrorCode =
+            typeof errorData.errorCode === 'string'
+              ? errorData.errorCode
+              : null;
+
+          // Expected business states should not be treated as technical errors.
+          if (
+            receivedErrorCode === 'BOOKING_UNDER_REVIEW' ||
+            receivedErrorCode === 'DUPLICATE_BOOKING'
+          ) {
+            setErrorCode(receivedErrorCode);
+            setError(
+              typeof errorData.error === 'string' && errorData.error.length > 0
+                ? errorData.error
+                : receivedErrorCode === 'BOOKING_UNDER_REVIEW'
+                  ? 'Deine Buchung wird gerade geprüft. Bitte warte auf die Freigabe durch einen Administrator.'
+                  : 'Du hast diesen Kurs bereits gebucht.'
+            );
+            setCourse(null);
+            setPaymentIntent(null);
+            return;
+          }
+
+          if (receivedErrorCode) {
+            setErrorCode(receivedErrorCode);
           }
           throw new Error(
             errorData.error || `Fehler beim Laden: ${response.status}`
           );
         }
 
-        const data = await response.json();
+        const data = (await response.json()) as unknown;
+
+        // Check if response indicates booking requires review (PRE_BOOKED workflow)
+        if (
+          data &&
+          typeof data === 'object' &&
+          'requiresReview' in data &&
+          (data as Record<string, unknown>).requiresReview === true
+        ) {
+          const bookingReview = data as BookingReviewResponse;
+          setErrorCode('BOOKING_UNDER_REVIEW');
+          setError(
+            bookingReview.message ||
+              'Deine Buchung wurde zur Prüfung eingereicht. Du bekommst eine Rückmeldung nach der Freigabe.'
+          );
+          setCourse(null);
+          setPaymentIntent(null);
+          return;
+        }
+
+        const paymentData = data as Partial<PaymentIntentData>;
+        if (
+          !paymentData.clientSecret ||
+          !paymentData.paymentIntentId ||
+          typeof paymentData.amount !== 'number' ||
+          !Number.isFinite(paymentData.amount) ||
+          !paymentData.currency ||
+          !paymentData.courseName ||
+          !paymentData.bookingId
+        ) {
+          throw new Error(
+            'Checkout konnte nicht initialisiert werden. Bitte versuche es erneut.'
+          );
+        }
 
         setCourse({
           id: courseRef as string,
-          title: data.courseName,
+          title: paymentData.courseName,
           description: null,
-          price: data.amount,
-          currency: data.currency,
+          price: paymentData.amount,
+          currency: paymentData.currency,
         });
 
-        setPaymentIntent(data);
+        setPaymentIntent(paymentData as PaymentIntentData);
       } catch (err) {
         logClientError(err, { context: 'Payment intent creation' });
         let errorMessage = 'Fehler beim Laden des Zahlungsformulars';
@@ -181,6 +261,29 @@ function CheckoutContent() {
   };
 
   if (!isLoaded) {
+    if (authLoadTimedOut) {
+      return (
+        <Container maxWidth='md' sx={{ py: 4 }} data-testid='checkout-page'>
+          <Alert
+            severity='warning'
+            action={
+              <Button
+                component={Link}
+                href='/sign-in'
+                color='inherit'
+                size='small'
+              >
+                Anmelden
+              </Button>
+            }
+          >
+            Anmeldung konnte nicht geladen werden. Bitte lade die Seite neu oder
+            melde dich erneut an.
+          </Alert>
+        </Container>
+      );
+    }
+
     return (
       <Box
         display='flex'

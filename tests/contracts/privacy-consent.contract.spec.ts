@@ -28,7 +28,7 @@ describe('Contract: Privacy/Consent default OFF (no PII)', () => {
       };
     }
 
-    mod.reportError('Test Error', {
+    await mod.reportError('Test Error', {
       userId: 'user-123',
       userEmail: 'user@example.com',
       requestId: 'req-1',

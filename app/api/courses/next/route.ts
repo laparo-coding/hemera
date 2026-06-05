@@ -1,14 +1,15 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getNextUpcomingCourse } from '../../../../lib/api/courses';
 import { serverInstance } from '../../../../lib/monitoring/rollbar-official';
+import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
 
 /**
  * GET /api/courses/next
  * Returns the next upcoming course
  */
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   const startTime = Date.now();
-  const requestId = Math.random().toString(36).slice(2);
+  const requestId = getOrCreateRequestId(request);
 
   try {
     const course = await getNextUpcomingCourse();

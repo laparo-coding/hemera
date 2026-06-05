@@ -28,7 +28,7 @@ describe('Integration: Rollbar enabled/disabled behavior', () => {
     (mod.serverInstance as any).error = (msg: any, payload: any) =>
       calls.push([msg, payload]);
 
-    mod.reportError('Disabled Error', { requestId: 'r1' });
+    await mod.reportError('Disabled Error', { requestId: 'r1' });
     expect(calls.length).toBe(0);
   });
 
@@ -38,7 +38,7 @@ describe('Integration: Rollbar enabled/disabled behavior', () => {
     (mod.serverInstance as any).error = (msg: any, payload: any) =>
       calls.push([msg, payload]);
 
-    mod.reportError('Enabled Error', { requestId: 'r2' });
+    await mod.reportError('Enabled Error', { requestId: 'r2' });
     expect(calls.length).toBe(1);
     const [msg, payload] = calls[0];
     expect(msg).toBe('Enabled Error');

@@ -1,51 +1,202 @@
 /**
  * HTML Sanitization Utility
- * Removes potentially dangerous content from HTML to prevent XSS attacks
+ * Implements defense-in-depth HTML sanitization to prevent XSS attacks.
+ * Uses multiple complementary sanitization strategies:
+ * - Removal of dangerous tag types (script, iframe, style)
+ * - Removal of event handlers
+ * - Removal of dangerous protocols
+ * - Removal of suspicious attributes
  */
 
 /**
- * DOMPurify-like sanitization for server-side HTML content
- * Removes script tags, event handlers, and other dangerous attributes
+ * Sanitizes HTML content by removing dangerous tags, attributes, and protocols
+ * Implements defense-in-depth approach: removes multiple XSS attack vectors
  */
 export function sanitizeHtml(html: string): string {
   if (!html || typeof html !== 'string') {
     return '';
   }
 
-  // Remove <script> tags and their content
-  let sanitized = html.replace(
+  try {
+    // Clean HTML content through multiple sanitization passes
+    const cleaned = cleanHtmlContent(html);
+    return cleaned;
+  } catch {
+    // If processing fails, return empty string for safety
+    return '';
+  }
+}
+
+/**
+ * Cleans HTML content by removing disallowed tags and attributes
+ */
+function cleanHtmlContent(html: string): string {
+  let result = html;
+
+  // Remove script tags and content
+  result = result.replace(
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
     ''
   );
 
-  // Remove event handlers (onclick, onload, etc.)
-  sanitized = sanitized.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
+  // Remove iframe tags and content
+  result = result.replace(
+    /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
+    ''
+  );
 
-  // Remove javascript: protocol
-  sanitized = sanitized.replace(/javascript:/gi, '');
+  // Remove style tags and content (can contain expressions)
+  result = result.replace(
+    /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi,
+    ''
+  );
 
-  // Remove data: protocol (can be used for XSS)
-  sanitized = sanitized.replace(/data:text\/html/gi, '');
+  // Remove SVG script/style contents
+  result = result.replace(/<svg[^>]*>[\s\S]*?<\/svg>/gi, '');
 
-  // Remove dangerous HTML5 attributes
-  const dangerousAttrs = [
-    'onerror',
-    'onload',
-    'onclick',
-    'onmouseover',
-    'onmouseout',
-    'onchange',
-    'onsubmit',
-    'onkeydown',
-    'onkeyup',
-  ];
+  // Remove any event handler attributes (comprehensive)
+  result = removeEventHandlers(result);
 
-  dangerousAttrs.forEach(attr => {
-    const regex = new RegExp(`\\s${attr}\\s*=\\s*["'][^"']*["']`, 'gi');
-    sanitized = sanitized.replace(regex, '');
+  // Remove dangerous protocols
+  result = removeDangerousProtocols(result);
+
+  // Remove data attributes that could contain scripts
+  result = result.replace(/data-[a-z-]*=["'][^"']*["']/gi, '');
+
+  // Remove style tags with expressions
+  result = result.replace(
+    /style=["'][^"']*(?:expression|behavior)[^"']*["']/gi,
+    ''
+  );
+
+  return result;
+}
+
+/**
+ * Decodes HTML entities to check for obfuscated attacks
+ * Handles both semicolon-terminated and semicolon-free entities
+ * Includes named entities that can obfuscate dangerous protocols
+ */
+function decodeHtmlEntities(str: string): string {
+  const entityMap: Record<string, string> = {
+    '&#39;': "'",
+    '&quot;': '"',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&amp;': '&',
+    '&colon;': ':',
+    '&tab;': '\t',
+    '&newline;': '\n',
+    '&lpar;': '(',
+    '&rpar;': ')',
+    '&sol;': '/',
+  };
+
+  let result = str;
+  Object.entries(entityMap).forEach(([entity, char]) => {
+    // Use replaceAll to replace all occurrences safely without regex injection risk
+    result = result.replaceAll(entity, char);
   });
 
-  return sanitized;
+  // Decode numeric entities with semicolon (&#123; or &#xAB;)
+  result = result.replace(/&#(\d+);/g, (_match, code) => {
+    return String.fromCharCode(parseInt(code, 10));
+  });
+  result = result.replace(/&#x([0-9A-Fa-f]+);/g, (_match, code) => {
+    return String.fromCharCode(parseInt(code, 16));
+  });
+
+  // Decode numeric entities without semicolon (HTML5 style: &#123x or &#xABx where x is non-hex/non-digit)
+  // This handles cases like j&#X41vascript where &#X41 decodes to 'A'
+  result = result.replace(/&#(\d+)(?=[^0-9;]|$)/g, (_match, code) => {
+    return String.fromCharCode(parseInt(code, 10));
+  });
+  result = result.replace(
+    /&#[xX]([0-9A-Fa-f]+)(?=[^0-9A-Fa-f;]|$)/g,
+    (_match, code) => {
+      return String.fromCharCode(parseInt(code, 16));
+    }
+  );
+
+  // Normalize whitespace and control characters that could obfuscate protocols
+  // e.g., java\tscript: or java\nscript: become javascript:
+  result = result
+    .split('')
+    .map(char => {
+      const code = char.charCodeAt(0);
+      // Remove null bytes and control characters (0x00-0x20) and delete character (0x7f)
+      return code <= 0x20 || code === 0x7f ? '' : char;
+    })
+    .join('');
+
+  return result;
+}
+
+/**
+ * Removes all event handler attributes
+ */
+function removeEventHandlers(html: string): string {
+  let result = html;
+
+  // Remove all on* event handlers
+  result = result.replace(/\s+on[a-z]+\s*=\s*["'][^"']*["']/gi, '');
+
+  // Remove event handlers without quotes
+  result = result.replace(/\s+on[a-z]+\s*=\s*[^\s>]*/gi, '');
+
+  return result;
+}
+
+/**
+ * Removes dangerous protocols from href, src, action, and other attributes
+ */
+function removeDangerousProtocols(html: string): string {
+  let result = html;
+
+  // Helper function to check if a value contains dangerous protocols
+  const hasDangerousProtocol = (value: string): boolean => {
+    const decoded = decodeHtmlEntities(value);
+    return (
+      /javascript:/i.test(decoded) ||
+      /vbscript:/i.test(decoded) ||
+      /data:text\/html/i.test(decoded)
+    );
+  };
+
+  // Remove attributes with dangerous protocols (quoted values)
+  result = result.replace(
+    /((?:href|src|action|style)\s*=\s*)"([^"]*)"/gi,
+    (_match, _attr, value) => {
+      if (hasDangerousProtocol(value)) {
+        return ''; // Remove the entire attribute
+      }
+      return _match;
+    }
+  );
+
+  // Remove attributes with dangerous protocols (single-quoted values)
+  result = result.replace(
+    /((?:href|src|action|style)\s*=\s*)'([^']*)'/gi,
+    (_match, _attr, value) => {
+      if (hasDangerousProtocol(value)) {
+        return ''; // Remove the entire attribute
+      }
+      return _match;
+    }
+  );
+
+  // Remove attributes without quotes (unquoted attribute values)
+  result = result.replace(
+    /\s(?:href|src|action)\s*=\s*([^\s>]*)/gi,
+    (_match, value) => {
+      if (hasDangerousProtocol(value)) {
+        return ''; // Remove the entire attribute
+      }
+      return _match;
+    }
+  );
+
+  return result;
 }
 
 /**
@@ -68,8 +219,18 @@ export function validateHtmlContent(html: string): {
     errors.push('Script tags are not allowed');
   }
 
+  // Check for iframe tags
+  if (/<iframe\b/i.test(html)) {
+    errors.push('IFrame tags are not allowed');
+  }
+
+  // Check for style tags with expressions
+  if (/<style\b/i.test(html)) {
+    errors.push('Style tags are not allowed');
+  }
+
   // Check for event handlers
-  if (/\s+on\w+\s*=/i.test(html)) {
+  if (/\s+on[a-z]+\s*=/i.test(html)) {
     errors.push('Event handlers are not allowed');
   }
 
@@ -81,6 +242,16 @@ export function validateHtmlContent(html: string): {
   // Check for data:text/html (can execute scripts)
   if (/data:text\/html/i.test(html)) {
     errors.push('Data URI with HTML content is not allowed');
+  }
+
+  // Check for vbscript: protocol
+  if (/vbscript:/i.test(html)) {
+    errors.push('VBScript protocol is not allowed');
+  }
+
+  // Check for SVG with script tags
+  if (/<svg[^>]*>[\s\S]*?<script/i.test(html)) {
+    errors.push('SVG with script content is not allowed');
   }
 
   return {
