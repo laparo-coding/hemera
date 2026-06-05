@@ -2,16 +2,17 @@
  * Résumé Upload Utility
  *
  * Handles participant résumé PDF uploads to Vercel Blob storage
- * with validation, single-active file enforcement, and Rollbar error reporting.
+ * with validation, single-active file enforcement, and error handling.
  *
  * Rules:
  * - Only PDF files accepted (application/pdf)
  * - Max size: 5MB
  * - Only one active résumé per participation (replacing deactivates previous)
+ *
+ * Note: Error reporting to Rollbar is handled by client components using logClientError
  */
 
 import { del, put } from '@vercel/blob';
-import { serverInstance as rollbar } from '../monitoring/rollbar-official';
 import { sanitizeBlobUrlField } from './log-sanitizer';
 
 const MAX_RESUME_SIZE = 5 * 1024 * 1024; // 5MB per docs/development/mux-setup.md
@@ -96,15 +97,18 @@ export async function uploadResume(
     // Validate file
     const validation = validateResumeFile(file);
     if (!validation.valid) {
-      rollbar.warning('Résumé upload validation failed', {
-        participationId,
-        userId,
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        error: validation.error,
-        code: validation.code,
-      });
+      if (process.env.NODE_ENV === 'development') {
+        // biome-ignore lint/suspicious/noConsole: Development-only logging
+        console.warn('Résumé upload validation failed', {
+          participationId,
+          userId,
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+          error: validation.error,
+          code: validation.code,
+        });
+      }
 
       return {
         success: false,
@@ -127,14 +131,17 @@ export async function uploadResume(
       addRandomSuffix: false,
     });
 
-    rollbar.info('Résumé uploaded successfully', {
-      participationId,
-      userId,
-      fileName: file.name,
-      fileSize: file.size,
-      blobUrl: blob.url,
-      blobKey,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Development-only logging
+      console.info('Résumé uploaded successfully', {
+        participationId,
+        userId,
+        fileName: file.name,
+        fileSize: file.size,
+        blobUrl: blob.url,
+        blobKey,
+      });
+    }
 
     return {
       success: true,
@@ -148,14 +155,17 @@ export async function uploadResume(
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
 
-    rollbar.error('Failed to upload résumé', error as Error, {
-      participationId,
-      userId,
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-      errorMessage,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Development-only logging
+      console.error('Failed to upload résumé', error, {
+        participationId,
+        userId,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        errorMessage,
+      });
+    }
 
     return {
       success: false,
@@ -185,21 +195,27 @@ export async function deleteResume(
   try {
     await del(blobUrl);
 
-    rollbar.info('Résumé deleted successfully', {
-      ...blobIdentifier,
-      ...context,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Development-only logging
+      console.info('Résumé deleted successfully', {
+        ...blobIdentifier,
+        ...context,
+      });
+    }
 
     return { success: true };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
 
-    rollbar.error('Failed to delete résumé', error as Error, {
-      ...blobIdentifier,
-      errorMessage,
-      ...context,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Development-only logging
+      console.error('Failed to delete résumé', error, {
+        ...blobIdentifier,
+        errorMessage,
+        ...context,
+      });
+    }
 
     return {
       success: false,

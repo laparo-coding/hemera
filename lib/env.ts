@@ -55,28 +55,19 @@ function buildEnvFromProcess(): Record<string, unknown> {
 const parseResult = EnvSchema.safeParse(buildEnvFromProcess());
 
 if (!parseResult.success) {
-  // Fail fast with a clear error during startup — report via Rollbar if available.
-  // Use lazy dynamic import to avoid circular dependency (env.ts ← rollbar-official.ts ← env.ts).
+  // Fail fast with a clear error during startup
   try {
     // Log only the field names that failed validation, never the values themselves
     const fieldErrors = Object.keys(parseResult.error.format()).filter(
       k => k !== '_errors'
     );
-    // biome-ignore lint/suspicious/noConsole: intentional fallback when Rollbar is not yet available
+    // biome-ignore lint/suspicious/noConsole: intentional fallback for critical startup errors
     console.error(
       '[env] Environment validation failed for fields:',
       fieldErrors
     );
-    // Attempt async Rollbar report (non-blocking)
-    import('./monitoring/rollbar-official')
-      .then(({ reportError }) => {
-        reportError(new Error('Environment validation failed'), {
-          additionalData: { failedFields: fieldErrors },
-        });
-      })
-      .catch(() => {
-        /* Rollbar not available */
-      });
+    // Note: Rollbar error reporting for env validation failures is handled by
+    // instrumentation.ts during the register() hook on server startup
   } catch (_reportErr) {
     // Rollbar not available yet — already logged to stderr above
   }

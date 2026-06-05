@@ -8,7 +8,7 @@
 'use client';
 
 import Rollbar from 'rollbar';
-import { clientConfig } from '../monitoring/rollbar-official';
+import { clientConfig } from '../monitoring/rollbar-client-config';
 
 // Check if we're in test/E2E mode
 const isDisabled =

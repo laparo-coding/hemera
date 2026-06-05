@@ -6,10 +6,12 @@
  *
  * Note: For image processing with multiple variants, use
  * lib/utils/courseImageUpload.ts (server-only)
+ *
+ * Note: This utility is called from client components, so we don't include
+ * server-only Rollbar logging. Error handling uses client-side patterns instead.
  */
 
 import { put } from '@vercel/blob';
-import { serverInstance as rollbar } from '../monitoring/rollbar-official';
 import { sanitizeBlobUrlField } from './log-sanitizer';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -66,12 +68,16 @@ export async function uploadThumbnail(file: File): Promise<UploadResult> {
     const _errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
 
-    rollbar.error('Failed to upload thumbnail', error as Error, {
-      action: 'upload',
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-    });
+    // Error logging handled by client components using logClientError
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Development-only logging
+      console.error('Failed to upload thumbnail', {
+        error,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+      });
+    }
 
     return {
       success: false,
@@ -88,17 +94,24 @@ export async function deleteThumbnail(url: string): Promise<boolean> {
   const blobIdentifier = sanitizeBlobUrlField(url);
   try {
     // Vercel Blob delete API would go here
-    // For now, just log the deletion request
-    rollbar.info('Thumbnail deletion requested', {
-      action: 'delete',
-      ...blobIdentifier,
-    });
+    // For now, just log the deletion request locally
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Development-only logging
+      console.info('Thumbnail deletion requested', {
+        action: 'delete',
+        ...blobIdentifier,
+      });
+    }
     return true;
   } catch (error) {
-    rollbar.error('Failed to delete thumbnail', error as Error, {
-      action: 'delete',
-      ...blobIdentifier,
-    });
+    // Error logging handled by client components using logClientError
+    if (process.env.NODE_ENV === 'development') {
+      // biome-ignore lint/suspicious/noConsole: Development-only logging
+      console.error('Failed to delete thumbnail', error, {
+        action: 'delete',
+        ...blobIdentifier,
+      });
+    }
     return false;
   }
 }

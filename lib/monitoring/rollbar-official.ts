@@ -8,9 +8,12 @@
  * 3. Valid access token is present (prevents accidental initialization)
  *
  * This prevents secret misuse and unexpected network calls in serverless/edge contexts.
+ *
+ * NOTE: This module is server-only. Client-side config is in rollbar-client-config.ts
  */
 
-import { randomInt } from 'node:crypto';
+import 'server-only';
+
 import Rollbar from 'rollbar';
 import { findEnvByPrefix } from '@/lib/utils/env-prefix';
 import { isTelemetryConsentGranted } from './privacy';
@@ -240,19 +243,8 @@ const baseConfig = {
   // we emulate simple sampling by filtering in our helpers (see below).
 };
 
-// Client-side configuration (for React components)
-// Uses Vercel-Rollbar integration token name
-// Only include token if validation passes
-export const clientConfig = {
-  accessToken: hasValidClientToken()
-    ? findEnvByPrefix(
-        'NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN',
-        'NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN'
-      )
-    : undefined,
-  ...baseConfig,
-  enabled: rollbarEnabled && hasValidClientToken(),
-};
+// Client-side configuration is now in rollbar-client-config.ts
+// This avoids bundling server-only code (like node:crypto) into client bundles
 
 // ============================================================================
 // Server-side Instance (Lazy Initialization)
@@ -366,11 +358,20 @@ export function createErrorContext(
   };
 }
 
-export function reportError(
+// Helper function to get secure random int from node:crypto
+// Server-only: This is safe because the parent module is marked 'server-only'
+async function getRandomIntFromCrypto(): Promise<
+  (min: number, max: number) => number
+> {
+  const crypto = await import('node:crypto');
+  return crypto.randomInt;
+}
+
+export async function reportError(
   error: Error | string,
   context?: ErrorContext,
   severity: ErrorSeverityType = ErrorSeverity.ERROR
-): void {
+): Promise<void> {
   // Never report in E2E mode to avoid polluting production telemetry
   if (isE2EMode) return;
 
@@ -383,6 +384,10 @@ export function reportError(
   if (!currentlyEnabled) return;
 
   try {
+    // Get randomInt function - uses crypto on server only
+    // Safe because this entire module is marked 'server-only'
+    const randomInt = await getRandomIntFromCrypto();
+
     // Build sample rates from environment
     const rateAll = readNumberEnv('ROLLBAR_SAMPLE_RATE_ALL', 1);
     const rateInfo = readNumberEnv('ROLLBAR_SAMPLE_RATE_INFO', 0.05);
