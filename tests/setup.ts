@@ -19,6 +19,9 @@ declare global {
 
 globalThis.jest = vi;
 
+// Mock server-only module to prevent errors in test environment
+vi.mock('server-only', () => ({}));
+
 // Polyfill Web APIs for jsdom environment (required by testcontainers and other libraries)
 if (typeof globalThis.TextEncoder === 'undefined') {
   globalThis.TextEncoder = TextEncoder;
