@@ -8,6 +8,7 @@ import {
 } from '../../../../lib/services/booking';
 import { getCourseById } from '../../../../lib/services/course';
 import { createCheckoutSession } from '../../../../lib/services/stripe';
+import { getOrCreateRequestId } from '../../../../lib/utils/request-id';
 
 /**
  * Request validation schema for Stripe checkout
@@ -59,7 +60,7 @@ function checkRateLimit(userId: string): boolean {
  * - Structured logging
  */
 export async function POST(req: NextRequest) {
-  const requestId = Math.random().toString(36).substring(7);
+  const requestId = getOrCreateRequestId(req);
   let userId: string | null = null;
 
   try {

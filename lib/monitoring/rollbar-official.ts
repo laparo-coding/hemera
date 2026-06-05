@@ -10,6 +10,7 @@
  * This prevents secret misuse and unexpected network calls in serverless/edge contexts.
  */
 
+import path from 'path';
 import Rollbar from 'rollbar';
 import { findEnvByPrefix } from '@/lib/utils/env-prefix';
 import { isTelemetryConsentGranted } from './privacy';
@@ -46,6 +47,20 @@ const isExplicitlyDisabled =
 const isExplicitlyEnabled =
   process.env.NEXT_PUBLIC_ROLLBAR_ENABLED === '1' ||
   process.env.ROLLBAR_ENABLED === '1';
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function hashToUnitInterval(input: string): number {
+  // FNV-1a 32-bit hash, normalized to [0, 1)
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0) / 0x100000000;
+}
 
 /** Minimum length for Rollbar tokens to be considered valid */
 const MIN_TOKEN_LENGTH = 20;
@@ -175,12 +190,31 @@ function readNumberEnv(name: string, fallback: number): number {
 
 function resolveServerRoot(): string | undefined {
   const configuredRoot = process.env.ROLLBAR_SERVER_ROOT?.trim();
-  if (configuredRoot) {
+  if (configuredRoot && configuredRoot.length > 0) {
     return configuredRoot;
   }
 
-  const currentWorkingDirectory = process.cwd().trim();
-  return currentWorkingDirectory || undefined;
+  // Try process.cwd() first (available in Node.js; Edge Runtime may not have it)
+  try {
+    const cwdPath = process.cwd();
+    if (cwdPath && cwdPath.length > 0 && path.isAbsolute(cwdPath)) {
+      return cwdPath;
+    }
+  } catch {
+    // process.cwd() may not be available in Edge Runtime; fall through to PWD
+  }
+
+  // Fallback to PWD environment variable
+  const envWorkingDirectory = process.env.PWD?.trim();
+  if (
+    envWorkingDirectory &&
+    envWorkingDirectory.length > 0 &&
+    path.isAbsolute(envWorkingDirectory)
+  ) {
+    return envWorkingDirectory;
+  }
+
+  return undefined;
 }
 
 const rollbarEnabled = shouldEnableRollbar();
@@ -351,8 +385,19 @@ export function reportError(
     const rateError = readNumberEnv('ROLLBAR_SAMPLE_RATE_ERROR', 1);
     const rateCritical = readNumberEnv('ROLLBAR_SAMPLE_RATE_CRITICAL', 1);
 
+    // Build sampling key without timestamp to ensure deterministic sampling
+    // (timestamp changes on every call, breaking hash stability; kept in rollbarContext for logging)
+    const samplingKey = [
+      severity,
+      typeof error === 'string' ? error : error.message,
+      context?.requestId || 'no-request-id',
+      context?.route || 'no-route',
+    ].join('|');
+
+    // Deterministic sampling keeps behavior stable without Math.random usage.
     const pick = (rate: number) =>
-      Math.random() < Math.max(0, Math.min(1, rate)) && Math.random() < rateAll;
+      hashToUnitInterval(`${samplingKey}|rate`) < clamp01(rate) &&
+      hashToUnitInterval(`${samplingKey}|all`) < clamp01(rateAll);
 
     const includePII = isTelemetryConsentGranted();
 

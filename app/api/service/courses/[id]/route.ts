@@ -146,6 +146,7 @@ export async function GET(
     // Transform response — includes both `participants` (for aither) and
     // `participations` (legacy consumers) to avoid breaking changes.
     const participants = course.bookings.map(booking => ({
+      bookingId: booking.id,
       participationId: booking.participation?.id ?? null,
       userId: booking.userId,
       name: booking.user?.name ?? null,
@@ -167,6 +168,7 @@ export async function GET(
       participants,
       participations: course.bookings.map(booking => ({
         id: booking.participation?.id ?? null,
+        bookingId: booking.id,
         userId: booking.userId,
         status: booking.participation?.status ?? null,
         createdAt: booking.createdAt.toISOString(),

@@ -10,6 +10,8 @@ interface GlobalWithCrypto {
   };
 }
 
+let fallbackByteSeed = 0;
+
 /**
  * Generate a unique request ID (RFC4122 v4 UUID preferred)
  */
@@ -26,7 +28,8 @@ export function generateRequestId(): string {
   } catch (_) {
     // fall through to fallback
   }
-  // Fallback: RFC4122 v4-ish using crypto.getRandomValues if available, else Math.random (last resort)
+  // Fallback: RFC4122 v4-ish using crypto.getRandomValues if available.
+  // If no crypto API exists, use a deterministic time/counter seed.
   const getBytes = (): Uint8Array => {
     if (
       typeof globalThis !== 'undefined' &&
@@ -39,7 +42,12 @@ export function generateRequestId(): string {
       return buf;
     }
     const buf = new Uint8Array(16);
-    for (let i = 0; i < 16; i++) buf[i] = (Math.random() * 256) & 0xff; // non-crypto fallback
+    fallbackByteSeed += 1;
+    const base = Date.now() ^ fallbackByteSeed;
+    for (let i = 0; i < 16; i++) {
+      const shift = (i % 8) * 4;
+      buf[i] = ((base >> shift) + i * 31 + fallbackByteSeed) & 0xff;
+    }
     return buf;
   };
   const b = getBytes();
