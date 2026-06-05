@@ -179,7 +179,7 @@ function CheckoutContent() {
           !paymentData.clientSecret ||
           !paymentData.paymentIntentId ||
           typeof paymentData.amount !== 'number' ||
-          !isFinite(paymentData.amount) ||
+          !Number.isFinite(paymentData.amount) ||
           !paymentData.currency ||
           !paymentData.courseName ||
           !paymentData.bookingId
