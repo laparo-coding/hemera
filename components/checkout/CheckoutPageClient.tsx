@@ -78,7 +78,9 @@ function CheckoutContent() {
       setAuthLoadTimedOut(true);
     }, 8000);
 
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [isLoaded]);
 
   // Handle authentication redirect
