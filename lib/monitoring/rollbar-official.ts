@@ -52,16 +52,6 @@ function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
 }
 
-function hashToUnitInterval(input: string): number {
-  // FNV-1a 32-bit hash, normalized to [0, 1)
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < input.length; i++) {
-    hash ^= input.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0) / 0x100000000;
-}
-
 /** Minimum length for Rollbar tokens to be considered valid */
 const MIN_TOKEN_LENGTH = 20;
 
@@ -378,26 +368,16 @@ export function reportError(
   if (!currentlyEnabled) return;
 
   try {
-    // Simple sampling: allow configuring rate per severity (0..1)
+    // Build sample rates from environment
     const rateAll = readNumberEnv('ROLLBAR_SAMPLE_RATE_ALL', 1);
     const rateInfo = readNumberEnv('ROLLBAR_SAMPLE_RATE_INFO', 0.05);
     const rateWarn = readNumberEnv('ROLLBAR_SAMPLE_RATE_WARN', 0.05);
     const rateError = readNumberEnv('ROLLBAR_SAMPLE_RATE_ERROR', 1);
     const rateCritical = readNumberEnv('ROLLBAR_SAMPLE_RATE_CRITICAL', 1);
 
-    // Build sampling key without timestamp to ensure deterministic sampling
-    // (timestamp changes on every call, breaking hash stability; kept in rollbarContext for logging)
-    const samplingKey = [
-      severity,
-      typeof error === 'string' ? error : error.message,
-      context?.requestId || 'no-request-id',
-      context?.route || 'no-route',
-    ].join('|');
-
-    // Deterministic sampling keeps behavior stable without Math.random usage.
+    // Sampling: rate-based with both rate and global rate thresholds
     const pick = (rate: number) =>
-      hashToUnitInterval(`${samplingKey}|rate`) < clamp01(rate) &&
-      hashToUnitInterval(`${samplingKey}|all`) < clamp01(rateAll);
+      Math.random() < clamp01(rate) && Math.random() < clamp01(rateAll);
 
     const includePII = isTelemetryConsentGranted();
 
