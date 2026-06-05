@@ -166,7 +166,10 @@ function CheckoutContent() {
 
         const data = await response.json();
 
-        if ((data as BookingReviewResponse).requiresReview) {
+        if (
+          'requiresReview' in data &&
+          (data as BookingReviewResponse).requiresReview
+        ) {
           setErrorCode('BOOKING_UNDER_REVIEW');
           setError(
             (data as BookingReviewResponse).message ||
