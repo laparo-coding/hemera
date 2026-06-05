@@ -17,7 +17,6 @@ import {
   withServerActionErrorHandling,
   withTransaction,
 } from '../middleware/server-action-error-handling';
-import { generateRandomSuffix } from '../utils/random-id';
 
 // Example 1: Basic server action with error handling
 export const createCourseAction = withServerActionErrorHandling(
