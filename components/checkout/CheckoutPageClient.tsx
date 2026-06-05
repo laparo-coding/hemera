@@ -166,13 +166,11 @@ function CheckoutContent() {
 
         const data = await response.json();
 
-        if (
-          'requiresReview' in data &&
-          (data as BookingReviewResponse).requiresReview
-        ) {
+        if ((data as any)?.requiresReview === true) {
+          const bookingReview = data as BookingReviewResponse;
           setErrorCode('BOOKING_UNDER_REVIEW');
           setError(
-            (data as BookingReviewResponse).message ||
+            bookingReview.message ||
               'Deine Buchung wurde zur Prüfung eingereicht. Du bekommst eine Rückmeldung nach der Freigabe.'
           );
           setCourse(null);
