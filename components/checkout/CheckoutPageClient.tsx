@@ -178,7 +178,8 @@ function CheckoutContent() {
         if (
           !paymentData.clientSecret ||
           !paymentData.paymentIntentId ||
-          !paymentData.amount ||
+          typeof paymentData.amount !== 'number' ||
+          !isFinite(paymentData.amount) ||
           !paymentData.currency ||
           !paymentData.courseName ||
           !paymentData.bookingId

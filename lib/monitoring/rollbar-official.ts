@@ -10,7 +10,6 @@
  * This prevents secret misuse and unexpected network calls in serverless/edge contexts.
  */
 
-import path from 'path';
 import Rollbar from 'rollbar';
 import { findEnvByPrefix } from '@/lib/utils/env-prefix';
 import { isTelemetryConsentGranted } from './privacy';
@@ -50,6 +49,21 @@ const isExplicitlyEnabled =
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
+}
+
+/**
+ * Browser/bundler-safe check for absolute paths.
+ * Handles Unix paths (/...), Windows drive letters (C:/...), and UNC paths (//...).
+ */
+function isAbsolutePath(p: string): boolean {
+  if (!p || p.length === 0) return false;
+  // Unix absolute path
+  if (p.startsWith('/')) return true;
+  // Windows drive letter (C:, D:, etc.)
+  if (p.length >= 2 && /^[a-zA-Z]:/.test(p)) return true;
+  // UNC path (//server/share)
+  if (p.startsWith('//')) return true;
+  return false;
 }
 
 /** Minimum length for Rollbar tokens to be considered valid */
@@ -187,7 +201,7 @@ function resolveServerRoot(): string | undefined {
   // Try process.cwd() first (available in Node.js; Edge Runtime may not have it)
   try {
     const cwdPath = process.cwd();
-    if (cwdPath && cwdPath.length > 0 && path.isAbsolute(cwdPath)) {
+    if (cwdPath && cwdPath.length > 0 && isAbsolutePath(cwdPath)) {
       return cwdPath;
     }
   } catch {
@@ -199,7 +213,7 @@ function resolveServerRoot(): string | undefined {
   if (
     envWorkingDirectory &&
     envWorkingDirectory.length > 0 &&
-    path.isAbsolute(envWorkingDirectory)
+    isAbsolutePath(envWorkingDirectory)
   ) {
     return envWorkingDirectory;
   }
