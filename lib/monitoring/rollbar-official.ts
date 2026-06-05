@@ -10,6 +10,7 @@
  * This prevents secret misuse and unexpected network calls in serverless/edge contexts.
  */
 
+import { randomInt } from 'node:crypto';
 import Rollbar from 'rollbar';
 import { findEnvByPrefix } from '@/lib/utils/env-prefix';
 import { isTelemetryConsentGranted } from './privacy';
@@ -390,8 +391,10 @@ export function reportError(
     const rateCritical = readNumberEnv('ROLLBAR_SAMPLE_RATE_CRITICAL', 1);
 
     // Sampling: rate-based with both rate and global rate thresholds
+    // Use crypto.randomInt for better randomness instead of Math.random()
+    const randomSample = randomInt(0, 10000) / 10000;
     const pick = (rate: number) =>
-      Math.random() < clamp01(rate) && Math.random() < clamp01(rateAll);
+      randomSample < clamp01(rate) && randomSample < clamp01(rateAll);
 
     const includePII = isTelemetryConsentGranted();
 

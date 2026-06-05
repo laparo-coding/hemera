@@ -24,7 +24,17 @@ function mapLevelToIndicator(
   if (level === 'INTERMEDIATE') return 'B';
   if (level === 'ADVANCED') return 'C';
   // Fallback based on position (modulo ensures valid index)
-  return (['A', 'B', 'C'] as const)[index % 3]!;
+  switch (index % 3) {
+    case 0:
+      return 'A';
+    case 1:
+      return 'B';
+    case 2:
+      return 'C';
+    default:
+      // This should never happen due to modulo, but TypeScript needs it
+      return 'A';
+  }
 }
 
 export const metadata: Metadata = generateCourseListMetadata();
