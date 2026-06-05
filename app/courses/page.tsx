@@ -24,7 +24,7 @@ function mapLevelToIndicator(
   if (level === 'INTERMEDIATE') return 'B';
   if (level === 'ADVANCED') return 'C';
   // Fallback based on position
-  return (['A', 'B', 'C'] as const)[index % 3] || 'A';
+  return (['A', 'B', 'C'] as const)[index % 3];
 }
 
 export const metadata: Metadata = generateCourseListMetadata();
