@@ -164,9 +164,15 @@ function CheckoutContent() {
           );
         }
 
-        const data = await response.json();
+        const data = (await response.json()) as unknown;
 
-        if ((data as any)?.requiresReview === true) {
+        // Check if response indicates booking requires review (PRE_BOOKED workflow)
+        if (
+          data &&
+          typeof data === 'object' &&
+          'requiresReview' in data &&
+          (data as Record<string, unknown>).requiresReview === true
+        ) {
           const bookingReview = data as BookingReviewResponse;
           setErrorCode('BOOKING_UNDER_REVIEW');
           setError(
