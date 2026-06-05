@@ -114,6 +114,7 @@ function CheckoutContent() {
       try {
         setLoading(true);
         setError(null);
+        setErrorCode(null);
 
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout

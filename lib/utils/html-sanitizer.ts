@@ -75,6 +75,7 @@ function cleanHtmlContent(html: string): string {
 /**
  * Decodes HTML entities to check for obfuscated attacks
  * Handles both semicolon-terminated and semicolon-free entities
+ * Includes named entities that can obfuscate dangerous protocols
  */
 function decodeHtmlEntities(str: string): string {
   const entityMap: Record<string, string> = {
@@ -83,6 +84,12 @@ function decodeHtmlEntities(str: string): string {
     '&lt;': '<',
     '&gt;': '>',
     '&amp;': '&',
+    '&colon;': ':',
+    '&tab;': '\t',
+    '&newline;': '\n',
+    '&lpar;': '(',
+    '&rpar;': ')',
+    '&sol;': '/',
   };
 
   let result = str;
@@ -110,6 +117,17 @@ function decodeHtmlEntities(str: string): string {
       return String.fromCharCode(parseInt(code, 16));
     }
   );
+
+  // Normalize whitespace and control characters that could obfuscate protocols
+  // e.g., java\tscript: or java\nscript: become javascript:
+  result = result
+    .split('')
+    .map(char => {
+      const code = char.charCodeAt(0);
+      // Remove null bytes and control characters (0x00-0x20) and delete character (0x7f)
+      return code <= 0x20 || code === 0x7f ? '' : char;
+    })
+    .join('');
 
   return result;
 }

@@ -53,16 +53,16 @@ function clamp01(value: number): number {
 
 /**
  * Browser/bundler-safe check for absolute paths.
- * Handles Unix paths (/...), Windows drive letters (C:/...), and UNC paths (//...).
+ * Handles Unix paths (/...), Windows drive letters (C:/...), and UNC paths (\\... or //).
  */
 function isAbsolutePath(p: string): boolean {
   if (!p || p.length === 0) return false;
+  // Windows UNC path (\\server\share or //server/share)
+  if (p.startsWith('\\\\') || p.startsWith('//')) return true;
+  // Windows absolute drive path (C:\ or C:/)
+  if (/^[a-zA-Z]:[\\/]/.test(p)) return true;
   // Unix absolute path
   if (p.startsWith('/')) return true;
-  // Windows drive letter (C:, D:, etc.)
-  if (p.length >= 2 && /^[a-zA-Z]:/.test(p)) return true;
-  // UNC path (//server/share)
-  if (p.startsWith('//')) return true;
   return false;
 }
 
