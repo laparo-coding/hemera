@@ -87,7 +87,8 @@ function decodeHtmlEntities(str: string): string {
 
   let result = str;
   Object.entries(entityMap).forEach(([entity, char]) => {
-    result = result.replace(new RegExp(entity, 'g'), char);
+    // Use replaceAll to replace all occurrences safely without regex injection risk
+    result = result.replaceAll(entity, char);
   });
 
   // Decode numeric entities with semicolon (&#123; or &#xAB;)
