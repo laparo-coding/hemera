@@ -74,21 +74,18 @@ export default function proxy(request: NextRequest, event: NextFetchEvent) {
       return NextResponse.next();
     }
 
-    // API-Key-basierte M2M-Authentifizierung: wenn ein X-API-Key Header
-    // vorhanden ist, Clerk-Middleware überspringen und den Request direkt
-    // durchlassen. Die Validierung erfolgt im Route-Handler.
-    const hasApiKey = !!request.headers.get('x-api-key');
-    if (hasApiKey) {
-      return NextResponse.next();
-    }
-
     // Fail fast if request has no usable auth material at all.
+    // Requests mit X-API-Key werden weiterhin durch die Clerk-Middleware
+    // geleitet, damit der normale API-Route-Resolver auf allen Umgebungen
+    // konsistent greift. Die eigentliche API-Key-Validierung erfolgt erst
+    // im Route-Handler.
+    const hasApiKey = !!request.headers.get('x-api-key');
     const authorizationHeader = request.headers.get('authorization');
     const bearerToken = extractBearerToken(authorizationHeader);
     const hasAuthHeader = !!bearerToken;
     const cookieValue = request.headers.get('cookie');
     const hasCookie = !!cookieValue && cookieValue.trim().length > 0;
-    if (!hasAuthHeader && !hasCookie) {
+    if (!hasApiKey && !hasAuthHeader && !hasCookie) {
       return new NextResponse(
         JSON.stringify({
           success: false,
