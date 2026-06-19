@@ -22,6 +22,10 @@ Run `nvm use` to switch to the correct Node version automatically.
 
 See `.github/prompts/*.prompt.md` and `.specify/templates/*` for automation guidance.
 
+> Personal/agent-specific prompt assets (e.g. `caveman-code.prompt.md`) are
+> git-ignored. Restore them from the tracked `.example` template – see
+> [docs/ops/caveman-prompt.md](docs/ops/caveman-prompt.md).
+
 PR governance assets are available here:
 
 - Skill: `.github/skills/pr-operations-governance/SKILL.md`
