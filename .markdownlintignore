@@ -11,3 +11,6 @@ out/
 # Test artifacts
 playwright-report/
 test-results/
+
+# Prompt templates (frontmatter + free form, not prose)
+.github/prompts/
