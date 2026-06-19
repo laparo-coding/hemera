@@ -3,7 +3,6 @@ name: caveman-code
 description: "Compressed coding assistant for this project. Use for debugging, code changes, repo questions, test guidance, and technical summaries with minimal prose but normal code formatting."
 argument-hint: "Task for caveman-code"
 agent: agent
-model: GPT-5 (copilot)
 ---
 
 The user input may be provided directly by chat or as an argument. Always use it.

@@ -15,8 +15,10 @@ is a personal/agent-specific asset. A versioned template ships with the repo as
 cp .github/prompts/caveman-code.prompt.md.example \
    .github/prompts/caveman-code.prompt.md
 
-# Optional: pin to a different model
-$EDITOR .github/prompts/caveman-code.prompt.md   # adjust the `model:` field
+# Optional: pin to a specific model (VS Code Copilot model id, e.g. `gpt-4`)
+# Add or change the `model:` field in the YAML header if you want to override
+# the model picker. Without it, VS Code uses the currently selected model.
+$EDITOR .github/prompts/caveman-code.prompt.md
 ```
 
 The untracked `caveman-code.prompt.md` is covered by `.gitignore`, so it survives
