@@ -1,3 +1,4 @@
+import { clerkClient } from '@clerk/nextjs/server';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { handleServiceAuthError } from '@/lib/auth/handle-service-auth';
@@ -24,6 +25,35 @@ import {
 export const dynamic = 'force-dynamic';
 
 const IdParamSchema = z.string().cuid('Invalid course ID format');
+
+async function resolveClerkImageMap(
+  userIds: string[]
+): Promise<Map<string, string | null>> {
+  const imageMap = new Map<string, string | null>();
+  if (userIds.length === 0) {
+    return imageMap;
+  }
+
+  try {
+    const clerk = await clerkClient();
+    await Promise.all(
+      userIds.map(async userId => {
+        try {
+          const user = await clerk.users.getUser(userId);
+          imageMap.set(userId, user.imageUrl ?? null);
+        } catch {
+          imageMap.set(userId, null);
+        }
+      })
+    );
+  } catch {
+    for (const userId of userIds) {
+      imageMap.set(userId, null);
+    }
+  }
+
+  return imageMap;
+}
 
 /**
  * OPTIONS /api/service/courses/[id]
@@ -111,6 +141,7 @@ export async function GET(
             user: {
               select: {
                 name: true,
+                image: true,
               },
             },
             participation: {
@@ -143,6 +174,15 @@ export async function GET(
       );
     }
 
+    const missingImageUserIds = Array.from(
+      new Set(
+        course.bookings
+          .filter(booking => !booking.user?.image)
+          .map(booking => booking.userId)
+      )
+    );
+    const clerkImageMap = await resolveClerkImageMap(missingImageUserIds);
+
     // Transform response — includes both `participants` (for aither) and
     // `participations` (legacy consumers) to avoid breaking changes.
     const participants = course.bookings.map(booking => ({
@@ -150,6 +190,8 @@ export async function GET(
       participationId: booking.participation?.id ?? null,
       userId: booking.userId,
       name: booking.user?.name ?? null,
+      imageUrl:
+        booking.user?.image ?? clerkImageMap.get(booking.userId) ?? null,
       status: booking.participation?.status ?? 'NONE',
       preparationIntent: booking.participation?.preparationIntent ?? null,
       desiredResults: booking.participation?.desiredResults ?? null,
