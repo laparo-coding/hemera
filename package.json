@@ -162,7 +162,7 @@
     "typescript": "^6.0.3",
     "vite": "^7.1.12",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4",
+    "vitest": "^4.1.9",
     "webpack": "^5.106.2"
   },
   "prisma": {
