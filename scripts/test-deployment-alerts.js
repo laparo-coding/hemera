@@ -3,7 +3,12 @@
 /**
  * Test-Skript für Deployment Alert System
  * Simuliert verschiedene Alert-Szenarien
+ *
+ * Note: Uses HTTP (not HTTPS) because this script targets localhost only.
+ * The local dev server runs on http://localhost:3000 without TLS.
  */
+
+const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
 
 async function testAlertSystem() {
   console.log('🧪 Testing Deployment Alert System...\n');
@@ -12,7 +17,7 @@ async function testAlertSystem() {
     // 1. Aktuellen Health-Status abrufen
     console.log('1️⃣ Checking current health status...');
     const healthResponse = await fetch(
-      'http://localhost:3000/api/health/deployment'
+      `${BASE_URL}/api/health/deployment`
     );
     const healthData = await healthResponse.json();
 
@@ -24,7 +29,7 @@ async function testAlertSystem() {
     // 2. Force Health Check triggern
     console.log('2️⃣ Triggering force health check...');
     const forceResponse = await fetch(
-      'http://localhost:3000/api/health/deployment',
+      `${BASE_URL}/api/health/deployment`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

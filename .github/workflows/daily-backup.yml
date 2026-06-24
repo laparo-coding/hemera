@@ -41,13 +41,17 @@ jobs:
     steps:
       - name: Check Environment Filter
         id: filter
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          MATRIX_ENV_NAME: ${{ matrix.env_name }}
         run: |
-          if [[ "${{ github.event_name }}" != "workflow_dispatch" ]] || \
-             [[ "${{ github.event.inputs.environment }}" == "both" ]] || \
-             [[ "${{ github.event.inputs.environment }}" == "${{ matrix.env_name }}" ]]; then
+          if [[ "$EVENT_NAME" != "workflow_dispatch" ]] || \
+             [[ "$INPUT_ENVIRONMENT" == "both" ]] || \
+             [[ "$INPUT_ENVIRONMENT" == "$MATRIX_ENV_NAME" ]]; then
             echo "run=true" >> $GITHUB_OUTPUT
           else
-            echo "⏭️ ${{ matrix.env_name }} übersprungen (nur ${{ github.event.inputs.environment }} gewählt)"
+            echo "⏭️ $MATRIX_ENV_NAME übersprungen (nur $INPUT_ENVIRONMENT gewählt)"
             echo "run=false" >> $GITHUB_OUTPUT
           fi
 

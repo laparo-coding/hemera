@@ -78,9 +78,11 @@ jobs:
           fi
 
       - name: Sanitize Vercel Token
+        env:
+          VERCEL_TOKEN_RAW: ${{ secrets.VERCEL_TOKEN }}
         run: |
           set -euo pipefail
-          token=$(printf %s "${{ secrets.VERCEL_TOKEN }}" | tr -d '"' | tr -d "\n\r\t" | sed -e 's/^ *//' -e 's/ *$//')
+          token=$(printf %s "$VERCEL_TOKEN_RAW" | tr -d '"' | tr -d "\n\r\t" | sed -e 's/^ *//' -e 's/ *$//')
           echo "SANITIZED_VERCEL_TOKEN=$token" >> "$GITHUB_ENV"
 
       - name: Configure Stripe env (production & preview) via Vercel API
@@ -92,9 +94,12 @@ jobs:
           STRIPE_API_VERSION: ${{ secrets.STRIPE_API_VERSION }}
           SECRET_KEY_INPUT: ${{ inputs.stripe_secret_key }}
           PUBLISHABLE_KEY_INPUT: ${{ inputs.next_public_stripe_publishable_key }}
+          VERCEL_PROJECT_INPUT: ${{ steps.project.outputs.project }}
+          SET_WEBHOOK_SECRET: ${{ github.event.inputs.set_webhook_secret }}
+          SET_API_VERSION: ${{ github.event.inputs.set_api_version }}
         run: |
           set -euo pipefail
-          VERCEL_PROJECT="${{ steps.project.outputs.project }}"
+          VERCEL_PROJECT="$VERCEL_PROJECT_INPUT"
           if [ -z "${VERCEL_PROJECT:-}" ]; then
             echo "::error::Please set repository secret VERCEL_PROJECT_ID or VERCEL_PROJECT_NAME"; exit 1; fi
           API_BASE="https://api.vercel.com"
@@ -155,19 +160,21 @@ jobs:
           add_var STRIPE_SECRET_KEY "$EFFECTIVE_STRIPE_SECRET_KEY"
           add_var NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY "$EFFECTIVE_PUBLISHABLE_KEY"
 
-          if [ "${{ github.event.inputs.set_webhook_secret }}" = "true" ]; then
+          if [ "$SET_WEBHOOK_SECRET" = "true" ]; then
             add_var STRIPE_WEBHOOK_SECRET "${STRIPE_WEBHOOK_SECRET:-}"
           fi
-          if [ "${{ github.event.inputs.set_api_version }}" = "true" ]; then
+          if [ "$SET_API_VERSION" = "true" ]; then
             add_var STRIPE_API_VERSION "${STRIPE_API_VERSION:-}"
           fi
 
       - name: List Vercel env (sanity check) via API
         shell: bash
+        env:
+          VERCEL_PROJECT_INPUT: ${{ steps.project.outputs.project }}
         run: |
           set -euo pipefail
           API_BASE="https://api.vercel.com"
-          VERCEL_PROJECT="${{ steps.project.outputs.project }}"
+          VERCEL_PROJECT="$VERCEL_PROJECT_INPUT"
           for TARGET in production preview; do
             echo "Targets: $TARGET"
             curl -sS -H "Authorization: Bearer ${SANITIZED_VERCEL_TOKEN}" \

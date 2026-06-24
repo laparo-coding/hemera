@@ -24,12 +24,14 @@ jobs:
     steps:
       - name: Check if Dependabot PR
         id: check
+        env:
+          ACTOR: ${{ github.actor }}
         run: |
-          if [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
+          if [[ "$ACTOR" == "dependabot[bot]" ]]; then
             echo "is-dependabot=true" >> "$GITHUB_OUTPUT"
           else
             echo "is-dependabot=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping: Not a Dependabot PR (actor: ${{ github.actor }})"
+            echo "Skipping: Not a Dependabot PR (actor: $ACTOR)"
           fi
 
   automerge:
@@ -41,7 +43,7 @@ jobs:
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v3
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
 
       - name: Block major version updates
         if: steps.metadata.outputs.update-type == 'version-update:semver-major'
@@ -56,7 +58,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Wait for build-and-test
-        uses: lewagon/wait-on-check-action@v1.7.0
+        uses: lewagon/wait-on-check-action@96d9100b431964d10e0136aff8b9ccb92470505e # v1.8.0
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
