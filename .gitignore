@@ -34,6 +34,9 @@ pnpm-debug.log*
 !.vscode/mcp.json
 .idea/
 
+# Rollbar MCP (local token config — keep .example committed)
+.rollbar-mcp.json
+
 # Misc
 *.lock
 **/*.swp
