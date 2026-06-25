@@ -65,13 +65,14 @@ jobs:
         id: migrate
         env:
           MIGRATION_MODE: ${{ github.event.inputs.migration_mode || 'prisma' }}
+          MIGRATION_FILE_INPUT: ${{ github.event.inputs.migration_file || 'prisma/migrations/20260215140000_add_api_log/migration.sql' }}
         run: |
           echo "Applying migration via mode: ${MIGRATION_MODE}"
           if [ "${MIGRATION_MODE}" = 'manual' ]; then
             if [ -z "${STAGING_DATABASE_URL}" ]; then
               echo "STAGING_DATABASE_URL not set; aborting"; exit 1
             fi
-            MIGRATION_FILE="${{ github.event.inputs.migration_file || 'prisma/migrations/20260215140000_add_api_log/migration.sql' }}"
+            MIGRATION_FILE="$MIGRATION_FILE_INPUT"
             if [ ! -f "$MIGRATION_FILE" ]; then
               echo "Migration file not found: $MIGRATION_FILE"; exit 1
             fi
