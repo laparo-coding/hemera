@@ -38,7 +38,7 @@ async function main() {
     connectionString: baseUrl,
     // Preview DBs (Neon/Vercel) may use self-signed certs; allow override via env.
     // In production, set DB_SSL_REJECT_UNAUTHORIZED=1 (default) to enforce verification.
-    ssl: { rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === '0' ? false : true },
+    ssl: { rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== '0' },
   });
   await client.connect();
   try {

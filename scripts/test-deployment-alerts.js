@@ -4,11 +4,11 @@
  * Test-Skript für Deployment Alert System
  * Simuliert verschiedene Alert-Szenarien
  *
- * Note: Uses HTTP (not HTTPS) because this script targets localhost only.
- * The local dev server runs on http://localhost:3000 without TLS.
+ * Note: Defaults to http://localhost:3000 (no TLS) for local dev server.
+ * Set BASE_URL env var to target a different environment (e.g. HTTPS staging).
  */
 
-const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 async function testAlertSystem() {
   console.log('🧪 Testing Deployment Alert System...\n');
