@@ -143,7 +143,7 @@ function hasValidServerToken(): boolean {
 /**
  * Validate that Rollbar client token is present and non-empty
  */
-function hasValidClientToken(): boolean {
+function _hasValidClientToken(): boolean {
   const token = findEnvByPrefix(
     'NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN',
     'NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN'

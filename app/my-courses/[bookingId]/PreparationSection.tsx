@@ -141,14 +141,6 @@ export default function PreparationSection({
             }
             disabled={isPending}
             onClick={handleStartPreparation}
-            sx={{
-              backgroundColor: colors.bronze,
-              color: colors.marsala,
-              '&:hover': {
-                backgroundColor: colors.marsala,
-                color: colors.white,
-              },
-            }}
           >
             {isPending ? 'Wird gestartet...' : 'Vorbereitung starten'}
           </Button>

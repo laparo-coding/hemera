@@ -55,10 +55,10 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
       '& a': {
         color: authForm.textColor,
       },
-      // Clerk renders two footer children: the action link (keep) and a
-      // secondary wrapper (privacy/TOS). Hide the second element regardless
-      // of its DOM position to avoid duplicating footer content on auth pages.
-      '& > :nth-of-type(2)': {
+      // Hide only the dedicated legal pages block.
+      // Avoid positional selectors here because Clerk may reorder children
+      // between sign-in steps (e.g. password reset), which can break actions.
+      '& .cl-footerPages': {
         backgroundColor: authForm.cardBackground,
         display: 'none',
       },
@@ -114,6 +114,32 @@ export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
         color: colors.white,
         opacity: 0.6,
       },
+    },
+    // Passwort-Reset (factor-one): visuell wie Primary-Button
+    alternativeMethodsBlockButton: {
+      backgroundColor: `${colors.marsala} !important`,
+      color: `${colors.white} !important`,
+      fontWeight: 600,
+      fontSize: '1rem',
+      fontFamily: '"Inter", sans-serif',
+      minHeight: '48px',
+      padding: '12px 24px',
+      borderRadius: '8px',
+      border: 'none',
+      transition: 'all 0.2s ease-in-out',
+      '&:hover': {
+        backgroundColor: `${colors.marsalaDark} !important`,
+      },
+      '&:disabled': {
+        backgroundColor: `${colors.rosyBrown} !important`,
+        color: `${colors.white} !important`,
+        opacity: 0.6,
+      },
+    },
+    alternativeMethodsBlockButtonText: {
+      color: `${colors.white} !important`,
+      fontWeight: 600,
+      fontSize: '1rem',
     },
     formFieldInput: {
       borderRadius: authForm.inputBorderRadius,
