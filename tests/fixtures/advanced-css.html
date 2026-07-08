@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced CSS Patterns</title>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #2D2D2D;
+            background: #EBE2D3;
+            margin: 0;
+            padding: 32px;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: #884143;
+            font-size: 2.2rem;
+            margin-bottom: 0.5em;
+        }
+        h2 {
+            font-family: 'Playfair Display', serif;
+            color: #926A49;
+            font-size: 1.8rem;
+            margin-top: 1.5em;
+            margin-bottom: 0.4em;
+        }
+        h3 {
+            font-family: 'Playfair Display', serif;
+            color: #926A49;
+            font-size: 1.3rem;
+            margin-top: 1.2em;
+            margin-bottom: 0.3em;
+        }
+        p {
+            margin-bottom: 0.8em;
+        }
+        ul, ol {
+            margin-bottom: 0.8em;
+            padding-left: 1.5em;
+        }
+        li {
+            margin-bottom: 0.3em;
+        }
+        code {
+            background: #f4f1eb;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            padding: 48px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(22, 64, 77, 0.12);
+        }
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .topic-card {
+            background: #EBE2D3;
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 4px solid #926A49;
+        }
+        .topic-card h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced CSS Patterns</h1>
+        <p>Lerne moderne CSS-Techniken für responsives Design und performante Web-Anwendungen.</p>
+
+        <h2>Übersicht</h2>
+        <p>Dieses Material deckt fortgeschrittene CSS-Konzepte ab, die über die Grundlagen hinausgehen.</p>
+
+        <h2>Themen</h2>
+        <div class="topic-grid">
+            <div class="topic-card">
+                <h3>Grid Layout</h3>
+                <p>Zweidimensionale Layouts mit CSS Grid.</p>
+            </div>
+            <div class="topic-card">
+                <h3>Flexbox Mastery</h3>
+                <p>Ein-dimensionale Layouts meistern.</p>
+            </div>
+            <div class="topic-card">
+                <h3>CSS Variables</h3>
+                <p>Custom Properties für dynamische Werte.</p>
+            </div>
+            <div class="topic-card">
+                <h3>CSS Animation</h3>
+                <p>Keyframes und Transitions.</p>
+            </div>
+        </div>
+
+        <h2>Lernziele</h2>
+        <ul>
+            <li>Verstehen der CSS Grid Spezifikation</li>
+            <li>Flexbox für komplexe Komponenten nutzen</li>
+            <li>Custom Properties für Design-Systeme einsetzen</li>
+            <li>Performante Animationen erstellen</li>
+            <li>Responsive Design Patterns anwenden</li>
+        </ul>
+
+        <h2>Beispiel: CSS Grid</h2>
+        <p>Ein einfaches Grid-Layout mit drei Spalten:</p>
+        <pre><code>.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}</code></pre>
+
+        <h2>Beispiel: Custom Properties</h2>
+        <p>Dynamische Werte mit CSS-Variablen:</p>
+        <pre><code>:root {
+    --primary-color: #884143;
+    --spacing: 16px;
+}
+
+.button {
+    background: var(--primary-color);
+    padding: var(--spacing);
+}</code></pre>
+
+        <h2>Zusammenfassung</h2>
+        <p>Mit diesen fortgeschrittenen CSS-Techniken kannst du moderne, responsive und wartbare Web-Anwendungen erstellen.</p>
+    </div>
+</body>
+</html>

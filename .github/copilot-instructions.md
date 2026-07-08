@@ -80,10 +80,9 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
+- 030-extended-material-upload: Added new tile for uploading HTML content files to course material interface (Material type selection with 3 tiles, HTMLContentUploadForm component, API endpoint extension for CONTENT type via FormData)
 - 029-jest-to-vitest-migration: Replaced Jest/ts-jest non-E2E execution with Vitest, kept Playwright unchanged, and added Vitest compatibility/setup infrastructure
 - 028-test-coverage: Established the pre-migration coverage baseline on Jest/ts-jest before the later Vitest switch in 029
-- 026-course-material-integration: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, PostgreSQL via Prisma 7.5.0 ORM, Vercel Blob storage (@vercel/blob), HTML sanitization (sanitize-html)
-- 024-admin-dashboard: Added TypeScript 5.9, Next.js 16 (App Router), React 19 + Material-UI v5, Clerk SDK, Prisma ORM
 
 ## PR Review Process
 
