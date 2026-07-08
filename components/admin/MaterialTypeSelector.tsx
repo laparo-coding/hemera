@@ -91,7 +91,9 @@ export default function MaterialTypeSelector({
           }}
         >
           <CardActionArea
-            onClick={() => onSelect(mode)}
+            onClick={() => {
+              onSelect(mode);
+            }}
             aria-label={label}
             sx={{
               p: 3,

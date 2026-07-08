@@ -129,7 +129,9 @@ export default function HTMLContentUploadForm({
       <TextField
         label='Identifier (optional)'
         value={identifier}
-        onChange={e => setIdentifier(e.target.value)}
+        onChange={e => {
+          setIdentifier(e.target.value);
+        }}
         fullWidth
         helperText='Wird automatisch aus dem Titel generiert, falls leer gelassen'
         sx={{ mb: 3 }}
