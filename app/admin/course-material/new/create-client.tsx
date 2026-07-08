@@ -165,7 +165,9 @@ export default function CreateCourseMaterialClient() {
           <Box sx={{ mb: 2 }}>
             <Button
               size='small'
-              onClick={() => setSelectedMode(null)}
+              onClick={() => {
+                setSelectedMode(null);
+              }}
               startIcon={<ArrowBackIcon />}
             >
               Zurück zur Auswahl
@@ -180,7 +182,9 @@ export default function CreateCourseMaterialClient() {
           <Box sx={{ mb: 2 }}>
             <Button
               size='small'
-              onClick={() => setSelectedMode(null)}
+              onClick={() => {
+                setSelectedMode(null);
+              }}
               startIcon={<ArrowBackIcon />}
             >
               Zurück zur Auswahl
@@ -198,7 +202,9 @@ export default function CreateCourseMaterialClient() {
           <Box sx={{ mb: 2 }}>
             <Button
               size='small'
-              onClick={() => setSelectedMode(null)}
+              onClick={() => {
+                setSelectedMode(null);
+              }}
               startIcon={<ArrowBackIcon />}
             >
               Zurück zur Auswahl
