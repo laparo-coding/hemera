@@ -1,8 +1,14 @@
 /**
  * MaterialTypeSelector Component
  *
- * Two-card selection for choosing between CONTENT and SLIDE_CONTROL material types.
- * Responsive grid: side-by-side on desktop, stacked on mobile.
+ * Selection screen for choosing material creation mode.
+ * Feature 030: Extended with 3rd tile for HTML content file upload.
+ *
+ * Three-card selection in 2-1 grid layout:
+ * - Row 1: "Inhaltsseite hinzufügen" (CONTENT upload) | "Inhaltsseite anlegen" (CONTENT editor)
+ * - Row 2: "Steuerdatei hinzufügen" (SLIDE_CONTROL upload)
+ *
+ * Responsive: side-by-side on desktop, stacked on mobile.
  * Keyboard accessible with focus/hover states using design tokens.
  */
 
@@ -17,24 +23,31 @@ import {
   Typography,
 } from '@mui/material';
 import { colors } from '@/lib/design-tokens';
-import type { MaterialType } from '@/lib/schemas/admin/course-material';
+import type { MaterialCreationMode } from '@/lib/types/course-material';
+
+export type { MaterialCreationMode };
 
 interface MaterialTypeSelectorProps {
-  onSelect: (type: MaterialType) => void;
+  onSelect: (mode: MaterialCreationMode) => void;
 }
 
 const typeOptions: {
-  type: MaterialType;
+  mode: MaterialCreationMode;
   icon: React.ReactNode;
   label: string;
 }[] = [
   {
-    type: 'CONTENT',
+    mode: 'CONTENT_UPLOAD',
+    icon: <UploadFileOutlined sx={{ fontSize: 48, color: colors.bronze }} />,
+    label: 'Ich möchte eine Inhaltsseite hinzufügen.',
+  },
+  {
+    mode: 'CONTENT_EDITOR',
     icon: <EditNoteOutlined sx={{ fontSize: 48, color: colors.bronze }} />,
     label: 'Ich möchte eine Inhaltsseite anlegen.',
   },
   {
-    type: 'SLIDE_CONTROL',
+    mode: 'SLIDE_CONTROL',
     icon: <UploadFileOutlined sx={{ fontSize: 48, color: colors.bronze }} />,
     label: 'Ich möchte eine Steuerdatei hinzufügen.',
   },
@@ -54,9 +67,9 @@ export default function MaterialTypeSelector({
         mt: 4,
       }}
     >
-      {typeOptions.map(({ type, icon, label }) => (
+      {typeOptions.map(({ mode, icon, label }) => (
         <Card
-          key={type}
+          key={mode}
           variant='outlined'
           sx={{
             transition:
@@ -69,10 +82,17 @@ export default function MaterialTypeSelector({
               borderColor: colors.bronze,
               boxShadow: `0 0 0 2px ${colors.bronze}`,
             },
+            // Third tile spans full width (2-1 layout)
+            ...(mode === 'SLIDE_CONTROL' && {
+              gridColumn: { xs: '1', sm: '1 / -1' },
+              maxWidth: { sm: 'calc(50% - 12px)' },
+              mx: { sm: 'auto' },
+            }),
           }}
         >
           <CardActionArea
-            onClick={() => onSelect(type)}
+            onClick={() => onSelect(mode)}
+            aria-label={label}
             sx={{
               p: 3,
               display: 'flex',

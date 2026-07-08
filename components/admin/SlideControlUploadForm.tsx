@@ -2,7 +2,8 @@
  * SlideControlUploadForm Component
  *
  * Form for creating/editing SLIDE_CONTROL course materials.
- * Uses drag-and-drop file upload pattern from ResumeUploader.
+ * Uses the shared useFileUpload hook (drag-and-drop, validation, size
+ * formatting) together with HTMLContentUploadForm (Feature 030).
  * Supports create mode (no initialData) and edit mode (with initialData).
  */
 
@@ -24,12 +25,10 @@ import {
   Typography,
 } from '@mui/material';
 import type React from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { useState } from 'react';
 import { colors } from '@/lib/design-tokens';
-import {
-  ALLOWED_FILE_EXTENSIONS,
-  MAX_FILE_SIZE,
-} from '@/lib/schemas/admin/course-material';
+import { formatFileSize, useFileUpload } from '@/lib/hooks/useFileUpload';
+import { MAX_FILE_SIZE } from '@/lib/schemas/admin/course-material';
 
 /** Data passed via initialData in edit mode */
 export interface SlideControlInitialData {
@@ -47,12 +46,6 @@ interface SlideControlUploadFormProps {
   submitting?: boolean;
 }
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 export default function SlideControlUploadForm({
   onSubmit,
   onCancel,
@@ -63,73 +56,23 @@ export default function SlideControlUploadForm({
 
   const [title, setTitle] = useState(initialData?.title ?? '');
   const [identifier, setIdentifier] = useState(initialData?.identifier ?? '');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [dragOver, setDragOver] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [titleError, setTitleError] = useState<string | null>(null);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const isLoading = submitting || !!externalSubmitting;
 
-  const validateFile = useCallback((file: File): string | null => {
-    const hasValidExtension = ALLOWED_FILE_EXTENSIONS.some(ext =>
-      file.name.toLowerCase().endsWith(ext)
-    );
-    if (!hasValidExtension) {
-      return 'Nur .html-Dateien sind erlaubt';
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      return `Datei darf maximal ${MAX_FILE_SIZE / 1024 / 1024} MB groß sein`;
-    }
-    return null;
-  }, []);
-
-  const handleFileSelect = useCallback(
-    (file: File) => {
-      const validationError = validateFile(file);
-      if (validationError) {
-        setError(validationError);
-        return;
-      }
-      setError(null);
-      setSelectedFile(file);
-    },
-    [validateFile]
-  );
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = (event: React.DragEvent) => {
-    event.preventDefault();
-    setDragOver(false);
-  };
-
-  const handleDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    setDragOver(false);
-    const file = event.dataTransfer.files?.[0];
-    if (file) {
-      handleFileSelect(file);
-    }
-  };
-
-  const handleRemoveFile = () => {
-    setSelectedFile(null);
-  };
+  const {
+    selectedFile,
+    dragOver,
+    fileInputRef,
+    error,
+    setError,
+    handleFileChange,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    handleRemoveFile,
+  } = useFileUpload({ isLoading });
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -161,6 +104,7 @@ export default function SlideControlUploadForm({
     if (selectedFile) {
       formData.append('file', selectedFile);
     }
+    formData.append('type', 'SLIDE_CONTROL');
 
     setSubmitting(true);
     try {

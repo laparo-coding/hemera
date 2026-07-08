@@ -1,9 +1,10 @@
 /**
  * Course Material Create Client Component
- * Feature: 026-course-material-integration
+ * Feature: 026-course-material-integration, 030-extended-material-upload
  *
  * Client-side component for creating new course materials.
- * Shows MaterialTypeSelector first, then appropriate form based on type.
+ * Shows MaterialTypeSelector first, then appropriate form based on selected mode.
+ * Feature 030: Added CONTENT_UPLOAD mode for HTML file upload.
  */
 
 'use client';
@@ -21,10 +22,11 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import HTMLContentUploadForm from '@/components/admin/HTMLContentUploadForm';
 import { MaterialForm } from '@/components/admin/MaterialForm';
 import MaterialTypeSelector from '@/components/admin/MaterialTypeSelector';
 import SlideControlUploadForm from '@/components/admin/SlideControlUploadForm';
-import type { MaterialType } from '@/lib/schemas/admin/course-material';
+import type { MaterialCreationMode } from '@/lib/types/course-material';
 
 /** Extract error message from a fetch Response, falling back to a default */
 async function extractErrorMessage(
@@ -41,7 +43,9 @@ async function extractErrorMessage(
 
 export default function CreateCourseMaterialClient() {
   const router = useRouter();
-  const [selectedType, setSelectedType] = useState<MaterialType | null>(null);
+  const [selectedMode, setSelectedMode] = useState<MaterialCreationMode | null>(
+    null
+  );
 
   const handleContentSubmit = async (data: {
     title: string;
@@ -69,32 +73,46 @@ export default function CreateCourseMaterialClient() {
     router.push('/admin/course-material');
   };
 
-  const handleSlideControlSubmit = async (formData: FormData) => {
-    try {
-      formData.append('type', 'SLIDE_CONTROL');
-      const response = await fetch('/api/admin/course-material', {
-        method: 'POST',
-        body: formData,
-      });
+  const handleContentUploadSubmit = async (formData: FormData) => {
+    const response = await fetch('/api/admin/course-material', {
+      method: 'POST',
+      body: formData,
+    });
 
-      if (!response.ok) {
-        const errorMessage = await extractErrorMessage(
-          response,
-          'Erstellen fehlgeschlagen'
-        );
-        throw new Error(errorMessage);
-      }
-
-      const result = await response.json();
-      if (!result || typeof result.id !== 'string') {
-        throw new Error('Ungültige Serverantwort');
-      }
-      router.push('/admin/course-material');
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Erstellen fehlgeschlagen';
-      throw new Error(message);
+    if (!response.ok) {
+      const errorMessage = await extractErrorMessage(
+        response,
+        'Upload fehlgeschlagen'
+      );
+      throw new Error(errorMessage);
     }
+
+    const result = await response.json();
+    if (!result || typeof result.id !== 'string') {
+      throw new Error('Ungültige Serverantwort');
+    }
+    router.push('/admin/course-material');
+  };
+
+  const handleSlideControlSubmit = async (formData: FormData) => {
+    const response = await fetch('/api/admin/course-material', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorMessage = await extractErrorMessage(
+        response,
+        'Erstellen fehlgeschlagen'
+      );
+      throw new Error(errorMessage);
+    }
+
+    const result = await response.json();
+    if (!result || typeof result.id !== 'string') {
+      throw new Error('Ungültige Serverantwort');
+    }
+    router.push('/admin/course-material');
   };
 
   return (
@@ -133,21 +151,21 @@ export default function CreateCourseMaterialClient() {
         </Typography>
       </Box>
 
-      {!selectedType && (
+      {!selectedMode && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Typography variant='h6' sx={{ mb: 2, textAlign: 'center' }}>
             Welche Art von Material möchtest du erstellen?
           </Typography>
-          <MaterialTypeSelector onSelect={setSelectedType} />
+          <MaterialTypeSelector onSelect={setSelectedMode} />
         </Paper>
       )}
 
-      {selectedType === 'CONTENT' && (
+      {selectedMode === 'CONTENT_EDITOR' && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Box sx={{ mb: 2 }}>
             <Button
               size='small'
-              onClick={() => setSelectedType(null)}
+              onClick={() => setSelectedMode(null)}
               startIcon={<ArrowBackIcon />}
             >
               Zurück zur Auswahl
@@ -157,12 +175,30 @@ export default function CreateCourseMaterialClient() {
         </Paper>
       )}
 
-      {selectedType === 'SLIDE_CONTROL' && (
+      {selectedMode === 'CONTENT_UPLOAD' && (
         <Paper elevation={2} sx={{ p: 3 }}>
           <Box sx={{ mb: 2 }}>
             <Button
               size='small'
-              onClick={() => setSelectedType(null)}
+              onClick={() => setSelectedMode(null)}
+              startIcon={<ArrowBackIcon />}
+            >
+              Zurück zur Auswahl
+            </Button>
+          </Box>
+          <HTMLContentUploadForm
+            onSubmit={handleContentUploadSubmit}
+            onCancel={() => router.push('/admin/course-material')}
+          />
+        </Paper>
+      )}
+
+      {selectedMode === 'SLIDE_CONTROL' && (
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Box sx={{ mb: 2 }}>
+            <Button
+              size='small'
+              onClick={() => setSelectedMode(null)}
               startIcon={<ArrowBackIcon />}
             >
               Zurück zur Auswahl
