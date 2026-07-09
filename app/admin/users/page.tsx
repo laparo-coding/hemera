@@ -106,7 +106,7 @@ export default function UsersPage() {
   }, [page, search, outperformerOnly, sortBy, sortOrder]);
 
   useEffect(() => {
-    fetchUsers();
+    void fetchUsers();
   }, [fetchUsers]);
 
   // Update URL when query params change

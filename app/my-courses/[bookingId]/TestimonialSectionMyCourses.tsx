@@ -99,7 +99,7 @@ export default function TestimonialSectionMyCourses({
   }, [bookingId]);
 
   useEffect(() => {
-    fetchTestimonial();
+    void fetchTestimonial();
   }, [fetchTestimonial]);
 
   function handleSuccess() {
@@ -273,7 +273,9 @@ export default function TestimonialSectionMyCourses({
 
       <Button
         variant='contained'
-        onClick={() => setShowForm(true)}
+        onClick={() => {
+          setShowForm(true);
+        }}
         startIcon={<TestimonialIcon />}
       >
         Erfahrungsbericht schreiben

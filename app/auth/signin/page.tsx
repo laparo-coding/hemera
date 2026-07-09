@@ -7,7 +7,7 @@ interface PageProps {
 
 export default async function SignInRedirectPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const redirectUrl = params.redirect_url || params?.returnUrl || undefined;
+  const redirectUrl = params.redirect_url || params.returnUrl || undefined;
 
   const fallbackPath = '/sign-in';
   const rawBase = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL?.trim();
