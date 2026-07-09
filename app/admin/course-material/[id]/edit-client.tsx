@@ -90,7 +90,7 @@ export default function EditCourseMaterialClient({
   }, [id]);
 
   useEffect(() => {
-    fetchMaterial();
+    void fetchMaterial();
   }, [fetchMaterial]);
 
   const handleSubmit = async (data: {
@@ -146,7 +146,9 @@ export default function EditCourseMaterialClient({
     <Paper elevation={2} sx={{ p: 3 }}>
       <MaterialForm
         onSubmit={handleSubmit}
-        onCancel={() => router.push('/admin/course-material')}
+        onCancel={() => {
+          router.push('/admin/course-material');
+        }}
         initialData={{
           title: state.material.title,
           identifier: state.material.identifier,

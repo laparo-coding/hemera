@@ -90,7 +90,9 @@ function CheckoutContent() {
         const currentUrl = encodeURIComponent(window.location.href);
         router.push(`/sign-in?redirect_url=${currentUrl}`);
       }, 100);
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+      };
     }
   }, [isLoaded, user, router]);
 
@@ -117,7 +119,9 @@ function CheckoutContent() {
         setErrorCode(null);
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+        }, 30000); // 30s timeout
 
         const response = await fetch('/api/payment/create-intent', {
           method: 'POST',
@@ -227,7 +231,7 @@ function CheckoutContent() {
       }
     };
 
-    fetchCourseAndCreatePaymentIntent();
+    void fetchCourseAndCreatePaymentIntent();
     // Note: stripeEnabled is a constant from env, not included in deps
   }, [isLoaded, user, courseRef]);
 

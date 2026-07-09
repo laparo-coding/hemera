@@ -26,7 +26,7 @@ export default function CustomSignUpClient() {
   const [code, setCode] = useState('');
 
   const redirectTo = useMemo(
-    () => params?.get('redirect_url') || '/dashboard',
+    () => params.get('redirect_url') || '/dashboard',
     [params]
   );
 
@@ -67,7 +67,7 @@ export default function CustomSignUpClient() {
     } catch (err: unknown) {
       const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        error?.errors?.[0]?.message ||
+        error.errors?.[0]?.message ||
         'Registrierung fehlgeschlagen. Bitte versuche es erneut.';
       setError(message);
     } finally {
@@ -100,7 +100,7 @@ export default function CustomSignUpClient() {
     } catch (err: unknown) {
       const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        error?.errors?.[0]?.message ||
+        error.errors?.[0]?.message ||
         'Verifizierung fehlgeschlagen. Bitte versuche es erneut.';
       setError(message);
     } finally {
@@ -181,7 +181,9 @@ export default function CustomSignUpClient() {
                   type='email'
                   label='E-Mail'
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={e => {
+                    setEmail(e.target.value);
+                  }}
                   required
                   autoComplete='email'
                   disabled={fetchStatus === 'fetching' || submitting}
@@ -205,7 +207,9 @@ export default function CustomSignUpClient() {
                   type='password'
                   label='Passwort'
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={e => {
+                    setPassword(e.target.value);
+                  }}
                   required
                   autoComplete='new-password'
                   disabled={fetchStatus === 'fetching' || submitting}
@@ -231,7 +235,9 @@ export default function CustomSignUpClient() {
                 type='text'
                 label='Bestätigungscode'
                 value={code}
-                onChange={e => setCode(e.target.value)}
+                onChange={e => {
+                  setCode(e.target.value);
+                }}
                 required
                 inputProps={{
                   inputMode: 'numeric',

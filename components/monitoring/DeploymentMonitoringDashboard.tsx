@@ -120,11 +120,13 @@ export default function DeploymentMonitoringDashboard() {
   };
 
   useEffect(() => {
-    fetchHealthStatus();
+    void fetchHealthStatus();
 
     // Auto-refresh alle 30 Sekunden
     const interval = setInterval(fetchHealthStatus, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [fetchHealthStatus]);
 
   const getStatusColor = (

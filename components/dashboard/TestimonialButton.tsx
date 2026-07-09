@@ -44,7 +44,9 @@ export default function TestimonialButton({
       <Button
         variant='outlined'
         startIcon={<RateReviewOutlined />}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+        }}
         sx={theme => ({
           fontFamily: theme.typography.body2.fontFamily,
           fontWeight: theme.typography.body2.fontWeight ?? 600,
@@ -68,7 +70,9 @@ export default function TestimonialButton({
       </Button>
       <TestimonialDrawer
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          setOpen(false);
+        }}
         bookingId={bookingId}
         courseName={courseName}
         userProfile={userProfile}

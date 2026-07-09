@@ -122,7 +122,7 @@ export default function AdminTestimonialList() {
     const controller = new AbortController();
 
     const debounceTimer = setTimeout(() => {
-      fetchTestimonials(controller.signal);
+      void fetchTestimonials(controller.signal);
     }, 150);
 
     return () => {
@@ -190,7 +190,13 @@ export default function AdminTestimonialList() {
       </Box>
 
       {error && (
-        <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>
+        <Alert
+          severity='error'
+          sx={{ mb: 2 }}
+          onClose={() => {
+            setError(null);
+          }}
+        >
           {error}
         </Alert>
       )}
@@ -307,7 +313,9 @@ export default function AdminTestimonialList() {
           <Pagination
             count={totalPages}
             page={page}
-            onChange={(_, value) => setPage(value)}
+            onChange={(_, value) => {
+              setPage(value);
+            }}
             color='primary'
           />
         </Box>

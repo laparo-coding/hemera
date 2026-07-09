@@ -163,7 +163,7 @@ export async function GET(request: NextRequest) {
           ? Math.max(
               0,
               course.capacity -
-                (course.bookings?.filter(
+                (course.bookings.filter(
                   booking =>
                     booking.paymentStatus === PaymentStatus.PAID ||
                     booking.paymentStatus === PaymentStatus.PENDING

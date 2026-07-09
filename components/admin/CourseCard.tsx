@@ -148,7 +148,9 @@ export default function CourseCard({
           <Button
             size='small'
             startIcon={<EditIcon />}
-            onClick={() => onEdit(course.id)}
+            onClick={() => {
+              onEdit(course.id);
+            }}
           >
             Edit
           </Button>
@@ -158,7 +160,9 @@ export default function CourseCard({
             size='small'
             color='error'
             startIcon={<DeleteIcon />}
-            onClick={() => onDelete(course.id)}
+            onClick={() => {
+              onDelete(course.id);
+            }}
           >
             Delete
           </Button>

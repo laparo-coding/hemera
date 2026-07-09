@@ -59,7 +59,9 @@ export default function NewCourseForm({ locations }: NewCourseFormProps) {
         <CourseForm
           locations={locations}
           onSubmit={handleSubmit}
-          onCancel={() => router.push('/admin')}
+          onCancel={() => {
+            router.push('/admin');
+          }}
           submitLabel='Create Course'
         />
       </Paper>

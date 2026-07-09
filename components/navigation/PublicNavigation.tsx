@@ -142,14 +142,18 @@ export function PublicNavigation({
   const [e2eRole, setE2eRole] = useState<E2ESessionUserRole>('user');
   useEffect(() => {
     if (!isE2E) return;
-    const syncRole = () => setE2eRole(readE2ERole());
+    const syncRole = () => {
+      setE2eRole(readE2ERole());
+    };
     syncRole();
     // subscribe to storage events so role changes reflect without reload
     const onStorage = (e: StorageEvent) => {
       if (e.key === 'clerk-session') syncRole();
     };
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+    };
   }, [isE2E]);
   return (
     <AppBar

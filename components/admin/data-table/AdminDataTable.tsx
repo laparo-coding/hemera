@@ -356,7 +356,13 @@ export default function AdminDataTable<T>({
                     key={rowKey}
                     hover
                     selected={isSelected}
-                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                    onClick={
+                      onRowClick
+                        ? () => {
+                            onRowClick(row);
+                          }
+                        : undefined
+                    }
                     sx={{
                       cursor: onRowClick ? 'pointer' : 'default',
                     }}
@@ -366,8 +372,12 @@ export default function AdminDataTable<T>({
                       <TableCell padding='checkbox'>
                         <Checkbox
                           checked={isSelected}
-                          onClick={e => e.stopPropagation()}
-                          onChange={() => handleSelectRow(rowKey)}
+                          onClick={e => {
+                            e.stopPropagation();
+                          }}
+                          onChange={() => {
+                            handleSelectRow(rowKey);
+                          }}
                         />
                       </TableCell>
                     )}

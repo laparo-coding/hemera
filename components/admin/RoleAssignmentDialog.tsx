@@ -71,7 +71,9 @@ export function RoleAssignmentDialog({
           control={
             <Switch
               checked={localIsAdmin}
-              onChange={e => setLocalIsAdmin(e.target.checked)}
+              onChange={e => {
+                setLocalIsAdmin(e.target.checked);
+              }}
               disabled={loading}
               data-testid='admin-role-toggle'
             />
@@ -85,7 +87,9 @@ export function RoleAssignmentDialog({
           Abbrechen
         </Button>
         <Button
-          onClick={() => onConfirm(localIsAdmin)}
+          onClick={() => {
+            onConfirm(localIsAdmin);
+          }}
           disabled={loading || localIsAdmin === isAdmin}
           variant='contained'
           data-testid='role-confirm-button'

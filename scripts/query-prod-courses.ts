@@ -19,4 +19,4 @@ async function main() {
   console.log(JSON.stringify(courses, null, 2));
   await closeDb();
 }
-main();
+void main();

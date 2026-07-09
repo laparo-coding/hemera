@@ -63,17 +63,17 @@ export default async function BookingSuccessPage({
   const viewModel: BookingSuccessViewModel = {
     id: booking.id,
     courseTitle: booking.course?.title ?? 'Dein Kurs',
-    courseDescription: booking.course?.teaser ?? null,
-    courseDate: booking.course?.startDate?.toISOString() ?? null,
+    courseDescription: booking.course.teaser ?? null,
+    courseDate: booking.course.startDate?.toISOString() ?? null,
     // Optional time fields may not exist on Course type; access defensively
     courseStartTime:
       (
         booking.course as unknown as { startTime?: Date | null }
-      )?.startTime?.toISOString() ?? null,
+      ).startTime?.toISOString() ?? null,
     courseEndTime:
       (
         booking.course as unknown as { endTime?: Date | null }
-      )?.endTime?.toISOString() ?? null,
+      ).endTime?.toISOString() ?? null,
     bookingCreatedAt: booking.createdAt.toISOString(),
     bookingUpdatedAt: booking.updatedAt.toISOString(),
     paymentStatus: booking.paymentStatus,

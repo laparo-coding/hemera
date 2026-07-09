@@ -74,7 +74,12 @@ export function MaterialForm({
     <Box component='form' onSubmit={handleSubmit}>
       <Stack spacing={3}>
         {error && (
-          <Alert severity='error' onClose={() => setError(null)}>
+          <Alert
+            severity='error'
+            onClose={() => {
+              setError(null);
+            }}
+          >
             {error}
           </Alert>
         )}
@@ -82,7 +87,9 @@ export function MaterialForm({
         <TextField
           label='Titel'
           value={title}
-          onChange={e => setTitle(e.target.value)}
+          onChange={e => {
+            setTitle(e.target.value);
+          }}
           fullWidth
           required
           placeholder='z.B. Einführung in Grundkurs'
@@ -94,7 +101,9 @@ export function MaterialForm({
         <TextField
           label='Kennung (optional)'
           value={identifier}
-          onChange={e => setIdentifier(e.target.value)}
+          onChange={e => {
+            setIdentifier(e.target.value);
+          }}
           fullWidth
           placeholder='z.B. einfuehrung-grundkurs (Auto-generiert falls leer)'
           helperText='Eindeutige URL-freundliche Bezeichnung. Wird automatisch generiert falls leer.'

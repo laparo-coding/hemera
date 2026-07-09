@@ -122,7 +122,12 @@ export default function FileUpload({
       />
 
       {error && (
-        <Alert severity='error' onClose={() => setError(null)}>
+        <Alert
+          severity='error'
+          onClose={() => {
+            setError(null);
+          }}
+        >
           {error}
         </Alert>
       )}

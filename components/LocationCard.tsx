@@ -99,7 +99,9 @@ export default function LocationCard({
                 <Tooltip title='Bearbeiten'>
                   <IconButton
                     size='small'
-                    onClick={() => onEdit(location.id)}
+                    onClick={() => {
+                      onEdit(location.id);
+                    }}
                     aria-label={`${location.name} bearbeiten`}
                   >
                     <EditIcon fontSize='small' />
@@ -110,7 +112,9 @@ export default function LocationCard({
                 <Tooltip title='Löschen'>
                   <IconButton
                     size='small'
-                    onClick={() => onDelete(location.id)}
+                    onClick={() => {
+                      onDelete(location.id);
+                    }}
                     aria-label={`${location.name} löschen`}
                     color='error'
                   >

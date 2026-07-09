@@ -285,7 +285,9 @@ const UserDashboardE2E: React.FC = () => {
     };
 
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+    };
   }, []);
 
   const fetchBookings = useCallback(async () => {
@@ -702,7 +704,7 @@ const UserDashboardClerk: React.FC = () => {
 
   useEffect(() => {
     if (userLoaded && user) {
-      fetchBookings();
+      void fetchBookings();
     } else if (userLoaded && !user) {
       setLoading(false);
     }

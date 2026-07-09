@@ -65,7 +65,7 @@ function BookingSuccessContent() {
       }
     };
 
-    verify();
+    void verify();
   }, [sessionId, bookingId]);
 
   if (loading) {

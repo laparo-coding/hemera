@@ -230,25 +230,33 @@ export function SlideEditorToolbar({
         onClose={handleHeadingClose}
       >
         <MenuItem
-          onClick={() => setHeading(1)}
+          onClick={() => {
+            setHeading(1);
+          }}
           selected={editor.isActive('heading', { level: 1 })}
         >
           Überschrift 1
         </MenuItem>
         <MenuItem
-          onClick={() => setHeading(2)}
+          onClick={() => {
+            setHeading(2);
+          }}
           selected={editor.isActive('heading', { level: 2 })}
         >
           Überschrift 2
         </MenuItem>
         <MenuItem
-          onClick={() => setHeading(3)}
+          onClick={() => {
+            setHeading(3);
+          }}
           selected={editor.isActive('heading', { level: 3 })}
         >
           Überschrift 3
         </MenuItem>
         <MenuItem
-          onClick={() => setHeading(4)}
+          onClick={() => {
+            setHeading(4);
+          }}
           selected={editor.isActive('heading', { level: 4 })}
         >
           Überschrift 4

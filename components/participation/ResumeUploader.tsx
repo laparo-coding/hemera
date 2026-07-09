@@ -86,7 +86,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
   }, [bookingId]);
 
   useEffect(() => {
-    loadResume();
+    void loadResume();
   }, [loadResume]);
 
   // Handle file upload
@@ -200,7 +200,13 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
   return (
     <Box>
       {error && (
-        <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>
+        <Alert
+          severity='error'
+          sx={{ mb: 2 }}
+          onClose={() => {
+            setError(null);
+          }}
+        >
           {error}
         </Alert>
       )}

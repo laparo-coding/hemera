@@ -139,8 +139,10 @@ export default function CourseMaterialTable({
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchMaterials(controller.signal);
-    return () => controller.abort();
+    void fetchMaterials(controller.signal);
+    return () => {
+      controller.abort();
+    };
   }, [fetchMaterials]);
 
   // Filter materials based on search
@@ -170,7 +172,7 @@ export default function CourseMaterialTable({
   };
 
   const handleRefresh = () => {
-    fetchMaterials();
+    void fetchMaterials();
     onRefresh?.();
   };
 
@@ -238,7 +240,7 @@ export default function CourseMaterialTable({
 
       setDeleteDialogOpen(false);
       setMaterialToDelete(null);
-      fetchMaterials();
+      void fetchMaterials();
     } catch (err) {
       setDeleteDialogOpen(false);
       setMaterialToDelete(null);
@@ -264,7 +266,13 @@ export default function CourseMaterialTable({
   return (
     <>
       {error && (
-        <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>
+        <Alert
+          severity='error'
+          sx={{ mb: 2 }}
+          onClose={() => {
+            setError(null);
+          }}
+        >
           {error}
           <Button onClick={handleRefresh} size='small' sx={{ ml: 2 }}>
             Erneut versuchen
@@ -314,7 +322,9 @@ export default function CourseMaterialTable({
             <Button
               variant='contained'
               startIcon={<AddIcon />}
-              onClick={() => router.push('/admin/course-material/new')}
+              onClick={() => {
+                router.push('/admin/course-material/new');
+              }}
             >
               Neues Material
             </Button>
@@ -351,9 +361,9 @@ export default function CourseMaterialTable({
                       <Button
                         variant='outlined'
                         startIcon={<AddIcon />}
-                        onClick={() =>
-                          router.push('/admin/course-material/new')
-                        }
+                        onClick={() => {
+                          router.push('/admin/course-material/new');
+                        }}
                         sx={{ mt: 1 }}
                       >
                         Erstes Material erstellen
@@ -412,7 +422,9 @@ export default function CourseMaterialTable({
                       <Tooltip title='Bearbeiten'>
                         <IconButton
                           size='small'
-                          onClick={() => handleEdit(material.id)}
+                          onClick={() => {
+                            handleEdit(material.id);
+                          }}
                           aria-label={`${material.title} bearbeiten`}
                         >
                           <EditIcon fontSize='small' />
@@ -421,7 +433,9 @@ export default function CourseMaterialTable({
                       <Tooltip title='Löschen'>
                         <IconButton
                           size='small'
-                          onClick={() => handleDeleteClick(material)}
+                          onClick={() => {
+                            handleDeleteClick(material);
+                          }}
                           aria-label={`${material.title} löschen`}
                           color='error'
                         >

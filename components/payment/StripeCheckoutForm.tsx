@@ -198,7 +198,9 @@ export default function StripeCheckoutForm({
           <Button
             variant='outlined'
             fullWidth
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              window.location.reload();
+            }}
           >
             Seite neu laden
           </Button>

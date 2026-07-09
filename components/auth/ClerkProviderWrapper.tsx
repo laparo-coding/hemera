@@ -83,11 +83,11 @@ class ClerkErrorBoundary extends Component<
   static getDerivedStateFromError(error: Error): ClerkErrorBoundaryState {
     // Check if this is a Clerk-related error
     const isClerkError =
-      error.message?.includes('Clerk') ||
-      error.message?.includes('origin_invalid') ||
-      error.message?.includes('Production Keys') ||
-      error.message?.includes('pk_live_') ||
-      error.message?.includes('pk_test_');
+      error.message.includes('Clerk') ||
+      error.message.includes('origin_invalid') ||
+      error.message.includes('Production Keys') ||
+      error.message.includes('pk_live_') ||
+      error.message.includes('pk_test_');
 
     if (isClerkError) {
       logClientWarning(

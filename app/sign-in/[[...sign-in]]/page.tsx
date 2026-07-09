@@ -24,7 +24,7 @@ function validateRedirectUrl(url: string | null): string {
 
 export default async function SignInPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const redirectUrl = validateRedirectUrl(params?.redirect_url ?? null);
+  const redirectUrl = validateRedirectUrl(params.redirect_url ?? null);
 
   return <SignInPageClient redirectUrl={redirectUrl} />;
 }

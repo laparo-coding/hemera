@@ -181,7 +181,7 @@ export const CourseParticipationStepper: React.FC<
   }, [bookingId]);
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, [loadData]);
 
   // Filter steps based on summary asset availability and caller context

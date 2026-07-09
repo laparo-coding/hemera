@@ -32,7 +32,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Fetch HTML content from Vercel Blob with timeout
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10_000);
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 10_000);
     let response: Response;
     try {
       response = await fetch(material.blobUrl, { signal: controller.signal });

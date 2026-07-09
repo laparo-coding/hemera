@@ -111,7 +111,9 @@ function DashboardLayoutE2E({ children }: { children: React.ReactNode }) {
       }
     };
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+    };
   }, []);
 
   const handleSignOut = useCallback(() => {
@@ -193,7 +195,7 @@ export default function DashboardLayout({
     }
 
     try {
-      setHasMockSession(Boolean(window.localStorage?.getItem('clerk-session')));
+      setHasMockSession(Boolean(window.localStorage.getItem('clerk-session')));
     } catch {
       setHasMockSession(false);
     }

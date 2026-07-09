@@ -131,7 +131,9 @@ export default function EditCourseForm({
           }}
           locations={locations}
           onSubmit={handleSubmit}
-          onCancel={() => router.push('/admin/courses')}
+          onCancel={() => {
+            router.push('/admin/courses');
+          }}
           submitLabel='Seminar aktualisieren'
         />
       </Paper>

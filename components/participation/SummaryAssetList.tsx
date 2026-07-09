@@ -80,7 +80,7 @@ export const SummaryAssetList: React.FC<SummaryAssetListProps> = ({
   }, [bookingId]);
 
   useEffect(() => {
-    loadAssets();
+    void loadAssets();
   }, [loadAssets]);
 
   // Mark as viewed when first asset starts playing

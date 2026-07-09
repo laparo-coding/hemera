@@ -322,9 +322,9 @@ export default function LocationForm({
             label='Außenansicht'
             imageType='exterior'
             currentUrl={formData.imageUrl}
-            onUploadComplete={url =>
-              setFormData(prev => ({ ...prev, imageUrl: url }))
-            }
+            onUploadComplete={url => {
+              setFormData(prev => ({ ...prev, imageUrl: url }));
+            }}
             disabled={isLoading}
           />
         </Grid>
@@ -334,9 +334,9 @@ export default function LocationForm({
             label='Innenansicht / Schulungsraum'
             imageType='room'
             currentUrl={formData.roomImageUrl}
-            onUploadComplete={url =>
-              setFormData(prev => ({ ...prev, roomImageUrl: url }))
-            }
+            onUploadComplete={url => {
+              setFormData(prev => ({ ...prev, roomImageUrl: url }));
+            }}
             disabled={isLoading}
           />
         </Grid>

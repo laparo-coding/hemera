@@ -162,7 +162,9 @@ export default function AdminTableToolbar({
                     ''
                   }
                   label={filter.label}
-                  onChange={e => handleFilterChange(filter.id, e.target.value)}
+                  onChange={e => {
+                    handleFilterChange(filter.id, e.target.value);
+                  }}
                   startAdornment={
                     <InputAdornment position='start'>
                       <FilterIcon fontSize='small' color='action' />
@@ -186,9 +188,9 @@ export default function AdminTableToolbar({
                 control={
                   <Checkbox
                     checked={(filterValues[filter.id] as boolean) ?? false}
-                    onChange={e =>
-                      handleFilterChange(filter.id, e.target.checked)
-                    }
+                    onChange={e => {
+                      handleFilterChange(filter.id, e.target.checked);
+                    }}
                     size='small'
                   />
                 }

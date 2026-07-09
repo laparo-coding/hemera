@@ -227,10 +227,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
       const successResponse = createSuccessResponse(
         {
-          id: booking!.id,
-          paymentStatus: booking!.paymentStatus,
-          reviewedAt: booking!.reviewedAt?.toISOString(),
-          reviewedBy: booking!.reviewedBy,
+          id: booking?.id,
+          paymentStatus: booking?.paymentStatus,
+          reviewedAt: booking?.reviewedAt?.toISOString(),
+          reviewedBy: booking?.reviewedBy,
           message: 'Booking approved successfully',
         },
         requestId

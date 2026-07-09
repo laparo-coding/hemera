@@ -294,9 +294,15 @@ export default function CurriculumEditor({
                   size='small'
                   label='Titel'
                   value={module.title}
-                  onChange={e => updateModuleTitle(module.id, e.target.value)}
-                  onBlur={() => trimModuleTitle(module.id)}
-                  onClick={e => e.stopPropagation()}
+                  onChange={e => {
+                    updateModuleTitle(module.id, e.target.value);
+                  }}
+                  onBlur={() => {
+                    trimModuleTitle(module.id);
+                  }}
+                  onClick={e => {
+                    e.stopPropagation();
+                  }}
                   disabled={disabled}
                   placeholder='z.B. Grundlagen der Verhandlung'
                   sx={{ flexGrow: 1, bgcolor: 'white' }}
@@ -353,9 +359,9 @@ export default function CurriculumEditor({
                             e.target.value
                           )
                         }
-                        onBlur={() =>
-                          trimTopic(module.id, topic.id, 'timeRange')
-                        }
+                        onBlur={() => {
+                          trimTopic(module.id, topic.id, 'timeRange');
+                        }}
                         disabled={disabled}
                         placeholder='09:00 - 09:30'
                         sx={{ width: 140, bgcolor: 'white' }}
@@ -371,7 +377,9 @@ export default function CurriculumEditor({
                             e.target.value
                           )
                         }
-                        onBlur={() => trimTopic(module.id, topic.id, 'title')}
+                        onBlur={() => {
+                          trimTopic(module.id, topic.id, 'title');
+                        }}
                         disabled={disabled}
                         placeholder='Thema / Aktivität'
                         sx={{ flexGrow: 1, bgcolor: 'white' }}
@@ -405,7 +413,9 @@ export default function CurriculumEditor({
                 <Button
                   size='small'
                   startIcon={<AddIcon />}
-                  onClick={() => addTopic(module.id)}
+                  onClick={() => {
+                    addTopic(module.id);
+                  }}
                   disabled={disabled}
                   sx={{ alignSelf: 'flex-start', mt: 1 }}
                 >
@@ -426,13 +436,13 @@ export default function CurriculumEditor({
       >
         <DialogTitle id='delete-dialog-title'>
           {deleteDialog?.type === 'module'
-            ? `„${deleteDialog?.title}" löschen?`
+            ? `„${deleteDialog.title}" löschen?`
             : `Thema „${deleteDialog?.title}" löschen?`}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id='delete-dialog-description'>
             {deleteDialog?.type === 'module'
-              ? `Möchtest du den Tag „${deleteDialog?.title}" und alle zugehörigen Themen wirklich löschen?`
+              ? `Möchtest du den Tag „${deleteDialog.title}" und alle zugehörigen Themen wirklich löschen?`
               : `Möchtest du das Thema „${deleteDialog?.title}" wirklich löschen?`}{' '}
             Diese Aktion kann nicht rückgängig gemacht werden.
           </DialogContentText>

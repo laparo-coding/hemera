@@ -84,7 +84,7 @@ export default function CheckoutSuccessClient() {
       }
     };
 
-    verifyPayment();
+    void verifyPayment();
   }, [sessionId, router]);
 
   if (!isLoaded || loading) {
@@ -109,7 +109,12 @@ export default function CheckoutSuccessClient() {
           {error}
         </Alert>
         <Box sx={{ textAlign: 'center' }}>
-          <Button variant='outlined' onClick={() => router.push('/courses')}>
+          <Button
+            variant='outlined'
+            onClick={() => {
+              router.push('/courses');
+            }}
+          >
             Back to Courses
           </Button>
         </Box>
@@ -204,13 +209,17 @@ export default function CheckoutSuccessClient() {
             <Stack direction='row' spacing={2}>
               <Button
                 variant='outlined'
-                onClick={() => router.push('/courses')}
+                onClick={() => {
+                  router.push('/courses');
+                }}
               >
                 Browse More Courses
               </Button>
               <Button
                 variant='contained'
-                onClick={() => router.push('/dashboard')}
+                onClick={() => {
+                  router.push('/dashboard');
+                }}
                 startIcon={<DashboardOutlined />}
               >
                 Go to My Dashboard

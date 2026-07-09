@@ -170,7 +170,9 @@ export function UserList({
               size='small'
               fullWidth
               value={searchValue}
-              onChange={e => setSearchValue(e.target.value)}
+              onChange={e => {
+                setSearchValue(e.target.value);
+              }}
               disabled={isLoading}
             />
           </Box>
@@ -275,7 +277,9 @@ export function UserList({
                     <IconButton
                       data-testid='action-menu-button'
                       size='small'
-                      onClick={e => handleMenuOpen(e, user.id)}
+                      onClick={e => {
+                        handleMenuOpen(e, user.id);
+                      }}
                     >
                       <MoreVertIcon />
                     </IconButton>
@@ -319,7 +323,11 @@ export function UserList({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={() => handleAction('view')}>
+        <MenuItem
+          onClick={() => {
+            handleAction('view');
+          }}
+        >
           <ListItemIcon>
             <VisibilityIcon fontSize='small' />
           </ListItemIcon>
@@ -327,7 +335,9 @@ export function UserList({
         </MenuItem>
         <MenuItem
           data-testid='assign-role-action'
-          onClick={() => handleAction('role')}
+          onClick={() => {
+            handleAction('role');
+          }}
         >
           <ListItemIcon>
             <SecurityIcon fontSize='small' />
@@ -336,7 +346,9 @@ export function UserList({
         </MenuItem>
         <MenuItem
           data-testid='delete-user-action'
-          onClick={() => handleAction('delete')}
+          onClick={() => {
+            handleAction('delete');
+          }}
           sx={{ color: 'error.main' }}
         >
           <ListItemIcon>
