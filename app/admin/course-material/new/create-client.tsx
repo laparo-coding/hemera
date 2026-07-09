@@ -216,7 +216,9 @@ export default function CreateCourseMaterialClient() {
           </Box>
           <SlideControlUploadForm
             onSubmit={handleSlideControlSubmit}
-            onCancel={() => router.push('/admin/course-material')}
+            onCancel={() => {
+              router.push('/admin/course-material');
+            }}
           />
         </Paper>
       )}

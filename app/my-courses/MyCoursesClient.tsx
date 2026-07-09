@@ -112,8 +112,8 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
               e.booking.id === bookingId
                 ? {
                     ...e,
-                    participation: result.data!.participation,
-                    hasSummaryAssets: result.data!.hasSummaryAssets,
+                    participation: result.data?.participation ?? null,
+                    hasSummaryAssets: result.data?.hasSummaryAssets ?? false,
                   }
                 : e
             )

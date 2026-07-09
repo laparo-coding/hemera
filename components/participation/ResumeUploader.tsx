@@ -148,7 +148,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      handleUpload(file);
+      void handleUpload(file);
     }
     // Reset input
     if (fileInputRef.current) {

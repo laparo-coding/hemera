@@ -286,7 +286,9 @@ export function UserProfileButton({
         {menuItems.map(item => (
           <MenuItem
             key={item.path}
-            onClick={() => handleNavigate(item.path)}
+            onClick={() => {
+              handleNavigate(item.path);
+            }}
             sx={{
               py: 1,
               '&:hover': {

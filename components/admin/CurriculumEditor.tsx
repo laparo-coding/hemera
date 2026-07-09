@@ -310,9 +310,9 @@ export default function CurriculumEditor({
                 <IconButton
                   size='small'
                   color='error'
-                  onClick={e =>
-                    handleModuleDeleteClick(e, module.id, module.title)
-                  }
+                  onClick={e => {
+                    handleModuleDeleteClick(e, module.id, module.title);
+                  }}
                   disabled={disabled}
                   title='Tag löschen'
                 >

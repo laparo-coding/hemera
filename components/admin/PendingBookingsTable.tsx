@@ -134,7 +134,7 @@ export default function PendingBookingsTable({
   }, []);
 
   useEffect(() => {
-    fetchPendingBookings();
+    void fetchPendingBookings();
   }, [fetchPendingBookings]);
 
   const handleOpenReviewDialog = (
