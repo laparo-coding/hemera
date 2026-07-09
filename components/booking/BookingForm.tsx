@@ -130,7 +130,9 @@ export default function BookingForm({
                   bgcolor: 'primary.50',
                 }),
               }}
-              onClick={() => setSelectedCourse(course.id)}
+              onClick={() => {
+                setSelectedCourse(course.id);
+              }}
             >
               <CardContent>
                 <FormControlLabel

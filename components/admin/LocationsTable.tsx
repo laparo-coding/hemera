@@ -121,7 +121,9 @@ export default function LocationsTable({
         <Button
           variant='contained'
           startIcon={<AddIcon />}
-          onClick={() => router.push('/admin/locations/new')}
+          onClick={() => {
+            router.push('/admin/locations/new');
+          }}
         >
           Neuer Veranstaltungsort
         </Button>
@@ -215,7 +217,9 @@ export default function LocationsTable({
                       <Tooltip title='Ansehen'>
                         <IconButton
                           size='small'
-                          onClick={() => handleView(location.slug)}
+                          onClick={() => {
+                            handleView(location.slug);
+                          }}
                           aria-label={`${location.name} ansehen`}
                         >
                           <ViewIcon fontSize='small' />
@@ -225,7 +229,9 @@ export default function LocationsTable({
                         <Tooltip title='Bearbeiten'>
                           <IconButton
                             size='small'
-                            onClick={() => onEdit(location.id)}
+                            onClick={() => {
+                              onEdit(location.id);
+                            }}
                             aria-label={`${location.name} bearbeiten`}
                           >
                             <EditIcon fontSize='small' />
@@ -243,7 +249,9 @@ export default function LocationsTable({
                           <span>
                             <IconButton
                               size='small'
-                              onClick={() => onDelete(location.id)}
+                              onClick={() => {
+                                onDelete(location.id);
+                              }}
                               aria-label={`${location.name} löschen`}
                               color='error'
                               disabled={courseCount > 0}

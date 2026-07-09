@@ -285,9 +285,9 @@ export default function PendingBookingsTable({
                     <Tooltip title='Genehmigen'>
                       <IconButton
                         color='success'
-                        onClick={() =>
-                          handleOpenReviewDialog(booking, 'approve')
-                        }
+                        onClick={() => {
+                          handleOpenReviewDialog(booking, 'approve');
+                        }}
                       >
                         <ApproveIcon />
                       </IconButton>
@@ -295,9 +295,9 @@ export default function PendingBookingsTable({
                     <Tooltip title='Ablehnen'>
                       <IconButton
                         color='error'
-                        onClick={() =>
-                          handleOpenReviewDialog(booking, 'reject')
-                        }
+                        onClick={() => {
+                          handleOpenReviewDialog(booking, 'reject');
+                        }}
                       >
                         <RejectIcon />
                       </IconButton>
@@ -313,7 +313,9 @@ export default function PendingBookingsTable({
         component='div'
         count={bookings.length}
         page={page}
-        onPageChange={(_, newPage) => setPage(newPage)}
+        onPageChange={(_, newPage) => {
+          setPage(newPage);
+        }}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={e => {
           setRowsPerPage(parseInt(e.target.value, 10));

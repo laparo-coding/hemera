@@ -55,4 +55,4 @@ async function main() {
   await prisma.$disconnect();
 }
 
-main();
+void main();

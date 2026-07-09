@@ -41,10 +41,18 @@ function createFetchTimeoutSignal(timeoutMs: number): AbortSignal {
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  controller.signal.addEventListener('abort', () => clearTimeout(timeoutId), {
-    once: true,
-  });
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, timeoutMs);
+  controller.signal.addEventListener(
+    'abort',
+    () => {
+      clearTimeout(timeoutId);
+    },
+    {
+      once: true,
+    }
+  );
   return controller.signal;
 }
 
@@ -253,11 +261,11 @@ export default function ReportsPage() {
       await Promise.all([fetchReports(), fetchHealth()]);
       setLoading(false);
     };
-    loadData();
+    void loadData();
   }, [fetchReports, fetchHealth]);
 
   const handleRefreshHealth = () => {
-    fetchHealth();
+    void fetchHealth();
   };
 
   const stats = reports?.stats;

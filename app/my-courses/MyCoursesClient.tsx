@@ -94,7 +94,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
   }, []);
 
   useEffect(() => {
-    loadEnrollments();
+    void loadEnrollments();
   }, [loadEnrollments]);
 
   const handleAccordionChange = (bookingId: string) => {
@@ -265,7 +265,9 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
             <Accordion
               key={item.booking.id}
               expanded={expandedId === item.booking.id}
-              onChange={() => handleAccordionChange(item.booking.id)}
+              onChange={() => {
+                handleAccordionChange(item.booking.id);
+              }}
               sx={{
                 mb: 2,
                 border: `1px solid ${colors.rosyBrown}`,
@@ -480,7 +482,9 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           fullWidth
           aria-label='Vorbereitungsabsicht'
           value={preparationIntent}
-          onChange={e => setPreparationIntent(e.target.value)}
+          onChange={e => {
+            setPreparationIntent(e.target.value);
+          }}
           placeholder='Beschreibe, was du mit diesem Seminar erreichen möchtest...'
           sx={textFieldSx}
         />
@@ -500,7 +504,9 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           fullWidth
           aria-label='Gewünschte Ergebnisse'
           value={desiredResults}
-          onChange={e => setDesiredResults(e.target.value)}
+          onChange={e => {
+            setDesiredResults(e.target.value);
+          }}
           placeholder='Welche konkreten Ergebnisse möchtest du erreichen...'
           sx={textFieldSx}
         />
@@ -520,7 +526,9 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
           fullWidth
           aria-label='Profil des Vorgesetzten'
           value={lineManagerProfile}
-          onChange={e => setLineManagerProfile(e.target.value)}
+          onChange={e => {
+            setLineManagerProfile(e.target.value);
+          }}
           placeholder='Charaktereigenschaften, Kommunikationsstil, Prioritäten deines Vorgesetzten...'
           sx={textFieldSx}
         />
@@ -536,7 +544,9 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
         </Typography>
         <ResumeUploader
           bookingId={bookingId}
-          onUploadComplete={() => setResumeUploaded(true)}
+          onUploadComplete={() => {
+            setResumeUploaded(true);
+          }}
         />
       </Box>
 
@@ -577,7 +587,9 @@ const SummaryStepContent: React.FC<SummaryStepContentProps> = ({
     <Box sx={{ mt: 2 }}>
       <SummaryAssetList
         bookingId={bookingId}
-        onAllAssetsViewed={() => setAllViewed(true)}
+        onAllAssetsViewed={() => {
+          setAllViewed(true);
+        }}
       />
 
       <Box sx={{ mt: 3 }}>

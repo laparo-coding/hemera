@@ -280,7 +280,9 @@ export default function CourseCard({
           component={Link}
           href={detailHref}
           scroll
-          onClick={() => window.scrollTo(0, 0)}
+          onClick={() => {
+            window.scrollTo(0, 0);
+          }}
           variant='contained'
           color='primary'
           fullWidth

@@ -67,10 +67,9 @@ export default function EditCourseMaterialClient({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const handleCancel = useCallback(
-    () => router.push('/admin/course-material'),
-    [router]
-  );
+  const handleCancel = useCallback(() => {
+    router.push('/admin/course-material');
+  }, [router]);
 
   const fetchMaterial = useCallback(async () => {
     if (!id) {
@@ -124,7 +123,7 @@ export default function EditCourseMaterialClient({
   }, [id]);
 
   useEffect(() => {
-    fetchMaterial();
+    void fetchMaterial();
   }, [fetchMaterial]);
 
   /**

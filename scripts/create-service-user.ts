@@ -181,4 +181,4 @@ function printNextSteps(userId: string) {
   console.log('\n' + '═'.repeat(60));
 }
 
-main();
+void main();

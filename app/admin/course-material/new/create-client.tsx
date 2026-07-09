@@ -141,7 +141,9 @@ export default function CreateCourseMaterialClient() {
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
         <IconButton
-          onClick={() => router.push('/admin/course-material')}
+          onClick={() => {
+            router.push('/admin/course-material');
+          }}
           aria-label='Zurück zur Seminarmaterial-Übersicht'
         >
           <ArrowBackIcon />
@@ -192,7 +194,9 @@ export default function CreateCourseMaterialClient() {
           </Box>
           <HTMLContentUploadForm
             onSubmit={handleContentUploadSubmit}
-            onCancel={() => router.push('/admin/course-material')}
+            onCancel={() => {
+              router.push('/admin/course-material');
+            }}
           />
         </Paper>
       )}

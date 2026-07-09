@@ -171,4 +171,4 @@ async function main() {
   }
 }
 
-main();
+void main();

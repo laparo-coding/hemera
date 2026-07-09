@@ -143,7 +143,9 @@ export default function SlideControlUploadForm({
       <TextField
         label='Identifier (optional)'
         value={identifier}
-        onChange={e => setIdentifier(e.target.value)}
+        onChange={e => {
+          setIdentifier(e.target.value);
+        }}
         fullWidth
         helperText='Wird automatisch aus dem Titel generiert, wenn leer'
         sx={{ mb: 3 }}
@@ -151,7 +153,7 @@ export default function SlideControlUploadForm({
       />
 
       {/* Current file in edit mode */}
-      {isEditMode && initialData?.blobUrl && !selectedFile && (
+      {isEditMode && initialData.blobUrl && !selectedFile && (
         <Box
           sx={{
             display: 'flex',

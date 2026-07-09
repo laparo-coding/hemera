@@ -21,4 +21,4 @@ async function check() {
   await prisma.$disconnect();
 }
 
-check();
+void check();

@@ -163,7 +163,9 @@ export default function TestimonialSectionMyCourses({
         {testimonial && (
           <Button
             variant='text'
-            onClick={() => setShowForm(false)}
+            onClick={() => {
+              setShowForm(false);
+            }}
             sx={{ mt: 2 }}
           >
             Abbrechen
@@ -234,7 +236,9 @@ export default function TestimonialSectionMyCourses({
 
         <Button
           variant='outlined'
-          onClick={() => setShowForm(true)}
+          onClick={() => {
+            setShowForm(true);
+          }}
           disabled={testimonial.status === 'PENDING'}
         >
           Bearbeiten

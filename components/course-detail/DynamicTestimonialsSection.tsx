@@ -75,7 +75,7 @@ export const DynamicTestimonialsSection: React.FC<
       }
     }
 
-    fetchTestimonials();
+    void fetchTestimonials();
   }, [courseSlug, limit]);
 
   // Don't render section if no testimonials and not loading

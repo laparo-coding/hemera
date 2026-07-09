@@ -49,7 +49,9 @@ export function AdminE2EAccessGate({
     };
 
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+    };
   }, [router]);
 
   if (accessState !== 'admin') {

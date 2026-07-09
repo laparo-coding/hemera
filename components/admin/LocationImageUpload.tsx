@@ -129,7 +129,12 @@ export default function LocationImageUpload({
       </Typography>
 
       {error && (
-        <Alert severity='error' onClose={() => setError(null)}>
+        <Alert
+          severity='error'
+          onClose={() => {
+            setError(null);
+          }}
+        >
           {error}
         </Alert>
       )}

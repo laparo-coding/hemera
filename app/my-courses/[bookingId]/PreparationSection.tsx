@@ -252,7 +252,9 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
         </Typography>
         <textarea
           value={preparationIntent}
-          onChange={e => setPreparationIntent(e.target.value)}
+          onChange={e => {
+            setPreparationIntent(e.target.value);
+          }}
           placeholder='Beschreibe, was du mit diesem Seminar erreichen möchtest...'
           style={{
             width: '100%',
@@ -280,7 +282,9 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
         </Typography>
         <textarea
           value={desiredResults}
-          onChange={e => setDesiredResults(e.target.value)}
+          onChange={e => {
+            setDesiredResults(e.target.value);
+          }}
           placeholder='Welche konkreten Ergebnisse möchtest du erreichen...'
           style={{
             width: '100%',
@@ -308,7 +312,9 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
         </Typography>
         <textarea
           value={lineManagerProfile}
-          onChange={e => setLineManagerProfile(e.target.value)}
+          onChange={e => {
+            setLineManagerProfile(e.target.value);
+          }}
           placeholder='Charaktereigenschaften, Kommunikationsstil, Prioritäten deines Vorgesetzten...'
           style={{
             width: '100%',
@@ -336,7 +342,9 @@ const PreparationStepContent: React.FC<PreparationStepContentProps> = ({
         </Typography>
         <ResumeUploader
           bookingId={bookingId}
-          onUploadComplete={() => setResumeUploaded(true)}
+          onUploadComplete={() => {
+            setResumeUploaded(true);
+          }}
         />
       </Box>
 
@@ -378,7 +386,9 @@ const SummaryStepContent: React.FC<SummaryStepContentProps> = ({
     <Box sx={{ mt: 2 }}>
       <SummaryAssetList
         bookingId={bookingId}
-        onAllAssetsViewed={() => setAllViewed(true)}
+        onAllAssetsViewed={() => {
+          setAllViewed(true);
+        }}
       />
 
       <Box sx={{ mt: 3 }}>

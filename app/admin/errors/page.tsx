@@ -105,7 +105,7 @@ export default function ErrorDashboard() {
   }, [fetchMetrics, fetchLogs]);
 
   useEffect(() => {
-    refreshData();
+    void refreshData();
   }, [refreshData]);
 
   const getCategoryIcon = (category: string) => {
@@ -170,7 +170,9 @@ export default function ErrorDashboard() {
             <Button
               variant={timeRange === 'hour' ? 'contained' : 'outlined'}
               size='small'
-              onClick={() => setTimeRange('hour')}
+              onClick={() => {
+                setTimeRange('hour');
+              }}
               sx={{ mr: 1 }}
             >
               1 Stunde
@@ -178,7 +180,9 @@ export default function ErrorDashboard() {
             <Button
               variant={timeRange === 'day' ? 'contained' : 'outlined'}
               size='small'
-              onClick={() => setTimeRange('day')}
+              onClick={() => {
+                setTimeRange('day');
+              }}
               sx={{ mr: 1 }}
             >
               24 Stunden
@@ -186,7 +190,9 @@ export default function ErrorDashboard() {
             <Button
               variant={timeRange === 'week' ? 'contained' : 'outlined'}
               size='small'
-              onClick={() => setTimeRange('week')}
+              onClick={() => {
+                setTimeRange('week');
+              }}
             >
               7 Tage
             </Button>
@@ -207,7 +213,9 @@ export default function ErrorDashboard() {
 
       <Tabs
         value={tabValue}
-        onChange={(_, value) => setTabValue(value)}
+        onChange={(_, value) => {
+          setTabValue(value);
+        }}
         sx={{ mb: 3 }}
       >
         <Tab label='Übersicht' />

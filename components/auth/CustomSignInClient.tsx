@@ -25,7 +25,7 @@ export default function CustomSignInClient() {
   const isLoaded = fetchStatus === 'idle';
 
   const redirectTo = useMemo(
-    () => params?.get('redirect_url') || '/dashboard',
+    () => params.get('redirect_url') || '/dashboard',
     [params]
   );
 
@@ -62,7 +62,7 @@ export default function CustomSignInClient() {
     } catch (err: unknown) {
       const error = err as { errors?: Array<{ message?: string }> };
       const message =
-        error?.errors?.[0]?.message ||
+        error.errors?.[0]?.message ||
         'Anmeldung fehlgeschlagen. Bitte versuche es erneut.';
       setError(message);
     } finally {
@@ -99,7 +99,9 @@ export default function CustomSignInClient() {
           type='email'
           label='E-Mail'
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={e => {
+            setEmail(e.target.value);
+          }}
           required
           autoComplete='email'
           disabled={!isLoaded || submitting}
@@ -108,7 +110,9 @@ export default function CustomSignInClient() {
           type='password'
           label='Passwort'
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={e => {
+            setPassword(e.target.value);
+          }}
           required
           autoComplete='current-password'
           disabled={!isLoaded || submitting}

@@ -76,7 +76,7 @@ export default function MaterialLinkSelector({
       }
     }
 
-    loadLinks();
+    void loadLinks();
     return () => {
       cancelled = true;
     };

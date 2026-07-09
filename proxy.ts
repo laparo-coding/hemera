@@ -31,7 +31,7 @@ function extractBearerToken(authorizationHeader: string | null): string | null {
     return null;
   }
 
-  const token = match[1]?.trim();
+  const token = match[1]!.trim();
   return token ? token : null;
 }
 
