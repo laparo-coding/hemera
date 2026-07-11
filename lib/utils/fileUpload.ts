@@ -50,7 +50,7 @@ export async function uploadThumbnail(file: File): Promise<UploadResult> {
 
     // Generate unique filename
     const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(7);
+    const randomString = crypto.randomUUID().split('-')[0];
     const extension = file.name.split('.').pop() || 'jpg';
     const filename = `course-thumbnails/${timestamp}-${randomString}.${extension}`;
 

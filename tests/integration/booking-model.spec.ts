@@ -26,7 +26,7 @@ describe('Booking Model Validations', () => {
 
     // Create test course with enhanced unique naming
     const timestamp = Date.now();
-    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const randomSuffix = crypto.randomUUID().split('-')[0];
     const uniqueId = `test-course-${timestamp}-${randomSuffix}`;
 
     // Create course directly without transaction to ensure persistence

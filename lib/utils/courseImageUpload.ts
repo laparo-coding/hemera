@@ -72,7 +72,7 @@ export async function uploadCourseImage(
 
     // Generate unique base filename
     const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(7);
+    const randomString = crypto.randomUUID().split('-')[0];
     const baseName = `course-images/${timestamp}-${randomString}`;
 
     // Upload original file

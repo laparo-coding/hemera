@@ -47,8 +47,7 @@ interface CurriculumEditorProps {
   courseId?: string;
 }
 
-const generateId = () =>
-  `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+const generateId = () => `${Date.now()}-${crypto.randomUUID().split('-')[0]}`;
 
 const createEmptyTopic = (): CurriculumTopic => ({
   id: generateId(),

@@ -119,7 +119,7 @@ export async function uploadResume(
 
     // Generate unique filename with participation context
     const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(7);
+    const randomString = crypto.randomUUID().split('-')[0];
     const sanitizedName = file.name
       .replace(/[^a-zA-Z0-9.-]/g, '_')
       .substring(0, 50);

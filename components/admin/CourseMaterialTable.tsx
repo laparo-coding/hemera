@@ -542,7 +542,7 @@ export default function CourseMaterialTable({
                 '& p': { mb: 1 },
                 '& ul, & ol': { pl: 3, mb: 1 },
               }}
-              dangerouslySetInnerHTML={{ __html: viewHtmlContent }}
+              dangerouslySetInnerHTML={{ __html: viewHtmlContent }} // nosemgrep: react-dangerouslysetinnerhtml - HTML content sanitized via lib/utils/html-sanitizer.ts on upload
             />
           )}
         </DialogContent>

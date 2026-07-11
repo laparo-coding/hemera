@@ -54,7 +54,7 @@ export default function AcademyPage() {
           type='application/ld+json'
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(schema, null, 2),
-          }}
+          }} // nosemgrep: react-dangerouslysetinnerhtml - JSON-LD serialized via JSON.stringify, safe
         />
       ))}
 

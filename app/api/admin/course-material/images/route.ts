@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     // Generate unique filename
     const timestamp = Date.now();
-    const randomId = Math.random().toString(36).substring(2, 8);
+    const randomId = crypto.randomUUID().split('-')[0];
     const fileExtension = MIME_TO_EXT[file.type] || 'bin';
     const filename = `course-material/images/${timestamp}-${randomId}.${fileExtension}`;
 

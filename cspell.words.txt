@@ -695,3 +695,4 @@ trivy
 msgbox
 vascript
 Thalassa
+nosemgrep

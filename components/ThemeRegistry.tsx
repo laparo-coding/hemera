@@ -49,7 +49,7 @@ export default function ThemeRegistry({
         data-emotion={`${cache.key} ${names.join(' ')}`}
         dangerouslySetInnerHTML={{
           __html: styles,
-        }}
+        }} // nosemgrep: react-dangerouslysetinnerhtml - Emotion CSS cache, framework-controlled
       />
     );
   });

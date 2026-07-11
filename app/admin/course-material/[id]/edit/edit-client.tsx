@@ -83,7 +83,7 @@ export default function EditCourseMaterialClient({
     try {
       // Fetch metadata and content in parallel
       const [metaRes, contentRes] = await Promise.all([
-        fetch(`/api/admin/course-material/${id}`),
+        fetch(`/api/admin/course-material/${id}`), // nosemgrep: javascript_ssrf_rule-node-ssrf relative URL, no SSRF risk
         fetch(`/api/admin/course-material/${id}/content`),
       ]);
 

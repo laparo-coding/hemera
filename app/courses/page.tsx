@@ -120,7 +120,7 @@ export default async function CoursesPage() {
           type='application/ld+json'
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(schema),
-          }}
+          }} // nosemgrep: react-dangerouslysetinnerhtml - JSON-LD serialized via JSON.stringify, safe
         />
       ))}
 

@@ -18,14 +18,14 @@ function parseArgs(argv) {
 
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
-    if (token === '--help') {
+    if (token === '--help') { // nosemgrep: javascript_crypto_rule-node-timing-attack CLI arg parsing, not security-sensitive
       args.help = true;
-    } else if (token === '--json') {
+    } else if (token === '--json') { // nosemgrep: javascript_crypto_rule-node-timing-attack CLI arg parsing, not security-sensitive
       args.json = true;
-    } else if (token === '--input') {
+    } else if (token === '--input') { // nosemgrep: javascript_crypto_rule-node-timing-attack CLI arg parsing, not security-sensitive
       args.input = argv[index + 1];
       index += 1;
-    } else if (token === '--top') {
+    } else if (token === '--top') { // nosemgrep: javascript_crypto_rule-node-timing-attack CLI arg parsing, not security-sensitive
       args.top = Number.parseInt(argv[index + 1] ?? '10', 10);
       index += 1;
     } else {
