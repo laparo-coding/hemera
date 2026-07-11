@@ -213,13 +213,8 @@ github
 GITLAB
 gitleaks
 Givrn
-gobwas
-golangci
-GoMCP
-gomcp
 Googlebot
 googlecloud
-gopkg
 groesse
 fortbildung
 Fkurs

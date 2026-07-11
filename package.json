@@ -71,7 +71,7 @@
       "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files --exclude 'lib/generated/**'"
     ],
     "*.json": [
-      "biome format --write"
+      "biome format --write --no-errors-on-unmatched"
     ],
     "*.{md,mdx}": [
       "cspell --config ./cspell.config.yaml --no-progress --no-summary --no-must-find-files"
