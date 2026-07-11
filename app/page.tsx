@@ -139,7 +139,7 @@ export default async function HomePage() {
           type='application/ld+json'
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(schema),
-          }}
+          }} // nosemgrep: react-dangerouslysetinnerhtml - JSON-LD serialized via JSON.stringify, safe
         />
       ))}
 

@@ -60,6 +60,15 @@ async function streamPdfDownload(
   pdfUrl: string,
   invoiceId: string
 ): Promise<Response> {
+  // Validate that the URL is from Stripe to prevent SSRF
+  const parsedUrl = new URL(pdfUrl);
+  if (
+    parsedUrl.hostname !== 'stripe.com' &&
+    !parsedUrl.hostname.endsWith('.stripe.com')
+  ) {
+    throw new Error('Invalid PDF URL: must be from stripe.com');
+  }
+
   const pdfResponse = await fetch(pdfUrl);
 
   if (!pdfResponse.ok) {

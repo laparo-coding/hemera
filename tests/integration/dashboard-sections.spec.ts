@@ -36,7 +36,7 @@ describe('Dashboard Sections Integration', () => {
     await prisma.user.deleteMany();
 
     const timestamp = Date.now();
-    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const randomSuffix = crypto.randomUUID().split('-')[0];
 
     // Create test user
     testUser = await prisma.user.create({

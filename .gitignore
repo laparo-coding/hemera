@@ -100,3 +100,4 @@ public/_next-video
 
 # VSCode AI-generated Codacy instructions (do not commit)
 .github/instructions/codacy.instructions.md
+security_items_gh_laparo-coding.csv

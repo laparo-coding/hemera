@@ -79,6 +79,7 @@ export default function AdminTestimonialList() {
         }
 
         const response = await fetch(`/api/admin/testimonials?${params}`, {
+          // nosemgrep: javascript_ssrf_rule-node-ssrf relative URL, no SSRF risk
           signal,
         });
         const data = await response.json();

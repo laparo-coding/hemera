@@ -19,9 +19,9 @@ function parseArgs(argv) {
   const args = { input: DEFAULT_INPUT, gates: {} };
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
-    if (token === '--help') {
+    if (token === '--help') { // nosemgrep: javascript_crypto_rule-node-timing-attack CLI arg parsing, not security-sensitive
       args.help = true;
-    } else if (token === '--input') {
+    } else if (token === '--input') { // nosemgrep: javascript_crypto_rule-node-timing-attack CLI arg parsing, not security-sensitive
       args.input = argv[index + 1];
       index += 1;
     } else if (['--lines', '--statements', '--functions', '--branches'].includes(token)) {

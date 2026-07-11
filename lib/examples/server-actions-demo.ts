@@ -5,6 +5,7 @@
 
 'use server';
 
+import { randomBytes } from 'node:crypto';
 import { createBooking } from '../api/bookings';
 import { BookingAlreadyExistsError } from '../errors/domain';
 import {
@@ -87,7 +88,7 @@ export const toggleBookmarkAction = withOptimisticUpdate(
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Toggle bookmark logic - 50% chance to be bookmarked
-    const isBookmarked = Math.random() > 0.5;
+    const isBookmarked = randomBytes(1)[0]! > 127;
 
     return { isBookmarked };
   },
@@ -98,7 +99,7 @@ export const toggleBookmarkAction = withOptimisticUpdate(
 export const syncExternalDataAction = withRetry(
   async (_context: ServerActionContext) => {
     // Simulate external API call that might fail (~30% failure rate)
-    if (Math.random() < 0.3) {
+    if (randomBytes(1)[0]! < 77) {
       throw new Error('External API temporarily unavailable');
     }
 

@@ -74,6 +74,7 @@ export default function CourseListWithDelete({
       }
 
       const response = await fetch(`/api/admin/courses/${courseId}`, {
+        // nosemgrep: javascript_ssrf_rule-node-ssrf relative URL, no SSRF risk
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

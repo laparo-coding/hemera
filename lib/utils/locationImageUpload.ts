@@ -108,7 +108,7 @@ export async function uploadLocationImage(
 
     // Generate unique filename
     const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(7);
+    const randomString = crypto.randomUUID().split('-')[0];
     const filename = `location-images/${imageType}/${timestamp}-${randomString}.webp`;
 
     // Upload to Vercel Blob
