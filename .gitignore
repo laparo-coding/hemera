@@ -100,7 +100,3 @@ public/_next-video
 
 # VSCode AI-generated Codacy instructions (do not commit)
 .github/instructions/codacy.instructions.md
-
-# Local agent prompt assets (tracked template ships as .example)
-.github/prompts/caveman-code.prompt.md
-!/.github/prompts/caveman-code.prompt.md.example

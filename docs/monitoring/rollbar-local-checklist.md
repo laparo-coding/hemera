@@ -3,6 +3,8 @@
 Diese Checkliste fasst die verifizierten lokalen Rollbar-Setups für Gaia,
 Hemera und Aither zusammen.
 
+Thalassa ist bewusst ausgenommen.
+
 ## Grundregeln
 
 - Verwende für serverseitige Ingestion immer einen echten
@@ -31,6 +33,13 @@ curl -sS https://api.rollbar.com/api/1/item/ \
 
 - Erwartung: Rollbar antwortet mit `"err": 0`.
 
+- macOS Keychain-Setup mit Token-Test:
+
+```bash
+cd gaia
+bash scripts/rollbar-keychain-setup.sh
+```
+
 ## Hemera
 
 - Datei: `hemera/.env.local`
@@ -53,6 +62,13 @@ curl -sS https://api.rollbar.com/api/1/item/ \
 
 - Erwartung: Rollbar antwortet mit `"err": 0`.
 
+- macOS Keychain-Setup mit Token-Test:
+
+```bash
+cd hemera
+bash scripts/rollbar-keychain-setup.sh
+```
+
 ## Aither
 
 - Datei: `aither/.env.local`
@@ -74,6 +90,13 @@ curl -sS https://api.rollbar.com/api/1/item/ \
 ```
 
 - Erwartung: Rollbar antwortet mit `"err": 0`.
+
+- macOS Keychain-Setup mit Token-Test:
+
+```bash
+cd aither
+bash scripts/rollbar-keychain-setup.sh
+```
 
 ## Abschlusscheck
 
