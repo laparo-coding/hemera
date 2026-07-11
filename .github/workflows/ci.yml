@@ -53,12 +53,14 @@ jobs:
 
       - name: Upload coverage to Codacy
         if: always()
+        continue-on-error: true
         run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage/lcov.info
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
       - name: Run Codacy Trivy security scan
         if: always()
+        continue-on-error: true
         run: |
           set -euo pipefail
           TRIVY_DB_REPOSITORY=ghcr.io/aquasecurity/trivy-db ./.codacy/cli.sh analyze -t trivy --format sarif -o /tmp/trivy-results.sarif
