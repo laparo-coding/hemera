@@ -2,18 +2,18 @@ import type { SignUpProps, UserButtonProps } from '@clerk/shared/types';
 import { authForm, colors } from '@/lib/design-tokens';
 
 export const authPageClerkAppearance: NonNullable<SignUpProps['appearance']> = {
-  layout: {
+  options: {
     socialButtonsPlacement: 'top',
     socialButtonsVariant: 'blockButton',
   },
   variables: {
     colorPrimary: colors.marsala,
-    colorTextOnPrimaryBackground: colors.beige,
+    colorPrimaryForeground: colors.beige,
     colorBackground: authForm.cardBackground,
-    colorText: authForm.textColor,
-    colorTextSecondary: authForm.subtleTextColor,
-    colorInputBackground: authForm.cardBackground,
-    colorInputText: authForm.textColor,
+    colorForeground: authForm.textColor,
+    colorMutedForeground: authForm.subtleTextColor,
+    colorInput: authForm.cardBackground,
+    colorInputForeground: authForm.textColor,
     borderRadius: authForm.inputBorderRadius,
   },
   elements: {
