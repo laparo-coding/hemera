@@ -137,7 +137,7 @@ export default function EditCourseMaterialClient({
   ): Promise<Response> => {
     let response: Response;
     try {
-      response = await fetch(url, options);
+      response = await fetch(url, options); // nosemgrep: javascript_ssrf_rule-node-ssrf - relative URL, no SSRF risk
     } catch (err) {
       rollbar.error('Network failure in material editor', {
         url,

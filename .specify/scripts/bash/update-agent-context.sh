@@ -428,6 +428,7 @@ update_existing_agent_file() {
                 echo "$new_change_entry" >> "$temp_file"
             fi
             in_changes_section=true
+            # shellcheck disable=SC2034 # used for tracking, not output
             changes_entries_added=true
             continue
         elif [[ $in_changes_section == true ]] && [[ "$line" =~ ^##[[:space:]] ]]; then
@@ -445,6 +446,7 @@ update_existing_agent_file() {
         
         # Update timestamp
         if [[ "$line" =~ \*\*Last\ updated\*\*:.*[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] ]]; then
+            # shellcheck disable=SC2001 # sed needed for regex replacement
             echo "$line" | sed "s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/$current_date/" >> "$temp_file"
         else
             echo "$line" >> "$temp_file"

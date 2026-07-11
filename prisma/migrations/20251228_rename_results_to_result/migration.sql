@@ -1,3 +1,4 @@
+-- nosemgrep: tsqllint_set-quoted-identifier - PostgreSQL migration, not SQL Server; QUOTED_IDENTIFIER is T-SQL only
 -- Rename 'results' to 'result' in ParticipationStatus enum and CourseParticipation columns
 
 -- Step 1: Rename enum value RESULTS to RESULT

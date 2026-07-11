@@ -1,3 +1,4 @@
+-- nosemgrep: tsqllint_set-quoted-identifier - PostgreSQL migration, not SQL Server; QUOTED_IDENTIFIER is T-SQL only
 -- Learning Path Feature (021)
 -- Adds recommendation fields to Course, outperformer flag to User,
 -- PRE_BOOKED status to PaymentStatus, and review fields to Booking

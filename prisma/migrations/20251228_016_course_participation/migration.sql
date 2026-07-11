@@ -1,3 +1,4 @@
+-- nosemgrep: tsqllint_set-quoted-identifier - PostgreSQL migration, not SQL Server; QUOTED_IDENTIFIER is T-SQL only
 -- CreateEnum
 CREATE TYPE "ParticipationStatus" AS ENUM ('PREPARATION', 'SUMMARY', 'DEBRIEFING', 'RESULTS', 'COMPLETE');
 
