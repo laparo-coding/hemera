@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout code (target ref)
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.target_ref }}
 
