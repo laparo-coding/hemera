@@ -5,6 +5,12 @@ Hemera und Aither zusammen.
 
 Thalassa ist bewusst ausgenommen.
 
+> **Hinweis zu Pfaden:** Die `cd`-Befehle unten gehen von einem Workspace
+> Root aus, das die Repos `gaia/`, `hemera/` und `aither/` als parallele
+> Ordner enthält (z. B. `~/GitHub/`). Passe die Pfade an, falls deine
+> Layout abweicht. Alternativ kannst du das jeweilige Script direkt mit
+> dem absoluten Pfad aufrufen.
+
 ## Grundregeln
 
 - Verwende für serverseitige Ingestion immer einen echten
@@ -17,11 +23,12 @@ Thalassa ist bewusst ausgenommen.
 
 ## Gaia
 
+- Repo: `gaia/`
 - Datei: `gaia/.env.local`
 - Server-Token: `GAIA_ROLLBAR_ACCESS_TOKEN`
 - Optionale Diagnostik: `GAIA_ROLLBAR_DIAGNOSTICS=true`
 - Optionales Drain-Tuning: `GAIA_ROLLBAR_DELIVERY_WAIT_SECONDS=1`
-- Lokaler API-Check:
+- Lokaler API-Check (vom Workspace Root):
 
 ```bash
 cd gaia
@@ -33,15 +40,15 @@ curl -sS https://api.rollbar.com/api/1/item/ \
 
 - Erwartung: Rollbar antwortet mit `"err": 0`.
 
-- macOS Keychain-Setup mit Token-Test:
+- macOS Keychain-Setup mit Token-Test (vom Workspace Root):
 
 ```bash
-cd gaia
-bash scripts/rollbar-keychain-setup.sh
+bash gaia/scripts/rollbar-keychain-setup.sh
 ```
 
 ## Hemera
 
+- Repo: `hemera/`
 - Datei: `hemera/.env.local`
 - Server-Token: `ROLLBAR_HEMERA_SERVER_TOKEN`
 - Optionaler Browser-Token: `NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN`
@@ -50,7 +57,7 @@ bash scripts/rollbar-keychain-setup.sh
 - Wichtiger Hinweis: Zeitstempel-suffigierte Altvariablen in `.env.local`
   aktivieren Hemera nicht automatisch. Ihre Werte muessen in die kanonischen
   Namen kopiert werden.
-- Lokaler API-Check:
+- Lokaler API-Check (vom Workspace Root):
 
 ```bash
 cd hemera
@@ -62,15 +69,15 @@ curl -sS https://api.rollbar.com/api/1/item/ \
 
 - Erwartung: Rollbar antwortet mit `"err": 0`.
 
-- macOS Keychain-Setup mit Token-Test:
+- macOS Keychain-Setup mit Token-Test (vom Workspace Root):
 
 ```bash
-cd hemera
-bash scripts/rollbar-keychain-setup.sh
+bash hemera/scripts/rollbar-keychain-setup.sh
 ```
 
 ## Aither
 
+- Repo: `aither/`
 - Datei: `aither/.env.local`
 - Server-Token: `ROLLBAR_SERVER_TOKEN`
 - Optionaler Browser-Token: `NEXT_PUBLIC_ROLLBAR_CLIENT_TOKEN`
@@ -79,7 +86,7 @@ bash scripts/rollbar-keychain-setup.sh
 - Wichtiger Hinweis: In Aither ist der Serverpfad jetzt von der Browser-
   Aktivierung getrennt. `NEXT_PUBLIC_ROLLBAR_ENABLED=0` schaltet den
   Serverpfad nicht mehr ab.
-- Lokaler API-Check:
+- Lokaler API-Check (vom Workspace Root):
 
 ```bash
 cd aither
@@ -91,11 +98,10 @@ curl -sS https://api.rollbar.com/api/1/item/ \
 
 - Erwartung: Rollbar antwortet mit `"err": 0`.
 
-- macOS Keychain-Setup mit Token-Test:
+- macOS Keychain-Setup mit Token-Test (vom Workspace Root):
 
 ```bash
-cd aither
-bash scripts/rollbar-keychain-setup.sh
+bash aither/scripts/rollbar-keychain-setup.sh
 ```
 
 ## Abschlusscheck
