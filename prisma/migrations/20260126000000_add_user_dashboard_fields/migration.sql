@@ -1,3 +1,4 @@
+-- nosemgrep: tsqllint_set-quoted-identifier - PostgreSQL migration, not SQL Server; QUOTED_IDENTIFIER is T-SQL only
 -- Add missing fields for 018-user-dashboard
 -- Course endDate field for multi-day courses
 ALTER TABLE courses ADD COLUMN IF NOT EXISTS end_date TIMESTAMP;

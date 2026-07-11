@@ -69,7 +69,7 @@ async function streamPdfDownload(
     throw new Error('Invalid PDF URL: must be from stripe.com');
   }
 
-  const pdfResponse = await fetch(pdfUrl);
+  const pdfResponse = await fetch(pdfUrl); // nosemgrep: javascript_ssrf_rule-node-ssrf - URL validated as stripe.com above
 
   if (!pdfResponse.ok) {
     throw new Error(`Failed to fetch PDF: ${pdfResponse.status}`);
