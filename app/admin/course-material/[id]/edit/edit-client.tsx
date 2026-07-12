@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { MaterialForm } from '@/components/admin/MaterialForm';
 import SlideControlUploadForm from '@/components/admin/SlideControlUploadForm';
+import { extractErrorMessage } from '@/lib/utils/fetch-error';
 
 interface MaterialDetail {
   id: string;
@@ -35,24 +36,6 @@ interface MaterialDetail {
 
 interface EditCourseMaterialClientProps {
   id: string;
-}
-
-/**
- * Extract error message from HTTP error response
- * Attempts to parse response as JSON and extract the message field,
- * falls back to default message if response is not valid JSON
- */
-async function extractErrorMessage(
-  response: Response,
-  defaultMessage: string
-): Promise<string> {
-  try {
-    const errorData = await response.json();
-    return errorData.message || defaultMessage;
-  } catch {
-    // Response is not valid JSON, return default
-    return defaultMessage;
-  }
 }
 
 export default function EditCourseMaterialClient({

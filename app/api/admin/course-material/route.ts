@@ -1,6 +1,6 @@
 import { del, put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
-
+import { handleServerError } from '@/lib/api/api-errors';
 import {
   createMaterial,
   getAllMaterials,
@@ -86,16 +86,11 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    serverInstance.error('Failed to list course materials', {
+    return handleServerError(
+      error,
+      'Failed to list course materials',
       requestId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-    return NextResponse.json(
-      {
-        error: 'internal_error',
-        message: 'Fehler beim Abrufen der Materialien',
-      },
-      { status: 500 }
+      'Fehler beim Abrufen der Materialien'
     );
   }
 }
@@ -118,9 +113,9 @@ export async function POST(request: NextRequest) {
     const isFormData = mediaType === 'multipart/form-data';
 
     if (isFormData) {
-      return await handleFormDataPost(request, userId);
+      return await handleFormDataPost(request, userId, requestId);
     }
-    return await handleJsonPost(request, userId);
+    return await handleJsonPost(request, userId, requestId);
   } catch (error) {
     const auditUserId = userId ?? 'unknown';
     logAuditEvent(
@@ -133,15 +128,11 @@ export async function POST(request: NextRequest) {
         error: error instanceof Error ? error.message : 'Unknown error',
       }
     );
-    serverInstance.error('Failed to create course material', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-    return NextResponse.json(
-      {
-        error: 'internal_error',
-        message: 'Fehler beim Erstellen des Materials',
-      },
-      { status: 500 }
+    return handleServerError(
+      error,
+      'Failed to create course material',
+      requestId,
+      'Fehler beim Erstellen des Materials'
     );
   }
 }
@@ -150,7 +141,11 @@ export async function POST(request: NextRequest) {
  * Handle FormData POST for SLIDE_CONTROL and CONTENT (upload) materials
  * Feature 030: Extended to support CONTENT type via FormData upload
  */
-async function handleFormDataPost(request: NextRequest, userId: string | null) {
+async function handleFormDataPost(
+  request: NextRequest,
+  userId: string | null,
+  requestId: string
+) {
   const formData = await request.formData();
   const titleValue = formData.get('title');
   const identifierValue = formData.get('identifier');
@@ -356,12 +351,11 @@ async function handleFormDataPost(request: NextRequest, userId: string | null) {
         error: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`,
       }
     );
-    return NextResponse.json(
-      {
-        error: 'internal_error',
-        message: 'Fehler beim Speichern des Materials',
-      },
-      { status: 500 }
+    return handleServerError(
+      dbError,
+      'Failed to persist material to DB',
+      requestId,
+      'Fehler beim Speichern des Materials'
     );
   }
 
@@ -392,7 +386,11 @@ async function handleFormDataPost(request: NextRequest, userId: string | null) {
 /**
  * Handle JSON POST for CONTENT materials (existing flow)
  */
-async function handleJsonPost(request: NextRequest, userId: string | null) {
+async function handleJsonPost(
+  request: NextRequest,
+  userId: string | null,
+  requestId: string
+) {
   let body;
   try {
     body = await request.json();
@@ -554,12 +552,11 @@ async function handleJsonPost(request: NextRequest, userId: string | null) {
         error: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`,
       }
     );
-    return NextResponse.json(
-      {
-        error: 'internal_error',
-        message: 'Fehler beim Speichern des Materials',
-      },
-      { status: 500 }
+    return handleServerError(
+      dbError,
+      'Failed to persist material to DB',
+      requestId,
+      'Fehler beim Speichern des Materials'
     );
   }
 

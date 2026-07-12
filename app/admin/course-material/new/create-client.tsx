@@ -27,19 +27,7 @@ import { MaterialForm } from '@/components/admin/MaterialForm';
 import MaterialTypeSelector from '@/components/admin/MaterialTypeSelector';
 import SlideControlUploadForm from '@/components/admin/SlideControlUploadForm';
 import type { MaterialCreationMode } from '@/lib/types/course-material';
-
-/** Extract error message from a fetch Response, falling back to a default */
-async function extractErrorMessage(
-  response: Response,
-  fallback: string
-): Promise<string> {
-  try {
-    const error = await response.json();
-    return error.message || fallback;
-  } catch {
-    return fallback;
-  }
-}
+import { extractErrorMessage } from '@/lib/utils/fetch-error';
 
 export default function CreateCourseMaterialClient() {
   const router = useRouter();

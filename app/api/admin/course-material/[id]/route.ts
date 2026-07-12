@@ -1,6 +1,6 @@
 import { del, put } from '@vercel/blob';
 import { type NextRequest, NextResponse } from 'next/server';
-
+import { handleServerError } from '@/lib/api/api-errors';
 import {
   deleteMaterial,
   getMaterialById,
@@ -91,13 +91,11 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         error: error instanceof Error ? error.message : 'Unknown error',
       }
     );
-    serverInstance.error('Failed to delete course material', {
+    return handleServerError(
+      error,
+      'Failed to delete course material',
       requestId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-    return NextResponse.json(
-      { error: 'internal_error', message: 'Fehler beim Löschen des Materials' },
-      { status: 500 }
+      'Fehler beim Löschen des Materials'
     );
   }
 }
@@ -135,13 +133,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       updatedAt: material.updatedAt.toISOString(),
     });
   } catch (error) {
-    serverInstance.error('Failed to get course material', {
+    return handleServerError(
+      error,
+      'Failed to get course material',
       requestId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-    return NextResponse.json(
-      { error: 'internal_error', message: 'Fehler beim Abrufen des Materials' },
-      { status: 500 }
+      'Fehler beim Abrufen des Materials'
     );
   }
 }
@@ -213,16 +209,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         error: error instanceof Error ? error.message : 'Unknown error',
       }
     );
-    serverInstance.error('Failed to update course material', {
+    return handleServerError(
+      error,
+      'Failed to update course material',
       requestId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-    return NextResponse.json(
-      {
-        error: 'internal_error',
-        message: 'Fehler beim Aktualisieren des Materials',
-      },
-      { status: 500 }
+      'Fehler beim Aktualisieren des Materials'
     );
   }
 }
