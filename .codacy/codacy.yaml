@@ -3,7 +3,7 @@ runtimes:
     - node@22.2.0
     - python@3.11.11
 tools:
-    - biome@2.0.0
+    - biome@2.5.3
     - lizard@1.23.0
     - opengrep@1.23.0
     - trivy@0.70.0
