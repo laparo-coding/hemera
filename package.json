@@ -91,7 +91,7 @@
     "@floating-ui/dom": "^1.7.6",
     "@hookform/resolvers": "^5.4.0",
     "@mui/icons-material": "^7.3.10",
-    "@mui/material": "7.3.10",
+    "@mui/material": "9.2.0",
     "@mui/x-date-pickers": "9.9.0",
     "@mux/mux-player-react": "^3.13.0",
     "@prisma/adapter-pg": "^7.8.0",
