@@ -25,7 +25,7 @@ jobs:
       # qodo-ai/pr-agent v0.34 pinned to an immutable commit SHA.
       - name: PR Agent action step
         id: pragent
-        uses: qodo-ai/pr-agent@570f67ed5fc8db5be74c18df070bc20079b64b0d
+        uses: qodo-ai/pr-agent@f6af7d77554ff8d26adffded077e6461329e92fa
         env:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
