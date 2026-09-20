@@ -257,7 +257,7 @@ export default function CourseMaterialTable({
 
   if (loading && materials.length === 0) {
     return (
-      <Box display='flex' justifyContent='center' py={4}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
         <CircularProgress />
       </Box>
     );
@@ -303,12 +303,14 @@ export default function CourseMaterialTable({
               setPage(0);
             }}
             sx={{ minWidth: 280, flex: 1 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position='start'>
-                  <SearchIcon color='action' />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SearchIcon color='action' />
+                  </InputAdornment>
+                ),
+              },
             }}
           />
 
@@ -379,7 +381,7 @@ export default function CourseMaterialTable({
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell>
-                      <Typography variant='body2' fontWeight='medium'>
+                      <Typography variant='body2' sx={{ fontWeight: 'medium' }}>
                         {material.title}
                       </Typography>
                     </TableCell>
@@ -486,8 +488,7 @@ export default function CourseMaterialTable({
         <DialogTitle>
           <Stack
             direction='row'
-            justifyContent='space-between'
-            alignItems='center'
+            sx={{ justifyContent: 'space-between', alignItems: 'center' }}
           >
             <Typography variant='h6' component='span'>
               {viewMaterial?.title ?? 'Seminarmaterial'}
@@ -519,7 +520,7 @@ export default function CourseMaterialTable({
         </DialogTitle>
         <DialogContent dividers>
           {viewLoading ? (
-            <Box display='flex' justifyContent='center' py={4}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <CircularProgress />
             </Box>
           ) : viewMaterial?.type === 'SLIDE_CONTROL' ? (

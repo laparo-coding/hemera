@@ -210,10 +210,12 @@ export default function StripeCheckoutForm({
 
     return (
       <Box
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        minHeight='200px'
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '200px',
+        }}
       >
         <CircularProgress />
         <Typography variant='body2' sx={{ ml: 2 }}>

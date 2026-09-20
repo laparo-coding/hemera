@@ -36,7 +36,7 @@ export default function ResultsSection({ participation }: ResultsSectionProps) {
         scrollMarginTop: '80px',
       }}
     >
-      <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 2 }}>
+      <Stack sx={{ flexDirection: 'row', gap: 2, alignItems: 'center', mb: 2 }}>
         <CheckCircleOutlined sx={{ color: colors.rosyBrown, fontSize: 28 }} />
         <Typography
           component='h2'

@@ -266,7 +266,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
         pb: 4,
       }}
     >
-      <Grid container spacing={4} alignItems='flex-start'>
+      <Grid container spacing={4} sx={{ alignItems: 'flex-start' }}>
         <Grid size={{ xs: 12, md: 8 }}>
           <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
             {course.imageDetail || course.thumbnailUrl ? (
@@ -316,8 +316,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     <Stack
                       direction='row'
                       spacing={0.5}
-                      alignItems='center'
-                      sx={{ mt: 1 }}
+                      sx={{ alignItems: 'center', mt: 1 }}
                     >
                       <PersonRoundedIcon
                         sx={{ fontSize: 20, color: 'text.primary' }}
@@ -340,7 +339,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                     }}
                   >
                     {formattedDate && (
-                      <Stack direction='row' spacing={1} alignItems='center'>
+                      <Stack
+                        direction='row'
+                        spacing={1}
+                        sx={{ alignItems: 'center' }}
+                      >
                         <CalendarMonthRoundedIcon
                           sx={{ fontSize: '1.25rem' }}
                         />
@@ -351,7 +354,11 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                       </Stack>
                     )}
                     {course.capacity ? (
-                      <Stack direction='row' spacing={1} alignItems='center'>
+                      <Stack
+                        direction='row'
+                        spacing={1}
+                        sx={{ alignItems: 'center' }}
+                      >
                         <GroupRoundedIcon sx={{ fontSize: '1.25rem' }} />
                         <Typography sx={{ fontSize: '0.9rem' }}>
                           {course.availableSpots !== null
@@ -360,14 +367,22 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                         </Typography>
                       </Stack>
                     ) : null}
-                    <Stack direction='row' spacing={1} alignItems='center'>
+                    <Stack
+                      direction='row'
+                      spacing={1}
+                      sx={{ alignItems: 'center' }}
+                    >
                       <CoinIcon sx={{ fontSize: '1.25rem' }} />
                       <Typography sx={{ fontSize: '0.9rem' }}>
                         {formatCurrency(course.price, course.currency)}
                       </Typography>
                     </Stack>
                     {course.location && (
-                      <Stack direction='row' spacing={1} alignItems='center'>
+                      <Stack
+                        direction='row'
+                        spacing={1}
+                        sx={{ alignItems: 'center' }}
+                      >
                         <LocationOnRoundedIcon sx={{ fontSize: '1.25rem' }} />
                         <Link
                           href={`/locations/${course.location.slug}`}
@@ -389,7 +404,12 @@ const CourseDetail: React.FC<CourseDetailProps> = ({
                   </Box>
                 </div>
 
-                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                <Stack
+                  direction='row'
+                  spacing={1}
+                  sx={{ flexWrap: 'wrap' }}
+                  useFlexGap
+                >
                   {!course.isPublished ? (
                     <Chip
                       label='Nicht veröffentlicht'

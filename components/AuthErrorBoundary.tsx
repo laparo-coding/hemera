@@ -92,7 +92,7 @@ export class AuthErrorBoundary extends React.Component<
               <Alert severity='error' sx={{ mb: 3, textAlign: 'left' }}>
                 {process.env.NODE_ENV === 'development' ? (
                   <>
-                    <Typography variant='body2' paragraph>
+                    <Typography variant='body2' sx={{ mb: 1 }}>
                       <strong>Development Error Details:</strong>
                     </Typography>
                     <Typography
@@ -124,7 +124,7 @@ export class AuthErrorBoundary extends React.Component<
                 )}
               </Alert>
 
-              <Typography variant='body1' color='text.secondary' paragraph>
+              <Typography variant='body1' color='text.secondary' sx={{ mb: 1 }}>
                 {process.env.NODE_ENV === 'development'
                   ? 'Check the console for more details and verify your Clerk configuration.'
                   : 'If this problem persists, please contact support.'}

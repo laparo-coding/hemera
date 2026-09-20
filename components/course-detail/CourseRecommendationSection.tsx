@@ -8,7 +8,7 @@
  * - "Das sind keine passenden Voraussetzungen für das Seminar" (notRecommended)
  */
 
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Box, Container, Paper, Stack, Typography } from '@mui/material';
 import type React from 'react';
@@ -59,9 +59,12 @@ export const CourseRecommendationSection: React.FC<
         <Stack
           direction={{ xs: 'column', md: 'row' }}
           spacing={3}
-          justifyContent='center'
-          alignItems='stretch'
-          sx={{ maxWidth: '900px', mx: 'auto' }}
+          sx={{
+            justifyContent: 'center',
+            alignItems: 'stretch',
+            maxWidth: '900px',
+            mx: 'auto',
+          }}
         >
           {/* Passende Voraussetzungen */}
           {recommended && (
@@ -75,7 +78,11 @@ export const CourseRecommendationSection: React.FC<
                 borderLeft: `4px solid ${colors.success}`,
               }}
             >
-              <Stack direction='row' spacing={1.5} alignItems='flex-start'>
+              <Stack
+                direction='row'
+                spacing={1.5}
+                sx={{ alignItems: 'flex-start' }}
+              >
                 <CheckCircleOutlineIcon
                   sx={{
                     color: colors.success,
@@ -127,7 +134,11 @@ export const CourseRecommendationSection: React.FC<
                 borderLeft: `4px solid ${colors.warning}`,
               }}
             >
-              <Stack direction='row' spacing={1.5} alignItems='flex-start'>
+              <Stack
+                direction='row'
+                spacing={1.5}
+                sx={{ alignItems: 'flex-start' }}
+              >
                 <WarningAmberIcon
                   sx={{
                     color: colors.warning,

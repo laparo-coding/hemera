@@ -51,7 +51,6 @@ export function DeleteConfirmationDialog({
     <Dialog
       open={open}
       onClose={loading ? undefined : onCancel}
-      disableEscapeKeyDown={loading}
       maxWidth='sm'
       fullWidth
       data-testid='delete-confirmation-dialog'

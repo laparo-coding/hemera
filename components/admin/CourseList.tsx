@@ -188,7 +188,7 @@ export default function CourseList({
               paginatedCourses.map(course => (
                 <TableRow key={course.id} hover>
                   <TableCell>
-                    <Typography variant='body2' fontWeight='medium'>
+                    <Typography variant='body2' sx={{ fontWeight: 'medium' }}>
                       {course.title}
                     </Typography>
                   </TableCell>

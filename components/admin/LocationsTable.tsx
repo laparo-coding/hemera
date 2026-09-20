@@ -110,12 +110,14 @@ export default function LocationsTable({
             setPage(0);
           }}
           sx={{ minWidth: 280, flex: 1 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <SearchIcon color='action' />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <SearchIcon color='action' />
+                </InputAdornment>
+              ),
+            },
           }}
         />
         <Button
@@ -174,7 +176,10 @@ export default function LocationsTable({
                         sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                       >
                         <PlaceIcon fontSize='small' color='action' />
-                        <Typography variant='body2' fontWeight='medium'>
+                        <Typography
+                          variant='body2'
+                          sx={{ fontWeight: 'medium' }}
+                        >
                           {location.name}
                         </Typography>
                       </Box>

@@ -69,7 +69,11 @@ export default function TestimonialList({
   if (loading) {
     return (
       <Box sx={{ py: 4 }}>
-        <Typography variant='h5' component='h2' gutterBottom fontWeight='bold'>
+        <Typography
+          variant='h5'
+          component='h2'
+          sx={{ mb: 1, fontWeight: 'bold' }}
+        >
           Was Teilnehmer sagen
         </Typography>
         <Grid container spacing={3}>
@@ -102,7 +106,11 @@ export default function TestimonialList({
 
   return (
     <Box sx={{ py: 4 }}>
-      <Typography variant='h5' component='h2' gutterBottom fontWeight='bold'>
+      <Typography
+        variant='h5'
+        component='h2'
+        sx={{ mb: 1, fontWeight: 'bold' }}
+      >
         Was Teilnehmer sagen
       </Typography>
       <Grid container spacing={3}>

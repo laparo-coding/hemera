@@ -218,7 +218,7 @@ export default function AdminTestimonialList() {
                     {getAvatarInitial(testimonial.cachedDisplayName)}
                   </Avatar>
                   <Box>
-                    <Typography variant='subtitle2' fontWeight='bold'>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 'bold' }}>
                       {testimonial.cachedDisplayName}
                     </Typography>
                     <Typography variant='caption' color='text.secondary'>
@@ -303,7 +303,7 @@ export default function AdminTestimonialList() {
       </Stack>
 
       {testimonials.length === 0 && !loading && (
-        <Typography color='text.secondary' textAlign='center' sx={{ py: 4 }}>
+        <Typography color='text.secondary' sx={{ textAlign: 'center', py: 4 }}>
           Keine Erfahrungsberichte gefunden.
         </Typography>
       )}

@@ -134,7 +134,7 @@ export default function CheckoutSuccessClient() {
     <Container maxWidth='md' sx={{ mt: 4 }}>
       <Card variant='outlined'>
         <CardContent>
-          <Stack spacing={4} alignItems='center' textAlign='center'>
+          <Stack spacing={4} sx={{ alignItems: 'center', textAlign: 'center' }}>
             {/* Success Icon */}
             <CheckCircleOutlined
               sx={{
@@ -163,7 +163,11 @@ export default function CheckoutSuccessClient() {
             <Card variant='outlined' sx={{ width: '100%', maxWidth: 400 }}>
               <CardContent>
                 <Stack spacing={2}>
-                  <Stack direction='row' spacing={2} alignItems='center'>
+                  <Stack
+                    direction='row'
+                    spacing={2}
+                    sx={{ alignItems: 'center' }}
+                  >
                     <SchoolOutlined color='primary' />
                     <Box>
                       <Typography variant='subtitle2' color='text.secondary'>
@@ -175,16 +179,22 @@ export default function CheckoutSuccessClient() {
                     </Box>
                   </Stack>
 
-                  <Stack direction='row' justifyContent='space-between'>
+                  <Stack
+                    direction='row'
+                    sx={{ justifyContent: 'space-between' }}
+                  >
                     <Typography variant='subtitle2' color='text.secondary'>
                       Amount Paid
                     </Typography>
-                    <Typography variant='body1' fontWeight='bold'>
+                    <Typography variant='body1' sx={{ fontWeight: 'bold' }}>
                       {booking.price.toLocaleString('de-DE')} {booking.currency}
                     </Typography>
                   </Stack>
 
-                  <Stack direction='row' justifyContent='space-between'>
+                  <Stack
+                    direction='row'
+                    sx={{ justifyContent: 'space-between' }}
+                  >
                     <Typography variant='subtitle2' color='text.secondary'>
                       Status
                     </Typography>
@@ -193,7 +203,10 @@ export default function CheckoutSuccessClient() {
                     </Typography>
                   </Stack>
 
-                  <Stack direction='row' justifyContent='space-between'>
+                  <Stack
+                    direction='row'
+                    sx={{ justifyContent: 'space-between' }}
+                  >
                     <Typography variant='subtitle2' color='text.secondary'>
                       Date
                     </Typography>

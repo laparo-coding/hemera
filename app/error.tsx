@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorOutline, Refresh } from '@mui/icons-material';
+import { ErrorOutlined, Refresh } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
 import React from 'react';
 import { isEnvFlagDisabled, isEnvFlagEnabled } from '../lib/utils/env-flags';
@@ -47,19 +47,25 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
   return (
     <Container maxWidth='md' sx={{ py: 8 }}>
       <Box
-        display='flex'
-        flexDirection='column'
-        alignItems='center'
-        textAlign='center'
-        gap={3}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          gap: 3,
+        }}
       >
-        <ErrorOutline sx={{ fontSize: 64, color: 'error.main' }} />
+        <ErrorOutlined sx={{ fontSize: 64, color: 'error.main' }} />
 
         <Typography variant='h4' component='h1' gutterBottom>
           Ein Fehler ist aufgetreten
         </Typography>
 
-        <Typography variant='body1' color='text.secondary' maxWidth='sm'>
+        <Typography
+          variant='body1'
+          color='text.secondary'
+          sx={{ maxWidth: 'sm' }}
+        >
           Beim Laden der Seite ist ein Problem aufgetreten. Bitte versuche es
           erneut.
         </Typography>
@@ -90,7 +96,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
           </Box>
         )}
 
-        <Box display='flex' gap={2} mt={2}>
+        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
           <Button variant='contained' startIcon={<Refresh />} onClick={reset}>
             Erneut versuchen
           </Button>

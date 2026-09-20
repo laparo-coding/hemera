@@ -122,10 +122,12 @@ const TestimonialDrawer: React.FC<TestimonialDrawerProps> = ({
       onClose={onClose}
       aria-labelledby='testimonial-drawer-title'
       data-testid='testimonial-drawer'
-      PaperProps={{
-        sx: {
-          width: { xs: '100%', sm: 400 },
-          p: 0,
+      slotProps={{
+        paper: {
+          sx: {
+            width: { xs: '100%', sm: 400 },
+            p: 0,
+          },
         },
       }}
     >

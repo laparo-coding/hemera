@@ -164,7 +164,7 @@ export default function PendingBookingsTable({
 
   if (loading) {
     return (
-      <Box display='flex' justifyContent='center' py={4}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
         <CircularProgress />
       </Box>
     );
@@ -201,10 +201,12 @@ export default function PendingBookingsTable({
   return (
     <>
       <Box
-        display='flex'
-        justifyContent='space-between'
-        alignItems='center'
-        mb={2}
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+        }}
       >
         <Typography variant='h6'>
           Ausstehende Buchungen ({bookings.length})

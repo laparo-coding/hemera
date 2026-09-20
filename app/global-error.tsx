@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorOutline, Refresh } from '@mui/icons-material';
+import { ErrorOutlined, Refresh } from '@mui/icons-material';
 import { Box, Button, Container, Typography } from '@mui/material';
 import React from 'react';
 import { logClientError } from '@/lib/errors/client';
@@ -25,19 +25,21 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
       <body>
         <Container maxWidth='md' sx={{ py: 8 }}>
           <Box
-            display='flex'
-            flexDirection='column'
-            alignItems='center'
-            textAlign='center'
-            gap={3}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              gap: 3,
+            }}
           >
-            <ErrorOutline sx={{ fontSize: 72, color: 'error.main' }} />
+            <ErrorOutlined sx={{ fontSize: 72, color: 'error.main' }} />
 
             <Typography variant='h4' component='h1' gutterBottom>
               Etwas ist schief gelaufen
             </Typography>
 
-            <Typography variant='body1' color='text.secondary' paragraph>
+            <Typography variant='body1' color='text.secondary' sx={{ mb: 1 }}>
               Ein unerwarteter Fehler ist aufgetreten. Wir wurden automatisch
               benachrichtigt.
             </Typography>

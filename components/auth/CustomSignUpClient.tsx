@@ -239,10 +239,12 @@ export default function CustomSignUpClient() {
                   setCode(e.target.value);
                 }}
                 required
-                inputProps={{
-                  inputMode: 'numeric',
-                  pattern: '[0-9]*',
-                  maxLength: 6,
+                slotProps={{
+                  htmlInput: {
+                    inputMode: 'numeric',
+                    pattern: '[0-9]*',
+                    maxLength: 6,
+                  },
                 }}
                 disabled={fetchStatus === 'fetching' || submitting}
                 fullWidth

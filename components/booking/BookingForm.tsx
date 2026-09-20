@@ -143,7 +143,7 @@ export default function BookingForm({
                       <Stack
                         direction='row'
                         spacing={2}
-                        alignItems='flex-start'
+                        sx={{ alignItems: 'flex-start' }}
                       >
                         <SchoolOutlined color='primary' />
                         <Box sx={{ flex: 1 }}>
@@ -153,7 +153,6 @@ export default function BookingForm({
                           <Typography
                             variant='body2'
                             color='text.secondary'
-                            paragraph
                             sx={{ mb: 2 }}
                           >
                             {course.description || 'No description available'}
@@ -162,13 +161,13 @@ export default function BookingForm({
                           <Stack
                             direction='row'
                             spacing={2}
-                            alignItems='center'
+                            sx={{ alignItems: 'center' }}
                           >
                             {course.price && (
                               <Stack
                                 direction='row'
                                 spacing={0.5}
-                                alignItems='center'
+                                sx={{ alignItems: 'center' }}
                               >
                                 <AttachMoneyOutlined
                                   fontSize='small'

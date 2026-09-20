@@ -22,7 +22,7 @@ export default function Loading() {
         }}
       >
         <Container maxWidth='lg'>
-          <Stack spacing={4} alignItems='center'>
+          <Stack spacing={4} sx={{ alignItems: 'center' }}>
             {/* Title skeleton */}
             <Skeleton
               variant='text'
@@ -46,7 +46,11 @@ export default function Loading() {
             />
 
             {/* CTA buttons skeleton */}
-            <Stack direction='row' spacing={2} justifyContent='center'>
+            <Stack
+              direction='row'
+              spacing={2}
+              sx={{ justifyContent: 'center' }}
+            >
               <Skeleton
                 variant='rounded'
                 width={180}
@@ -73,10 +77,14 @@ export default function Loading() {
         }}
       >
         <Container maxWidth='md'>
-          <Stack spacing={3} alignItems='center'>
+          <Stack spacing={3} sx={{ alignItems: 'center' }}>
             <Skeleton variant='text' width='60%' height={60} />
             <Skeleton variant='text' width='80%' height={30} />
-            <Stack direction='row' spacing={3} justifyContent='center'>
+            <Stack
+              direction='row'
+              spacing={3}
+              sx={{ justifyContent: 'center' }}
+            >
               <Skeleton variant='rounded' width={160} height={52} />
               <Skeleton variant='rounded' width={160} height={52} />
             </Stack>
@@ -96,7 +104,7 @@ export default function Loading() {
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             spacing={4}
-            justifyContent='space-between'
+            sx={{ justifyContent: 'space-between' }}
           >
             {[1, 2, 3, 4].map(i => (
               <Stack key={i} spacing={2} sx={{ flex: 1 }}>

@@ -358,7 +358,7 @@ export const CourseParticipationStepper: React.FC<
 
   if (loading) {
     return (
-      <Box display='flex' justifyContent='center' py={4}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
         <CircularProgress sx={{ color: colors.marsala }} />
       </Box>
     );
@@ -402,16 +402,18 @@ export const CourseParticipationStepper: React.FC<
         {visibleSteps.map((step, index) => (
           <Step key={step.key} completed={index < activeStep}>
             <StepLabel
-              StepIconProps={{
-                sx: {
-                  color:
-                    index <= activeStep ? colors.marsala : colors.rosyBrown,
-                  '&.Mui-active': { color: colors.bronze },
-                  '&.Mui-completed': { color: colors.rosyBrown },
+              slotProps={{
+                stepIcon: {
+                  sx: {
+                    color:
+                      index <= activeStep ? colors.marsala : colors.rosyBrown,
+                    '&.Mui-active': { color: colors.bronze },
+                    '&.Mui-completed': { color: colors.rosyBrown },
+                  },
                 },
               }}
             >
-              <Box display='flex' alignItems='center' gap={1}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 {step.icon}
                 <Typography
                   variant='subtitle1'

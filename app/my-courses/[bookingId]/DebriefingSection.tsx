@@ -37,7 +37,7 @@ export default function DebriefingSection({
         scrollMarginTop: '80px',
       }}
     >
-      <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 2 }}>
+      <Stack sx={{ flexDirection: 'row', gap: 2, alignItems: 'center', mb: 2 }}>
         <VideoLibraryOutlined sx={{ color: colors.bronze, fontSize: 28 }} />
         <Typography
           component='h2'

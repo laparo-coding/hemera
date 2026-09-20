@@ -55,7 +55,6 @@ export function RoleAssignmentDialog({
     <Dialog
       open={open}
       onClose={loading ? undefined : onCancel}
-      disableEscapeKeyDown={loading}
       maxWidth='sm'
       fullWidth
       data-testid='role-assignment-dialog'

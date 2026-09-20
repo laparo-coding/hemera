@@ -133,7 +133,7 @@ export const CourseDetailSkeleton: React.FC = () => {
             height={50}
             sx={{ mx: 'auto', mb: 4 }}
           />
-          <Grid container spacing={4} justifyContent='center'>
+          <Grid container spacing={4} sx={{ justifyContent: 'center' }}>
             <Grid size={{ xs: 12, md: 6 }}>
               <Paper
                 elevation={0}

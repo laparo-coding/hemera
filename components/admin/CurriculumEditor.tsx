@@ -245,7 +245,7 @@ export default function CurriculumEditor({
           mb: 2,
         }}
       >
-        <Typography variant='subtitle1' fontWeight='bold'>
+        <Typography variant='subtitle1' sx={{ fontWeight: 'bold' }}>
           {TERMS.courseProgress}
         </Typography>
         <Button

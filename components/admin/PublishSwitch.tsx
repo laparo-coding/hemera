@@ -94,8 +94,10 @@ export function PublishSwitch({
             checked={optimisticPublished}
             onChange={handleToggle}
             disabled={disabled || isPending}
-            inputProps={{
-              'aria-label': ariaLabel,
+            slotProps={{
+              input: {
+                'aria-label': ariaLabel,
+              },
             }}
             color={optimisticPublished ? 'success' : 'default'}
             size='small'
