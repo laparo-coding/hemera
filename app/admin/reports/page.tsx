@@ -200,7 +200,7 @@ function StatCard({
 }) {
   return (
     <Paper sx={{ p: 2, textAlign: 'center', height: '100%' }}>
-      <Typography variant='h4' color='primary' gutterBottom>
+      <Typography variant='h4' color='primary' sx={{ mb: 1 }}>
         {value}
       </Typography>
       <Typography variant='body1' sx={{ fontWeight: 'medium' }}>

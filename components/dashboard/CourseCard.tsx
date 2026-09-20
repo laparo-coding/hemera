@@ -246,17 +246,18 @@ export default function CourseCard({
       <Stack
         direction={{ xs: 'column', md: 'row' }}
         spacing={2}
-        alignItems={{ xs: 'flex-start', md: 'center' }}
-        justifyContent='space-between'
-        sx={{ width: '100%' }}
+        sx={{
+          alignItems: { xs: 'flex-start', md: 'center' },
+          justifyContent: 'space-between',
+          width: '100%',
+        }}
       >
         {/* Course Info */}
         <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
           <Stack
             direction='row'
             spacing={2}
-            alignItems='center'
-            sx={{ mb: 1, minWidth: 0 }}
+            sx={{ alignItems: 'center', mb: 1, minWidth: 0 }}
           >
             <SchoolOutlined sx={{ color: colors.marsala }} />
             <Typography
@@ -280,7 +281,7 @@ export default function CourseCard({
             sx={{ ml: { xs: 0, sm: 5 }, minWidth: 0 }}
           >
             {/* Date */}
-            <Stack direction='row' spacing={0.5} alignItems='center'>
+            <Stack direction='row' spacing={0.5} sx={{ alignItems: 'center' }}>
               <CalendarTodayOutlined
                 sx={{ fontSize: 16, color: colors.marsala, opacity: 0.7 }}
               />
@@ -299,7 +300,11 @@ export default function CourseCard({
 
             {/* Time */}
             {timeText && (
-              <Stack direction='row' spacing={0.5} alignItems='center'>
+              <Stack
+                direction='row'
+                spacing={0.5}
+                sx={{ alignItems: 'center' }}
+              >
                 <ScheduleOutlined
                   sx={{ fontSize: 16, color: colors.marsala, opacity: 0.7 }}
                 />
@@ -319,7 +324,11 @@ export default function CourseCard({
 
             {/* Location */}
             {locationText && (
-              <Stack direction='row' spacing={0.5} alignItems='center'>
+              <Stack
+                direction='row'
+                spacing={0.5}
+                sx={{ alignItems: 'center' }}
+              >
                 <LocationOnOutlined
                   sx={{ fontSize: 16, color: colors.marsala, opacity: 0.7 }}
                 />

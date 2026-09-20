@@ -76,7 +76,7 @@ export default function DeleteConfirmation({
         {enrollmentCount > 0 ? (
           <>
             <Alert severity='error' sx={{ mt: 2, mb: 2 }}>
-              <Typography variant='body2' fontWeight='medium'>
+              <Typography variant='body2' sx={{ fontWeight: 'medium' }}>
                 Löschen nicht möglich: {enrollmentCount} Teilnehmer
                 {enrollmentCount !== 1 ? '' : ''} angemeldet
               </Typography>

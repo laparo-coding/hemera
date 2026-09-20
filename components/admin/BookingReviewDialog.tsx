@@ -102,7 +102,7 @@ export default function BookingReviewDialog({
         )}
 
         <DialogContentText component='div'>
-          <Box mb={2}>
+          <Box sx={{ mb: 2 }}>
             {isApprove ? (
               <Typography>
                 Möchtest du die folgende Buchung genehmigen? Der Teilnehmer kann
@@ -134,7 +134,7 @@ export default function BookingReviewDialog({
               {booking.user.email}
             </Typography>
 
-            <Box mt={2}>
+            <Box sx={{ mt: 2 }}>
               <Typography variant='subtitle2' color='text.secondary'>
                 Kurs
               </Typography>
@@ -145,7 +145,7 @@ export default function BookingReviewDialog({
             </Box>
 
             {booking.user.isOutperformer && (
-              <Box mt={2}>
+              <Box sx={{ mt: 2 }}>
                 <Alert severity='info' variant='outlined'>
                   Dieser Teilnehmer ist als Outperformer markiert.
                 </Alert>

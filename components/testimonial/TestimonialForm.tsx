@@ -312,7 +312,7 @@ export default function TestimonialForm({
             >
               {getAvatarInitial(previewDisplayName)}
             </Avatar>
-            <Typography variant='subtitle2' fontWeight='bold'>
+            <Typography variant='subtitle2' sx={{ fontWeight: 'bold' }}>
               {previewDisplayName}
             </Typography>
           </Box>

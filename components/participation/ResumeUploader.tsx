@@ -191,7 +191,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
 
   if (loading) {
     return (
-      <Box display='flex' justifyContent='center' py={4}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
         <CircularProgress sx={{ color: colors.marsala }} />
       </Box>
     );
@@ -232,11 +232,13 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
         >
           <CardContent>
             <Box
-              display='flex'
-              alignItems='center'
-              justifyContent='space-between'
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
             >
-              <Box display='flex' alignItems='center' gap={2}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <DescriptionOutlined
                   sx={{ fontSize: 40, color: colors.marsala }}
                 />
@@ -257,7 +259,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
                 </Box>
               </Box>
 
-              <Box display='flex' gap={1}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 <Tooltip title='Ersetzen'>
                   <IconButton
                     onClick={() => fileInputRef.current?.click()}

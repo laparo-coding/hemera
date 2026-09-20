@@ -65,7 +65,7 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
             {getAvatarInitial(testimonial.displayName)}
           </Avatar>
           <Box>
-            <Typography variant='subtitle2' fontWeight='bold'>
+            <Typography variant='subtitle2' sx={{ fontWeight: 'bold' }}>
               {testimonial.displayName}
             </Typography>
             <Typography variant='caption' color='text.secondary'>

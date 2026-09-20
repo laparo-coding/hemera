@@ -125,7 +125,7 @@ export default function CourseForm({
             }
             fullWidth
             disabled={isLoading || isSubmitting}
-            inputProps={{ maxLength: 50 }}
+            slotProps={{ htmlInput: { maxLength: 50 } }}
           />
         )}
       />
@@ -147,7 +147,7 @@ export default function CourseForm({
             }
             fullWidth
             disabled={isLoading || isSubmitting}
-            inputProps={{ maxLength: 900 }}
+            slotProps={{ htmlInput: { maxLength: 900 } }}
           />
         )}
       />
@@ -169,7 +169,7 @@ export default function CourseForm({
             }
             fullWidth
             disabled={isLoading || isSubmitting}
-            inputProps={{ maxLength: 200 }}
+            slotProps={{ htmlInput: { maxLength: 200 } }}
           />
         )}
       />
@@ -193,8 +193,10 @@ export default function CourseForm({
               }
               fullWidth
               disabled={isLoading || isSubmitting}
-              inputProps={{ maxLength }}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{
+                htmlInput: { maxLength },
+                inputLabel: { shrink: true },
+              }}
               onChange={e => field.onChange(e.target.value || null)}
             />
           );
@@ -220,8 +222,10 @@ export default function CourseForm({
               }
               fullWidth
               disabled={isLoading || isSubmitting}
-              inputProps={{ maxLength }}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{
+                htmlInput: { maxLength },
+                inputLabel: { shrink: true },
+              }}
               onChange={e => field.onChange(e.target.value || null)}
             />
           );
@@ -240,7 +244,7 @@ export default function CourseForm({
               required
               error={!!errors.price}
               helperText={errors.price?.message}
-              inputProps={{ min: 0, step: 0.01 }}
+              slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
               disabled={isLoading || isSubmitting}
               value={field.value === 0 ? '' : field.value}
               onChange={e => {
@@ -262,7 +266,7 @@ export default function CourseForm({
               required
               error={!!errors.capacity}
               helperText={errors.capacity?.message}
-              inputProps={{ min: 1 }}
+              slotProps={{ htmlInput: { min: 1 } }}
               disabled={isLoading || isSubmitting}
               value={field.value === 0 ? '' : field.value}
               onChange={e => {
@@ -285,7 +289,7 @@ export default function CourseForm({
             required
             error={!!errors.startDate}
             helperText={errors.startDate?.message}
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             disabled={isLoading || isSubmitting}
             value={
               field.value instanceof Date
@@ -345,7 +349,7 @@ export default function CourseForm({
             helperText={
               errors.endDate?.message || 'Optional – für mehrtägige Seminare'
             }
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
             disabled={isLoading || isSubmitting}
             value={
               field.value instanceof Date
@@ -402,7 +406,7 @@ export default function CourseForm({
               required
               error={!!errors.startTime}
               helperText={errors.startTime?.message}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
               disabled={isLoading || isSubmitting}
               value={
                 field.value instanceof Date
@@ -452,7 +456,7 @@ export default function CourseForm({
               required
               error={!!errors.endTime}
               helperText={errors.endTime?.message}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
               disabled={isLoading || isSubmitting}
               value={
                 field.value instanceof Date

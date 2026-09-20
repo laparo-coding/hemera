@@ -93,7 +93,7 @@ export function MaterialForm({
           fullWidth
           required
           placeholder='z.B. Einführung in Grundkurs'
-          inputProps={{ maxLength: 200 }}
+          slotProps={{ htmlInput: { maxLength: 200 } }}
           helperText={`${title.length}/200`}
           disabled={isSubmitting}
         />

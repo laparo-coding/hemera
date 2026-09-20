@@ -166,7 +166,7 @@ export default function LocationForm({
             error={!!errors.name}
             helperText={errors.name}
             disabled={isLoading}
-            inputProps={{ maxLength: 200 }}
+            slotProps={{ htmlInput: { maxLength: 200 } }}
           />
         </Grid>
 
@@ -179,7 +179,7 @@ export default function LocationForm({
             value={formData.description ?? ''}
             onChange={handleChange('description')}
             disabled={isLoading}
-            inputProps={{ maxLength: 2000 }}
+            slotProps={{ htmlInput: { maxLength: 2000 } }}
           />
         </Grid>
 
@@ -200,7 +200,7 @@ export default function LocationForm({
             error={!!errors.address}
             helperText={errors.address}
             disabled={isLoading}
-            inputProps={{ maxLength: 500 }}
+            slotProps={{ htmlInput: { maxLength: 500 } }}
           />
         </Grid>
 
@@ -211,7 +211,7 @@ export default function LocationForm({
             value={formData.zipCode ?? ''}
             onChange={handleChange('zipCode')}
             disabled={isLoading}
-            inputProps={{ maxLength: 20 }}
+            slotProps={{ htmlInput: { maxLength: 20 } }}
           />
         </Grid>
 
@@ -225,7 +225,7 @@ export default function LocationForm({
             error={!!errors.city}
             helperText={errors.city}
             disabled={isLoading}
-            inputProps={{ maxLength: 100 }}
+            slotProps={{ htmlInput: { maxLength: 100 } }}
           />
         </Grid>
 
@@ -293,7 +293,7 @@ export default function LocationForm({
             value={formData.phone ?? ''}
             onChange={handleChange('phone')}
             disabled={isLoading}
-            inputProps={{ maxLength: 50 }}
+            slotProps={{ htmlInput: { maxLength: 50 } }}
           />
         </Grid>
 

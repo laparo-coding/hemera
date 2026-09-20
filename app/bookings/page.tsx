@@ -10,6 +10,7 @@ import {
   Card,
   CardContent,
   Chip,
+  Grid,
   IconButton,
   List,
   ListItem,
@@ -19,7 +20,6 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/GridLegacy';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -51,12 +51,12 @@ export default async function BookingsPage() {
       <Typography variant='h4' component='h1' gutterBottom>
         My Bookings
       </Typography>
-      <Typography variant='body1' color='text.secondary' paragraph>
+      <Typography variant='body1' color='text.secondary' sx={{ mb: 1 }}>
         View and manage your course bookings and enrollment status.
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant='h3' color='primary'>
@@ -68,7 +68,7 @@ export default async function BookingsPage() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant='h3' color='warning.main'>
@@ -80,7 +80,7 @@ export default async function BookingsPage() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant='h3' color='success.main'>
@@ -92,7 +92,7 @@ export default async function BookingsPage() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant='h3' color='error.main'>
@@ -110,9 +110,11 @@ export default async function BookingsPage() {
         <CardContent>
           <Stack
             direction='row'
-            justifyContent='space-between'
-            alignItems='center'
-            sx={{ mb: 2 }}
+            sx={{
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2,
+            }}
           >
             <Typography variant='h6'>Course Bookings</Typography>
             <Button
@@ -133,7 +135,7 @@ export default async function BookingsPage() {
               <Typography variant='h6' color='text.secondary' gutterBottom>
                 No bookings yet
               </Typography>
-              <Typography variant='body2' color='text.secondary' paragraph>
+              <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
                 Start by exploring our course catalog and book your first
                 course.
               </Typography>
@@ -166,7 +168,11 @@ export default async function BookingsPage() {
                   </ListItemAvatar>
                   <ListItemText
                     primary={
-                      <Stack direction='row' spacing={1} alignItems='center'>
+                      <Stack
+                        direction='row'
+                        spacing={1}
+                        sx={{ alignItems: 'center' }}
+                      >
                         <Typography variant='subtitle1' component='span'>
                           {booking.course.title}
                         </Typography>
@@ -187,7 +193,7 @@ export default async function BookingsPage() {
                           <Stack
                             direction='row'
                             spacing={0.5}
-                            alignItems='center'
+                            sx={{ alignItems: 'center' }}
                           >
                             <CalendarTodayOutlined fontSize='small' />
                             <Typography variant='caption'>

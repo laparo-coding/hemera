@@ -88,7 +88,7 @@ export default function LocationMap({
         />
         <Marker position={[latitude, longitude]}>
           <Popup>
-            <Typography variant='subtitle2' fontWeight='bold'>
+            <Typography variant='subtitle2' sx={{ fontWeight: 'bold' }}>
               {name}
             </Typography>
             {address && (

@@ -9,10 +9,12 @@ const CheckoutPageClient = dynamic(
     ssr: false,
     loading: () => (
       <Box
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        minHeight='50vh'
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh',
+        }}
       >
         <CircularProgress />
       </Box>

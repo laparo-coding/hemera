@@ -121,7 +121,7 @@ export const SummaryAssetList: React.FC<SummaryAssetListProps> = ({
 
   if (loading) {
     return (
-      <Box display='flex' justifyContent='center' py={4}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
         <CircularProgress sx={{ color: colors.marsala }} />
       </Box>
     );

@@ -24,6 +24,7 @@ import {
   Card,
   CardContent,
   Chip,
+  Grid,
   LinearProgress,
   List,
   ListItem,
@@ -31,7 +32,6 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/GridLegacy';
 import { useCallback, useEffect, useState } from 'react';
 
 interface HealthCheck {
@@ -232,7 +232,7 @@ export default function DeploymentMonitoringDashboard() {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant='h6' gutterBottom>
                 Deployment Status
               </Typography>
@@ -249,24 +249,24 @@ export default function DeploymentMonitoringDashboard() {
                 {healthData.deployment.region}
               </Typography>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant='h6' gutterBottom>
                 Service Summary
               </Typography>
               <Grid container spacing={2}>
-                <Grid item xs={4}>
+                <Grid size={{ xs: 4 }}>
                   <Typography variant='h4' color='success.main'>
                     {healthData.summary.passedChecks}
                   </Typography>
                   <Typography variant='caption'>Healthy</Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={{ xs: 4 }}>
                   <Typography variant='h4' color='warning.main'>
                     {healthData.summary.warningChecks}
                   </Typography>
                   <Typography variant='caption'>Warnings</Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={{ xs: 4 }}>
                   <Typography variant='h4' color='error.main'>
                     {healthData.summary.failedChecks}
                   </Typography>
@@ -370,7 +370,7 @@ export default function DeploymentMonitoringDashboard() {
             Deployment Information
           </Typography>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant='subtitle2'>Deployment ID</Typography>
               <Typography
                 variant='body2'
@@ -380,7 +380,7 @@ export default function DeploymentMonitoringDashboard() {
                 {healthData.deployment.deploymentId}
               </Typography>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant='subtitle2'>Request ID</Typography>
               <Typography
                 variant='body2'
@@ -390,13 +390,13 @@ export default function DeploymentMonitoringDashboard() {
                 {healthData.requestId}
               </Typography>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant='subtitle2'>Timestamp</Typography>
               <Typography variant='body2' color='text.secondary'>
                 {new Date(healthData.deployment.timestamp).toLocaleString()}
               </Typography>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant='subtitle2'>Check Timestamp</Typography>
               <Typography variant='body2' color='text.secondary'>
                 {new Date(healthData.timestamp).toLocaleString()}

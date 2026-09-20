@@ -278,11 +278,13 @@ export default function CourseProgressStepper({
             shouldLockFutureSteps && step.key !== 'VORBEREITUNG';
           const stepAriaLabel = `${step.label} – ${timelineDate ?? step.timelineLabel}`;
 
+          const StepIcon = (props: StepIconProps) => (
+            <NumberedStepIcon {...props} unlocked={isDevUnlocked} />
+          );
+
           const label = (
             <StepLabel
-              StepIconComponent={props => (
-                <NumberedStepIcon {...props} unlocked={isDevUnlocked} />
-              )}
+              slots={{ stepIcon: StepIcon }}
               sx={{
                 cursor: isLockedUntilSeminarStart ? 'default' : 'pointer',
                 '& .MuiStepLabel-labelContainer': {

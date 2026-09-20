@@ -224,7 +224,7 @@ export default function AdminDataTable<T>({
   // Loading state
   if (loading) {
     return (
-      <Box display='flex' justifyContent='center' py={4}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
         <CircularProgress />
       </Box>
     );

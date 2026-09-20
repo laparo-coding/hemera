@@ -17,11 +17,13 @@ export default function CustomSignUpPage() {
       <Suspense
         fallback={
           <Box
-            display='flex'
-            justifyContent='center'
-            alignItems='center'
-            minHeight='100vh'
-            bgcolor={colors.beige}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '100vh',
+              bgcolor: colors.beige,
+            }}
           >
             <CircularProgress
               aria-label='Laden'

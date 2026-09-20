@@ -9,7 +9,7 @@
 
 'use client';
 
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import DescriptionIcon from '@mui/icons-material/Description';
 import {
@@ -211,7 +211,7 @@ export default function MaterialLinkSelector({
             aria-label='Seminarmaterial verknüpfen'
             sx={{ alignSelf: 'flex-start' }}
           >
-            <AddCircleOutlineIcon fontSize='small' />
+            <AddCircleOutlinedIcon fontSize='small' />
           </IconButton>
         </span>
       </Tooltip>

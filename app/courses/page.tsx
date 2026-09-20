@@ -179,8 +179,8 @@ export default async function CoursesPage() {
             {/* Error State */}
             {fetchError && (
               <Box
-                textAlign='center'
                 sx={{
+                  textAlign: 'center',
                   py: 8,
                   px: 4,
                   bgcolor: 'rgba(211, 47, 47, 0.08)',
@@ -209,8 +209,7 @@ export default async function CoursesPage() {
             {/* Empty State (no error, just no courses) */}
             {!fetchError && courses.length === 0 && (
               <Box
-                textAlign='center'
-                sx={{ py: 8 }}
+                sx={{ textAlign: 'center', py: 8 }}
                 data-testid='e2e-courses-empty'
               >
                 <Typography

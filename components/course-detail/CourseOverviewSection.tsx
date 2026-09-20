@@ -5,7 +5,7 @@
  * Course description, learning objectives, and instructor info.
  */
 
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import {
   Box,
@@ -115,11 +115,16 @@ export const CourseOverviewSection: React.FC<CourseOverviewSectionProps> = ({
                     <CheckCircleOutlineIcon sx={{ color: colors.bronze }} />
                   </ListItemIcon>
                   <ListItemText
-                    primary={objective}
-                    primaryTypographyProps={{
-                      fontFamily: typography.body,
-                      color: colors.lightBlack,
-                    }}
+                    primary={
+                      <Typography
+                        sx={{
+                          fontFamily: typography.body,
+                          color: colors.lightBlack,
+                        }}
+                      >
+                        {objective}
+                      </Typography>
+                    }
                   />
                 </ListItem>
               ))}

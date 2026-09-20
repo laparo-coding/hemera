@@ -290,10 +290,12 @@ function CheckoutContent() {
 
     return (
       <Box
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        minHeight='50vh'
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh',
+        }}
       >
         <CircularProgress />
       </Box>
@@ -304,10 +306,12 @@ function CheckoutContent() {
   if (!user) {
     return (
       <Box
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        minHeight='50vh'
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh',
+        }}
       >
         <CircularProgress />
       </Box>
@@ -344,12 +348,14 @@ function CheckoutContent() {
 
       {loading ? (
         <Box
-          display='flex'
-          justifyContent='center'
-          alignItems='center'
-          minHeight='300px'
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '300px',
+          }}
         >
-          <Stack spacing={2} alignItems='center'>
+          <Stack spacing={2} sx={{ alignItems: 'center' }}>
             <CircularProgress />
             <Typography variant='body2' color='text.secondary'>
               Checkout wird vorbereitet ...
@@ -358,11 +364,14 @@ function CheckoutContent() {
         </Box>
       ) : course && paymentIntent ? (
         <Box
-          display='flex'
-          justifyContent='center'
-          sx={{ mt: { xs: 4, md: 8 }, width: '100%' }}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            mt: { xs: 4, md: 8 },
+            width: '100%',
+          }}
         >
-          <Box maxWidth={500} width='100%'>
+          <Box sx={{ maxWidth: 500, width: '100%' }}>
             {stripePromise ? (
               <Elements
                 key={paymentIntent.clientSecret}
@@ -406,10 +415,12 @@ export default function CheckoutPageClient() {
     <Suspense
       fallback={
         <Box
-          display='flex'
-          justifyContent='center'
-          alignItems='center'
-          minHeight='50vh'
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '50vh',
+          }}
         >
           <CircularProgress />
         </Box>

@@ -133,7 +133,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
 
   if (loading) {
     return (
-      <Box display='flex' justifyContent='center' py={8}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
         <CircularProgress sx={{ color: colors.marsala }} />
       </Box>
     );
@@ -207,11 +207,13 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
             >
               <CardContent>
                 <Box
-                  display='flex'
-                  alignItems='center'
-                  justifyContent='space-between'
-                  flexWrap='wrap'
-                  gap={2}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 2,
+                  }}
                 >
                   <Box>
                     <Typography
@@ -288,11 +290,13 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
                 }}
               >
                 <Box
-                  display='flex'
-                  alignItems='center'
-                  justifyContent='space-between'
-                  width='100%'
-                  pr={2}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    pr: 2,
+                  }}
                 >
                   <Box>
                     <Typography
@@ -380,7 +384,7 @@ export const MyCoursesClient: React.FC<MyCoursesClientProps> = ({
               }}
             >
               <CardContent>
-                <Box display='flex' alignItems='center' gap={2}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <SchoolOutlined
                     sx={{ color: colors.rosyBrown, fontSize: 32 }}
                   />
