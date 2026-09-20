@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
+import { STRIPE_API_VERSION } from '../lib/stripe/config';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-07-29.dahlia',
+  apiVersion: STRIPE_API_VERSION,
 });
 
 async function main() {
