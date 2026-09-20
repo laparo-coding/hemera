@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
-import { criticalAreas } from './tests/critical-areas.js';
+import { criticalAreas } from './tests/coverage/critical-areas';
 
 const unitMeasuredCriticalAreaPaths = (
   criticalAreas as Array<{ paths: string[] }>

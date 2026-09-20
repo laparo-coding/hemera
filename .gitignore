@@ -9,6 +9,8 @@ node_modules/
 dist/
 build/
 coverage/
+!tests/coverage/
+!tests/coverage/**
 .eslintcache
 tsconfig.tsbuildinfo
 next-env.d.ts
