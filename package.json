@@ -152,7 +152,7 @@
     "@vitest/coverage-v8": "4.1.10",
     "@vitest/ui": "^4.1.10",
     "cross-env": "10.1.0",
-    "cspell": "^9.8.0",
+    "cspell": "^10.3.3",
     "dotenv": "^17.4.2",
     "dotenv-cli": "^11.0.0",
     "fast-check": "^4.10.1",
