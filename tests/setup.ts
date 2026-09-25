@@ -22,6 +22,19 @@ globalThis.jest = vi;
 // Mock server-only module to prevent errors in test environment
 vi.mock('server-only', () => ({}));
 
+// Polyfill focus()/blur() for jsdom to fix MUI FocusTrap errors
+// MUI's Unstable_TrapFocus calls nodeToRestore.current.focus() on cleanup,
+// but jsdom doesn't consistently implement focus() on all node types.
+// We ALWAYS override because jsdom's existing implementation may still fail.
+if (typeof window !== 'undefined') {
+  HTMLElement.prototype.focus = (): void => {
+    // Robust no-op polyfill for jsdom - always available
+  };
+  HTMLElement.prototype.blur = (): void => {
+    // Robust no-op polyfill for jsdom - always available
+  };
+}
+
 // Polyfill Web APIs for jsdom environment (required by testcontainers and other libraries)
 if (typeof globalThis.TextEncoder === 'undefined') {
   globalThis.TextEncoder = TextEncoder;
