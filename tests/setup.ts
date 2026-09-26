@@ -56,20 +56,56 @@ if (typeof globalThis.TransformStream === 'undefined') {
 }
 
 // Load env files eagerly so that DATABASE_URL is available before test files import PrismaClient
+// SECURITY: Only .env.test is loaded automatically. .env.local / .env may contain
+// production DATABASE_URLs - loading them here caused a production data wipe
+// (E2E tests ran deleteMany against the production database).
 (() => {
   if (!process.env.DATABASE_URL) {
     const root = process.cwd();
-    const envCandidates = [
-      path.join(root, '.env.test'),
-      path.join(root, '.env.local'),
-      path.join(root, '.env'),
-    ];
+    const envCandidates = [path.join(root, '.env.test')];
     for (const p of envCandidates) {
       if (fs.existsSync(p)) {
         dotenv.config({ path: p, quiet: true });
         if (process.env.DATABASE_URL) break;
       }
     }
+  }
+})();
+
+// SECURITY GUARD: Refuse to run tests against a production database.
+// Tests use deleteMany()/delete() extensively and must never touch production data.
+// Override only with explicit ALLOW_TESTS_AGAINST_PRODUCTION=true (not recommended).
+(() => {
+  const databaseUrl = process.env.DATABASE_URL || '';
+  const productionHostPatterns = [
+    'db.prisma.io',
+    'prisma-data.net',
+    'neon.tech',
+    'supabase.co',
+    'supabase.com',
+    'railway.app',
+    'cockroachlabs.cloud',
+    'planetscale.com',
+    'elephantsql.com',
+    'heroku.com',
+    'amazonaws.com',
+    'azure.com',
+    'googlecloud.com',
+  ];
+  const isProductionUrl = productionHostPatterns.some(pattern =>
+    databaseUrl.includes(pattern)
+  );
+  const override = process.env.ALLOW_TESTS_AGAINST_PRODUCTION === 'true';
+
+  if (databaseUrl && isProductionUrl && !override) {
+    throw new Error(
+      `\n🚨 TEST ABORTED: DATABASE_URL points to a production database!\n` +
+        `   Tests perform destructive operations (deleteMany) and would wipe production data.\n` +
+        `   DATABASE_URL: ${databaseUrl.replace(/:[^:@/]*@/, ':***@')}\n\n` +
+        `   Use a local/test database instead:\n` +
+        `   - .env.test with a local DATABASE_URL, or\n` +
+        `   - unset DATABASE_URL to let testcontainers start an ephemeral Postgres.\n`
+    );
   }
 })();
 
