@@ -57,8 +57,8 @@ export const E2E_TEST_LOCATION: E2ELocationBase = {
 export const E2E_TEST_COURSE_FIXTURES: RawE2ECourseFixture[] = [
   {
     title: 'Gehe zielsicher durch dein Gehaltsgespräch',
-    description: 'Produktionsnahe Testdaten fuer den Grundkurs.',
-    teaser: 'Produktionsnahe Testdaten fuer den Grundkurs.',
+    description: 'Produktionsnahe Testdaten für den Grundkurs.',
+    teaser: 'Produktionsnahe Testdaten für den Grundkurs.',
     slug: 'grundkurs',
     price: 30000,
     currency: 'EUR',
@@ -72,8 +72,8 @@ export const E2E_TEST_COURSE_FIXTURES: RawE2ECourseFixture[] = [
   },
   {
     title: 'Fortgeschrittene Verhandlungsstrategien',
-    description: 'Produktionsnahe Testdaten fuer den Aufbaukurs.',
-    teaser: 'Produktionsnahe Testdaten fuer den Aufbaukurs.',
+    description: 'Produktionsnahe Testdaten für den Aufbaukurs.',
+    teaser: 'Produktionsnahe Testdaten für den Aufbaukurs.',
     slug: 'fortgeschrittene',
     price: 50000,
     currency: 'EUR',
@@ -87,8 +87,8 @@ export const E2E_TEST_COURSE_FIXTURES: RawE2ECourseFixture[] = [
   },
   {
     title: 'Masterclass: Exzellenz in Verhandlungen',
-    description: 'Produktionsnahe Testdaten fuer die Masterclass.',
-    teaser: 'Produktionsnahe Testdaten fuer die Masterclass.',
+    description: 'Produktionsnahe Testdaten für die Masterclass.',
+    teaser: 'Produktionsnahe Testdaten für die Masterclass.',
     slug: 'masterclass',
     price: 70000,
     currency: 'EUR',

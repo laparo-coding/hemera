@@ -112,8 +112,7 @@ export default function CourseProgressionSection({
                 sx={{ color: colors.marsala, mb: 1 }}
                 gutterBottom
               >
-                Aktuell sind keine veroeffentlichten Seminare in der Datenbank
-                verfuegbar.
+                Aktuell sind keine veröffentlichten Seminare verfügbar.
               </Typography>
               <Typography
                 sx={{
@@ -122,8 +121,7 @@ export default function CourseProgressionSection({
                   opacity: 0.8,
                 }}
               >
-                Sobald Seminare veroeffentlicht sind, erscheinen sie hier
-                automatisch aus der Datenbank.
+                Sobald Seminare veröffentlicht sind, erscheinen sie hier.
               </Typography>
             </Box>
           )}
