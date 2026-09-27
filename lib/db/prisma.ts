@@ -24,7 +24,7 @@ let _prismaClient: PrismaClient | undefined;
 
 function createMissingDatabaseConfigurationError(): Error {
   return new Error(
-    'DATABASE_URL oder PRISMA_ACCELERATE_URL muss gesetzt sein. Kursdaten duerfen in Development und Production nicht ueber Platzhalterquellen geladen werden.'
+    'DATABASE_URL oder PRISMA_ACCELERATE_URL muss gesetzt sein. Kursdaten dürfen in Development und Production nicht über Platzhalterquellen geladen werden.'
   );
 }
 

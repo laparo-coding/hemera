@@ -63,7 +63,7 @@ const mockBookings = [
   {
     id: 'booking-no-show',
     courseId: 'course-no-show',
-    courseTitle: 'Entwurfskurs fuer lokale E2E-Tests',
+    courseTitle: 'Entwurfskurs für lokale E2E-Tests',
     coursePrice: 9900,
     currency: 'EUR',
     paymentStatus: 'PAID',

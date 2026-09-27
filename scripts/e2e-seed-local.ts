@@ -36,8 +36,8 @@ const courseSeeds: CourseSeed[] = [
     slug: 'grundkurs',
     title: 'Grundlagen der Gehaltsverhandlung',
     description:
-      'Lerne die fundamentalen Strategien und Techniken fuer erfolgreiche Gehaltsverhandlungen. Perfekt fuer den Einstieg.',
-    teaser: 'Der belastbare Einstieg fuer erste Gehalts- und Honorargespräche.',
+      'Lerne die fundamentalen Strategien und Techniken für erfolgreiche Gehaltsverhandlungen. Perfekt für den Einstieg.',
+    teaser: 'Der belastbare Einstieg für erste Gehalts- und Honorargespräche.',
     price: 14900,
     capacity: 25,
     level: 'BEGINNER',
@@ -66,8 +66,8 @@ const courseSeeds: CourseSeed[] = [
     slug: 'masterclass',
     title: 'Masterclass: Exzellenz in Verhandlungen',
     description:
-      'Meistere die Kunst der Verhandlung auf hoechstem Niveau und erreiche deine anspruchsvollsten Ziele.',
-    teaser: 'Der anspruchsvolle Aufbaukurs fuer Fuehrungskraefte und Senior Profiles.',
+      'Meistere die Kunst der Verhandlung auf höchstem Niveau und erreiche deine anspruchsvollsten Ziele.',
+    teaser: 'Der anspruchsvolle Aufbaukurs für Führungskräfte und Senior Profiles.',
     price: 49900,
     capacity: 12,
     level: 'ADVANCED',
@@ -79,10 +79,10 @@ const courseSeeds: CourseSeed[] = [
   },
   {
     slug: 'e2e-draft-course',
-    title: 'Entwurfskurs fuer lokale E2E-Tests',
+    title: 'Entwurfskurs für lokale E2E-Tests',
     description:
-      'Unveroeffentlichter Kurs, damit Admin- und Publish-Toggle-Szenarien lokal reproduzierbar bleiben.',
-    teaser: 'Lokaler Entwurfskurs fuer Admin-Regressionen.',
+      'Unveröffentlichter Kurs, damit Admin- und Publish-Toggle-Szenarien lokal reproduzierbar bleiben.',
+    teaser: 'Lokaler Entwurfskurs für Admin-Regressionen.',
     price: 9900,
     capacity: 8,
     level: 'BEGINNER',

@@ -17,7 +17,7 @@ export default function StepperDebugClient() {
   return (
     <Box sx={{ p: 4 }}>
       <Typography variant='h5' gutterBottom>
-        Schritt-fuer-Schritt-Debugging
+        Schritt-für-Schritt-Debugging
       </Typography>
       {statuses.map(status => (
         <Box key={status ?? 'null'} sx={{ mb: 4 }}>
