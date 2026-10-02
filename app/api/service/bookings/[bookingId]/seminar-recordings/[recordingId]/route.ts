@@ -10,14 +10,17 @@
  */
 
 import { createHash } from 'node:crypto';
-import { Prisma, SeminarRecordingWorkflowStatus } from '@prisma/client';
-import type { NextRequest } from 'next/server';
+import { Prisma } from '@prisma/client';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { handleServiceAuthError } from '@/lib/auth/handle-service-auth';
 import { authenticateServiceRequest } from '@/lib/auth/service-auth';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
-import { serializeWorkflow } from '@/lib/services/seminar-recording-workflow';
+import {
+  fromWireStatus,
+  serializeWorkflow,
+} from '@/lib/services/seminar-recording-workflow';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import { ErrorCodes } from '@/lib/utils/api-response';
 import {
@@ -26,26 +29,52 @@ import {
 } from '@/lib/utils/request-id';
 import {
   createServiceApiErrorResponse,
-  createServiceApiSuccessResponse,
+  getServiceApiHeaders,
   handleOptionsRequest,
 } from '@/lib/utils/service-api-response';
 
 export const dynamic = 'force-dynamic';
 
-const WorkflowStatusSchema = z.nativeEnum(SeminarRecordingWorkflowStatus);
+// Wire-format enums per the OpenAPI contract (lowercase snake_case).
+// Prisma values are converted at this boundary in both directions.
+const WorkflowStatusSchema = z.enum([
+  'queued',
+  'transcribing',
+  'transcript_ready',
+  'review_required',
+  'publishing',
+  'ready',
+  'retryable_failure',
+  'failed',
+  'deletion_pending',
+  'deleted',
+]);
 
 const CleanupStatusSchema = z.enum([
-  'PENDING',
-  'COMPLETE',
-  'RETRYABLE_FAILURE',
-  'NOT_REQUIRED',
+  'pending',
+  'complete',
+  'retryable_failure',
+  'not_required',
 ]);
 
 const DeletionReasonSchema = z.enum([
-  'BOOKING_DELETED',
-  'PARTICIPATION_DELETED',
-  'OPERATOR_ABANDONED',
+  'booking_deleted',
+  'participation_deleted',
+  'operator_abandoned',
 ]);
+
+const WIRE_TO_PRISMA_CLEANUP = {
+  pending: 'PENDING',
+  complete: 'COMPLETE',
+  retryable_failure: 'RETRYABLE_FAILURE',
+  not_required: 'NOT_REQUIRED',
+} as const;
+
+const WIRE_TO_PRISMA_DELETION_REASON = {
+  booking_deleted: 'BOOKING_DELETED',
+  participation_deleted: 'PARTICIPATION_DELETED',
+  operator_abandoned: 'OPERATOR_ABANDONED',
+} as const;
 
 const WorkflowUpdateSchema = z
   .object({
@@ -59,11 +88,13 @@ const WorkflowUpdateSchema = z
     muxAssetId: z.string().nullish(),
     muxPlaybackId: z.string().nullish(),
     muxPlaybackUrl: z.string().url().nullish(),
+    durationSeconds: z.number().positive().nullish(),
     transcriptBlobPathname: z.string().nullish(),
     lastErrorCode: z.string().nullish(),
     stageAttemptCounts: z
       .record(z.string(), z.number().int().min(0).max(5))
       .optional(),
+    nextAttemptAt: z.string().datetime().nullish(),
     assemblyAiCleanupStatus: CleanupStatusSchema.optional(),
     sourceBlobCleanupStatus: CleanupStatusSchema.optional(),
     reviewedSpeakerMapping: z.record(z.string(), z.string()).nullish(),
@@ -75,10 +106,7 @@ const WorkflowUpdateSchema = z
   })
   .strict();
 
-const ALLOWED_TRANSITIONS: Record<
-  SeminarRecordingWorkflowStatus,
-  SeminarRecordingWorkflowStatus[]
-> = {
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
   QUEUED: ['TRANSCRIBING', 'RETRYABLE_FAILURE', 'FAILED', 'DELETION_PENDING'],
   TRANSCRIBING: [
     'TRANSCRIPT_READY',
@@ -141,7 +169,12 @@ export async function GET(
     }
 
     const workflow = await prisma.seminarRecordingWorkflow.findUnique({
-      where: { bookingId_recordingId: { bookingId, recordingId } },
+      where: {
+        originalBookingId_recordingId: {
+          originalBookingId: bookingId,
+          recordingId,
+        },
+      },
     });
 
     if (!workflow) {
@@ -155,12 +188,11 @@ export async function GET(
       );
     }
 
-    return await createServiceApiSuccessResponse(
-      requestId,
-      userId,
-      role,
-      serializeWorkflow(workflow)
-    );
+    // Flat body per the OpenAPI contract: Aither parses the workflow
+    // object at the top level, so no { success, data } envelope.
+    return NextResponse.json(serializeWorkflow(workflow), {
+      headers: await getServiceApiHeaders(requestId, userId, role),
+    });
   } catch (error) {
     logger.error(
       'Workflow read failed',
@@ -246,8 +278,21 @@ export async function PUT(
       );
     }
 
+    // Convert wire-format enums to Prisma values at the API boundary.
+    const prismaStatus = fromWireStatus(update.status);
+    if (!prismaStatus) {
+      return await createServiceApiErrorResponse(
+        'Invalid workflow update',
+        ErrorCodes.VALIDATION_ERROR,
+        requestId,
+        400,
+        userId,
+        role
+      );
+    }
+
     const data = {
-      status: update.status,
+      status: prismaStatus,
       recordingDate: new Date(update.recordingDate),
       queuedAt: update.queuedAt ? new Date(update.queuedAt) : undefined,
       firstProviderAttemptAt:
@@ -274,6 +319,10 @@ export async function PUT(
         update.muxPlaybackId === undefined ? undefined : update.muxPlaybackId,
       muxPlaybackUrl:
         update.muxPlaybackUrl === undefined ? undefined : update.muxPlaybackUrl,
+      durationSeconds:
+        update.durationSeconds === undefined
+          ? undefined
+          : update.durationSeconds,
       transcriptBlobPathname:
         update.transcriptBlobPathname === undefined
           ? undefined
@@ -284,8 +333,20 @@ export async function PUT(
         update.stageAttemptCounts === undefined
           ? undefined
           : update.stageAttemptCounts,
-      assemblyAiCleanupStatus: update.assemblyAiCleanupStatus,
-      sourceBlobCleanupStatus: update.sourceBlobCleanupStatus,
+      nextAttemptAt:
+        update.nextAttemptAt !== undefined
+          ? update.nextAttemptAt
+            ? new Date(update.nextAttemptAt)
+            : null
+          : undefined,
+      assemblyAiCleanupStatus:
+        update.assemblyAiCleanupStatus === undefined
+          ? undefined
+          : WIRE_TO_PRISMA_CLEANUP[update.assemblyAiCleanupStatus],
+      sourceBlobCleanupStatus:
+        update.sourceBlobCleanupStatus === undefined
+          ? undefined
+          : WIRE_TO_PRISMA_CLEANUP[update.sourceBlobCleanupStatus],
       reviewedSpeakerMapping:
         update.reviewedSpeakerMapping === undefined
           ? undefined
@@ -313,7 +374,11 @@ export async function PUT(
             : null
           : undefined,
       deletionReason:
-        update.deletionReason === undefined ? undefined : update.deletionReason,
+        update.deletionReason === undefined
+          ? undefined
+          : update.deletionReason === null
+            ? null
+            : WIRE_TO_PRISMA_DELETION_REASON[update.deletionReason],
     };
 
     const requestHash = createHash('sha256')
@@ -345,29 +410,43 @@ export async function PUT(
         return { kind: 'success', data: priorRequest.response };
       }
 
-      const booking = await tx.booking.findUnique({
-        where: { id: bookingId },
-        select: { id: true, userId: true },
-      });
-      if (!booking) {
-        return { kind: 'not_found' };
-      }
-
       const existing = await tx.seminarRecordingWorkflow.findUnique({
-        where: { bookingId_recordingId: { bookingId, recordingId } },
+        where: {
+          originalBookingId_recordingId: {
+            originalBookingId: bookingId,
+            recordingId,
+          },
+        },
       });
+
+      // The booking is only required when creating a new workflow. Existing
+      // workflows — including tombstones whose booking was deleted — stay
+      // addressable so Aither can confirm the deletion and purge them.
+      let participantUserId: string;
+      if (existing) {
+        participantUserId = existing.participantUserId;
+      } else {
+        const booking = await tx.booking.findUnique({
+          where: { id: bookingId },
+          select: { id: true, userId: true },
+        });
+        if (!booking) {
+          return { kind: 'not_found' };
+        }
+        participantUserId = booking.userId;
+      }
 
       if (
         existing &&
-        existing.status !== update.status &&
-        !ALLOWED_TRANSITIONS[existing.status].includes(update.status)
+        existing.status !== prismaStatus &&
+        !(ALLOWED_TRANSITIONS[existing.status] ?? []).includes(prismaStatus)
       ) {
         return {
           kind: 'conflict',
-          message: `Invalid state transition ${existing.status} -> ${update.status}`,
+          message: `Invalid state transition ${existing.status} -> ${prismaStatus}`,
         };
       }
-      if (!existing && update.status !== 'QUEUED') {
+      if (!existing && prismaStatus !== 'QUEUED') {
         return {
           kind: 'conflict',
           message: 'A new workflow must start in QUEUED status',
@@ -395,7 +474,8 @@ export async function PUT(
         workflow = await tx.seminarRecordingWorkflow.create({
           data: {
             bookingId,
-            participantUserId: booking.userId,
+            originalBookingId: bookingId,
+            participantUserId,
             recordingId,
             ...data,
             queuedAt: update.queuedAt ? new Date(update.queuedAt) : new Date(),
@@ -422,6 +502,15 @@ export async function PUT(
         ? { purged: true, recordingId }
         : serializeWorkflow(workflow);
       if (purged) {
+        // Full removal of workflow metadata: the workflow, its idempotency
+        // records (which store complete workflow responses), and any
+        // outstanding deletion outbox entry.
+        await tx.seminarRecordingIdempotency.deleteMany({
+          where: { bookingId, recordingId },
+        });
+        await tx.seminarRecordingDeletionOutbox.deleteMany({
+          where: { bookingId, recordingId },
+        });
         await tx.seminarRecordingWorkflow.delete({
           where: { id: workflow.id },
         });
@@ -457,12 +546,11 @@ export async function PUT(
         409
       );
     }
-    return await createServiceApiSuccessResponse(
-      requestId,
-      userId,
-      role,
-      result.data
-    );
+    // Flat body per the OpenAPI contract: Aither parses the workflow
+    // object at the top level, so no { success, data } envelope.
+    return NextResponse.json(result.data, {
+      headers: await getServiceApiHeaders(requestId, userId, role),
+    });
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&

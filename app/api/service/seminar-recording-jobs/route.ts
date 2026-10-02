@@ -7,14 +7,16 @@
  * Auth: service API key (X-API-Key) or Clerk session (api-client/admin role)
  */
 
-import { SeminarRecordingWorkflowStatus } from '@prisma/client';
-import type { NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { handleServiceAuthError } from '@/lib/auth/handle-service-auth';
 import { authenticateServiceRequest } from '@/lib/auth/service-auth';
 import { prisma } from '@/lib/db/prisma';
 import { checkRateLimit } from '@/lib/middleware/rate-limit';
-import { serializeWorkflow } from '@/lib/services/seminar-recording-workflow';
+import {
+  fromWireStatus,
+  serializeWorkflow,
+} from '@/lib/services/seminar-recording-workflow';
 import { createApiLogger } from '@/lib/utils/api-logger';
 import { ErrorCodes } from '@/lib/utils/api-response';
 import {
@@ -23,18 +25,32 @@ import {
 } from '@/lib/utils/request-id';
 import {
   createServiceApiErrorResponse,
-  createServiceApiSuccessResponse,
+  getServiceApiHeaders,
   handleOptionsRequest,
 } from '@/lib/utils/service-api-response';
 
 export const dynamic = 'force-dynamic';
+
+// Wire-format statuses per the OpenAPI contract (lowercase snake_case).
+const WireStatusSchema = z.enum([
+  'queued',
+  'transcribing',
+  'transcript_ready',
+  'review_required',
+  'publishing',
+  'ready',
+  'retryable_failure',
+  'failed',
+  'deletion_pending',
+  'deleted',
+]);
 
 const JobQuerySchema = z.object({
   status: z
     .string()
     .min(1)
     .transform(val => val.split(',').map(s => s.trim()))
-    .pipe(z.array(z.nativeEnum(SeminarRecordingWorkflowStatus)).min(1)),
+    .pipe(z.array(WireStatusSchema).min(1)),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
@@ -85,17 +101,23 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Convert wire statuses to Prisma enum values for the database query.
+    const prismaStatuses = validated.status
+      .map(fromWireStatus)
+      .filter((status): status is NonNullable<typeof status> => !!status);
+
     const workflows = await prisma.seminarRecordingWorkflow.findMany({
-      where: { status: { in: validated.status } },
+      where: { status: { in: prismaStatuses } },
       orderBy: { queuedAt: 'asc' },
       take: validated.limit,
     });
 
     const items = workflows.map(serializeWorkflow);
 
-    return await createServiceApiSuccessResponse(requestId, userId, role, {
-      items,
-    });
+    // Flat { items } body per the OpenAPI contract — Aither's JobListingSchema
+    // parses the top-level object directly.
+    const headers = await getServiceApiHeaders(requestId, userId, role);
+    return NextResponse.json({ items }, { headers });
   } catch (error) {
     logger.error(
       'Job listing failed',

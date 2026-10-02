@@ -370,7 +370,12 @@ enum WorkflowDeletionReason {
 
 model SeminarRecordingWorkflow {
   id                     String                          @id @default(cuid())
+  // Live relation to the booking; becomes NULL when the booking is deleted
+  // (tombstone survives for provider cleanup).
   bookingId              String?                         @map("booking_id")
+  // Permanent original booking id: survives booking deletion and keeps the
+  // tombstone addressable via the API key (bookingId, recordingId).
+  originalBookingId      String                          @map("original_booking_id")
   participantUserId      String                          @map("participant_user_id")
   recordingId            String                          @map("recording_id")
   status                 SeminarRecordingWorkflowStatus  @default(QUEUED)
@@ -384,7 +389,9 @@ model SeminarRecordingWorkflow {
   muxPlaybackId          String?                         @map("mux_playback_id")
   muxPlaybackUrl         String?                         @map("mux_playback_url")
   transcriptBlobPathname String?                         @map("transcript_blob_pathname")
+  durationSeconds        Float?                          @map("duration_seconds")
   stageAttemptCounts     Json                            @default("{}") @map("stage_attempt_counts")
+  nextAttemptAt          DateTime?                       @map("next_attempt_at")
   assemblyAiCleanupStatus ProviderCleanupStatus           @default(NOT_REQUIRED) @map("assembly_ai_cleanup_status")
   sourceBlobCleanupStatus ProviderCleanupStatus          @default(NOT_REQUIRED) @map("source_blob_cleanup_status")
   reviewedSpeakerMapping Json?                           @map("reviewed_speaker_mapping")
@@ -400,10 +407,30 @@ model SeminarRecordingWorkflow {
   booking   Booking?              @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   traceEvents SeminarRecordingTraceEvent[]
 
-  @@unique([bookingId, recordingId])
+  @@unique([originalBookingId, recordingId])
   @@index([status, queuedAt])
   @@index([participantUserId])
   @@map("seminar_recording_workflows")
+}
+
+// Durable provider-cleanup job (outbox) for a seminar recording. Created
+// atomically when workflows are marked DELETION_PENDING; dispatched to
+// Aither's DELETE endpoint after the response. Failed dispatches stay
+// pending with a capped attempt counter and are retried on the next trigger.
+model SeminarRecordingDeletionOutbox {
+  id             String                @id @default(cuid())
+  bookingId      String                @map("booking_id")
+  recordingId    String                @map("recording_id")
+  deletionId     String                @map("deletion_id")
+  deletionReason WorkflowDeletionReason @map("deletion_reason")
+  dispatchedAt   DateTime?             @map("dispatched_at")
+  attempts       Int                   @default(0) @map("attempts")
+  lastError      String?               @map("last_error")
+  createdAt      DateTime              @default(now()) @map("created_at")
+  updatedAt      DateTime              @updatedAt @map("updated_at")
+
+  @@unique([bookingId, recordingId])
+  @@map("seminar_recording_deletion_outbox")
 }
 
 // Minimal sanitized trace event; deleted with its workflow (FR-025/FR-023).

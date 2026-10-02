@@ -11,6 +11,7 @@ CREATE TYPE "WorkflowDeletionReason" AS ENUM ('BOOKING_DELETED', 'PARTICIPATION_
 CREATE TABLE "seminar_recording_workflows" (
     "id" TEXT NOT NULL,
     "booking_id" TEXT,
+    "original_booking_id" TEXT NOT NULL,
     "participant_user_id" TEXT NOT NULL,
     "recording_id" TEXT NOT NULL,
     "status" "SeminarRecordingWorkflowStatus" NOT NULL DEFAULT 'QUEUED',
@@ -24,7 +25,9 @@ CREATE TABLE "seminar_recording_workflows" (
     "mux_playback_id" TEXT,
     "mux_playback_url" TEXT,
     "transcript_blob_pathname" TEXT,
+    "duration_seconds" DOUBLE PRECISION,
     "stage_attempt_counts" JSONB NOT NULL DEFAULT '{}',
+    "next_attempt_at" TIMESTAMP(3),
     "assembly_ai_cleanup_status" "ProviderCleanupStatus" NOT NULL DEFAULT 'NOT_REQUIRED',
     "source_blob_cleanup_status" "ProviderCleanupStatus" NOT NULL DEFAULT 'NOT_REQUIRED',
     "reviewed_speaker_mapping" JSONB,
@@ -70,6 +73,22 @@ CREATE TABLE "seminar_recording_idempotency" (
     CONSTRAINT "seminar_recording_idempotency_pkey" PRIMARY KEY ("booking_id", "recording_id", "idempotency_key")
 );
 
+-- CreateTable
+CREATE TABLE "seminar_recording_deletion_outbox" (
+    "id" TEXT NOT NULL,
+    "booking_id" TEXT NOT NULL,
+    "recording_id" TEXT NOT NULL,
+    "deletion_id" TEXT NOT NULL,
+    "deletion_reason" "WorkflowDeletionReason" NOT NULL,
+    "dispatched_at" TIMESTAMP(3),
+    "attempts" INTEGER NOT NULL DEFAULT 0,
+    "last_error" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "seminar_recording_deletion_outbox_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE INDEX "seminar_recording_workflows_status_queued_at_idx" ON "seminar_recording_workflows"("status", "queued_at");
 
@@ -77,12 +96,15 @@ CREATE INDEX "seminar_recording_workflows_status_queued_at_idx" ON "seminar_reco
 CREATE INDEX "seminar_recording_workflows_participant_user_id_idx" ON "seminar_recording_workflows"("participant_user_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "seminar_recording_workflows_booking_id_recording_id_key" ON "seminar_recording_workflows"("booking_id", "recording_id");
+-- NOTE: the conventional name exceeds PostgreSQL's 63-char identifier limit;
+-- use the name Prisma generates (truncated) so migrate diff stays clean.
+CREATE UNIQUE INDEX "seminar_recording_workflows_original_booking_id_recording_i_key" ON "seminar_recording_workflows"("original_booking_id", "recording_id");
 
 -- CreateIndex
 CREATE INDEX "seminar_recording_trace_events_workflow_id_occurred_at_idx" ON "seminar_recording_trace_events"("workflow_id", "occurred_at");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "seminar_recording_deletion_outbox_booking_id_recording_id_key" ON "seminar_recording_deletion_outbox"("booking_id", "recording_id");
 
 -- AddForeignKey
 ALTER TABLE "seminar_recording_workflows" ADD CONSTRAINT "seminar_recording_workflows_booking_id_fkey" FOREIGN KEY ("booking_id") REFERENCES "bookings"("id") ON DELETE SET NULL ON UPDATE CASCADE;

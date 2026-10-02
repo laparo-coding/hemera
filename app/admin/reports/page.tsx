@@ -32,29 +32,9 @@ import type {
   HealthStatusLevel,
   ServiceHealth,
 } from '@/lib/types/admin';
+import { createFetchTimeoutSignal } from '@/lib/utils/fetch-timeout';
 
 const REPORTS_FETCH_TIMEOUT_MS = 10_000;
-
-function createFetchTimeoutSignal(timeoutMs: number): AbortSignal {
-  if (typeof AbortSignal.timeout === 'function') {
-    return AbortSignal.timeout(timeoutMs);
-  }
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => {
-    controller.abort();
-  }, timeoutMs);
-  controller.signal.addEventListener(
-    'abort',
-    () => {
-      clearTimeout(timeoutId);
-    },
-    {
-      once: true,
-    }
-  );
-  return controller.signal;
-}
 
 function createFallbackServiceHealth(
   name: ServiceHealth['name'],

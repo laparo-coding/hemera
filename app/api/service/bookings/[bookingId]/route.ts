@@ -7,7 +7,7 @@
  * Auth: service API key (X-API-Key) or Clerk session (api-client/admin role)
  */
 
-import type { NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { handleServiceAuthError } from '@/lib/auth/handle-service-auth';
 import { authenticateServiceRequest } from '@/lib/auth/service-auth';
@@ -21,7 +21,7 @@ import {
 } from '@/lib/utils/request-id';
 import {
   createServiceApiErrorResponse,
-  createServiceApiSuccessResponse,
+  getServiceApiHeaders,
   handleOptionsRequest,
 } from '@/lib/utils/service-api-response';
 
@@ -83,19 +83,17 @@ export async function GET(
       );
     }
 
-    // Server-derived participant identity — never trust caller input
+    // Server-derived participant identity — never trust caller input.
+    // Flat response body per the OpenAPI contract: Aither's
+    // BookingContextSchema parses the top-level object directly.
     const bookingContext = BookingContextSchema.parse({
       bookingId: booking.id,
       participantUserId: booking.userId,
       courseId: booking.courseId,
     });
 
-    return await createServiceApiSuccessResponse(
-      requestId,
-      userId,
-      role,
-      bookingContext
-    );
+    const headers = await getServiceApiHeaders(requestId, userId, role);
+    return NextResponse.json(bookingContext, { headers });
   } catch (error) {
     logger.error(
       'Booking lookup failed',

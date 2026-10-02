@@ -19,7 +19,9 @@ const { mockPrisma, mockTransaction, mockAuthenticate } = vi.hoisted(() => {
     seminarRecordingIdempotency: {
       findUnique: vi.fn(),
       create: vi.fn(),
+      deleteMany: vi.fn(),
     },
+    seminarRecordingDeletionOutbox: { deleteMany: vi.fn() },
     seminarRecordingTraceEvent: { create: vi.fn() },
   };
   return {
@@ -66,7 +68,7 @@ function createRequest(body: Record<string, unknown>): NextRequest {
 }
 
 const validBody = {
-  status: 'QUEUED',
+  status: 'queued',
   recordingDate: '2026-09-30T10:00:00.000Z',
 };
 
@@ -96,6 +98,7 @@ describe('PUT seminar recording workflow', () => {
     mockTransaction.seminarRecordingWorkflow.create.mockResolvedValue({
       id: 'workflow-001',
       bookingId: 'booking-001',
+      originalBookingId: 'booking-001',
       participantUserId: 'participant-001',
       recordingId: 'recording-001',
       status: 'QUEUED',
@@ -108,8 +111,10 @@ describe('PUT seminar recording workflow', () => {
       muxAssetId: null,
       muxPlaybackId: null,
       muxPlaybackUrl: null,
+      durationSeconds: null,
       transcriptBlobPathname: null,
       stageAttemptCounts: {},
+      nextAttemptAt: null,
       assemblyAiCleanupStatus: 'NOT_REQUIRED',
       sourceBlobCleanupStatus: 'NOT_REQUIRED',
       reviewedSpeakerMapping: null,
@@ -157,7 +162,7 @@ describe('PUT seminar recording workflow', () => {
 
   it('returns 409 when a new workflow does not start in QUEUED', async () => {
     const response = await PUT(
-      createRequest({ ...validBody, status: 'TRANSCRIBING' }),
+      createRequest({ ...validBody, status: 'transcribing' }),
       { params }
     );
 
@@ -192,7 +197,7 @@ describe('PUT seminar recording workflow', () => {
     const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(payload.data).toEqual({ accepted: true });
+    expect(payload).toEqual({ accepted: true });
     expect(
       mockTransaction.seminarRecordingWorkflow.findUnique
     ).not.toHaveBeenCalled();
@@ -206,6 +211,7 @@ describe('PUT seminar recording workflow', () => {
     const deletedWorkflow = {
       id: 'workflow-001',
       bookingId: 'booking-001',
+      originalBookingId: 'booking-001',
       participantUserId: 'participant-001',
       recordingId: 'recording-001',
       status: 'DELETED',
@@ -218,8 +224,10 @@ describe('PUT seminar recording workflow', () => {
       muxAssetId: null,
       muxPlaybackId: null,
       muxPlaybackUrl: null,
+      durationSeconds: null,
       transcriptBlobPathname: null,
       stageAttemptCounts: {},
+      nextAttemptAt: null,
       assemblyAiCleanupStatus: 'NOT_REQUIRED',
       sourceBlobCleanupStatus: 'NOT_REQUIRED',
       reviewedSpeakerMapping: null,
@@ -240,7 +248,7 @@ describe('PUT seminar recording workflow', () => {
     const response = await PUT(
       createRequest({
         ...validBody,
-        status: 'DELETED',
+        status: 'deleted',
         deletionConfirmedAt: '2026-09-30T10:05:00.000Z',
       }),
       { params }
@@ -248,11 +256,21 @@ describe('PUT seminar recording workflow', () => {
     const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(payload.data).toEqual({
+    expect(payload).toEqual({
       purged: true,
       recordingId: 'recording-001',
     });
     expect(mockTransaction.seminarRecordingWorkflow.delete).toHaveBeenCalled();
+    expect(
+      mockTransaction.seminarRecordingIdempotency.deleteMany
+    ).toHaveBeenCalledWith({
+      where: { bookingId: 'booking-001', recordingId: 'recording-001' },
+    });
+    expect(
+      mockTransaction.seminarRecordingDeletionOutbox.deleteMany
+    ).toHaveBeenCalledWith({
+      where: { bookingId: 'booking-001', recordingId: 'recording-001' },
+    });
     expect(
       mockTransaction.seminarRecordingIdempotency.create
     ).toHaveBeenCalled();

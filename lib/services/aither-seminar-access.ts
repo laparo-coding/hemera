@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod';
+import { createFetchTimeoutSignal } from '@/lib/utils/fetch-timeout';
 
 const ACCESS_PATH = '/api/service/seminar-document-access';
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -126,7 +127,7 @@ export async function requestSeminarDocumentAccess(target: {
       cache: 'no-store',
       // Never replay the service key to a redirect target.
       redirect: 'error',
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: createFetchTimeoutSignal(REQUEST_TIMEOUT_MS),
     });
   } catch (error) {
     throw new AitherAccessError('unavailable', {

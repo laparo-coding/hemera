@@ -5,7 +5,8 @@
  * Task: T034 [US2] — Player and role-separated transcript UI for ready
  * seminar recordings. Requests fresh signed media links from Aither on each
  * load (never caches bearer URLs beyond expiry), follows MUI/Hemera design
- * tokens and WCAG 2.1 AA, and provides loading/empty/error states.
+ * tokens, and provides loading/empty/error states. Synchronized captions are
+ * deferred until Aither/Mux provides a track (see player note below).
  */
 
 import { Alert, Box, CircularProgress, Typography } from '@mui/material';
@@ -188,9 +189,12 @@ export default function SeminarRecordingDocuments({
               })}
             </Typography>
 
-            {/* The full role-separated transcript is rendered directly below the
-                player, serving as the accessible text alternative (WCAG 2.1 AA). */}
-            {/* biome-ignore lint/a11y/useMediaCaption: transcript rendered below as text alternative */}
+            {/* NOTE (WCAG 2.1 AA): a synchronized captions track is not yet
+                available. The role-separated transcript below is a text
+                alternative, but it is NOT synchronized captions; the player is
+                therefore not fully WCAG-2.1-AA-compliant for recorded video
+                with audio until Aither/Mux provides a captions track. */}
+            {/* biome-ignore lint/a11y/useMediaCaption: captions track deferred until Aither/Mux provides one; see PR description */}
             <video
               controls
               preload='metadata'
