@@ -1,3 +1,4 @@
+-- nosemgrep: tsqllint_set-quoted-identifier - PostgreSQL migration, not SQL Server; QUOTED_IDENTIFIER is T-SQL only
 -- CreateEnum
 CREATE TYPE "SeminarRecordingWorkflowStatus" AS ENUM ('QUEUED', 'TRANSCRIBING', 'TRANSCRIPT_READY', 'REVIEW_REQUIRED', 'PUBLISHING', 'READY', 'RETRYABLE_FAILURE', 'FAILED', 'DELETION_PENDING', 'DELETED');
 
