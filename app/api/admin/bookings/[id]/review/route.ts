@@ -18,6 +18,8 @@ import { getOrCreateRequestId } from '../../../../../../lib/utils/request-id';
 // CORS headers for external app access
 const corsHeaders = getCorsHeaders();
 
+class BookingReviewConflict extends Error {}
+
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
@@ -222,12 +224,27 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         }
       }
 
-      // Atomic delete with status precondition
-      const deleteResult = await prisma.booking.deleteMany({
-        where: {
-          id: bookingId,
-          paymentStatus: 'PRE_BOOKED', // Only delete if still PRE_BOOKED
-        },
+      // Revoke access and retain tombstones atomically with the booking deletion.
+      const deleteResult = await prisma.$transaction(async tx => {
+        await tx.seminarRecordingWorkflow.updateMany({
+          where: { bookingId, status: { not: 'DELETED' } },
+          data: {
+            status: 'DELETION_PENDING',
+            deletionRequestedAt: new Date(),
+            deletionReason: 'BOOKING_DELETED',
+          },
+        });
+
+        const result = await tx.booking.deleteMany({
+          where: {
+            id: bookingId,
+            paymentStatus: 'PRE_BOOKED', // Only delete if still PRE_BOOKED
+          },
+        });
+        if (result.count === 0) {
+          throw new BookingReviewConflict();
+        }
+        return result;
       });
 
       // Check if deletion succeeded
@@ -255,6 +272,17 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       );
     }
   } catch (error) {
+    if (error instanceof BookingReviewConflict) {
+      return applyCorsHeaders(
+        createErrorResponse(
+          'Booking status changed during review (possible race condition)',
+          ErrorCodes.CONFLICT,
+          requestId,
+          409
+        ),
+        corsHeaders
+      );
+    }
     // Log minimal context without full error object
     serverInstance.error('Failed to process booking review', {
       context: 'AdminBookingReview.PATCH',
