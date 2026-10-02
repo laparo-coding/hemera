@@ -97,6 +97,7 @@ model Booking {
   user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   testimonial           Testimonial?
   participation         CourseParticipation?
+  seminarRecordingWorkflows SeminarRecordingWorkflow[]
 
   @@unique([userId, courseId])
   @@map("bookings")
@@ -337,4 +338,104 @@ model ApiLog {
   @@index([serviceUserId, createdAt])
   @@index([createdAt])
   @@map("api_logs")
+}
+
+// SEMINAR RECORDING WORKFLOW (012-video-transcription)
+// Durable transcription workflow state owned by Hemera; Aither is stateless.
+enum SeminarRecordingWorkflowStatus {
+  QUEUED
+  TRANSCRIBING
+  TRANSCRIPT_READY
+  REVIEW_REQUIRED
+  PUBLISHING
+  READY
+  RETRYABLE_FAILURE
+  FAILED
+  DELETION_PENDING
+  DELETED
+}
+
+enum ProviderCleanupStatus {
+  PENDING
+  COMPLETE
+  RETRYABLE_FAILURE
+  NOT_REQUIRED
+}
+
+enum WorkflowDeletionReason {
+  BOOKING_DELETED
+  PARTICIPATION_DELETED
+  OPERATOR_ABANDONED
+}
+
+model SeminarRecordingWorkflow {
+  id                     String                          @id @default(cuid())
+  bookingId              String?                         @map("booking_id")
+  participantUserId      String                          @map("participant_user_id")
+  recordingId            String                          @map("recording_id")
+  status                 SeminarRecordingWorkflowStatus  @default(QUEUED)
+  recordingDate          DateTime                        @map("recording_date")
+  queuedAt               DateTime                        @map("queued_at")
+  firstProviderAttemptAt DateTime?                       @map("first_provider_attempt_at")
+  assemblyAiTranscriptId String?                          @map("assembly_ai_transcript_id")
+  assemblyAiStatus       String?                         @map("assembly_ai_status")
+  sourceBlobPathname     String?                         @map("source_blob_pathname")
+  muxAssetId             String?                         @map("mux_asset_id")
+  muxPlaybackId          String?                         @map("mux_playback_id")
+  muxPlaybackUrl         String?                         @map("mux_playback_url")
+  transcriptBlobPathname String?                         @map("transcript_blob_pathname")
+  stageAttemptCounts     Json                            @default("{}") @map("stage_attempt_counts")
+  assemblyAiCleanupStatus ProviderCleanupStatus           @default(NOT_REQUIRED) @map("assembly_ai_cleanup_status")
+  sourceBlobCleanupStatus ProviderCleanupStatus          @default(NOT_REQUIRED) @map("source_blob_cleanup_status")
+  reviewedSpeakerMapping Json?                           @map("reviewed_speaker_mapping")
+  reviewedBy             String?                         @map("reviewed_by")
+  reviewedAt             DateTime?                       @map("reviewed_at")
+  deletionRequestedAt    DateTime?                       @map("deletion_requested_at")
+  deletionConfirmedAt    DateTime?                       @map("deletion_confirmed_at")
+  deletionReason         WorkflowDeletionReason?         @map("deletion_reason")
+  lastErrorCode          String?                         @map("last_error_code")
+  createdAt              DateTime                        @default(now()) @map("created_at")
+  updatedAt              DateTime                        @updatedAt @map("updated_at")
+
+  booking   Booking?              @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  traceEvents SeminarRecordingTraceEvent[]
+
+  @@unique([bookingId, recordingId])
+  @@index([status, queuedAt])
+  @@index([participantUserId])
+  @@map("seminar_recording_workflows")
+}
+
+// Minimal sanitized trace event; deleted with its workflow (FR-025/FR-023).
+// MUST NOT store transcript text, raw payloads, signed URLs, tokens, secrets.
+model SeminarRecordingTraceEvent {
+  id                String    @id @default(cuid())
+  workflowId        String    @map("workflow_id")
+  eventType         String    @map("event_type")
+  fromStatus        String?   @map("from_status")
+  toStatus          String?   @map("to_status")
+  providerReference String?   @map("provider_reference")
+  errorCode         String?   @map("error_code")
+  operatorId        String?   @map("operator_id")
+  occurredAt        DateTime  @map("occurred_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  workflow SeminarRecordingWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId, occurredAt])
+  @@map("seminar_recording_trace_events")
+}
+
+model SeminarRecordingIdempotency {
+  bookingId      String   @map("booking_id")
+  recordingId    String   @map("recording_id")
+  idempotencyKey String   @map("idempotency_key")
+  requestHash    String   @map("request_hash")
+  response       Json
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@id([bookingId, recordingId, idempotencyKey])
+  @@map("seminar_recording_idempotency")
 }
