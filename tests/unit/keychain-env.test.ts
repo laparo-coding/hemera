@@ -57,7 +57,7 @@ describe('resolveKeychainEnv', () => {
 
     expect(env.API_KEY).toBeUndefined();
     expect(warn).toHaveBeenCalledWith(
-      'Unable to read Keychain entry for API_KEY'
+      'Unable to read Keychain entry for API_KEY: Keychain unavailable'
     );
     warn.mockRestore();
   });
