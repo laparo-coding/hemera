@@ -102,6 +102,12 @@ Failure to monitor constitutes a process violation per the constitution
 - Stripe integration for secure payment processing and course enrollment.
 - All payment flows must use Stripe test mode during development.
 
+## Secrets aus der macOS-Keychain
+
+Geheimnisse in `.env.local` stehen als Referenz `<NAME>_KEYCHAIN_SERVICE=<service>`; die Werte liegen in der Keychain und werden zur Laufzeit von `lib/keychain-env.mjs` geladen (Next-Config, Prisma-Config, Deploy-Skript).
+
+Achtung: `vercel env pull` überschreibt `.env.local` mit Klartext-Werten. Danach die Referenzen wiederherstellen und keine Klartext-Secrets einchecken.
+
 ## Local Development Tips
 
 - Ensure valid Clerk keys are set in your local env file for authentication flows. Example for
