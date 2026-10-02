@@ -9,8 +9,13 @@
  */
 
 import { execSync } from 'node:child_process';
+import { config } from 'dotenv';
 import { resolveKeychainEnv } from '../lib/keychain-env.mjs';
 
+// Same load order as prisma.config.ts, so Keychain refs defined in
+// .env.local / .env are resolved before the DB URL is read below.
+config({ path: '.env.local', quiet: true });
+config({ path: '.env', quiet: true });
 resolveKeychainEnv();
 
 const isVercel = process.env.VERCEL === '1';
