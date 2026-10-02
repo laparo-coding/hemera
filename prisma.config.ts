@@ -2,11 +2,13 @@
 // Docs: https://pris.ly/d/config-datasource
 import { defineConfig } from '@prisma/config';
 import { config } from 'dotenv';
+import { resolveKeychainEnv } from './lib/keychain-env.mjs';
 
 // Load environment variables from multiple sources (in order of precedence)
 // This ensures DATABASE_URL is available for prisma CLI commands
 config({ path: '.env.local' });
 config({ path: '.env' });
+resolveKeychainEnv();
 
 // Allow prisma generate to work without DATABASE_URL (for CI/client-only generation)
 // The actual connection will fail at runtime if not set, but generate only needs the schema
@@ -19,5 +21,10 @@ export default defineConfig({
     // Use direct URL from environment - this works for both PostgreSQL and SQLite
     // Note: SQLite (file:) URLs require the schema.prisma provider to be 'sqlite'
     url: databaseUrl,
+    // Shadow database for migrate diff/dev (optional; enables migration workflows)
+    shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
+  },
+  migrations: {
+    seed: 'node --loader ts-node/esm ./prisma/seed.ts',
   },
 });

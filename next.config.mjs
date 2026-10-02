@@ -1,5 +1,8 @@
 import { fileURLToPath } from 'node:url';
 import { withNextVideo } from 'next-video/process';
+import { resolveKeychainEnv } from './lib/keychain-env.mjs';
+
+resolveKeychainEnv();
 
 const __filename = fileURLToPath(import.meta.url);
 
