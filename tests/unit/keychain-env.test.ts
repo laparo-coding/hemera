@@ -1,13 +1,14 @@
-import { execFileSync } from 'node:child_process';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 // @ts-expect-error mjs without types
 import { resolveKeychainEnv } from '../../lib/keychain-env.mjs';
 
-vi.mock('node:child_process', () => ({
-  execFileSync: vi.fn(),
-}));
+const { mockExecFileSync } = vi.hoisted(() => ({ mockExecFileSync: vi.fn() }));
 
-const mockExecFileSync = vi.mocked(execFileSync);
+// Vitest 5 requires a `default` export on mocked node: builtins.
+vi.mock('node:child_process', () => ({
+  default: { execFileSync: mockExecFileSync },
+  execFileSync: mockExecFileSync,
+}));
 
 describe('resolveKeychainEnv', () => {
   beforeEach(() => {
