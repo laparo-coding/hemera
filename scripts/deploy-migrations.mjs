@@ -9,6 +9,9 @@
  */
 
 import { execSync } from 'node:child_process';
+import { resolveKeychainEnv } from '../lib/keychain-env.mjs';
+
+resolveKeychainEnv();
 
 const isVercel = process.env.VERCEL === '1';
 const vercelEnv = process.env.VERCEL_ENV;
