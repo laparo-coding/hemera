@@ -14,6 +14,10 @@ describe('Integration: Rollbar enabled/disabled behavior', () => {
     delete process.env.NEXT_PUBLIC_DISABLE_ROLLBAR;
     delete process.env.NEXT_PUBLIC_ROLLBAR_ENABLED;
     delete process.env.ROLLBAR_ENABLED;
+    // Provide a syntactically valid server token so enablement checks do not
+    // depend on a real token being present in the environment (CI/local).
+    process.env.ROLLBAR_HEMERA_SERVER_TOKEN =
+      'valid-token-with-sufficient-length-12345';
     vi.resetModules();
   });
 

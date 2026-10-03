@@ -158,6 +158,9 @@ beforeAll(async () => {
   )}:${encodeURIComponent(password)}@${host}:${port}/${database}`;
 
   process.env.DATABASE_URL = connectionUri;
+  // The ephemeral container runs without SSL; lib/db/prisma.ts defaults to
+  // SSL enabled (opt-out via PGSSL) since e15da52, so disable it explicitly.
+  process.env.PGSSL = 'false';
 
   // Apply Prisma migrations to the fresh database
   execSync('npx prisma migrate deploy', {
