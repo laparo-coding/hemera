@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type React from 'react';
 import DebriefingVideoCatalog from '@/components/participation/DebriefingVideoCatalog';
+import SeminarRecordingDocuments from '@/components/participation/SeminarRecordingDocuments';
 import { requireAuthenticatedUser } from '@/lib/auth/helpers';
 import { getResolvedSummaryAssets } from '@/lib/db/courseParticipation';
 import { prisma } from '@/lib/db/prisma';
@@ -92,6 +93,27 @@ export default async function NachbereitungPage({
     }
   }
 
+  // Feature 012: ready-only seminar recording workflows for this booking
+  // (FR-009/FR-016). Only `ready` records are ever listed to participants.
+  let seminarRecordings: { recordingId: string; recordingDate: Date }[] = [];
+  try {
+    seminarRecordings = await prisma.seminarRecordingWorkflow.findMany({
+      where: {
+        bookingId: booking.id,
+        status: 'READY',
+      },
+      select: {
+        recordingId: true,
+        recordingDate: true,
+      },
+      orderBy: { recordingDate: 'desc' },
+    });
+  } catch (error) {
+    serverInstance.error('Failed to load seminar recordings', error as Error, {
+      bookingId,
+    });
+  }
+
   return (
     <Box sx={{ maxWidth: 960, mx: 'auto', px: { xs: 2, sm: 3 }, py: 4 }}>
       <Link
@@ -149,6 +171,16 @@ export default async function NachbereitungPage({
       )}
 
       <DebriefingVideoCatalog assets={assets} courseTitle={courseTitle} />
+
+      {seminarRecordings.length > 0 && (
+        <SeminarRecordingDocuments
+          bookingId={booking.id}
+          recordings={seminarRecordings.map(r => ({
+            recordingId: r.recordingId,
+            recordingDate: r.recordingDate.toISOString(),
+          }))}
+        />
+      )}
     </Box>
   );
 }

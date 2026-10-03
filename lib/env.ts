@@ -36,6 +36,13 @@ const EnvSchema = z.object({
   // Service API (M2M) auth — API-Key-basierte Authentifizierung für aither
   HEMERA_SERVICE_API_KEY: z.string().min(32).optional(),
   HEMERA_SERVICE_USER_ID: z.string().optional(),
+
+  // Aither media access (seminar recordings): Hemera -> Aither service credential.
+  // Intentionally lenient: lib/services/aither-seminar-access.ts validates both
+  // values per request, so a bad value disables only the recording endpoint
+  // (503) instead of aborting startup.
+  AITHER_API_URL: z.string().optional(),
+  AITHER_SERVICE_KEY: z.string().optional(),
 });
 
 type Env = z.infer<typeof EnvSchema>;

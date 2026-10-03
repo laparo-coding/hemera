@@ -1,9 +1,11 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'node:crypto';
+import { after, type NextRequest, NextResponse } from 'next/server';
 import { requireAdminUser } from '../../../../../../lib/auth/helpers';
 import { prisma } from '../../../../../../lib/db/prisma';
 import { serverInstance } from '../../../../../../lib/monitoring/rollbar-official';
 import { bookingReviewSchema } from '../../../../../../lib/schemas/admin/booking';
 import { sendBookingRejectedEmail } from '../../../../../../lib/services/loops';
+import { dispatchSeminarRecordingDeletions } from '../../../../../../lib/services/seminar-recording-deletion-outbox';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -17,6 +19,8 @@ import { getOrCreateRequestId } from '../../../../../../lib/utils/request-id';
 
 // CORS headers for external app access
 const corsHeaders = getCorsHeaders();
+
+class BookingReviewConflict extends Error {}
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
@@ -222,12 +226,70 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         }
       }
 
-      // Atomic delete with status precondition
-      const deleteResult = await prisma.booking.deleteMany({
-        where: {
-          id: bookingId,
-          paymentStatus: 'PRE_BOOKED', // Only delete if still PRE_BOOKED
-        },
+      // Revoke access and retain tombstones atomically with the booking deletion.
+      // A durable outbox entry per workflow guarantees the provider cleanup is
+      // dispatched to Aither even if the request or Aither fails midway.
+      const deleteResult = await prisma.$transaction(async tx => {
+        // Narrowed copy for the closure below (bookingId is a let above).
+        const targetBookingId = bookingId as string;
+        const workflows = await tx.seminarRecordingWorkflow.findMany({
+          where: { bookingId: targetBookingId, status: { not: 'DELETED' } },
+          select: { recordingId: true },
+        });
+
+        await tx.seminarRecordingWorkflow.updateMany({
+          where: { bookingId: targetBookingId, status: { not: 'DELETED' } },
+          data: {
+            status: 'DELETION_PENDING',
+            deletionRequestedAt: new Date(),
+            deletionReason: 'BOOKING_DELETED',
+          },
+        });
+
+        // One outbox row per recording (unique on bookingId+recordingId);
+        // a retry of this rejection reuses the same deletionId.
+        for (const workflow of workflows) {
+          await tx.seminarRecordingDeletionOutbox.upsert({
+            where: {
+              bookingId_recordingId: {
+                bookingId: targetBookingId,
+                recordingId: workflow.recordingId,
+              },
+            },
+            create: {
+              bookingId: targetBookingId,
+              recordingId: workflow.recordingId,
+              deletionId: randomUUID(),
+              deletionReason: 'BOOKING_DELETED',
+            },
+            update: {},
+          });
+        }
+
+        const result = await tx.booking.deleteMany({
+          where: {
+            id: targetBookingId,
+            paymentStatus: 'PRE_BOOKED', // Only delete if still PRE_BOOKED
+          },
+        });
+        if (result.count === 0) {
+          throw new BookingReviewConflict();
+        }
+        return result;
+      });
+
+      // Dispatch the provider cleanup after the response; failures stay in
+      // the outbox and are retried on the next trigger.
+      after(async () => {
+        try {
+          await dispatchSeminarRecordingDeletions();
+        } catch (error) {
+          serverInstance.error(
+            'Seminar recording deletion dispatch failed',
+            error instanceof Error ? error : new Error('unknown'),
+            { bookingId }
+          );
+        }
       });
 
       // Check if deletion succeeded
@@ -255,6 +317,17 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       );
     }
   } catch (error) {
+    if (error instanceof BookingReviewConflict) {
+      return applyCorsHeaders(
+        createErrorResponse(
+          'Booking status changed during review (possible race condition)',
+          ErrorCodes.CONFLICT,
+          requestId,
+          409
+        ),
+        corsHeaders
+      );
+    }
     // Log minimal context without full error object
     serverInstance.error('Failed to process booking review', {
       context: 'AdminBookingReview.PATCH',
