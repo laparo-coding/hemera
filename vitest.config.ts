@@ -33,6 +33,10 @@ export default defineConfig({
     // specs/029-jest-to-vitest-migration/tasks.md restores deterministic
     // coverage for the participant-flow and summary-visibility paths.
     exclude: [
+      // Agent worktrees (e.g. .kilo/worktrees) contain copies of the test
+      // suite that must not run as part of the main project's test commands.
+      '.kilo/**',
+      '.kilocode/**',
       'tests/e2e/**',
       'tests/integration/participant-flow.spec.ts',
       'tests/integration/summary-visibility.spec.ts',

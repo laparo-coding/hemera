@@ -698,3 +698,4 @@ Thalassa
 nosemgrep
 IDOR
 unstub
+worktrees

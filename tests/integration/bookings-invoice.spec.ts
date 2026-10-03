@@ -14,7 +14,10 @@ import {
 } from '@/tests/vitest/jest-globals';
 import { closeDb, prisma } from '../../lib/db/prisma';
 
-describe.sequential('GET /api/bookings/[bookingId]/invoice - Contract', () => {
+// Note: Vitest 5 removed describe.sequential; the runner is already fully
+// sequential via maxWorkers: 1 and sequence.concurrent: false in
+// vitest.config.ts
+describe('GET /api/bookings/[bookingId]/invoice - Contract', () => {
   let testCourse: { id: string };
   let testUser: { id: string };
   let testUser2: { id: string };

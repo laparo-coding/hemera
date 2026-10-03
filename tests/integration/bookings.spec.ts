@@ -15,7 +15,10 @@ import {
 } from '@/tests/vitest/jest-globals';
 import { closeDb, prisma } from '../../lib/db/prisma';
 
-describe.sequential('GET /api/bookings - Enhanced Response Contract', () => {
+// Note: Vitest 5 removed describe.sequential; the runner is already fully
+// sequential via maxWorkers: 1 and sequence.concurrent: false in
+// vitest.config.ts
+describe('GET /api/bookings - Enhanced Response Contract', () => {
   let testCourse: { id: string };
   let testUser: { id: string };
   let testLocation: { id: string; slug: string; name: string };
