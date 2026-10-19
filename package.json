@@ -108,7 +108,6 @@
     "@tiptap/extension-table-header": "^3.32.0",
     "@tiptap/extension-table-row": "^3.32.0",
     "@tiptap/extension-text-align": "^3.32.0",
-    "@mux/mux-player-react": "^3.14.0",
     "@tiptap/extension-text-style": "^3.27.3",
     "@tiptap/extension-underline": "^3.32.0",
     "@tiptap/pm": "^3.32.0",
