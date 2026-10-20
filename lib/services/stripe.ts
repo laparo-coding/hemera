@@ -101,7 +101,6 @@ export class StripeService {
       }
 
       const session = await this.ensureStripe().checkout.sessions.create({
-        payment_method_types: ['card'],
         line_items: [
           {
             price_data: {
