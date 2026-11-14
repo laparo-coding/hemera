@@ -1,4 +1,4 @@
-name: 'E2E: External Smoke'
+name: "E2E: External Smoke"
 
 # This workflow uses optional secrets:
 # - PLAYWRIGHT_BASE_URL: Optional base URL for testing (fallback logic in place)
@@ -9,18 +9,18 @@ on:
   workflow_dispatch:
     inputs:
       base_url:
-        description: 'Base URL to test (e.g., https://hemera-academy-preview.vercel.app)'
+        description: "Base URL to test (e.g., https://hemera-academy-preview.vercel.app)"
         required: false
         type: string
       grep:
-        description: 'Playwright grep for test selection (regex)'
+        description: "Playwright grep for test selection (regex)"
         required: false
-        default: '(seo|academy|courses|health)'
+        default: "(seo|academy|courses|health)"
         type: string
       project:
-        description: 'Playwright project name'
+        description: "Playwright project name"
         required: false
-        default: 'public'
+        default: "public"
         type: string
 
 concurrency:
@@ -47,8 +47,8 @@ jobs:
       - name: Setup Node.js 20
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -123,16 +123,16 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.resolve.outputs.base_url }}
           # disable creating test users in external previews
-          E2E_CREATE_USERS: 'false'
+          E2E_CREATE_USERS: "false"
           # Accept both the shared automation secret and the legacy fallback.
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           VERCEL_PROTECTION_BYPASS: ${{ secrets.VERCEL_PROTECTION_BYPASS }}
           # SSO tolerant mode: tests should only hit public pages by default via grep
           PLAYWRIGHT_PROJECT_INPUT: ${{ github.event.inputs.project || 'public' }}
           PLAYWRIGHT_GREP_INPUT: ${{ github.event.inputs.grep || '(seo|academy|courses|health)' }}
-          PLAYWRIGHT_SSO_TOLERANT: '1'
+          PLAYWRIGHT_SSO_TOLERANT: "1"
           NODE_ENV: test
-          NEXT_TELEMETRY_DISABLED: '1'
+          NEXT_TELEMETRY_DISABLED: "1"
         run: |
           BYPASS_TOKEN="${VERCEL_AUTOMATION_BYPASS_SECRET:-$VERCEL_PROTECTION_BYPASS}"
 

@@ -93,7 +93,9 @@ interface CreateUserOptions {
   emailVerified?: Date | null;
 }
 
-export function createTestUser(options: CreateUserOptions = {}): Prisma.UserCreateInput {
+export function createTestUser(
+  options: CreateUserOptions = {}
+): Prisma.UserCreateInput {
   return {
     email: options.email ?? `test-${Date.now()}@example.com`,
     name: options.name ?? 'Test User',
@@ -110,7 +112,9 @@ interface CreateBookingOptions {
   status?: 'pending' | 'confirmed' | 'cancelled';
 }
 
-export function createTestBooking(options: CreateBookingOptions = {}): Prisma.BookingCreateInput {
+export function createTestBooking(
+  options: CreateBookingOptions = {}
+): Prisma.BookingCreateInput {
   return {
     user: {
       connect: { id: options.userId ?? 'user-1' },
@@ -129,7 +133,10 @@ interface MockStripeService {
     Promise<{ id: string; url: string }>,
     [params: { priceId: string; successUrl: string; cancelUrl: string }]
   >;
-  retrieveSession: jest.Mock<Promise<{ id: string; payment_status: string }>, [sessionId: string]>;
+  retrieveSession: jest.Mock<
+    Promise<{ id: string; payment_status: string }>,
+    [sessionId: string]
+  >;
 }
 
 export function createMockStripeService(): MockStripeService {
@@ -155,7 +162,9 @@ export function assertUserShape(user: unknown): asserts user is User {
   });
 }
 
-export function assertBookingShape(booking: unknown): asserts booking is Booking {
+export function assertBookingShape(
+  booking: unknown
+): asserts booking is Booking {
   expect(booking).toMatchObject({
     id: expect.any(String),
     userId: expect.any(String),
@@ -214,7 +223,10 @@ export class TestApiClient {
     this.baseUrl = baseUrl;
   }
 
-  async request<T = unknown>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  async request<T = unknown>(
+    path: string,
+    options: RequestOptions = {}
+  ): Promise<ApiResponse<T>> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -233,7 +245,10 @@ export class TestApiClient {
     return response.json() as Promise<ApiResponse<T>>;
   }
 
-  async get<T = unknown>(path: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async get<T = unknown>(
+    path: string,
+    options?: RequestOptions
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(path, { ...options, method: 'GET' });
   }
 
@@ -409,19 +424,26 @@ export class OpenApiValidator {
   ): ValidationResult {
     const errors: ValidationError[] = [];
 
-    const pathItem = this.schema.paths[path] as OpenAPIV3.PathItemObject | undefined;
+    const pathItem = this.schema.paths[path] as
+      | OpenAPIV3.PathItemObject
+      | undefined;
     if (!pathItem) {
-      return { valid: false, errors: [{ field: 'path', message: 'Path not found', value: path }] };
+      return {
+        valid: false,
+        errors: [{ field: 'path', message: 'Path not found', value: path }],
+      };
     }
 
-    const operation = pathItem[method.toLowerCase() as keyof OpenAPIV3.PathItemObject] as
-      | OpenAPIV3.OperationObject
-      | undefined;
+    const operation = pathItem[
+      method.toLowerCase() as keyof OpenAPIV3.PathItemObject
+    ] as OpenAPIV3.OperationObject | undefined;
 
     if (!operation) {
       return {
         valid: false,
-        errors: [{ field: 'method', message: 'Method not allowed', value: method }],
+        errors: [
+          { field: 'method', message: 'Method not allowed', value: method },
+        ],
       };
     }
 
@@ -476,7 +498,8 @@ export function setupUserMocks(users: Prisma.UserCreateInput[]): void {
       id: `user-${index}`,
       email: user.email,
       name: user.name ?? null,
-      emailVerified: user.emailVerified instanceof Date ? user.emailVerified : null,
+      emailVerified:
+        user.emailVerified instanceof Date ? user.emailVerified : null,
       image: null,
       createdAt: new Date(),
       updatedAt: new Date(),

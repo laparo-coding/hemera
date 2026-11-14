@@ -20,12 +20,13 @@ Enhance course management with prerequisite tracking, recommendation fields, and
 
 Add two new database fields to the Course model:
 
-| Field | Type | Max Length | Description |
-|-------|------|------------|-------------|
-| `recommended` | Text (multi-line) | 300 chars | Describes who this course is recommended for |
-| `notRecommended` | Text (multi-line) | 300 chars | Describes who this course is NOT recommended for |
+| Field            | Type              | Max Length | Description                                      |
+| ---------------- | ----------------- | ---------- | ------------------------------------------------ |
+| `recommended`    | Text (multi-line) | 300 chars  | Describes who this course is recommended for     |
+| `notRecommended` | Text (multi-line) | 300 chars  | Describes who this course is NOT recommended for |
 
 **Display locations:**
+
 - Course detail page (public)
 - Course admin panel (create/edit forms)
 
@@ -41,6 +42,7 @@ Introduce a booking validation for intermediate and master class courses:
 > "Sie haben bisher kein Seminar absolviert, das für die Teilnahme an {course_name} erforderlich ist. Wir prüfen Ihre Buchungsanfrage und melden uns per E-Mail bei Ihnen."
 
 **Behavior:**
+
 - Non-qualified bookings are **always** created with status `PRE_BOOKED` (requires manual admin review)
 - Admin receives notification to review the booking request
 - Customer receives confirmation that request is under review
@@ -49,6 +51,7 @@ Introduce a booking validation for intermediate and master class courses:
   - **Reject:** Change status to `CANCELLED` and send cancellation email to customer via Loops.so
 
 **Admin Notification Email (via Loops.so):**
+
 - Trigger: When a non-qualified customer attempts to book a course
 - Recipient: All Clerk users with `publicMetadata.role = 'admin'` (dynamically fetched)
 - Email content:
@@ -63,11 +66,12 @@ Introduce a booking validation for intermediate and master class courses:
 
 Add a checkbox to the course admin panel:
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field         | Type    | Description                          |
+| ------------- | ------- | ------------------------------------ |
 | `isNonPublic` | Boolean | When true, course is invitation-only |
 
 **Behavior:**
+
 - Non-public courses are hidden from public course listings
 - Customers can only book via direct invitation link
 - Admin can still manage and view all courses
@@ -76,35 +80,40 @@ Add a checkbox to the course admin panel:
 
 Add a checkbox to the user management panel:
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field            | Type    | Description                         |
+| ---------------- | ------- | ----------------------------------- |
 | `isOutperformer` | Boolean | Marks participant as high-performer |
 
 **Usage:**
+
 - Allows admins to track exceptional participants
 - Can be used for prioritized invitations to advanced courses
 
 ## Acceptance Criteria
 
 ### Feature 1: Recommendation Fields
+
 - [ ] Database migration adds `recommended` and `not_recommended` columns to courses table
 - [ ] Fields are editable in course admin create/edit forms
 - [ ] Fields display on public course detail page
 - [ ] Character limit of 300 is enforced
 
 ### Feature 2: Prerequisite Check
+
 - [ ] System checks completed courses by email before allowing booking
 - [ ] Warning message displayed when prerequisites not met
 - [ ] Booking created with "pending review" status
 - [ ] Admin notification sent for manual review
 
 ### Feature 3: Non-Public Courses
+
 - [ ] `is_non_public` field added to courses table
 - [ ] Checkbox in admin course form
 - [ ] Non-public courses hidden from public listings
 - [ ] Direct booking link still works
 
 ### Feature 4: Outperformer Flag
+
 - [ ] `is_outperformer` field added to users table
 - [ ] Checkbox in user management panel
 - [ ] Flag visible in admin user list

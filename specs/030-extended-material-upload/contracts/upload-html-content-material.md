@@ -3,21 +3,24 @@
 **Feature**: 030-extended-material-upload  
 **Endpoint**: `POST /api/admin/course-material`  
 **Purpose**: Create course material from uploaded HTML file  
-**Version**: 1.0  
+**Version**: 1.0
 
 ## Request
 
 ### Method & Path
+
 ```
 POST /api/admin/course-material
 ```
 
 ### Authentication
+
 - **Required**: Clerk auth token (cookie or header)
 - **Role**: Admin required (Clerk custom claim)
 - **Failure**: 401 Unauthorized if unauthenticated; 403 Forbidden if not admin
 
 ### Headers
+
 ```
 Content-Type: multipart/form-data
 Authorization: Bearer {clerk_token}  [implicit via cookie; optional explicit header]
@@ -25,11 +28,11 @@ Authorization: Bearer {clerk_token}  [implicit via cookie; optional explicit hea
 
 ### Request Body (FormData)
 
-| Field | Type | Required | Constraints | Example |
-|-------|------|----------|-------------|---------|
-| `title` | String | Yes | 1-255 characters | "Advanced CSS Patterns" |
-| `identifier` | String | No | alphanumeric + dashes; auto-generated if omitted | "advanced-css-2024" |
-| `file` | File | Yes | .html extension; Content-Type text/html; ≤ 20 MB | `File(advanced-css.html)` |
+| Field        | Type   | Required | Constraints                                      | Example                   |
+| ------------ | ------ | -------- | ------------------------------------------------ | ------------------------- |
+| `title`      | String | Yes      | 1-255 characters                                 | "Advanced CSS Patterns"   |
+| `identifier` | String | No       | alphanumeric + dashes; auto-generated if omitted | "advanced-css-2024"       |
+| `file`       | File   | Yes      | .html extension; Content-Type text/html; ≤ 20 MB | `File(advanced-css.html)` |
 
 ### Example Request (cURL)
 
@@ -187,10 +190,10 @@ const material = await prisma.courseMaterial.create({
     courseId,
     title,
     identifier,
-    type: 'CONTENT',           // Always CONTENT for uploads
+    type: 'CONTENT', // Always CONTENT for uploads
     blobPathname: pathname,
     blobUrl: publicUrl,
-    htmlContent: null,         // No inline HTML for uploads
+    htmlContent: null, // No inline HTML for uploads
   },
 });
 ```
@@ -208,9 +211,12 @@ if (blobError) {
     error: sanitizeBlobUrlField(blobError.message),
     requestId,
   });
-  
+
   // Client response
-  throw new HttpError(502, 'Upload fehlgeschlagen. Bitte versuchen Sie es später erneut.');
+  throw new HttpError(
+    502,
+    'Upload fehlgeschlagen. Bitte versuchen Sie es später erneut.'
+  );
 }
 ```
 

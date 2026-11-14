@@ -3,18 +3,18 @@ name: Daily Database Backup
 on:
   schedule:
     # Täglich um 03:00 UTC (04:00 MEZ / 05:00 MESZ)
-    - cron: '0 3 * * *'
+    - cron: "0 3 * * *"
   workflow_dispatch:
     # Manueller Trigger für On-Demand Backups
     inputs:
       reason:
-        description: 'Grund für manuelles Backup'
+        description: "Grund für manuelles Backup"
         required: false
-        default: 'Manuelles Backup'
+        default: "Manuelles Backup"
       environment:
-        description: 'Welche Umgebung sichern?'
+        description: "Welche Umgebung sichern?"
         required: false
-        default: 'both'
+        default: "both"
         type: choice
         options:
           - both
@@ -63,8 +63,8 @@ jobs:
         if: steps.filter.outputs.run == 'true'
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Install Dependencies
         if: steps.filter.outputs.run == 'true'
@@ -124,7 +124,7 @@ jobs:
           name: db-backup-${{ matrix.env_name }}-${{ github.run_number }}-${{ github.run_id }}
           path: hemera_backup_*.tar.gz
           retention-days: 30
-          compression-level: 0  # Bereits komprimiert
+          compression-level: 0 # Bereits komprimiert
 
       - name: Backup Summary
         if: steps.filter.outputs.run == 'true' && steps.check_db.outputs.skip != 'true'

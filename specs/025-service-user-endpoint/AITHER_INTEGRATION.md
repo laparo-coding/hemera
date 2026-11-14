@@ -40,30 +40,33 @@ export async function getHemeraApiToken(): Promise<string> {
   const sessions = await clerkClient.sessions.getSessionList({
     userId: 'service-user-id', // Get this from Clerk Dashboard
   });
-  
+
   if (sessions.length === 0) {
     throw new Error('No active session for service user');
   }
-  
+
   const token = await clerkClient.sessions.getToken(
     sessions[0].id,
     'hemera-api'
   );
-  
+
   return token;
 }
 
 // Option 2: Use Clerk sign-in flow (for initial setup)
 export async function signInServiceUser() {
-  const response = await fetch(`${process.env.HEMERA_API_URL}/api/auth/sign-in`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      email: process.env.HEMERA_SERVICE_USER_EMAIL,
-      password: process.env.HEMERA_SERVICE_USER_PASSWORD,
-    }),
-  });
-  
+  const response = await fetch(
+    `${process.env.HEMERA_API_URL}/api/auth/sign-in`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: process.env.HEMERA_SERVICE_USER_EMAIL,
+        password: process.env.HEMERA_SERVICE_USER_PASSWORD,
+      }),
+    }
+  );
+
   const { token } = await response.json();
   return token;
 }
@@ -80,7 +83,8 @@ export class HemeraApiClient {
   private token: string | null = null;
 
   constructor() {
-    this.baseUrl = process.env.HEMERA_API_URL || 'https://hemera-academy.vercel.app';
+    this.baseUrl =
+      process.env.HEMERA_API_URL || 'https://hemera-academy.vercel.app';
   }
 
   private async getToken(): Promise<string> {
@@ -95,12 +99,12 @@ export class HemeraApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const token = await this.getToken();
-    
+
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         ...options.headers,
       },
     });
@@ -143,10 +147,13 @@ export class HemeraApiClient {
       complete?: boolean;
     }
   ) {
-    return this.request(`/api/service/participations/${participationId}/result`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
+    return this.request(
+      `/api/service/participations/${participationId}/result`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }
+    );
   }
 }
 
@@ -174,10 +181,7 @@ export async function GET() {
     return Response.json({ success: true, count: courses.length });
   } catch (error) {
     console.error('Failed to sync courses:', error);
-    return Response.json(
-      { error: 'Failed to sync courses' },
-      { status: 500 }
-    );
+    return Response.json({ error: 'Failed to sync courses' }, { status: 500 });
   }
 }
 ```
@@ -189,6 +193,7 @@ export async function GET() {
 The service user has a rate limit of **100 requests per minute**.
 
 If you exceed this limit, you'll receive a `429 Too Many Requests` response with headers:
+
 - `X-RateLimit-Limit`: 100
 - `X-RateLimit-Remaining`: 0
 - `X-RateLimit-Reset`: Unix timestamp when limit resets
@@ -207,9 +212,9 @@ async function requestWithRetry<T>(
       if (error.status === 429 && i < maxRetries - 1) {
         const resetTime = error.headers?.['x-ratelimit-reset'];
         const waitTime = resetTime
-          ? (Number(resetTime) * 1000 - Date.now())
+          ? Number(resetTime) * 1000 - Date.now()
           : Math.pow(2, i) * 1000;
-        
+
         await new Promise(resolve => setTimeout(resolve, waitTime));
         continue;
       }
@@ -243,6 +248,7 @@ All Hemera API errors follow this schema:
 ```
 
 Common error codes:
+
 - `UNAUTHORIZED` (401): Missing or invalid JWT token
 - `FORBIDDEN` (403): Insufficient permissions (not api-client or admin)
 - `NOT_FOUND` (404): Resource not found
@@ -276,20 +282,24 @@ curl -X GET "https://hemera-academy.vercel.app/api/service/courses" \
 ## Troubleshooting
 
 ### "Not authenticated" (401)
+
 - Check that JWT token is valid and not expired
 - Verify service user credentials are correct
 - Ensure `Authorization: Bearer <token>` header is present
 
 ### "Forbidden" (403)
+
 - Verify service user has `api-client` role in Clerk
 - Check `publicMetadata.role` in Clerk Dashboard
 
 ### "Rate limit exceeded" (429)
+
 - Implement exponential backoff
 - Consider caching responses
 - Reduce request frequency
 
 ### "Internal server error" (500)
+
 - Check Hemera's Rollbar for error details
 - Verify request payload is valid
 - Contact Hemera team if issue persists
@@ -311,6 +321,7 @@ curl -X GET "https://hemera-academy.vercel.app/api/service/courses" \
 ## Support
 
 For issues or questions:
+
 - Check [`specs/025-service-user-endpoint/quickstart.md`](quickstart.md)
 - Review [`specs/025-service-user-endpoint/openapi-service-endpoints.yaml`](openapi-service-endpoints.yaml)
 - Contact Hemera team
@@ -324,14 +335,16 @@ When deploying these service endpoints to Staging, follow these steps:
 1. Deploy the application branch `feat/025-service-user-endpoints` to the Staging environment.
 2. Apply the new database migration `prisma/migrations/20260215140000_add_api_log/migration.sql` to the staging DB (do not run destructive resets).
 3. Feature-flag guidance:
-  - By default the service API returns the modern shapes (arrays/objects) in `data`.
-  - To enable legacy response compatibility for downstream consumers temporarily, set:
+
+- By default the service API returns the modern shapes (arrays/objects) in `data`.
+- To enable legacy response compatibility for downstream consumers temporarily, set:
 
 ```bash
 FEATURE_SERVICE_RESPONSE_LEGACY=true
 ```
 
-  - Verify consumers using the legacy shape can parse responses correctly.
+- Verify consumers using the legacy shape can parse responses correctly.
+
 4. Run smoke tests against Staging:
 
 ```bash
@@ -342,4 +355,4 @@ curl -H "Authorization: Bearer $TOKEN" "$HEMERA_API_URL/api/service/courses/<id>
 
 5. After validation, if no legacy compatibility is required, unset `FEATURE_SERVICE_RESPONSE_LEGACY` and proceed to production rollout.
 
-If you want, I can prepare a staging PR checklist or run these steps for you (requires staging credentials). 
+If you want, I can prepare a staging PR checklist or run these steps for you (requires staging credentials).

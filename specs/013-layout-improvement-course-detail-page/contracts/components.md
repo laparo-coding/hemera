@@ -11,6 +11,7 @@
 **Type**: Server Component (container)
 
 ### Props
+
 ```typescript
 interface CourseDetailLayoutProps {
   course: CourseWithDetails;
@@ -40,11 +41,13 @@ interface CourseWithDetails {
 ```
 
 ### Responsibilities
+
 - Orchestrate section layout (full-width vs contained)
 - Pass data to child sections
 - Apply page-level background colors
 
 ### Renders
+
 - `CourseHeroSection`
 - `CourseOverviewSection`
 - `CurriculumSection`
@@ -60,6 +63,7 @@ interface CourseWithDetails {
 **Type**: Client Component (video player)
 
 ### Props
+
 ```typescript
 interface CourseHeroSectionProps {
   title: string;
@@ -73,11 +77,13 @@ interface CourseHeroSectionProps {
 ```
 
 ### Behavior
+
 - If `heroVideoPlaybackId` exists: Render Mux Player (autoplay, muted, loop)
 - If null: Return null (section not rendered)
 - Display video player with 16:9 aspect ratio
 
 ### Accessibility
+
 - Video section has `aria-label` for screen readers
 - Section is only rendered when video is available
 
@@ -89,6 +95,7 @@ interface CourseHeroSectionProps {
 **Type**: Server Component
 
 ### Props
+
 ```typescript
 interface CourseOverviewSectionProps {
   description: string;
@@ -98,6 +105,7 @@ interface CourseOverviewSectionProps {
 ```
 
 ### Behavior
+
 - Display formatted description (supports markdown/HTML)
 - Show learning objectives as bullet list
 - Display instructor name with optional photo
@@ -111,6 +119,7 @@ interface CourseOverviewSectionProps {
 **Type**: Client Component (accordion interaction)
 
 ### Props
+
 ```typescript
 interface CurriculumSectionProps {
   modules: CurriculumModule[];
@@ -125,18 +134,20 @@ interface CurriculumModule {
 
 interface CurriculumTopic {
   id: string;
-  timeRange: string;  // "09:00 - 09:20"
+  timeRange: string; // "09:00 - 09:20"
   title: string;
 }
 ```
 
 ### Behavior
+
 - Render MUI Accordion for each module/day
 - First module expanded by default
 - Table layout inside accordion for topics
 - Paper styling with subtle elevation
 
 ### Note
+
 MVP uses placeholder data hardcoded in component.
 
 ---
@@ -147,6 +158,7 @@ MVP uses placeholder data hardcoded in component.
 **Type**: Server Component
 
 ### Props
+
 ```typescript
 interface DatesPricingSectionProps {
   price: number;
@@ -164,6 +176,7 @@ interface DatesPricingSectionProps {
 ```
 
 ### Behavior
+
 - Display price with "inkl. 19% MwSt." suffix
 - Format date in German locale (e.g., "15. März 2026")
 - Show time range (e.g., "09:00 - 17:00 Uhr")
@@ -178,6 +191,7 @@ interface DatesPricingSectionProps {
 **Type**: Server Component
 
 ### Props
+
 ```typescript
 interface TestimonialsSectionProps {
   testimonials: Testimonial[];
@@ -193,12 +207,14 @@ interface Testimonial {
 ```
 
 ### Behavior
+
 - Grid layout (1 col mobile, 3 col desktop)
 - Card for each testimonial with quote icon
 - Display success indicator below quote
 - Dark (petrol) background for contrast
 
 ### Note
+
 MVP uses placeholder testimonials hardcoded in component.
 
 ---
@@ -209,6 +225,7 @@ MVP uses placeholder testimonials hardcoded in component.
 **Type**: Client Component
 
 ### Props
+
 ```typescript
 interface BookingCTAProps {
   courseId: string;
@@ -221,13 +238,15 @@ interface BookingCTAProps {
 ```
 
 ### Variants
-| Variant | Style | Use Case |
-|---------|-------|----------|
-| `primary` | Gold filled button | Hero, Pricing section |
-| `secondary` | Petrol outline button | After Overview |
-| `banner` | Full-width gold background | Page footer |
+
+| Variant     | Style                      | Use Case              |
+| ----------- | -------------------------- | --------------------- |
+| `primary`   | Gold filled button         | Hero, Pricing section |
+| `secondary` | Petrol outline button      | After Overview        |
+| `banner`    | Full-width gold background | Page footer           |
 
 ### Behavior
+
 - Links to `/checkout?course={slug}`
 - Displays price if provided
 - Tracks click events for analytics (future)
@@ -240,9 +259,11 @@ interface BookingCTAProps {
 **Type**: Server Component
 
 ### Props
+
 None (loading state)
 
 ### Behavior
+
 - Render skeleton for all sections
 - Match final layout dimensions
 - Prevent CLS during page load

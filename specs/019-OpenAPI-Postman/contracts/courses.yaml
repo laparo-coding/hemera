@@ -18,29 +18,29 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Preparation phase data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/PreparationPhase'
-        '401':
+                        $ref: "#/components/schemas/PreparationPhase"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Booking not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     put:
       tags:
         - Courses
@@ -70,18 +70,18 @@ paths:
                   type: object
                   additionalProperties: true
       responses:
-        '200':
+        "200":
           description: Preparation updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
-        '401':
+                $ref: "#/components/schemas/StandardResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /my-courses/{bookingId}/summary:
     get:
@@ -100,23 +100,23 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Summary phase data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/SummaryPhase'
-        '401':
+                        $ref: "#/components/schemas/SummaryPhase"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     put:
       tags:
         - Courses
@@ -144,12 +144,12 @@ paths:
                 notes:
                   type: string
       responses:
-        '200':
+        "200":
           description: Summary updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
 
   /my-courses/{bookingId}/debriefing:
     get:
@@ -167,17 +167,17 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Debriefing phase data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/DebriefingPhase'
+                        $ref: "#/components/schemas/DebriefingPhase"
     put:
       tags:
         - Courses
@@ -209,12 +209,12 @@ paths:
                   minimum: 1
                   maximum: 5
       responses:
-        '200':
+        "200":
           description: Debriefing updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
 
   /my-courses/{bookingId}/result:
     get:
@@ -232,17 +232,17 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Result phase data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/ResultPhase'
+                        $ref: "#/components/schemas/ResultPhase"
     put:
       tags:
         - Courses
@@ -270,12 +270,12 @@ paths:
                 score:
                   type: number
       responses:
-        '200':
+        "200":
           description: Result updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
 
   /my-courses/{bookingId}/resume:
     get:
@@ -293,13 +293,13 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Resume data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -340,12 +340,12 @@ paths:
               required:
                 - file
       responses:
-        '201':
+        "201":
           description: Resume uploaded
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
     delete:
       tags:
         - Courses
@@ -361,9 +361,9 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Resume deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"

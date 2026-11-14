@@ -46,6 +46,7 @@ The guard checks for:
 #### Safe Patterns
 
 These are considered safe for destructive operations:
+
 - `localhost`, `127.0.0.1`, `::1`
 - `file:` (SQLite)
 - `.local` domains
@@ -74,13 +75,13 @@ if (isSafeForDestructiveOperations()) {
 
 ### 3. NPM Scripts Protection
 
-| Script                  | Behavior                                   |
-| ----------------------- | ------------------------------------------ |
-| `npm run db:seed`       | Runs `db:check-env` first, then seeds      |
-| `npm run db:migrate`    | Runs `db:check-env` first                  |
-| `npm run db:reset`      | **DISABLED** - Shows error message         |
-| `npm run db:reset:force`| Requires `ALLOW_DESTRUCTIVE_DB_OPS=true`   |
-| `npm run db:check-env`  | Shows current database environment status  |
+| Script                   | Behavior                                  |
+| ------------------------ | ----------------------------------------- |
+| `npm run db:seed`        | Runs `db:check-env` first, then seeds     |
+| `npm run db:migrate`     | Runs `db:check-env` first                 |
+| `npm run db:reset`       | **DISABLED** - Shows error message        |
+| `npm run db:reset:force` | Requires `ALLOW_DESTRUCTIVE_DB_OPS=true`  |
+| `npm run db:check-env`   | Shows current database environment status |
 
 ## Override Mechanism
 
@@ -102,6 +103,7 @@ npm run db:check-env
 ```
 
 Output for production:
+
 ```
 🔍 Database Environment Check
 ──────────────────────────────────────────────────

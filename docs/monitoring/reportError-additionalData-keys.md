@@ -1,4 +1,5 @@
 ---
+
 title: "reportError — additionalData keys"
 maintained-by: Monitoring Team <monitoring@hemera.local>
 policy: docs/monitoring/reporting-policy.md
@@ -62,6 +63,7 @@ Hinweis: Diese Liste basiert auf einer initialen Sammlung aus wichtigen `reportE
   - `additionalData` verwendet `sanitizeForErrorReporting(...)` (kompakte/gesäuberte Struktur; vermeidet PII)
 
 Nächste Schritte (optional):
+
 - Erweitern: alle `reportError`-Aufrufe durchsuchen und jede `additionalData`-Form dokumentieren.
 - Policy: `docs/monitoring/reporting-policy.md` erstellen mit erlaubter Schlüssel-Whitelist und Redaction-Regeln (rekursiv vs. top-level).
 - Automatisierung: ESLint-Rule / Biome-Check, die `additionalData`-Schlüssel gegen die Whitelist prüft.

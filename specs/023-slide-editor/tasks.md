@@ -8,4 +8,4 @@
 
 ---
 
-*Dieses Dokument wurde automatisch nach Speckit-Standard generiert.*
+_Dieses Dokument wurde automatisch nach Speckit-Standard generiert._

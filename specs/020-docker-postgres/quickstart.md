@@ -16,6 +16,7 @@ npm run db:docker:start
 ```
 
 This starts a PostgreSQL 16 container with:
+
 - **Container name**: `hemera-postgres`
 - **Port**: 5432 (localhost)
 - **Database**: `hemera`
@@ -56,26 +57,30 @@ npm run dev
 
 ## Daily Workflow
 
-| Command | Description |
-|---------|-------------|
-| `npm run db:docker:start` | Start PostgreSQL container |
-| `npm run db:docker:stop` | Stop container (data preserved) |
-| `npm run db:docker:reset` | Reset database (data deleted) |
-| `npm run db:docker:logs` | View container logs |
-| `npm run db:status` | Check migration status |
+| Command                   | Description                     |
+| ------------------------- | ------------------------------- |
+| `npm run db:docker:start` | Start PostgreSQL container      |
+| `npm run db:docker:stop`  | Stop container (data preserved) |
+| `npm run db:docker:reset` | Reset database (data deleted)   |
+| `npm run db:docker:logs`  | View container logs             |
+| `npm run db:status`       | Check migration status          |
 
 ## Troubleshooting
 
 ### Port 5432 Already in Use
 
 Another PostgreSQL instance is running. Either:
+
 - Stop the other instance, or
 - Change the port in `docker-compose.yml`:
+
   ```yaml
   ports:
     - "5433:5432"  # Use 5433 instead
   ```
+
   Update `.env.local` accordingly:
+
   ```bash
   DATABASE_URL=postgres://postgres:postgres@localhost:5433/hemera?schema=hemera
   ```
@@ -93,11 +98,13 @@ sudo systemctl start docker
 ### Container Won't Start
 
 Check logs:
+
 ```bash
 npm run db:docker:logs
 ```
 
 Reset completely:
+
 ```bash
 npm run db:docker:reset
 ```
@@ -105,6 +112,7 @@ npm run db:docker:reset
 ### Migration Fails
 
 Ensure container is healthy:
+
 ```bash
 docker ps  # Should show "healthy" status
 ```

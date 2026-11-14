@@ -17,9 +17,9 @@ Authorization: Bearer <clerk_session_token>
 
 ### Path Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| bookingId | string | Yes | The booking's unique ID (cuid) |
+| Parameter | Type   | Required | Description                    |
+| --------- | ------ | -------- | ------------------------------ |
+| bookingId | string | Yes      | The booking's unique ID (cuid) |
 
 ## Response
 
@@ -35,6 +35,7 @@ Location: https://invoice.stripe.com/invoice/acct_xxx/xxx/pdf
 ### Error Responses
 
 **401 Unauthorized** - User not authenticated
+
 ```json
 {
   "success": false,
@@ -43,6 +44,7 @@ Location: https://invoice.stripe.com/invoice/acct_xxx/xxx/pdf
 ```
 
 **403 Forbidden** - User does not own this booking
+
 ```json
 {
   "success": false,
@@ -51,6 +53,7 @@ Location: https://invoice.stripe.com/invoice/acct_xxx/xxx/pdf
 ```
 
 **404 Not Found** - Booking not found
+
 ```json
 {
   "success": false,
@@ -59,6 +62,7 @@ Location: https://invoice.stripe.com/invoice/acct_xxx/xxx/pdf
 ```
 
 **404 Not Found** - Invoice not available
+
 ```json
 {
   "success": false,
@@ -67,6 +71,7 @@ Location: https://invoice.stripe.com/invoice/acct_xxx/xxx/pdf
 ```
 
 **400 Bad Request** - Booking not paid
+
 ```json
 {
   "success": false,
@@ -75,6 +80,7 @@ Location: https://invoice.stripe.com/invoice/acct_xxx/xxx/pdf
 ```
 
 **500 Internal Server Error**
+
 ```json
 {
   "success": false,
@@ -181,13 +187,16 @@ export async function GET(
   if (booking.userId !== userId) return forbidden();
 
   // 4. Payment status check
-  if (booking.paymentStatus !== 'PAID' && booking.paymentStatus !== 'CONFIRMED') {
+  if (
+    booking.paymentStatus !== 'PAID' &&
+    booking.paymentStatus !== 'CONFIRMED'
+  ) {
     return badRequest('Invoice only available for paid bookings');
   }
 
   // 5. Get invoice URL (from DB or fetch from Stripe)
   let pdfUrl = booking.stripeInvoicePdfUrl;
-  
+
   if (!pdfUrl && booking.stripeInvoiceId) {
     pdfUrl = await getInvoicePdfUrl(booking.stripeInvoiceId);
     // Cache for future requests

@@ -69,7 +69,7 @@ module.exports = {
 
 - [ ] `webpackMemoryOptimizations: true` enabled in experimental
 - [ ] Build completes without "[webpack.cache.PackFileCacheStrategy] Serializing big strings"
-      warning
+  warning
 - [ ] No breaking changes to existing config
 
 **Reference**: FR-009, NFR-005
@@ -164,7 +164,7 @@ module.exports = {
 
 ```tsx
 // Pattern from Next.js official docs
-<Script src='rollbar.min.js' strategy='lazyOnload' />
+<Script src='rollbar.min.js' strategy='lazyOnload' />;
 ```
 
 ---

@@ -10,22 +10,23 @@ Feature 030 does not introduce new database entities or schema changes. It exten
 
 **No schema changes required.**
 
-| Field | Type | Constraints | Notes |
-|-------|------|-------------|-------|
-| `id` | UUID | Primary Key | Existing |
-| `courseId` | UUID | Foreign Key → Course | Existing |
-| `title` | String | Required, 1-255 chars | Existing |
-| `identifier` | String | Optional, auto-generated | Existing |
-| `type` | Enum | CONTENT \| SLIDE_CONTROL | **Feature 026 already added** |
-| `htmlContent` | String | Optional, text | Existing (for CONTENT editor) |
-| `blobUrl` | String | Optional | Existing (for SLIDE_CONTROL or CONTENT uploads) |
-| `blobPathname` | String | Optional | Existing (for storage tracking) |
-| `createdAt` | DateTime | Immutable | Existing |
-| `updatedAt` | DateTime | Auto-update | Existing |
+| Field          | Type     | Constraints              | Notes                                           |
+| -------------- | -------- | ------------------------ | ----------------------------------------------- |
+| `id`           | UUID     | Primary Key              | Existing                                        |
+| `courseId`     | UUID     | Foreign Key → Course     | Existing                                        |
+| `title`        | String   | Required, 1-255 chars    | Existing                                        |
+| `identifier`   | String   | Optional, auto-generated | Existing                                        |
+| `type`         | Enum     | CONTENT \| SLIDE_CONTROL | **Feature 026 already added**                   |
+| `htmlContent`  | String   | Optional, text           | Existing (for CONTENT editor)                   |
+| `blobUrl`      | String   | Optional                 | Existing (for SLIDE_CONTROL or CONTENT uploads) |
+| `blobPathname` | String   | Optional                 | Existing (for storage tracking)                 |
+| `createdAt`    | DateTime | Immutable                | Existing                                        |
+| `updatedAt`    | DateTime | Auto-update              | Existing                                        |
 
 ### Usage in Feature 030
 
 **New Upload Entry Point**:
+
 - User clicks "Ich möchte eine Inhaltsseite hinzufügen"
 - Uploads HTML file via new form
 - System creates `CourseMaterial` record with:
@@ -35,6 +36,7 @@ Feature 030 does not introduce new database entities or schema changes. It exten
   - `htmlContent: null` (no inline HTML for uploads)
 
 **Existing Entry Point** (unchanged from Feature 026):
+
 - User clicks "Ich möchte eine Inhaltsseite anlegen"
 - Edits HTML via SlideEditor
 - System creates `CourseMaterial` record with:
@@ -45,16 +47,17 @@ Feature 030 does not introduce new database entities or schema changes. It exten
 
 ### Validation Rules
 
-| Field | Validation |
-|-------|-----------|
-| `title` | Required; 1-255 characters |
-| `identifier` | If provided: alphanumeric + dashes; auto-generated if omitted (UUID slug) |
-| `type` | Immutable after creation; must be CONTENT or SLIDE_CONTROL |
+| Field          | Validation                                                                |
+| -------------- | ------------------------------------------------------------------------- |
+| `title`        | Required; 1-255 characters                                                |
+| `identifier`   | If provided: alphanumeric + dashes; auto-generated if omitted (UUID slug) |
+| `type`         | Immutable after creation; must be CONTENT or SLIDE_CONTROL                |
 | `blobPathname` | Must follow pattern `course-material/(content\|slides)/{identifier}.html` |
 
 ### State Transitions
 
 No new state transitions. Material lifecycle remains:
+
 1. Created (initial)
 2. Updated (title, content, or file changes)
 3. Deleted (cascades to parent Course)

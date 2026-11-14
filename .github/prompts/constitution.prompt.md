@@ -1,7 +1,8 @@
 ---
+
 description:
-  Create or update the project constitution from interactive or provided principle inputs, ensuring
-  all dependent templates stay in sync.
+Create or update the project constitution from interactive or provided principle inputs, ensuring
+all dependent templates stay in sync.
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST**

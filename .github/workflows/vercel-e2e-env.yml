@@ -1,20 +1,20 @@
-name: 'Vercel: E2E Environment'
+name: "Vercel: E2E Environment"
 
 on:
   workflow_dispatch:
     inputs:
       e2e_email_capture:
-        description: 'Set E2E_EMAIL_CAPTURE (1 to enable)'
+        description: "Set E2E_EMAIL_CAPTURE (1 to enable)"
         required: false
-        default: '1'
+        default: "1"
       e2e_auth:
         description: "Set E2E_AUTH (use 'credentials' to enable test credentials)"
         required: false
-        default: ''
+        default: ""
       e2e_test_password:
-        description: 'Set E2E_TEST_PASSWORD (used when E2E_AUTH=credentials)'
+        description: "Set E2E_TEST_PASSWORD (used when E2E_AUTH=credentials)"
         required: false
-        default: 'password'
+        default: "password"
 
 jobs:
   set-env:
@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
       - name: Install Vercel CLI
         run: npm i -g vercel@latest

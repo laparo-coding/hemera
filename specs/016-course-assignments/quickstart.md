@@ -95,6 +95,7 @@ curl -X POST http://localhost:3000/api/my-courses/invalid-id/resume \
 ```
 
 Check Rollbar dashboard for structured error with:
+
 - `participationId`
 - `bookingId`
 - `userId`
@@ -102,19 +103,19 @@ Check Rollbar dashboard for structured error with:
 
 ## Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| Migration fails | Check DATABASE_URL, ensure DB exists |
-| Video not playing | Verify MUX_TOKEN_ID/SECRET, check asset status |
-| Upload fails | Verify BLOB_READ_WRITE_TOKEN, check file size (<5MB) |
-| Step skipped | Summary step hides when no assets exist |
+| Issue             | Solution                                             |
+| ----------------- | ---------------------------------------------------- |
+| Migration fails   | Check DATABASE_URL, ensure DB exists                 |
+| Video not playing | Verify MUX_TOKEN_ID/SECRET, check asset status       |
+| Upload fails      | Verify BLOB_READ_WRITE_TOKEN, check file size (<5MB) |
+| Step skipped      | Summary step hides when no assets exist              |
 
 ## API Quick Reference
 
-| Endpoint | Methods |
-|----------|---------|
-| `/api/my-courses/[bookingId]/preparation` | GET, PUT |
-| `/api/my-courses/[bookingId]/resume` | GET, POST, DELETE |
-| `/api/my-courses/[bookingId]/summary` | GET, PUT |
-| `/api/my-courses/[bookingId]/debriefing` | GET, PUT |
-| `/api/my-courses/[bookingId]/results` | GET, PUT |
+| Endpoint                                  | Methods           |
+| ----------------------------------------- | ----------------- |
+| `/api/my-courses/[bookingId]/preparation` | GET, PUT          |
+| `/api/my-courses/[bookingId]/resume`      | GET, POST, DELETE |
+| `/api/my-courses/[bookingId]/summary`     | GET, PUT          |
+| `/api/my-courses/[bookingId]/debriefing`  | GET, PUT          |
+| `/api/my-courses/[bookingId]/results`     | GET, PUT          |

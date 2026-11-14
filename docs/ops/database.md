@@ -100,12 +100,14 @@ npm run dev
 Falls Port 5432 bereits belegt ist:
 
 1. In `docker-compose.yml` den Port ändern:
+
    ```yaml
    ports:
      - "5433:5432"  # Alternativer Port
    ```
 
 2. `DATABASE_URL` in `.env.local` anpassen:
+
    ```bash
    DATABASE_URL=postgres://postgres:postgres@localhost:5433/hemera?schema=hemera
    ```

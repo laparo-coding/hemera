@@ -17,6 +17,7 @@ Das Learning Path Feature ermöglicht strukturierte Kursabfolgen mit Voraussetzu
 ### 🚀 Schnelleinstieg
 
 **→ [Quick Start Guide](./QUICK_START.md)**
+
 - 5-Minuten-Übersicht
 - Wichtigste Funktionen & Code-Snippets
 - Status-Übergänge
@@ -30,6 +31,7 @@ Das Learning Path Feature ermöglicht strukturierte Kursabfolgen mit Voraussetzu
 ### 📖 Vollständige Dokumentation
 
 **→ [PRE_BOOKED Approval Workflow](./PRE_BOOKED_APPROVAL_WORKFLOW.md)**
+
 - Detaillierter Workflow mit Diagramm
 - API-Endpoint-Dokumentation
 - Database-Schema
@@ -47,6 +49,7 @@ Das Learning Path Feature ermöglicht strukturierte Kursabfolgen mit Voraussetzu
 ### 📋 Feature Plan & Spezifikationen
 
 **→ [Specs Directory](../../../specs/021-learning-path/)**
+
 - `plan.md` - Ursprünglicher Feature-Plan
 - `tasks.md` - Task-Tracking
 - `contracts/` - API-Contract-Tests
@@ -57,11 +60,13 @@ Das Learning Path Feature ermöglicht strukturierte Kursabfolgen mit Voraussetzu
 ### 🧪 Test-Dokumentation
 
 **→ [Test Coverage Summary](../../../tests/unit/services/TEST_COVERAGE_SUMMARY.md)**
+
 - Unit-Test-Übersicht
 - Test-Szenarien
 - Coverage-Statistiken
 
 **Test-Dateien:**
+
 - `tests/unit/services/booking-transitions.spec.ts` (12 Tests)
 - `tests/unit/services/booking-orchestrator.spec.ts` (13 Tests)
 - `tests/contracts/admin-booking-review.spec.ts` (5 Tests)
@@ -72,28 +77,28 @@ Das Learning Path Feature ermöglicht strukturierte Kursabfolgen mit Voraussetzu
 
 ### Backend (Service Layer)
 
-| Datei | Beschreibung |
-|-------|--------------|
+| Datei                                  | Beschreibung                                         |
+| -------------------------------------- | ---------------------------------------------------- |
 | `lib/services/booking-orchestrator.ts` | Hauptorchestrator für Booking + Prerequisite-Prüfung |
-| `lib/services/booking.ts` | CRUD-Operationen, Transition Rules (Zeilen 57-81) |
-| `lib/services/prerequisite.ts` | Voraussetzungsprüfung basierend auf Kurs-Level |
-| `lib/services/loops.ts` | Email-Versand (Admin-Benachrichtigung + Ablehnung) |
+| `lib/services/booking.ts`              | CRUD-Operationen, Transition Rules (Zeilen 57-81)    |
+| `lib/services/prerequisite.ts`         | Voraussetzungsprüfung basierend auf Kurs-Level       |
+| `lib/services/loops.ts`                | Email-Versand (Admin-Benachrichtigung + Ablehnung)   |
 
 ### API Endpoints
 
-| Endpoint | Methode | Beschreibung |
-|----------|---------|--------------|
-| `/api/payment/create-intent` | POST | Erstellt Booking, prüft Voraussetzungen |
-| `/api/admin/bookings/[id]/review` | PATCH | Admin genehmigt/lehnt PRE_BOOKED ab |
+| Endpoint                          | Methode | Beschreibung                            |
+| --------------------------------- | ------- | --------------------------------------- |
+| `/api/payment/create-intent`      | POST    | Erstellt Booking, prüft Voraussetzungen |
+| `/api/admin/bookings/[id]/review` | PATCH   | Admin genehmigt/lehnt PRE_BOOKED ab     |
 
 ### UI-Komponenten
 
-| Komponente | Status | Beschreibung |
-|------------|--------|--------------|
-| `BookingReviewDialog` | ✅ Implementiert | Admin-Review-Dialog |
-| `CourseForm` | ✅ Implementiert | Learning-Path-Felder (recommended, notRecommended) |
-| **Admin Dashboard** | ⚠️ TODO | Liste aller PRE_BOOKED Bookings |
-| **Customer Status UI** | ⚠️ TODO | PRE_BOOKED-Status-Badge in Dashboard |
+| Komponente             | Status           | Beschreibung                                       |
+| ---------------------- | ---------------- | -------------------------------------------------- |
+| `BookingReviewDialog`  | ✅ Implementiert | Admin-Review-Dialog                                |
+| `CourseForm`           | ✅ Implementiert | Learning-Path-Felder (recommended, notRecommended) |
+| **Admin Dashboard**    | ⚠️ TODO          | Liste aller PRE_BOOKED Bookings                    |
+| **Customer Status UI** | ⚠️ TODO          | PRE_BOOKED-Status-Badge in Dashboard               |
 
 ---
 
@@ -176,6 +181,7 @@ Vor Production-Deployment:
 ## Monitoring
 
 **Wichtige Metriken:**
+
 - PRE_BOOKED Bookings pro Tag/Woche
 - Durchschnittliche Review-Zeit
 - Approval-Rate (%)
@@ -183,6 +189,7 @@ Vor Production-Deployment:
 - Bookings >48h ohne Review (Alert)
 
 **Rollbar-Tags:**
+
 ```
 feature: learning-path
 workflow: pre-booked-approval

@@ -1,4 +1,4 @@
-name: 'Vercel: Guard'
+name: "Vercel: Guard"
 
 on:
   pull_request:
@@ -30,7 +30,7 @@ jobs:
         if: steps.check-secrets.outputs.skip != 'true'
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
       - name: Run Vercel Guard
         if: steps.check-secrets.outputs.skip != 'true'
@@ -40,4 +40,4 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           # Git auto-deployments were disabled on 2025-10-20; only enforce against newer runs.
-          VERCEL_GUARD_GIT_ENFORCE_AFTER: '2025-10-20T00:00:00Z'
+          VERCEL_GUARD_GIT_ENFORCE_AFTER: "2025-10-20T00:00:00Z"

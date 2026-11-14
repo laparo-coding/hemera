@@ -25,6 +25,7 @@ and tests.
 5. Consider implementing suggested code improvements (especially security-related)
 
 **Common Qodo issues to watch for:**
+
 - Error handling without context
 - Sensitive data in logs
 - Hardcoded values that should be dynamic

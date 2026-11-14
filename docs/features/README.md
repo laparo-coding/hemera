@@ -17,11 +17,13 @@ Zentrale Übersicht aller implementierten Features mit Verlinkung zur jeweiligen
 Strukturierte Kursabfolgen mit Voraussetzungsprüfung. Wenn Voraussetzungen fehlen, wird eine PRE_BOOKED-Buchung erstellt, die auf Admin-Genehmigung wartet.
 
 **Dokumentation:**
+
 - 📖 [Feature Overview](./021-learning-path/README.md)
 - 🚀 [Quick Start Guide](./021-learning-path/QUICK_START.md)
 - 📋 [Complete Workflow Documentation](./021-learning-path/PRE_BOOKED_APPROVAL_WORKFLOW.md)
 
 **Kern-Features:**
+
 - Prerequisite-Checking basierend auf Kurs-Level
 - PRE_BOOKED Status für Admin-Review
 - Email-Benachrichtigungen (Admin + Customer)
@@ -29,6 +31,7 @@ Strukturierte Kursabfolgen mit Voraussetzungsprüfung. Wenn Voraussetzungen fehl
 - 25 Unit-Tests + Contract-Tests
 
 **TODO:**
+
 - [ ] Admin-Dashboard für PRE_BOOKED Liste
 - [ ] Customer UI für Status-Anzeige
 - [ ] E2E-Tests
@@ -73,6 +76,7 @@ docs/
 ### Neue Feature-Dokumentation erstellen
 
 1. **Verzeichnis erstellen:**
+
    ```bash
    mkdir docs/features/{feature-number}-{feature-name}
    ```
@@ -101,19 +105,24 @@ docs/
 **Last Updated:** {YYYY-MM-DD}
 
 ## Übersicht
+
 {Kurze Beschreibung des Features}
 
 ## Dokumentations-Index
+
 - [Quick Start Guide](./QUICK_START.md)
 - [Workflow Documentation](./WORKFLOW.md)
 
 ## Kern-Komponenten
+
 {Liste wichtigster Dateien}
 
 ## API Endpoints
+
 {Liste der Endpoints}
 
 ## Status & TODOs
+
 {Was fehlt noch?}
 ```
 

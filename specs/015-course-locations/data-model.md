@@ -33,45 +33,45 @@ model Location {
 
 ### Field Specifications
 
-| Field | Type | Required | Validation | Notes |
-|-------|------|----------|------------|-------|
-| id | String | Auto | CUID format | Primary key |
-| slug | String | Auto | Unique, lowercase, URL-safe | Generated from name |
-| name | String | Yes | Min 1, Max 200 | Display name |
-| description | String | No | Max 2000 | Venue description |
-| address | String | Yes | Min 1, Max 500 | Street address |
-| zipCode | String | No | Max 20 | Postal/ZIP code |
-| city | String | Yes | Min 1, Max 100 | City name |
-| email | String | No | Email format | Contact email |
-| phone | String | No | Max 50 | Contact phone |
-| website | String | No | URL format | Website URL |
-| imageUrl | String | No | URL format | Exterior image |
-| roomImageUrl | String | No | URL format | Interior image |
-| latitude | Float | No | -90 to 90 | From Nominatim |
-| longitude | Float | No | -180 to 180 | From Nominatim |
-| createdAt | DateTime | Auto | ISO 8601 | Creation timestamp |
-| updatedAt | DateTime | Auto | ISO 8601 | Update timestamp |
+| Field        | Type     | Required | Validation                  | Notes               |
+| ------------ | -------- | -------- | --------------------------- | ------------------- |
+| id           | String   | Auto     | CUID format                 | Primary key         |
+| slug         | String   | Auto     | Unique, lowercase, URL-safe | Generated from name |
+| name         | String   | Yes      | Min 1, Max 200              | Display name        |
+| description  | String   | No       | Max 2000                    | Venue description   |
+| address      | String   | Yes      | Min 1, Max 500              | Street address      |
+| zipCode      | String   | No       | Max 20                      | Postal/ZIP code     |
+| city         | String   | Yes      | Min 1, Max 100              | City name           |
+| email        | String   | No       | Email format                | Contact email       |
+| phone        | String   | No       | Max 50                      | Contact phone       |
+| website      | String   | No       | URL format                  | Website URL         |
+| imageUrl     | String   | No       | URL format                  | Exterior image      |
+| roomImageUrl | String   | No       | URL format                  | Interior image      |
+| latitude     | Float    | No       | -90 to 90                   | From Nominatim      |
+| longitude    | Float    | No       | -180 to 180                 | From Nominatim      |
+| createdAt    | DateTime | Auto     | ISO 8601                    | Creation timestamp  |
+| updatedAt    | DateTime | Auto     | ISO 8601                    | Update timestamp    |
 
 ### Database Column Mapping
 
-| Prisma Field | DB Column | DB Type |
-|--------------|-----------|---------|
-| id | id | VARCHAR(30) |
-| slug | slug | VARCHAR(255) |
-| name | name | VARCHAR(200) |
-| description | description | TEXT |
-| address | address | VARCHAR(500) |
-| zipCode | zip_code | VARCHAR(20) |
-| city | city | VARCHAR(100) |
-| email | email | VARCHAR(255) |
-| phone | phone | VARCHAR(50) |
-| website | website | VARCHAR(500) |
-| imageUrl | image_url | VARCHAR(500) |
+| Prisma Field | DB Column      | DB Type      |
+| ------------ | -------------- | ------------ |
+| id           | id             | VARCHAR(30)  |
+| slug         | slug           | VARCHAR(255) |
+| name         | name           | VARCHAR(200) |
+| description  | description    | TEXT         |
+| address      | address        | VARCHAR(500) |
+| zipCode      | zip_code       | VARCHAR(20)  |
+| city         | city           | VARCHAR(100) |
+| email        | email          | VARCHAR(255) |
+| phone        | phone          | VARCHAR(50)  |
+| website      | website        | VARCHAR(500) |
+| imageUrl     | image_url      | VARCHAR(500) |
 | roomImageUrl | room_image_url | VARCHAR(500) |
-| latitude | latitude | FLOAT |
-| longitude | longitude | FLOAT |
-| createdAt | created_at | TIMESTAMP |
-| updatedAt | updated_at | TIMESTAMP |
+| latitude     | latitude       | FLOAT        |
+| longitude    | longitude      | FLOAT        |
+| createdAt    | created_at     | TIMESTAMP    |
+| updatedAt    | updated_at     | TIMESTAMP    |
 
 ## Relationship: Course → Location
 
@@ -89,12 +89,12 @@ model Course {
 
 ### Relationship Characteristics
 
-| Aspect | Value |
-|--------|-------|
-| Type | One-to-Many (Location has many Courses) |
-| Required | No (Course.locationId is optional) |
+| Aspect    | Value                                        |
+| --------- | -------------------------------------------- |
+| Type      | One-to-Many (Location has many Courses)      |
+| Required  | No (Course.locationId is optional)           |
 | On Delete | Restrict (prevent deletion if courses exist) |
-| Cascade | None |
+| Cascade   | None                                         |
 
 ## Indexes
 
@@ -121,7 +121,7 @@ Location has no explicit state field. Lifecycle:
 ## Validation Rules (Zod Schema)
 
 ```typescript
-import { z } from 'zod'
+import { z } from 'zod';
 
 export const locationSchema = z.object({
   name: z.string().min(1).max(200),
@@ -134,13 +134,13 @@ export const locationSchema = z.object({
   website: z.string().url().optional().or(z.literal('')),
   imageUrl: z.string().url().optional().or(z.literal('')),
   roomImageUrl: z.string().url().optional().or(z.literal('')),
-})
+});
 
-export const locationCreateSchema = locationSchema
+export const locationCreateSchema = locationSchema;
 
-export const locationUpdateSchema = locationSchema.partial()
+export const locationUpdateSchema = locationSchema.partial();
 
-export type LocationInput = z.infer<typeof locationSchema>
+export type LocationInput = z.infer<typeof locationSchema>;
 ```
 
 ## Migration Strategy

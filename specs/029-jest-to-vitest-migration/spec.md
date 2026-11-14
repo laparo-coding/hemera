@@ -69,17 +69,17 @@ CI confidence.
 ### Acceptance Scenarios
 
 1. Given the repository's current non-E2E automated test inventory, when the
-  migration is complete, then unit, contract, and integration validation can
-  still be run as distinct repository-managed scopes.
+   migration is complete, then unit, contract, and integration validation can
+   still be run as distinct repository-managed scopes.
 2. Given a contributor who relies on repository test commands, when they run
-  non-E2E validation after the migration, then they can still access clear
-  entry points for default, unit, contract, and integration test flows.
+   non-E2E validation after the migration, then they can still access clear
+   entry points for default, unit, contract, and integration test flows.
 3. Given non-E2E tests that rely on shared setup behavior, aliases, and
-  mocking support, when those suites run after migration, then the suites keep
-  their required setup and support behavior without silent coverage loss.
+   mocking support, when those suites run after migration, then the suites keep
+   their required setup and support behavior without silent coverage loss.
 4. Given repository CI validation, when non-E2E automated checks run after the
-  migration, then they continue to validate the intended non-E2E scope while
-  Playwright remains the separate E2E path.
+   migration, then they continue to validate the intended non-E2E scope while
+   Playwright remains the separate E2E path.
 
 ### Edge Cases
 
@@ -109,6 +109,7 @@ CI confidence.
 ### Functional Requirements
 
 #### FR-1: Non-E2E Test Runner Migration Scope
+
 - The repository MUST migrate its non-E2E automated test execution from Jest
   and ts-jest to Vitest.
 - The migration MUST cover the repository's default, unit, contract, and
@@ -116,6 +117,7 @@ CI confidence.
 - The migration MUST leave Playwright as the repository's E2E test solution.
 
 #### FR-2: Scope Parity Across Test Layers
+
 - The migrated test setup MUST preserve distinct unit, contract, and
   integration coverage scopes.
 - Contributors MUST continue to have clear repository entry points for running
@@ -124,6 +126,7 @@ CI confidence.
   execution path that obscures which validation layer is being run.
 
 #### FR-3: Shared Setup Continuity
+
 - Shared automated-test setup behavior MUST remain available to migrated
   non-E2E tests.
 - This continuity MUST include environment initialization, matcher setup,
@@ -133,6 +136,7 @@ CI confidence.
   environments that depend on shared database setup or teardown behavior.
 
 #### FR-4: Module Resolution and Import Compatibility
+
 - Migrated non-E2E tests MUST continue to resolve repository path aliases that
   are required by the current test suites.
 - The migration MUST preserve compatibility for the repository's existing ESM-
@@ -141,6 +145,7 @@ CI confidence.
   repository imports after the migration.
 
 #### FR-5: Mocking and Test Utility Compatibility
+
 - The migration MUST provide an approved path for replacing or adapting
   existing Jest-specific test utility usage in the non-E2E suites.
 - Existing test behavior that depends on module mocking, function spies,
@@ -150,6 +155,7 @@ CI confidence.
   suites so contributors are not forced to mix incompatible mocking models.
 
 #### FR-6: Coverage Continuity
+
 - The migration MUST preserve the repository's ability to produce coverage
   outputs for non-E2E automated tests.
 - Coverage reporting MUST continue to support the repository's established
@@ -160,6 +166,7 @@ CI confidence.
   feature changes that scope.
 
 #### FR-7: Workflow and CI Continuity
+
 - Repository-level commands for non-E2E automated tests MUST remain available
   after migration.
 - CI entry points that currently validate non-E2E automated tests MUST continue
@@ -168,6 +175,7 @@ CI confidence.
   Playwright-based E2E validation in local and CI workflows.
 
 #### FR-8: Migration Completion Definition
+
 - The migration MUST be considered complete only when the repository's
   non-E2E automated test flows run through Vitest-based entry points rather
   than Jest-based entry points.

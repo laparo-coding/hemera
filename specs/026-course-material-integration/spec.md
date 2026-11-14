@@ -195,19 +195,19 @@ A migration must add the column with default `'CONTENT'` so existing rows are un
 
 ## Affected Files
 
-| Area | Files |
-|------|-------|
-| List page | `app/admin/course-material/page.tsx` (type badge) |
-| Create flow | `app/admin/course-material/new/page.tsx` (type selection) |
-| Create client | `app/admin/course-material/new/create-client.tsx` (new) |
-| Editor | `app/admin/course-material/[id]/edit/edit-client.tsx`, `…/edit/page.tsx` |
-| API (create) | `app/api/admin/course-material/route.ts` (extend POST for FormData) |
-| API (update) | `app/api/admin/course-material/[id]/route.ts` (extend PUT for file replacement) |
-| Schema | `prisma/schema.prisma` (`CourseMaterial.type` field) |
-| Migration | `prisma/migrations/…_add_material_type/` |
-| Tokens | `lib/design-tokens.ts` |
-| Components | `BookingCTA`, `CourseCard` (dashboard), `DashboardSection`, `PublicNavigation`, `ResumeUploader`, `SummaryAssetList` |
-| Config | `vercel.json` |
+| Area          | Files                                                                                                                |
+| ------------- | -------------------------------------------------------------------------------------------------------------------- |
+| List page     | `app/admin/course-material/page.tsx` (type badge)                                                                    |
+| Create flow   | `app/admin/course-material/new/page.tsx` (type selection)                                                            |
+| Create client | `app/admin/course-material/new/create-client.tsx` (new)                                                              |
+| Editor        | `app/admin/course-material/[id]/edit/edit-client.tsx`, `…/edit/page.tsx`                                             |
+| API (create)  | `app/api/admin/course-material/route.ts` (extend POST for FormData)                                                  |
+| API (update)  | `app/api/admin/course-material/[id]/route.ts` (extend PUT for file replacement)                                      |
+| Schema        | `prisma/schema.prisma` (`CourseMaterial.type` field)                                                                 |
+| Migration     | `prisma/migrations/…_add_material_type/`                                                                             |
+| Tokens        | `lib/design-tokens.ts`                                                                                               |
+| Components    | `BookingCTA`, `CourseCard` (dashboard), `DashboardSection`, `PublicNavigation`, `ResumeUploader`, `SummaryAssetList` |
+| Config        | `vercel.json`                                                                                                        |
 
 ## Non-Goals
 

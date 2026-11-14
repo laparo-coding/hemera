@@ -8,6 +8,7 @@
 ## Clarifications
 
 ### Session 2026-01-26
+
 - Q: Which PostgreSQL version is used in production? → A: **PostgreSQL 16** (documented in `docs/ops/database.md` and used by testcontainers)
 - Q: Are there specific PostgreSQL extensions required? → A: **None** - Prisma uses standard PostgreSQL features; cuid() is generated in JavaScript
 - Q: Should the Docker setup include persistent volume mapping? → A: **Yes**, optional but recommended for data retention across restarts

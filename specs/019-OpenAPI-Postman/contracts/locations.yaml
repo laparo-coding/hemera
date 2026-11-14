@@ -9,19 +9,19 @@ paths:
       summary: List all locations
       description: Returns all active locations
       responses:
-        '200':
+        "200":
           description: List of locations
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Location'
+                          $ref: "#/components/schemas/Location"
     post:
       tags:
         - Locations
@@ -72,29 +72,29 @@ paths:
                 - address
                 - city
       responses:
-        '201':
+        "201":
           description: Location created
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Location'
-        '400':
+                        $ref: "#/components/schemas/Location"
+        "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden - Admin role required
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /locations/{id}:
     get:
@@ -110,23 +110,23 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Location details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Location'
-        '404':
+                        $ref: "#/components/schemas/Location"
+        "404":
           description: Location not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     put:
       tags:
         - Locations
@@ -175,29 +175,29 @@ paths:
                 isActive:
                   type: boolean
       responses:
-        '200':
+        "200":
           description: Location updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Location'
-        '403':
+                        $ref: "#/components/schemas/Location"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Location not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
       tags:
         - Locations
@@ -214,30 +214,30 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Location deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
-        '403':
+                $ref: "#/components/schemas/StandardResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Location not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Conflict - Location has associated courses
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /locations/geocode:
     post:
@@ -270,13 +270,13 @@ paths:
               required:
                 - address
       responses:
-        '200':
+        "200":
           description: Geocoding result
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -295,13 +295,13 @@ paths:
                             format: float
                             minimum: 0
                             maximum: 1
-        '400':
+        "400":
           description: Invalid address
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
           description: Rate limit exceeded
           headers:
             Retry-After:
@@ -311,4 +311,4 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"

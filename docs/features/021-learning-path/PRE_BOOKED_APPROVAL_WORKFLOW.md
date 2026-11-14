@@ -87,6 +87,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 **Description:** Creates booking and checks prerequisites automatically for INTERMEDIATE/ADVANCED courses. BEGINNER courses skip prerequisite check entirely.
 
 **Request:**
+
 ```json
 {
   "courseId": "course_abc123"
@@ -94,6 +95,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 ```
 
 **Response (BEGINNER Course - Direct Checkout):**
+
 ```json
 {
   "clientSecret": "pi_xxx_secret_yyy",
@@ -102,6 +104,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 ```
 
 **Response (Not Qualified - PRE_BOOKED):**
+
 ```json
 {
   "requiresReview": true,
@@ -112,6 +115,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 ```
 
 **Response (Qualified - Normal Flow):**
+
 ```json
 {
   "clientSecret": "pi_xxx_secret_yyy",
@@ -120,6 +124,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 ```
 
 **Implementation:**
+
 - File: `app/api/payment/create-intent/route.ts`
 - Uses: `handleBookingWithPrerequisites()` orchestrator
 - Creates: `PRE_BOOKED` status booking if not qualified (INTERMEDIATE/ADVANCED only)
@@ -137,6 +142,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 **Authentication:** Required (Admin role)
 
 **Request (Approve):**
+
 ```json
 {
   "action": "approve"
@@ -144,6 +150,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 ```
 
 **Request (Reject):**
+
 ```json
 {
   "action": "reject"
@@ -151,6 +158,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 ```
 
 **Response (Approved):**
+
 ```json
 {
   "success": true,
@@ -166,6 +174,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 ```
 
 **Response (Rejected):**
+
 ```json
 {
   "success": true,
@@ -178,6 +187,7 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 ```
 
 **Implementation:**
+
 - File: `app/api/admin/bookings/[id]/review/route.ts`
 - Approve: Uses atomic `updateMany` with `paymentStatus: PRE_BOOKED` precondition
 - Reject: Uses atomic `deleteMany` with `paymentStatus: PRE_BOOKED` precondition
@@ -185,10 +195,11 @@ The PRE_BOOKED workflow allows users who don't meet course prerequisites to requ
 - Email: `sendBookingRejectedEmail()` on rejection
 
 **Race Condition Prevention:**
+
 ```typescript
 // Atomic update with status precondition
 await prisma.booking.updateMany({
-  where: { 
+  where: {
     id: bookingId,
     paymentStatus: 'PRE_BOOKED', // Only update if still PRE_BOOKED
   },
@@ -286,6 +297,7 @@ if (result.requiresReview) {
 **Recipients:** All users with `role: 'admin'` in Clerk metadata
 
 **Data Variables:**
+
 ```typescript
 {
   customer_name: "John",
@@ -304,6 +316,7 @@ if (result.requiresReview) {
 **Template ID:** `booking-rejected` (Loops.so)
 
 **Data Variables:**
+
 ```typescript
 {
   customer_name: "John",
@@ -319,11 +332,13 @@ if (result.requiresReview) {
 ### Implemented Components
 
 ✅ **BookingReviewDialog** (`components/admin/BookingReviewDialog.tsx`)
+
 - Modal dialog for approve/reject
 - Admin notes field
 - Confirmation flow
 
 ✅ **CourseForm** (`components/admin/CourseForm.tsx`)
+
 - Learning Path fields (recommended, notRecommended, isNonPublic)
 - Character counters with visual warnings
 - MUI Checkbox components
@@ -369,6 +384,7 @@ if (result.requiresReview) {
 ### Race Condition Protection
 
 **Atomic Operations:**
+
 ```typescript
 // app/api/admin/bookings/[id]/review/route.ts
 
@@ -405,6 +421,7 @@ if (deleteResult.count === 0) {
 ```
 
 **Why This Matters:**
+
 - Prevents double-approval if two admins review simultaneously
 - Prevents approval of already-cancelled bookings
 - Ensures `reviewedAt` and `reviewedBy` are only set once
@@ -413,6 +430,7 @@ if (deleteResult.count === 0) {
 ### Schema Validation
 
 **Booking Transition Rules:**
+
 ```typescript
 // lib/services/booking.ts
 
@@ -425,6 +443,7 @@ if (deleteResult.count === 0) {
 ```
 
 **Email Guards:**
+
 ```typescript
 // lib/services/loops.ts
 
@@ -438,12 +457,14 @@ if (deleteResult.count === 0) {
 ### Logging Strategy
 
 **Structured Logging:**
+
 - Context: Always include `bookingId`, `userId`, `courseId`
 - PII Protection: Mask email addresses (`j***n@example.com`)
 - Error Sanitization: Never log full error objects (tokens/headers)
 - Severity Levels: `error`, `warn`, `info`
 
 **Example:**
+
 ```typescript
 serverInstance.warn('Email send skipped - invalid recipient', {
   context: 'LoopsService.sendPrerequisiteReviewEmail',
@@ -460,11 +481,13 @@ serverInstance.warn('Email send skipped - invalid recipient', {
 ### Unit Tests
 
 ✅ **Booking Transitions** (`tests/unit/services/booking-transitions.spec.ts`)
+
 - 12 tests covering PRE_BOOKED creation rules
 - Status transition validation
 - Duplicate prevention
 
 ✅ **Booking Orchestrator** (`tests/unit/services/booking-orchestrator.spec.ts`)
+
 - 13 tests covering orchestration logic
 - Email notification handling
 - Error scenarios
@@ -472,6 +495,7 @@ serverInstance.warn('Email send skipped - invalid recipient', {
 ### Integration Tests
 
 ✅ **Contract Tests** (`tests/contracts/admin-booking-review.spec.ts`)
+
 - PATCH /api/admin/bookings/{id}/review endpoint
 - Request/response validation
 - Error handling
@@ -520,6 +544,7 @@ NEXT_PUBLIC_APP_URL=https://app.hemera-academy.de
 ### Clerk Metadata
 
 **Admin Role Configuration:**
+
 ```json
 {
   "publicMetadata": {
@@ -529,6 +554,7 @@ NEXT_PUBLIC_APP_URL=https://app.hemera-academy.de
 ```
 
 **How to set:**
+
 1. Clerk Dashboard → Users
 2. Select user
 3. Edit → Public Metadata
@@ -598,10 +624,12 @@ Before deploying PRE_BOOKED feature to production:
 ### Common Issues
 
 **Issue:** PRE_BOOKED bookings not appearing in admin dashboard
+
 - **Cause:** Missing UI implementation
 - **Fix:** Implement `app/admin/bookings/pending/page.tsx` (see TODO)
 
 **Issue:** Admin doesn't receive notification email
+
 - **Causes:**
   1. No admin role in Clerk metadata
   2. LOOPS_API_KEY not configured
@@ -609,6 +637,7 @@ Before deploying PRE_BOOKED feature to production:
 - **Debug:** Check Rollbar for `LoopsService.*` warnings
 
 **Issue:** Customer doesn't receive rejection email
+
 - **Causes:**
   1. Invalid/empty customer email
   2. Email template missing
@@ -616,6 +645,7 @@ Before deploying PRE_BOOKED feature to production:
 - **Debug:** Non-blocking - booking is still deleted successfully
 
 **Issue:** Duplicate PRE_BOOKED bookings
+
 - **Cause:** Race condition or validation bug
 - **Check:** Unit tests in `booking-transitions.spec.ts`
 - **Fix:** Review transition guards in `lib/services/booking.ts`
@@ -662,6 +692,7 @@ Before deploying PRE_BOOKED feature to production:
 ## Questions?
 
 For questions or issues with the PRE_BOOKED workflow:
+
 1. Check this documentation
 2. Review unit tests for expected behavior
 3. Search Rollbar for related errors

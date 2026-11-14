@@ -12,6 +12,7 @@ Schnellübersicht für Entwickler zur PRE_BOOKED Approval-Funktionalität.
 ### Was ist PRE_BOOKED?
 
 Ein Booking-Status für Kunden, die:
+
 - Einen Kurs buchen möchten
 - ABER die Voraussetzungen nicht erfüllen
 - → Admin-Genehmigung erforderlich vor Zahlung
@@ -37,14 +38,14 @@ Abgelehnt → CANCELLED + Email
 
 ## Wichtigste Dateien
 
-| Datei | Zweck |
-|-------|-------|
-| `lib/services/booking-orchestrator.ts` | Hauptlogik: Voraussetzungsprüfung + Booking-Erstellung |
-| `lib/services/booking.ts` | CRUD-Operationen, Transition Rules (Zeilen 57-81) |
-| `app/api/payment/create-intent/route.ts` | User-Endpoint: Booking + Payment Intent |
-| `app/api/admin/bookings/[id]/review/route.ts` | Admin-Endpoint: Genehmigen/Ablehnen |
-| `components/admin/BookingReviewDialog.tsx` | UI: Review-Dialog für Admin |
-| `lib/services/loops.ts` | Email-Versand (Admin-Benachrichtigung + Ablehnung) |
+| Datei                                         | Zweck                                                  |
+| --------------------------------------------- | ------------------------------------------------------ |
+| `lib/services/booking-orchestrator.ts`        | Hauptlogik: Voraussetzungsprüfung + Booking-Erstellung |
+| `lib/services/booking.ts`                     | CRUD-Operationen, Transition Rules (Zeilen 57-81)      |
+| `app/api/payment/create-intent/route.ts`      | User-Endpoint: Booking + Payment Intent                |
+| `app/api/admin/bookings/[id]/review/route.ts` | Admin-Endpoint: Genehmigen/Ablehnen                    |
+| `components/admin/BookingReviewDialog.tsx`    | UI: Review-Dialog für Admin                            |
+| `lib/services/loops.ts`                       | Email-Versand (Admin-Benachrichtigung + Ablehnung)     |
 
 ---
 
@@ -107,7 +108,10 @@ const response = await fetch(`/api/admin/bookings/${bookingId}/review`, {
 ### 3. Email-Benachrichtigungen
 
 ```typescript
-import { sendPrerequisiteReviewEmail, sendBookingRejectedEmail } from '@/lib/services/loops';
+import {
+  sendPrerequisiteReviewEmail,
+  sendBookingRejectedEmail,
+} from '@/lib/services/loops';
 
 // Admin benachrichtigen
 await sendPrerequisiteReviewEmail({
@@ -203,12 +207,12 @@ npm test
 
 ### Test-Coverage
 
-| Komponente | Tests | Status |
-|------------|-------|--------|
-| Booking Transitions | 12 | ✅ Passing |
-| Booking Orchestrator | 13 | ✅ Passing |
-| Contract Tests | 5 | ✅ Passing |
-| E2E Tests | 0 | ⚠️ TODO |
+| Komponente           | Tests | Status     |
+| -------------------- | ----- | ---------- |
+| Booking Transitions  | 12    | ✅ Passing |
+| Booking Orchestrator | 13    | ✅ Passing |
+| Contract Tests       | 5     | ✅ Passing |
+| E2E Tests            | 0     | ⚠️ TODO    |
 
 **Details:** `tests/unit/services/TEST_COVERAGE_SUMMARY.md`
 

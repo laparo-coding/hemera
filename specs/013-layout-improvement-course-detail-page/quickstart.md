@@ -88,12 +88,12 @@ npm run test:e2e -- --grep="course detail"
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
+| File                        | Purpose                               |
+| --------------------------- | ------------------------------------- |
 | `app/courses/[id]/page.tsx` | Page route (update to use new layout) |
-| `components/course-detail/` | New component folder |
-| `lib/design-tokens.ts` | Centralized design tokens |
-| `prisma/schema.prisma` | Course model with new field |
+| `components/course-detail/` | New component folder                  |
+| `lib/design-tokens.ts`      | Centralized design tokens             |
+| `prisma/schema.prisma`      | Course model with new field           |
 
 ---
 
@@ -126,14 +126,17 @@ npx prisma migrate resolve --rolled-back add_hero_video_playback_id
 ## Common Issues
 
 ### Video Not Playing
+
 - Check browser console for Mux errors
 - Verify `heroVideoPlaybackId` is valid Mux Playback ID
 - Ensure Mux credentials are set in environment
 
 ### Styling Issues
+
 - Clear Next.js cache: `rm -rf .next`
 - Verify design tokens import path
 
 ### Database Issues
+
 - Run `npx prisma generate` after schema changes
 - Check Prisma Studio: `npx prisma studio`

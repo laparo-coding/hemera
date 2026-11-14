@@ -164,7 +164,7 @@ CourseSummary:
       format: uri
       nullable: true
     location:
-      $ref: '#/components/schemas/LocationSummary'
+      $ref: "#/components/schemas/LocationSummary"
   required:
     - id
     - title
@@ -214,7 +214,7 @@ Booking:
       type: string
       format: date-time
     course:
-      $ref: '#/components/schemas/CourseSummary'
+      $ref: "#/components/schemas/CourseSummary"
   required:
     - id
     - userId
@@ -573,12 +573,12 @@ securitySchemes:
     bearerFormat: JWT
     description: |
       Clerk JWT token obtained from Clerk authentication.
-      
+
       To obtain a token:
       1. Sign in via the Hemera web application
       2. Open browser DevTools → Application → Cookies
       3. Copy the `__session` cookie value
-      
+
       Or use Clerk's `getToken()` method in frontend code.
 ```
 

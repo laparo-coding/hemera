@@ -89,35 +89,36 @@ Use a **MUI `<Stepper>`** in horizontal orientation as a timeline:
 ```
 
 **Step States:**
-| State | Icon | Color | Interaction |
-|-------|------|-------|-------------|
-| Completed | `CheckCircle` | `colors.statusHealthy` | Link to review |
-| Active | `RadioButtonChecked` | `primary` | Link/button to start |
-| Locked | `Lock` | `text.disabled` | Disabled, tooltip explains prerequisite |
+
+| State     | Icon                 | Color                  | Interaction                             |
+| --------- | -------------------- | ---------------------- | --------------------------------------- |
+| Completed | `CheckCircle`        | `colors.statusHealthy` | Link to review                          |
+| Active    | `RadioButtonChecked` | `primary`              | Link/button to start                    |
+| Locked    | `Lock`               | `text.disabled`        | Disabled, tooltip explains prerequisite |
 
 ## Affected Files
 
-| File | Change |
-|------|--------|
-| `app/my-courses/[bookingId]/page.tsx` | Remove `<DebriefingSection />` and `<ResultsSection />` rendering |
-| `app/my-courses/[bookingId]/DebriefingSection.tsx` | Legacy file retained temporarily; replaced by `components/participation/DebriefingVideoCatalog.tsx` for the new Nachbereitung page |
-| `app/my-courses/[bookingId]/ResultsSection.tsx` | Legacy file retained temporarily; no longer rendered on the detail page |
-| `components/participation/CourseParticipationStepper.tsx` | Replace with 5-step preparation substep variant for detail page |
-| `components/dashboard/CourseCard.tsx` | Remove `#nachbereitung` and `#ergebnisse` buttons |
-| `components/dashboard/CourseProgressStepper.tsx` | **NEW** — 4-step sequential progress component |
-| `app/my-courses/[bookingId]/seminarveranstaltung/page.tsx` | **NEW** — Seminar event page route with curriculum display |
-| `components/UserDashboard.tsx` | Integrate `CourseProgressStepper` per booking |
+| File                                                       | Change                                                                                                                             |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `app/my-courses/[bookingId]/page.tsx`                      | Remove `<DebriefingSection />` and `<ResultsSection />` rendering                                                                  |
+| `app/my-courses/[bookingId]/DebriefingSection.tsx`         | Legacy file retained temporarily; replaced by `components/participation/DebriefingVideoCatalog.tsx` for the new Nachbereitung page |
+| `app/my-courses/[bookingId]/ResultsSection.tsx`            | Legacy file retained temporarily; no longer rendered on the detail page                                                            |
+| `components/participation/CourseParticipationStepper.tsx`  | Replace with 5-step preparation substep variant for detail page                                                                    |
+| `components/dashboard/CourseCard.tsx`                      | Remove `#nachbereitung` and `#ergebnisse` buttons                                                                                  |
+| `components/dashboard/CourseProgressStepper.tsx`           | **NEW** — 4-step sequential progress component                                                                                     |
+| `app/my-courses/[bookingId]/seminarveranstaltung/page.tsx` | **NEW** — Seminar event page route with curriculum display                                                                         |
+| `components/UserDashboard.tsx`                             | Integrate `CourseProgressStepper` per booking                                                                                      |
 
 ## Amendment A: Rename "Vorbereitung" → "Vorbereitung Seminar"
 
 All user-facing occurrences of the label **"Vorbereitung"** on the course detail page
 (`/my-courses/[bookingId]`) must be renamed to **"Vorbereitung Seminar"**:
 
-| Location | Current Text | New Text |
-|----------|-------------|----------|
-| `PreparationSection.tsx` — section heading (`<Typography>`) | Vorbereitung | Vorbereitung Seminar |
-| `PreparationSection.tsx` — CTA button | Vorbereitung starten | Vorbereitung Seminar starten |
-| `CourseParticipationStepper.tsx` — step label in `allSteps` array | Vorbereitung | Vorbereitung Seminar |
+| Location                                                          | Current Text         | New Text                     |
+| ----------------------------------------------------------------- | -------------------- | ---------------------------- |
+| `PreparationSection.tsx` — section heading (`<Typography>`)       | Vorbereitung         | Vorbereitung Seminar         |
+| `PreparationSection.tsx` — CTA button                             | Vorbereitung starten | Vorbereitung Seminar starten |
+| `CourseParticipationStepper.tsx` — step label in `allSteps` array | Vorbereitung         | Vorbereitung Seminar         |
 
 The dashboard stepper (`CourseProgressStepper`) also uses "Vorbereitung Seminar" as its
 first step label.
@@ -156,18 +157,18 @@ in the existing vertical stepper design (connected by the gray MUI connector lin
 
 ### Substep Definitions
 
-| # | Label | Field / Component | Required | Description |
-|---|-------|-------------------|----------|-------------|
-| 1 | Seminar-Absicht | `preparationIntent` (textarea) | No | "Was ist deine Absicht für dieses Seminar?" |
-| 2 | Erwartete Ergebnisse | `desiredResults` (textarea) | No | "Welche Ergebnisse erwartest du nach dem Seminar?" |
-| 3 | Dein Vorgesetzter | `lineManagerProfile` (textarea) | No | "Beschreibe deinen Vorgesetzten" |
-| 4 | Lebenslauf | `ResumeUploader` | No | Upload-Bereich für den Lebenslauf |
-| 5 | Zusammenfassung | `SummaryAssetList` | — | Video-Assets (unchanged) |
+| #   | Label                | Field / Component               | Required | Description                                        |
+| --- | -------------------- | ------------------------------- | -------- | -------------------------------------------------- |
+| 1   | Seminar-Absicht      | `preparationIntent` (textarea)  | No       | "Was ist deine Absicht für dieses Seminar?"        |
+| 2   | Erwartete Ergebnisse | `desiredResults` (textarea)     | No       | "Welche Ergebnisse erwartest du nach dem Seminar?" |
+| 3   | Dein Vorgesetzter    | `lineManagerProfile` (textarea) | No       | "Beschreibe deinen Vorgesetzten"                   |
+| 4   | Lebenslauf           | `ResumeUploader`                | No       | Upload-Bereich für den Lebenslauf                  |
+| 5   | Zusammenfassung      | `SummaryAssetList`              | —        | Video-Assets (unchanged)                           |
 
 ### Behaviour
 
 - Each substep is individually completable via a **"Weiter"** button.
-- Completing substep *n* advances the stepper to substep *n+1*.
+- Completing substep _n_ advances the stepper to substep _n+1_.
 - Users may skip optional substeps (all preparation fields are optional) by clicking
   "Überspringen" or directly clicking "Weiter" with an empty field.
 - The **overall** `ParticipationStatus` transitions to `SUMMARY` only when the user
@@ -225,9 +226,9 @@ function getPreparationResumeIndex(input: {
 
 ### Affected Files (additional)
 
-| File | Change |
-|------|--------|
-| `app/my-courses/[bookingId]/PreparationSection.tsx` | Break `PreparationStepContent` into individual step renderers; rename heading + button |
+| File                                                      | Change                                                                                                                                      |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/my-courses/[bookingId]/PreparationSection.tsx`       | Break `PreparationStepContent` into individual step renderers; rename heading + button                                                      |
 | `components/participation/CourseParticipationStepper.tsx` | Expand `allSteps` from 2 entries to 5 entries (4 preparation substeps + Zusammenfassung); adjust `getStepIndex()` and step completion logic |
 
 ## Amendment C: Move Testimonial to Dashboard with Flyout
@@ -257,9 +258,10 @@ to the **user dashboard** so participants encounter it more prominently.
    - The drawer closes on successful submission or on explicit close (X button / backdrop click).
 
 4. **Pass required data through `CourseCard` props.**
-  - Use the existing `courseTitle` prop from `CourseCard` (no new prop required).
-   - Add `userProfile: { firstName, lastName, imageUrl?, city? }` prop — sourced from
-     the dashboard data fetch in `UserDashboard.tsx`.
+
+- Use the existing `courseTitle` prop from `CourseCard` (no new prop required).
+- Add `userProfile: { firstName, lastName, imageUrl?, city? }` prop — sourced from
+  the dashboard data fetch in `UserDashboard.tsx`.
 
 ### Wireframe
 
@@ -293,13 +295,13 @@ to the **user dashboard** so participants encounter it more prominently.
 
 ### Affected Files (additional)
 
-| File | Change |
-|------|--------|
-| `app/my-courses/[bookingId]/page.tsx` | Remove `<TestimonialSectionMyCourses>` rendering |
-| `app/my-courses/[bookingId]/TestimonialSectionMyCourses.tsx` | Keep file (reuse form logic), or extract shared parts |
-| `components/dashboard/CourseCard.tsx` | Add `courseName`, `userProfile` props; add "Erfahrungsbericht" button for COMPLETED cards |
-| `components/dashboard/TestimonialDrawer.tsx` | **NEW** — MUI Drawer wrapping `TestimonialForm` with fetch/display/edit logic |
-| `components/UserDashboard.tsx` | Pass `userProfile` data to `CourseCard` |
+| File                                                         | Change                                                                                    |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `app/my-courses/[bookingId]/page.tsx`                        | Remove `<TestimonialSectionMyCourses>` rendering                                          |
+| `app/my-courses/[bookingId]/TestimonialSectionMyCourses.tsx` | Keep file (reuse form logic), or extract shared parts                                     |
+| `components/dashboard/CourseCard.tsx`                        | Add `courseName`, `userProfile` props; add "Erfahrungsbericht" button for COMPLETED cards |
+| `components/dashboard/TestimonialDrawer.tsx`                 | **NEW** — MUI Drawer wrapping `TestimonialForm` with fetch/display/edit logic             |
+| `components/UserDashboard.tsx`                               | Pass `userProfile` data to `CourseCard`                                                   |
 
 ## Amendment D: Rename "Nachbereitung" → "Nachbereitung Seminar" + Video Catalog Page
 
@@ -308,10 +310,10 @@ to the **user dashboard** so participants encounter it more prominently.
 All user-facing occurrences of **"Nachbereitung"** must be renamed to
 **"Nachbereitung Seminar"**:
 
-| Location | Current Text | New Text |
-|----------|-------------|----------|
-| `DebriefingSection.tsx` — heading | Nachbereitung | Nachbereitung Seminar |
-| `CourseCard.tsx` — dashboard button (if any) | Nachbereitung | Nachbereitung Seminar |
+| Location                                                 | Current Text  | New Text              |
+| -------------------------------------------------------- | ------------- | --------------------- |
+| `DebriefingSection.tsx` — heading                        | Nachbereitung | Nachbereitung Seminar |
+| `CourseCard.tsx` — dashboard button (if any)             | Nachbereitung | Nachbereitung Seminar |
 | Dashboard stepper (`CourseProgressStepper`) — step label | Nachbereitung | Nachbereitung Seminar |
 
 ### Navigation
@@ -378,12 +380,12 @@ resolved asset list — reuse it for the Nachbereitung page.
 
 ### Affected Files
 
-| File | Change |
-|------|--------|
-| `app/my-courses/[bookingId]/nachbereitung/page.tsx` | **NEW** — Server Component page that loads booking context |
-| `components/participation/DebriefingVideoCatalog.tsx` | **NEW** — Client Component video catalog grid with MuxPlayer cards |
-| `app/my-courses/[bookingId]/DebriefingSection.tsx` | Legacy file retained temporarily; deprecated in favor of `components/participation/DebriefingVideoCatalog.tsx` |
-| `components/dashboard/CourseProgressStepper.tsx` | Update step label; step links to `/my-courses/[bookingId]/nachbereitung` |
+| File                                                  | Change                                                                                                         |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `app/my-courses/[bookingId]/nachbereitung/page.tsx`   | **NEW** — Server Component page that loads booking context                                                     |
+| `components/participation/DebriefingVideoCatalog.tsx` | **NEW** — Client Component video catalog grid with MuxPlayer cards                                             |
+| `app/my-courses/[bookingId]/DebriefingSection.tsx`    | Legacy file retained temporarily; deprecated in favor of `components/participation/DebriefingVideoCatalog.tsx` |
+| `components/dashboard/CourseProgressStepper.tsx`      | Update step label; step links to `/my-courses/[bookingId]/nachbereitung`                                       |
 
 ## Amendment E: Rename "Ergebnis" → "Verhandlungsergebnis" + Result Form Page
 
@@ -392,11 +394,11 @@ resolved asset list — reuse it for the Nachbereitung page.
 All user-facing occurrences of **"Ergebnis"** must be renamed to
 **"Verhandlungsergebnis"**:
 
-| Location | Current Text | New Text |
-|----------|-------------|----------|
-| `ResultsSection.tsx` — heading | Teilnahme bestätigt | Verhandlungsergebnis |
-| Dashboard stepper (`CourseProgressStepper`) — step label | Ergebnis | Verhandlungsergebnis |
-| `CourseParticipationStepper.tsx` — step label in `allSteps` | Ergebnis | Verhandlungsergebnis |
+| Location                                                    | Current Text        | New Text             |
+| ----------------------------------------------------------- | ------------------- | -------------------- |
+| `ResultsSection.tsx` — heading                              | Teilnahme bestätigt | Verhandlungsergebnis |
+| Dashboard stepper (`CourseProgressStepper`) — step label    | Ergebnis            | Verhandlungsergebnis |
+| `CourseParticipationStepper.tsx` — step label in `allSteps` | Ergebnis            | Verhandlungsergebnis |
 
 ### Navigation
 
@@ -424,11 +426,11 @@ vertical flow. Three fields in order:
 - Label: **"Mit wem hast du verhandelt?"**
 - Three options:
 
-| Key | Label |
-|-----|-------|
-| `DIRECT_MANAGER` | Mit meiner Führungskraft |
+| Key                  | Label                                      |
+| -------------------- | ------------------------------------------ |
+| `DIRECT_MANAGER`     | Mit meiner Führungskraft                   |
 | `SKIP_LEVEL_MANAGER` | Mit der Führungskraft meiner Führungskraft |
-| `HR_DEPARTMENT` | Mit der Personalabteilung |
+| `HR_DEPARTMENT`      | Mit der Personalabteilung                  |
 
 - Each option is a `Card` with `CardActionArea`, vertically stacked (single column).
 - Selected card shows a highlighted border (`colors.marsala`) and filled background
@@ -500,15 +502,15 @@ scope. Validation is handled in the server action before the DB helper is called
 
 ### Affected Files
 
-| File | Change |
-|------|--------|
-| `app/my-courses/[bookingId]/verhandlungsergebnis/page.tsx` | **NEW** — Server Component page |
-| `components/participation/NegotiationResultForm.tsx` | **NEW** — Client Component with DatePicker + choice cards + textarea |
-| `prisma/schema.prisma` | Add `resultDate`, `resultNegotiationPartner` to `CourseParticipation` |
-| `lib/db/courseParticipation.ts` | Add save/load helpers for the new fields |
-| `app/api/my-courses/[bookingId]/result/route.ts` | Existing result endpoint remains for legacy result fields |
-| `app/my-courses/[bookingId]/ResultsSection.tsx` | Legacy file retained temporarily; no longer rendered on the detail page |
-| `components/dashboard/CourseProgressStepper.tsx` | Update step label to "Verhandlungsergebnis"; link to new route |
+| File                                                       | Change                                                                  |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `app/my-courses/[bookingId]/verhandlungsergebnis/page.tsx` | **NEW** — Server Component page                                         |
+| `components/participation/NegotiationResultForm.tsx`       | **NEW** — Client Component with DatePicker + choice cards + textarea    |
+| `prisma/schema.prisma`                                     | Add `resultDate`, `resultNegotiationPartner` to `CourseParticipation`   |
+| `lib/db/courseParticipation.ts`                            | Add save/load helpers for the new fields                                |
+| `app/api/my-courses/[bookingId]/result/route.ts`           | Existing result endpoint remains for legacy result fields               |
+| `app/my-courses/[bookingId]/ResultsSection.tsx`            | Legacy file retained temporarily; no longer rendered on the detail page |
+| `components/dashboard/CourseProgressStepper.tsx`           | Update step label to "Verhandlungsergebnis"; link to new route          |
 
 ## Amendment F: Seminarveranstaltung Route with Curriculum Display
 

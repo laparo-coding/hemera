@@ -56,12 +56,12 @@ grep -r "console\.\(log\|error\|warn\)" app/ lib/ components/ --include="*.ts" -
 
 ## Verifikation
 
-| Check | Command | Erwartung |
-|-------|---------|-----------|
-| Component Tests | `npm test -- tests/unit/components/` | 43+ passed |
-| Coverage | `npm test -- --coverage` | ≥70% |
-| E2E (no-auth) | `npx playwright test --project=chromium-no-auth` | All passed |
-| Lint (no-console) | `npm run lint` | 0 console.* in app/lib/components |
+| Check             | Command                                          | Erwartung                         |
+| ----------------- | ------------------------------------------------ | --------------------------------- |
+| Component Tests   | `npm test -- tests/unit/components/`             | 43+ passed                        |
+| Coverage          | `npm test -- --coverage`                         | ≥70%                              |
+| E2E (no-auth)     | `npx playwright test --project=chromium-no-auth` | All passed                        |
+| Lint (no-console) | `npm run lint`                                   | 0 console.* in app/lib/components |
 
 ## Nächste Schritte
 

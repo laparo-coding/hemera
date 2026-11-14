@@ -12,6 +12,7 @@ This document describes the protection mechanisms that prevent email sending att
 ## Problem Statement
 
 Without proper guards, the email service could:
+
 1. ❌ Attempt to instantiate `LoopsClient` without API key → internal errors
 2. ❌ Make unnecessary API calls to Clerk (fetching admin emails) → external dependency failure
 3. ❌ Leak operational context (which admins exist, booking details) in error logs
@@ -32,7 +33,8 @@ export function isLoopsConfigured(): boolean {
   if (!apiKey) {
     serverInstance.warn('Loops email service not configured', {
       context: 'LoopsService.isLoopsConfigured',
-      message: 'LOOPS_API_KEY environment variable is missing - email functionality disabled',
+      message:
+        'LOOPS_API_KEY environment variable is missing - email functionality disabled',
     });
     return false;
   }
@@ -41,6 +43,7 @@ export function isLoopsConfigured(): boolean {
 ```
 
 **Purpose:**
+
 - ✅ Fast check (no I/O, only environment variable read)
 - ✅ Logs warning once per call for visibility
 - ✅ Returns `false` to signal callers to skip email operations
@@ -65,6 +68,7 @@ function getLoopsClient(): LoopsClient | null {
 ```
 
 **Purpose:**
+
 - ✅ Prevents `new LoopsClient()` construction without valid API key
 - ✅ Returns `null` to signal unavailability
 - ✅ No logging here (handled by `isLoopsConfigured()`)
@@ -114,6 +118,7 @@ export async function sendPrerequisiteReviewEmail(data: {...}): Promise<LoopsEma
 ```
 
 **Protection Sequence:**
+
 1. ✅ Email validation (instant)
 2. ✅ Config check (instant)
 3. ✅ Admin emails check (data already fetched upstream)
@@ -151,6 +156,7 @@ export async function sendBookingRejectedEmail(data: {...}): Promise<LoopsEmailR
 ```
 
 **Protection Sequence:**
+
 1. ✅ Email validation (instant)
 2. ✅ Config check (instant)
 3. ✅ Client null-check (defense-in-depth)
@@ -190,6 +196,7 @@ async function notifyAdminsForReview(params: {...}) {
 ```
 
 **Critical Protection:**
+
 - ✅ **`isLoopsConfigured()` check BEFORE `getAdminEmails()`**
 - ✅ Prevents unnecessary Clerk API call when email service is disabled
 - ✅ Avoids leaking admin user information when Loops is not configured
@@ -201,14 +208,17 @@ async function notifyAdminsForReview(params: {...}) {
 ### What Gets Logged When LOOPS_API_KEY is Missing
 
 **Safe Logs (Generic Context Only):**
+
 ```typescript
 serverInstance.warn('Loops email service not configured', {
   context: 'LoopsService.isLoopsConfigured',
-  message: 'LOOPS_API_KEY environment variable is missing - email functionality disabled',
+  message:
+    'LOOPS_API_KEY environment variable is missing - email functionality disabled',
 });
 ```
 
 **What is NOT logged:**
+
 - ❌ Admin email addresses (not fetched)
 - ❌ Customer email addresses (masked if logged)
 - ❌ Booking IDs (only in orchestrator, minimal context)
@@ -222,6 +232,7 @@ serverInstance.warn('Loops email service not configured', {
 ### Problem: Unsafe Error Logging
 
 Error objects from external APIs can contain:
+
 - 🔴 Authorization headers with tokens
 - 🔴 API response bodies with sensitive data
 - 🔴 Database connection strings
@@ -287,17 +298,19 @@ All error handling in email-related services uses sanitization:
 ### What Gets Logged on Email Failure
 
 **sendPrerequisiteReviewEmail error:**
+
 ```typescript
 serverInstance.error('Failed to send prerequisite review email', {
   context: 'LoopsService.sendPrerequisiteReviewEmail',
   bookingId: 'abc123',
   recipientCount: 2,
-  errorType: 'NetworkError',           // ✅ Safe: error.name only
-  errorMessage: 'Request timeout',     // ✅ Safe: error.message only
+  errorType: 'NetworkError', // ✅ Safe: error.name only
+  errorMessage: 'Request timeout', // ✅ Safe: error.message only
 });
 ```
 
 **What is NOT logged:**
+
 - ❌ `error` object itself
 - ❌ `error.stack` (stack traces)
 - ❌ `error.response` (API response bodies)
@@ -339,7 +352,7 @@ describe('isLoopsConfigured', () => {
 describe('sendPrerequisiteReviewEmail', () => {
   it('should skip email and return error when Loops is not configured', async () => {
     delete process.env.LOOPS_API_KEY;
-    
+
     const result = await sendPrerequisiteReviewEmail({
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
@@ -349,7 +362,7 @@ describe('sendPrerequisiteReviewEmail', () => {
       bookingId: 'test-123',
       adminEmails: ['admin@example.com'],
     });
-    
+
     expect(result.success).toBe(false);
     expect(result.error).toContain('not configured');
   });
@@ -385,6 +398,7 @@ Tests:       10 passed, 10 total
 ### Local Development (No LOOPS_API_KEY)
 
 **Expected Behavior:**
+
 1. ✅ Application runs normally
 2. ✅ Bookings can be created (PRE_BOOKED status)
 3. ✅ Email operations silently skip with warnings in logs
@@ -392,6 +406,7 @@ Tests:       10 passed, 10 total
 5. ✅ No crashes or thrown exceptions
 
 **Log Output:**
+
 ```
 [WARN] Loops email service not configured
   context: LoopsService.isLoopsConfigured
@@ -406,6 +421,7 @@ Tests:       10 passed, 10 total
 ### Staging/Production (LOOPS_API_KEY Set)
 
 **Expected Behavior:**
+
 1. ✅ All guards pass configuration checks
 2. ✅ External API calls to Loops proceed normally
 3. ✅ `getAdminEmails()` fetches admin list from Clerk
@@ -484,6 +500,7 @@ if (!loops) {
 ## Maintenance Notes
 
 **When to update this document:**
+
 1. Adding new email notification types
 2. Changing configuration validation logic
 3. Adding new external service dependencies (beyond Loops/Clerk)

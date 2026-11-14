@@ -6,11 +6,11 @@ Diese Seite fasst die wichtigsten Schritte aus `specs/019-OpenAPI-Postman/quicks
 
 ## Dateien
 
-| Datei | Zweck |
-|-------|-------|
-| `openapi.yaml` | Vollständige OpenAPI 3.1.0 Spezifikation (Tags: Public, Auth, Bookings, Courses, Locations, Admin, Webhooks, Monitoring) |
-| `hemera.postman.json` | Postman Collection v2.1 inkl. Ordnern nach Tags und globalen Pre-Request/Test-Skripten |
-| `hemera.env.json` | Environment-Vorlage mit `baseUrl`, `bearer_token` und Test-IDs |
+| Datei                 | Zweck                                                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `openapi.yaml`        | Vollständige OpenAPI 3.1.0 Spezifikation (Tags: Public, Auth, Bookings, Courses, Locations, Admin, Webhooks, Monitoring) |
+| `hemera.postman.json` | Postman Collection v2.1 inkl. Ordnern nach Tags und globalen Pre-Request/Test-Skripten                                   |
+| `hemera.env.json`     | Environment-Vorlage mit `baseUrl`, `bearer_token` und Test-IDs                                                           |
 
 ## Schritt 1: OpenAPI importieren
 
@@ -32,13 +32,13 @@ Wenn du lieber direkt in Swagger UI schauen möchtest, kannst du `openapi.yaml` 
 
 ## Schritt 3: Environment anpassen
 
-| Variable | Beschreibung | Typ | Standardwert |
-|----------|--------------|-----|--------------|
-| `baseUrl` | Aktive API-URL | default | `http://localhost:3000/api` |
-| `bearer_token` | Clerk JWT ohne `Bearer` Prefix | 🔒 secret | _(leer)_ |
-| `clerk_session_id` | Clerk Session-ID für erweiterte Tests | 🔒 secret | _(leer)_ |
-| `test_user_id`, `test_course_id`, `test_booking_id` | IDs für Workflows | default | _(leer)_ |
-| `stripe_webhook_secret` | Stripe Webhook Secret für lokale Tests | 🔒 secret | _(leer)_ |
+| Variable                                            | Beschreibung                           | Typ       | Standardwert                |
+| --------------------------------------------------- | -------------------------------------- | --------- | --------------------------- |
+| `baseUrl`                                           | Aktive API-URL                         | default   | `http://localhost:3000/api` |
+| `bearer_token`                                      | Clerk JWT ohne `Bearer` Prefix         | 🔒 secret | _(leer)_                    |
+| `clerk_session_id`                                  | Clerk Session-ID für erweiterte Tests  | 🔒 secret | _(leer)_                    |
+| `test_user_id`, `test_course_id`, `test_booking_id` | IDs für Workflows                      | default   | _(leer)_                    |
+| `stripe_webhook_secret`                             | Stripe Webhook Secret für lokale Tests | 🔒 secret | _(leer)_                    |
 
 Passe mindestens `baseUrl` und `bearer_token` an.
 

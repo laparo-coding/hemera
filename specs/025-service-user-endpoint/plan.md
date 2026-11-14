@@ -5,22 +5,26 @@
 This feature will be implemented in phases to ensure security, testability, and maintainability.
 
 ### Phase 1: Authentication & Authorization Foundation
+
 1. Extend `lib/auth/permissions.ts` with `api-client` role
 2. Create Clerk service user in dashboard
 3. Write unit tests for permission checks
 
 ### Phase 2: Service Endpoints
+
 1. Create `/api/service/courses/route.ts` (GET)
 2. Create `/api/service/courses/[id]/route.ts` (GET)
 3. Create `/api/service/participations/[id]/route.ts` (GET)
 4. Create `/api/service/participations/[id]/result/route.ts` (PUT)
 
 ### Phase 3: Security & Monitoring
+
 1. Implement rate limiting middleware
 2. Add audit logging for service calls
 3. Update Rollbar error tracking
 
 ### Phase 4: Testing & Documentation
+
 1. Write contract tests for all endpoints
 2. Update OpenAPI spec
 3. Create quickstart guide
@@ -31,28 +35,29 @@ This feature will be implemented in phases to ensure security, testability, and 
 
 ### New Files
 
-| File | Purpose |
-|------|---------|
-| `app/api/service/courses/route.ts` | List courses endpoint |
-| `app/api/service/courses/[id]/route.ts` | Course details endpoint |
-| `app/api/service/participations/[id]/route.ts` | Participation details endpoint |
-| `app/api/service/participations/[id]/result/route.ts` | Update participation result |
-| `lib/middleware/rate-limit.ts` | Rate limiting middleware |
-| `tests/contracts/service-api.spec.ts` | Contract tests for service endpoints |
+| File                                                  | Purpose                              |
+| ----------------------------------------------------- | ------------------------------------ |
+| `app/api/service/courses/route.ts`                    | List courses endpoint                |
+| `app/api/service/courses/[id]/route.ts`               | Course details endpoint              |
+| `app/api/service/participations/[id]/route.ts`        | Participation details endpoint       |
+| `app/api/service/participations/[id]/result/route.ts` | Update participation result          |
+| `lib/middleware/rate-limit.ts`                        | Rate limiting middleware             |
+| `tests/contracts/service-api.spec.ts`                 | Contract tests for service endpoints |
 
 ### Modified Files
 
-| File | Changes |
-|------|---------|
-| `lib/auth/permissions.ts` | Add `api-client` to `UserRole` type, add permission checks |
-| `lib/monitoring/rollbar-official.ts` | Add service API logging helpers |
-| `docs/api/openapi.yaml` | Add service endpoint definitions |
+| File                                 | Changes                                                    |
+| ------------------------------------ | ---------------------------------------------------------- |
+| `lib/auth/permissions.ts`            | Add `api-client` to `UserRole` type, add permission checks |
+| `lib/monitoring/rollbar-official.ts` | Add service API logging helpers                            |
+| `docs/api/openapi.yaml`              | Add service endpoint definitions                           |
 
 ---
 
 ## Database Changes
 
 **No database migrations required.** This feature uses existing models:
+
 - `Course`
 - `Booking`
 - `CourseParticipation`
@@ -66,12 +71,14 @@ This feature will be implemented in phases to ensure security, testability, and 
 **Purpose:** List all courses with participant counts
 
 **Query Parameters:**
+
 - `level` (optional): Filter by course level (BEGINNER, INTERMEDIATE, ADVANCED)
 - `published` (optional): Filter by published status (default: true)
 - `limit` (optional): Max results (default: 100, max: 500)
 - `offset` (optional): Pagination offset (default: 0)
 
 **Response:**
+
 ```typescript
 {
   success: boolean;
@@ -88,7 +95,7 @@ This feature will be implemented in phases to ensure security, testability, and 
     total: number;
     limit: number;
     offset: number;
-  };
+  }
 }
 ```
 
@@ -97,6 +104,7 @@ This feature will be implemented in phases to ensure security, testability, and 
 **Purpose:** Get detailed course information with participations
 
 **Response:**
+
 ```typescript
 {
   success: boolean;
@@ -113,7 +121,7 @@ This feature will be implemented in phases to ensure security, testability, and 
       status: ParticipationStatus;
       createdAt: string;
     }>;
-  };
+  }
 }
 ```
 
@@ -122,6 +130,7 @@ This feature will be implemented in phases to ensure security, testability, and 
 **Purpose:** Get participation details
 
 **Response:**
+
 ```typescript
 {
   success: boolean;
@@ -137,7 +146,7 @@ This feature will be implemented in phases to ensure security, testability, and 
     resultCompletedAt: string | null;
     createdAt: string;
     updatedAt: string;
-  };
+  }
 }
 ```
 
@@ -146,6 +155,7 @@ This feature will be implemented in phases to ensure security, testability, and 
 **Purpose:** Update participation result data
 
 **Request Body:**
+
 ```typescript
 {
   resultOutcome?: string; // max 2000 chars
@@ -155,6 +165,7 @@ This feature will be implemented in phases to ensure security, testability, and 
 ```
 
 **Response:**
+
 ```typescript
 {
   success: boolean;
@@ -169,11 +180,13 @@ This feature will be implemented in phases to ensure security, testability, and 
 ### Implementation Options
 
 **Option A: In-Memory Rate Limiter (Recommended for MVP)**
+
 - Use `Map<userId, { count: number, resetAt: Date }>`
 - Simple, no external dependencies
 - Resets on server restart (acceptable for MVP)
 
 **Option B: Redis-based Rate Limiter (Future Enhancement)**
+
 - Persistent across server restarts
 - Distributed rate limiting for multi-instance deployments
 - Requires Redis setup
@@ -188,7 +201,7 @@ const RATE_LIMITS = {
     windowMs: 60 * 1000, // 1 minute
     maxRequests: 100,
   },
-  'admin': {
+  admin: {
     windowMs: 60 * 1000,
     maxRequests: 500, // Higher limit for admins
   },
@@ -201,13 +214,13 @@ const RATE_LIMITS = {
 
 ### Standard Error Responses
 
-| Status | Error Code | Description |
-|--------|------------|-------------|
-| 401 | `AUTH_REQUIRED` | No valid JWT token provided |
-| 403 | `FORBIDDEN` | User role not authorized for this endpoint |
-| 404 | `NOT_FOUND` | Resource (course/participation) not found |
-| 429 | `RATE_LIMIT_EXCEEDED` | Too many requests |
-| 500 | `INTERNAL_ERROR` | Server error (logged to Rollbar) |
+| Status | Error Code            | Description                                |
+| ------ | --------------------- | ------------------------------------------ |
+| 401    | `AUTH_REQUIRED`       | No valid JWT token provided                |
+| 403    | `FORBIDDEN`           | User role not authorized for this endpoint |
+| 404    | `NOT_FOUND`           | Resource (course/participation) not found  |
+| 429    | `RATE_LIMIT_EXCEEDED` | Too many requests                          |
+| 500    | `INTERNAL_ERROR`      | Server error (logged to Rollbar)           |
 
 ### Error Response Format
 
@@ -225,17 +238,20 @@ const RATE_LIMITS = {
 ## Testing Strategy
 
 ### Unit Tests
+
 - Permission checks in `lib/auth/permissions.ts`
 - Rate limiting logic
 - Input validation (Zod schemas)
 
 ### Contract Tests
+
 - All service endpoints with valid `api-client` token
 - Unauthorized access attempts (wrong role)
 - Rate limit enforcement
 - Error scenarios (404, 500)
 
 ### Integration Tests
+
 - End-to-end flow: Aither → Hemera service API
 - JWT token generation and validation
 - Data consistency after PUT operations
@@ -258,6 +274,7 @@ const RATE_LIMITS = {
 ## Rollback Plan
 
 If issues arise after deployment:
+
 1. Disable service endpoints by adding feature flag check
 2. Revert to previous deployment via Vercel dashboard
 3. Investigate errors in Rollbar

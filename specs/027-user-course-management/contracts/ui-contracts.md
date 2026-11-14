@@ -27,7 +27,11 @@ interface CourseProgressStepperProps {
 ### Step Configuration
 
 ```typescript
-type DashboardStepKey = 'VORBEREITUNG' | 'SEMINARVERANSTALTUNG' | 'NACHBEREITUNG' | 'VERHANDLUNGSERGEBNIS';
+type DashboardStepKey =
+  | 'VORBEREITUNG'
+  | 'SEMINARVERANSTALTUNG'
+  | 'NACHBEREITUNG'
+  | 'VERHANDLUNGSERGEBNIS';
 
 interface DashboardStep {
   key: DashboardStepKey;
@@ -35,8 +39,8 @@ interface DashboardStep {
   label: string;
   hrefTemplate: string; // navigation target (replace {bookingId})
   completedAt: ParticipationStatus[]; // statuses where this step is completed
-  activeAt: ParticipationStatus[];    // statuses where this step is active
-  timelineLabel: string;              // label relative to course start date
+  activeAt: ParticipationStatus[]; // statuses where this step is active
+  timelineLabel: string; // label relative to course start date
 }
 
 const DASHBOARD_STEPS: DashboardStep[] = [
@@ -81,12 +85,12 @@ const DASHBOARD_STEPS: DashboardStep[] = [
 
 ### Step Icon Contract
 
-| State | Icon | Color |
-|-------|------|-------|
-| Completed | `Check` (inside numbered circle) | `colors.statusHealthy` (#2E7D32) |
-| Active | `RadioButtonChecked` | `theme.palette.primary.main` |
-| Available | `RadioButtonUnchecked` | `theme.palette.text.secondary` |
-| Locked (post-testing) | `Lock` | `theme.palette.text.disabled` |
+| State                 | Icon                             | Color                            |
+| --------------------- | -------------------------------- | -------------------------------- |
+| Completed             | `Check` (inside numbered circle) | `colors.statusHealthy` (#2E7D32) |
+| Active                | `RadioButtonChecked`             | `theme.palette.primary.main`     |
+| Available             | `RadioButtonUnchecked`           | `theme.palette.text.secondary`   |
+| Locked (post-testing) | `Lock`                           | `theme.palette.text.disabled`    |
 
 > **Testing phase:** All steps render as clickable (Active or Available). Locked state is
 > defined for post-testing but NOT implemented during the current testing phase.
@@ -201,7 +205,10 @@ interface DebriefingVideoCatalogProps {
 ### Props Interface
 
 ```typescript
-type NegotiationPartner = 'DIRECT_MANAGER' | 'SKIP_LEVEL_MANAGER' | 'HR_DEPARTMENT';
+type NegotiationPartner =
+  | 'DIRECT_MANAGER'
+  | 'SKIP_LEVEL_MANAGER'
+  | 'HR_DEPARTMENT';
 
 interface NegotiationResultFormProps {
   bookingId: string;
@@ -215,7 +222,10 @@ interface NegotiationResultFormProps {
     resultDate?: string | null;
     resultNegotiationPartner?: string | null;
     resultOutcome?: string | null;
-  }) => Promise<{ success: boolean; error?: { code?: string; message: string } }>;
+  }) => Promise<{
+    success: boolean;
+    error?: { code?: string; message: string };
+  }>;
 }
 ```
 
@@ -224,19 +234,19 @@ to a `yyyy-MM-dd` string before `saveAction` is called.
 
 ### Field Contract
 
-| # | Label | Component | Persisted Field |
-|---|-------|-----------|-----------------|
-| 1 | Wann hast du dein Gehaltsgespräch geführt? | `StaticDatePicker` (de locale) | `resultDate` |
-| 2 | Mit wem hast du verhandelt? | Card selector (3 options) | `resultNegotiationPartner` |
-| 3 | Was war das Verhandlungsergebnis? | Multiline textarea | `resultOutcome` |
+| #   | Label                                      | Component                      | Persisted Field            |
+| --- | ------------------------------------------ | ------------------------------ | -------------------------- |
+| 1   | Wann hast du dein Gehaltsgespräch geführt? | `StaticDatePicker` (de locale) | `resultDate`               |
+| 2   | Mit wem hast du verhandelt?                | Card selector (3 options)      | `resultNegotiationPartner` |
+| 3   | Was war das Verhandlungsergebnis?          | Multiline textarea             | `resultOutcome`            |
 
 ### Card Selector Options
 
-| Key | Label |
-|-----|-------|
-| `DIRECT_MANAGER` | Mit meiner Führungskraft |
+| Key                  | Label                                      |
+| -------------------- | ------------------------------------------ |
+| `DIRECT_MANAGER`     | Mit meiner Führungskraft                   |
 | `SKIP_LEVEL_MANAGER` | Mit der Führungskraft meiner Führungskraft |
-| `HR_DEPARTMENT` | Mit der Personalabteilung |
+| `HR_DEPARTMENT`      | Mit der Personalabteilung                  |
 
 ### Accessibility
 
@@ -306,7 +316,8 @@ interface CourseCardProps {
   // ... existing props unchanged ...
   participationStatus: ParticipationStatus | null; // NEW — for stepper
   // Note: existing courseTitle prop is forwarded as courseName to TestimonialDrawer
-  userProfile: {               // NEW — for testimonial drawer
+  userProfile: {
+    // NEW — for testimonial drawer
     firstName: string | null;
     lastName: string | null;
     imageUrl?: string;

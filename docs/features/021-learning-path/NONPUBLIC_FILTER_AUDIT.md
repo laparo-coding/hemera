@@ -37,7 +37,9 @@ export async function getCourses(): Promise<CourseWithBookings[]> {
 **File:** `lib/services/course.ts`
 
 ```typescript
-export async function searchCourses(query: string): Promise<CourseWithBookings[]> {
+export async function searchCourses(
+  query: string
+): Promise<CourseWithBookings[]> {
   return await prisma.course.findMany({
     where: {
       isPublished: true,
@@ -62,15 +64,17 @@ export async function searchCourses(query: string): Promise<CourseWithBookings[]
 **File:** `lib/services/course.ts`
 
 ```typescript
-export async function getCourses(params?: CourseSearchParams): Promise<CourseWithBookings[]> {
+export async function getCourses(
+  params?: CourseSearchParams
+): Promise<CourseWithBookings[]> {
   const where: Record<string, unknown> = {
     isNonPublic: false, // ✅ Filtered by default
   };
-  
+
   // Additional filters (title, price range, etc.)
   // ...
-  
-  const courses = await prisma.course.findMany({ where, /* ... */ });
+
+  const courses = await prisma.course.findMany({ where /* ... */ });
 }
 ```
 
@@ -105,13 +109,15 @@ export async function getCourseById(
   options?: { includeNonPublic?: boolean }
 ): Promise<CourseWithBookings | null> {
   const where: Record<string, unknown> = { id };
-  
+
   // ✅ Exclude non-public by default (admin can override)
   if (!options?.includeNonPublic) {
     where.isNonPublic = false;
   }
-  
-  return await prisma.course.findUnique({ where: where as { id: string }, /* ... */ });
+
+  return await prisma.course.findUnique({
+    where: where as { id: string } /* ... */,
+  });
 }
 ```
 
@@ -132,13 +138,13 @@ export async function getCourseByIdOrSlug(
   const where: Record<string, unknown> = {
     OR: [{ id: idOrSlug }, { slug: idOrSlug }],
   };
-  
+
   // ✅ Exclude non-public by default
   if (!options?.includeNonPublic) {
     where.isNonPublic = false;
   }
-  
-  return await prisma.course.findFirst({ where, /* ... */ });
+
+  return await prisma.course.findFirst({ where /* ... */ });
 }
 ```
 
@@ -202,13 +208,15 @@ export async function getNextUpcomingCourse(): Promise<Course | null> {
 ```typescript
 export async function getCourseById(id: string): Promise<Course> {
   const courseRecord = await prisma.course.findUnique({ where: { id } });
-  
+
   // ✅ Throws error if non-public
   if (!courseRecord || !courseRecord.isPublished || courseRecord.isNonPublic) {
     throw new CourseNotFoundError(id);
   }
-  
-  return { /* ... */ };
+
+  return {
+    /* ... */
+  };
 }
 ```
 
@@ -225,17 +233,19 @@ export async function getCourseById(id: string): Promise<Course> {
 ```typescript
 export async function getCourseBySlug(slug: string): Promise<Course> {
   const courseRecord = await prisma.course.findUnique({ where: { slug } });
-  
+
   if (!courseRecord) {
     throw new CourseNotFoundError(`slug:${slug}`);
   }
-  
+
   // ✅ Throws error if non-public
   if (!courseRecord.isPublished || courseRecord.isNonPublic) {
     throw new CourseNotPublishedError(courseRecord.id);
   }
-  
-  return { /* ... */ };
+
+  return {
+    /* ... */
+  };
 }
 ```
 
@@ -251,13 +261,15 @@ export async function getCourseBySlug(slug: string): Promise<Course> {
 
 ```typescript
 export async function getPublishedCourses(): Promise<Course[]> {
-  const allCourses = await prisma.course.findMany({ /* ... */ });
-  
+  const allCourses = await prisma.course.findMany({
+    /* ... */
+  });
+
   // ✅ Filter after fetch
   const courses = allCourses.filter(
     course => course.isPublished && !course.isNonPublic
   );
-  
+
   return courses;
 }
 ```
@@ -275,7 +287,11 @@ export async function getPublishedCourses(): Promise<Course[]> {
 
 ```typescript
 export const SCHEMA_COMBINATIONS = {
-  courseList: (courses: Array<{ /* ... */ }> = []) => [
+  courseList: (
+    courses: Array<{
+      /* ... */
+    }> = []
+  ) => [
     // ...
     ...courses.map(course => generateCourseSchema(course)),
   ],
@@ -335,7 +351,7 @@ export async function getCourseStats() {
     prisma.course.count({ where: { isPublished: false } }),
     prisma.course.count({ where: { isNonPublic: true } }), // ✅ Separate counter
   ]);
-  
+
   return { total, published, unpublished, nonPublic };
 }
 ```
@@ -445,17 +461,17 @@ describe('GET /api/courses', () => {
 
 ## Risk Assessment
 
-| Endpoint | Exposure Risk | Mitigation |
-|----------|---------------|------------|
-| `/api/courses` | ❌ None | `isNonPublic: false` in query |
-| `/api/courses/next` | ❌ None | `isNonPublic: false` in query |
-| `/api/courses/[id]` | ❌ None | Throws 404 on `isNonPublic` |
-| `/courses` listing | ❌ None | Uses `getPublishedCourses()` with filter |
-| `/courses/[id]` detail | ❌ None | Uses `getCourseBySlug()` with check |
-| Schema.org JSON-LD | ❌ None | Uses filtered course source |
-| Robots.txt | ❌ None | No dynamic sitemap |
-| Search functionality | ❌ None | `isNonPublic: false` in query |
-| Admin routes | ⚠️ By design | Route-level auth required |
+| Endpoint               | Exposure Risk | Mitigation                               |
+| ---------------------- | ------------- | ---------------------------------------- |
+| `/api/courses`         | ❌ None       | `isNonPublic: false` in query            |
+| `/api/courses/next`    | ❌ None       | `isNonPublic: false` in query            |
+| `/api/courses/[id]`    | ❌ None       | Throws 404 on `isNonPublic`              |
+| `/courses` listing     | ❌ None       | Uses `getPublishedCourses()` with filter |
+| `/courses/[id]` detail | ❌ None       | Uses `getCourseBySlug()` with check      |
+| Schema.org JSON-LD     | ❌ None       | Uses filtered course source              |
+| Robots.txt             | ❌ None       | No dynamic sitemap                       |
+| Search functionality   | ❌ None       | `isNonPublic: false` in query            |
+| Admin routes           | ⚠️ By design  | Route-level auth required                |
 
 ---
 

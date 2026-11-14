@@ -7,10 +7,12 @@
 ## Authentication
 
 All endpoints require:
+
 - Valid Clerk session token
 - User metadata: `publicMetadata.role === 'admin'`
 
 **Response for unauthorized access**:
+
 ```json
 {
   "error": "Unauthorized",
@@ -31,18 +33,21 @@ All endpoints require:
 Lists all courses sorted by start time (nearest first).
 
 **Query Parameters**:
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| published | boolean | No | null | Filter by published status (null = all) |
-| limit | number | No | 50 | Max results (future pagination) |
+
+| Parameter | Type    | Required | Default | Description                             |
+| --------- | ------- | -------- | ------- | --------------------------------------- |
+| published | boolean | No       | null    | Filter by published status (null = all) |
+| limit     | number  | No       | 50      | Max results (future pagination)         |
 
 **Request Example**:
+
 ```http
 GET /api/admin/courses?published=true HTTP/1.1
 Authorization: Bearer <clerk_token>
 ```
 
 **Response Success** (200 OK):
+
 ```json
 {
   "courses": [
@@ -68,6 +73,7 @@ Authorization: Bearer <clerk_token>
 ```
 
 **Response Error** (500 Internal Server Error):
+
 ```json
 {
   "error": "Database Error",
@@ -85,17 +91,20 @@ Authorization: Bearer <clerk_token>
 Retrieves detailed information for a specific course including enrollment count.
 
 **Path Parameters**:
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | Course CUID |
+
+| Parameter | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| id        | string | Yes      | Course CUID |
 
 **Request Example**:
+
 ```http
 GET /api/admin/courses/clx123abc456 HTTP/1.1
 Authorization: Bearer <clerk_token>
 ```
 
 **Response Success** (200 OK):
+
 ```json
 {
   "id": "clx123abc456",
@@ -116,6 +125,7 @@ Authorization: Bearer <clerk_token>
 ```
 
 **Response Error** (404 Not Found):
+
 ```json
 {
   "error": "Not Found",
@@ -133,11 +143,12 @@ Authorization: Bearer <clerk_token>
 Creates a new course with all required fields.
 
 **Request Body**:
+
 ```json
 {
   "title": "Gehaltsverhandlung für Fortgeschrittene",
   "description": "Vertiefen Sie Ihre Verhandlungskompetenzen...",
-  "price": 499.00,
+  "price": 499.0,
   "startTime": "2025-03-20T09:00:00Z",
   "duration": 12,
   "instructor": "Prof. Dr. Anna Weber",
@@ -148,6 +159,7 @@ Creates a new course with all required fields.
 ```
 
 **Validation Rules**:
+
 - `title`: 3-200 characters, required
 - `description`: Min 10 characters, required
 - `price`: >= 0, max 2 decimals, required
@@ -159,6 +171,7 @@ Creates a new course with all required fields.
 - `capacity`: Positive integer, required
 
 **Response Success** (201 Created):
+
 ```json
 {
   "id": "clx789xyz123",
@@ -179,6 +192,7 @@ Creates a new course with all required fields.
 ```
 
 **Response Error** (400 Bad Request - Validation):
+
 ```json
 {
   "error": "Validation Error",
@@ -198,6 +212,7 @@ Creates a new course with all required fields.
 ```
 
 **Response Error** (409 Conflict - Duplicate Title Warning):
+
 ```json
 {
   "error": "Conflict",
@@ -217,26 +232,30 @@ Creates a new course with all required fields.
 Updates an existing course with optimistic locking.
 
 **Path Parameters**:
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | Course CUID |
+
+| Parameter | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| id        | string | Yes      | Course CUID |
 
 **Request Body**:
+
 ```json
 {
   "updatedAt": "2025-01-12T09:15:00Z",
   "title": "Gehaltsverhandlung Grundkurs (Aktualisiert)",
-  "price": 349.00,
+  "price": 349.0,
   "capacity": 25
 }
 ```
 
 **Notes**:
+
 - `updatedAt` required for optimistic locking (must match current DB value)
 - Only provided fields are updated (partial update)
 - Cannot update `id`, `createdAt`, or `enrollmentCount`
 
 **Response Success** (200 OK):
+
 ```json
 {
   "id": "clx123abc456",
@@ -257,6 +276,7 @@ Updates an existing course with optimistic locking.
 ```
 
 **Response Error** (409 Conflict - Concurrent Edit):
+
 ```json
 {
   "error": "Conflict",
@@ -267,6 +287,7 @@ Updates an existing course with optimistic locking.
 ```
 
 **Response Error** (400 Bad Request - Capacity Constraint):
+
 ```json
 {
   "error": "Validation Error",
@@ -286,22 +307,26 @@ Updates an existing course with optimistic locking.
 Deletes a course only if no active enrollments exist.
 
 **Path Parameters**:
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | Course CUID |
+
+| Parameter | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| id        | string | Yes      | Course CUID |
 
 **Request Example**:
+
 ```http
 DELETE /api/admin/courses/clx123abc456 HTTP/1.1
 Authorization: Bearer <clerk_token>
 ```
 
 **Response Success** (204 No Content):
+
 ```
 (empty body)
 ```
 
 **Response Error** (409 Conflict - Active Enrollments):
+
 ```json
 {
   "error": "Conflict",
@@ -320,6 +345,7 @@ Authorization: Bearer <clerk_token>
 **Status**: 409 Conflict
 
 **Response Error** (404 Not Found):
+
 ```json
 {
   "error": "Not Found",
@@ -337,11 +363,13 @@ Authorization: Bearer <clerk_token>
 Transfers all active enrollments from one course to another (prerequisite for deletion).
 
 **Path Parameters**:
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| id | string | Yes | Source course CUID |
+
+| Parameter | Type   | Required | Description        |
+| --------- | ------ | -------- | ------------------ |
+| id        | string | Yes      | Source course CUID |
 
 **Request Body**:
+
 ```json
 {
   "targetCourseId": "clx789xyz123"
@@ -349,11 +377,13 @@ Transfers all active enrollments from one course to another (prerequisite for de
 ```
 
 **Validation**:
+
 - `targetCourseId` must be a valid existing course
 - Target course must have sufficient capacity (capacity >= current enrollments + transferred enrollments)
 - Source and target courses cannot be the same
 
 **Response Success** (200 OK):
+
 ```json
 {
   "message": "Successfully transferred enrollments",
@@ -364,6 +394,7 @@ Transfers all active enrollments from one course to another (prerequisite for de
 ```
 
 **Response Error** (400 Bad Request - Insufficient Capacity):
+
 ```json
 {
   "error": "Validation Error",
@@ -377,6 +408,7 @@ Transfers all active enrollments from one course to another (prerequisite for de
 ```
 
 **Response Error** (404 Not Found - Invalid Target):
+
 ```json
 {
   "error": "Not Found",
@@ -389,19 +421,19 @@ Transfers all active enrollments from one course to another (prerequisite for de
 
 ## Error Codes Reference
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| AUTH_INSUFFICIENT_PERMISSIONS | 403 | User does not have admin role |
-| COURSE_NOT_FOUND | 404 | Course ID does not exist |
-| VALIDATION_FAILED | 400 | Request body validation errors |
-| DUPLICATE_TITLE_WARNING | 409 | Similar course title exists (non-blocking) |
-| CONCURRENT_EDIT_CONFLICT | 409 | updatedAt mismatch (optimistic lock) |
-| CAPACITY_BELOW_ENROLLMENTS | 400 | Requested capacity < enrollment count |
-| ACTIVE_ENROLLMENTS_EXIST | 409 | Cannot delete course with students |
-| INSUFFICIENT_CAPACITY | 400 | Target course cannot accommodate transfers |
-| TARGET_COURSE_NOT_FOUND | 404 | Transfer target does not exist |
-| DB_QUERY_FAILED | 500 | Database operation error |
-| BLOB_UPLOAD_FAILED | 500 | Vercel Blob upload error |
+| Code                          | HTTP Status | Description                                |
+| ----------------------------- | ----------- | ------------------------------------------ |
+| AUTH_INSUFFICIENT_PERMISSIONS | 403         | User does not have admin role              |
+| COURSE_NOT_FOUND              | 404         | Course ID does not exist                   |
+| VALIDATION_FAILED             | 400         | Request body validation errors             |
+| DUPLICATE_TITLE_WARNING       | 409         | Similar course title exists (non-blocking) |
+| CONCURRENT_EDIT_CONFLICT      | 409         | updatedAt mismatch (optimistic lock)       |
+| CAPACITY_BELOW_ENROLLMENTS    | 400         | Requested capacity < enrollment count      |
+| ACTIVE_ENROLLMENTS_EXIST      | 409         | Cannot delete course with students         |
+| INSUFFICIENT_CAPACITY         | 400         | Target course cannot accommodate transfers |
+| TARGET_COURSE_NOT_FOUND       | 404         | Transfer target does not exist             |
+| DB_QUERY_FAILED               | 500         | Database operation error                   |
+| BLOB_UPLOAD_FAILED            | 500         | Vercel Blob upload error                   |
 
 ---
 
@@ -441,9 +473,9 @@ Transfers all active enrollments from one course to another (prerequisite for de
 
 ## Changelog
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-12-15 | Initial API contract definition |
+| Version | Date       | Changes                         |
+| ------- | ---------- | ------------------------------- |
+| 1.0     | 2025-12-15 | Initial API contract definition |
 
 ---
 

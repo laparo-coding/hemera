@@ -1,7 +1,8 @@
 ---
+
 description:
-  Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md,
-  and tasks.md after task generation.
+Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md,
+and tasks.md after task generation.
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST**

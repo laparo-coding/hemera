@@ -19,12 +19,12 @@
 
 ### Test-Frameworks
 
-| Framework | Zweck | Config |
-|-----------|-------|--------|
-| **Jest** | Unit + Contract Tests | `jest.config.ts` |
-| **Playwright** | E2E Tests | `playwright.config.ts` |
-| **@testing-library/react** | Component Tests | Bereits installiert ✅ |
-| **jest-environment-jsdom** | Browser-Umgebung | Bereits installiert ✅ |
+| Framework                  | Zweck                 | Config                 |
+| -------------------------- | --------------------- | ---------------------- |
+| **Jest**                   | Unit + Contract Tests | `jest.config.ts`       |
+| **Playwright**             | E2E Tests             | `playwright.config.ts` |
+| **@testing-library/react** | Component Tests       | Bereits installiert ✅ |
+| **jest-environment-jsdom** | Browser-Umgebung      | Bereits installiert ✅ |
 
 ### Test-Verzeichnisstruktur
 
@@ -106,12 +106,12 @@ Call log:
 
 ### Mögliche Ursachen
 
-| Ursache | Wahrscheinlichkeit | Investigation |
-|---------|-------------------|---------------|
-| SSR Cold Start | Hoch | Next.js Build-Cache prüfen |
-| DB-Verbindung langsam | Mittel | Connection Pooling analysieren |
-| CI Runner Ressourcen | Mittel | GitHub Actions Logs prüfen |
-| Prisma Query Performance | Niedrig | Query Logging aktivieren |
+| Ursache                  | Wahrscheinlichkeit | Investigation                  |
+| ------------------------ | ------------------ | ------------------------------ |
+| SSR Cold Start           | Hoch               | Next.js Build-Cache prüfen     |
+| DB-Verbindung langsam    | Mittel             | Connection Pooling analysieren |
+| CI Runner Ressourcen     | Mittel             | GitHub Actions Logs prüfen     |
+| Prisma Query Performance | Niedrig            | Query Logging aktivieren       |
 
 ### Empfehlung
 
@@ -128,11 +128,11 @@ Call log:
 
 ### Dependencies
 
-| Package | Status |
-|---------|--------|
-| `@testing-library/react` | ✅ Installiert |
+| Package                     | Status         |
+| --------------------------- | -------------- |
+| `@testing-library/react`    | ✅ Installiert |
 | `@testing-library/jest-dom` | ✅ Installiert |
-| `jest-environment-jsdom` | ✅ Installiert |
+| `jest-environment-jsdom`    | ✅ Installiert |
 
 ### Jest-Config
 
@@ -191,15 +191,16 @@ const isStripeTestMode = (): boolean => {
 
 ### Vorhandene Tests
 
-| Test | Status | Grund für Skip |
-|------|--------|----------------|
+| Test                                     | Status     | Grund für Skip       |
+| ---------------------------------------- | ---------- | -------------------- |
 | `should complete payment with test card` | ⏭️ Skipped | Erfordert Clerk Auth |
 | `should handle declined card gracefully` | ⏭️ Skipped | Erfordert Clerk Auth |
-| `should display Stripe payment form` | ⏭️ Skipped | Erfordert Clerk Auth |
+| `should display Stripe payment form`     | ⏭️ Skipped | Erfordert Clerk Auth |
 
 ### Problem
 
 Tests werden in CI übersprungen weil:
+
 1. `isCI() === true` → Clerk ist deaktiviert
 2. Ohne Auth kein Zugriff auf `/checkout` (protected route)
 
@@ -212,6 +213,7 @@ Tests werden in CI übersprungen weil:
 ### Invoice Download Tests
 
 `tests/integration/api/bookings-invoice.spec.ts` existiert bereits:
+
 - Testet `/api/bookings/[bookingId]/invoice` Endpoint
 - Verifiziert Redirect zu Stripe PDF URL
 - Verwendet Test-Daten mit `stripeInvoicePdfUrl`
@@ -260,21 +262,21 @@ private shouldMockAuth(): boolean {
 
 ### E2E Tests mit `test.skip()`
 
-| Datei | Anzahl Skips | Grund |
-|-------|--------------|-------|
-| `course-detail.spec.ts` | 9 (ganzes describe) | CI Timeout (#384) |
-| `checkout.spec.ts` | 8 | Clerk Auth erforderlich |
-| `dashboard-sections.spec.ts` | 11 | Verschiedene Gründe |
-| `admin-course-*.spec.ts` | 3 Dateien | Clerk Auth erforderlich |
-| `locations.spec.ts` | 3 | API Auth erforderlich |
-| `build-info.spec.ts` | 1 | Unbekannt |
-| `error-boundary.spec.ts` | 1 | Unbekannt |
-| `protected-legacy-redirect.spec.ts` | 1 | Unbekannt |
+| Datei                               | Anzahl Skips        | Grund                   |
+| ----------------------------------- | ------------------- | ----------------------- |
+| `course-detail.spec.ts`             | 9 (ganzes describe) | CI Timeout (#384)       |
+| `checkout.spec.ts`                  | 8                   | Clerk Auth erforderlich |
+| `dashboard-sections.spec.ts`        | 11                  | Verschiedene Gründe     |
+| `admin-course-*.spec.ts`            | 3 Dateien           | Clerk Auth erforderlich |
+| `locations.spec.ts`                 | 3                   | API Auth erforderlich   |
+| `build-info.spec.ts`                | 1                   | Unbekannt               |
+| `error-boundary.spec.ts`            | 1                   | Unbekannt               |
+| `protected-legacy-redirect.spec.ts` | 1                   | Unbekannt               |
 
 ### Unit Tests mit `describe.skip()`
 
-| Datei | Tests | Grund |
-|-------|-------|-------|
+| Datei                     | Tests      | Grund     |
+| ------------------------- | ---------- | --------- |
 | `testimonial-api.spec.ts` | POST Tests | Unbekannt |
 
 ### Zusammenfassung

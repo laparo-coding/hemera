@@ -117,11 +117,11 @@ return res.status(200).json({ message: 'Booking rejected and removed' });
 
 ### Booking Model Fields
 
-| Field | Type | Purpose | Set When |
-|-------|------|---------|----------|
-| `paymentStatus` | `PaymentStatus` | Current booking state | Always |
-| `reviewedAt` | `DateTime?` | When admin reviewed | On **approve** only |
-| `reviewedBy` | `String?` | Admin user ID | On **approve** only |
+| Field           | Type            | Purpose               | Set When            |
+| --------------- | --------------- | --------------------- | ------------------- |
+| `paymentStatus` | `PaymentStatus` | Current booking state | Always              |
+| `reviewedAt`    | `DateTime?`     | When admin reviewed   | On **approve** only |
+| `reviewedBy`    | `String?`       | Admin user ID         | On **approve** only |
 
 ### PaymentStatus Flow
 
@@ -149,7 +149,7 @@ await prisma.booking.update({
 ```typescript
 // ✅ CORRECT: Atomic operation with precondition
 const result = await prisma.booking.updateMany({
-  where: { 
+  where: {
     id: bookingId,
     paymentStatus: 'PRE_BOOKED', // Ensures booking hasn't changed
   },
@@ -187,9 +187,9 @@ if (customerEmail && customerEmail.length > 0) {
 // ❌ WRONG: These fields are for approvals only
 await prisma.booking.deleteMany({
   where: { id: bookingId },
-  data: { 
-    reviewedAt: new Date(),  // Don't set on delete!
-    reviewedBy: userId,       // Don't set on delete!
+  data: {
+    reviewedAt: new Date(), // Don't set on delete!
+    reviewedBy: userId, // Don't set on delete!
   },
 });
 ```
@@ -227,7 +227,7 @@ Before processing a review request:
 ```typescript
 it('should approve PRE_BOOKED booking with reviewedAt and reviewedBy', async () => {
   const booking = await createTestBooking({ paymentStatus: 'PRE_BOOKED' });
-  
+
   const result = await prisma.booking.updateMany({
     where: { id: booking.id, paymentStatus: 'PRE_BOOKED' },
     data: {
@@ -236,10 +236,12 @@ it('should approve PRE_BOOKED booking with reviewedAt and reviewedBy', async () 
       reviewedBy: 'admin_123',
     },
   });
-  
+
   expect(result.count).toBe(1);
-  
-  const updated = await prisma.booking.findUnique({ where: { id: booking.id } });
+
+  const updated = await prisma.booking.findUnique({
+    where: { id: booking.id },
+  });
   expect(updated.paymentStatus).toBe('PENDING');
   expect(updated.reviewedAt).toBeDefined();
   expect(updated.reviewedBy).toBe('admin_123');
@@ -250,18 +252,20 @@ it('should approve PRE_BOOKED booking with reviewedAt and reviewedBy', async () 
 
 ```typescript
 it('should delete PRE_BOOKED booking and send email', async () => {
-  const booking = await createTestBooking({ 
+  const booking = await createTestBooking({
     paymentStatus: 'PRE_BOOKED',
     user: { email: 'test@example.com' },
   });
-  
+
   const result = await prisma.booking.deleteMany({
     where: { id: booking.id, paymentStatus: 'PRE_BOOKED' },
   });
-  
+
   expect(result.count).toBe(1);
-  
-  const deleted = await prisma.booking.findUnique({ where: { id: booking.id } });
+
+  const deleted = await prisma.booking.findUnique({
+    where: { id: booking.id },
+  });
   expect(deleted).toBeNull();
 });
 ```
@@ -271,7 +275,7 @@ it('should delete PRE_BOOKED booking and send email', async () => {
 ```typescript
 it('should prevent double approval with atomic updateMany', async () => {
   const booking = await createTestBooking({ paymentStatus: 'PRE_BOOKED' });
-  
+
   // Simulate concurrent approvals
   const [result1, result2] = await Promise.all([
     prisma.booking.updateMany({
@@ -283,7 +287,7 @@ it('should prevent double approval with atomic updateMany', async () => {
       data: { paymentStatus: 'PENDING' },
     }),
   ]);
-  
+
   // Only one should succeed
   expect(result1.count + result2.count).toBe(1);
 });
@@ -294,12 +298,14 @@ it('should prevent double approval with atomic updateMany', async () => {
 ## Implementation Reference
 
 **Live Implementation:**
+
 - API Route: [`app/api/admin/bookings/[id]/review/route.ts`](../../../app/api/admin/bookings/[id]/review/route.ts)
 - Schema: [`lib/schemas/admin/booking.ts`](../../../lib/schemas/admin/booking.ts)
 - Email Service: [`lib/services/loops.ts`](../../../lib/services/loops.ts)
 - Tests: [`tests/unit/api/admin-booking-review.spec.ts`](../../../tests/unit/api/admin-booking-review.spec.ts)
 
 **Related Documentation:**
+
 - [Complete Workflow](./PRE_BOOKED_APPROVAL_WORKFLOW.md) - Full feature documentation
 - [Quick Start](./QUICK_START.md) - Overview for new developers
 - [Booking Transitions](../../../tests/unit/services/booking-transitions.spec.ts) - All valid status transitions
@@ -309,6 +315,7 @@ it('should prevent double approval with atomic updateMany', async () => {
 ## When to Update This Guide
 
 Update this document when:
+
 - Adding new review actions (beyond approve/reject)
 - Changing database schema (new fields, constraints)
 - Modifying atomic operation patterns

@@ -1,4 +1,4 @@
-name: 'Bot: Label Dependabot PRs for Auto-Merge'
+name: "Bot: Label Dependabot PRs for Auto-Merge"
 
 on:
   pull_request_target:

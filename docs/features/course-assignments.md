@@ -34,22 +34,22 @@ Vor- und Nachbereitung ihrer Gehaltsverhandlungskurse:
 
 ### API Endpunkte
 
-| Endpunkt | Methoden | Beschreibung |
-|----------|----------|--------------|
-| `/api/my-courses/[bookingId]/preparation` | GET, PUT | Vorbereitungsdaten lesen/speichern |
-| `/api/my-courses/[bookingId]/resume` | GET, POST, DELETE | Lebenslauf-Management (Single-Active) |
-| `/api/my-courses/[bookingId]/summary` | GET, PUT | Video-Assets und View-Tracking |
-| `/api/my-courses/[bookingId]/debriefing` | GET, PUT | Nachbereitungsplan speichern |
-| `/api/my-courses/[bookingId]/result` | GET, PUT | Verhandlungsergebnisse erfassen |
+| Endpunkt                                  | Methoden          | Beschreibung                          |
+| ----------------------------------------- | ----------------- | ------------------------------------- |
+| `/api/my-courses/[bookingId]/preparation` | GET, PUT          | Vorbereitungsdaten lesen/speichern    |
+| `/api/my-courses/[bookingId]/resume`      | GET, POST, DELETE | Lebenslauf-Management (Single-Active) |
+| `/api/my-courses/[bookingId]/summary`     | GET, PUT          | Video-Assets und View-Tracking        |
+| `/api/my-courses/[bookingId]/debriefing`  | GET, PUT          | Nachbereitungsplan speichern          |
+| `/api/my-courses/[bookingId]/result`      | GET, PUT          | Verhandlungsergebnisse erfassen       |
 
 ### UI Komponenten
 
-| Komponente | Pfad | Beschreibung |
-|------------|------|--------------|
+| Komponente                   | Pfad                        | Beschreibung                         |
+| ---------------------------- | --------------------------- | ------------------------------------ |
 | `CourseParticipationStepper` | `components/participation/` | MUI Vertical Stepper mit 4 Schritten |
-| `SummaryAssetList` | `components/participation/` | Mux Video Player mit View-Tracking |
-| `ResumeUploader` | `components/participation/` | Drag-and-Drop PDF Upload |
-| `MyCoursesClient` | `app/my-courses/` | Dashboard mit Accordion-Navigation |
+| `SummaryAssetList`           | `components/participation/` | Mux Video Player mit View-Tracking   |
+| `ResumeUploader`             | `components/participation/` | Drag-and-Drop PDF Upload             |
+| `MyCoursesClient`            | `app/my-courses/`           | Dashboard mit Accordion-Navigation   |
 
 ## Status-Workflow
 
@@ -111,12 +111,14 @@ npx tsx scripts/seed-summary-assets.ts
 **Symptom**: Benutzer sieht "Upload fehlgeschlagen" Fehlermeldung
 
 **Diagnose**:
+
 1. Prüfen ob `BLOB_READ_WRITE_TOKEN` korrekt gesetzt ist
 2. Rollbar Logs filtern nach `participation.resume_upload_failed`
 3. Dateigröße prüfen (Limit: 5MB)
 4. Dateityp prüfen (nur PDF erlaubt)
 
 **Lösung**:
+
 - Bei Token-Problemen: Vercel Dashboard → Storage → Blob → Token regenerieren
 - Bei Größenproblemen: Benutzer informieren über 5MB Limit
 
@@ -125,6 +127,7 @@ npx tsx scripts/seed-summary-assets.ts
 **Symptom**: Zusammenfassungs-Schritt ist leer oder ausgeblendet
 
 **Diagnose**:
+
 1. Prüfen ob `CourseSummaryAsset` Einträge für den Kurs existieren
 2. Prüfen ob `ParticipationSummaryOverride` für Booking existiert
 3. Mux Playback ID Validität prüfen
@@ -138,6 +141,7 @@ SELECT * FROM participation_summary_overrides WHERE participation_id = '<partici
 ```
 
 **Lösung**:
+
 - Assets über Admin-UI oder direkt in DB hinzufügen
 - Mux Dashboard prüfen ob Asset "ready" Status hat
 
@@ -146,6 +150,7 @@ SELECT * FROM participation_summary_overrides WHERE participation_id = '<partici
 **Symptom**: Benutzer kann Schritt nicht abschließen
 
 **Diagnose**:
+
 1. Aktuellen Status in `course_participations` prüfen
 2. Pflichtfelder für aktuellen Schritt prüfen
 
@@ -156,6 +161,7 @@ WHERE booking_id = '<bookingId>';
 ```
 
 **Lösung**:
+
 - Status manuell korrigieren falls inkonsistent
 - Fehlende Pflichtfelder identifizieren und Benutzer informieren
 
@@ -163,23 +169,23 @@ WHERE booking_id = '<bookingId>';
 
 ### Rollbar Events
 
-| Event Type | Beschreibung |
-|------------|--------------|
-| `participation.step_started` | Benutzer beginnt neuen Schritt |
-| `participation.step_completed` | Schritt erfolgreich abgeschlossen |
-| `participation.resume_uploaded` | Lebenslauf hochgeladen |
-| `participation.resume_deleted` | Lebenslauf gelöscht |
-| `participation.summary_viewed` | Video-Asset angesehen |
-| `participation.flow_completed` | Gesamter Workflow abgeschlossen |
+| Event Type                      | Beschreibung                      |
+| ------------------------------- | --------------------------------- |
+| `participation.step_started`    | Benutzer beginnt neuen Schritt    |
+| `participation.step_completed`  | Schritt erfolgreich abgeschlossen |
+| `participation.resume_uploaded` | Lebenslauf hochgeladen            |
+| `participation.resume_deleted`  | Lebenslauf gelöscht               |
+| `participation.summary_viewed`  | Video-Asset angesehen             |
+| `participation.flow_completed`  | Gesamter Workflow abgeschlossen   |
 
 ### Fehler-Events
 
-| Event Type | Beschreibung |
-|------------|--------------|
+| Event Type                           | Beschreibung           |
+| ------------------------------------ | ---------------------- |
 | `participation.authorization_failed` | Unberechtigter Zugriff |
-| `participation.resume_upload_failed` | Upload-Fehler |
-| `participation.validation_failed` | Validierungsfehler |
-| `participation.database_error` | DB-Operationsfehler |
+| `participation.resume_upload_failed` | Upload-Fehler          |
+| `participation.validation_failed`    | Validierungsfehler     |
+| `participation.database_error`       | DB-Operationsfehler    |
 
 ### Dashboard-Abfrage (Rollbar)
 

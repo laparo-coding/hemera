@@ -39,16 +39,16 @@ to streamline the local development workflow. No database schema changes - infra
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Requirement | Status | Notes |
-|-------------|--------|-------|
-| Test-First Development | ✅ N/A | Infrastructure feature, no application code |
-| Code Quality & Formatting | ✅ PASS | Shell scripts follow existing patterns |
-| Feature Development Workflow | ✅ PASS | Spec created, plan in progress |
-| Error Handling & Observability | ✅ N/A | No new error paths in app code |
-| Authentication & Security | ✅ N/A | Local dev only, no auth changes |
-| Stripe Integration | ✅ N/A | No payment changes |
-| Deployment Standards | ✅ PASS | No deployment changes, local tooling only |
-| GitHub Actions Workflow | ✅ N/A | No CI/CD modifications |
+| Requirement                    | Status  | Notes                                       |
+| ------------------------------ | ------- | ------------------------------------------- |
+| Test-First Development         | ✅ N/A  | Infrastructure feature, no application code |
+| Code Quality & Formatting      | ✅ PASS | Shell scripts follow existing patterns      |
+| Feature Development Workflow   | ✅ PASS | Spec created, plan in progress              |
+| Error Handling & Observability | ✅ N/A  | No new error paths in app code              |
+| Authentication & Security      | ✅ N/A  | Local dev only, no auth changes             |
+| Stripe Integration             | ✅ N/A  | No payment changes                          |
+| Deployment Standards           | ✅ PASS | No deployment changes, local tooling only   |
+| GitHub Actions Workflow        | ✅ N/A  | No CI/CD modifications                      |
 
 **Initial Constitution Check**: PASS - Infrastructure-only feature, no constitutional violations.
 
@@ -82,6 +82,7 @@ specs/020-docker-postgres/
 Research completed and documented in [research.md](research.md).
 
 **Key Findings**:
+
 - PostgreSQL 16 is the production version (confirmed)
 - No special extensions required
 - Existing `docs/ops/database.md` has `docker run` command but no Compose file
@@ -89,12 +90,13 @@ Research completed and documented in [research.md](research.md).
 - Production guard recognizes `localhost` as safe
 
 **Decisions Made**:
-| Decision | Rationale |
-|----------|-----------|
-| Use Docker Compose | Declarative, reproducible, supports volumes and health checks |
-| PostgreSQL 16 | Matches production (Neon/Vercel) |
-| Named volume for data | Optional persistence across restarts |
-| Port 5432 default | Standard PostgreSQL port, matches existing docs |
+
+| Decision              | Rationale                                                     |
+| --------------------- | ------------------------------------------------------------- |
+| Use Docker Compose    | Declarative, reproducible, supports volumes and health checks |
+| PostgreSQL 16         | Matches production (Neon/Vercel)                              |
+| Named volume for data | Optional persistence across restarts                          |
+| Port 5432 default     | Standard PostgreSQL port, matches existing docs               |
 
 ## Phase 1: Design & Contracts
 
@@ -115,7 +117,7 @@ See [quickstart.md](quickstart.md) for developer setup instructions.
 #### docker-compose.yml (NEW)
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   postgres:
     image: postgres:16
@@ -141,6 +143,7 @@ volumes:
 #### .env.local.example (UPDATE)
 
 Add local Docker database URL:
+
 ```bash
 # Local Docker PostgreSQL (npm run db:docker:start)
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/hemera?schema=hemera
@@ -161,12 +164,12 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/hemera?schema=hemera
 
 ## Constitution Re-Check (Post-Design)
 
-| Requirement | Status | Notes |
-|-------------|--------|-------|
-| Test-First Development | ✅ N/A | No testable application code added |
-| Code Quality & Formatting | ✅ PASS | YAML follows standard formatting |
-| Deployment Standards | ✅ PASS | Local tooling, does not affect deployments |
-| Documentation | ✅ PASS | README/docs updated with setup instructions |
+| Requirement               | Status  | Notes                                       |
+| ------------------------- | ------- | ------------------------------------------- |
+| Test-First Development    | ✅ N/A  | No testable application code added          |
+| Code Quality & Formatting | ✅ PASS | YAML follows standard formatting            |
+| Deployment Standards      | ✅ PASS | Local tooling, does not affect deployments  |
+| Documentation             | ✅ PASS | README/docs updated with setup instructions |
 
 **Post-Design Constitution Check**: PASS
 
@@ -175,6 +178,7 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/hemera?schema=hemera
 _This section describes what the /tasks command will do - DO NOT execute during /plan_
 
 **Task Generation Strategy**:
+
 1. Create `docker-compose.yml` at repository root
 2. Update `package.json` with db:docker:* scripts
 3. Update `.env.local.example` with local DATABASE_URL
@@ -183,6 +187,7 @@ _This section describes what the /tasks command will do - DO NOT execute during 
 6. Update agent context file with new tooling
 
 **Ordering Strategy**:
+
 - Infrastructure first (docker-compose.yml)
 - Scripts second (package.json)
 - Documentation third (env example, docs)
@@ -197,6 +202,7 @@ _No constitutional violations - section not applicable._
 ## Progress Tracking
 
 **Phase Status**:
+
 - [x] Phase 0: Research complete (/plan command)
 - [x] Phase 1: Design complete (/plan command)
 - [x] Phase 2: Task planning complete (/plan command - describe approach only)
@@ -205,6 +211,7 @@ _No constitutional violations - section not applicable._
 - [ ] Phase 5: Validation passed
 
 **Gate Status**:
+
 - [x] Initial Constitution Check: PASS
 - [x] Post-Design Constitution Check: PASS
 - [x] All NEEDS CLARIFICATION resolved

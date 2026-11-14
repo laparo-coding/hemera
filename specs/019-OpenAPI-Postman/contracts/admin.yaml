@@ -17,31 +17,31 @@ paths:
             type: boolean
             default: true
       responses:
-        '200':
+        "200":
           description: List of all courses
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Course'
-        '401':
+                          $ref: "#/components/schemas/Course"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden - Admin role required
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       tags:
         - Admin
@@ -85,29 +85,29 @@ paths:
                 - price
                 - startDate
       responses:
-        '201':
+        "201":
           description: Course created
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Course'
-        '400':
+                        $ref: "#/components/schemas/Course"
+        "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /admin/courses/create:
     post:
@@ -128,12 +128,12 @@ paths:
             schema:
               type: object
       responses:
-        '201':
+        "201":
           description: Course created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
 
   /admin/courses/delete:
     delete:
@@ -157,12 +157,12 @@ paths:
                 courseId:
                   type: string
       responses:
-        '200':
+        "200":
           description: Course deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
 
   /admin/courses/{id}:
     get:
@@ -181,18 +181,18 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Course details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         allOf:
-                          - $ref: '#/components/schemas/Course'
+                          - $ref: "#/components/schemas/Course"
                           - type: object
                             properties:
                               enrollmentCount:
@@ -200,13 +200,13 @@ paths:
                               bookings:
                                 type: array
                                 items:
-                                  $ref: '#/components/schemas/Booking'
-        '404':
+                                  $ref: "#/components/schemas/Booking"
+        "404":
           description: Course not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     patch:
       tags:
         - Admin
@@ -252,23 +252,23 @@ paths:
                   type: string
                   format: uri
       responses:
-        '200':
+        "200":
           description: Course updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Course'
-        '404':
+                        $ref: "#/components/schemas/Course"
+        "404":
           description: Course not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
       tags:
         - Admin
@@ -285,18 +285,18 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Course deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
-        '404':
+                $ref: "#/components/schemas/StandardResponse"
+        "404":
           description: Course not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /admin/courses/{id}/transfer-enrollments:
     post:
@@ -327,13 +327,13 @@ paths:
               required:
                 - targetCourseId
       responses:
-        '200':
+        "200":
           description: Enrollments transferred
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -358,25 +358,25 @@ paths:
             type: string
             enum: [USER, ADMIN]
       responses:
-        '200':
+        "200":
           description: List of users
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/User'
-        '403':
+                          $ref: "#/components/schemas/User"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /admin/analytics:
     get:
@@ -399,13 +399,13 @@ paths:
             type: string
             format: date
       responses:
-        '200':
+        "200":
           description: Analytics data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -420,7 +420,7 @@ paths:
                           recentBookings:
                             type: array
                             items:
-                              $ref: '#/components/schemas/Booking'
+                              $ref: "#/components/schemas/Booking"
 
   /users:
     get:
@@ -431,19 +431,19 @@ paths:
       security:
         - clerkAuth: []
       responses:
-        '200':
+        "200":
           description: List of users
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/User'
+                          $ref: "#/components/schemas/User"
     post:
       tags:
         - Admin
@@ -471,17 +471,17 @@ paths:
               required:
                 - email
       responses:
-        '201':
+        "201":
           description: User created
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/User'
+                        $ref: "#/components/schemas/User"
 
   /users/{id}:
     get:
@@ -499,17 +499,17 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: User details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/User'
+                        $ref: "#/components/schemas/User"
     put:
       tags:
         - Admin
@@ -539,17 +539,17 @@ paths:
                   type: string
                   enum: [USER, ADMIN]
       responses:
-        '200':
+        "200":
           description: User updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/User'
+                        $ref: "#/components/schemas/User"
     delete:
       tags:
         - Admin
@@ -565,12 +565,12 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: User deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
 
   /users/profile:
     get:
@@ -581,17 +581,17 @@ paths:
       security:
         - clerkAuth: []
       responses:
-        '200':
+        "200":
           description: User profile
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/UserProfile'
+                        $ref: "#/components/schemas/UserProfile"
     put:
       tags:
         - Bookings
@@ -611,14 +611,14 @@ paths:
                 lastName:
                   type: string
       responses:
-        '200':
+        "200":
           description: Profile updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/UserProfile'
+                        $ref: "#/components/schemas/UserProfile"

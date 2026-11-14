@@ -58,15 +58,15 @@ context
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Notes |
-| ---- | ------ | ----- |
-| Test-First Development | PASS | The feature itself is a test and coverage initiative and preserves TDD ordering for downstream tasks. |
-| Rollbar Error Logging | PASS | No console-based observability pattern is introduced; coverage planning favors regression-prone error paths. |
-| Holistic Error Handling & Observability | PASS | Expanded test scope explicitly covers API behavior and critical user journeys, strengthening error-path verification. |
-| GitHub Actions Workflow Discipline | PASS | CI quality gating is an explicit requirement; no manual bypass path is introduced. |
-| Stripe Integration Fundamentals | PASS | Payment-related flows may be covered where relevant, but no production payment behavior is changed in planning. |
-| Security & Privacy | PASS | Planning assumes safe fixtures, auth-aware test design, and no exposure of secrets or PII in artifacts. |
-| Specs-First Workflow | PASS | Spec, research, plan, data model, contracts, and quickstart are all produced inside the feature directory. |
+| Gate                                    | Status | Notes                                                                                                                 |
+| --------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------- |
+| Test-First Development                  | PASS   | The feature itself is a test and coverage initiative and preserves TDD ordering for downstream tasks.                 |
+| Rollbar Error Logging                   | PASS   | No console-based observability pattern is introduced; coverage planning favors regression-prone error paths.          |
+| Holistic Error Handling & Observability | PASS   | Expanded test scope explicitly covers API behavior and critical user journeys, strengthening error-path verification. |
+| GitHub Actions Workflow Discipline      | PASS   | CI quality gating is an explicit requirement; no manual bypass path is introduced.                                    |
+| Stripe Integration Fundamentals         | PASS   | Payment-related flows may be covered where relevant, but no production payment behavior is changed in planning.       |
+| Security & Privacy                      | PASS   | Planning assumes safe fixtures, auth-aware test design, and no exposure of secrets or PII in artifacts.               |
+| Specs-First Workflow                    | PASS   | Spec, research, plan, data model, contracts, and quickstart are all produced inside the feature directory.            |
 
 **Violations**: None.
 

@@ -5,6 +5,7 @@
 This document describes the security measures implemented to prevent accidental SDK initialization in serverless/edge contexts without proper configuration. These measures protect against secret misuse and unexpected network calls.
 
 **Secured SDKs:**
+
 - Rollbar (error monitoring)
 - Upstash Redis/Ratelimit (distributed rate limiting)
 - Context7 (AI context retrieval)
@@ -22,6 +23,7 @@ Context7 is an optional SDK used for AI-powered context retrieval. Security meas
 - Named exports only (no default export) for tree-shaking and explicit imports.
 
 Configuration example:
+
 ```bash
 CONTEXT7_ENABLED=1
 CONTEXT7_API_KEY=ctx7sk_...
@@ -30,12 +32,14 @@ CONTEXT7_API_KEY=ctx7sk_...
 ## Problem Statement
 
 External SDKs can accidentally initialize in serverless/edge contexts if:
+
 1. No explicit enable flag is required (auto-activation based on env var presence)
 2. No runtime validation of credentials (malformed tokens accepted)
 3. Module-level initialization (eager loading instead of lazy)
 4. No guards for test/E2E environments
 
 This can lead to:
+
 - Secret misuse (tokens sent to wrong endpoints)
 - Unexpected network calls (cost, latency, errors)
 - Memory leaks (timers/intervals in serverless)
@@ -48,22 +52,26 @@ This can lead to:
 #### Security Measures
 
 **Token Validation:**
+
 - Requires valid server token (20+ characters minimum)
 - Validates token presence before initialization
 - Falls back to no-op instance if token invalid/missing
 
 **Environment Guards:**
+
 - Automatically disabled in test mode (`NODE_ENV=test`)
 - Automatically disabled in E2E mode (`E2E_TEST=1`)
 - Respects explicit disable flags (`ROLLBAR_ENABLED=0`)
 
 **Lazy Initialization:**
+
 - SDK only initialized when all conditions met:
   1. Not in test/E2E mode
   2. Not explicitly disabled
   3. Valid token present
 
 **Configuration:**
+
 ```bash
 # Required for Rollbar to initialize
 ROLLBAR_HEMERA_SERVER_TOKEN=<valid-token-20+-chars>
@@ -93,21 +101,25 @@ export const serverInstance = rollbarEnabled
 #### Security Measures
 
 **Explicit Opt-In:**
+
 - Requires `UPSTASH_ENABLED=1` flag (not just URL presence)
 - Validates URL format (must start with `https://`)
 - Validates token presence and non-empty
 
 **Package Detection:**
+
 - Gracefully handles missing packages (not installed by default)
 - Falls back to in-memory rate limiting if packages unavailable
 
 **Serverless Guards:**
+
 - `setInterval` cleanup only runs in long-running Node.js contexts
 - Disabled in Vercel serverless (`VERCEL=1`)
 - Disabled in AWS Lambda (`AWS_LAMBDA_FUNCTION_NAME` present)
 - Disabled in test mode
 
 **Configuration:**
+
 ```bash
 # Step 1: Install packages (optional)
 npm install @upstash/redis @upstash/ratelimit
@@ -144,26 +156,27 @@ function isUpstashEnabled(): boolean {
 
 ### Rollbar
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `ROLLBAR_HEMERA_SERVER_TOKEN` | Yes (for init) | - | Server-side token (20+ chars) |
-| `NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN` | No | - | Client-side token (20+ chars) |
-| `ROLLBAR_ENABLED` | No | `1` | Explicit disable: `0` |
-| `NEXT_PUBLIC_ROLLBAR_ENABLED` | No | `1` | Client-side disable: `0` |
+| Variable                                  | Required       | Default | Description                   |
+| ----------------------------------------- | -------------- | ------- | ----------------------------- |
+| `ROLLBAR_HEMERA_SERVER_TOKEN`             | Yes (for init) | -       | Server-side token (20+ chars) |
+| `NEXT_PUBLIC_ROLLBAR_HEMERA_CLIENT_TOKEN` | No             | -       | Client-side token (20+ chars) |
+| `ROLLBAR_ENABLED`                         | No             | `1`     | Explicit disable: `0`         |
+| `NEXT_PUBLIC_ROLLBAR_ENABLED`             | No             | `1`     | Client-side disable: `0`      |
 
 ### Upstash Redis
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `UPSTASH_ENABLED` | Yes | `0` | Explicit opt-in: `1` |
-| `UPSTASH_REDIS_REST_URL` | Yes (if enabled) | - | HTTPS URL to Redis instance |
-| `UPSTASH_REDIS_REST_TOKEN` | Yes (if enabled) | - | Authentication token |
+| Variable                   | Required         | Default | Description                 |
+| -------------------------- | ---------------- | ------- | --------------------------- |
+| `UPSTASH_ENABLED`          | Yes              | `0`     | Explicit opt-in: `1`        |
+| `UPSTASH_REDIS_REST_URL`   | Yes (if enabled) | -       | HTTPS URL to Redis instance |
+| `UPSTASH_REDIS_REST_TOKEN` | Yes (if enabled) | -       | Authentication token        |
 
 ## Testing
 
 ### Unit Tests
 
 Run Rollbar validation tests:
+
 ```bash
 npm run test tests/unit/monitoring/rollbar-validation.spec.ts
 ```
@@ -171,6 +184,7 @@ npm run test tests/unit/monitoring/rollbar-validation.spec.ts
 ### Manual Verification
 
 **Test 1: Rollbar without token**
+
 ```bash
 # Remove token
 unset ROLLBAR_HEMERA_SERVER_TOKEN
@@ -182,6 +196,7 @@ npm run dev
 ```
 
 **Test 2: Upstash without explicit enable**
+
 ```bash
 # Set URL/token but no enable flag
 export UPSTASH_REDIS_REST_URL=https://example.com
@@ -195,6 +210,7 @@ npm run dev
 ```
 
 **Test 3: Upstash with explicit enable**
+
 ```bash
 # Enable Upstash
 export UPSTASH_ENABLED=1
@@ -289,6 +305,7 @@ export function getNewSdkInstance() {
 **Symptom:** No errors logged to Rollbar dashboard
 
 **Checks:**
+
 1. Verify token is set: `echo $ROLLBAR_HEMERA_SERVER_TOKEN`
 2. Verify token length: `echo $ROLLBAR_HEMERA_SERVER_TOKEN | wc -c` (should be 20+)
 3. Check disable flags: `echo $ROLLBAR_ENABLED` (should not be `0`)
@@ -299,6 +316,7 @@ export function getNewSdkInstance() {
 **Symptom:** In-memory rate limiting used instead of distributed
 
 **Checks:**
+
 1. Verify enable flag: `echo $UPSTASH_ENABLED` (should be `1`)
 2. Verify URL format: `echo $UPSTASH_REDIS_REST_URL` (should start with `https://`)
 3. Verify token: `echo $UPSTASH_REDIS_REST_TOKEN` (should be non-empty)
@@ -309,6 +327,7 @@ export function getNewSdkInstance() {
 **Symptom:** Tests making real API calls to external services
 
 **Checks:**
+
 1. Verify test mode: `echo $NODE_ENV` (should be `test`)
 2. Check test worker env: `echo $VITEST` or `echo $JEST_WORKER_ID` (one test signal should be set during tests)
 3. Review SDK initialization logs in test output
@@ -316,15 +335,18 @@ export function getNewSdkInstance() {
 ### Related Resources
 
 **Documentation**
+
 - [Rollbar Integration](./rollbar-integration.md)
 - [Telemetry Reporting Policy](./reporting-policy.md) — PII guardrails and `additionalData` whitelist for `reportError()` calls
 - [reportError additionalData Keys](./reportError-additionalData-keys.md)
 
 **Code References**
+
 - [Rate Limiting implementation](../../lib/middleware/rate-limit.ts)
 - [check-reporterror-keys.mjs](../../scripts/check-reporterror-keys.mjs) — Automated whitelist enforcement script
 
 **Configuration**
+
 - [Environment Variables example](../../.env.local.example)
 - [Testing Guidelines](../tests/e2e.md)
 

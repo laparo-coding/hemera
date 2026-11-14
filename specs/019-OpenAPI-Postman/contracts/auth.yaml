@@ -10,13 +10,13 @@ paths:
       description: Returns available authentication providers (Clerk)
       security: []
       responses:
-        '200':
+        "200":
           description: List of auth providers
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:

@@ -1,16 +1,16 @@
-name: 'CI: Lighthouse'
+name: "CI: Lighthouse"
 
 on:
   # Manual trigger with URL input (preferred)
   workflow_dispatch:
     inputs:
       url:
-        description: 'Target URL to analyze (e.g., Vercel Preview URL)'
+        description: "Target URL to analyze (e.g., Vercel Preview URL)"
         required: true
         type: string
   # Optional: Run on PRs (will skip if no URL is provided via env PREVIEW_URL)
   pull_request:
-    branches: ['**']
+    branches: ["**"]
   # Auto-trigger after deployments update their status (e.g., Vercel GitHub App)
   deployment_status:
 
@@ -82,7 +82,7 @@ jobs:
         if: steps.target.outputs.url != ''
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
       - name: Install Lighthouse CI
         if: steps.target.outputs.url != ''

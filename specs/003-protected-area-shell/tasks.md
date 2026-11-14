@@ -53,7 +53,7 @@ research.md ✅, data-model.md ✅, contracts/ ✅, quickstart.md ✅
 - [x] T005 [P] Role permission contract test in `tests/e2e/role-based-navigation.spec.ts`
 - [x] T006 [P] Protected layout component contract test in `tests/e2e/protected-layout.spec.ts`
 - [x] T007 [P] Protected navigation component contract test in
-      `tests/e2e/protected-navigation.spec.ts`
+  `tests/e2e/protected-navigation.spec.ts`
 - [x] T008 [P] Middleware protection contract test in `tests/e2e/middleware-protection.spec.ts`
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
@@ -75,7 +75,7 @@ research.md ✅, data-model.md ✅, contracts/ ✅, quickstart.md ✅
 - [x] T017 Error boundary for auth failures in `components/AuthErrorBoundary.tsx`
 - [x] T018 Sign-out handling and redirect logic
 - [x] T019 Performance validation tests for TTFB <200ms and auth checks <100ms in
-      `tests/e2e/performance.spec.ts`
+  `tests/e2e/performance.spec.ts`
 
 ## Dependencies
 

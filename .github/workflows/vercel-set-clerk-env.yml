@@ -1,20 +1,20 @@
-name: 'Vercel: Set Clerk Env'
+name: "Vercel: Set Clerk Env"
 
 on:
   workflow_dispatch:
     inputs:
       clerk_publishable_key:
-        description: 'Optional: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY (overrides secret if provided)'
+        description: "Optional: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY (overrides secret if provided)"
         required: false
-        default: ''
+        default: ""
       clerk_secret_key:
-        description: 'Optional: CLERK_SECRET_KEY (overrides secret if provided)'
+        description: "Optional: CLERK_SECRET_KEY (overrides secret if provided)"
         required: false
-        default: ''
+        default: ""
       targets:
-        description: 'Targets to update (comma-separated). One or both of: preview,production'
+        description: "Targets to update (comma-separated). One or both of: preview,production"
         required: false
-        default: 'preview,production'
+        default: "preview,production"
 
 jobs:
   set-env:

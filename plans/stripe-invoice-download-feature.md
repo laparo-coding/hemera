@@ -50,6 +50,7 @@ model Booking {
 ```
 
 **Migration erstellen**:
+
 ```bash
 npx prisma migrate dev --name add_stripe_invoice_fields
 ```
@@ -109,6 +110,7 @@ async getInvoicePdfUrl(invoiceId: string): Promise<string | null> {
 ```
 
 Export hinzufügen:
+
 ```typescript
 export const getInvoicePdfUrl = (invoiceId: string) =>
   stripeService.getInvoicePdfUrl(invoiceId);
@@ -173,11 +175,11 @@ export async function GET(
 
     // 5. Invoice-URL abrufen
     let invoicePdfUrl = booking.stripeInvoicePdfUrl;
-    
+
     // Falls nicht gespeichert, von Stripe abrufen
     if (!invoicePdfUrl && booking.stripeInvoiceId) {
       invoicePdfUrl = await getInvoicePdfUrl(booking.stripeInvoiceId);
-      
+
       // In DB speichern für zukünftige Anfragen
       if (invoicePdfUrl) {
         await prisma.booking.update({
@@ -221,7 +223,7 @@ interface Booking {
   currency: string;
   paymentStatus: string;
   createdAt: string;
-  stripeInvoicePdfUrl?: string | null;  // NEU
+  stripeInvoicePdfUrl?: string | null; // NEU
 }
 ```
 
@@ -295,7 +297,7 @@ import {
   ArrowForwardOutlined,
   AttachMoneyOutlined,
   CheckCircleOutlined,
-  DownloadOutlined,  // NEU
+  DownloadOutlined, // NEU
   PendingOutlined,
   SchoolOutlined,
 } from '@mui/icons-material';
@@ -316,7 +318,7 @@ const bookingsWithDetails = bookings.map(booking => ({
   currency: booking.currency,
   paymentStatus: booking.paymentStatus,
   createdAt: booking.createdAt.toISOString(),
-  stripeInvoicePdfUrl: booking.stripeInvoicePdfUrl,  // NEU
+  stripeInvoicePdfUrl: booking.stripeInvoicePdfUrl, // NEU
 }));
 ```
 
@@ -478,6 +480,7 @@ graph LR
 Diese Implementierung ermöglicht es Nutzern, ihre Stripe-Rechnungen direkt vom Dashboard herunterzuladen. Der Ansatz nutzt die bestehende Stripe-Integration und erweitert sie um Invoice-Management. Die Lösung ist sicher, skalierbar und bietet eine gute Nutzererfahrung.
 
 **Geschätzter Aufwand**:
+
 - Backend: 3-4 Stunden
 - Frontend: 2-3 Stunden
 - Testing: 2-3 Stunden
@@ -486,5 +489,6 @@ Diese Implementierung ermöglicht es Nutzern, ihre Stripe-Rechnungen direkt vom 
 **Priorität**: Mittel (Nice-to-have Feature, verbessert UX)
 
 **Risiken**:
+
 - Gering: Nutzt bestehende Stripe-Funktionalität
 - Stripe-API-Änderungen könnten Anpassungen erfordern

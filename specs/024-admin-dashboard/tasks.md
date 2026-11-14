@@ -116,6 +116,7 @@ T033-T035 (Integration) → T036-T040 (Polish)
 ## Parallel Execution Examples
 
 ### Phase 3.2: All Contract + E2E Tests [P]
+
 ```bash
 # Run all test tasks in parallel (T003-T012)
 Task: "Contract test GET /api/admin/users in tests/contracts/admin-users-api.spec.ts"
@@ -131,6 +132,7 @@ Task: "E2E test reports page in tests/e2e/admin-reports.spec.ts"
 ```
 
 ### Phase 3.3a: Shared Components + Service Layer [P]
+
 ```bash
 # After Setup complete, run T013-T017 in parallel
 Task: "Create components/admin/AdminBreadcrumb.tsx"
@@ -141,6 +143,7 @@ Task: "Create lib/api/admin-reports.ts"
 ```
 
 ### Phase 3.3b: UI Components [P]
+
 ```bash
 # After API routes complete, run T022-T023 in parallel
 Task: "Create components/admin/UserList.tsx"
@@ -148,6 +151,7 @@ Task: "Create components/admin/ReportsPanel.tsx"
 ```
 
 ### Phase 3.5: Polish [P]
+
 ```bash
 # Run T036-T037 in parallel
 Task: "Add placeholder text to admin forms"
@@ -158,13 +162,13 @@ Task: "German translation audit"
 
 ## Summary
 
-| Phase | Tasks | Parallel? |
-|-------|-------|-----------|
-| 3.1 Setup | T001-T002 | Sequential |
-| 3.2 Tests | T003-T012 | ✅ All parallel |
-| 3.3 Core | T013-T032 | Partial (see deps) |
-| 3.4 Integration | T033-T035 | Sequential |
-| 3.5 Polish | T036-T040 | Partial |
+| Phase           | Tasks     | Parallel?          |
+| --------------- | --------- | ------------------ |
+| 3.1 Setup       | T001-T002 | Sequential         |
+| 3.2 Tests       | T003-T012 | ✅ All parallel    |
+| 3.3 Core        | T013-T032 | Partial (see deps) |
+| 3.4 Integration | T033-T035 | Sequential         |
+| 3.5 Polish      | T036-T040 | Partial            |
 
 **Total Tasks**: 40
 **Estimated Effort**: 4-6 hours with parallel execution

@@ -104,20 +104,20 @@ npm test
 
 ## API Quick Reference
 
-| Action | Method | Endpoint | Body |
-|--------|--------|----------|------|
-| List (course) | GET | `/api/testimonials?courseId=X&status=PUBLISHED` | – |
-| Create | POST | `/api/testimonials` | `{ bookingId, statement, nameDisplayFormat }` |
-| Update | PATCH | `/api/testimonials/[id]` | `{ statement?, nameDisplayFormat?, status? }` |
-| Approve | PATCH | `/api/testimonials/[id]` | `{ status: "PUBLISHED" }` |
-| Hide | PATCH | `/api/testimonials/[id]` | `{ status: "HIDDEN" }` |
+| Action        | Method | Endpoint                                        | Body                                          |
+| ------------- | ------ | ----------------------------------------------- | --------------------------------------------- |
+| List (course) | GET    | `/api/testimonials?courseId=X&status=PUBLISHED` | –                                             |
+| Create        | POST   | `/api/testimonials`                             | `{ bookingId, statement, nameDisplayFormat }` |
+| Update        | PATCH  | `/api/testimonials/[id]`                        | `{ statement?, nameDisplayFormat?, status? }` |
+| Approve       | PATCH  | `/api/testimonials/[id]`                        | `{ status: "PUBLISHED" }`                     |
+| Hide          | PATCH  | `/api/testimonials/[id]`                        | `{ status: "HIDDEN" }`                        |
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| Option A not showing | User has no city in Clerk profile metadata |
+| Issue                     | Solution                                      |
+| ------------------------- | --------------------------------------------- |
+| Option A not showing      | User has no city in Clerk profile metadata    |
 | Testimonial not appearing | Check status is PUBLISHED, not PENDING/HIDDEN |
-| 401 on POST | User not authenticated via Clerk |
-| 403 on approve | User lacks admin role |
-| Duplicate error | User already has testimonial for this booking |
+| 401 on POST               | User not authenticated via Clerk              |
+| 403 on approve            | User lacks admin role                         |
+| Duplicate error           | User already has testimonial for this booking |

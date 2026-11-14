@@ -16,16 +16,16 @@ paths:
       tags:
         - Reports
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DashboardStatsResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                $ref: "#/components/schemas/DashboardStatsResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /reports/health:
     get:
@@ -35,16 +35,16 @@ paths:
       tags:
         - Reports
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthStatusResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                $ref: "#/components/schemas/HealthStatusResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
 components:
   schemas:
@@ -55,7 +55,7 @@ components:
         - requestId
       properties:
         data:
-          $ref: '#/components/schemas/DashboardStats'
+          $ref: "#/components/schemas/DashboardStats"
         requestId:
           type: string
 
@@ -68,13 +68,13 @@ components:
         - users
       properties:
         bookings:
-          $ref: '#/components/schemas/BookingStats'
+          $ref: "#/components/schemas/BookingStats"
         revenue:
-          $ref: '#/components/schemas/RevenueStats'
+          $ref: "#/components/schemas/RevenueStats"
         courses:
-          $ref: '#/components/schemas/CourseStats'
+          $ref: "#/components/schemas/CourseStats"
         users:
-          $ref: '#/components/schemas/UserStats'
+          $ref: "#/components/schemas/UserStats"
 
     BookingStats:
       type: object
@@ -131,7 +131,7 @@ components:
         utilization:
           type: array
           items:
-            $ref: '#/components/schemas/CourseUtilization'
+            $ref: "#/components/schemas/CourseUtilization"
 
     CourseUtilization:
       type: object
@@ -171,7 +171,7 @@ components:
         growth:
           type: array
           items:
-            $ref: '#/components/schemas/MonthlyGrowth'
+            $ref: "#/components/schemas/MonthlyGrowth"
 
     MonthlyGrowth:
       type: object
@@ -193,7 +193,7 @@ components:
         - requestId
       properties:
         data:
-          $ref: '#/components/schemas/HealthStatus'
+          $ref: "#/components/schemas/HealthStatus"
         requestId:
           type: string
 
@@ -224,11 +224,11 @@ components:
             - stripe
           properties:
             database:
-              $ref: '#/components/schemas/ServiceCheck'
+              $ref: "#/components/schemas/ServiceCheck"
             clerk:
-              $ref: '#/components/schemas/ServiceCheck'
+              $ref: "#/components/schemas/ServiceCheck"
             stripe:
-              $ref: '#/components/schemas/ServiceCheck'
+              $ref: "#/components/schemas/ServiceCheck"
 
     ServiceCheck:
       type: object
@@ -264,10 +264,10 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
     Forbidden:
       description: Not authorized (admin required)
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"

@@ -13,6 +13,7 @@ The focus is on view models and API response types for the admin UI.
 ## Existing Entities Used
 
 ### User (Clerk-managed)
+
 External entity managed by Clerk. Accessed via Clerk SDK.
 
 ```typescript
@@ -22,7 +23,7 @@ interface ClerkUserView {
   emailAddresses: { emailAddress: string }[];
   firstName: string | null;
   lastName: string | null;
-  createdAt: number;        // Unix timestamp
+  createdAt: number; // Unix timestamp
   lastSignInAt: number | null;
   publicMetadata: {
     role?: 'admin' | 'user';
@@ -31,6 +32,7 @@ interface ClerkUserView {
 ```
 
 ### User (Prisma - local extension)
+
 Local user record linking Clerk ID to app-specific data.
 
 ```prisma
@@ -49,6 +51,7 @@ model User {
 ```
 
 ### Course (existing)
+
 ```prisma
 model Course {
   id          String   @id @default(cuid())
@@ -62,6 +65,7 @@ model Course {
 ```
 
 ### Booking (existing)
+
 ```prisma
 model Booking {
   id         String        @id @default(cuid())
@@ -83,23 +87,25 @@ model Booking {
 ## View Models (API Response Types)
 
 ### AdminUserListItem
+
 Combined view of Clerk user data + local user extension.
 
 ```typescript
 interface AdminUserListItem {
-  id: string;              // Clerk user ID
+  id: string; // Clerk user ID
   email: string;
   firstName: string | null;
   lastName: string | null;
-  fullName: string;        // Computed: firstName + lastName or email
+  fullName: string; // Computed: firstName + lastName or email
   role: 'admin' | 'user';
   isOutperformer: boolean; // From local User table
-  createdAt: string;       // ISO date
+  createdAt: string; // ISO date
   lastSignInAt: string | null;
 }
 ```
 
 ### AdminUserListResponse
+
 Paginated user list response.
 
 ```typescript
@@ -115,6 +121,7 @@ interface AdminUserListResponse {
 ```
 
 ### DashboardStats
+
 Statistics for Reports & Analytics.
 
 ```typescript
@@ -126,7 +133,7 @@ interface DashboardStats {
     thisMonth: number;
   };
   revenue: {
-    total: number;         // in cents
+    total: number; // in cents
     thisMonth: number;
     currency: 'EUR';
   };
@@ -151,12 +158,13 @@ interface CourseUtilization {
 }
 
 interface MonthlyGrowth {
-  month: string;  // YYYY-MM format
+  month: string; // YYYY-MM format
   count: number;
 }
 ```
 
 ### HealthStatus
+
 Extended health status for admin display.
 
 ```typescript
@@ -174,7 +182,7 @@ interface HealthStatus {
 
 interface ServiceCheck {
   status: 'ok' | 'error';
-  latency?: number;  // ms
+  latency?: number; // ms
   message?: string;
 }
 ```
@@ -184,21 +192,25 @@ interface ServiceCheck {
 ## State Transitions
 
 ### Course Publication State
+
 ```
 UNPUBLISHED <--toggle--> PUBLISHED
      │                        │
      └──── Direct toggle ─────┘
 ```
+
 - Toggle via API PATCH /api/admin/courses/[id]
 - No intermediate states
 - Immediate effect on public visibility
 
 ### User Role Assignment
+
 ```
 USER <--assign--> ADMIN
   │                  │
   └── Via Clerk ─────┘
 ```
+
 - Managed via Clerk publicMetadata
 - Requires Clerk Backend API call
 - Only admins can assign roles
@@ -208,17 +220,19 @@ USER <--assign--> ADMIN
 ## Validation Rules
 
 ### User Actions
-| Action | Validation |
-|--------|------------|
-| Delete user | Cannot delete self |
-| Assign admin role | Must be admin |
-| Toggle outperformer | Must be admin |
+
+| Action              | Validation         |
+| ------------------- | ------------------ |
+| Delete user         | Cannot delete self |
+| Assign admin role   | Must be admin      |
+| Toggle outperformer | Must be admin      |
 
 ### Course Actions
-| Action | Validation |
-|--------|------------|
-| Toggle publish | Course must exist |
-| Link material | Material must exist |
+
+| Action         | Validation          |
+| -------------- | ------------------- |
+| Toggle publish | Course must exist   |
+| Link material  | Material must exist |
 
 ---
 
@@ -258,11 +272,13 @@ USER <--assign--> ADMIN
 ## No Schema Changes Required
 
 This feature does not require database migrations. All necessary fields exist:
+
 - `User.isOutperformer` - Added in Spec 014/021
 - `Course.isPublished` - Existing field
 - `CourseMaterial` - Added in Spec 016
 
 The implementation focuses on:
+
 1. New API endpoints for aggregated views
 2. UI components for admin dashboard
 3. Integration with Clerk Backend API for user listing

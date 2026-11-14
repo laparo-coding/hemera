@@ -4,7 +4,7 @@
 openapi: 3.1.0
 info:
   title: Hemera Service API (spec)
-  version: '1.0'
+  version: "1.0"
 
 paths:
   /api/service/courses:
@@ -14,7 +14,7 @@ paths:
       summary: CORS preflight for courses endpoint
       description: Handle CORS preflight requests
       responses:
-        '204':
+        "204":
           description: No Content
     get:
       tags: [Service API]
@@ -58,22 +58,22 @@ paths:
             minimum: 0
             default: 0
       responses:
-        '200':
+        "200":
           description: Course list retrieved successfully
           headers:
-            $ref: '#/components/headers/StandardServiceHeaders'
+            $ref: "#/components/headers/StandardServiceHeaders"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseListResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-        '500':
-          $ref: '#/components/responses/InternalError'
+                $ref: "#/components/schemas/CourseListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
 
   /api/service/courses/{id}:
     get:
@@ -93,24 +93,24 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Course details retrieved successfully
           headers:
-            $ref: '#/components/headers/StandardServiceHeaders'
+            $ref: "#/components/headers/StandardServiceHeaders"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseDetailResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-        '500':
-          $ref: '#/components/responses/InternalError'
+                $ref: "#/components/schemas/CourseDetailResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
 
   /api/service/participations/{id}:
     get:
@@ -130,24 +130,24 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Participation details retrieved successfully
           headers:
-            $ref: '#/components/headers/StandardServiceHeaders'
+            $ref: "#/components/headers/StandardServiceHeaders"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ParticipationResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-        '500':
-          $ref: '#/components/responses/InternalError'
+                $ref: "#/components/schemas/ParticipationResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
 
   /api/service/participations/{id}/result:
     put:
@@ -171,28 +171,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateParticipationResult'
+              $ref: "#/components/schemas/UpdateParticipationResult"
       responses:
-        '200':
+        "200":
           description: Participation result updated successfully
           headers:
-            $ref: '#/components/headers/StandardServiceHeaders'
+            $ref: "#/components/headers/StandardServiceHeaders"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UpdateResultResponse'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
-        '500':
-          $ref: '#/components/responses/InternalError'
+                $ref: "#/components/schemas/UpdateResultResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
 
 components:
   headers:
@@ -229,19 +229,19 @@ components:
           oneOf:
             - type: array
               items:
-                $ref: '#/components/schemas/ServiceCourse'
+                $ref: "#/components/schemas/ServiceCourse"
             - type: object
               properties:
                 courses:
                   type: array
                   items:
-                    $ref: '#/components/schemas/ServiceCourse'
+                    $ref: "#/components/schemas/ServiceCourse"
                 total:
                   type: integer
                   minimum: 0
                   example: 25
         pagination:
-          $ref: '#/components/schemas/Pagination'
+          $ref: "#/components/schemas/Pagination"
 
     CourseDetailResponse:
       type: object
@@ -256,11 +256,11 @@ components:
             legacy wrapped object `{ course: { ... } }` when
             `FEATURE_SERVICE_RESPONSE_LEGACY=true`.
           oneOf:
-            - $ref: '#/components/schemas/ServiceCourseDetail'
+            - $ref: "#/components/schemas/ServiceCourseDetail"
             - type: object
               properties:
                 course:
-                  $ref: '#/components/schemas/ServiceCourseDetail'
+                  $ref: "#/components/schemas/ServiceCourseDetail"
 
     ParticipationResponse:
       type: object
@@ -275,11 +275,11 @@ components:
             legacy wrapped object `{ participation: { ... } }` when
             `FEATURE_SERVICE_RESPONSE_LEGACY=true`.
           oneOf:
-            - $ref: '#/components/schemas/ServiceParticipation'
+            - $ref: "#/components/schemas/ServiceParticipation"
             - type: object
               properties:
                 participation:
-                  $ref: '#/components/schemas/ServiceParticipation'
+                  $ref: "#/components/schemas/ServiceParticipation"
 
     UpdateResultResponse:
       description: |
@@ -341,10 +341,10 @@ components:
         timestamp:
           type: string
           format: date-time
-          example: '2026-02-14T12:00:00Z'
+          example: "2026-02-14T12:00:00Z"
         version:
           type: string
-          example: '1.0'
+          example: "1.0"
 
     ServiceCourse:
       type: object
@@ -367,12 +367,12 @@ components:
           type: string
           format: date-time
           nullable: true
-          example: '2026-03-15T09:00:00Z'
+          example: "2026-03-15T09:00:00Z"
         endDate:
           type: string
           format: date-time
           nullable: true
-          example: '2026-03-17T17:00:00Z'
+          example: "2026-03-17T17:00:00Z"
         participantCount:
           type: integer
           minimum: 0
@@ -399,12 +399,12 @@ components:
           type: string
           format: date-time
           nullable: true
-          example: '2026-03-15T09:00:00Z'
+          example: "2026-03-15T09:00:00Z"
         endDate:
           type: string
           format: date-time
           nullable: true
-          example: '2026-03-17T17:00:00Z'
+          example: "2026-03-17T17:00:00Z"
         participations:
           type: array
           items:
@@ -426,7 +426,7 @@ components:
               createdAt:
                 type: string
                 format: date-time
-                example: '2026-02-01T10:00:00Z'
+                example: "2026-02-01T10:00:00Z"
 
     ServiceParticipation:
       type: object
@@ -469,15 +469,15 @@ components:
           type: string
           format: date-time
           nullable: true
-          example: '2026-03-20T14:30:00Z'
+          example: "2026-03-20T14:30:00Z"
         createdAt:
           type: string
           format: date-time
-          example: '2026-02-01T10:00:00Z'
+          example: "2026-02-01T10:00:00Z"
         updatedAt:
           type: string
           format: date-time
-          example: '2026-03-20T14:30:00Z'
+          example: "2026-03-20T14:30:00Z"
 
     UpdateParticipationResult:
       type: object
@@ -536,12 +536,12 @@ components:
     Unauthorized:
       description: Not authenticated
       headers:
-        $ref: '#/components/headers/StandardServiceHeaders'
+        $ref: "#/components/headers/StandardServiceHeaders"
       content:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ErrorResponse'
+              - $ref: "#/components/schemas/ErrorResponse"
               - type: object
                 properties:
                   error:
@@ -554,12 +554,12 @@ components:
     Forbidden:
       description: Insufficient permissions
       headers:
-        $ref: '#/components/headers/StandardServiceHeaders'
+        $ref: "#/components/headers/StandardServiceHeaders"
       content:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ErrorResponse'
+              - $ref: "#/components/schemas/ErrorResponse"
               - type: object
                 properties:
                   error:
@@ -572,12 +572,12 @@ components:
     NotFound:
       description: Resource not found
       headers:
-        $ref: '#/components/headers/StandardServiceHeaders'
+        $ref: "#/components/headers/StandardServiceHeaders"
       content:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ErrorResponse'
+              - $ref: "#/components/schemas/ErrorResponse"
               - type: object
                 properties:
                   error:
@@ -590,12 +590,12 @@ components:
     ValidationError:
       description: Invalid request data
       headers:
-        $ref: '#/components/headers/StandardServiceHeaders'
+        $ref: "#/components/headers/StandardServiceHeaders"
       content:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ErrorResponse'
+              - $ref: "#/components/schemas/ErrorResponse"
               - type: object
                 properties:
                   error:
@@ -632,7 +632,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ErrorResponse'
+              - $ref: "#/components/schemas/ErrorResponse"
               - type: object
                 properties:
                   error:
@@ -645,12 +645,12 @@ components:
     InternalError:
       description: Internal server error
       headers:
-        $ref: '#/components/headers/StandardServiceHeaders'
+        $ref: "#/components/headers/StandardServiceHeaders"
       content:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ErrorResponse'
+              - $ref: "#/components/schemas/ErrorResponse"
               - type: object
                 properties:
                   error:

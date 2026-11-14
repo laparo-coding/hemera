@@ -148,6 +148,7 @@ reviewedBy      String?   @map("reviewed_by")
 **Hauptkomponente:** [components/admin/CourseForm.tsx](components/admin/CourseForm.tsx)
 
 Die `CourseForm`-Komponente verwendet:
+
 - React Hook Form mit Zod-Validierung
 - Controller-Pattern für alle Felder
 - Teaser-Feld als Referenz für Textareas mit Zeichenbegrenzung (300 chars)
@@ -170,10 +171,11 @@ Die `CourseForm`-Komponente verwendet:
       inputProps={{ maxLength: 300 }}
     />
   )}
-/>
+/>;
 ```
 
 **Erweiterungen benötigt in:**
+
 - `lib/schemas/admin/course.ts` - Zod-Schema
 - `lib/db/admin/courses.ts` - `createCourse()` und `updateCourse()`
 - `lib/types/admin.ts` - TypeScript-Typen
@@ -197,6 +199,7 @@ export interface CourseDetailCourse {
 ```
 
 **Neue Felder benötigt:**
+
 - `recommended: string | null`
 - `notRecommended: string | null`
 
@@ -206,6 +209,7 @@ Eine neue Komponente `CourseRecommendationSection` sollte erstellt werden.
 ### 3.3 Course Listing (Public)
 
 **Relevante Dateien:**
+
 - `lib/api/courses.ts` - `getCourseBySlug()`, `getCourseById()`
 - `components/CourseListing.tsx`
 - `app/courses/page.tsx`
@@ -219,7 +223,7 @@ export async function getPublishedCourses() {
   return prisma.course.findMany({
     where: {
       isPublished: true,
-      isNonPublic: false,  // NEU: Nicht-öffentliche ausschließen
+      isNonPublic: false, // NEU: Nicht-öffentliche ausschließen
     },
     // ...
   });
@@ -229,6 +233,7 @@ export async function getPublishedCourses() {
 ### 3.4 Booking Flow
 
 **Hauptdateien:**
+
 - [app/api/payment/create-intent/route.ts](app/api/payment/create-intent/route.ts) - Payment Intent Erstellung
 - [lib/services/booking.ts](lib/services/booking.ts) - `createBooking()`
 - [components/checkout/CheckoutPageClient.tsx](components/checkout/CheckoutPageClient.tsx)
@@ -242,7 +247,7 @@ export async function getPublishedCourses() {
 // Prüfen ob Voraussetzungen erforderlich (INTERMEDIATE/ADVANCED)
 if (course.level !== 'BEGINNER') {
   const hasPrerequisite = await checkUserPrerequisite(userId, course.level);
-  
+
   if (!hasPrerequisite) {
     // Booking mit requiresReview = true erstellen
     // Admin-Email senden via Loops.so
@@ -255,6 +260,7 @@ if (course.level !== 'BEGINNER') {
 **API-Endpoint:** [app/api/admin/users/route.ts](app/api/admin/users/route.ts)
 
 Aktuell nur GET-Methode zum Auflisten von Usern. Für Feature 4 benötigt:
+
 - PATCH-Endpoint zum Aktualisieren des `isOutperformer`-Flags
 - Frontend-UI im Admin-Panel
 
@@ -273,24 +279,25 @@ Es gibt **keine bestehende Loops.so-Integration** im Projekt. Dies ist eine neue
 ### Implementierungsplan
 
 1. **NPM-Paket installieren:**
+
    ```bash
    npm install loops
    ```
 
 2. **Umgebungsvariablen hinzufügen:**
+
    ```env
    LOOPS_API_KEY=xxxxxxxxxx
    ADMIN_NOTIFICATION_EMAIL=admin@hemera-academy.de
    ```
 
 3. **Service-Datei erstellen:**
+
    ```typescript
    // lib/services/loops.ts
    import { LoopsClient } from 'loops';
-   
-   const client = new LoopsClient(process.env.LOOPS_API_KEY);
-   
-   export async function sendPrerequisiteReviewEmail(data: {
+      const client = new LoopsClient(process.env.LOOPS_API_KEY);
+      export async function sendPrerequisiteReviewEmail(data: {
      customerName: string;
      customerEmail: string;
      courseName: string;
@@ -321,15 +328,16 @@ Es gibt **keine bestehende Loops.so-Integration** im Projekt. Dies ist eine neue
 
 ### Level-Hierarchie
 
-| Level | Erforderliche Voraussetzung |
-|-------|----------------------------|
-| BEGINNER | Keine |
-| INTERMEDIATE | Mindestens ein BEGINNER-Kurs abgeschlossen |
-| ADVANCED | Mindestens ein INTERMEDIATE-Kurs abgeschlossen |
+| Level        | Erforderliche Voraussetzung                    |
+| ------------ | ---------------------------------------------- |
+| BEGINNER     | Keine                                          |
+| INTERMEDIATE | Mindestens ein BEGINNER-Kurs abgeschlossen     |
+| ADVANCED     | Mindestens ein INTERMEDIATE-Kurs abgeschlossen |
 
 ### "Abgeschlossen" Definition
 
 Ein Kurs gilt als abgeschlossen wenn:
+
 1. Booking mit `paymentStatus = 'PAID'` existiert
 2. **UND** das Kursdatum in der Vergangenheit liegt (`course.endDate < now()`)
 
@@ -341,10 +349,9 @@ export async function checkUserPrerequisite(
   userEmail: string,
   requiredLevel: CourseLevel
 ): Promise<boolean> {
-  const requiredCompletedLevel = requiredLevel === 'ADVANCED' 
-    ? 'INTERMEDIATE' 
-    : 'BEGINNER';
-    
+  const requiredCompletedLevel =
+    requiredLevel === 'ADVANCED' ? 'INTERMEDIATE' : 'BEGINNER';
+
   const completedCourses = await prisma.booking.findMany({
     where: {
       user: { email: userEmail },
@@ -356,7 +363,7 @@ export async function checkUserPrerequisite(
     },
     take: 1,
   });
-  
+
   return completedCourses.length > 0;
 }
 ```
@@ -368,6 +375,7 @@ export async function checkUserPrerequisite(
 ### Booking via Direktlink
 
 Nicht-öffentliche Kurse können weiterhin gebucht werden über:
+
 - `/courses/{slug}` - Detailseite bleibt erreichbar
 - `/checkout?courseId={id}` - Checkout funktioniert
 
@@ -397,10 +405,12 @@ export async function getAllCoursesForAdmin() {
 ## 7. Betroffene Dateien
 
 ### Schema & Migration
+
 - `prisma/schema.prisma` - Neue Felder
 - `prisma/migrations/xxx_learning_path/migration.sql` - Migration
 
 ### Backend
+
 - `lib/db/admin/courses.ts` - CRUD erweitern
 - `lib/schemas/admin/course.ts` - Zod-Schema
 - `lib/types/admin.ts` - TypeScript-Typen
@@ -411,12 +421,14 @@ export async function getAllCoursesForAdmin() {
 - `app/api/payment/create-intent/route.ts` - Prerequisite Check
 
 ### Frontend - Admin
+
 - `components/admin/CourseForm.tsx` - Neue Felder
 - `app/admin/database/page.tsx` - User Outperformer Toggle
 - `app/api/admin/users/route.ts` - PATCH für isOutperformer
 - `app/api/admin/bookings/[id]/review/route.ts` - NEU: Review Endpoint
 
 ### Frontend - Public
+
 - `components/course-detail/CourseRecommendationSection.tsx` - NEU
 - `components/course-detail/CourseDetailLayout.tsx` - Section einbinden
 - `components/course-detail/index.ts` - Export
@@ -427,13 +439,16 @@ export async function getAllCoursesForAdmin() {
 ## 8. Test-Strategie
 
 ### Unit Tests
+
 - `tests/unit/services/prerequisite.spec.ts` - Level-Prüfung
 - `tests/unit/services/loops.spec.ts` - E-Mail (mocked)
 
 ### Integration Tests
+
 - `tests/integration/booking-prerequisite.spec.ts` - Booking mit/ohne Voraussetzung
 
 ### E2E Tests
+
 - `tests/e2e/admin-course-form.spec.ts` - Neue Felder im Admin
 - `tests/e2e/course-listing.spec.ts` - isNonPublic Filter
 
@@ -465,11 +480,11 @@ ALTER TABLE bookings
 
 ### Risiken
 
-| Risiko | Auswirkung | Mitigation |
-|--------|-----------|------------|
-| Loops.so API-Ausfälle | Admin erhält keine Benachrichtigung | Retry-Mechanismus + Fallback-Logging |
-| Falsche Voraussetzungs-Prüfung | Kunden falsch abgelehnt | Manuelle Review bleibt möglich |
-| Performance bei Booking | Zusätzliche DB-Queries | Indexes auf relevante Felder |
+| Risiko                         | Auswirkung                          | Mitigation                           |
+| ------------------------------ | ----------------------------------- | ------------------------------------ |
+| Loops.so API-Ausfälle          | Admin erhält keine Benachrichtigung | Retry-Mechanismus + Fallback-Logging |
+| Falsche Voraussetzungs-Prüfung | Kunden falsch abgelehnt             | Manuelle Review bleibt möglich       |
+| Performance bei Booking        | Zusätzliche DB-Queries              | Indexes auf relevante Felder         |
 
 ### Offene Fragen
 
@@ -490,9 +505,11 @@ ALTER TABLE bookings
 ## 11. Dependencies
 
 ### Neue npm-Pakete
+
 - `loops` - Loops.so SDK für transaktionale E-Mails
 
 ### Neue Umgebungsvariablen
+
 ```env
 LOOPS_API_KEY=xxx
 ADMIN_NOTIFICATION_EMAIL=admin@hemera-academy.de
@@ -510,6 +527,7 @@ Die 021-learning-path Feature-Implementierung erfordert:
 4. **1 Migration** für alle Datenbankänderungen
 
 Das bestehende Code-Muster für:
+
 - Zod-Validierung in `lib/schemas/`
 - Prisma-Queries in `lib/db/`
 - Admin-Forms mit React Hook Form

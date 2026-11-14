@@ -238,12 +238,14 @@ T021, T022      → T023 → T024 → T025
 ## Parallel Execution Examples
 
 ### Batch 1: Foundation (after migration)
+
 ```
 Task: "T003 [P] Extend Zod schemas in lib/schemas/admin/course-material.ts"
 Task: "T004 [P] Extend Prisma CRUD helpers in lib/api/course-material.ts"
 ```
 
 ### Batch 2: Tests First (TDD)
+
 ```
 Task: "T005 [P] Unit tests — type field + file validation in tests/unit/schemas/course-material.spec.ts"
 Task: "T006 [P] Contract tests — GET endpoints return type in tests/contracts/course-material-api.spec.ts"
@@ -251,6 +253,7 @@ Task: "T006 [P] Contract tests — GET endpoints return type in tests/contracts/
 _Then sequential: T007 → T008 → T009 (same file as T006)_
 
 ### Batch 3: API Implementation
+
 ```
 Task: "T011 [P] GET list — add type to response in app/api/admin/course-material/route.ts"
 Task: "T012 [P] GET single — add type + blob fields in app/api/admin/course-material/[id]/route.ts"
@@ -258,6 +261,7 @@ Task: "T012 [P] GET single — add type + blob fields in app/api/admin/course-ma
 _Then sequential per file: T013 after T011, T014 after T012_
 
 ### Batch 4: UI Components
+
 ```
 Task: "T016 [P] Create components/admin/MaterialTypeSelector.tsx"
 Task: "T017 [P] Create components/admin/SlideControlUploadForm.tsx"
@@ -266,6 +270,7 @@ Task: "T018 [P] Add type badge chip to components/admin/CourseMaterialTable.tsx"
 _Then: T019 (create page), T020 (edit page)_
 
 ### Batch 5: Quality Gates
+
 ```
 Task: "T021 [P] Run lint"
 Task: "T022 [P] Run typecheck"
@@ -291,13 +296,13 @@ _Then: T023 (test suite) → T024 (manual) → T025 (docs)_
 
 ## Summary
 
-| Phase | Tasks | Parallel? | Scope |
-|-------|-------|-----------|-------|
-| 3.1: Foundation | T001–T004 | T003 ∥ T004 | Migration, schemas, CRUD |
-| 3.2: Tests First | T005–T010 | T005 ∥ T006, then sequential | 12 contract + 18 unit tests |
-| 3.3: API Implementation | T011–T015 | T011 ∥ T012, then sequential | GET/POST/PUT extensions |
-| 3.4: UI Components | T016–T020 | T016 ∥ T017 ∥ T018, then sequential | Selector, upload form, badge, pages |
-| 3.5: Polish | T021–T025 | T021 ∥ T022, then sequential | Lint, typecheck, test, manual, docs |
+| Phase                   | Tasks     | Parallel?                           | Scope                               |
+| ----------------------- | --------- | ----------------------------------- | ----------------------------------- |
+| 3.1: Foundation         | T001–T004 | T003 ∥ T004                         | Migration, schemas, CRUD            |
+| 3.2: Tests First        | T005–T010 | T005 ∥ T006, then sequential        | 12 contract + 18 unit tests         |
+| 3.3: API Implementation | T011–T015 | T011 ∥ T012, then sequential        | GET/POST/PUT extensions             |
+| 3.4: UI Components      | T016–T020 | T016 ∥ T017 ∥ T018, then sequential | Selector, upload form, badge, pages |
+| 3.5: Polish             | T021–T025 | T021 ∥ T022, then sequential        | Lint, typecheck, test, manual, docs |
 
 **Total Tasks**: 25
 **TDD Coverage**: 30 test cases (12 contract + 18 unit) written before implementation

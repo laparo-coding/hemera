@@ -204,11 +204,13 @@ T020 (page) → T021-T022 (polish needs working page)
 ## Parallel Execution Examples
 
 ### Batch 1: Setup (sequential)
+
 ```bash
 # Execute T001, T002, T003 in order
 ```
 
 ### Batch 2: All Tests (parallel)
+
 ```
 Task: "Component test CourseHeroSection in tests/components/course-detail/CourseHeroSection.spec.tsx"
 Task: "Component test CurriculumSection in tests/components/course-detail/CurriculumSection.spec.tsx"
@@ -219,6 +221,7 @@ Task: "E2E test course detail page in tests/e2e/course-detail.spec.ts"
 ```
 
 ### Batch 3: All Components (parallel)
+
 ```
 Task: "Implement CourseHeroSection in components/course-detail/CourseHeroSection.tsx"
 Task: "Implement CourseOverviewSection in components/course-detail/CourseOverviewSection.tsx"
@@ -230,6 +233,7 @@ Task: "Implement CourseDetailSkeleton in components/course-detail/CourseDetailSk
 ```
 
 ### Batch 4: Integration (sequential)
+
 ```bash
 # Execute T019, T020 in order
 ```

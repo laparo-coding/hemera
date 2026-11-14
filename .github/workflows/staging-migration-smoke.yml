@@ -4,17 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       migration_mode:
-        description: 'Use manual SQL (manual) or prisma migrate deploy (prisma)'
+        description: "Use manual SQL (manual) or prisma migrate deploy (prisma)"
         required: true
-        default: 'prisma'
+        default: "prisma"
       deploy_method:
-        description: 'Deploy method (repository_dispatch, post-to-cd, or script)'
+        description: "Deploy method (repository_dispatch, post-to-cd, or script)"
         required: false
-        default: 'repository_dispatch'
+        default: "repository_dispatch"
       migration_file:
-        description: 'Path to SQL migration file (only used when migration_mode=manual)'
+        description: "Path to SQL migration file (only used when migration_mode=manual)"
         required: false
-        default: 'prisma/migrations/20260215140000_add_api_log/migration.sql'
+        default: "prisma/migrations/20260215140000_add_api_log/migration.sql"
 
 concurrency:
   group: staging-migrate-smoke
@@ -38,7 +38,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
       - name: Install dependencies
         run: npm ci

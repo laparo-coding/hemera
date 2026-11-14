@@ -109,7 +109,9 @@ export default function MonitoringInit() {
 // In MonitoringInit.tsx
 useEffect(() => {
   const initRollbar = async () => {
-    const { initRollbarClient } = await import('@/lib/monitoring/rollbar-official');
+    const { initRollbarClient } = await import(
+      '@/lib/monitoring/rollbar-official'
+    );
     initRollbarClient();
   };
 

@@ -52,8 +52,14 @@ interface DashboardStructureContract {
   // Stats cards (4 required)
   statsCards: {
     totalBookings: { icon: 'SchoolOutlined'; label: 'Gesamte Buchungen' };
-    confirmedBookings: { icon: 'CheckCircleOutlined'; label: 'Bestätigte Buchungen' };
-    pendingPayments: { icon: 'PendingOutlined'; label: 'Ausstehende Zahlungen' };
+    confirmedBookings: {
+      icon: 'CheckCircleOutlined';
+      label: 'Bestätigte Buchungen';
+    };
+    pendingPayments: {
+      icon: 'PendingOutlined';
+      label: 'Ausstehende Zahlungen';
+    };
     totalSpent: { icon: 'AttachMoneyOutlined'; label: 'Gesamtausgaben' };
   };
 }

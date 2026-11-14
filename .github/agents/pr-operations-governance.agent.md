@@ -1,6 +1,6 @@
 ---
-description: Operational control for PR readiness, local checks, review blockers, branch protection, and tightly scoped bypass exceptions.
----
+
+## description: Operational control for PR readiness, local checks, review blockers, branch protection, and tightly scoped bypass exceptions.
 
 # PR Operations Governance Agent
 

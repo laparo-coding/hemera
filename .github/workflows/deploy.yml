@@ -1,4 +1,4 @@
-name: 'Deploy: Production'
+name: "Deploy: Production"
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Deployment target (preview or production)'
+        description: "Deployment target (preview or production)"
         type: choice
         required: true
         default: production
@@ -52,7 +52,7 @@ jobs:
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       # Use 127.0.0.1:5432 mapping for the Postgres service (force IPv4)
-      DATABASE_URL: 'postgresql://postgres:postgres@127.0.0.1:5432/hemera_test'
+      DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:5432/hemera_test"
       NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
       NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
       NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /dashboard
@@ -65,8 +65,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Set BUILD_TIME (UTC)
         run: echo "BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
@@ -130,7 +130,7 @@ jobs:
       - name: Run unit tests (with coverage)
         run: npm run test:unit:coverage
         env:
-          CI: 'true'
+          CI: "true"
 
       - name: Verify coverage scripts
         run: |
@@ -215,7 +215,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
         if: steps.check-secrets.outputs.available == 'true'
 
       - name: Install Vercel CLI
@@ -391,7 +391,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -737,8 +737,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version-file: ".nvmrc"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci

@@ -8,12 +8,13 @@
 
 No new entities. Two fields added to the existing `CourseParticipation` model.
 
-| Field | Type | DB Column | Required | Description |
-|-------|------|-----------|----------|-------------|
-| `resultDate` | `DateTime?` | `result_date` | No | Date the negotiation conversation took place (interpreted as UTC; Prisma `DateTime` maps to PostgreSQL `TIMESTAMP(3)` which does not store timezone info) |
-| `resultNegotiationPartner` | `String?` | `result_negotiation_partner` | No | Who the user negotiated with (enum key as string, max 30 chars validated in app layer) |
+| Field                      | Type        | DB Column                    | Required | Description                                                                                                                                               |
+| -------------------------- | ----------- | ---------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `resultDate`               | `DateTime?` | `result_date`                | No       | Date the negotiation conversation took place (interpreted as UTC; Prisma `DateTime` maps to PostgreSQL `TIMESTAMP(3)` which does not store timezone info) |
+| `resultNegotiationPartner` | `String?`   | `result_negotiation_partner` | No       | Who the user negotiated with (enum key as string, max 30 chars validated in app layer)                                                                    |
 
 **Prisma addition**:
+
 ```prisma
 model CourseParticipation {
   // ... existing fields ...
@@ -23,13 +24,15 @@ model CourseParticipation {
 ```
 
 **Negotiation partner values** (stored as string, validated in application layer):
-| Key | Label (German) |
-|-----|----------------|
-| `DIRECT_MANAGER` | Mit meiner Führungskraft |
+
+| Key                  | Label (German)                             |
+| -------------------- | ------------------------------------------ |
+| `DIRECT_MANAGER`     | Mit meiner Führungskraft                   |
 | `SKIP_LEVEL_MANAGER` | Mit der Führungskraft meiner Führungskraft |
-| `HR_DEPARTMENT` | Mit der Personalabteilung |
+| `HR_DEPARTMENT`      | Mit der Personalabteilung                  |
 
 **Decision**: Store as `String?` rather than a Prisma `enum` because:
+
 - Only 3 values, unlikely to be referenced in complex queries
 - Application-layer validation via TypeScript union type is sufficient
 - Avoids a migration-heavy enum addition for a single field
@@ -45,13 +48,13 @@ CHECK constraint restricting the column to `NULL`, `DIRECT_MANAGER`,
 
 ### Existing fields reused
 
-| Field | Model | Reused For |
-|-------|-------|------------|
-| `preparationIntent` | CourseParticipation | Substep 1 — Seminar-Absicht |
-| `desiredResults` | CourseParticipation | Substep 2 — Erwartete Ergebnisse |
-| `lineManagerProfile` | CourseParticipation | Substep 3 — Dein Vorgesetzter |
-| `resultOutcome` | CourseParticipation | Verhandlungsergebnis textarea |
-| `status` | CourseParticipation | Dashboard stepper state derivation |
+| Field                | Model               | Reused For                         |
+| -------------------- | ------------------- | ---------------------------------- |
+| `preparationIntent`  | CourseParticipation | Substep 1 — Seminar-Absicht        |
+| `desiredResults`     | CourseParticipation | Substep 2 — Erwartete Ergebnisse   |
+| `lineManagerProfile` | CourseParticipation | Substep 3 — Dein Vorgesetzter      |
+| `resultOutcome`      | CourseParticipation | Verhandlungsergebnis textarea      |
+| `status`             | CourseParticipation | Dashboard stepper state derivation |
 
 ### No new entities
 
@@ -69,17 +72,17 @@ PREPARATION → SUMMARY → DEBRIEFING → RESULT → COMPLETE
 ### Dashboard Stepper State Mapping
 
 > **Testing phase:** All steps are always clickable — no locking logic active.
-> The table below shows the *visual state* derivation from `participationStatus`.
+> The table below shows the _visual state_ derivation from `participationStatus`.
 > Locked behavior will be reintroduced post-testing.
 
 | ParticipationStatus | Vorbereitung Seminar | Seminarveranstaltung | Nachbereitung Seminar | Verhandlungsergebnis |
-|---------------------|----------------------|----------------------|------------------------|----------------------|
-| PREPARATION | ● Active | ○ Available | ○ Available | ○ Available |
-| SUMMARY | ✅ Completed | ● Active | ○ Available | ○ Available |
-| DEBRIEFING | ✅ Completed | ✅ Completed | ● Active | ○ Available |
-| RESULT | ✅ Completed | ✅ Completed | ✅ Completed | ● Active |
-| COMPLETE | ✅ Completed | ✅ Completed | ✅ Completed | ✅ Completed |
-| (no participation) | ● Active | ○ Available | ○ Available | ○ Available |
+| ------------------- | -------------------- | -------------------- | --------------------- | -------------------- |
+| PREPARATION         | ● Active             | ○ Available          | ○ Available           | ○ Available          |
+| SUMMARY             | ✅ Completed         | ● Active             | ○ Available           | ○ Available          |
+| DEBRIEFING          | ✅ Completed         | ✅ Completed         | ● Active              | ○ Available          |
+| RESULT              | ✅ Completed         | ✅ Completed         | ✅ Completed          | ● Active             |
+| COMPLETE            | ✅ Completed         | ✅ Completed         | ✅ Completed          | ✅ Completed         |
+| (no participation)  | ● Active             | ○ Available          | ○ Available           | ○ Available          |
 
 ### Detail Page Substep Derivation
 
@@ -97,14 +100,14 @@ all filled or skipped → Substep 4 (Zusammenfassung)
 
 ## Validation Rules
 
-| Field | Rule |
-|-------|------|
-| `resultDate` | Nullable; when set, must be a valid date; must not be in the future (compared against server time in UTC); round-trip validated (reject semantic rollover dates like Feb 30) |
-| `resultNegotiationPartner` | Nullable; when set, must be one of: `DIRECT_MANAGER`, `SKIP_LEVEL_MANAGER`, `HR_DEPARTMENT`; max 30 chars |
-| `resultOutcome` | Max 2000 chars (existing VarChar constraint) |
-| `preparationIntent` | Max 2000 chars (existing) |
-| `desiredResults` | Max 2000 chars (existing) |
-| `lineManagerProfile` | Max 2000 chars (existing) |
+| Field                      | Rule                                                                                                                                                                         |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `resultDate`               | Nullable; when set, must be a valid date; must not be in the future (compared against server time in UTC); round-trip validated (reject semantic rollover dates like Feb 30) |
+| `resultNegotiationPartner` | Nullable; when set, must be one of: `DIRECT_MANAGER`, `SKIP_LEVEL_MANAGER`, `HR_DEPARTMENT`; max 30 chars                                                                    |
+| `resultOutcome`            | Max 2000 chars (existing VarChar constraint)                                                                                                                                 |
+| `preparationIntent`        | Max 2000 chars (existing)                                                                                                                                                    |
+| `desiredResults`           | Max 2000 chars (existing)                                                                                                                                                    |
+| `lineManagerProfile`       | Max 2000 chars (existing)                                                                                                                                                    |
 
 ## Migration
 

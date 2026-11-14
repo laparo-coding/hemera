@@ -14,6 +14,7 @@
 ### Scenario 1: Create a Location (Admin)
 
 **Steps**:
+
 1. Navigate to `/admin/locations`
 2. Click "Neue Location hinzufügen"
 3. Fill in required fields:
@@ -28,12 +29,14 @@
 5. Click "Speichern"
 
 **Expected Result**:
+
 - Location appears in list
 - Slug generated: `yoga-studio-berlin`
 - Coordinates populated (if Nominatim successful)
 - Success toast displayed
 
 **Validation**:
+
 ```bash
 # Check via API
 curl http://localhost:3000/api/locations | jq '.locations[0]'
@@ -44,11 +47,14 @@ curl http://localhost:3000/api/locations | jq '.locations[0]'
 ### Scenario 2: View Location Landing Page (Public)
 
 **Steps**:
+
 1. Navigate to `/locations/yoga-studio-berlin`
 
 **Expected Result**:
+
 - Page title: "Yoga Studio Berlin"
 - Address block displayed:
+
   ```
   Torstraße 123
   10119 Berlin
@@ -62,6 +68,7 @@ curl http://localhost:3000/api/locations | jq '.locations[0]'
 - "In Google Maps öffnen" button
 
 **Mobile Check**:
+
 - Open on mobile device/emulator
 - Verify tap-to-call works
 - Verify map is touch-friendly
@@ -72,12 +79,14 @@ curl http://localhost:3000/api/locations | jq '.locations[0]'
 ### Scenario 3: Edit Location (Admin)
 
 **Steps**:
+
 1. Navigate to `/admin/locations`
 2. Click edit icon on "Yoga Studio Berlin"
 3. Change address to "Friedrichstraße 456"
 4. Click "Speichern"
 
 **Expected Result**:
+
 - Location updated in list
 - New coordinates fetched from Nominatim
 - Map on landing page shows new location
@@ -89,11 +98,13 @@ curl http://localhost:3000/api/locations | jq '.locations[0]'
 **Precondition**: Create a Course that references "Yoga Studio Berlin"
 
 **Steps**:
+
 1. Navigate to `/admin/locations`
 2. Click delete icon on "Yoga Studio Berlin"
 3. Confirm deletion
 
 **Expected Result**:
+
 - Error dialog displayed: "Location wird von Kursen verwendet"
 - List of referencing courses shown
 - Location NOT deleted
@@ -105,11 +116,13 @@ curl http://localhost:3000/api/locations | jq '.locations[0]'
 **Precondition**: Location has no courses assigned
 
 **Steps**:
+
 1. Navigate to `/admin/locations`
 2. Click delete icon on unused location
 3. Confirm deletion
 
 **Expected Result**:
+
 - Confirmation dialog shown
 - After confirm: Location removed from list
 - Success toast displayed
@@ -119,16 +132,19 @@ curl http://localhost:3000/api/locations | jq '.locations[0]'
 ### Scenario 6: Map Navigation Buttons
 
 **Steps**:
+
 1. Navigate to `/locations/yoga-studio-berlin`
 2. Click "In Apple Maps öffnen"
 3. Click "In Google Maps öffnen"
 
 **Expected Result**:
+
 - Apple Maps button: Opens `maps.apple.com` with address
 - Google Maps button: Opens `maps.google.com` with address
 - Both open in new tab
 
 **Button URLs**:
+
 ```
 Apple:  https://maps.apple.com/?address=Torstraße+123,+10119+Berlin
 Google: https://www.google.com/maps/search/?api=1&query=Torstraße+123,+10119+Berlin
@@ -139,10 +155,12 @@ Google: https://www.google.com/maps/search/?api=1&query=Torstraße+123,+10119+Be
 ### Scenario 7: Geocoding Failure Handling
 
 **Steps**:
+
 1. Create location with invalid address: "XYZ123 Nowhere"
 2. Save location
 
 **Expected Result**:
+
 - Location saved successfully
 - Latitude/Longitude remain null
 - On landing page: Map hidden, address text shown
@@ -155,9 +173,11 @@ Google: https://www.google.com/maps/search/?api=1&query=Torstraße+123,+10119+Be
 **Precondition**: No locations in database
 
 **Steps**:
+
 1. Navigate to `/admin/locations`
 
 **Expected Result**:
+
 - Empty state message: "Noch keine Locations vorhanden"
 - Prominent "Erste Location erstellen" button
 
@@ -236,15 +256,15 @@ curl -X POST http://localhost:3000/api/locations \
 
 ## Acceptance Criteria Checklist
 
-| # | Criterion | Test Scenario |
-|---|-----------|---------------|
-| 1 | Admin can create location | Scenario 1 |
-| 2 | Public can view landing page | Scenario 2 |
-| 3 | Admin can edit location | Scenario 3 |
-| 4 | Delete blocked with references | Scenario 4 |
-| 5 | Delete allowed without references | Scenario 5 |
-| 6 | Map navigation buttons work | Scenario 6 |
-| 7 | Graceful geocoding failure | Scenario 7 |
-| 8 | Empty state displayed | Scenario 8 |
-| 9 | Slug auto-generated | Scenario 1 |
-| 10 | Mobile-responsive layout | Scenario 2 (mobile) |
+| #   | Criterion                         | Test Scenario       |
+| --- | --------------------------------- | ------------------- |
+| 1   | Admin can create location         | Scenario 1          |
+| 2   | Public can view landing page      | Scenario 2          |
+| 3   | Admin can edit location           | Scenario 3          |
+| 4   | Delete blocked with references    | Scenario 4          |
+| 5   | Delete allowed without references | Scenario 5          |
+| 6   | Map navigation buttons work       | Scenario 6          |
+| 7   | Graceful geocoding failure        | Scenario 7          |
+| 8   | Empty state displayed             | Scenario 8          |
+| 9   | Slug auto-generated               | Scenario 1          |
+| 10  | Mobile-responsive layout          | Scenario 2 (mobile) |

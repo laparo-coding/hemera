@@ -47,16 +47,16 @@ Create a consolidated OpenAPI 3.1.0 specification and Postman Collection v2.1 do
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Test-First Development | ✅ N/A | Documentation feature - no runtime code |
-| Code Quality & Formatting | ✅ PASS | YAML/JSON will be linted via Spectral |
-| Feature Development Workflow | ✅ PASS | Spec-first approach followed |
-| Error Handling & Observability | ✅ N/A | No runtime code |
-| Authentication & Security | ✅ PASS | Security schemes documented, no secrets exposed |
-| Stripe Integration | ✅ PASS | Payment endpoints documented with proper schemas |
-| Deployment Standards | ✅ N/A | Static documentation files |
-| GitHub Actions | ✅ N/A | No deployment workflow needed |
+| Gate                           | Status  | Notes                                            |
+| ------------------------------ | ------- | ------------------------------------------------ |
+| Test-First Development         | ✅ N/A  | Documentation feature - no runtime code          |
+| Code Quality & Formatting      | ✅ PASS | YAML/JSON will be linted via Spectral            |
+| Feature Development Workflow   | ✅ PASS | Spec-first approach followed                     |
+| Error Handling & Observability | ✅ N/A  | No runtime code                                  |
+| Authentication & Security      | ✅ PASS | Security schemes documented, no secrets exposed  |
+| Stripe Integration             | ✅ PASS | Payment endpoints documented with proper schemas |
+| Deployment Standards           | ✅ N/A  | Static documentation files                       |
+| GitHub Actions                 | ✅ N/A  | No deployment workflow needed                    |
 
 **Constitution Compliance**: PASS - This is a documentation-only feature that generates static OpenAPI and Postman files. No runtime code, no database changes, no security risks.
 
@@ -106,6 +106,7 @@ Research completed. Key findings consolidated in [research.md](research.md).
 ### 1. Schema Definitions → [data-model.md](data-model.md)
 
 Reusable OpenAPI component schemas extracted from existing API routes:
+
 - Course, Booking, Location, User entities
 - StandardResponse wrapper (`success`, `data`, `error`, `code`, `requestId`)
 - Error schemas (ValidationError, AuthError, NotFoundError)
@@ -114,6 +115,7 @@ Reusable OpenAPI component schemas extracted from existing API routes:
 ### 2. API Contracts → [contracts/](contracts/)
 
 OpenAPI fragments organized by tag:
+
 - `public.yaml` - Health, Courses (public), Locations (public)
 - `auth.yaml` - Authentication providers
 - `bookings.yaml` - Booking CRUD
@@ -126,6 +128,7 @@ OpenAPI fragments organized by tag:
 ### 3. Quickstart Guide → [quickstart.md](quickstart.md)
 
 Step-by-step instructions for:
+
 - Importing OpenAPI spec into Swagger UI / Postman
 - Configuring Postman environment variables
 - Obtaining Clerk JWT tokens for authenticated requests
@@ -170,6 +173,7 @@ _This section describes what the /tasks command will do - DO NOT execute during 
    - Test sample requests against local dev server
 
 **Ordering Strategy**:
+
 - Setup → Schemas → Endpoints (by tag) → Postman → Validation
 - Parallel execution [P] for independent endpoint documentation
 - Sequential for validation (depends on all prior)
@@ -192,7 +196,7 @@ _No violations - documentation-only feature requires no complexity justification
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 | --------- | ---------- | ------------------------------------ |
-| None | N/A | N/A |
+| None      | N/A        | N/A                                  |
 
 ## Progress Tracking
 

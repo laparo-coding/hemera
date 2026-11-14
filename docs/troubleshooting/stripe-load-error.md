@@ -21,6 +21,7 @@ at <unknown> (file:///.../chunks/node_modules_xxx._.js:...)
 ### Quick Fix
 
 1. **Verify Stripe Keys in `.env.local`**:
+
    ```bash
    grep "STRIPE" .env.local
    # Should output:
@@ -29,11 +30,11 @@ at <unknown> (file:///.../chunks/node_modules_xxx._.js:...)
    ```
 
 2. **Restart Development Server**:
+
    ```bash
    # Kill the current dev server
    pkill -f "next dev"
-   
-   # Start a fresh dev server
+      # Start a fresh dev server
    npm run dev
    ```
 
@@ -53,6 +54,7 @@ export const stripePromise =
 ```
 
 This ensures:
+
 - ✅ Stripe is only loaded if a valid publishable key exists
 - ✅ Errors during loading are gracefully caught
 - ✅ The app remains functional even if Stripe loading fails
@@ -88,13 +90,15 @@ Components that use Stripe should check for availability:
 import { stripePromise } from '../payment/StripeProvider';
 
 // In JSX:
-{stripePromise ? (
-  <Elements stripe={stripePromise} options={{ clientSecret }}>
-    <StripeCheckoutForm />
-  </Elements>
-) : (
-  <Alert>Stripe not configured</Alert>
-)}
+{
+  stripePromise ? (
+    <Elements stripe={stripePromise} options={{ clientSecret }}>
+      <StripeCheckoutForm />
+    </Elements>
+  ) : (
+    <Alert>Stripe not configured</Alert>
+  );
+}
 ```
 
 The `CheckoutPageClient` component provides a full example of safe Stripe usage with fallback UI.

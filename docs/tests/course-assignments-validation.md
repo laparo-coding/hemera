@@ -34,21 +34,23 @@ npm test -- tests/unit/components/CourseParticipationStepper.spec.ts tests/unit/
 
 **Result**: ✅ PASSED
 
-| Test Suite | Tests | Status |
-|------------|-------|--------|
-| CourseParticipationStepper.spec.ts | 13 | ✅ |
-| participation.spec.ts | 10 | ✅ |
-| **Total** | **23** | **✅** |
+| Test Suite                         | Tests  | Status |
+| ---------------------------------- | ------ | ------ |
+| CourseParticipationStepper.spec.ts | 13     | ✅     |
+| participation.spec.ts              | 10     | ✅     |
+| **Total**                          | **23** | **✅** |
 
 #### Test Coverage
 
 **Stepper Tests:**
+
 - Step visibility logic (4 vs 3 steps based on summary assets)
 - Step index calculation with/without Summary step
 - Status progression (PREPARATION → SUMMARY → DEBRIEFING → RESULT → COMPLETE)
 - German label localization
 
 **Server Actions Tests:**
+
 - Authorization checks (unauthenticated, not found, ownership)
 - Data normalization for preparation, debriefing, result
 - Rollbar logging on success, step completion, and errors
@@ -68,6 +70,7 @@ This allowed Jest to find tests in `tests/unit/components/` and `tests/unit/acti
 ### 4. Integration Tests (Playwright)
 
 Integration tests for course participation flow are located in:
+
 - `tests/integration/016-course-assignments/participant-flow.spec.ts`
 - `tests/integration/016-course-assignments/summary-visibility.spec.ts`
 
@@ -82,33 +85,33 @@ npx playwright test --grep "course participation"  # In another terminal
 
 ### New Files
 
-| Path | Description |
-|------|-------------|
-| `app/api/my-courses/[bookingId]/preparation/route.ts` | GET/PUT for preparation data |
-| `app/api/my-courses/[bookingId]/resume/route.ts` | GET/POST/DELETE for résumé |
-| `app/api/my-courses/[bookingId]/summary/route.ts` | GET/PUT for summary assets |
-| `app/api/my-courses/[bookingId]/debriefing/route.ts` | GET/PUT for debriefing |
-| `app/api/my-courses/[bookingId]/result/route.ts` | GET/PUT for result |
-| `components/participation/CourseParticipationStepper.tsx` | MUI Stepper component |
-| `components/participation/SummaryAssetList.tsx` | Mux video player |
-| `components/participation/ResumeUploader.tsx` | PDF upload component |
-| `components/participation/index.ts` | Barrel export |
-| `app/my-courses/MyCoursesClient.tsx` | Dashboard client component |
-| `lib/actions/participation.ts` | Server actions |
-| `lib/db/courseParticipation.ts` | Data access layer |
-| `lib/utils/resumeUpload.ts` | Blob upload utilities |
-| `tests/unit/components/CourseParticipationStepper.spec.ts` | Unit tests |
-| `tests/unit/actions/participation.spec.ts` | Unit tests |
-| `docs/features/course-assignments.md` | Feature documentation |
+| Path                                                       | Description                  |
+| ---------------------------------------------------------- | ---------------------------- |
+| `app/api/my-courses/[bookingId]/preparation/route.ts`      | GET/PUT for preparation data |
+| `app/api/my-courses/[bookingId]/resume/route.ts`           | GET/POST/DELETE for résumé   |
+| `app/api/my-courses/[bookingId]/summary/route.ts`          | GET/PUT for summary assets   |
+| `app/api/my-courses/[bookingId]/debriefing/route.ts`       | GET/PUT for debriefing       |
+| `app/api/my-courses/[bookingId]/result/route.ts`           | GET/PUT for result           |
+| `components/participation/CourseParticipationStepper.tsx`  | MUI Stepper component        |
+| `components/participation/SummaryAssetList.tsx`            | Mux video player             |
+| `components/participation/ResumeUploader.tsx`              | PDF upload component         |
+| `components/participation/index.ts`                        | Barrel export                |
+| `app/my-courses/MyCoursesClient.tsx`                       | Dashboard client component   |
+| `lib/actions/participation.ts`                             | Server actions               |
+| `lib/db/courseParticipation.ts`                            | Data access layer            |
+| `lib/utils/resumeUpload.ts`                                | Blob upload utilities        |
+| `tests/unit/components/CourseParticipationStepper.spec.ts` | Unit tests                   |
+| `tests/unit/actions/participation.spec.ts`                 | Unit tests                   |
+| `docs/features/course-assignments.md`                      | Feature documentation        |
 
 ### Modified Files
 
-| Path | Changes |
-|------|---------|
-| `prisma/schema.prisma` | Added CourseParticipation, ParticipationDocument, CourseSummaryAsset, ParticipationSummaryOverride models |
-| `app/my-courses/page.tsx` | Refactored to server component |
-| `jest.config.ts` | Historical testMatch fix for subdirectories |
-| `.github/copilot-instructions.md` | Updated with 016 technologies |
+| Path                              | Changes                                                                                                   |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `prisma/schema.prisma`            | Added CourseParticipation, ParticipationDocument, CourseSummaryAsset, ParticipationSummaryOverride models |
+| `app/my-courses/page.tsx`         | Refactored to server component                                                                            |
+| `jest.config.ts`                  | Historical testMatch fix for subdirectories                                                               |
+| `.github/copilot-instructions.md` | Updated with 016 technologies                                                                             |
 
 ## Known Issues
 

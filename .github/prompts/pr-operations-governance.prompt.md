@@ -1,6 +1,6 @@
 ---
-description: Evaluates operational PR readiness including local checks, open reviews, branch protection, and tightly scoped bypass exceptions.
----
+
+## description: Evaluates operational PR readiness including local checks, open reviews, branch protection, and tightly scoped bypass exceptions.
 
 # PR Operations Governance Prompt
 

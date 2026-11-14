@@ -42,17 +42,17 @@ paths:
       description: Returns application health status
       security: []
       responses:
-        '200':
+        "200":
           description: Health status
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/HealthCheck'
+                        $ref: "#/components/schemas/HealthCheck"
   /health/deployment:
     get:
       tags: [Public]
@@ -61,12 +61,12 @@ paths:
       description: Returns deployment-specific health information
       security: []
       responses:
-        '200':
+        "200":
           description: Deployment health status
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
     post:
       tags: [Public]
       operationId: updateDeploymentHealth
@@ -85,12 +85,12 @@ paths:
                 version:
                   type: string
       responses:
-        '200':
+        "200":
           description: Health updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
   /courses:
     get:
       tags: [Public, Courses]
@@ -120,13 +120,13 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: List of courses
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -135,11 +135,11 @@ paths:
                           courses:
                             type: array
                             items:
-                              $ref: '#/components/schemas/CourseSummary'
+                              $ref: "#/components/schemas/CourseSummary"
                           pagination:
-                            $ref: '#/components/schemas/Pagination'
-        '429':
-          $ref: '#/components/responses/RateLimited'
+                            $ref: "#/components/schemas/Pagination"
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /courses/next:
     get:
       tags: [Public, Courses]
@@ -148,19 +148,19 @@ paths:
       description: Returns the next scheduled published course.
       security: []
       responses:
-        '200':
+        "200":
           description: Next course
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/CourseSummary'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                        $ref: "#/components/schemas/CourseSummary"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /courses/{id}:
     get:
       tags: [Public, Courses]
@@ -176,19 +176,19 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Course details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Course'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                        $ref: "#/components/schemas/Course"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /locations:
     get:
       tags: [Public, Locations]
@@ -197,19 +197,19 @@ paths:
       description: Returns all active locations
       security: []
       responses:
-        '200':
+        "200":
           description: List of locations
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Location'
+                          $ref: "#/components/schemas/Location"
     post:
       tags: [Locations]
       operationId: createLocation
@@ -259,21 +259,21 @@ paths:
                 - address
                 - city
       responses:
-        '201':
+        "201":
           description: Location created
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Location'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                        $ref: "#/components/schemas/Location"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /locations/{id}:
     get:
       tags: [Public, Locations]
@@ -289,19 +289,19 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Location details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Location'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                        $ref: "#/components/schemas/Location"
+        "404":
+          $ref: "#/components/responses/NotFound"
     put:
       tags: [Locations]
       operationId: updateLocation
@@ -343,21 +343,21 @@ paths:
                 isActive:
                   type: boolean
       responses:
-        '200':
+        "200":
           description: Location updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Location'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                        $ref: "#/components/schemas/Location"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       tags: [Locations]
       operationId: deleteLocation
@@ -373,18 +373,18 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Location deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
+                $ref: "#/components/schemas/StandardResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
   /locations/geocode:
     post:
       tags: [Locations]
@@ -414,13 +414,13 @@ paths:
               required:
                 - address
       responses:
-        '200':
+        "200":
           description: Geocoding result
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -437,10 +437,10 @@ paths:
                           confidence:
                             type: number
                             format: float
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '429':
-          $ref: '#/components/responses/RateLimited'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /auth/providers:
     get:
       tags: [Auth]
@@ -449,13 +449,13 @@ paths:
       description: Returns enabled Clerk authentication providers and their URLs.
       security: []
       responses:
-        '200':
+        "200":
           description: Providers list
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -484,21 +484,21 @@ paths:
             type: string
             enum: [PENDING, CONFIRMED, CANCELLED, COMPLETED]
       responses:
-        '200':
+        "200":
           description: Bookings list
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Booking'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                          $ref: "#/components/schemas/Booking"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
       security:
         - clerkAuth: []
     post:
@@ -519,23 +519,23 @@ paths:
               required:
                 - courseId
       responses:
-        '201':
+        "201":
           description: Booking created
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Booking'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '409':
-          $ref: '#/components/responses/Conflict'
+                        $ref: "#/components/schemas/Booking"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
       security:
         - clerkAuth: []
   /my-courses/{bookingId}/preparation:
@@ -552,21 +552,21 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Preparation phase data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/PreparationPhase'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                        $ref: "#/components/schemas/PreparationPhase"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
       security:
         - clerkAuth: []
     put:
@@ -595,14 +595,14 @@ paths:
                   type: object
                   additionalProperties: true
       responses:
-        '200':
+        "200":
           description: Preparation updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/StandardResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
       security:
         - clerkAuth: []
   /my-courses/{bookingId}/summary:
@@ -619,19 +619,19 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Summary phase data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/SummaryPhase'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                        $ref: "#/components/schemas/SummaryPhase"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
       security:
         - clerkAuth: []
     put:
@@ -659,12 +659,12 @@ paths:
                 notes:
                   type: string
       responses:
-        '200':
+        "200":
           description: Summary updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
       security:
         - clerkAuth: []
   /my-courses/{bookingId}/debriefing:
@@ -681,19 +681,19 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Debriefing phase data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/DebriefingPhase'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                        $ref: "#/components/schemas/DebriefingPhase"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
       security:
         - clerkAuth: []
     put:
@@ -725,12 +725,12 @@ paths:
                   minimum: 1
                   maximum: 5
       responses:
-        '200':
+        "200":
           description: Debriefing updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
       security:
         - clerkAuth: []
   /my-courses/{bookingId}/result:
@@ -747,19 +747,19 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Result phase data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/ResultPhase'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                        $ref: "#/components/schemas/ResultPhase"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
       security:
         - clerkAuth: []
     put:
@@ -787,12 +787,12 @@ paths:
                 score:
                   type: number
       responses:
-        '200':
+        "200":
           description: Result updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
       security:
         - clerkAuth: []
   /my-courses/{bookingId}/resume:
@@ -809,13 +809,13 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Resume details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -829,8 +829,8 @@ paths:
                           uploadedAt:
                             type: string
                             format: date-time
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
       security:
         - clerkAuth: []
     post:
@@ -858,12 +858,12 @@ paths:
               required:
                 - file
       responses:
-        '201':
+        "201":
           description: Resume uploaded
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
       security:
         - clerkAuth: []
     delete:
@@ -879,12 +879,12 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Resume deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
       security:
         - clerkAuth: []
   /admin/courses:
@@ -900,23 +900,23 @@ paths:
             type: boolean
             default: true
       responses:
-        '200':
+        "200":
           description: Courses list
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Course'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/Course"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
       security:
         - clerkAuth: []
     post:
@@ -959,21 +959,21 @@ paths:
                 - price
                 - startDate
       responses:
-        '201':
+        "201":
           description: Course created
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Course'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                        $ref: "#/components/schemas/Course"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
       security:
         - clerkAuth: []
   /admin/courses/create:
@@ -991,12 +991,12 @@ paths:
             schema:
               type: object
       responses:
-        '201':
+        "201":
           description: Course created (legacy)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
       security:
         - clerkAuth: []
   /admin/courses/delete:
@@ -1017,12 +1017,12 @@ paths:
                 courseId:
                   type: string
       responses:
-        '200':
+        "200":
           description: Course deleted (legacy)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
       security:
         - clerkAuth: []
   /admin/courses/{id}:
@@ -1039,18 +1039,18 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Course details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         allOf:
-                          - $ref: '#/components/schemas/Course'
+                          - $ref: "#/components/schemas/Course"
                           - type: object
                             properties:
                               enrollmentCount:
@@ -1058,9 +1058,9 @@ paths:
                               bookings:
                                 type: array
                                 items:
-                                  $ref: '#/components/schemas/Booking'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                                  $ref: "#/components/schemas/Booking"
+        "404":
+          $ref: "#/components/responses/NotFound"
       security:
         - clerkAuth: []
     patch:
@@ -1103,19 +1103,19 @@ paths:
                   type: string
                   format: uri
       responses:
-        '200':
+        "200":
           description: Course updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Course'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                        $ref: "#/components/schemas/Course"
+        "404":
+          $ref: "#/components/responses/NotFound"
       security:
         - clerkAuth: []
     delete:
@@ -1131,14 +1131,14 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Course deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/StandardResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
       security:
         - clerkAuth: []
   /admin/courses/{id}/transfer-enrollments:
@@ -1167,13 +1167,13 @@ paths:
               required:
                 - targetCourseId
       responses:
-        '200':
+        "200":
           description: Enrollments transferred
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -1196,21 +1196,21 @@ paths:
             type: string
             enum: [USER, ADMIN]
       responses:
-        '200':
+        "200":
           description: Users list
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/User'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                          $ref: "#/components/schemas/User"
+        "403":
+          $ref: "#/components/responses/Forbidden"
       security:
         - clerkAuth: []
     post:
@@ -1238,17 +1238,17 @@ paths:
               required:
                 - email
       responses:
-        '201':
+        "201":
           description: User created
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/User'
+                        $ref: "#/components/schemas/User"
       security:
         - clerkAuth: []
   /users/{id}:
@@ -1265,17 +1265,17 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: User details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/User'
+                        $ref: "#/components/schemas/User"
       security:
         - clerkAuth: []
     put:
@@ -1303,17 +1303,17 @@ paths:
                   type: string
                   enum: [USER, ADMIN]
       responses:
-        '200':
+        "200":
           description: User updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/User'
+                        $ref: "#/components/schemas/User"
       security:
         - clerkAuth: []
     delete:
@@ -1329,12 +1329,12 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: User deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
       security:
         - clerkAuth: []
   /users/profile:
@@ -1344,19 +1344,19 @@ paths:
       summary: Get current user profile
       description: Returns the authenticated user's profile data.
       responses:
-        '200':
+        "200":
           description: Profile
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/UserProfile'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                        $ref: "#/components/schemas/UserProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
       security:
         - clerkAuth: []
     put:
@@ -1374,19 +1374,19 @@ paths:
                 firstName: { type: string }
                 lastName: { type: string }
       responses:
-        '200':
+        "200":
           description: Profile updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/UserProfile'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                        $ref: "#/components/schemas/UserProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
       security:
         - clerkAuth: []
   /webhooks/stripe:
@@ -1431,7 +1431,7 @@ paths:
                 - type
                 - data
       responses:
-        '200':
+        "200":
           description: Webhook processed
           content:
             application/json:
@@ -1441,12 +1441,12 @@ paths:
                   received:
                     type: boolean
                     example: true
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /webhooks/clerk:
     post:
       tags: [Webhooks]
@@ -1486,7 +1486,7 @@ paths:
                 - type
                 - data
       responses:
-        '200':
+        "200":
           description: Webhook processed
           content:
             application/json:
@@ -1496,10 +1496,10 @@ paths:
                   received:
                     type: boolean
                     example: true
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
   /vitals:
     get:
       tags: [Monitoring]
@@ -1514,13 +1514,13 @@ paths:
             enum: [json, prometheus]
             default: json
       responses:
-        '200':
+        "200":
           description: Vitals data
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -1557,10 +1557,10 @@ paths:
                           timestamp:
                             type: string
                             format: date-time
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/RateLimited'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
       security:
         - clerkAuth: []
   # --- Service API Endpoints (025-service-user-endpoint) ---
@@ -1599,7 +1599,7 @@ paths:
             minimum: 0
             default: 0
       responses:
-        '200':
+        "200":
           description: Course list
           headers:
             X-RateLimit-Limit:
@@ -1612,19 +1612,19 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/ServiceCourse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '429':
-          $ref: '#/components/responses/RateLimited'
+                          $ref: "#/components/schemas/ServiceCourse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /service/courses/{id}:
     get:
       tags: [Service]
@@ -1642,25 +1642,25 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Course details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/ServiceCourseDetail'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
+                        $ref: "#/components/schemas/ServiceCourseDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /service/participations/{id}:
     get:
       tags: [Service]
@@ -1678,25 +1678,25 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Participation details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/ServiceParticipation'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
+                        $ref: "#/components/schemas/ServiceParticipation"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /service/participations/{id}/result:
     put:
       tags: [Service]
@@ -1719,30 +1719,30 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateParticipationResult'
+              $ref: "#/components/schemas/UpdateParticipationResult"
       responses:
-        '200':
+        "200":
           description: Result updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       message:
                         type: string
                         example: Participation result updated successfully
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/RateLimited'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 components:
   securitySchemes:
     clerkAuth:
@@ -1863,7 +1863,7 @@ components:
           format: uri
           nullable: true
         location:
-          $ref: '#/components/schemas/LocationSummary'
+          $ref: "#/components/schemas/LocationSummary"
       required: [id, title, slug, price, startDate]
     Booking:
       type: object
@@ -1897,7 +1897,7 @@ components:
           type: string
           format: date-time
         course:
-          $ref: '#/components/schemas/CourseSummary'
+          $ref: "#/components/schemas/CourseSummary"
       required: [id, userId, courseId, status, createdAt]
     Location:
       type: object
@@ -2212,7 +2212,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             error: "Invalid request parameters"
@@ -2223,7 +2223,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             error: "Authentication required"
@@ -2234,7 +2234,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             error: "You do not have permission to access this resource"
@@ -2245,7 +2245,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             error: "Resource not found"
@@ -2256,7 +2256,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             error: "Resource already exists or conflicts with current state"
@@ -2272,7 +2272,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             error: "Rate limit exceeded. Try again later."
@@ -2283,7 +2283,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             success: false
             error: "An unexpected error occurred"

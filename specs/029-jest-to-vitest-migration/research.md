@@ -8,12 +8,14 @@
 their internals with Vitest.
 
 **Rationale**:
+
 - `package.json` currently exposes familiar entry points for `test`, `test:unit`,
   `test:unit:coverage`, `test:contracts`, `test:integration`, and `test:watch`.
 - Keeping those entry points stable reduces workflow churn for contributors and CI.
 - The spec values workflow continuity more than CLI cleanup.
 
 **Alternatives considered**:
+
 - Rename all scripts to `vitest:*`: rejected because it creates avoidable workflow and CI churn.
 - Keep both Jest and Vitest command families long term: rejected because it prolongs toolchain
   fragmentation.
@@ -24,6 +26,7 @@ their internals with Vitest.
 `integration` projects instead of one undifferentiated suite.
 
 **Rationale**:
+
 - The current repository already models three distinct non-E2E scopes with three Jest configs.
 - Separate projects preserve clarity around runtime environment, timeouts, include patterns,
   ignored paths, and database-related execution constraints.
@@ -31,6 +34,7 @@ their internals with Vitest.
   collapsed into an opaque path.
 
 **Alternatives considered**:
+
 - One Vitest config with path filters only: rejected because it weakens scope clarity and makes
   per-scope behavior easier to drift.
 - Separate standalone Vitest config files per scope: rejected because it preserves duplication that
@@ -43,12 +47,14 @@ their internals with Vitest.
 model.
 
 **Rationale**:
+
 - The current test inventory contains extensive Jest-specific API usage across unit, contract, and
   integration tests.
 - Deferring this conversion until later slices would make every failing test harder to diagnose.
 - A single approved mocking model is required by the spec.
 
 **Alternatives considered**:
+
 - Rely on compatibility shims indefinitely: rejected because it leaves the repository in a partial
   migration state.
 - Hand-edit files opportunistically during each suite migration: rejected because it produces
@@ -59,6 +65,7 @@ model.
 **Decision**: Keep `tests/setup.ts` as the shared setup file and adapt it for Vitest lifecycle APIs.
 
 **Rationale**:
+
 - `tests/setup.ts` currently handles env loading, polyfills, jsdom detection, database lifecycle,
   Prisma migrations, seed fallback, and analytics cleanup.
 - Splitting that logic per suite would increase drift risk exactly where the migration needs
@@ -67,6 +74,7 @@ model.
   scopes.
 
 **Alternatives considered**:
+
 - Create separate setup files per suite immediately: rejected because it expands scope before parity
   is proven.
 - Inline setup into individual tests: rejected because it is unmaintainable and conflicts with the
@@ -78,12 +86,14 @@ model.
 Node as the default environment for non-DOM suites.
 
 **Rationale**:
+
 - The repository contains many component tests that rely on jsdom and Testing Library.
 - The shared setup file explicitly branches between jsdom and database-aware Node behavior.
 - Losing that distinction would either break UI tests or accidentally boot database setup for jsdom
   files.
 
 **Alternatives considered**:
+
 - Set jsdom globally for all unit tests: rejected because many service and database-oriented tests
   are better suited to Node and would gain unnecessary browser shims.
 - Set Node globally without per-file overrides: rejected because component tests already rely on
@@ -95,12 +105,14 @@ Node as the default environment for non-DOM suites.
 `text`, `lcov`, `html`, and `json-summary` artifacts.
 
 **Rationale**:
+
 - The current default Jest config uses V8 coverage and produces these formats.
 - Coverage continuity matters to maintainers and automation, but byte-for-byte parity is not a
   useful acceptance standard.
 - Vitest can satisfy the repository need if these consumer-facing outputs remain available.
 
 **Alternatives considered**:
+
 - Accept only Vitest defaults without parity checks: rejected because it risks silent downstream
   breakage.
 - Require exact artifact identity with Jest: rejected because it is stricter than the business need.
@@ -110,10 +122,12 @@ Node as the default environment for non-DOM suites.
 **Decision**: Leave Playwright scripts, configuration, and E2E validation untouched by this feature.
 
 **Rationale**:
+
 - The spec explicitly defines Playwright as the dedicated E2E framework and excludes E2E rewrites.
 - Isolating the migration to non-E2E scopes reduces rollback cost and debugging ambiguity.
 
 **Alternatives considered**:
+
 - Unify all tests under a new runner strategy including E2E: rejected because it violates scope and
   increases risk sharply.
 
@@ -123,6 +137,7 @@ Node as the default environment for non-DOM suites.
 contracts, integration, cleanup.
 
 **Rationale**:
+
 - Current risk is concentrated in compatibility and environment behavior rather than in a single
   config file.
 - Slice-by-slice migration creates narrower validation checkpoints and cheaper rollback paths.
@@ -130,6 +145,7 @@ contracts, integration, cleanup.
   suites.
 
 **Alternatives considered**:
+
 - Replace all Jest scripts and configs in one commit: rejected because it would hide the real source
   of failures.
 - Migrate integration first: rejected because it is the slowest and most environment-sensitive

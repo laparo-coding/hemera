@@ -140,6 +140,7 @@
 
 - [ ] T021 Run full test suite
   - Commands:
+
     ```bash
     npm run typecheck
     npm run lint
@@ -167,6 +168,7 @@ T001-T020 → T021 (all tasks before verification)
 ## Parallel Execution Examples
 
 ### Batch 1: Configuration (can run together)
+
 ```bash
 # T001, T002, T003, T006 - different config files
 Task: "Remove component test exclusion from tsconfig.json"
@@ -176,6 +178,7 @@ Task: "Add .auth/ to .gitignore"
 ```
 
 ### Batch 2: Console.log Migration (can run together)
+
 ```bash
 # T012, T013, T014, T015 - different directories
 Task: "Migrate console.log in app/api/**"
@@ -185,6 +188,7 @@ Task: "Migrate console.log in components/**"
 ```
 
 ### Batch 3: New E2E Tests (can run together after T005)
+
 ```bash
 # T017, T018 - different test files
 Task: "Create Invoice Download E2E test"
@@ -193,17 +197,17 @@ Task: "Create Production Smoke test spec"
 
 ## Acceptance Criteria Mapping
 
-| Acceptance Criterion | Task(s) |
-|---------------------|---------|
-| Stripe Checkout E2E läuft | T010 |
-| Invoice Download Test | T017 |
-| Production Login Test | T018, T007 |
-| Course-Detail Tests (#384) | T009 |
-| Component Tests (#357) | T001, T011 |
-| Jest-DOM Matchers | T001 |
-| tsconfig exclude entfernt | T001 |
-| CI grün | T021 |
-| Coverage Report | T019, T020 |
-| Keine console.log | T012-T016 |
-| Rollbar Logging | T012-T015 |
-| Biome no-console aktiv | T003, T016 |
+| Acceptance Criterion       | Task(s)    |
+| -------------------------- | ---------- |
+| Stripe Checkout E2E läuft  | T010       |
+| Invoice Download Test      | T017       |
+| Production Login Test      | T018, T007 |
+| Course-Detail Tests (#384) | T009       |
+| Component Tests (#357)     | T001, T011 |
+| Jest-DOM Matchers          | T001       |
+| tsconfig exclude entfernt  | T001       |
+| CI grün                    | T021       |
+| Coverage Report            | T019, T020 |
+| Keine console.log          | T012-T016  |
+| Rollbar Logging            | T012-T015  |
+| Biome no-console aktiv     | T003, T016 |

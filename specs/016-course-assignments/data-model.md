@@ -3,6 +3,7 @@
 ## Entities
 
 ### CourseParticipation
+
 - **id**: `String` (`cuid`) — primary key.
 - **bookingId**: `String` — unique reference to `Booking.id` (1:1).
 - **userId**: `String` — redundant link to `User.id` (enables quick lookups, kept in sync with booking).
@@ -25,11 +26,13 @@
 - **updatedAt**: `DateTime` (auto updated).
 
 **Relationships**:
+
 - `CourseParticipation` 1:1 `Booking` (unique `bookingId`).
 - `CourseParticipation` optional 1:1 `ParticipationDocument` (active résumé).
 - `CourseParticipation` has many `ParticipationSummaryOverride` entries (optional).
 
 ### ParticipationDocument
+
 - **id**: `String` (`cuid`).
 - **participationId**: `String` — FK to `CourseParticipation`.
 - **blobUrl**: `String` — Vercel Blob public URL.
@@ -46,9 +49,11 @@
 - **updatedAt**: `DateTime`.
 
 **Relationships**:
+
 - Many documents per participation, only one active at a time (enforced by business logic + partial unique index on `participationId` where `isActive = true`).
 
 ### CourseSummaryAsset
+
 - **id**: `String` (`cuid`).
 - **courseId**: `String` — FK to `Course`.
 - **muxAssetId**: `String` — asset identifier.
@@ -63,6 +68,7 @@
 - **updatedAt**: `DateTime`.
 
 ### ParticipationSummaryOverride
+
 - **id**: `String` (`cuid`).
 - **participationId**: `String` — FK to `CourseParticipation`.
 - **courseSummaryAssetId**: `String` — FK to `CourseSummaryAsset` (optional when custom asset defined inline).
@@ -74,6 +80,7 @@
 - **updatedAt**: `DateTime`.
 
 ## Indexing & Constraints
+
 - `CourseParticipation.bookingId` unique index ensures single participation per booking.
 - Composite index on `CourseParticipation` (`userId`, `status`) for dashboard filtering.
 - Partial unique index on `ParticipationDocument` (`participationId`) WHERE `isActive = true` to enforce one active résumé.
@@ -81,12 +88,14 @@
 - `ParticipationSummaryOverride` composite index on (`participationId`, `sortOrder`).
 
 ## State Transitions
+
 - Default status `PREPARATION` on creation.
 - Status auto-advances when each step completes (record `*_CompletedAt`).
 - Summary step toggled by asset availability: if no default assets and no overrides, backend marks summary as skipped without altering status progression until assets exist.
 - Result completion transitions status to `COMPLETE` and locks further automatic transitions while still allowing edits (only timestamps update).
 
 ## Audit & Compliance
+
 - All entities include `createdAt`/`updatedAt` for auditing per constitution.
 - Résumé replacement captured through `replacesDocumentId` and `replacedAt`, providing an immutable audit trail.
 - Clerk user identifiers stored on upload-related records for traceability and access queries.

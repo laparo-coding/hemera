@@ -34,7 +34,8 @@
 
 **Primary Requirement**: Create a production-ready admin interface for managing course offerings with full CRUD operations, file upload support, and enrollment-aware deletion protection.
 
-**Technical Approach**: 
+**Technical Approach**:
+
 - Next.js App Router with Server Actions for mutations and API routes for queries
 - Clerk authentication with admin role verification via middleware
 - Prisma ORM for type-safe database operations with PostgreSQL
@@ -62,40 +63,47 @@
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 **Test-First Development (NON-NEGOTIABLE)**:
+
 - ✅ Contract tests will be created for all admin API endpoints before implementation
 - ✅ Unit tests required for course CRUD operations, file upload, and enrollment checks
 - ✅ E2E tests for complete admin workflow (create/edit/delete with Clerk auth)
 - ✅ Minimum 80% coverage target, 90% for Clerk auth and course enrollment logic
 
 **Code Quality & Formatting**:
+
 - ✅ Prettier and ESLint compliance enforced via pre-commit hooks
 - ✅ TypeScript strict mode for all new code
 - ✅ CI/CD quality gates block merges for violations
 
 **Feature Development Workflow**:
+
 - ✅ Specification complete in specs/014-create-an-admin/spec.md with clarifications
 - ✅ Clerk authentication integration for admin role verification
 - ✅ Prisma migration required for course model updates (startTime, capacity fields)
 - ✅ Rollbar error monitoring for file upload failures and enrollment conflicts
 
 **Holistic Error Handling & Observability**:
+
 - ✅ Rollbar integration mandatory for all error scenarios (file upload, enrollment checks)
 - ✅ Error boundaries for admin UI components
 - ✅ Graceful degradation when file upload service unavailable
 - ✅ User-facing error messages with recovery guidance (e.g., "Transfer students first")
 
 **Authentication & Security**:
+
 - ✅ Clerk middleware validation for admin role on all /admin routes
 - ✅ File upload validation (size, type, malware scanning)
 - ✅ CSRF protection for course mutation operations
 - ✅ Rollbar security incident tracking for unauthorized access attempts
 
 **Component Architecture**:
+
 - ✅ Material-UI design system for admin interface consistency
 - ✅ Reusable form components for course create/edit
 - ✅ WCAG 2.1 AA accessibility compliance
 
 **Deployment Standards**:
+
 - ✅ GitHub Actions exclusive deployment (no manual CLI)
 - ✅ Preview deployment for PR testing with admin role assignment
 - ✅ E2E tests against preview environment before production merge
@@ -300,6 +308,7 @@ The `/tasks` command will generate a comprehensive task list following TDD princ
 **Ordering Strategy**:
 
 **Phase A: Foundation (Parallel)**
+
 1. Database migration & backfill
 2. TypeScript types & Zod schemas
 3. Contract test scaffolding [P]
@@ -326,6 +335,7 @@ The `/tasks` command will generate a comprehensive task list following TDD princ
 16. Performance testing (API response times)
 
 **Parallel Execution Markers**:
+
 - [P] tasks can be worked on simultaneously by different developers or AI agents
 - Database tasks are sequential (migrations must run in order)
 - E2E tests should run serially to avoid test pollution
@@ -333,11 +343,13 @@ The `/tasks` command will generate a comprehensive task list following TDD princ
 **Estimated Total Tasks**: 30-35 numbered, ordered tasks
 
 **Critical Path Dependencies**:
+
 1. Migration → Queries → Actions → API → Contract Tests
 2. Types/Schemas → Components → Pages
 3. Everything → E2E Tests → Validation
 
 **Constitutional Checkpoints**:
+
 - Task 7: Contract tests must fail before implementation (TDD gate)
 - Task 15: Pre-merge constitutional review (quality gates)
 - Task 35: Final E2E validation (deployment readiness)
@@ -382,6 +394,7 @@ _This checklist is updated during execution flow_
 - [x] Complexity deviations documented - No deviations required
 
 **Artifacts Generated**:
+
 - ✅ `/specs/014-create-an-admin/research.md` - Technology decisions and best practices
 - ✅ `/specs/014-create-an-admin/data-model.md` - Course entity and database schema
 - ✅ `/specs/014-create-an-admin/contracts/api-contract.md` - API specifications

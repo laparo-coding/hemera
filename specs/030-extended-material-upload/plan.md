@@ -38,14 +38,14 @@ Feature 030 extends the course material upload interface by adding a new tile fo
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Constitutional Requirement | Status | Notes |
-|----------------------------|--------|-------|
-| **Course Data Authority** (v1.11.0) | ✅ PASS | HTML content stored in Blob with DB metadata; no placeholder data |
-| **Code Organization** (db-only sourcing) | ✅ PASS | Reuses existing Prisma model; no hardcoded materials |
-| **UI Consistency** (informal German) | ✅ PASS | Labels "hinzufügen"/"anlegen" already confirmed; consistent with Feature 026 |
-| **Design Tokens** (from Feature 026) | ✅ PASS | Icon/styling reused from existing "Steuerdatei hinzufügen" tile |
-| **API Security** (upload validation) | ✅ PASS | File extension + Content-Type validation required; matches Feature 026 pattern |
-| **Deployment & Testing** (E2E coverage) | ⚠️ CONDITIONAL | Playwright E2E tests must cover new upload flow; TBD in Phase 2 |
+| Constitutional Requirement               | Status         | Notes                                                                          |
+| ---------------------------------------- | -------------- | ------------------------------------------------------------------------------ |
+| **Course Data Authority** (v1.11.0)      | ✅ PASS        | HTML content stored in Blob with DB metadata; no placeholder data              |
+| **Code Organization** (db-only sourcing) | ✅ PASS        | Reuses existing Prisma model; no hardcoded materials                           |
+| **UI Consistency** (informal German)     | ✅ PASS        | Labels "hinzufügen"/"anlegen" already confirmed; consistent with Feature 026   |
+| **Design Tokens** (from Feature 026)     | ✅ PASS        | Icon/styling reused from existing "Steuerdatei hinzufügen" tile                |
+| **API Security** (upload validation)     | ✅ PASS        | File extension + Content-Type validation required; matches Feature 026 pattern |
+| **Deployment & Testing** (E2E coverage)  | ⚠️ CONDITIONAL | Playwright E2E tests must cover new upload flow; TBD in Phase 2                |
 
 ## Project Structure
 
@@ -101,15 +101,15 @@ _All clarifications resolved in Spec Phase; no NEEDS CLARIFICATION remain._
 
 ### Research Findings
 
-| Topic | Finding | Source |
-|-------|---------|--------|
-| **HTML Upload Pattern** | Reuse existing Feature 026 slide control file upload; max 20 MB, .html validation server-side | Spec req UP1-UP6 |
-| **Storage Pattern** | Vercel Blob under `course-material/content/{identifier}.html`; no sanitization | Spec req UP3 |
-| **Type Differentiation** | Use existing `CourseMaterialType` enum (CONTENT, SLIDE_CONTROL); both stored identically in DB | Spec clarification #3 |
-| **UI Layout** | CSS Grid 2-column first row, 1-column second row; reuse "Steuerdatei" icon | Spec req LY1-LY2 |
-| **Tile Labeling** | "hinzufügen" (upload) vs "anlegen" (editor); consistent across interface | Spec clarification #3 |
-| **Error Handling** | Generic client messages; detailed server-side logging (pattern from Feature 026) | Spec req UP6 |
-| **Testing Strategy** | Contract tests for API; integration tests for upload flow; E2E tests for UI layout | AGENTS.md testing stack |
+| Topic                    | Finding                                                                                        | Source                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------- | ----------------------- |
+| **HTML Upload Pattern**  | Reuse existing Feature 026 slide control file upload; max 20 MB, .html validation server-side  | Spec req UP1-UP6        |
+| **Storage Pattern**      | Vercel Blob under `course-material/content/{identifier}.html`; no sanitization                 | Spec req UP3            |
+| **Type Differentiation** | Use existing `CourseMaterialType` enum (CONTENT, SLIDE_CONTROL); both stored identically in DB | Spec clarification #3   |
+| **UI Layout**            | CSS Grid 2-column first row, 1-column second row; reuse "Steuerdatei" icon                     | Spec req LY1-LY2        |
+| **Tile Labeling**        | "hinzufügen" (upload) vs "anlegen" (editor); consistent across interface                       | Spec clarification #3   |
+| **Error Handling**       | Generic client messages; detailed server-side logging (pattern from Feature 026)               | Spec req UP6            |
+| **Testing Strategy**     | Contract tests for API; integration tests for upload flow; E2E tests for UI layout             | AGENTS.md testing stack |
 
 ### Phase 0 Status
 
@@ -134,17 +134,18 @@ _All clarifications resolved in Spec Phase; no NEEDS CLARIFICATION remain._
 
 **Endpoint**: `POST /api/admin/course-material` (extend existing)
 
-| Aspect | Specification |
-|--------|---------------|
-| **Purpose** | Create new course material with HTML file upload |
-| **Method** | POST |
-| **Auth** | Clerk auth required; admin role required (per existing pattern) |
-| **Input** | `FormData` with `title` (required), `identifier` (optional), `file` (.html, ≤20 MB) |
-| **Validation** | File extension + `Content-Type: text/html` server-side |
-| **Success** | 201 Created with material metadata (id, title, type, blobUrl, blobPathname) |
-| **Error** | 400 (validation), 401 (auth), 403 (forbidden), 409 (duplicate identifier), 500 (DB failure), 502 (Blob storage failure) |
+| Aspect         | Specification                                                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Purpose**    | Create new course material with HTML file upload                                                                        |
+| **Method**     | POST                                                                                                                    |
+| **Auth**       | Clerk auth required; admin role required (per existing pattern)                                                         |
+| **Input**      | `FormData` with `title` (required), `identifier` (optional), `file` (.html, ≤20 MB)                                     |
+| **Validation** | File extension + `Content-Type: text/html` server-side                                                                  |
+| **Success**    | 201 Created with material metadata (id, title, type, blobUrl, blobPathname)                                             |
+| **Error**      | 400 (validation), 401 (auth), 403 (forbidden), 409 (duplicate identifier), 500 (DB failure), 502 (Blob storage failure) |
 
 **Response Schema**:
+
 ```json
 {
   "id": "uuid",
@@ -183,6 +184,7 @@ _All clarifications resolved in Spec Phase; no NEEDS CLARIFICATION remain._
 ### 1.4 Implementation References
 
 **Reuse from Feature 026**:
+
 - `app/api/admin/course-material/route.ts` — extend POST handler
 - `app/admin/course-material/new/page.tsx` — extend type selection logic
 - `lib/services/blob-storage.ts` — reuse upload helper
@@ -191,6 +193,7 @@ _All clarifications resolved in Spec Phase; no NEEDS CLARIFICATION remain._
 ### 1.5 Testing Strategy
 
 **Contract Tests** (Vitest):
+
 - ✅ POST endpoint accepts FormData with title, identifier, file
 - ✅ Rejects non-.html files (400 error)
 - ✅ Rejects files > 20 MB (400 error)
@@ -198,11 +201,13 @@ _All clarifications resolved in Spec Phase; no NEEDS CLARIFICATION remain._
 - ✅ Stores file in Blob with correct pathname
 
 **Integration Tests** (Vitest):
+
 - ✅ Upload flow: file → validation → Blob storage → DB insert
 - ✅ Error handling: invalid file → generic error message returned to client; server logs via `serverInstance.error()` (Rollbar)
 - ✅ Concurrent uploads don't cause ID collisions (auto-generated identifiers unique)
 
 **E2E Tests** (Playwright):
+
 - ✅ Material type selection screen renders 3 tiles in correct layout
 - ✅ Clicking "hinzufügen" tile opens upload form
 - ✅ Drag-and-drop HTML file triggers upload
@@ -214,16 +219,19 @@ _All clarifications resolved in Spec Phase; no NEEDS CLARIFICATION remain._
 **Scenario**: Admin uploads complete HTML course material
 
 **Setup**:
+
 1. Navigate to `/admin/course-material/new`
 2. Verify 3 tiles render in 2-1 layout
 
 **Steps**:
+
 1. Click "Ich möchte eine Inhaltsseite hinzufügen"
 2. Enter title "Advanced CSS Patterns"
 3. Upload file `advanced-css.html` (5 MB, valid HTML)
 4. Click "Save"
 
 **Expected Outcome**:
+
 - Upload completes (< 5 seconds)
 - Material appears in list with type badge "Inhaltsseite"
 - File stored in Blob at `course-material/content/{identifier}.html`
@@ -238,6 +246,7 @@ _This section describes task generation strategy; /tasks command will create tas
 ### Task Generation Strategy
 
 **Source Materials**:
+
 - Phase 1 API contract → contract test tasks
 - Phase 1 data model → no schema tasks (type field exists)
 - Phase 1 UI components → component implementation tasks
@@ -246,6 +255,7 @@ _This section describes task generation strategy; /tasks command will create tas
 ### Task Ordering (TDD + Dependency Order)
 
 **Priority 1 (Tests First)**:
+
 1. Contract tests for POST endpoint (✅ must fail initially)
 2. Integration test for upload flow (✅ must fail)
 3. E2E test for UI layout (✅ must fail)
@@ -282,10 +292,10 @@ _This section describes task generation strategy; /tasks command will create tas
 
 _No constitutional violations detected; no complexity deviations._
 
-| Item | Status |
-|------|--------|
-| Violations | None |
-| Deviations | None |
+| Item       | Status |
+| ---------- | ------ |
+| Violations | None   |
+| Deviations | None   |
 
 ---
 

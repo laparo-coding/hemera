@@ -17,25 +17,25 @@ paths:
             type: string
             enum: [PENDING, CONFIRMED, CANCELLED, COMPLETED]
       responses:
-        '200':
+        "200":
           description: List of bookings
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Booking'
-        '401':
+                          $ref: "#/components/schemas/Booking"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       tags:
         - Bookings
@@ -60,32 +60,32 @@ paths:
             example:
               courseId: "clx1234567890"
       responses:
-        '201':
+        "201":
           description: Booking created
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Booking'
-        '400':
+                        $ref: "#/components/schemas/Booking"
+        "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Already booked
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
