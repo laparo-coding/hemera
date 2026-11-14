@@ -23,10 +23,10 @@ Postman erstellt automatisch eine Collection mit allen Endpoints, gruppiert nach
 1. Importiere `docs/api/hemera.env.json` (gleicher Import-Prozess)
 2. Oder erstelle ein neues Environment mit folgenden Variablen:
 
-| Variable | Wert (Development) | Wert (Production) |
-|----------|-------------------|-------------------|
-| `baseUrl` | `http://localhost:3000/api` | `https://hemera.app/api` |
-| `clerkToken` | `<dein-JWT-Token>` | `<dein-JWT-Token>` |
+| Variable     | Wert (Development)          | Wert (Production)        |
+| ------------ | --------------------------- | ------------------------ |
+| `baseUrl`    | `http://localhost:3000/api` | `https://hemera.app/api` |
+| `clerkToken` | `<dein-JWT-Token>`          | `<dein-JWT-Token>`       |
 
 3. Wähle das Environment in der oberen rechten Ecke aus
 
@@ -64,6 +64,7 @@ Für authentifizierte Endpoints benötigst du ein Clerk JWT Token:
 3. Klicke auf **Send**
 
 Erwartete Antwort:
+
 ```json
 {
   "success": true,

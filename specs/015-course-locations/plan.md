@@ -31,6 +31,7 @@
 ## Summary
 
 Create a Location entity for storing venue/location information for courses, including:
+
 - **Database**: Location model with Prisma (16 fields, one-to-many relationship with Course)
 - **API**: RESTful CRUD endpoints at `/api/locations` with admin authorization
 - **Admin UI**: Location management page at `/admin/locations` following Course admin pattern
@@ -53,16 +54,16 @@ Create a Location entity for storing venue/location information for courses, inc
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Test-First Development | ✅ Pass | Contract tests planned before implementation |
-| Code Quality (Prettier/ESLint) | ✅ Pass | Standard tooling applies |
-| Clerk Authentication | ✅ Pass | Admin routes require auth (FR-API-006/007) |
-| Prisma Migrations | ✅ Pass | Location model requires migration |
-| Error Handling | ✅ Pass | Rollbar integration for API errors |
-| MUI Design System | ✅ Pass | Admin page uses MUI (FR-ADM-023) |
-| WCAG 2.1 AA Accessibility | ✅ Pass | Alt text, touch targets defined (FR-LP-019/022) |
-| GitHub Actions Deployment | ✅ Pass | Standard workflow applies |
+| Gate                           | Status  | Notes                                           |
+| ------------------------------ | ------- | ----------------------------------------------- |
+| Test-First Development         | ✅ Pass | Contract tests planned before implementation    |
+| Code Quality (Prettier/ESLint) | ✅ Pass | Standard tooling applies                        |
+| Clerk Authentication           | ✅ Pass | Admin routes require auth (FR-API-006/007)      |
+| Prisma Migrations              | ✅ Pass | Location model requires migration               |
+| Error Handling                 | ✅ Pass | Rollbar integration for API errors              |
+| MUI Design System              | ✅ Pass | Admin page uses MUI (FR-ADM-023)                |
+| WCAG 2.1 AA Accessibility      | ✅ Pass | Alt text, touch targets defined (FR-LP-019/022) |
+| GitHub Actions Deployment      | ✅ Pass | Standard workflow applies                       |
 
 ## Project Structure
 
@@ -144,13 +145,13 @@ tests/
 
 ### Key Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Map Library | React Leaflet | Free, DSGVO-compliant, OSM integration |
-| Geocoding | Nominatim API | Free, OSM-consistent, cached in DB |
-| Slug Strategy | Auto from name | Matches Course pattern |
-| Image Storage | URL only | Matches Course thumbnailUrl pattern |
-| Admin Workflow | Manual entry | Website scanning deferred to Phase 2 |
+| Decision       | Choice         | Rationale                              |
+| -------------- | -------------- | -------------------------------------- |
+| Map Library    | React Leaflet  | Free, DSGVO-compliant, OSM integration |
+| Geocoding      | Nominatim API  | Free, OSM-consistent, cached in DB     |
+| Slug Strategy  | Auto from name | Matches Course pattern                 |
+| Image Storage  | URL only       | Matches Course thumbnailUrl pattern    |
+| Admin Workflow | Manual entry   | Website scanning deferred to Phase 2   |
 
 **Output**: [research.md](./research.md)
 
@@ -160,24 +161,24 @@ tests/
 
 **Location Entity** (16 fields):
 
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| id | String (CUID) | Auto | Primary key |
-| slug | String | Auto | Unique, from name |
-| name | String | Yes | Display name |
-| description | String | No | Venue description |
-| address | String | Yes | Street address |
-| zipCode | String | No | Postal code |
-| city | String | Yes | City name |
-| email | String | No | Contact email (validated) |
-| phone | String | No | Contact phone |
-| website | String | No | Website URL (validated) |
-| imageUrl | String | No | Exterior image URL |
-| roomImageUrl | String | No | Interior image URL |
-| latitude | Float | No | From Nominatim |
-| longitude | Float | No | From Nominatim |
-| createdAt | DateTime | Auto | Timestamp |
-| updatedAt | DateTime | Auto | Timestamp |
+| Field        | Type          | Required | Notes                     |
+| ------------ | ------------- | -------- | ------------------------- |
+| id           | String (CUID) | Auto     | Primary key               |
+| slug         | String        | Auto     | Unique, from name         |
+| name         | String        | Yes      | Display name              |
+| description  | String        | No       | Venue description         |
+| address      | String        | Yes      | Street address            |
+| zipCode      | String        | No       | Postal code               |
+| city         | String        | Yes      | City name                 |
+| email        | String        | No       | Contact email (validated) |
+| phone        | String        | No       | Contact phone             |
+| website      | String        | No       | Website URL (validated)   |
+| imageUrl     | String        | No       | Exterior image URL        |
+| roomImageUrl | String        | No       | Interior image URL        |
+| latitude     | Float         | No       | From Nominatim            |
+| longitude    | Float         | No       | From Nominatim            |
+| createdAt    | DateTime      | Auto     | Timestamp                 |
+| updatedAt    | DateTime      | Auto     | Timestamp                 |
 
 **Relationship**: Course → Location (optional FK `locationId`)
 
@@ -185,14 +186,14 @@ tests/
 
 ### API Contracts
 
-| Endpoint | Method | Auth | Description |
-|----------|--------|------|-------------|
-| `/api/locations` | GET | Public | List all locations |
-| `/api/locations` | POST | Admin | Create location |
-| `/api/locations/[id]` | GET | Public | Get single location |
-| `/api/locations/[id]` | PUT | Admin | Update location |
-| `/api/locations/[id]` | DELETE | Admin | Delete (if no refs) |
-| `/api/locations/geocode` | POST | Admin | Geocode address |
+| Endpoint                 | Method | Auth   | Description         |
+| ------------------------ | ------ | ------ | ------------------- |
+| `/api/locations`         | GET    | Public | List all locations  |
+| `/api/locations`         | POST   | Admin  | Create location     |
+| `/api/locations/[id]`    | GET    | Public | Get single location |
+| `/api/locations/[id]`    | PUT    | Admin  | Update location     |
+| `/api/locations/[id]`    | DELETE | Admin  | Delete (if no refs) |
+| `/api/locations/geocode` | POST   | Admin  | Geocode address     |
 
 **Output**: [contracts/locations-api.yaml](./contracts/locations-api.yaml)
 
@@ -245,6 +246,7 @@ _This section describes what the /tasks command will do - DO NOT execute during 
    - Link from Course detail to Location page
 
 **Ordering Strategy**:
+
 - TDD order: Tests before implementation
 - Dependency order: Schema → Service → API → Components → Pages
 - Mark [P] for parallel execution (independent files)
@@ -263,12 +265,12 @@ _Executed by /implement or manual development_
 
 ## Progress Tracking
 
-| Phase | Status | Artifacts |
-|-------|--------|-----------|
-| Phase 0: Research | ✅ Complete | research.md |
-| Phase 1: Design | ✅ Complete | data-model.md, contracts/, quickstart.md |
-| Phase 2: Tasks | ⏳ Pending | /tasks command |
-| Phase 3+: Impl | ⏳ Pending | Source code |
+| Phase             | Status      | Artifacts                                |
+| ----------------- | ----------- | ---------------------------------------- |
+| Phase 0: Research | ✅ Complete | research.md                              |
+| Phase 1: Design   | ✅ Complete | data-model.md, contracts/, quickstart.md |
+| Phase 2: Tasks    | ⏳ Pending  | /tasks command                           |
+| Phase 3+: Impl    | ⏳ Pending  | Source code                              |
 
 ---
 

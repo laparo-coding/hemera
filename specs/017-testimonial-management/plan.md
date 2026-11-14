@@ -102,12 +102,12 @@ prisma/
 
 Research completed in [research.md](research.md). Key decisions:
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Data Model | Testimonial → Booking (1:1) | Consistent with CourseParticipation; enforces eligibility |
-| Name Display | Enum with 4 options | Clear UI mapping; cached at write time |
-| Status Workflow | DRAFT → PENDING → PUBLISHED / HIDDEN | Supports admin approval; soft-delete via HIDDEN |
-| Caching | Store computed displayName + photoUrl | Avoid Clerk API calls on public page render |
+| Decision        | Choice                                | Rationale                                                 |
+| --------------- | ------------------------------------- | --------------------------------------------------------- |
+| Data Model      | Testimonial → Booking (1:1)           | Consistent with CourseParticipation; enforces eligibility |
+| Name Display    | Enum with 4 options                   | Clear UI mapping; cached at write time                    |
+| Status Workflow | DRAFT → PENDING → PUBLISHED / HIDDEN  | Supports admin approval; soft-delete via HIDDEN           |
+| Caching         | Store computed displayName + photoUrl | Avoid Clerk API calls on public page render               |
 
 ## Phase 1: Design & Contracts ✅
 
@@ -121,17 +121,18 @@ Defined in [data-model.md](data-model.md). New entities:
 
 ### API Contracts
 
-| Endpoint | Method | Description | Auth |
-|----------|--------|-------------|------|
-| `/api/testimonials` | GET | List testimonials (filter by course/user/status) | Public (PUBLISHED) / Auth (own) |
-| `/api/testimonials` | POST | Create testimonial for booking | Authenticated participant |
-| `/api/testimonials/[id]` | GET | Get single testimonial | Public (PUBLISHED) / Auth (own) |
-| `/api/testimonials/[id]` | PATCH | Update statement/format or change status | Owner (edit) / Admin (approve) |
-| `/api/testimonials/[id]` | DELETE | Soft-delete (set HIDDEN) | Admin only |
+| Endpoint                 | Method | Description                                      | Auth                            |
+| ------------------------ | ------ | ------------------------------------------------ | ------------------------------- |
+| `/api/testimonials`      | GET    | List testimonials (filter by course/user/status) | Public (PUBLISHED) / Auth (own) |
+| `/api/testimonials`      | POST   | Create testimonial for booking                   | Authenticated participant       |
+| `/api/testimonials/[id]` | GET    | Get single testimonial                           | Public (PUBLISHED) / Auth (own) |
+| `/api/testimonials/[id]` | PATCH  | Update statement/format or change status         | Owner (edit) / Admin (approve)  |
+| `/api/testimonials/[id]` | DELETE | Soft-delete (set HIDDEN)                         | Admin only                      |
 
 ### Quickstart
 
 Defined in [quickstart.md](quickstart.md). Validation steps:
+
 1. Create booking for test user
 2. Submit testimonial via dashboard form
 3. Verify PENDING status
@@ -143,6 +144,7 @@ Defined in [quickstart.md](quickstart.md). Validation steps:
 _Executed by /tasks command_
 
 **Task Generation Strategy**:
+
 - Contract tests for each API endpoint (5 tasks)
 - Prisma migration for new entities (1 task)
 - Service layer with business logic (1 task)
@@ -152,6 +154,7 @@ _Executed by /tasks command_
 - E2E tests for complete flow (2 tasks)
 
 **Ordering Strategy**:
+
 1. Database migration (foundation)
 2. Contract tests (TDD: write failing tests)
 3. API implementation (make tests pass)
@@ -163,10 +166,10 @@ _Executed by /tasks command_
 
 ## Progress Tracking
 
-| Phase | Status | Artifacts |
-|-------|--------|-----------|
-| Phase 0: Research | ✅ Complete | research.md |
-| Phase 1: Design | ✅ Complete | data-model.md, quickstart.md |
-| Constitution Check (Initial) | ✅ PASS | All gates passed |
-| Constitution Check (Post-Design) | ✅ PASS | No new violations |
-| Phase 2: Tasks | ✅ Complete | tasks.md (22 tasks) |
+| Phase                            | Status      | Artifacts                    |
+| -------------------------------- | ----------- | ---------------------------- |
+| Phase 0: Research                | ✅ Complete | research.md                  |
+| Phase 1: Design                  | ✅ Complete | data-model.md, quickstart.md |
+| Constitution Check (Initial)     | ✅ PASS     | All gates passed             |
+| Constitution Check (Post-Design) | ✅ PASS     | No new violations            |
+| Phase 2: Tasks                   | ✅ Complete | tasks.md (22 tasks)          |

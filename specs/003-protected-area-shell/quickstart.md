@@ -21,6 +21,7 @@ navigation.
 ### Steps
 
 1. **Start the application**
+
    ```bash
    cd /Users/Zauberflocke/Documents/My\ Dev\ Projects/hemera
    npm run dev
@@ -217,6 +218,7 @@ Verify that performance requirements are met for protected area access.
    - Verify clean state for future tests
 
 3. **Stop development server**
+
    ```bash
    # Press Ctrl+C in terminal running npm run dev
    ```

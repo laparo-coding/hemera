@@ -81,7 +81,7 @@
 ## Testing Phase Consistency
 
 - [x] CHK050 — Is the "testing phase" scope boundary defined? (When does it end? Who decides? Is there a feature flag?) [Gap] → Acceptable: product decision outside this spec's scope. Feature is self-contained and functional without locking.
-- [x] CHK051 — Are ALL artifacts consistently updated for the testing-phase "all unlocked" policy? (spec ✅, data-model ✅, contracts ✅, tasks ✅ — but Design Component table in spec still shows Locked row) [Consistency] → **FIXED** (`specs/027-user-course-management/spec.md`): Design Component table now shows "Locked *(post-testing)*" with explanatory note.
+- [x] CHK051 — Are ALL artifacts consistently updated for the testing-phase "all unlocked" policy? (spec ✅, data-model ✅, contracts ✅, tasks ✅ — but Design Component table in spec still shows Locked row) [Consistency] → **FIXED** (`specs/027-user-course-management/spec.md`): Design Component table now shows "Locked _(post-testing)_" with explanatory note.
 - [x] CHK052 — Are requirements clear about what code to write now vs. defer? Should Locked state code be written but feature-flagged, or omitted entirely? [Clarity, Gap] → **FIXED** (via CHK051): Note says "Only Completed and Active states are implemented." Contracts: "NOT implemented during testing phase." Tasks: no Locked tasks.
 
 ## Security & Privacy

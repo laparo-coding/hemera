@@ -170,16 +170,16 @@ GET /api/admin/analytics?type=trace&requestId=xyz123
 ```yaml
 performance_alerts:
   slow_response:
-    threshold: '> 2s average in 5min'
-    action: 'Slack notification'
+    threshold: "> 2s average in 5min"
+    action: "Slack notification"
 
   high_error_rate:
-    threshold: '> 5% in 10min'
-    action: 'Email + Slack'
+    threshold: "> 5% in 10min"
+    action: "Email + Slack"
 
   anomaly_detection:
-    threshold: '500% volume increase'
-    action: 'Immediate alert'
+    threshold: "500% volume increase"
+    action: "Immediate alert"
 ```
 
 ### Business-Metriken

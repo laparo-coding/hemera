@@ -112,7 +112,9 @@ export function mapPrismaError(error: unknown): HttpError {
 **Example**:
 
 ```typescript
-export function withErrorHandling<T extends unknown[], R>(handler: (...args: T) => Promise<R>) {
+export function withErrorHandling<T extends unknown[], R>(
+  handler: (...args: T) => Promise<R>
+) {
   return async (...args: T): Promise<R> => {
     try {
       return await handler(...args);

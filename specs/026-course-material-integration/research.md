@@ -11,6 +11,7 @@ All Technical Context items resolved; no NEEDS CLARIFICATION remaining.
 identical MIME types and extensions. File-extension heuristics cannot distinguish them; an explicit
 DB field is the simplest, most reliable approach.
 **Alternatives**:
+
 - Blob pathname convention (e.g., `course-material/slides/` vs `course-material/`) — fragile, would
   require path parsing at every read.
 - Separate Prisma model (`SlideControlFile`) — adds join complexity and diverges CRUD patterns that
@@ -24,6 +25,7 @@ in addition to `application/json`. Detect via `Content-Type` header.
 (separate route, e.g., `POST /api/admin/course-material/upload`) would duplicate auth, validation,
 and identifier handling.
 **Alternatives**:
+
 - Separate upload endpoint — rejected for DRY reasons.
 - Client-side Base64 encoding + JSON body — rejected for 20 MB files (33% overhead, memory pressure).
 
@@ -35,10 +37,12 @@ No sanitization for SLIDE_CONTROL files.
 **Rationale**: Slide control files are admin-uploaded and rendered in controlled contexts. Sanitizing
 them would break their functionality (they may contain inline scripts for slide control logic).
 **Alternatives**:
+
 - Sanitize all uploads — rejected because SLIDE_CONTROL files contain intentional script/style blocks.
 - Client-only validation — rejected; server must be authoritative per constitution.
 
 **Security controls implemented**:
+
 - Runtime type validation for FormData fields (prevent `as` cast bypasses)
 - blobUrl null guards before Vercel Blob `del()` calls
 - Generic error messages in client responses (raw blob errors logged server-side only)
@@ -51,6 +55,7 @@ them would break their functionality (they may contain inline scripts for slide 
 „Inhaltsseite" for `CONTENT`, „Steuerdatei" for `SLIDE_CONTROL`.
 **Rationale**: Minimal UI change, high information value. No filter needed at current scale.
 **Alternatives**:
+
 - Icon-only indicator — less accessible, harder to interpret.
 - Dedicated column — takes horizontal space; chip is more compact inline.
 
@@ -61,19 +66,20 @@ them would break their functionality (they may contain inline scripts for slide 
 **Rationale**: Single entry point (`/admin/course-material/[id]/edit`), type-driven conditional
 rendering. No separate edit routes needed.
 **Alternatives**:
+
 - Separate edit routes per type — rejected for URL consistency and code duplication.
 
 ### 6. Existing Code Patterns Identified
 
-| Pattern | Location | Reuse Strategy |
-|---------|----------|----------------|
-| Drag-and-drop upload | `components/participation/ResumeUploader.tsx` | Adapt visual pattern (beige/bronze tokens, progress indicators) |
-| Hidden file input | `components/admin/SlideEditorToolbar.tsx` | Reuse click-to-browse pattern |
-| Blob upload (server) | `app/api/admin/course-material/route.ts` (POST) | Extend with FormData branch |
-| Blob delete + replace | `app/api/admin/course-material/[id]/route.ts` (PUT) | Extend with FormData branch |
-| Zod schemas | `lib/schemas/admin/course-material.ts` | Add `type` field + file upload schema |
-| Contract tests | `tests/contracts/course-material-api.spec.ts` | Extend with FormData test cases |
-| Unit tests | `tests/unit/schemas/course-material.spec.ts` | Add type field + upload schema tests |
+| Pattern               | Location                                            | Reuse Strategy                                                  |
+| --------------------- | --------------------------------------------------- | --------------------------------------------------------------- |
+| Drag-and-drop upload  | `components/participation/ResumeUploader.tsx`       | Adapt visual pattern (beige/bronze tokens, progress indicators) |
+| Hidden file input     | `components/admin/SlideEditorToolbar.tsx`           | Reuse click-to-browse pattern                                   |
+| Blob upload (server)  | `app/api/admin/course-material/route.ts` (POST)     | Extend with FormData branch                                     |
+| Blob delete + replace | `app/api/admin/course-material/[id]/route.ts` (PUT) | Extend with FormData branch                                     |
+| Zod schemas           | `lib/schemas/admin/course-material.ts`              | Add `type` field + file upload schema                           |
+| Contract tests        | `tests/contracts/course-material-api.spec.ts`       | Extend with FormData test cases                                 |
+| Unit tests            | `tests/unit/schemas/course-material.spec.ts`        | Add type field + upload schema tests                            |
 
 ### 7. Constitutional Compliance Notes
 

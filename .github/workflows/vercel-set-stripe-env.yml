@@ -1,28 +1,28 @@
-name: 'Vercel: Set Stripe Env'
+name: "Vercel: Set Stripe Env"
 
 on:
   workflow_dispatch:
     inputs:
       stripe_secret_key:
-        description: 'Optional: STRIPE_SECRET_KEY (overrides secret if provided)'
+        description: "Optional: STRIPE_SECRET_KEY (overrides secret if provided)"
         required: false
-        default: ''
+        default: ""
       next_public_stripe_publishable_key:
-        description: 'Optional: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (overrides secret if provided)'
+        description: "Optional: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (overrides secret if provided)"
         required: false
-        default: ''
+        default: ""
       set_webhook_secret:
-        description: 'Also set STRIPE_WEBHOOK_SECRET (if provided as a secret)'
+        description: "Also set STRIPE_WEBHOOK_SECRET (if provided as a secret)"
         required: false
-        default: 'false'
+        default: "false"
         type: choice
-        options: ['false', 'true']
+        options: ["false", "true"]
       set_api_version:
-        description: 'Also set STRIPE_API_VERSION (if provided as a secret)'
+        description: "Also set STRIPE_API_VERSION (if provided as a secret)"
         required: false
-        default: 'false'
+        default: "false"
         type: choice
-        options: ['false', 'true']
+        options: ["false", "true"]
 
 jobs:
   set-env:

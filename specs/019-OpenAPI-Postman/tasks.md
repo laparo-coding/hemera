@@ -46,12 +46,14 @@
 - [ ] T003 Create base OpenAPI file `docs/api/openapi.yaml` with info, servers, security schemes
 
 ### T001 Details
+
 ```
 Files: docs/api/README.md
 Action: Create directory and placeholder README
 ```
 
 ### T002 Details
+
 ```
 Files: .spectral.yaml
 Action: Configure Spectral with spectral:oas ruleset + custom rules for Hemera conventions
@@ -59,6 +61,7 @@ Command: npm install -D @stoplight/spectral-cli
 ```
 
 ### T003 Details
+
 ```
 Files: docs/api/openapi.yaml
 Action: Create OpenAPI 3.1.0 base structure with:
@@ -79,6 +82,7 @@ Action: Create OpenAPI 3.1.0 base structure with:
 - [ ] T005 [P] Create Postman import validation test script `scripts/validate-postman-import.js`
 
 ### T004 Details
+
 ```
 Files: .spectral.yaml
 Rules to enforce:
@@ -90,6 +94,7 @@ Rules to enforce:
 ```
 
 ### T005 Details
+
 ```
 Files: scripts/validate-postman-import.js
 Action: Script that:
@@ -109,6 +114,7 @@ Action: Script that:
 - [ ] T009 [P] Document utility schemas in `docs/api/openapi.yaml` components/schemas (Pagination, HealthCheck, PaymentIntent, CheckoutSession)
 
 ### T006-T009 Details
+
 ```
 Source: specs/019-OpenAPI-Postman/data-model.md
 Target: docs/api/openapi.yaml → components/schemas/
@@ -131,6 +137,7 @@ Each task documents one tag group from contracts/ into openapi.yaml paths sectio
 - [ ] T017 [P] Document Monitoring endpoints (vitals) from `contracts/monitoring.yaml` → `docs/api/openapi.yaml` paths
 
 ### T010-T017 Details
+
 ```
 Source: specs/019-OpenAPI-Postman/contracts/*.yaml
 Target: docs/api/openapi.yaml → paths/
@@ -148,12 +155,14 @@ Note: All [P] tasks document different paths - can run in parallel
 - [ ] T021 Add basic response validation tests to Postman collection (status codes, response structure)
 
 ### T018 Details
+
 ```
 Command: npx openapi-to-postmanv2 -s docs/api/openapi.yaml -o docs/api/hemera.postman.json
 Verify: Collection structure, folder organization matches tags
 ```
 
 ### T019 Details
+
 ```
 Files: docs/api/hemera.postman.json
 Action: Add collection-level pre-request script:
@@ -166,6 +175,7 @@ Action: Add collection-level pre-request script:
 ```
 
 ### T020 Details
+
 ```
 Files: docs/api/hemera.env.json
 Variables:
@@ -175,6 +185,7 @@ Variables:
 ```
 
 ### T021 Details
+
 ```
 Files: docs/api/hemera.postman.json
 Action: Add test scripts to key requests:
@@ -191,6 +202,7 @@ Action: Add test scripts to key requests:
 - [ ] T024 Execute quickstart.md validation: Import into Postman, test sample requests against dev server
 
 ### T022 Details
+
 ```
 Files: docs/api/README.md
 Content:
@@ -202,6 +214,7 @@ Content:
 ```
 
 ### T023 Details
+
 ```
 Command: npx spectral lint docs/api/openapi.yaml
 Expected: 0 errors, 0 warnings
@@ -209,6 +222,7 @@ Fix: Any violations before proceeding
 ```
 
 ### T024 Details
+
 ```
 Action: Manual validation following specs/019-OpenAPI-Postman/quickstart.md
 Steps:
@@ -239,19 +253,20 @@ Polish (T022-T024) → need Postman collection
 
 ### Blocking Dependencies
 
-| Task | Blocked By | Reason |
-|------|------------|--------|
-| T006-T009 | T003 | Need base openapi.yaml structure |
-| T010-T017 | T006-T009 | Need schema $refs to exist |
-| T018 | T010-T017 | Need complete paths section |
-| T019-T021 | T018 | Need generated collection |
-| T023-T024 | T018-T021 | Final validation |
+| Task      | Blocked By | Reason                           |
+| --------- | ---------- | -------------------------------- |
+| T006-T009 | T003       | Need base openapi.yaml structure |
+| T010-T017 | T006-T009  | Need schema $refs to exist       |
+| T018      | T010-T017  | Need complete paths section      |
+| T019-T021 | T018       | Need generated collection        |
+| T023-T024 | T018-T021  | Final validation                 |
 
 ---
 
 ## Parallel Execution Examples
 
 ### Schema Tasks (T006-T009)
+
 ```
 # Launch all schema tasks together after T003:
 Task: "Document core response schemas (StandardResponse, ErrorResponse)"
@@ -261,6 +276,7 @@ Task: "Document utility schemas (Pagination, HealthCheck, PaymentIntent)"
 ```
 
 ### Endpoint Documentation Tasks (T010-T017)
+
 ```
 # Launch all endpoint tasks together after schemas complete:
 Task: "Document Public endpoints from contracts/public.yaml"
@@ -301,15 +317,15 @@ _GATE: Check before marking tasks.md complete_
 
 ## Task Summary
 
-| Phase | Tasks | Parallel | Sequential |
-|-------|-------|----------|------------|
-| Setup | T001-T003 | 0 | 3 |
-| Validation Tests | T004-T005 | 1 | 1 |
-| Schemas | T006-T009 | 4 | 0 |
-| Endpoints | T010-T017 | 8 | 0 |
-| Postman | T018-T021 | 0 | 4 |
-| Polish | T022-T024 | 1 | 2 |
-| **Total** | **24** | **14** | **10** |
+| Phase            | Tasks     | Parallel | Sequential |
+| ---------------- | --------- | -------- | ---------- |
+| Setup            | T001-T003 | 0        | 3          |
+| Validation Tests | T004-T005 | 1        | 1          |
+| Schemas          | T006-T009 | 4        | 0          |
+| Endpoints        | T010-T017 | 8        | 0          |
+| Postman          | T018-T021 | 0        | 4          |
+| Polish           | T022-T024 | 1        | 2          |
+| **Total**        | **24**    | **14**   | **10**     |
 
 ---
 

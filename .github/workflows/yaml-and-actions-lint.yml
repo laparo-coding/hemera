@@ -1,4 +1,4 @@
-name: 'Lint: YAML & Actions'
+name: "Lint: YAML & Actions"
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.x'
+          python-version: "3.x"
       - name: Install yamllint
         run: |
           python -m pip install --upgrade pip

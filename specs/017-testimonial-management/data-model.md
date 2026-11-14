@@ -52,38 +52,38 @@
 
 ### Testimonial
 
-| Field | Type | Constraint | Description |
-|-------|------|------------|-------------|
-| `id` | String | @id @default(cuid()) | Primary key |
-| `bookingId` | String | @unique FK → Booking | Links to participant's booking |
-| `courseId` | String | FK → Course | Denormalized for efficient course page queries |
-| `statement` | String | @db.VarChar(1000) | Testimonial text content |
-| `nameDisplayFormat` | NameDisplayFormat | enum | How participant name is displayed |
-| `cachedDisplayName` | String | | Pre-computed display name |
-| `cachedPhotoUrl` | String? | nullable | Profile photo URL from Clerk |
-| `cachedCity` | String? | nullable | City for format A display |
-| `status` | TestimonialStatus | enum, default DRAFT | Publication workflow state |
-| `createdAt` | DateTime | @default(now()) | Creation timestamp |
-| `updatedAt` | DateTime | @updatedAt | Last update timestamp |
+| Field               | Type              | Constraint           | Description                                    |
+| ------------------- | ----------------- | -------------------- | ---------------------------------------------- |
+| `id`                | String            | @id @default(cuid()) | Primary key                                    |
+| `bookingId`         | String            | @unique FK → Booking | Links to participant's booking                 |
+| `courseId`          | String            | FK → Course          | Denormalized for efficient course page queries |
+| `statement`         | String            | @db.VarChar(1000)    | Testimonial text content                       |
+| `nameDisplayFormat` | NameDisplayFormat | enum                 | How participant name is displayed              |
+| `cachedDisplayName` | String            |                      | Pre-computed display name                      |
+| `cachedPhotoUrl`    | String?           | nullable             | Profile photo URL from Clerk                   |
+| `cachedCity`        | String?           | nullable             | City for format A display                      |
+| `status`            | TestimonialStatus | enum, default DRAFT  | Publication workflow state                     |
+| `createdAt`         | DateTime          | @default(now())      | Creation timestamp                             |
+| `updatedAt`         | DateTime          | @updatedAt           | Last update timestamp                          |
 
 ### Enums
 
 #### NameDisplayFormat
 
-| Value | Display Example | Description |
-|-------|-----------------|-------------|
-| `FULL_NAME_CITY` | "Max Mustermann, Berlin" | Option A: Full name + city |
-| `FULL_NAME` | "Max Mustermann" | Option B: Full name only |
-| `FIRST_INITIAL` | "Max M." | Option C: First name + last initial |
-| `FIRST_NAME_ONLY` | "Max" | Option D: First name only |
+| Value             | Display Example          | Description                         |
+| ----------------- | ------------------------ | ----------------------------------- |
+| `FULL_NAME_CITY`  | "Max Mustermann, Berlin" | Option A: Full name + city          |
+| `FULL_NAME`       | "Max Mustermann"         | Option B: Full name only            |
+| `FIRST_INITIAL`   | "Max M."                 | Option C: First name + last initial |
+| `FIRST_NAME_ONLY` | "Max"                    | Option D: First name only           |
 
 #### TestimonialStatus
 
-| Value | Description |
-|-------|-------------|
-| `DRAFT` | Saved but not visible |
+| Value       | Description                   |
+| ----------- | ----------------------------- |
+| `DRAFT`     | Saved but not visible         |
 | `PUBLISHED` | Visible on course detail page |
-| `HIDDEN` | Hidden by user or admin |
+| `HIDDEN`    | Hidden by user or admin       |
 
 ## Prisma Schema Addition
 
@@ -124,11 +124,11 @@ model Testimonial {
 
 ## Relationships
 
-| From | To | Type | Description |
-|------|-----|------|-------------|
-| Testimonial | Booking | 1:1 | Each booking can have one testimonial |
-| Testimonial | Course | N:1 | Many testimonials per course |
-| Booking | Testimonial | 1:0..1 | Optional testimonial per booking |
+| From        | To          | Type   | Description                           |
+| ----------- | ----------- | ------ | ------------------------------------- |
+| Testimonial | Booking     | 1:1    | Each booking can have one testimonial |
+| Testimonial | Course      | N:1    | Many testimonials per course          |
+| Booking     | Testimonial | 1:0..1 | Optional testimonial per booking      |
 
 ## Required Schema Changes
 

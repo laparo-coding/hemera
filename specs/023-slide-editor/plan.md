@@ -22,6 +22,7 @@
 Erstelle ein WYSIWYG-Modul zur Gestaltung von HTML-Seiten (Seminarmaterial/Slides) im Admin-Panel. Das Modul nutzt **Tiptap** als Rich-Text-Editor und speichert HTML-Dateien/Bilder in **Vercel Blob** (da Vercel kein persistentes Dateisystem hat). Curriculum-Einträge können über `materialId` mit spezifischem Seminarmaterial verknüpft werden.
 
 **Kernfunktionen:**
+
 - Tiptap-Editor mit StarterKit, Image, Table, Link Extensions
 - CRUD für SeminarMaterial mit Auto-Slug-Identifier
 - Vercel Blob Storage für HTML und Bilder
@@ -43,15 +44,15 @@ Erstelle ein WYSIWYG-Modul zur Gestaltung von HTML-Seiten (Seminarmaterial/Slide
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Notes |
-|------|--------|-------|
+| Gate                          | Status  | Notes                                                             |
+| ----------------------------- | ------- | ----------------------------------------------------------------- |
 | **I. Test-First Development** | ✅ PASS | Contract tests für API-Routen geplant, Unit-Tests für SlideEditor |
-| **II. Code Quality** | ✅ PASS | Biome/Prettier/ESLint enforced, TypeScript strict |
-| **III. Feature Dev Workflow** | ✅ PASS | Spec → Plan → Tasks Workflow eingehalten |
-| **IV. Auth & Security** | ✅ PASS | Admin-only via Clerk, Blob private/public access control |
-| **V. Component Architecture** | ✅ PASS | MUI-Integration, Tiptap als Client Component |
-| **VI. Error Handling** | ✅ PASS | Rollbar für Blob-Operationen, API-Fehler-Handling |
-| **VII. Stripe Integration** | N/A | Keine Zahlungsintegration in diesem Feature |
+| **II. Code Quality**          | ✅ PASS | Biome/Prettier/ESLint enforced, TypeScript strict                 |
+| **III. Feature Dev Workflow** | ✅ PASS | Spec → Plan → Tasks Workflow eingehalten                          |
+| **IV. Auth & Security**       | ✅ PASS | Admin-only via Clerk, Blob private/public access control          |
+| **V. Component Architecture** | ✅ PASS | MUI-Integration, Tiptap als Client Component                      |
+| **VI. Error Handling**        | ✅ PASS | Rollbar für Blob-Operationen, API-Fehler-Handling                 |
+| **VII. Stripe Integration**   | N/A     | Keine Zahlungsintegration in diesem Feature                       |
 
 **Initial Constitution Check**: PASS ✅  
 **Post-Design Constitution Check**: PASS ✅
@@ -164,29 +165,35 @@ export const curriculumTopicSchema = z.object({
 ### 1.2 API Contracts
 
 **POST /api/admin/seminarmaterial**
+
 - Request: `{ title: string, identifier?: string, htmlContent: string }`
 - Response: `{ id, identifier, title, blobUrl, createdAt }`
 - Auth: Admin only
 
 **PUT /api/admin/seminarmaterial/[id]**
+
 - Request: `{ title?: string, identifier?: string, htmlContent?: string }`
 - Response: `{ id, identifier, title, blobUrl, updatedAt }`
 - Auth: Admin only
 
 **DELETE /api/admin/seminarmaterial/[id]**
+
 - Response: `{ success: true }`
 - Side-Effect: Blob löschen
 - Auth: Admin only
 
 **GET /api/admin/seminarmaterial**
+
 - Response: `{ materials: [{ id, identifier, title, createdAt, updatedAt }] }`
 - Auth: Admin only
 
 **GET /api/admin/seminarmaterial/[id]/content**
+
 - Response: HTML-String aus Blob
 - Auth: Admin only
 
 **POST /api/admin/seminarmaterial/images**
+
 - Request: FormData mit `file`
 - Response: `{ url: string }` (public CDN-URL)
 - Auth: Admin only
@@ -209,6 +216,7 @@ tests/contracts/api/seminarmaterial.spec.ts
 ### 1.4 Quickstart
 
 **Lokales Testen:**
+
 ```bash
 # 1. Dependencies installieren
 npm install @tiptap/react @tiptap/pm @tiptap/starter-kit \
@@ -231,6 +239,7 @@ open http://localhost:3000/admin/seminarmaterial
 ```
 
 **E2E-Validierung:**
+
 ```bash
 # Seminarmaterial-Tests ausführen
 npx playwright test tests/e2e/admin-seminarmaterial.spec.ts
@@ -265,6 +274,7 @@ _This section describes what the /tasks command will do - DO NOT execute during 
    - E2E-Tests
 
 **Ordering Strategy**:
+
 - TDD: Contract tests vor Implementation
 - Dependency order: Schema → API → Components → Integration
 - Parallel [P] für unabhängige Komponenten
@@ -276,8 +286,8 @@ _This section describes what the /tasks command will do - DO NOT execute during 
 _No constitution violations requiring justification._
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|--------------------------------------|
-| (none) | - | - |
+| --------- | ---------- | ------------------------------------ |
+| (none)    | -          | -                                    |
 
 ## Progress Tracking
 

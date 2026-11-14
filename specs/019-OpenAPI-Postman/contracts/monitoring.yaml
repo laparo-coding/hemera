@@ -23,13 +23,13 @@ paths:
             default: json
           description: Output format for metrics
       responses:
-        '200':
+        "200":
           description: Application vitals
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -75,13 +75,13 @@ paths:
                           timestamp:
                             type: string
                             format: date-time
-        '401':
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
           description: Rate limit exceeded
           headers:
             Retry-After:
@@ -91,4 +91,4 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"

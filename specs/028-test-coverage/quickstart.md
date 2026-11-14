@@ -35,6 +35,7 @@ npm run lint
 ```
 
 Expected result:
+
 - no TypeScript errors
 - no Biome failures
 
@@ -45,6 +46,7 @@ npm run test:unit:coverage
 ```
 
 Expected result:
+
 - coverage output generated in `coverage/`
 - baseline values available for global and `lib/services/`
 - no assumption yet that new thresholds are final
@@ -57,6 +59,7 @@ npm run test:contracts
 ```
 
 Expected result:
+
 - current Vitest-backed test layers run successfully
 - candidate gaps can be identified from failures, skips, or low-signal areas
 
@@ -74,6 +77,7 @@ npx playwright test --project=production-smoke
 ```
 
 Expected result:
+
 - Playwright projects remain operational
 - dashboard and authenticated journey scope can be planned realistically
 

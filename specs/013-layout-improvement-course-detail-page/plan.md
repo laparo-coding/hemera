@@ -31,9 +31,9 @@
 
 ## Summary
 
-Redesign the course detail page (`/courses/[slug]`) with Hemera premium feminine design system. 
-Key features: full-width layout, hero video via Mux, tabular curriculum display, multiple booking 
-CTAs at strategic positions, testimonials with success indicators. Database extension required 
+Redesign the course detail page (`/courses/[slug]`) with Hemera premium feminine design system.
+Key features: full-width layout, hero video via Mux, tabular curriculum display, multiple booking
+CTAs at strategic positions, testimonials with success indicators. Database extension required
 for `heroVideoPlaybackId` field. All styling uses existing design tokens from `lib/theme.ts`.
 
 ## Technical Context
@@ -52,18 +52,18 @@ for `heroVideoPlaybackId` field. All styling uses existing design tokens from `l
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Requirement | Status |
-|------|-------------|--------|
-| **Test-First Development** | Unit tests for new components before implementation | ✅ PASS |
-| **Prettier/ESLint** | All code passes formatting and linting | ✅ PASS |
-| **TypeScript Strict** | Full type safety for new components | ✅ PASS |
-| **WCAG 2.1 AA** | Accessibility compliance for interactive elements | ✅ PASS |
-| **Rollbar Integration** | Error tracking for video player failures | ✅ PASS |
-| **Performance Targets** | FCP < 1.2s, LCP < 2s (lazy loading video) | ✅ PASS |
-| **Clerk Integration** | Protected booking flow maintained | ✅ PASS (no changes) |
-| **Stripe Integration** | Booking CTAs use existing payment flow | ✅ PASS (no changes) |
-| **Design Token Usage** | Use theme.ts tokens, no hardcoded values | ✅ PASS |
-| **GitHub Actions Deploy** | Changes deployed via workflow only | ✅ PASS |
+| Gate                       | Requirement                                         | Status               |
+| -------------------------- | --------------------------------------------------- | -------------------- |
+| **Test-First Development** | Unit tests for new components before implementation | ✅ PASS              |
+| **Prettier/ESLint**        | All code passes formatting and linting              | ✅ PASS              |
+| **TypeScript Strict**      | Full type safety for new components                 | ✅ PASS              |
+| **WCAG 2.1 AA**            | Accessibility compliance for interactive elements   | ✅ PASS              |
+| **Rollbar Integration**    | Error tracking for video player failures            | ✅ PASS              |
+| **Performance Targets**    | FCP < 1.2s, LCP < 2s (lazy loading video)           | ✅ PASS              |
+| **Clerk Integration**      | Protected booking flow maintained                   | ✅ PASS (no changes) |
+| **Stripe Integration**     | Booking CTAs use existing payment flow              | ✅ PASS (no changes) |
+| **Design Token Usage**     | Use theme.ts tokens, no hardcoded values            | ✅ PASS              |
+| **GitHub Actions Deploy**  | Changes deployed via workflow only                  | ✅ PASS              |
 
 **Initial Constitution Check**: PASS ✅
 
@@ -120,8 +120,8 @@ tests/
 │   └── course-detail.spec.ts           # NEW: E2E tests
 ```
 
-**Structure Decision**: Next.js App Router with feature-based component organization. 
-New components in `components/course-detail/` folder. Legacy `CourseDetail.tsx` preserved 
+**Structure Decision**: Next.js App Router with feature-based component organization.
+New components in `components/course-detail/` folder. Legacy `CourseDetail.tsx` preserved
 for rollback capability.
 
 ## Phase 0: Outline & Research
@@ -267,18 +267,19 @@ _This checklist is updated during execution flow_
 
 **Artifacts Generated**:
 
-| Artifact | Status | Path |
-|----------|--------|------|
-| research.md | ✅ Complete | `specs/013-.../research.md` |
-| data-model.md | ✅ Complete | `specs/013-.../data-model.md` |
-| contracts/components.md | ✅ Complete | `specs/013-.../contracts/components.md` |
+| Artifact                   | Status      | Path                                       |
+| -------------------------- | ----------- | ------------------------------------------ |
+| research.md                | ✅ Complete | `specs/013-.../research.md`                |
+| data-model.md              | ✅ Complete | `specs/013-.../data-model.md`              |
+| contracts/components.md    | ✅ Complete | `specs/013-.../contracts/components.md`    |
 | contracts/design-tokens.md | ✅ Complete | `specs/013-.../contracts/design-tokens.md` |
-| quickstart.md | ✅ Complete | `specs/013-.../quickstart.md` |
-| tasks.md | ✅ Complete | `specs/013-.../tasks.md` |
+| quickstart.md              | ✅ Complete | `specs/013-.../quickstart.md`              |
+| tasks.md                   | ✅ Complete | `specs/013-.../tasks.md`                   |
 
 ---
 
 **Next Step**: Run `/implement` command to execute tasks T001-T022.
+
 - [ ] All NEEDS CLARIFICATION resolved
 - [ ] Complexity deviations documented
 

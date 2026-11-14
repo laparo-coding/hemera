@@ -108,10 +108,15 @@ const corsHeaders = {
 };
 
 // Example: Allow multiple trusted domains
-const allowedOrigins = ['https://trusted-app-1.example.com', 'https://trusted-app-2.example.com'];
+const allowedOrigins = [
+  'https://trusted-app-1.example.com',
+  'https://trusted-app-2.example.com',
+];
 
 const origin = request.headers.get('origin');
-const corsOrigin = allowedOrigins.includes(origin || '') ? origin : allowedOrigins[0];
+const corsOrigin = allowedOrigins.includes(origin || '')
+  ? origin
+  : allowedOrigins[0];
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': corsOrigin,
@@ -619,13 +624,16 @@ async function getUsers() {
 // Fetch analytics
 async function getAnalytics(timeframe = '24h', type = 'summary') {
   const params = new URLSearchParams({ timeframe, type });
-  const response = await fetch(`${API_BASE_URL}/api/admin/analytics?${params}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${CLERK_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/api/admin/analytics?${params}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${CLERK_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
 
   if (!response.ok) {
     const error = await response.json();
@@ -675,10 +683,10 @@ Rate Limiting ist über `lib/middleware/rate-limit.ts` implementiert:
 
 ### Konfigurierte Rate Limits
 
-| Rolle | Limit | Fenster |
-|-------|-------|---------|
+| Rolle        | Limit        | Fenster  |
+| ------------ | ------------ | -------- |
 | `api-client` | 100 Requests | 1 Minute |
-| `admin` | 500 Requests | 1 Minute |
+| `admin`      | 500 Requests | 1 Minute |
 
 Bei Überschreitung wird `429 Too Many Requests` mit `Retry-After` Header zurückgegeben.
 

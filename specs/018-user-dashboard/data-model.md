@@ -68,20 +68,29 @@ const now = new Date();
 // Section A: Nächstes Seminar (next upcoming)
 const nextSeminar = bookings
   .filter(b => b.course.startDate > now && b.paymentStatus !== 'CANCELLED')
-  .sort((a, b) => a.course.startDate - b.course.startDate)
-  [0];
+  .sort((a, b) => a.course.startDate - b.course.startDate)[0];
 
 // Section B: Weitere gebuchte Seminare
-const upcomingOthers = bookings
-  .filter(b => b.course.startDate > now && b.id !== nextSeminar?.id && b.paymentStatus !== 'CANCELLED');
+const upcomingOthers = bookings.filter(
+  b =>
+    b.course.startDate > now &&
+    b.id !== nextSeminar?.id &&
+    b.paymentStatus !== 'CANCELLED'
+);
 
 // Section C: Absolvierte Seminare
-const completed = bookings
-  .filter(b => (b.course.endDate || b.course.startDate) < now && b.participation !== null);
+const completed = bookings.filter(
+  b =>
+    (b.course.endDate || b.course.startDate) < now && b.participation !== null
+);
 
 // Section D: Seminare ohne Teilnahme
-const noShow = bookings
-  .filter(b => (b.course.endDate || b.course.startDate) < now && b.participation === null && b.paymentStatus !== 'CANCELLED');
+const noShow = bookings.filter(
+  b =>
+    (b.course.endDate || b.course.startDate) < now &&
+    b.participation === null &&
+    b.paymentStatus !== 'CANCELLED'
+);
 ```
 
 ---

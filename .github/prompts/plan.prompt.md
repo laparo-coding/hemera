@@ -1,6 +1,7 @@
 ---
+
 description:
-  Execute the implementation planning workflow using the plan template to generate design artifacts.
+Execute the implementation planning workflow using the plan template to generate design artifacts.
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST**

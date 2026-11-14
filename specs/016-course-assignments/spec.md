@@ -8,6 +8,7 @@
 ## Clarifications
 
 ### Session 2025-12-28
+
 - Q: How should résumé uploads be managed for each course participation? → A: Allow one active résumé; new upload replaces the old.
 - Q: Who is responsible for providing and maintaining the summary videos shown to participants? → A: Use MUX for videos.
 - Q: If a course currently has no summary videos on Mux, what should participants see in the Summary step? → A: Hide the Summary step entirely until videos exist.
@@ -82,4 +83,3 @@ _Updated by main() during processing_
 - [x] Requirements generated
 - [x] Entities identified
 - [ ] Review checklist passed
-

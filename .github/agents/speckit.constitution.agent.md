@@ -1,9 +1,12 @@
 ---
+
 description: Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync.
-handoffs: 
-  - label: Build Specification
-    agent: speckit.specify
-    prompt: Implement the feature specification based on the updated constitution. I want to build...
+handoffs:
+
+- label: Build Specification
+  agent: speckit.specify
+  prompt: Implement the feature specification based on the updated constitution. I want to build...
+
 ---
 
 ## User Input
@@ -26,14 +29,14 @@ Follow this execution flow:
 
 1. Load the existing constitution at `.specify/memory/constitution.md`.
    - Identify every placeholder token of the form `[ALL_CAPS_IDENTIFIER]`.
-   **IMPORTANT**: The user might require less or more principles than the ones used in the template. If a number is specified, respect that - follow the general template. You will update the doc accordingly.
+     **IMPORTANT**: The user might require less or more principles than the ones used in the template. If a number is specified, respect that - follow the general template. You will update the doc accordingly.
 
 2. Collect/derive values for placeholders:
    - If user input (conversation) supplies a value, use it.
    - Otherwise infer from existing repo context (README, docs, prior constitution versions if embedded).
-    - For governance dates:
-       - `RATIFICATION_DATE` is the original adoption date. If it is unknown in an interactive session, use the same two-phase timeout strategy as the Bestätigung der Prinzipienanzahl before writing `TODO(RATIFICATION_DATE): original adoption date unknown`.
-       - `LAST_AMENDED_DATE` is today if changes are made, otherwise keep previous.
+   - For governance dates:
+     - `RATIFICATION_DATE` is the original adoption date. If it is unknown in an interactive session, use the same two-phase timeout strategy as the Bestätigung der Prinzipienanzahl before writing `TODO(RATIFICATION_DATE): original adoption date unknown`.
+     - `LAST_AMENDED_DATE` is today if changes are made, otherwise keep previous.
    - `CONSTITUTION_VERSION` must increment according to semantic versioning rules:
      - MAJOR: Backward incompatible governance/principle removals or redefinitions.
      - MINOR: New principle/section added or materially expanded guidance.

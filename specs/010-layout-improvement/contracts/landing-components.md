@@ -122,11 +122,13 @@ const conceptContent: ConceptSectionProps = {
   features: [
     {
       title: 'Praxisorientiert',
-      description: 'Du übst in realistischen Szenarien und erhältst direktes Feedback.',
+      description:
+        'Du übst in realistischen Szenarien und erhältst direktes Feedback.',
     },
     {
       title: 'Wissenschaftlich fundiert',
-      description: 'Unsere Methoden basieren auf aktueller Verhandlungsforschung.',
+      description:
+        'Unsere Methoden basieren auf aktueller Verhandlungsforschung.',
     },
     {
       title: 'Persönlich begleitet',
@@ -234,7 +236,9 @@ const coursesContent: CourseCardProps[] = [
     title: 'Masterclass: Komplexe Verhandlungen',
     description:
       'Du meisterst anspruchsvolle Verhandlungssituationen und entwickelst deinen persönlichen Verhandlungsstil.',
-    upcomingDates: [{ date: new Date('2025-03-08'), formattedDate: '8. März 2025' }],
+    upcomingDates: [
+      { date: new Date('2025-03-08'), formattedDate: '8. März 2025' },
+    ],
     detailHref: '/courses/kurs-c',
     ctaText: 'Zur Masterclass',
   },

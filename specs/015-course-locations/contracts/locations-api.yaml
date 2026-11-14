@@ -14,9 +14,9 @@ paths:
       summary: List all locations
       operationId: listLocations
       tags: [Locations]
-      security: []  # Public endpoint
+      security: [] # Public endpoint
       responses:
-        '200':
+        "200":
           description: List of locations
           content:
             application/json:
@@ -26,7 +26,7 @@ paths:
                   locations:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Location'
+                      $ref: "#/components/schemas/Location"
                   total:
                     type: integer
 
@@ -41,20 +41,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LocationInput'
+              $ref: "#/components/schemas/LocationInput"
       responses:
-        '201':
+        "201":
           description: Location created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Location'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                $ref: "#/components/schemas/Location"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /locations/{id}:
     parameters:
@@ -69,16 +69,16 @@ paths:
       summary: Get a single location
       operationId: getLocation
       tags: [Locations]
-      security: []  # Public endpoint
+      security: [] # Public endpoint
       responses:
-        '200':
+        "200":
           description: Location details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Location'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/Location"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
     put:
       summary: Update a location
@@ -91,22 +91,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LocationInput'
+              $ref: "#/components/schemas/LocationInput"
       responses:
-        '200':
+        "200":
           description: Location updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Location'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/Location"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
     delete:
       summary: Delete a location
@@ -115,15 +115,15 @@ paths:
       security:
         - clerkAuth: []
       responses:
-        '204':
+        "204":
           description: Location deleted
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
           description: Location is referenced by courses
           content:
             application/json:
@@ -168,7 +168,7 @@ paths:
                 zipCode:
                   type: string
       responses:
-        '200':
+        "200":
           description: Geocoding result
           content:
             application/json:
@@ -183,10 +183,10 @@ paths:
                     nullable: true
                   success:
                     type: boolean
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /locations/by-slug/{slug}:
     parameters:
@@ -201,16 +201,16 @@ paths:
       summary: Get a location by slug
       operationId: getLocationBySlug
       tags: [Locations]
-      security: []  # Public endpoint
+      security: [] # Public endpoint
       responses:
-        '200':
+        "200":
           description: Location details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Location'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/Location"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
 components:
   securitySchemes:

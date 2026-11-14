@@ -3,6 +3,7 @@
 ## Kontext
 
 Die **Aither-App** (Next.js + Clerk) muss auf die **Hemera API** zugreifen, um:
+
 1. **Seminar-/Kursdaten lesen** (Courses, Bookings, Teilnehmer)
 2. **Teilnehmer-spezifische Ergebnisse schreiben** (CourseParticipation-Felder: `resultOutcome`, `resultNotes`)
 
@@ -14,12 +15,12 @@ Beide Apps nutzen Clerk als Auth-Provider.
 
 ### Warum NICHT den Admin-Account verwenden?
 
-| Risiko | Beschreibung |
-|--------|-------------|
-| **Überprivilegierung** | Admin hat Zugriff auf alles - Aither braucht nur Kurs- und Teilnehmerdaten |
-| **Audit-Verlust** | Alle Aither-Aktionen erscheinen als Admin-Aktionen im Log |
-| **Credential-Kopplung** | Wenn Aither kompromittiert wird, ist der Admin-Zugang betroffen |
-| **Session-Konflikte** | Admin-Sessions könnten durch parallele Nutzung gestört werden |
+| Risiko                  | Beschreibung                                                               |
+| ----------------------- | -------------------------------------------------------------------------- |
+| **Überprivilegierung**  | Admin hat Zugriff auf alles - Aither braucht nur Kurs- und Teilnehmerdaten |
+| **Audit-Verlust**       | Alle Aither-Aktionen erscheinen als Admin-Aktionen im Log                  |
+| **Credential-Kopplung** | Wenn Aither kompromittiert wird, ist der Admin-Zugang betroffen            |
+| **Session-Konflikte**   | Admin-Sessions könnten durch parallele Nutzung gestört werden              |
 
 ### Empfohlener Ansatz: Clerk JWT + Service-Rolle
 
@@ -47,12 +48,14 @@ sequenceDiagram
 4. **Aither**: Clerk Backend-SDK nutzen, um JWT zu generieren und an Hemera-API zu senden
 
 **Vorteile:**
+
 - Minimale Änderungen an Hemera (nur Rolle + Permissions erweitern)
 - Clerk verwaltet Credentials zentral
 - Audit-Trail zeigt klar "aither-service" als Akteur
 - Gleiche Auth-Infrastruktur wie bestehende User
 
 **Nachteile:**
+
 - Service-User belegt einen Clerk-Seat
 - JWT-Refresh muss in Aither gehandhabt werden
 
@@ -63,10 +66,12 @@ sequenceDiagram
 3. **Hemera Middleware** erweitern für M2M-Token-Validierung
 
 **Vorteile:**
+
 - Kein User-Seat nötig
 - Saubere M2M-Trennung
 
 **Nachteile:**
+
 - Clerk M2M ist ein neueres Feature, erfordert ggf. Plan-Upgrade
 - Mehr Middleware-Anpassungen in Hemera nötig
 
@@ -77,10 +82,12 @@ sequenceDiagram
 3. **Aither**: API Key bei jedem Request mitsenden
 
 **Vorteile:**
+
 - Sehr einfach zu implementieren
 - Keine Clerk-Abhängigkeit für Service-Kommunikation
 
 **Nachteile:**
+
 - Kein User-Kontext (kein Audit wer genau was tat)
 - Key-Rotation muss manuell erfolgen
 - Weniger sicher als JWT-basierte Lösung
@@ -99,6 +106,7 @@ sequenceDiagram
 #### 2. Hemera: Neue Rolle `api-client` einführen
 
 **Datei:** `lib/auth/permissions.ts`
+
 - `UserRole` erweitern um `api-client`
 - Permissions definieren:
   - `read:courses` ✅
@@ -112,14 +120,15 @@ sequenceDiagram
 
 Neue Route-Gruppe `app/api/service/` mit:
 
-| Endpunkt | Methode | Beschreibung |
-|----------|---------|-------------|
-| `/api/service/courses` | GET | Kurse mit Teilnehmerdaten lesen |
-| `/api/service/courses/[id]` | GET | Einzelnen Kurs mit Buchungen lesen |
-| `/api/service/participations/[id]` | GET | Participation-Details lesen |
-| `/api/service/participations/[id]/result` | PUT | Ergebnis-Daten schreiben |
+| Endpunkt                                  | Methode | Beschreibung                       |
+| ----------------------------------------- | ------- | ---------------------------------- |
+| `/api/service/courses`                    | GET     | Kurse mit Teilnehmerdaten lesen    |
+| `/api/service/courses/[id]`               | GET     | Einzelnen Kurs mit Buchungen lesen |
+| `/api/service/participations/[id]`        | GET     | Participation-Details lesen        |
+| `/api/service/participations/[id]/result` | PUT     | Ergebnis-Daten schreiben           |
 
 Jeder Endpunkt prüft:
+
 ```typescript
 const { userId } = await auth();
 const role = await getUserRole(); // muss api-client sein
@@ -140,7 +149,7 @@ const token = await clerkClient.sessions.getToken(sessionId, 'hemera-api');
 // Hemera API aufrufen
 const response = await fetch('https://hemera.example.com/api/service/courses', {
   headers: {
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   },
 });
@@ -190,11 +199,11 @@ flowchart LR
 
 ## Geklärte Rahmenbedingungen
 
-| Frage | Antwort |
-|-------|---------|
-| Hosting | Hemera auf Vercel, Aither lokal/anderer Host |
-| Datenzugriff | Nur Kurse + Participations, keine Booking-Details |
-| Clerk-Plan | Free/Hobby - kein M2M verfügbar → **Option A bestätigt** |
+| Frage        | Antwort                                                  |
+| ------------ | -------------------------------------------------------- |
+| Hosting      | Hemera auf Vercel, Aither lokal/anderer Host             |
+| Datenzugriff | Nur Kurse + Participations, keine Booking-Details        |
+| Clerk-Plan   | Free/Hobby - kein M2M verfügbar → **Option A bestätigt** |
 
 ---
 

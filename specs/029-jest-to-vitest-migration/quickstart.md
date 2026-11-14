@@ -25,6 +25,7 @@ npm run lint
 ```
 
 Expected result:
+
 - no TypeScript errors
 - no Biome failures unrelated to the migration feature
 
@@ -38,6 +39,7 @@ npm run test:integration
 ```
 
 Expected result:
+
 - the current Jest-backed scopes establish the pre-migration baseline
 - failures, skips, ignored specs, and coverage artifacts are recorded against the existing runner
 
@@ -48,6 +50,7 @@ npm run test:e2e:public
 ```
 
 Expected result:
+
 - Playwright still runs independently of non-E2E tooling
 - no migration work is required in Playwright config or scripts
 
@@ -64,6 +67,7 @@ npm run test:unit
 ```
 
 Expected result:
+
 - Vitest resolves `@/` imports
 - shared setup loads successfully
 - at least the unit slice can run through the new runner without touching Playwright
@@ -78,6 +82,7 @@ npm run test:unit
 ```
 
 Expected result:
+
 - `@jest/globals` imports are gone from migrated scopes
 - `jest.*` mocks and spies have approved Vitest replacements
 - component specs that need a DOM still run under jsdom and non-DOM unit tests continue to pass under the shared Vitest unit runner
@@ -104,6 +109,7 @@ npm run test:integration
 ```
 
 Expected result:
+
 - each non-E2E scope passes independently under Vitest
 - database-backed integration behavior still works with existing setup expectations
 
@@ -119,6 +125,7 @@ npm run lint
 ```
 
 Expected result:
+
 - repository-managed non-E2E entry points are Vitest-backed
 - required coverage artifacts are present and consumable
 - type and lint baselines remain healthy
@@ -130,6 +137,7 @@ npm run test:e2e:public
 ```
 
 Expected result:
+
 - Playwright still operates as the repository's E2E framework
 - non-E2E migration changes did not leak into the E2E path
 

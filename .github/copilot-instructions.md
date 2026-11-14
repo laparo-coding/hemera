@@ -9,6 +9,7 @@ Auto-generated from all feature plans. Last updated: 2025-01-15
 - Example: "Dein Kurs", "Lade deinen Lebenslauf hoch", "Deine Buchung"
 
 ## Active Technologies
+
 - TypeScript 5.x with Next.js 15.5.6 (App Router) + React 18, Material-UI v5, Clerk auth, Prisma ORM, Rollbar monitoring (017-testimonial-management)
 - PostgreSQL via Prisma models (Testimonial entity with admin approval workflow) (017-testimonial-management)
 - TypeScript 5+ with Next.js 15.5.6 (App Router) + React 18+, Material-UI v5, Clerk (auth), Prisma (ORM), Rollbar (monitoring) (014-create-an-admin)
@@ -50,14 +51,15 @@ TypeScript 6.0, Next.js 16.2, React 19: Follow standard conventions
 
 All database tables and columns follow PostgreSQL naming standards with Prisma mapping:
 
-| Layer | Convention | Example |
-|-------|------------|---------|
-| Prisma Models | PascalCase | `User`, `Course`, `Booking` |
-| Prisma Fields | camelCase | `userId`, `createdAt`, `isPublished` |
-| DB Tables | snake_case plural | `users`, `courses`, `bookings` |
-| DB Columns | snake_case | `user_id`, `created_at`, `is_published` |
+| Layer         | Convention        | Example                                 |
+| ------------- | ----------------- | --------------------------------------- |
+| Prisma Models | PascalCase        | `User`, `Course`, `Booking`             |
+| Prisma Fields | camelCase         | `userId`, `createdAt`, `isPublished`    |
+| DB Tables     | snake_case plural | `users`, `courses`, `bookings`          |
+| DB Columns    | snake_case        | `user_id`, `created_at`, `is_published` |
 
 **Rules:**
+
 - Use `@@map("table_name")` on every model to define the database table name
 - Use `@map("column_name")` on fields where Prisma name differs from DB column
 - Default currency is `EUR` (not USD)
@@ -80,6 +82,7 @@ All database tables and columns follow PostgreSQL naming standards with Prisma m
 See `docs/performance/README.md` for detailed patterns.
 
 ## Recent Changes
+
 - 030-extended-material-upload: Added new tile for uploading HTML content files to course material interface (Material type selection with 3 tiles, HTMLContentUploadForm component, API endpoint extension for CONTENT type via FormData)
 - 029-jest-to-vitest-migration: Replaced Jest/ts-jest non-E2E execution with Vitest, kept Playwright unchanged, and added Vitest compatibility/setup infrastructure
 - 028-test-coverage: Established the pre-migration coverage baseline on Jest/ts-jest before the later Vitest switch in 029
@@ -101,11 +104,13 @@ See `docs/performance/README.md` for detailed patterns.
 5. **Implement high-impact suggestions** - Especially security, performance, and TypeScript improvements
 
 **Issues to always fix:**
+
 - 🔴 Security issues (injection, data exposure, auth bypasses)
 - 🔴 Error Handling issues (unhandled exceptions, missing try/catch)
 - 🔴 Type Safety issues (any types, missing validations)
 
 **CodeRabbit commands in PR comments:**
+
 ```bash
 # Trigger a new review
 @coderabbitai review

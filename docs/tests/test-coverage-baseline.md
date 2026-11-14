@@ -20,13 +20,13 @@ npm run test:e2e -- --project=chromium-auth
 
 ## Ergebnisübersicht
 
-| Bereich | Status | Beobachtung |
-| ------- | ------ | ----------- |
-| TypeScript | PASS | `npm run typecheck` lief erfolgreich durch. |
-| Biome | PASS | `npm run lint` lief erfolgreich durch. |
-| Jest Unit Coverage | FAIL | Test-Suites grün, aber Coverage-Gates reißen deutlich. |
-| Contract-Tests | FAIL | `npm run test:contracts` findet aktuell keine Tests. |
-| Playwright `chromium-auth` | FAIL | Historische Ausgangslage: Auth-State `.auth/user.json` fehlt, dadurch scheitern die auth-basierten Läufe früh. |
+| Bereich                    | Status | Beobachtung                                                                                                    |
+| -------------------------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| TypeScript                 | PASS   | `npm run typecheck` lief erfolgreich durch.                                                                    |
+| Biome                      | PASS   | `npm run lint` lief erfolgreich durch.                                                                         |
+| Jest Unit Coverage         | FAIL   | Test-Suites grün, aber Coverage-Gates reißen deutlich.                                                         |
+| Contract-Tests             | FAIL   | `npm run test:contracts` findet aktuell keine Tests.                                                           |
+| Playwright `chromium-auth` | FAIL   | Historische Ausgangslage: Auth-State `.auth/user.json` fehlt, dadurch scheitern die auth-basierten Läufe früh. |
 
 ## Jest-Coverage-Baseline
 

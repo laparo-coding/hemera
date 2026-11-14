@@ -27,16 +27,16 @@ hardening was completed as a prerequisite.
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Test-First Development | PASS | Contract tests for new API variants, unit tests for schemas |
-| Code Quality & Formatting | PASS | Biome lint/format, TypeScript strict |
-| Feature Development Workflow | PASS | Spec → Plan → Tasks → Implementation |
-| Error Handling & Observability | PASS | Rollbar for all server errors, no console.error |
-| Authentication & Security | PASS | `requireAdminUser()` on all endpoints |
-| Component Architecture | PASS | MUI + design tokens, WCAG 2.1 AA, keyboard nav |
-| Deployment Standards | PASS | GitHub Actions only, no manual deploys |
-| Stripe Integration | N/A | No payment flows affected |
+| Gate                           | Status | Notes                                                       |
+| ------------------------------ | ------ | ----------------------------------------------------------- |
+| Test-First Development         | PASS   | Contract tests for new API variants, unit tests for schemas |
+| Code Quality & Formatting      | PASS   | Biome lint/format, TypeScript strict                        |
+| Feature Development Workflow   | PASS   | Spec → Plan → Tasks → Implementation                        |
+| Error Handling & Observability | PASS   | Rollbar for all server errors, no console.error             |
+| Authentication & Security      | PASS   | `requireAdminUser()` on all endpoints                       |
+| Component Architecture         | PASS   | MUI + design tokens, WCAG 2.1 AA, keyboard nav              |
+| Deployment Standards           | PASS   | GitHub Actions only, no manual deploys                      |
+| Stripe Integration             | N/A    | No payment flows affected                                   |
 
 ## Project Structure
 
@@ -98,6 +98,7 @@ tests/
 All unknowns resolved. See [research.md](research.md).
 
 Key decisions:
+
 1. **Type discrimination**: `type` column on `CourseMaterial` (String, default `"CONTENT"`)
 2. **Upload pattern**: Extend existing POST endpoint with FormData detection via Content-Type header
 3. **File validation**: Server-side HTML extension + MIME + size check; no sanitization for SLIDE_CONTROL
@@ -120,6 +121,7 @@ Migration adds column with default — zero-downtime, no backfill.
 See [contracts/api-contracts.md](contracts/api-contracts.md).
 
 Changes:
+
 - **GET /api/admin/course-material**: Response includes `type` per material
 - **GET /api/admin/course-material/[id]**: Response includes `type`, `blobUrl`, `blobPathname`
 - **POST /api/admin/course-material**: Two variants — JSON (CONTENT) and FormData (SLIDE_CONTROL)
@@ -129,6 +131,7 @@ Changes:
 ### Contract Test Additions
 
 New test cases for existing `tests/contracts/course-material-api.spec.ts`:
+
 1. `POST with FormData creates SLIDE_CONTROL material`
 2. `POST with FormData rejects non-HTML files`
 3. `POST with FormData rejects oversized files`
@@ -140,6 +143,7 @@ New test cases for existing `tests/contracts/course-material-api.spec.ts`:
 ### Unit Test Additions
 
 New test cases for `tests/unit/schemas/course-material.spec.ts`:
+
 1. `courseMaterialCreateSchema with type field`
 2. `file validation: accepts .html`
 3. `file validation: rejects non-.html`
@@ -161,6 +165,7 @@ Updated via `update-agent-context.sh copilot`.
 _This section describes what the /tasks command will do — DO NOT execute during /plan._
 
 **Task Generation Strategy**:
+
 - Load `tasks-template.md` as base
 - Generate tasks from Phase 1 artifacts (data model, contracts, quickstart)
 - Each contract change → contract test task [P]
@@ -171,11 +176,13 @@ _This section describes what the /tasks command will do — DO NOT execute durin
 - Integration tests from quickstart scenarios
 
 **Ordering Strategy**:
+
 - TDD order: Tests before implementation
 - Dependency order: Schema/DB → API → UI
 - Mark [P] for parallel execution (independent files)
 
 **Estimated Output**: ~25 tasks covering:
+
 - Phase A: Foundation (Prisma migration, Zod schemas, GET response extension)
 - Phase B: API (POST/PUT FormData handling, file validation)
 - Phase C: UI (MaterialTypeSelector, SlideControlUploadForm, create page, list page badge)

@@ -6,7 +6,7 @@
 
 ## Overview
 
-This specification defines the extended material upload functionality for Hemera. 
+This specification defines the extended material upload functionality for Hemera.
 The feature adds a new tile for uploading complete HTML content files to the course material upload interface, and extends the tile set to organize material creation/upload options with improved layout.
 
 ## Current Reality
@@ -69,13 +69,13 @@ Based on existing "Steuerdatei" pattern from Feature 026:
 
 ## Acceptance Criteria
 
-- [X] New tile "Ich möchte eine Inhaltsseite hinzufügen" is displayed on the upload interface
-- [X] New tile reuses the same icon as the control file tile ("Steuerdatei hinzufügen")
-- [X] New tile provides HTML file upload functionality (max 20 MB, `.html` only, no sanitization)
-- [X] Existing tile "Ich möchte eine Inhaltsseite anlegen" remains unchanged (opens SlideEditor)
-- [X] Tiles are arranged in the correct layout (2 tiles on first line, 1 on second line)
-- [X] Upload of HTML content files works without errors
-- [X] Label is consistent: "anlegen" for editor, "hinzufügen" for file upload
+- [x] New tile "Ich möchte eine Inhaltsseite hinzufügen" is displayed on the upload interface
+- [x] New tile reuses the same icon as the control file tile ("Steuerdatei hinzufügen")
+- [x] New tile provides HTML file upload functionality (max 20 MB, `.html` only, no sanitization)
+- [x] Existing tile "Ich möchte eine Inhaltsseite anlegen" remains unchanged (opens SlideEditor)
+- [x] Tiles are arranged in the correct layout (2 tiles on first line, 1 on second line)
+- [x] Upload of HTML content files works without errors
+- [x] Label is consistent: "anlegen" for editor, "hinzufügen" for file upload
 
 ## Implementation Notes
 

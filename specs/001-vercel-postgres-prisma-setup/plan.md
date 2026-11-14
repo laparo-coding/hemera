@@ -337,7 +337,7 @@ This checklist is updated during execution flow.
 - [ ] Initial Constitution Check: PASS
 - [ ] Post-Design Constitution Check: PASS
 - [ ] All NEEDS CLARIFICATION resolved — exception: FR‑007 is DEFERRED (Retention Policy) → not a
-      blocker for this implementation
+  blocker for this implementation
 - [ ] Complexity deviations documented
 
 ---

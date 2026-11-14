@@ -21,7 +21,9 @@ Use Next.js dynamic imports with `ssr: false` for monitoring/analytics:
 ```tsx
 import dynamic from 'next/dynamic';
 
-const MonitoringInit = dynamic(() => import('@/components/MonitoringInit'), { ssr: false });
+const MonitoringInit = dynamic(() => import('@/components/MonitoringInit'), {
+  ssr: false,
+});
 ```
 
 **Benefits**:

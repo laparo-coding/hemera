@@ -11,21 +11,21 @@ Feature 028 must treat coverage as a combination of:
 
 ### Coverage Sources
 
-| Source | Purpose |
-| ------ | ------- |
+| Source                      | Purpose                              |
+| --------------------------- | ------------------------------------ |
 | Jest coverage (V8 provider) | Primary numeric coverage measurement |
-| Contract test results | API behavior confidence |
-| Playwright results | Critical journey confidence |
+| Contract test results       | API behavior confidence              |
+| Playwright results          | Critical journey confidence          |
 
 ### Initial Scope Contract
 
-| Scope | Required |
-| ----- | -------- |
-| Global coverage movement | Yes |
-| Critical-area coverage movement | Yes |
-| Backend logic | Yes |
-| API behavior | Yes |
-| Dashboard/authenticated journeys | Yes |
+| Scope                            | Required |
+| -------------------------------- | -------- |
+| Global coverage movement         | Yes      |
+| Critical-area coverage movement  | Yes      |
+| Backend logic                    | Yes      |
+| API behavior                     | Yes      |
+| Dashboard/authenticated journeys | Yes      |
 
 ## 2. Critical-Area Contract
 
@@ -43,11 +43,11 @@ Feature 028 must result in CI-enforced quality gating.
 
 ### Gate Rollout
 
-| Phase | Expectation |
-| ----- | ----------- |
-| Planning | CI gate direction defined |
-| Implementation | Coverage checks wired into CI |
-| Enforcement | Exact thresholds activated after baseline review |
+| Phase          | Expectation                                      |
+| -------------- | ------------------------------------------------ |
+| Planning       | CI gate direction defined                        |
+| Implementation | Coverage checks wired into CI                    |
+| Enforcement    | Exact thresholds activated after baseline review |
 
 ### Hard Rules
 

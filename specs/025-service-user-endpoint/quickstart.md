@@ -55,6 +55,7 @@ const token = await clerkClient.sessions.getToken(sessionId, 'hemera-api');
 **Endpoint**: `GET /api/service/courses`
 
 **Query Parameters**:
+
 - `level` (optional): Filter by course level (`BEGINNER`, `INTERMEDIATE`, `ADVANCED`)
 - `published` (optional): Filter by published status (default: `true`)
 - `limit` (optional): Max results (default: 100, max: 500)
@@ -228,13 +229,13 @@ When the rate limit is exceeded, you'll receive a `429 Too Many Requests` respon
 
 ### Common Error Codes
 
-| Status | Code | Description |
-|--------|------|-------------|
-| 401 | `UNAUTHORIZED` | Missing or invalid JWT token |
-| 403 | `FORBIDDEN` | Insufficient permissions (not api-client or admin) |
-| 404 | `NOT_FOUND` | Resource not found |
-| 429 | `RATE_LIMITED` | Rate limit exceeded |
-| 500 | `INTERNAL_ERROR` | Server error |
+| Status | Code             | Description                                        |
+| ------ | ---------------- | -------------------------------------------------- |
+| 401    | `UNAUTHORIZED`   | Missing or invalid JWT token                       |
+| 403    | `FORBIDDEN`      | Insufficient permissions (not api-client or admin) |
+| 404    | `NOT_FOUND`      | Resource not found                                 |
+| 429    | `RATE_LIMITED`   | Rate limit exceeded                                |
+| 500    | `INTERNAL_ERROR` | Server error                                       |
 
 ### Error Response Format
 
@@ -282,15 +283,18 @@ class HemeraServiceClient {
   }) {
     const params = new URLSearchParams();
     if (filters?.level) params.append('level', filters.level);
-    if (filters?.published !== undefined) params.append('published', String(filters.published));
-    if (filters?.limit !== undefined) params.append('limit', String(filters.limit));
-    if (filters?.offset !== undefined) params.append('offset', String(filters.offset));
+    if (filters?.published !== undefined)
+      params.append('published', String(filters.published));
+    if (filters?.limit !== undefined)
+      params.append('limit', String(filters.limit));
+    if (filters?.offset !== undefined)
+      params.append('offset', String(filters.offset));
 
     const response = await fetch(
       `${this.baseUrl}/api/service/courses?${params}`,
       {
         headers: {
-          'Authorization': `Bearer ${this.token}`,
+          Authorization: `Bearer ${this.token}`,
           'Content-Type': 'application/json',
         },
       }
@@ -316,7 +320,7 @@ class HemeraServiceClient {
       {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${this.token}`,
+          Authorization: `Bearer ${this.token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
@@ -348,6 +352,7 @@ console.log('Courses:', courses);
 **Cause**: Missing or invalid JWT token
 
 **Solution**:
+
 1. Verify your JWT token is valid and not expired
 2. Ensure the token is included in the `Authorization` header
 3. Check that the service user exists in Clerk
@@ -357,6 +362,7 @@ console.log('Courses:', courses);
 **Cause**: User role is not `api-client` or `admin`
 
 **Solution**:
+
 1. Verify the service user's `publicMetadata.role` is set to `"api-client"`
 2. Check Clerk Dashboard → Users → [Service User] → Metadata
 
@@ -365,6 +371,7 @@ console.log('Courses:', courses);
 **Cause**: Too many requests in a short time
 
 **Solution**:
+
 1. Implement exponential backoff in your client
 2. Check `X-RateLimit-Reset` header for retry time
 3. Consider batching requests if possible
@@ -374,6 +381,7 @@ console.log('Courses:', courses);
 **Cause**: Resource (course/participation) doesn't exist
 
 **Solution**:
+
 1. Verify the ID is correct
 2. Check if the resource was deleted
 3. Ensure you're using the correct environment (local vs production)
@@ -381,6 +389,7 @@ console.log('Courses:', courses);
 ## Support
 
 For issues or questions:
+
 - Check the [API Documentation](../docs/api/openapi.yaml)
 - Review [Spec 025](./spec.md) for detailed requirements
 - Contact the Hemera development team

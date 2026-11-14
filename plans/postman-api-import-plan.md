@@ -10,7 +10,7 @@ Create a complete, consolidated OpenAPI 3.1.0 specification and a Postman Collec
 
 ## Executable Prompt for Code Mode
 
-```
+````
 Create a consolidated OpenAPI 3.1.0 specification and Postman documentation for the Hemera project:
 
 1. **Create OpenAPI Specification** (`specs/postman/hemera-api.yaml`):
@@ -97,7 +97,7 @@ Create a consolidated OpenAPI 3.1.0 specification and Postman documentation for 
        }
      ]
    }
-   ```
+````
 
 1. **Create Import Guide** (`specs/postman/README.md`):
    - Step-by-step guide for Postman import
@@ -113,6 +113,7 @@ Create a consolidated OpenAPI 3.1.0 specification and Postman documentation for 
    - Add tests for successful responses
 
 **Important Details:**
+
 - Base URL: `http://localhost:3000` (local) or `https://hemera.academy` (prod)
 - Authentication: Clerk JWT Bearer Token in Authorization Header
 - Response Format: Standardized with `success`, `data`, `requestId` fields
@@ -122,6 +123,7 @@ Create a consolidated OpenAPI 3.1.0 specification and Postman documentation for 
 - Currency: EUR
 
 **References:**
+
 - Existing OpenAPI specs in specs/*/contracts/
 - API route implementations in app/api/
 - Zod schemas for validation
@@ -151,3 +153,4 @@ Create a consolidated OpenAPI 3.1.0 specification and Postman documentation for 
 3. Paste and execute the prompt
 4. Review the generated files
 5. Test the import in Postman
+```

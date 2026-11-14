@@ -224,7 +224,9 @@ await clickAndWait(page, () => detailLink, { expectUrl: /\/courses\/[\w-]+/ });
 
 // 3) CTA klicken und Redirect erwarten (z. B. zu /sign-in)
 const bookCta = page.getByTestId('course-detail-book-cta');
-await clickAndWait(page, () => bookCta, { expectUrl: /\/sign-in\?redirect_url=/ });
+await clickAndWait(page, () => bookCta, {
+  expectUrl: /\/sign-in\?redirect_url=/,
+});
 
 // 4) Performance: vor FID-Messung Hydration beruhigen
 await page.waitForTimeout(500);
@@ -270,17 +272,17 @@ const fid = Date.now() - start;
 Verwende nach Möglichkeit ein stabiles, semantisches Test-ID-Element als Anker nach der Navigation.
 Die folgende Tabelle listet häufige Seiten/Flows und geeignete `data-testid`-Werte:
 
-| Seite/Route                      | waitForTestId                                      | Hinweis                                                                                                    |
-| -------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Home `/`                         | `build-info`                                       | Badge rendert nach Hydration; eignet sich als allgemeiner Verfügbarkeitsindikator.                         |
-| Kursliste `/courses`             | `course-overview`                                  | Warten, bis Kurs-Übersicht sichtbar ist; danach weitere Assertions.                                        |
-| Kurse leer (DB-Empty-State)      | `e2e-courses-empty`                                | Der Public-Bereich zeigt nur DB-Daten; bei 0 Treffern gilt ausschließlich der explizite Empty-State.      |
-| Kursdetail `/courses/[id\|slug]` | `course-detail-book-cta`                           | Für Interaktionstest; alternativ H1 prüfen, wenn keine CTA vorhanden.                                      |
-| Ausgebucht-Detail                | `course-detail-sold-out-badge`                     | Optional zusätzlich `course-detail-disable-reason`.                                                        |
-| Dashboard `/dashboard`           | `user-dashboard`                                   | Für Layout-/Navigationsprüfungen existieren zudem `dashboard-title`, `dashboard-nav`, `dashboard-metrics`. |
-| Payment (vereinfachter Flow)     | `payment-flow`                                     | Weitere Hilfs-IDs: `payment-summary`, `payment-action`, `duplicate-warning`.                               |
-| Redirect-Tests `/protected/*`    | –                                                  | Kein TestId nötig; finalen URL-Zustand prüfen.                                                             |
-| Error-Boundary `/e2e/crash`      | –                                                  | Kein TestId verfügbar; erhöhte Timeouts bei Headline/Buttons verwenden.                                    |
+| Seite/Route                      | waitForTestId                  | Hinweis                                                                                                    |
+| -------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| Home `/`                         | `build-info`                   | Badge rendert nach Hydration; eignet sich als allgemeiner Verfügbarkeitsindikator.                         |
+| Kursliste `/courses`             | `course-overview`              | Warten, bis Kurs-Übersicht sichtbar ist; danach weitere Assertions.                                        |
+| Kurse leer (DB-Empty-State)      | `e2e-courses-empty`            | Der Public-Bereich zeigt nur DB-Daten; bei 0 Treffern gilt ausschließlich der explizite Empty-State.       |
+| Kursdetail `/courses/[id\|slug]` | `course-detail-book-cta`       | Für Interaktionstest; alternativ H1 prüfen, wenn keine CTA vorhanden.                                      |
+| Ausgebucht-Detail                | `course-detail-sold-out-badge` | Optional zusätzlich `course-detail-disable-reason`.                                                        |
+| Dashboard `/dashboard`           | `user-dashboard`               | Für Layout-/Navigationsprüfungen existieren zudem `dashboard-title`, `dashboard-nav`, `dashboard-metrics`. |
+| Payment (vereinfachter Flow)     | `payment-flow`                 | Weitere Hilfs-IDs: `payment-summary`, `payment-action`, `duplicate-warning`.                               |
+| Redirect-Tests `/protected/*`    | –                              | Kein TestId nötig; finalen URL-Zustand prüfen.                                                             |
+| Error-Boundary `/e2e/crash`      | –                              | Kein TestId verfügbar; erhöhte Timeouts bei Headline/Buttons verwenden.                                    |
 
 Tipp: Wenn keine passende Test-ID existiert, favorisiere ein zentrales Landmark-Element (z. B.
 `main` mit dedizierter `data-testid`) oder nutze in SEO-Tests das Vorhandensein von

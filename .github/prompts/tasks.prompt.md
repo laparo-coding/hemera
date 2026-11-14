@@ -1,7 +1,8 @@
 ---
+
 description:
-  Generate an actionable, dependency-ordered tasks.md for the feature based on available design
-  artifacts.
+Generate an actionable, dependency-ordered tasks.md for the feature based on available design
+artifacts.
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST**

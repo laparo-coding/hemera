@@ -59,12 +59,12 @@ for edit page to detect type and show download link).
 
 **Content-Type**: `application/json`
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| title | string | Yes | Material title (1–200 chars) |
-| identifier | string | No | URL-safe slug; auto-generated from title if omitted |
-| htmlContent | string | Yes | HTML content, max 2 MB |
-| type | string | No | Defaults to `"CONTENT"` |
+| Field       | Type   | Required | Description                                         |
+| ----------- | ------ | -------- | --------------------------------------------------- |
+| title       | string | Yes      | Material title (1–200 chars)                        |
+| identifier  | string | No       | URL-safe slug; auto-generated from title if omitted |
+| htmlContent | string | Yes      | HTML content, max 2 MB                              |
+| type        | string | No       | Defaults to `"CONTENT"`                             |
 
 ```json
 {
@@ -80,11 +80,11 @@ for edit page to detect type and show download link).
 
 **Content-Type**: `multipart/form-data`
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| title | string | Yes | Material title (1–200 chars) |
-| identifier | string | No | URL-safe slug; auto-generated from title if omitted |
-| file | File | Yes | HTML file, `.html` extension, ≤ 20 MB |
+| Field      | Type   | Required | Description                                         |
+| ---------- | ------ | -------- | --------------------------------------------------- |
+| title      | string | Yes      | Material title (1–200 chars)                        |
+| identifier | string | No       | URL-safe slug; auto-generated from title if omitted |
+| file       | File   | Yes      | HTML file, `.html` extension, ≤ 20 MB               |
 
 **Response (201)**:
 
@@ -103,13 +103,13 @@ for edit page to detect type and show download link).
 
 ### Error Responses (both variants)
 
-| Status | Error Code | Message |
-|--------|------------|---------|
-| 400 | `validation_error` | `Ungültiges JSON-Format` / `Ungültige Eingabe` / `Nur .html-Dateien sind erlaubt` / `Datei darf maximal 20 MB groß sein` |
-| 401 | `unauthorized` | `Authentifizierung erforderlich` |
-| 409 | `conflict` | `Identifier "{identifier}" ist bereits vergeben` |
-| 502 | `blob_error` | `Upload zu Blob-Storage fehlgeschlagen` |
-| 500 | `internal_error` | `Fehler beim Erstellen des Materials` |
+| Status | Error Code         | Message                                                                                                                  |
+| ------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| 400    | `validation_error` | `Ungültiges JSON-Format` / `Ungültige Eingabe` / `Nur .html-Dateien sind erlaubt` / `Datei darf maximal 20 MB groß sein` |
+| 401    | `unauthorized`     | `Authentifizierung erforderlich`                                                                                         |
+| 409    | `conflict`         | `Identifier "{identifier}" ist bereits vergeben`                                                                         |
+| 502    | `blob_error`       | `Upload zu Blob-Storage fehlgeschlagen`                                                                                  |
+| 500    | `internal_error`   | `Fehler beim Erstellen des Materials`                                                                                    |
 
 ---
 
@@ -130,24 +130,24 @@ for edit page to detect type and show download link).
 
 **Content-Type**: `multipart/form-data`
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| title | string | No | Updated title |
-| identifier | string | No | Updated identifier |
-| file | File | No | Replacement HTML file; if omitted, only metadata updates |
+| Field      | Type   | Required | Description                                              |
+| ---------- | ------ | -------- | -------------------------------------------------------- |
+| title      | string | No       | Updated title                                            |
+| identifier | string | No       | Updated identifier                                       |
+| file       | File   | No       | Replacement HTML file; if omitted, only metadata updates |
 
 **Response (200)**: Full material object with `type`.
 
 ### Error Responses (PUT)
 
-| Status | Error Code | Message |
-|--------|------------|--------|
-| 400 | `type_mismatch` | `Materialtyp stimmt nicht mit der Anfrage überein` / `Ungültige Eingabe` |
-| 401 | `unauthorized` | `Authentifizierung erforderlich` |
-| 404 | `not_found` | `Material nicht gefunden` |
-| 409 | `conflict` | `Identifier "{identifier}" ist bereits vergeben` |
-| 502 | `blob_error` | `Upload zu Blob-Storage fehlgeschlagen` |
-| 500 | `internal_error` | `Fehler beim Aktualisieren des Materials` |
+| Status | Error Code       | Message                                                                  |
+| ------ | ---------------- | ------------------------------------------------------------------------ |
+| 400    | `type_mismatch`  | `Materialtyp stimmt nicht mit der Anfrage überein` / `Ungültige Eingabe` |
+| 401    | `unauthorized`   | `Authentifizierung erforderlich`                                         |
+| 404    | `not_found`      | `Material nicht gefunden`                                                |
+| 409    | `conflict`       | `Identifier "{identifier}" ist bereits vergeben`                         |
+| 502    | `blob_error`     | `Upload zu Blob-Storage fehlgeschlagen`                                  |
+| 500    | `internal_error` | `Fehler beim Aktualisieren des Materials`                                |
 
 ### Error: Type Mismatch
 
@@ -155,7 +155,10 @@ If the request sends `multipart/form-data` to a CONTENT material (or JSON with `
 SLIDE_CONTROL material), the server returns:
 
 ```json
-{ "error": "type_mismatch", "message": "Materialtyp stimmt nicht mit der Anfrage überein" }
+{
+  "error": "type_mismatch",
+  "message": "Materialtyp stimmt nicht mit der Anfrage überein"
+}
 ```
 
 Status: 400
@@ -165,6 +168,7 @@ Status: 400
 ## DELETE /api/admin/course-material/[id]
 
 No changes to the interface. Works identically for both types:
+
 - **CONTENT**: Deletes blob at `course-material/{identifier}.html` + DB record
 - **SLIDE_CONTROL**: Deletes blob at `course-material/slides/{identifier}.html` + DB record
 - If `blobUrl` is null/empty, blob deletion is skipped (guard added in 026)

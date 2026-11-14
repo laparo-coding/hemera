@@ -24,24 +24,31 @@
 ## User Stories
 
 ### US-1: Admin navigiert zurück zum Dashboard
+
 Als Admin möchte ich auf jeder Unterseite eine Breadcrumb-Navigation sehen, damit ich schnell zum Admin Dashboard zurückkehren kann.
 
 ### US-2: Admin hat konsistente Ansicht
+
 Als Admin möchte ich, dass alle Unterseiten dieselbe Breite wie das Dashboard haben, damit das Layout einheitlich wirkt.
 
 ### US-3: Admin verwaltet Benutzer
+
 Als Admin möchte ich Clerk-Benutzerdaten sehen und den Outperformer-Status setzen können.
 
 ### US-4: Admin verknüpft Seminarmaterial
+
 Als Admin möchte ich bei jedem Curriculum-Item ein Seminarmaterial verlinken können.
 
 ### US-5: Admin überwacht Systemstatus
+
 Als Admin möchte ich in "Berichte & Analysen" den API-Health-Status und Systemstatus sehen.
 
 ### US-6: Admin veröffentlicht Kurse per Toggle
+
 Als Admin möchte ich den Veröffentlichungsstatus eines Kurses per Toggle ändern können, ohne eine separate Aktion auszuführen.
 
 ### US-7: Admin verwaltet Standorte einheitlich
+
 Als Admin möchte ich, dass die Standortverwaltung das gleiche Layout wie die Kursverwaltung hat.
 
 ## Technical Requirements
@@ -80,10 +87,10 @@ interface AdminBreadcrumbProps {
 ```typescript
 // Einheitlicher Kopfbereich für alle Admin-Unterseiten
 const ADMIN_PAGE_HEAD_SPACE = {
-  paddingTop: 4,    // 32px
+  paddingTop: 4, // 32px
   paddingBottom: 3, // 24px
-  marginBottom: 4,  // 32px
-}
+  marginBottom: 4, // 32px
+};
 ```
 
 ### TR-4: Dashboard Grid-Struktur
@@ -101,14 +108,14 @@ const ADMIN_PAGE_HEAD_SPACE = {
 
 ### TR-5: Dashboard-Karten (6 Stück)
 
-| Karte | Route | Icon |
-|-------|-------|------|
-| Benutzerverwaltung | `/admin/users` | People |
-| Kursverwaltung | `/admin/courses` | School |
-| Standortverwaltung | `/admin/locations` | LocationOn |
+| Karte                  | Route                 | Icon        |
+| ---------------------- | --------------------- | ----------- |
+| Benutzerverwaltung     | `/admin/users`        | People      |
+| Kursverwaltung         | `/admin/courses`      | School      |
+| Standortverwaltung     | `/admin/locations`    | LocationOn  |
 | Testimonial-Verwaltung | `/admin/testimonials` | FormatQuote |
-| Systemeinstellungen | `/admin/settings` | Settings |
-| Berichte & Analysen | `/admin/reports` | Analytics |
+| Systemeinstellungen    | `/admin/settings`     | Settings    |
+| Berichte & Analysen    | `/admin/reports`      | Analytics   |
 
 ### TR-6: API Health Integration
 
@@ -188,39 +195,43 @@ interface CurriculumItem {
 ## UI/UX Requirements
 
 ### UX-1: Website Header Breite
+
 - Der Website-Header (`components/navigation/`) muss dieselbe Maximalbreite wie das Admin Dashboard haben
 - Zentrierte Ausrichtung beibehalten
 
 ### UX-2: Entfernte Elemente
+
 - ❌ Footer auf Admin Dashboard entfernen
 - ❌ Willkommensnachricht auf Admin Dashboard entfernen
 
 ### UX-3: Deutsche Lokalisierung
 
-| English | Deutsch |
-|---------|---------|
-| User Management | Benutzerverwaltung |
-| Course Management | Kursverwaltung |
-| Location Management | Standortverwaltung |
+| English                | Deutsch                |
+| ---------------------- | ---------------------- |
+| User Management        | Benutzerverwaltung     |
+| Course Management      | Kursverwaltung         |
+| Location Management    | Standortverwaltung     |
 | Testimonial Management | Testimonial-Verwaltung |
-| System Settings | Systemeinstellungen |
-| Reports & Analytics | Berichte & Analysen |
-| System Status | Systemstatus |
-| Save | Speichern |
-| Cancel | Abbrechen |
-| Edit | Bearbeiten |
-| Delete | Löschen |
-| Add | Hinzufügen |
-| Search | Suchen |
-| Filter | Filtern |
-| Outperformer | Outperformer |
+| System Settings        | Systemeinstellungen    |
+| Reports & Analytics    | Berichte & Analysen    |
+| System Status          | Systemstatus           |
+| Save                   | Speichern              |
+| Cancel                 | Abbrechen              |
+| Edit                   | Bearbeiten             |
+| Delete                 | Löschen                |
+| Add                    | Hinzufügen             |
+| Search                 | Suchen                 |
+| Filter                 | Filtern                |
+| Outperformer           | Outperformer           |
 
 ### UX-4: Breadcrumb-Design
+
 - Pfeil-Separator (`>`) zwischen Items
 - Letztes Item nicht klickbar (aktuelle Seite)
 - Hover-Effekt auf klickbaren Items
 
 ### UX-5: Dashboard-Karten Design
+
 - Einheitliche Kartenhöhe
 - Icon oben links
 - Titel zentriert
@@ -229,22 +240,26 @@ interface CurriculumItem {
 ## Acceptance Criteria
 
 ### AC-1: Layout
+
 - [ ] Alle Admin-Unterseiten haben dieselbe Maximalbreite wie das Dashboard
 - [ ] Website-Header hat dieselbe Maximalbreite
 - [ ] Einheitlicher Head Space auf allen Unterseiten
 
 ### AC-2: Navigation
+
 - [ ] Breadcrumb auf allen Admin-Unterseiten sichtbar
 - [ ] Klick auf "Admin Dashboard" navigiert zurück
 - [ ] Aktuelle Seite ist nicht klickbar
 
 ### AC-3: Dashboard
+
 - [ ] 3-Spalten-Grid mit 6 Karten
 - [ ] Kein Footer sichtbar
 - [ ] Keine Willkommensnachricht sichtbar
 - [ ] Alle Texte in Deutsch
 
 ### AC-4: Benutzerverwaltung
+
 - [ ] Clerk-Benutzerdaten werden angezeigt
 - [ ] Outperformer-Checkbox pro Benutzer
 - [ ] Checkbox-Änderung wird gespeichert
@@ -253,6 +268,7 @@ interface CurriculumItem {
 - [ ] Filter "Nur Outperformer anzeigen" verfügbar
 
 ### AC-5: Kursverwaltung
+
 - [ ] Curriculum-Items zeigen Seminarmaterial-Feld
 - [ ] Verlinkung zu bestehendem Seminarmaterial möglich
 - [ ] Status-Spalte ersetzt durch Toggle "Veröffentlicht"/"Unveröffentlicht"
@@ -260,11 +276,13 @@ interface CurriculumItem {
 - [ ] Spalte "Veröffentlichen" entfernt
 
 ### AC-5a: Standortverwaltung
+
 - [ ] Suchfunktion entfernt
 - [ ] Layout identisch mit Kursverwaltung
 - [ ] Gleiche Tabellenstruktur und Abstände
 
 ### AC-6: Berichte & Analysen
+
 - [ ] API Health-Daten werden angezeigt
 - [ ] Systemstatus ist hier integriert
 - [ ] Daten werden manuell aktualisiert (bei Seitenaufruf + Refresh-Button)
@@ -273,6 +291,7 @@ interface CurriculumItem {
 - [ ] Benutzerwachstum (neue Registrierungen)
 
 ### AC-7: Input-Felder
+
 - [ ] Alle Input-Felder haben Placeholder-Text
 - [ ] Alle Input-Felder haben Hilfetext (Subtitle)
 
@@ -285,18 +304,18 @@ interface CurriculumItem {
 
 ## File Changes (Estimated)
 
-| Datei | Änderung |
-|-------|----------|
-| `app/admin/page.tsx` | Dashboard-Redesign, Footer/Welcome entfernen |
-| `app/admin/layout.tsx` | Breadcrumb, einheitliche Breite |
-| `components/admin/AdminBreadcrumb.tsx` | Neue Komponente |
-| `components/admin/DashboardCard.tsx` | Neue/überarbeitete Komponente |
-| `components/admin/AdminPageContainer.tsx` | Wrapper mit Head Space |
-| `app/admin/users/page.tsx` | Clerk-Integration, Outperformer |
-| `app/admin/courses/*/page.tsx` | Seminarmaterial-Feld |
-| `app/admin/reports/page.tsx` | Health-Status, Systemstatus |
-| `components/navigation/Header.tsx` | Breitenanpassung |
-| `lib/constants/admin.ts` | Layout-Konstanten |
+| Datei                                     | Änderung                                     |
+| ----------------------------------------- | -------------------------------------------- |
+| `app/admin/page.tsx`                      | Dashboard-Redesign, Footer/Welcome entfernen |
+| `app/admin/layout.tsx`                    | Breadcrumb, einheitliche Breite              |
+| `components/admin/AdminBreadcrumb.tsx`    | Neue Komponente                              |
+| `components/admin/DashboardCard.tsx`      | Neue/überarbeitete Komponente                |
+| `components/admin/AdminPageContainer.tsx` | Wrapper mit Head Space                       |
+| `app/admin/users/page.tsx`                | Clerk-Integration, Outperformer              |
+| `app/admin/courses/*/page.tsx`            | Seminarmaterial-Feld                         |
+| `app/admin/reports/page.tsx`              | Health-Status, Systemstatus                  |
+| `components/navigation/Header.tsx`        | Breitenanpassung                             |
+| `lib/constants/admin.ts`                  | Layout-Konstanten                            |
 
 ## Open Questions
 
@@ -307,6 +326,7 @@ interface CurriculumItem {
 ## Clarifications
 
 ### Session 2026-02-04
+
 - Q: Welches Aktualisierungsintervall für Health-Status in "Berichte & Analysen"? → A: Manuell (bei Seitenaufruf + Refresh-Button)
 - Q: Welche Aktionen soll Admin auf Benutzer ausführen können? → A: Ansicht + Löschen + Rolle zuweisen
 - Q: Systemstatus aus Settings nach Reports verschieben? → A: Ja, komplett verschieben (aus Settings entfernen)

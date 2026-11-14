@@ -199,6 +199,7 @@ strengths."**
 7. On mobile: Show poster image, video loads on user interaction
 
 **Video Requirements**:
+
 - Provider: Mux (already integrated in project for Feature 016)
 - Embedding: Mux Player SDK (@mux/mux-player-react)
 - Autoplay: Yes, muted by default (browser policy compliant)
@@ -251,6 +252,7 @@ strengths."**
 5. Apply premium Paper component styling
 
 **Example Format**:
+
 ```
 09:00 - 09:20  Vorstellungsrunde
 09:20 - 10:00  Vorbereitungen besprechen
@@ -319,12 +321,13 @@ strengths."**
 6. Each CTA shows next available date and price
 
 **CTA Placement Strategy**:
-| Position | Trigger | CTA Style |
-|----------|---------|------------|
-| Hero (below title) | Immediate interest | Primary (large) |
-| After Curriculum | Convinced by content | Secondary (medium) |
-| After Testimonials | Social proof convinced | Secondary (medium) |
-| Page Bottom | Final decision point | Primary (large) with price summary |
+
+| Position           | Trigger                | CTA Style                          |
+| ------------------ | ---------------------- | ---------------------------------- |
+| Hero (below title) | Immediate interest     | Primary (large)                    |
+| After Curriculum   | Convinced by content   | Secondary (medium)                 |
+| After Testimonials | Social proof convinced | Secondary (medium)                 |
+| Page Bottom        | Final decision point   | Primary (large) with price summary |
 
 **Success Criteria**:
 
@@ -367,6 +370,7 @@ strengths."**
 7. Maintain readability and hierarchy across breakpoints
 
 **Layout Structure**:
+
 ```
 ┌────────────────────────────────────────┐
 │          HERO (Full Width + Video)     │

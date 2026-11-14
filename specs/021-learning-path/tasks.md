@@ -171,6 +171,7 @@ All implementation → T027-T030 (Polish)
 ## Parallel Execution Examples
 
 ### Phase 3.1 Parallel Group (after T003)
+
 ```
 Task: "Create Zod schema for course learning path fields in lib/schemas/admin/course.ts"
 Task: "Create Zod schema for booking review action in lib/schemas/admin/booking.ts"
@@ -178,30 +179,35 @@ Task: "Create Zod schema for user outperformer update in lib/schemas/admin/user.
 ```
 
 ### Phase 3.2 Parallel Group (Contract Tests)
+
 ```
 Task: "Contract test GET /api/admin/bookings/pending in tests/contracts/admin-booking-pending.spec.ts"
 Task: "Contract test PATCH /api/admin/bookings/{id}/review in tests/contracts/admin-booking-review.spec.ts"
 ```
 
 ### Phase 3.2 Parallel Group (Unit Tests)
+
 ```
 Task: "Unit test PrerequisiteService in tests/unit/services/prerequisite.spec.ts"
 Task: "Unit test LoopsService (mocked) in tests/unit/services/loops.spec.ts"
 ```
 
 ### Phase 3.2 Parallel Group (Integration Tests)
+
 ```
 Task: "Integration test prerequisite booking flow in tests/integration/booking-prerequisite.spec.ts"
 Task: "Integration test admin review workflow in tests/integration/admin-review.spec.ts"
 ```
 
 ### Phase 3.5 Parallel Group (Admin UI)
+
 ```
 Task: "Create BookingReviewPanel component in components/admin/BookingReviewPanel.tsx"
 Task: "Create UserOutperformerToggle component in components/admin/UserOutperformerToggle.tsx"
 ```
 
 ### Phase 3.8 Parallel Group (Polish)
+
 ```
 Task: "Run quickstart.md validation scenarios manually"
 Task: "Add Loops.so environment variable documentation to README.md"
@@ -222,15 +228,15 @@ Task: "Add Loops.so environment variable documentation to README.md"
 
 ## Summary
 
-| Phase | Tasks | Parallel |
-|-------|-------|----------|
-| 3.1 Setup | T001-T006 | T004-T006 |
-| 3.2 Tests | T007-T012 | T007-T008, T009-T010, T011-T012 |
-| 3.3 Services | T013-T015 | - |
-| 3.4 API | T016-T019 | - |
-| 3.5 Admin UI | T020-T023 | T021, T023 |
-| 3.6 Public UI | T024-T025 | T024 |
-| 3.7 Filter | T026 | - |
-| 3.8 Polish | T027-T030 | T027-T028 |
+| Phase         | Tasks     | Parallel                        |
+| ------------- | --------- | ------------------------------- |
+| 3.1 Setup     | T001-T006 | T004-T006                       |
+| 3.2 Tests     | T007-T012 | T007-T008, T009-T010, T011-T012 |
+| 3.3 Services  | T013-T015 | -                               |
+| 3.4 API       | T016-T019 | -                               |
+| 3.5 Admin UI  | T020-T023 | T021, T023                      |
+| 3.6 Public UI | T024-T025 | T024                            |
+| 3.7 Filter    | T026      | -                               |
+| 3.8 Polish    | T027-T030 | T027-T028                       |
 
 **Total: 30 tasks** (14 parallelizable)

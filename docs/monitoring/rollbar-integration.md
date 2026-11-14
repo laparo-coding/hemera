@@ -143,7 +143,10 @@ reportError(
 ### Client-side Error Reporting mit @rollbar/react
 
 ```typescript
-import { reportClientError, useRollbarError } from '@/lib/monitoring/rollbar-react';
+import {
+  reportClientError,
+  useRollbarError,
+} from '@/lib/monitoring/rollbar-react';
 
 // Funktional
 reportClientError(
@@ -284,10 +287,12 @@ export const GET = withApiErrorHandling(async context => {
 Alle Server Actions verwenden `withServerActionErrorHandling`:
 
 ```typescript
-export const updateProfile = withServerActionErrorHandling(async (data: ProfileData) => {
-  // Automatic error reporting
-  return await updateUserProfile(data);
-});
+export const updateProfile = withServerActionErrorHandling(
+  async (data: ProfileData) => {
+    // Automatic error reporting
+    return await updateUserProfile(data);
+  }
+);
 ```
 
 ### 3. Prisma Operations

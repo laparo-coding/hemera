@@ -20,30 +20,30 @@ Für die verifizierten lokalen Token-Namen und Minimalchecks siehe auch
 
 ```yaml
 error_rate_alert:
-  threshold: '> 5% in 5 minutes'
-  notification: 'Email + Slack'
+  threshold: "> 5% in 5 minutes"
+  notification: "Email + Slack"
 
 response_time_alert:
-  threshold: '> 2 seconds average in 10 minutes'
-  notification: 'Email'
+  threshold: "> 2 seconds average in 10 minutes"
+  notification: "Email"
 
 volume_spike_alert:
-  threshold: '> 500% increase in 5 minutes'
-  notification: 'Slack'
+  threshold: "> 500% increase in 5 minutes"
+  notification: "Slack"
 ```
 
 **API-spezifische Alerts:**
 
 ```yaml
 auth_failures:
-  threshold: '> 10 failures in 5 minutes'
-  routes: ['/api/auth/*']
+  threshold: "> 10 failures in 5 minutes"
+  routes: ["/api/auth/*"]
 
 database_errors:
-  threshold: '> 3 database errors in 5 minutes'
+  threshold: "> 3 database errors in 5 minutes"
 
 payment_failures:
-  threshold: '> 1 payment error'
+  threshold: "> 1 payment error"
   immediate: true
 ```
 

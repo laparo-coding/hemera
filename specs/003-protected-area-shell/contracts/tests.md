@@ -119,7 +119,9 @@ test.describe('Protected Layout Component Contract', () => {
 
     // Should render page content
     await expect(page.locator('[data-testid=page-content]')).toBeVisible();
-    await expect(page.locator('[data-testid=protected-navigation]')).toBeVisible();
+    await expect(
+      page.locator('[data-testid=protected-navigation]')
+    ).toBeVisible();
   });
 
   test('should show user information in layout', async ({ page }) => {
@@ -204,7 +206,11 @@ import { test, expect } from '@playwright/test';
 test.describe('Middleware Contract', () => {
   test('should protect all /protected routes', async ({ page }) => {
     // This test will fail until middleware is implemented
-    const protectedRoutes = ['/protected/dashboard', '/protected/courses', '/protected/admin'];
+    const protectedRoutes = [
+      '/protected/dashboard',
+      '/protected/courses',
+      '/protected/admin',
+    ];
 
     for (const route of protectedRoutes) {
       await page.goto(route);

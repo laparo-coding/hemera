@@ -135,6 +135,7 @@ jobs:
    ```
 
 3. **Refactor Phase**: Improve code while maintaining test coverage
+
    ```bash
    # All tests still pass after refactoring
    npm run test:unit

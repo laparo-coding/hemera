@@ -17,6 +17,7 @@
 ## Summary
 
 Extend und stabilize die E2E- und Unit-Test-Suite für Hemera:
+
 - **Issue #357**: React Component Testing aktivieren (tsconfig.json Exclusion entfernen)
 - **Issue #384**: Course-Detail E2E Tests reparieren (CI-Timeout lösen)
 - **Stripe E2E**: Checkout-Tests mit Clerk Test-User aktivieren
@@ -41,15 +42,15 @@ Extend und stabilize die E2E- und Unit-Test-Suite für Hemera:
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Test-First Development | ✅ Pass | Feature ist Test-fokussiert, aktiviert bestehende Tests |
-| Rollbar Mandatory Logging | ✅ Pass | FR-7 implementiert Rollbar-Ersetzung für console.log/error |
-| Coverage Thresholds | ✅ Pass | 70%/85% aligned mit Constitution (80% min für critical paths) |
-| Stripe Test Mode | ✅ Pass | Nur Testmode Keys, keine echten Transaktionen |
-| GitHub Actions Deployment | ✅ Pass | Production Tests als Scheduled Workflow |
-| Error Handling Tests | ✅ Pass | Console.log → Rollbar Migration verbessert Observability |
-| PII Filtering | ✅ Pass | Rollbar-Integration filtert bereits PII |
+| Gate                      | Status  | Notes                                                         |
+| ------------------------- | ------- | ------------------------------------------------------------- |
+| Test-First Development    | ✅ Pass | Feature ist Test-fokussiert, aktiviert bestehende Tests       |
+| Rollbar Mandatory Logging | ✅ Pass | FR-7 implementiert Rollbar-Ersetzung für console.log/error    |
+| Coverage Thresholds       | ✅ Pass | 70%/85% aligned mit Constitution (80% min für critical paths) |
+| Stripe Test Mode          | ✅ Pass | Nur Testmode Keys, keine echten Transaktionen                 |
+| GitHub Actions Deployment | ✅ Pass | Production Tests als Scheduled Workflow                       |
+| Error Handling Tests      | ✅ Pass | Console.log → Rollbar Migration verbessert Observability      |
+| PII Filtering             | ✅ Pass | Rollbar-Integration filtert bereits PII                       |
 
 **Violations**: Keine
 
@@ -97,18 +98,19 @@ components/              # Error handlers
 
 ### Key Findings
 
-| Topic | Finding | Decision |
-|-------|---------|----------|
-| Issue #357 | Component Tests funktionieren bereits | Nur tsconfig.json Exclusion entfernen |
-| Issue #384 | CI-Timeout bei SSR | Warmup + höheres Timeout implementieren |
-| Stripe Auth | Tests skippen wegen fehlender Clerk Auth | Playwright auth state mit echtem Login |
-| Console.log | ~50 Vorkommen in Production-Code | Durch Rollbar ersetzen |
+| Topic       | Finding                                  | Decision                                |
+| ----------- | ---------------------------------------- | --------------------------------------- |
+| Issue #357  | Component Tests funktionieren bereits    | Nur tsconfig.json Exclusion entfernen   |
+| Issue #384  | CI-Timeout bei SSR                       | Warmup + höheres Timeout implementieren |
+| Stripe Auth | Tests skippen wegen fehlender Clerk Auth | Playwright auth state mit echtem Login  |
+| Console.log | ~50 Vorkommen in Production-Code         | Durch Rollbar ersetzen                  |
 
 ## Phase 1: Design & Contracts
 
 ### 1.1 Configuration Changes (No new entities)
 
 **tsconfig.json** - Exclusion entfernen:
+
 ```diff
 "exclude": [
   "node_modules",
@@ -118,6 +120,7 @@ components/              # Error handlers
 ```
 
 **jest.config.ts** - Coverage Thresholds:
+
 ```typescript
 coverageThreshold: {
   global: { branches: 70, functions: 70, lines: 70, statements: 70 },
@@ -126,6 +129,7 @@ coverageThreshold: {
 ```
 
 **biome.json** - no-console Rule:
+
 ```json
 {
   "linter": {
@@ -141,6 +145,7 @@ coverageThreshold: {
 ### 1.2 Playwright Auth Setup
 
 **playwright.config.ts** - Neue Projekte:
+
 ```typescript
 projects: [
   {
@@ -161,10 +166,11 @@ projects: [
     use: { baseURL: 'https://hemera.academy' },
     testMatch: /production-smoke\.spec\.ts/,
   },
-]
+];
 ```
 
 **tests/e2e/auth-setup.ts**:
+
 ```typescript
 // Playwright auth state setup
 // Logs in via Clerk and saves storageState
@@ -173,11 +179,12 @@ projects: [
 ### 1.3 Production Smoke Workflow
 
 **.github/workflows/production-smoke.yml**:
+
 ```yaml
 name: Production Smoke Tests
 on:
   schedule:
-    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+    - cron: "0 6 * * *" # Daily at 6 AM UTC
   workflow_dispatch: {}
 
 jobs:
@@ -192,26 +199,28 @@ jobs:
 ### 1.4 Course-Detail Timeout Fix
 
 **tests/e2e/course-detail.spec.ts**:
+
 - Warmup: Health-Endpoint vor Navigation aufrufen
 - Timeout: 120s für Course-Detail Tests
 - Remove `test.describe.skip()`
 
 ### 1.5 Console.log Audit Scope
 
-| Directory | Approach |
-|-----------|----------|
-| `app/api/**` | `console.error` → `serverInstance.error()` |
-| `lib/services/**` | `console.log` → entfernen oder `rollbar.info()` |
-| `lib/monitoring/**` | Ausnahme (Rollbar-Setup) |
-| `components/**` | `console.error` in Error Boundaries → `useRollbar().error()` |
-| `tests/**` | Keine Änderung |
-| `scripts/**` | Keine Änderung |
+| Directory           | Approach                                                     |
+| ------------------- | ------------------------------------------------------------ |
+| `app/api/**`        | `console.error` → `serverInstance.error()`                   |
+| `lib/services/**`   | `console.log` → entfernen oder `rollbar.info()`              |
+| `lib/monitoring/**` | Ausnahme (Rollbar-Setup)                                     |
+| `components/**`     | `console.error` in Error Boundaries → `useRollbar().error()` |
+| `tests/**`          | Keine Änderung                                               |
+| `scripts/**`        | Keine Änderung                                               |
 
 ### 1.6 Contract Tests (No new APIs)
 
 Dieses Feature erstellt keine neuen APIs - es aktiviert/repariert bestehende Tests.
 
 **Bestehende Contract Tests bleiben unverändert:**
+
 - `tests/contracts/stripe-checkout.spec.ts`
 - `tests/contracts/stripe-webhook.spec.ts`
 - `tests/contracts/bookings-api.spec.ts`
@@ -232,6 +241,7 @@ _This section describes what the /tasks command will do - DO NOT execute during 
 8. **Verification** (Coverage report, CI green)
 
 **Ordering Strategy**:
+
 - TDD: Config changes enable tests first
 - Dependencies: Auth setup before auth-dependent tests
 - Parallel [P]: Console.log migration per directory

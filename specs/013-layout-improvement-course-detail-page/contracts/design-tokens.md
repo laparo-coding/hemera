@@ -12,7 +12,7 @@ Centralized design tokens for Hemera Design System.
 ```typescript
 /**
  * Hemera Design Tokens
- * 
+ *
  * Central source of truth for colors, typography, and spacing.
  * Import this module instead of defining tokens inline.
  */
@@ -24,19 +24,19 @@ Centralized design tokens for Hemera Design System.
 export const colors = {
   /** Primary cream background - warm, inviting */
   cream: '#FBF5DD',
-  
+
   /** Primary petrol text/accent - professional, trustworthy */
   petrol: '#16404D',
-  
+
   /** Gold accent - premium, call-to-action */
   gold: '#DDA853',
-  
+
   /** Sage accent - calming, supportive */
   sage: '#A6CDC6',
-  
+
   /** Pure white for cards and contrast */
   white: '#FFFFFF',
-  
+
   /** Light gray for borders and dividers */
   lightGray: '#E5E5E5',
 } as const;
@@ -51,7 +51,7 @@ export type ColorValue = (typeof colors)[ColorKey];
 export const typography = {
   /** Serif font for headings - elegant, premium */
   heading: '"Playfair Display", serif',
-  
+
   /** Sans-serif font for body - clean, readable */
   body: '"Inter", sans-serif',
 } as const;
@@ -70,10 +70,10 @@ export const fontWeights = {
 export const spacing = {
   /** Standard section vertical padding */
   sectionPy: { xs: 6, md: 10 },
-  
+
   /** Reduced section padding for dense layouts */
   sectionPyCompact: { xs: 4, md: 6 },
-  
+
   /** Container max width */
   containerMaxWidth: 'lg' as const,
 } as const;
@@ -109,12 +109,13 @@ export type CourseLevel = keyof typeof courseLevelColors;
 export const shadows = {
   /** Subtle card shadow */
   card: '0 2px 8px rgba(22, 64, 77, 0.08)',
-  
+
   /** Elevated card shadow (hover state) */
   cardHover: '0 4px 16px rgba(22, 64, 77, 0.12)',
-  
+
   /** Hero overlay gradient */
-  heroOverlay: 'linear-gradient(to bottom, rgba(22, 64, 77, 0.3), rgba(22, 64, 77, 0.7))',
+  heroOverlay:
+    'linear-gradient(to bottom, rgba(22, 64, 77, 0.3), rgba(22, 64, 77, 0.7))',
 } as const;
 
 // ============================================
@@ -145,6 +146,7 @@ export const zIndex = {
 ## Usage Examples
 
 ### In Components
+
 ```typescript
 import { colors, typography, spacing } from '@/lib/design-tokens';
 
@@ -156,6 +158,7 @@ import { colors, typography, spacing } from '@/lib/design-tokens';
 ```
 
 ### Course Level Badge
+
 ```typescript
 import { courseLevelColors } from '@/lib/design-tokens';
 

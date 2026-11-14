@@ -7,57 +7,71 @@ This document provides Git Speckit commands for managing the 025-service-user-en
 ## Available Commands
 
 ### `/clarify`
+
 Ask clarifying questions about the specification before implementation.
 
 **Usage:**
+
 ```
 /clarify What authentication method should be used for service users?
 ```
 
 ### `/plan`
+
 Generate or update the implementation plan based on the specification.
 
 **Usage:**
+
 ```
 /plan
 ```
 
 ### `/tasks`
+
 Generate or update the task breakdown for implementation.
 
 **Usage:**
+
 ```
 /tasks
 ```
 
 ### `/implement`
+
 Start implementing the specification based on the plan and tasks.
 
 **Usage:**
+
 ```
 /implement
 ```
 
 ### `/test`
+
 Generate or run tests for the implemented feature.
 
 **Usage:**
+
 ```
 /test
 ```
 
 ### `/review`
+
 Request a review of the specification or implementation.
 
 **Usage:**
+
 ```
 /review
 ```
 
 ### `/status`
+
 Check the current status of the specification and implementation.
 
 **Usage:**
+
 ```
 /status
 ```
@@ -67,6 +81,7 @@ Check the current status of the specification and implementation.
 ## Workflow
 
 1. **Clarify Requirements** (if needed)
+
    ```
    /clarify [your question]
    ```
@@ -84,16 +99,19 @@ Check the current status of the specification and implementation.
    - Understand task breakdown (15 tasks, 3-4 days)
 
 5. **Start Implementation**
+
    ```
    /implement
    ```
 
 6. **Run Tests**
+
    ```
    /test
    ```
 
 7. **Request Review**
+
    ```
    /review
    ```

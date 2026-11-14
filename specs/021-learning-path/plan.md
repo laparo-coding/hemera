@@ -6,6 +6,7 @@
 ## Summary
 
 Enhance course management with:
+
 1. **Course recommendation fields** (`recommended`, `notRecommended`) for course detail page and admin forms
 2. **Prerequisite booking check** with PRE_BOOKED status for non-qualified customers, admin review workflow, and Loops.so email notifications
 3. **Non-public course flag** (`isNonPublic`) to hide invitation-only courses from public listings
@@ -29,16 +30,16 @@ Technical approach: Extend Prisma schema with new fields, add PRE_BOOKED payment
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| **I. Test-First Development** | ✅ PASS | Contract tests for prerequisite service, admin review API |
-| **II. Code Quality & Formatting** | ✅ PASS | TypeScript strict, Prettier, ESLint |
-| **III. Feature Development Workflow** | ✅ PASS | Spec-first approach followed, Prisma migrations planned |
-| **IV. Authentication & Security** | ✅ PASS | Clerk admin role check for review actions |
-| **V. Component Architecture** | ✅ PASS | MUI components, theme consistency |
-| **VI. Holistic Error Handling** | ✅ PASS | Rollbar for Loops.so failures, silent degradation |
-| **VII. Stripe Integration** | ✅ PASS | New PRE_BOOKED status integrates with existing flow |
-| **Deployment Standards** | ✅ PASS | GitHub Actions exclusive |
+| Principle                             | Status  | Notes                                                     |
+| ------------------------------------- | ------- | --------------------------------------------------------- |
+| **I. Test-First Development**         | ✅ PASS | Contract tests for prerequisite service, admin review API |
+| **II. Code Quality & Formatting**     | ✅ PASS | TypeScript strict, Prettier, ESLint                       |
+| **III. Feature Development Workflow** | ✅ PASS | Spec-first approach followed, Prisma migrations planned   |
+| **IV. Authentication & Security**     | ✅ PASS | Clerk admin role check for review actions                 |
+| **V. Component Architecture**         | ✅ PASS | MUI components, theme consistency                         |
+| **VI. Holistic Error Handling**       | ✅ PASS | Rollbar for Loops.so failures, silent degradation         |
+| **VII. Stripe Integration**           | ✅ PASS | New PRE_BOOKED status integrates with existing flow       |
+| **Deployment Standards**              | ✅ PASS | GitHub Actions exclusive                                  |
 
 **Initial Constitution Check: PASS** ✅
 
@@ -115,13 +116,13 @@ tests/
 
 Research was completed prior to planning. Key findings from [research.md](research.md):
 
-| Decision | Rationale |
-|----------|-----------|
-| Loops.so for emails | Transactional email API, simple integration, no SMTP setup |
-| PRE_BOOKED as new PaymentStatus | Distinguishes from PENDING (payment not yet started vs. needs review) |
-| Clerk emails for prerequisite check | User can have multiple emails in Clerk account |
-| CourseParticipation.status = COMPLETE | Strictest definition of "completed" course |
-| Silent degradation for Loops.so | Booking flow must not be blocked by email failures |
+| Decision                              | Rationale                                                             |
+| ------------------------------------- | --------------------------------------------------------------------- |
+| Loops.so for emails                   | Transactional email API, simple integration, no SMTP setup            |
+| PRE_BOOKED as new PaymentStatus       | Distinguishes from PENDING (payment not yet started vs. needs review) |
+| Clerk emails for prerequisite check   | User can have multiple emails in Clerk account                        |
+| CourseParticipation.status = COMPLETE | Strictest definition of "completed" course                            |
+| Silent degradation for Loops.so       | Booking flow must not be blocked by email failures                    |
 
 **Phase 0: COMPLETE** ✅
 
@@ -133,15 +134,15 @@ See [data-model.md](data-model.md) for full schema.
 
 **Summary of changes:**
 
-| Model | Field | Type | Migration |
-|-------|-------|------|-----------|
-| Course | `recommended` | VARCHAR(300) nullable | ADD COLUMN |
-| Course | `notRecommended` | VARCHAR(300) nullable | ADD COLUMN |
-| Course | `isNonPublic` | BOOLEAN default false | ADD COLUMN |
-| User | `isOutperformer` | BOOLEAN default false | ADD COLUMN |
-| PaymentStatus | `PRE_BOOKED` | ENUM value | ALTER TYPE |
-| Booking | `reviewedAt` | TIMESTAMP nullable | ADD COLUMN |
-| Booking | `reviewedBy` | VARCHAR nullable | ADD COLUMN |
+| Model         | Field            | Type                  | Migration  |
+| ------------- | ---------------- | --------------------- | ---------- |
+| Course        | `recommended`    | VARCHAR(300) nullable | ADD COLUMN |
+| Course        | `notRecommended` | VARCHAR(300) nullable | ADD COLUMN |
+| Course        | `isNonPublic`    | BOOLEAN default false | ADD COLUMN |
+| User          | `isOutperformer` | BOOLEAN default false | ADD COLUMN |
+| PaymentStatus | `PRE_BOOKED`     | ENUM value            | ALTER TYPE |
+| Booking       | `reviewedAt`     | TIMESTAMP nullable    | ADD COLUMN |
+| Booking       | `reviewedBy`     | VARCHAR nullable      | ADD COLUMN |
 
 ### 1.2 API Contracts
 
@@ -149,21 +150,22 @@ See [contracts/](contracts/) directory for OpenAPI specs.
 
 **New Endpoints:**
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| PATCH | `/api/admin/bookings/{id}/review` | Approve/reject PRE_BOOKED booking |
-| GET | `/api/admin/bookings/pending` | List PRE_BOOKED bookings |
-| PATCH | `/api/admin/users/{id}` | Update user (isOutperformer) |
+| Method | Path                              | Purpose                           |
+| ------ | --------------------------------- | --------------------------------- |
+| PATCH  | `/api/admin/bookings/{id}/review` | Approve/reject PRE_BOOKED booking |
+| GET    | `/api/admin/bookings/pending`     | List PRE_BOOKED bookings          |
+| PATCH  | `/api/admin/users/{id}`           | Update user (isOutperformer)      |
 
 **Modified Endpoints:**
 
-| Method | Path | Change |
-|--------|------|--------|
-| POST | `/api/payment/create-intent` | Add prerequisite check, return PRE_BOOKED if not qualified |
+| Method | Path                         | Change                                                     |
+| ------ | ---------------------------- | ---------------------------------------------------------- |
+| POST   | `/api/payment/create-intent` | Add prerequisite check, return PRE_BOOKED if not qualified |
 
 ### 1.3 Service Contracts
 
 **PrerequisiteService** (`lib/services/prerequisite.ts`):
+
 ```typescript
 interface PrerequisiteResult {
   qualified: boolean;
@@ -171,10 +173,14 @@ interface PrerequisiteResult {
   completedCourses: string[];
 }
 
-function checkPrerequisite(clerkUserId: string, targetCourseLevel: CourseLevel): Promise<PrerequisiteResult>
+function checkPrerequisite(
+  clerkUserId: string,
+  targetCourseLevel: CourseLevel
+): Promise<PrerequisiteResult>;
 ```
 
 **LoopsService** (`lib/services/loops.ts`):
+
 ```typescript
 function sendPrerequisiteReviewEmail(data: {
   customerName: string;
@@ -183,18 +189,19 @@ function sendPrerequisiteReviewEmail(data: {
   missingPrerequisite: string;
   bookingId: string;
   adminEmails: string[];
-}): Promise<{ success: boolean; error?: string }>
+}): Promise<{ success: boolean; error?: string }>;
 
 function sendBookingRejectedEmail(data: {
   customerEmail: string;
   customerName: string;
   courseName: string;
-}): Promise<{ success: boolean; error?: string }>
+}): Promise<{ success: boolean; error?: string }>;
 ```
 
 ### 1.4 Component Contracts
 
 **CourseRecommendationSection** (public course detail):
+
 ```typescript
 interface Props {
   recommended: string | null;
@@ -203,6 +210,7 @@ interface Props {
 ```
 
 **BookingReviewPanel** (admin):
+
 ```typescript
 interface Props {
   bookings: PendingBooking[];
@@ -250,6 +258,7 @@ _This section describes what the /tasks command will do - DO NOT execute during 
    - Loops.so degradation test
 
 **Ordering Strategy**:
+
 - TDD order: Contract tests → Unit tests → Implementation
 - Dependency order: Schema → Services → API → Frontend
 - [P] marks parallel-safe tasks
@@ -261,8 +270,8 @@ _This section describes what the /tasks command will do - DO NOT execute during 
 _No constitution violations requiring justification._
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|-----------|-------------------------------------|
-| (none) | - | - |
+| --------- | ---------- | ------------------------------------ |
+| (none)    | -          | -                                    |
 
 ## Progress Tracking
 

@@ -22,7 +22,8 @@ npm run dev
 
 Navigate to: `http://localhost:3000/admin`
 
-**Expected**: 
+**Expected**:
+
 - 3-column grid with 6 cards
 - No footer visible
 - No welcome message
@@ -40,7 +41,7 @@ Navigate to: `http://localhost:3000/admin`
 1. Navigate to `/admin/courses`
 2. Find any course in the list
 3. Click the toggle switch in the "Status" column
-4. **Expected**: 
+4. **Expected**:
    - Toggle changes state
    - Label shows "Veröffentlicht" or "Unveröffentlicht"
    - No page reload required
@@ -72,7 +73,7 @@ Navigate to: `http://localhost:3000/admin`
 ### 7. Test Location Management
 
 1. Click "Veranstaltungsorte" card
-2. **Expected**: 
+2. **Expected**:
    - No search field visible
    - Table layout matches Seminare style
    - Same column spacing and structure
@@ -87,6 +88,7 @@ curl -X GET "http://localhost:3000/api/admin/users?page=1&limit=10" \
 ```
 
 **Expected Response**:
+
 ```json
 {
   "data": [
@@ -117,6 +119,7 @@ curl -X GET "http://localhost:3000/api/admin/reports/stats" \
 ```
 
 **Expected Response**:
+
 ```json
 {
   "data": {
@@ -159,12 +162,15 @@ npx playwright test tests/e2e/admin-dashboard.spec.ts --ui
 ## Common Issues
 
 ### Issue: "Forbidden" when accessing admin
+
 **Solution**: Ensure your Clerk user has `publicMetadata.role = 'admin'`
 
 ### Issue: User list empty
+
 **Solution**: Check Clerk API key is valid and has Backend API access
 
 ### Issue: Stats show 0
+
 **Solution**: Seed database with test data: `npm run db:seed`
 
 ## Definition of Done Checklist

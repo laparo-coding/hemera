@@ -64,15 +64,15 @@ mock-heavy service tests, and database-aware setup paths
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Notes |
-| ---- | ------ | ----- |
-| Test-First Development | PASS | The migration preserves and clarifies unit, contract, and integration layers rather than collapsing them. Downstream tasks should migrate each layer with failing checks first. |
-| Testing Requirements | PASS | Unit, contract, integration, error handling, and monitoring-related tests remain in scope; Playwright stays the E2E layer. |
-| Holistic Error Handling & Observability | PASS | The plan preserves tests that validate Rollbar and failure scenarios, and requires parity checks for error-path behavior during migration. |
-| Code Organization | PASS | No runtime product architecture is changed; planning is limited to test infrastructure, scripts, and support files. |
-| GitHub Actions Workflow Discipline | PASS | CI validation remains a first-class acceptance criterion; no manual or ad hoc workflow bypass is introduced. |
-| Security & Privacy | PASS | The plan keeps existing environment loading and database lifecycle handling, with no new secret handling model. |
-| Specs-First Workflow | PASS | Spec, plan, research, data model, contracts, and quickstart are produced inside the feature directory before implementation. |
+| Gate                                    | Status | Notes                                                                                                                                                                           |
+| --------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test-First Development                  | PASS   | The migration preserves and clarifies unit, contract, and integration layers rather than collapsing them. Downstream tasks should migrate each layer with failing checks first. |
+| Testing Requirements                    | PASS   | Unit, contract, integration, error handling, and monitoring-related tests remain in scope; Playwright stays the E2E layer.                                                      |
+| Holistic Error Handling & Observability | PASS   | The plan preserves tests that validate Rollbar and failure scenarios, and requires parity checks for error-path behavior during migration.                                      |
+| Code Organization                       | PASS   | No runtime product architecture is changed; planning is limited to test infrastructure, scripts, and support files.                                                             |
+| GitHub Actions Workflow Discipline      | PASS   | CI validation remains a first-class acceptance criterion; no manual or ad hoc workflow bypass is introduced.                                                                    |
+| Security & Privacy                      | PASS   | The plan keeps existing environment loading and database lifecycle handling, with no new secret handling model.                                                                 |
+| Specs-First Workflow                    | PASS   | Spec, plan, research, data model, contracts, and quickstart are produced inside the feature directory before implementation.                                                    |
 
 **Violations**: None.
 
@@ -259,14 +259,14 @@ Playwright behavior
 
 ## Risks
 
-| Risk | Impact | Mitigation |
-| ---- | ------ | ---------- |
-| Jest-specific mock APIs are used broadly across unit and contract tests | High | Perform a compatibility slice first, favor codemod-friendly replacements, and reserve manual cleanup for outliers |
-| Current per-file `@jest-environment jsdom` directives do not transfer automatically | High | Convert directives deliberately and validate jsdom-backed component suites before switching the default script |
-| `tests/setup.ts` mixes environment loading, database lifecycle, polyfills, and Jest lifecycle imports | High | Keep one shared setup file, migrate lifecycle hooks first, and validate both Node and jsdom execution paths |
-| `tsconfig.json` currently includes Jest types | Medium | Introduce Vitest-aware type configuration before removing Jest packages to avoid editor and build churn |
-| Coverage artifacts may differ subtly between Jest V8 output and Vitest output | Medium | Validate required reporter formats explicitly and treat equivalent consumer value as the acceptance standard |
-| Integration tests rely on sequential database behavior and ignored-file exceptions | Medium | Preserve single-worker execution and existing ignore intent until a separate feature revisits parallelism or suite scope |
+| Risk                                                                                                  | Impact | Mitigation                                                                                                               |
+| ----------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Jest-specific mock APIs are used broadly across unit and contract tests                               | High   | Perform a compatibility slice first, favor codemod-friendly replacements, and reserve manual cleanup for outliers        |
+| Current per-file `@jest-environment jsdom` directives do not transfer automatically                   | High   | Convert directives deliberately and validate jsdom-backed component suites before switching the default script           |
+| `tests/setup.ts` mixes environment loading, database lifecycle, polyfills, and Jest lifecycle imports | High   | Keep one shared setup file, migrate lifecycle hooks first, and validate both Node and jsdom execution paths              |
+| `tsconfig.json` currently includes Jest types                                                         | Medium | Introduce Vitest-aware type configuration before removing Jest packages to avoid editor and build churn                  |
+| Coverage artifacts may differ subtly between Jest V8 output and Vitest output                         | Medium | Validate required reporter formats explicitly and treat equivalent consumer value as the acceptance standard             |
+| Integration tests rely on sequential database behavior and ignored-file exceptions                    | Medium | Preserve single-worker execution and existing ignore intent until a separate feature revisits parallelism or suite scope |
 
 ## Validation Strategy
 

@@ -136,10 +136,10 @@ LOOPS_API_KEY=loops_xxxxx  # Get from Loops.so Dashboard → API
 
 Create the following templates in your Loops.so dashboard:
 
-| Template ID            | Purpose                                      | Variables                                 |
-| ---------------------- | -------------------------------------------- | ----------------------------------------- |
-| `prerequisite-review`  | Admin notification for PRE_BOOKED booking    | `customerName`, `courseTitle`, `adminUrl` |
-| `booking-rejected`     | Customer rejection notice                    | `firstName`, `courseTitle`                |
+| Template ID           | Purpose                                   | Variables                                 |
+| --------------------- | ----------------------------------------- | ----------------------------------------- |
+| `prerequisite-review` | Admin notification for PRE_BOOKED booking | `customerName`, `courseTitle`, `adminUrl` |
+| `booking-rejected`    | Customer rejection notice                 | `firstName`, `courseTitle`                |
 
 ### Feature Behavior
 

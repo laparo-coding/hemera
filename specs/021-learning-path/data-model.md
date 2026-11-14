@@ -17,6 +17,7 @@ enum PaymentStatus {
 ```
 
 **Migration SQL:**
+
 ```sql
 ALTER TYPE "PaymentStatus" ADD VALUE 'PRE_BOOKED' AFTER 'PENDING';
 ```
@@ -37,6 +38,7 @@ model Course {
 ```
 
 **Migration SQL:**
+
 ```sql
 ALTER TABLE courses 
   ADD COLUMN recommended VARCHAR(300),
@@ -58,6 +60,7 @@ model User {
 ```
 
 **Migration SQL:**
+
 ```sql
 ALTER TABLE users 
   ADD COLUMN is_outperformer BOOLEAN DEFAULT false NOT NULL;
@@ -78,6 +81,7 @@ model Booking {
 ```
 
 **Migration SQL:**
+
 ```sql
 ALTER TABLE bookings 
   ADD COLUMN reviewed_at TIMESTAMP,
@@ -118,25 +122,25 @@ ALTER TABLE bookings
 
 ### Course Fields
 
-| Field | Validation |
-|-------|------------|
-| `recommended` | Optional, max 300 chars, trimmed |
+| Field            | Validation                       |
+| ---------------- | -------------------------------- |
+| `recommended`    | Optional, max 300 chars, trimmed |
 | `notRecommended` | Optional, max 300 chars, trimmed |
-| `isNonPublic` | Boolean, default false |
+| `isNonPublic`    | Boolean, default false           |
 
 ### User Fields
 
-| Field | Validation |
-|-------|------------|
+| Field            | Validation             |
+| ---------------- | ---------------------- |
 | `isOutperformer` | Boolean, default false |
 
 ### Booking Fields
 
-| Field | Validation |
-|-------|------------|
-| `paymentStatus` | Must be valid enum value |
-| `reviewedAt` | Optional, set when admin reviews |
-| `reviewedBy` | Optional, Clerk userId of reviewing admin |
+| Field           | Validation                                |
+| --------------- | ----------------------------------------- |
+| `paymentStatus` | Must be valid enum value                  |
+| `reviewedAt`    | Optional, set when admin reviews          |
+| `reviewedBy`    | Optional, Clerk userId of reviewing admin |
 
 ## State Transitions
 
@@ -230,6 +234,7 @@ ADVANCED (Masterclass)
 ## Indexes
 
 No new indexes required. Existing indexes are sufficient:
+
 - `courses.level` - implicit from enum
 - `bookings.payment_status` - may benefit from index for pending review queries
 - `course_participations.user_id + status` - existing index covers prerequisite check
@@ -270,7 +275,7 @@ CREATE INDEX idx_bookings_payment_status ON bookings(payment_status)
 // lib/schemas/admin/course.ts - additions
 export const courseCreateSchema = z.object({
   // ... existing fields ...
-  
+
   // NEW: Learning Path fields
   recommended: z
     .string()

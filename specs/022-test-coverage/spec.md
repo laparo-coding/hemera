@@ -7,6 +7,7 @@
 ## Overview
 
 Extend und stabilize die E2E- und Unit-Test-Suite für Hemera. Dieses Feature umfasst:
+
 - Stripe-Integration Tests im Testmodus
 - Invoice-Download Tests
 - Production-Login-Tests mit Clerk Test-User
@@ -33,6 +34,7 @@ Extend und stabilize die E2E- und Unit-Test-Suite für Hemera. Dieses Feature um
 ### Functional Requirements
 
 #### FR-1: Stripe Testmode E2E Tests
+
 - E2E-Tests auf dev-Umgebung mit Stripe Testmode
 - Verwendung von Clerk Test-User für Authentifizierung
 - Test-Kreditkartennummern (z.B. `4242 4242 4242 4242`)
@@ -40,11 +42,13 @@ Extend und stabilize die E2E- und Unit-Test-Suite für Hemera. Dieses Feature um
 - **Scope:** E2E testet bis Checkout-Redirect; Webhook-Verarbeitung wird in Contract-Tests abgedeckt
 
 #### FR-2: Invoice Download Tests
+
 - Test des Rechnungsdownloads von Stripe im Testmodus
 - Verifizierung, dass PDF erfolgreich generiert wird
 - Test mit authentifiziertem Clerk Test-User
 
 #### FR-3: Production Login Tests
+
 - Login-Test auf Production-Umgebung
 - Verwendung von Clerk Test-User
 - Smoke-Test für kritische Auth-Flows
@@ -53,12 +57,14 @@ Extend und stabilize die E2E- und Unit-Test-Suite für Hemera. Dieses Feature um
 - **Alerting:** Benachrichtigung bei Fehlschlag (Slack/E-Mail)
 
 #### FR-4: Issue #384 - Course-Detail E2E Tests reparieren
+
 - **Problem:** E2E-Tests für `/courses/[slug]` schlagen mit Timeout auf CI fehl
 - **Ursache:** SSR-Performance, Datenbank-Latenz, oder Cold-Start Probleme
 - **Lösung:** CI-Runner-Performance analysieren, SSR optimieren, Tests wieder aktivieren
 - **Betroffene Tests:** `tests/e2e/course-detail.spec.ts` (9 Tests, derzeit mit `test.describe.skip()` deaktiviert)
 
 #### FR-5: Issue #357 - React Component Testing Setup
+
 - Dependencies installieren: `@testing-library/react`, `@testing-library/jest-dom`, `jest-environment-jsdom`
 - Jest-Config für React-Tests erweitern (`testEnvironment: 'jsdom'`, `*.spec.tsx` in `testMatch`)
 - `tests/setup.ts` für Jest-DOM Matchers erweitern
@@ -72,11 +78,13 @@ Extend und stabilize die E2E- und Unit-Test-Suite für Hemera. Dieses Feature um
   - `tests/unit/components/course-detail/TestimonialsSection.spec.tsx`
 
 #### FR-6: Missing Tests Audit
+
 - Audit der bestehenden Test-Coverage
 - Identifizierung fehlender Tests für kritische Flows
 - Priorisierung und Implementierung fehlender Tests
 
 #### FR-7: Console.log durch Rollbar Logging ersetzen
+
 - **Audit:** Alle `console.log`, `console.warn`, `console.error` im Produktionscode identifizieren
 - **Ersetzung:** Durch entsprechende Rollbar-Methoden ersetzen:
   - `console.log` → `rollbar.info()` oder entfernen (wenn nur Debug)
@@ -116,21 +124,25 @@ Extend und stabilize die E2E- und Unit-Test-Suite für Hemera. Dieses Feature um
 ## Technical Considerations
 
 ### Stripe Testmode
+
 - Stripe Secret Key: `STRIPE_SECRET_KEY` (Testmode-Key beginnt mit `sk_test_`)
 - Test-Karten: https://stripe.com/docs/testing#cards
 - Webhook-Simulation für Post-Payment Flows
 
 ### Clerk Test-User
+
 - Dedizierter Test-User in Clerk Dashboard anlegen
 - Credentials in CI-Secrets speichern
 - E2E_TEST_EMAIL und E2E_TEST_PASSWORD Environment Variables
 
 ### Production Tests
+
 - Nur lesende Operationen
 - Separate Test-User mit minimalen Berechtigungen
 - Playwright `--project=production` Konfiguration
 
 ### CI-Performance (Issue #384)
+
 - GitHub Actions Runner Ressourcen analysieren
 - Next.js Build-Cache optimieren
 - Database Connection Pooling prüfen
@@ -149,4 +161,4 @@ Extend und stabilize die E2E- und Unit-Test-Suite für Hemera. Dieses Feature um
 
 ## Open Questions
 
-*Alle Fragen geklärt in Session 2026-01-28.*
+_Alle Fragen geklärt in Session 2026-01-28._

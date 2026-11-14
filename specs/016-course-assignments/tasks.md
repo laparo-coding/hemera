@@ -40,12 +40,12 @@
 
 ## Dependency Notes
 
-- T002 depends on T001 completion to ensure dependencies are in place before scaffolding feature directories.  
-- Contract and integration tests (T003–T010) must run and fail before schema or implementation tasks (T011 onward).  
-- Prisma schema update (T011) unblocks migration (T012) and seeding (T013); these must finish before data layer work (T014) and API endpoints (T017–T021).  
-- Server utilities (T014–T016) are prerequisites for API routes and UI integration tasks (T017–T025).  
-- Observability wiring (T026) should occur after core APIs (T017–T021) to hook into final contexts.  
-- Unit and documentation polish tasks (T027–T030) rely on prior implementation to reflect accurate behavior.  
+- T002 depends on T001 completion to ensure dependencies are in place before scaffolding feature directories.
+- Contract and integration tests (T003–T010) must run and fail before schema or implementation tasks (T011 onward).
+- Prisma schema update (T011) unblocks migration (T012) and seeding (T013); these must finish before data layer work (T014) and API endpoints (T017–T021).
+- Server utilities (T014–T016) are prerequisites for API routes and UI integration tasks (T017–T025).
+- Observability wiring (T026) should occur after core APIs (T017–T021) to hook into final contexts.
+- Unit and documentation polish tasks (T027–T030) rely on prior implementation to reflect accurate behavior.
 - Final validation (T031) must run last after all other tasks complete.
 
 ## Parallel Execution Examples

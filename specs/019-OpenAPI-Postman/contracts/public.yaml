@@ -10,17 +10,17 @@ paths:
       description: Returns application health status
       security: []
       responses:
-        '200':
+        "200":
           description: Health status
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/HealthCheck'
+                        $ref: "#/components/schemas/HealthCheck"
 
   /health/deployment:
     get:
@@ -31,12 +31,12 @@ paths:
       description: Returns deployment-specific health information
       security: []
       responses:
-        '200':
+        "200":
           description: Deployment health status
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
     post:
       tags:
         - Public
@@ -56,12 +56,12 @@ paths:
                 version:
                   type: string
       responses:
-        '200':
+        "200":
           description: Health updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StandardResponse'
+                $ref: "#/components/schemas/StandardResponse"
 
   /courses:
     get:
@@ -95,13 +95,13 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: List of courses
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
@@ -110,10 +110,10 @@ paths:
                           courses:
                             type: array
                             items:
-                              $ref: '#/components/schemas/CourseSummary'
+                              $ref: "#/components/schemas/CourseSummary"
                           pagination:
-                            $ref: '#/components/schemas/Pagination'
-        '429':
+                            $ref: "#/components/schemas/Pagination"
+        "429":
           description: Too Many Requests
           headers:
             Retry-After:
@@ -123,7 +123,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /courses/next:
     get:
@@ -135,23 +135,23 @@ paths:
       description: Returns the next scheduled course
       security: []
       responses:
-        '200':
+        "200":
           description: Next course
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/CourseSummary'
-        '404':
+                        $ref: "#/components/schemas/CourseSummary"
+        "404":
           description: No upcoming courses
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /courses/{id}:
     get:
@@ -170,23 +170,23 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Course details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Course'
-        '404':
+                        $ref: "#/components/schemas/Course"
+        "404":
           description: Course not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /locations:
     get:
@@ -198,19 +198,19 @@ paths:
       description: Returns a list of all training locations
       security: []
       responses:
-        '200':
+        "200":
           description: List of locations
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Location'
+                          $ref: "#/components/schemas/Location"
 
   /locations/{id}:
     get:
@@ -229,23 +229,23 @@ paths:
             type: string
             format: cuid
       responses:
-        '200':
+        "200":
           description: Location details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Location'
-        '404':
+                        $ref: "#/components/schemas/Location"
+        "404":
           description: Location not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /locations/by-slug/{slug}:
     get:
@@ -264,20 +264,20 @@ paths:
             type: string
             pattern: ^[a-z0-9-]+$
       responses:
-        '200':
+        "200":
           description: Location details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/StandardResponse'
+                  - $ref: "#/components/schemas/StandardResponse"
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/Location'
-        '404':
+                        $ref: "#/components/schemas/Location"
+        "404":
           description: Location not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"

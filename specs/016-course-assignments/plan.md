@@ -73,6 +73,7 @@ specs/[###-feature]/
 ### Source Code (repository root)
 
 ios/ or android/
+
 ```
 app/
 ├── my-courses/              # Participant dashboard entry point

@@ -52,17 +52,17 @@ Als eingeloggter Nutzer möchte ich auf meinem Dashboard einen klaren Überblick
 
 7. **Given** ein Nutzer mit genau einer zukünftigen Buchung, **When** er das Dashboard öffnet, **Then** sieht er nur die Sektion "Nächstes Seminar" mit dieser Buchung.
 
-6. **Given** ein Nutzer mit mehreren zukünftigen Buchungen, **When** er das Dashboard öffnet, **Then** sieht er:
+8. **Given** ein Nutzer mit mehreren zukünftigen Buchungen, **When** er das Dashboard öffnet, **Then** sieht er:
    - "Nächstes Seminar": Die zeitlich nächste Buchung mit Aktionsbuttons
    - "Weitere gebuchte Seminare": Alle weiteren zukünftigen Buchungen ohne Aktionsbuttons
 
-7. **Given** ein Nutzer mit absolvierten Kursen, **When** er das Dashboard öffnet, **Then** sieht er die Sektion "Absolvierte Seminare" mit diesen Kursen (ohne Aktionsbuttons, aber mit Rechnungs-Download).
+9. **Given** ein Nutzer mit absolvierten Kursen, **When** er das Dashboard öffnet, **Then** sieht er die Sektion "Absolvierte Seminare" mit diesen Kursen (ohne Aktionsbuttons, aber mit Rechnungs-Download).
 
-8. **Given** ein Nutzer ohne zusätzliche Buchungen, **When** er das Dashboard öffnet, **Then** wird die Sektion "Weitere gebuchte Seminare" nicht angezeigt.
+10. **Given** ein Nutzer ohne zusätzliche Buchungen, **When** er das Dashboard öffnet, **Then** wird die Sektion "Weitere gebuchte Seminare" nicht angezeigt.
 
-9. **Given** ein Nutzer mit gebuchten Kursen, deren Enddatum vergangen ist aber ohne Teilnahme (No-Show), **When** er das Dashboard öffnet, **Then** sieht er die Sektion "Seminare ohne Teilnahme" mit diesen Kursen.
+11. **Given** ein Nutzer mit gebuchten Kursen, deren Enddatum vergangen ist aber ohne Teilnahme (No-Show), **When** er das Dashboard öffnet, **Then** sieht er die Sektion "Seminare ohne Teilnahme" mit diesen Kursen.
 
-10. **Given** ein Nutzer ohne No-Show-Kurse, **When** er das Dashboard öffnet, **Then** wird die Sektion "Seminare ohne Teilnahme" nicht angezeigt.
+12. **Given** ein Nutzer ohne No-Show-Kurse, **When** er das Dashboard öffnet, **Then** wird die Sektion "Seminare ohne Teilnahme" nicht angezeigt.
 
 #### D. Stripe-Rechnungs-Download
 

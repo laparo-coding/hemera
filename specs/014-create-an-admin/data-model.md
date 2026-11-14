@@ -13,31 +13,34 @@ Represents an educational offering in the catalog with admin-manageable fields.
 
 **Attributes**:
 
-| Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
-| id | String | PK, @id, @default(cuid()) | Unique identifier |
-| title | String | NOT NULL, 3-200 chars | Course title |
-| description | String | NOT NULL, @db.Text | Detailed course description |
-| price | Decimal | NOT NULL, >=0, @db.Decimal(10,2) | Price in EUR |
-| startTime | DateTime | NOT NULL, indexed | Course start date/time (for sorting) |
-| duration | Int | NOT NULL, >0 | Duration in hours |
-| instructor | String | NOT NULL | Instructor name |
-| level | Enum | NOT NULL, CourseLevel | BEGINNER, INTERMEDIATE, ADVANCED |
-| thumbnailUrl | String | NULLABLE | Vercel Blob URL for thumbnail image |
-| capacity | Int | NOT NULL, >0 | Maximum number of students |
-| published | Boolean | NOT NULL, @default(false) | Visibility status |
-| createdAt | DateTime | NOT NULL, @default(now()) | Creation timestamp |
-| updatedAt | DateTime | NOT NULL, @updatedAt | Last modification timestamp (for optimistic locking) |
+| Field        | Type     | Constraints                      | Description                                          |
+| ------------ | -------- | -------------------------------- | ---------------------------------------------------- |
+| id           | String   | PK, @id, @default(cuid())        | Unique identifier                                    |
+| title        | String   | NOT NULL, 3-200 chars            | Course title                                         |
+| description  | String   | NOT NULL, @db.Text               | Detailed course description                          |
+| price        | Decimal  | NOT NULL, >=0, @db.Decimal(10,2) | Price in EUR                                         |
+| startTime    | DateTime | NOT NULL, indexed                | Course start date/time (for sorting)                 |
+| duration     | Int      | NOT NULL, >0                     | Duration in hours                                    |
+| instructor   | String   | NOT NULL                         | Instructor name                                      |
+| level        | Enum     | NOT NULL, CourseLevel            | BEGINNER, INTERMEDIATE, ADVANCED                     |
+| thumbnailUrl | String   | NULLABLE                         | Vercel Blob URL for thumbnail image                  |
+| capacity     | Int      | NOT NULL, >0                     | Maximum number of students                           |
+| published    | Boolean  | NOT NULL, @default(false)        | Visibility status                                    |
+| createdAt    | DateTime | NOT NULL, @default(now())        | Creation timestamp                                   |
+| updatedAt    | DateTime | NOT NULL, @updatedAt             | Last modification timestamp (for optimistic locking) |
 
 **Relationships**:
+
 - `enrollments` → Enrollment[] (one-to-many): Students enrolled in this course
 - `bookings` → Booking[] (one-to-many): Booking records for this course
 
 **Indexes**:
+
 - `startTime` (ascending): For efficient sorting in course list
 - `published` (for filtering published courses)
 
 **Validation Rules**:
+
 - Title: 3-200 characters, alphanumeric and common punctuation
 - Price: Non-negative, max 2 decimal places
 - StartTime: Must be future date (validated at creation, not at update)
@@ -46,6 +49,7 @@ Represents an educational offering in the catalog with admin-manageable fields.
 - ThumbnailUrl: Must be valid Vercel Blob URL or null
 
 **State Transitions**:
+
 1. **Draft** (published=false): Course created but not visible to students
 2. **Published** (published=true): Course visible in public catalog
 3. **Archived** (hypothetical future state): Course completed, read-only
@@ -57,6 +61,7 @@ Represents a student's enrollment in a course. Used for deletion protection logi
 **Database Table**: `Enrollment` (Prisma model)
 
 **Key Attributes**:
+
 - `id`: Unique identifier
 - `userId`: Foreign key to User
 - `courseId`: Foreign key to Course
@@ -64,6 +69,7 @@ Represents a student's enrollment in a course. Used for deletion protection logi
 - `status`: ACTIVE, COMPLETED, WITHDRAWN
 
 **Admin Interface Usage**:
+
 - Check `Enrollment.count({ where: { courseId, status: 'ACTIVE' } })` before course deletion
 - Transfer enrollments: `Enrollment.updateMany({ where: { courseId: oldId }, data: { courseId: newId } })`
 
@@ -74,12 +80,14 @@ Represents users with admin privileges. Not a separate database entity.
 **Implementation**: Clerk user metadata
 
 **Authorization Check**:
+
 ```typescript
 const { userId, sessionClaims } = auth();
 const isAdmin = sessionClaims?.metadata?.role === 'admin';
 ```
 
 **Admin Assignment**: Managed via Clerk Dashboard
+
 - Navigate to Users → Select user → Metadata → Public Metadata
 - Add: `{ "role": "admin" }`
 
@@ -115,6 +123,7 @@ enum CourseLevel {
 4. **Create index**: Add index on startTime column
 
 **Migration File** (`prisma/migrations/<timestamp>_add_course_admin_fields`):
+
 - Add startTime, capacity, thumbnailUrl columns
 - Add CourseLevel enum
 - Add index on startTime
@@ -175,6 +184,7 @@ Admin Delete Request → Check Enrollments
 ### Admin Operations
 
 1. **List Courses** (sorted by startTime):
+
    ```typescript
    prisma.course.findMany({
      orderBy: { startTime: 'asc' },
@@ -183,6 +193,7 @@ Admin Delete Request → Check Enrollments
    ```
 
 2. **Get Course by ID** (with enrollment count):
+
    ```typescript
    prisma.course.findUnique({
      where: { id },
@@ -191,6 +202,7 @@ Admin Delete Request → Check Enrollments
    ```
 
 3. **Create Course**:
+
    ```typescript
    prisma.course.create({
      data: { title, description, price, startTime, duration, instructor, level, thumbnailUrl, capacity }
@@ -198,6 +210,7 @@ Admin Delete Request → Check Enrollments
    ```
 
 4. **Update Course** (with optimistic locking):
+
    ```typescript
    prisma.course.update({
      where: { id, updatedAt: formData.updatedAt },
@@ -206,16 +219,17 @@ Admin Delete Request → Check Enrollments
    ```
 
 5. **Delete Course** (after enrollment check):
+
    ```typescript
    const enrollmentCount = await prisma.enrollment.count({
      where: { courseId, status: 'ACTIVE' }
    });
    if (enrollmentCount > 0) throw new Error('Transfer students first');
-   
-   await prisma.course.delete({ where: { id } });
+      await prisma.course.delete({ where: { id } });
    ```
 
 6. **Transfer Enrollments**:
+
    ```typescript
    prisma.enrollment.updateMany({
      where: { courseId: sourceCourseId, status: 'ACTIVE' },
@@ -248,7 +262,10 @@ type Course = {
 type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 
 // Admin-specific DTOs
-type CourseCreateInput = Omit<Course, 'id' | 'createdAt' | 'updatedAt' | 'published'>;
+type CourseCreateInput = Omit<
+  Course,
+  'id' | 'createdAt' | 'updatedAt' | 'published'
+>;
 
 type CourseUpdateInput = Partial<CourseCreateInput> & {
   updatedAt: Date; // For optimistic locking
@@ -298,6 +315,7 @@ type CourseWithEnrollmentCount = Course & {
 ## Next Steps
 
 Proceed to contract generation:
+
 - Define API contracts for admin endpoints
 - Create contract tests
 - Generate quickstart.md

@@ -7,6 +7,7 @@ Enable secure API access for the Aither application to read course and participa
 ## Context
 
 The **Aither** and **Gaia** applications (both Next.js + Clerk) need to:
+
 1. Read course and participation data from Hemera
 2. Write participant-specific results to `CourseParticipation` fields (`resultOutcome`, `resultNotes`)
 
@@ -18,16 +19,17 @@ All three applications (Hemera, Aither, Gaia) use Clerk as their authentication 
 
 Introduce a new user role `api-client` with restricted permissions:
 
-| Permission | Allowed |
-|------------|---------|
-| `read:courses` | ✅ |
-| `read:participations` | ✅ |
-| `write:participation-results` | ✅ |
-| `read:bookings` | ❌ |
-| `manage:courses` | ❌ |
-| `manage:users` | ❌ |
+| Permission                    | Allowed |
+| ----------------------------- | ------- |
+| `read:courses`                | ✅      |
+| `read:participations`         | ✅      |
+| `write:participation-results` | ✅      |
+| `read:bookings`               | ❌      |
+| `manage:courses`              | ❌      |
+| `manage:users`                | ❌      |
 
 **Implementation:**
+
 - Create Clerk service users:
   - `aither-service@hemera-academy.com` with `publicMetadata`: `{ "role": "api-client", "service": "aither" }`
   - `gaia-service@hemera-academy.com` with `publicMetadata`: `{ "role": "api-client", "service": "gaia" }`
@@ -37,14 +39,15 @@ Introduce a new user role `api-client` with restricted permissions:
 
 Create new route group `/api/service/*` with the following endpoints:
 
-| Endpoint | Method | Description | Auth Required |
-|----------|--------|-------------|---------------|
-| `/api/service/courses` | GET | List all courses with participant counts | `api-client` or `admin` |
-| `/api/service/courses/[id]` | GET | Get course details with participations | `api-client` or `admin` |
-| `/api/service/participations/[id]` | GET | Get participation details | `api-client` or `admin` |
-| `/api/service/participations/[id]/result` | PUT | Update participation result data | `api-client` or `admin` |
+| Endpoint                                  | Method | Description                              | Auth Required           |
+| ----------------------------------------- | ------ | ---------------------------------------- | ----------------------- |
+| `/api/service/courses`                    | GET    | List all courses with participant counts | `api-client` or `admin` |
+| `/api/service/courses/[id]`               | GET    | Get course details with participations   | `api-client` or `admin` |
+| `/api/service/participations/[id]`        | GET    | Get participation details                | `api-client` or `admin` |
+| `/api/service/participations/[id]/result` | PUT    | Update participation result data         | `api-client` or `admin` |
 
 **Response Format (GET /api/service/courses):**
+
 ```json
 {
   "success": true,
@@ -63,6 +66,7 @@ Create new route group `/api/service/*` with the following endpoints:
 ```
 
 **Response Format (GET /api/service/participations/[id]):**
+
 ```json
 {
   "success": true,
@@ -79,6 +83,7 @@ Create new route group `/api/service/*` with the following endpoints:
 ```
 
 **Request Format (PUT /api/service/participations/[id]/result):**
+
 ```json
 {
   "resultOutcome": "Successfully completed all objectives",
@@ -90,12 +95,14 @@ Create new route group `/api/service/*` with the following endpoints:
 ### 3. Authentication & Authorization
 
 Each `/api/service/*` endpoint must:
+
 1. Verify Clerk JWT token via `auth()` from `@clerk/nextjs/server`
 2. Check user role via `getUserRole()` from `lib/auth/permissions.ts`
 3. Allow access only if role is `api-client` or `admin`
 4. Return `403 Forbidden` for unauthorized roles
 
 **Example Guard:**
+
 ```typescript
 const { userId } = await auth();
 if (!userId) {
@@ -111,6 +118,7 @@ if (role !== 'api-client' && role !== 'admin') {
 ### 4. Rate Limiting
 
 Implement rate limiting for `/api/service/*` endpoints:
+
 - **Limit:** 100 requests per minute per service user
 - **Response on limit exceeded:** `429 Too Many Requests`
 - **Header:** `X-RateLimit-Remaining`, `X-RateLimit-Reset`
@@ -118,6 +126,7 @@ Implement rate limiting for `/api/service/*` endpoints:
 ### 5. Audit Logging
 
 All service API calls must be logged with:
+
 - Service user ID (`aither-service`)
 - Endpoint accessed
 - Request timestamp
@@ -129,11 +138,13 @@ Use existing Rollbar integration for error logging.
 ## Acceptance Criteria
 
 ### Feature 1: Service User Role
+
 - [ ] `api-client` role added to `UserRole` type in `lib/auth/permissions.ts`
 - [ ] Permission checks implemented for `read:courses`, `read:participations`, `write:participation-results`
 - [ ] Clerk service user created with `publicMetadata.role = "api-client"`
 
 ### Feature 2: Service Endpoints
+
 - [ ] `GET /api/service/courses` returns course list with participant counts
 - [ ] `GET /api/service/courses/[id]` returns course details with participations
 - [ ] `GET /api/service/participations/[id]` returns participation details
@@ -141,17 +152,20 @@ Use existing Rollbar integration for error logging.
 - [ ] All endpoints return proper error responses (401, 403, 404, 500)
 
 ### Feature 3: Authentication & Authorization
+
 - [ ] All service endpoints verify Clerk JWT token
 - [ ] Role check allows only `api-client` and `admin` roles
 - [ ] Unauthorized access returns `403 Forbidden`
 - [ ] Missing authentication returns `401 Unauthorized`
 
 ### Feature 4: Rate Limiting
+
 - [ ] Rate limiting enforced at 100 req/min per service user
 - [ ] `429 Too Many Requests` returned when limit exceeded
 - [ ] Rate limit headers included in responses
 
 ### Feature 5: Audit Logging
+
 - [ ] All service API calls logged with user ID, endpoint, timestamp
 - [ ] Errors logged to Rollbar with context
 - [ ] Successful operations logged for audit trail

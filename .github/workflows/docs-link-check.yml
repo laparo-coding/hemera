@@ -1,16 +1,16 @@
-name: 'Docs: Link Check'
+name: "Docs: Link Check"
 
 on:
   pull_request:
     paths:
-      - '**/*.md'
+      - "**/*.md"
   push:
     branches: [main, master]
     paths:
-      - '**/*.md'
+      - "**/*.md"
   schedule:
     # Runs daily at 06:00 UTC (07:00 CET/08:00 CEST)
-    - cron: '0 6 * * *'
+    - cron: "0 6 * * *"
 
 jobs:
   lychee:

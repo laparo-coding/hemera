@@ -38,6 +38,7 @@ HEMERA_SERVICE_API_KEY=old_key_32_chars_min,new_key_32_chars_min
 ### Erforderliche Rolle
 
 Der authentifizierte User muss eine der folgenden Rollen haben:
+
 - `api-client` - Dedizierte Service-User-Rolle
 - `admin` - Voller Admin-Zugriff
 
@@ -67,12 +68,12 @@ Listet alle Kurse mit Teilnehmerzahlen auf.
 
 **Query Parameters:**
 
-| Parameter | Typ | Beschreibung | Default |
-|-----------|-----|--------------|---------|
-| `level` | `CourseLevel` | Filter nach Kurslevel (BASIC, INTERMEDIATE, ADVANCED) | - |
-| `published` | `boolean` | Filter nach Veröffentlichungsstatus | `true` |
-| `limit` | `number` | Maximale Anzahl Ergebnisse (1-500) | `100` |
-| `offset` | `number` | Offset für Pagination | `0` |
+| Parameter   | Typ           | Beschreibung                                          | Default |
+| ----------- | ------------- | ----------------------------------------------------- | ------- |
+| `level`     | `CourseLevel` | Filter nach Kurslevel (BASIC, INTERMEDIATE, ADVANCED) | -       |
+| `published` | `boolean`     | Filter nach Veröffentlichungsstatus                   | `true`  |
+| `limit`     | `number`      | Maximale Anzahl Ergebnisse (1-500)                    | `100`   |
+| `offset`    | `number`      | Offset für Pagination                                 | `0`     |
 
 **Beispiel-Request:**
 
@@ -118,9 +119,9 @@ Ruft Details eines einzelnen Kurses mit allen Participations ab.
 
 **Path Parameters:**
 
-| Parameter | Typ | Beschreibung |
-|-----------|-----|--------------|
-| `id` | `string` | Kurs-ID |
+| Parameter | Typ      | Beschreibung |
+| --------- | -------- | ------------ |
+| `id`      | `string` | Kurs-ID      |
 
 **Beispiel-Request:**
 
@@ -172,9 +173,9 @@ Ruft Details einer Participation ab.
 
 **Path Parameters:**
 
-| Parameter | Typ | Beschreibung |
-|-----------|-----|--------------|
-| `id` | `string` | Participation-ID |
+| Parameter | Typ      | Beschreibung     |
+| --------- | -------- | ---------------- |
+| `id`      | `string` | Participation-ID |
 
 **Beispiel-Request:**
 
@@ -223,9 +224,9 @@ Aktualisiert die Ergebnis-Daten einer Participation.
 
 **Path Parameters:**
 
-| Parameter | Typ | Beschreibung |
-|-----------|-----|--------------|
-| `id` | `string` | Participation-ID |
+| Parameter | Typ      | Beschreibung     |
+| --------- | -------- | ---------------- |
+| `id`      | `string` | Participation-ID |
 
 **Request Body:**
 
@@ -297,6 +298,7 @@ Alle Service-API-Aufrufe werden geloggt und in Rollbar überwacht:
 - Response Time
 
 Logs sind verfügbar in:
+
 - Rollbar Dashboard (Fehler und Warnungen)
 - Vercel Logs (alle Requests)
 - Hemera Datenbank (Audit Trail)
@@ -318,15 +320,15 @@ Alle Fehler-Responses folgen diesem Schema:
 
 ### Error Codes
 
-| Code | HTTP Status | Beschreibung |
-|------|-------------|--------------|
-| `UNAUTHORIZED` | 401 | Kein gültiges Token |
-| `FORBIDDEN` | 403 | Unzureichende Berechtigungen |
-| `NOT_FOUND` | 404 | Ressource nicht gefunden |
-| `VALIDATION_ERROR` | 400 | Ungültige Request-Daten |
-| `INVALID_INPUT` | 400 | Ungültiger Request Body |
-| `RATE_LIMIT_EXCEEDED` | 429 | Rate Limit überschritten |
-| `INTERNAL_ERROR` | 500 | Server-Fehler |
+| Code                  | HTTP Status | Beschreibung                 |
+| --------------------- | ----------- | ---------------------------- |
+| `UNAUTHORIZED`        | 401         | Kein gültiges Token          |
+| `FORBIDDEN`           | 403         | Unzureichende Berechtigungen |
+| `NOT_FOUND`           | 404         | Ressource nicht gefunden     |
+| `VALIDATION_ERROR`    | 400         | Ungültige Request-Daten      |
+| `INVALID_INPUT`       | 400         | Ungültiger Request Body      |
+| `RATE_LIMIT_EXCEEDED` | 429         | Rate Limit überschritten     |
+| `INTERNAL_ERROR`      | 500         | Server-Fehler                |
 
 ## Implementierungsdetails
 
@@ -346,6 +348,7 @@ Alle Fehler-Responses folgen diesem Schema:
 ### Tests
 
 Contract-Tests für die Service API befinden sich in:
+
 - `tests/contracts/service-api.contract.spec.ts`
 
 ## Beispiel-Integration (Aither)
@@ -368,15 +371,16 @@ const client = new HemeraClient({
 const courses = await client.get('/api/service/courses', CoursesSchema);
 
 // Ergebnis schreiben
-await client.put(
-  `/api/service/participations/${id}/result`,
-  { resultOutcome: '...', complete: true }
-);
+await client.put(`/api/service/participations/${id}/result`, {
+  resultOutcome: '...',
+  complete: true,
+});
 ```
 
 ## Support
 
 Bei Fragen oder Problemen:
+
 - Rollbar Dashboard prüfen
 - Hemera-Team kontaktieren
 - [GitHub Issues](https://github.com/hemera-academy/hemera/issues)

@@ -17,9 +17,9 @@ Authorization: Bearer <clerk_session_token>
 
 ### Headers
 
-| Header | Required | Description |
-|--------|----------|-------------|
-| Authorization | Yes | Clerk session token |
+| Header        | Required | Description         |
+| ------------- | -------- | ------------------- |
+| Authorization | Yes      | Clerk session token |
 
 ### Query Parameters
 
@@ -42,16 +42,16 @@ interface EnhancedBooking {
   id: string;
   courseId: string;
   courseTitle: string;
-  coursePrice: number;      // In cents
-  currency: string;         // "EUR"
+  coursePrice: number; // In cents
+  currency: string; // "EUR"
   paymentStatus: PaymentStatus;
-  createdAt: string;        // ISO 8601
+  createdAt: string; // ISO 8601
 
   // NEW: Course schedule fields
-  startDate: string | null;   // ISO 8601 date
-  endDate: string | null;     // ISO 8601 date (null if same as startDate)
-  startTime: string | null;   // ISO 8601 datetime
-  endTime: string | null;     // ISO 8601 datetime
+  startDate: string | null; // ISO 8601 date
+  endDate: string | null; // ISO 8601 date (null if same as startDate)
+  startTime: string | null; // ISO 8601 datetime
+  endTime: string | null; // ISO 8601 datetime
 
   // NEW: Location fields
   locationId: string | null;
@@ -67,18 +67,19 @@ interface EnhancedBooking {
   stripeInvoicePdfUrl: string | null;
 }
 
-type PaymentStatus = 
-  | 'PENDING' 
-  | 'PAID' 
-  | 'FAILED' 
-  | 'CANCELLED' 
-  | 'REFUNDED' 
+type PaymentStatus =
+  | 'PENDING'
+  | 'PAID'
+  | 'FAILED'
+  | 'CANCELLED'
+  | 'REFUNDED'
   | 'CONFIRMED';
 ```
 
 ### Error Responses
 
 **401 Unauthorized**
+
 ```json
 {
   "success": false,
@@ -87,6 +88,7 @@ type PaymentStatus =
 ```
 
 **500 Internal Server Error**
+
 ```json
 {
   "success": false,
@@ -107,11 +109,11 @@ describe('GET /api/bookings', () => {
     // Setup: Create user with booking
     const response = await authenticatedFetch('/api/bookings');
     const data = await response.json();
-    
+
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.data.bookings).toBeInstanceOf(Array);
-    
+
     if (data.data.bookings.length > 0) {
       const booking = data.data.bookings[0];
       expect(booking).toHaveProperty('startDate');
@@ -130,11 +132,11 @@ describe('GET /api/bookings', () => {
     // Setup: Course with location
     const response = await authenticatedFetch('/api/bookings');
     const data = await response.json();
-    
+
     const bookingWithLocation = data.data.bookings.find(
       (b: EnhancedBooking) => b.locationId !== null
     );
-    
+
     if (bookingWithLocation) {
       expect(bookingWithLocation.locationName).not.toBeNull();
       expect(bookingWithLocation.locationSlug).not.toBeNull();
@@ -144,7 +146,7 @@ describe('GET /api/bookings', () => {
   it('should set hasParticipation based on participation record', async () => {
     const response = await authenticatedFetch('/api/bookings');
     const data = await response.json();
-    
+
     // Verify boolean type
     data.data.bookings.forEach((booking: EnhancedBooking) => {
       expect(typeof booking.hasParticipation).toBe('boolean');

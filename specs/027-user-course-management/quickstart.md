@@ -100,10 +100,10 @@ npm run test:e2e
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| `resultDate` or `resultNegotiationPartner` not in Prisma types | Run `npx prisma generate` after migration |
-| DatePicker locale not German | Ensure `LocalizationProvider` wraps with `adapterLocale={de}` (import `de` from `date-fns/locale/de`) |
-| MuxPlayer SSR error | Verify dynamic import with `{ ssr: false }` |
-| Dashboard stepper shows all locked | Check that `participationStatus` is returned from dashboard API |
-| Testimonial drawer doesn't open | Verify `open` state management in CourseCard |
+| Issue                                                          | Solution                                                                                              |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `resultDate` or `resultNegotiationPartner` not in Prisma types | Run `npx prisma generate` after migration                                                             |
+| DatePicker locale not German                                   | Ensure `LocalizationProvider` wraps with `adapterLocale={de}` (import `de` from `date-fns/locale/de`) |
+| MuxPlayer SSR error                                            | Verify dynamic import with `{ ssr: false }`                                                           |
+| Dashboard stepper shows all locked                             | Check that `participationStatus` is returned from dashboard API                                       |
+| Testimonial drawer doesn't open                                | Verify `open` state management in CourseCard                                                          |

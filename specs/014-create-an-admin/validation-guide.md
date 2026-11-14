@@ -5,6 +5,7 @@ This guide describes how to validate the complete implementation of the Course A
 ## Overview
 
 Three automated validation scripts have been created to verify:
+
 1. **Rollbar Integration** - Structured logging at all levels
 2. **Performance** - API endpoints and page load times
 3. **Quickstart Compliance** - Feature completeness
@@ -12,6 +13,7 @@ Three automated validation scripts have been created to verify:
 ## Prerequisites
 
 Before running validation scripts:
+
 - Development server running: `npm run dev`
 - Database running and migrated: `npm run prisma:migrate`
 - Environment variables configured in `.env.local`
@@ -26,11 +28,13 @@ Before running validation scripts:
 **Purpose:** Validates that Rollbar logging is configured and working correctly.
 
 **Usage:**
+
 ```bash
 node scripts/verify-rollbar-admin.js
 ```
 
 **What it checks:**
+
 - ✅ Rollbar access token configured
 - ✅ INFO level logging (course CRUD operations)
 - ✅ WARNING level logging (deletion blocked)
@@ -38,6 +42,7 @@ node scripts/verify-rollbar-admin.js
 - ✅ CRITICAL level logging (server errors)
 
 **Expected output:**
+
 ```
 🔍 Verifying Rollbar Integration for Course Admin Interface...
 
@@ -55,6 +60,7 @@ node scripts/verify-rollbar-admin.js
 ```
 
 **Manual verification:**
+
 1. Visit https://rollbar.com/
 2. Navigate to your project
 3. Filter by "last 5 minutes"
@@ -62,6 +68,7 @@ node scripts/verify-rollbar-admin.js
 5. Verify all 4 test events are present
 
 **Structured context should include:**
+
 - `feature`: 'course-admin'
 - `action`: create|update|delete|validate|delete-blocked
 - `adminId`: Clerk user ID
@@ -77,6 +84,7 @@ node scripts/verify-rollbar-admin.js
 **Purpose:** Measures API endpoint and page load performance.
 
 **Usage:**
+
 ```bash
 # Start dev server first
 npm run dev
@@ -86,11 +94,13 @@ node scripts/verify-performance-admin.js
 ```
 
 **What it measures:**
+
 - ✅ LIST /api/admin/courses (target: <100ms average)
 - ✅ GET /api/admin/courses/[id] (target: <50ms average)
 - ✅ Admin page load /admin/courses (target: <2000ms)
 
 **Expected output:**
+
 ```
 ⚡ Performance Verification for Course Admin Interface
 
@@ -112,11 +122,13 @@ Testing against: http://localhost:3000
 ```
 
 **Performance targets:**
+
 - **LIST endpoint**: <100ms (quickstart requirement)
 - **GET endpoint**: <50ms (efficient single record fetch)
 - **Page load**: <2s (quickstart requirement)
 
 **If targets not met:**
+
 - Add database indexes (e.g., on `startTime`)
 - Enable query caching
 - Optimize Prisma queries (use `select` to limit fields)
@@ -131,11 +143,13 @@ Testing against: http://localhost:3000
 **Purpose:** Automated validation of feature completeness per quickstart checklist.
 
 **Usage:**
+
 ```bash
 node scripts/validate-quickstart-admin.js
 ```
 
 **What it checks:**
+
 - ✅ Environment variables configured
 - ✅ Database schema has all required fields
 - ✅ CourseLevel enum exists
@@ -145,6 +159,7 @@ node scripts/validate-quickstart-admin.js
 - ✅ Database CRUD operations work
 
 **Expected output:**
+
 ```
 ✅ Quickstart Validation for Course Admin Interface
 
@@ -179,11 +194,13 @@ After automated validation passes, follow manual steps in:
 Use this checklist to verify the feature is ready for production:
 
 ### Automated Checks
+
 - [ ] Run `node scripts/verify-rollbar-admin.js` - all levels log correctly
 - [ ] Run `node scripts/verify-performance-admin.js` - all targets met
 - [ ] Run `node scripts/validate-quickstart-admin.js` - all checks pass
 
 ### Manual Testing (from quickstart.md)
+
 - [ ] Step 1: Access admin interface (/admin)
 - [ ] Step 2: Create new course with all fields
 - [ ] Step 3: View course details
@@ -196,12 +213,14 @@ Use this checklist to verify the feature is ready for production:
 - [ ] Step 10: Verify Rollbar logging in production dashboard
 
 ### Code Quality
+
 - [ ] Run `npm run typecheck` - no TypeScript errors
 - [ ] Run `npm run lint` - no ESLint errors
 - [ ] Run `npm test` - all tests pass
 - [ ] Run `npm run test:e2e` - all E2E tests pass
 
 ### Security
+
 - [ ] Admin routes protected by Clerk authentication
 - [ ] Role check: `user.publicMetadata?.role === 'admin'`
 - [ ] File upload validated (type, size)
@@ -209,6 +228,7 @@ Use this checklist to verify the feature is ready for production:
 - [ ] XSS protection (React escaping)
 
 ### Documentation
+
 - [ ] README updated with admin interface instructions
 - [ ] API routes documented in `docs/api/`
 - [ ] Quickstart guide complete and tested
@@ -221,10 +241,12 @@ Use this checklist to verify the feature is ready for production:
 ### Rollbar script fails
 
 **Error:** `ROLLBAR_ACCESS_TOKEN not found`
+
 - Add token to `.env.local`
 - Restart any running processes
 
 **Error:** Events not appearing in Rollbar
+
 - Check Rollbar dashboard filters (time range)
 - Verify token has correct permissions
 - Check network connectivity
@@ -232,11 +254,13 @@ Use this checklist to verify the feature is ready for production:
 ### Performance script fails
 
 **Error:** `Cannot connect to development server`
+
 - Start dev server: `npm run dev`
 - Wait for server to be ready
 - Verify port 3000 is not blocked
 
 **Performance targets not met:**
+
 - Check database has indexes
 - Run `ANALYZE=true npm run build` to check bundle size
 - Profile with Chrome DevTools
@@ -245,16 +269,19 @@ Use this checklist to verify the feature is ready for production:
 ### Quickstart validation fails
 
 **Database schema errors:**
+
 - Run migrations: `npm run prisma:migrate`
 - Verify `.env.local` DATABASE_URL
 - Check PostgreSQL is running
 
 **File not found errors:**
+
 - Verify all tasks (T001-T029) completed
 - Check file paths match exactly
 - Ensure no typos in filenames
 
 **Database operations fail:**
+
 - Check PostgreSQL connection
 - Verify Prisma schema matches database
 - Run `npx prisma db push` to sync

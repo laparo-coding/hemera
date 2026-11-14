@@ -37,17 +37,17 @@ Enhance the user dashboard with a four-section layout (Nächstes Seminar, Weiter
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Test-First Development | ✅ PASS | Contract tests defined before implementation |
-| Prettier/ESLint Compliance | ✅ PASS | Standard tooling applies |
-| Clerk Authentication | ✅ PASS | All dashboard routes protected via middleware |
-| Stripe Security | ✅ PASS | Invoice access restricted to booking owner, server-side only |
-| Rollbar Error Monitoring | ✅ PASS | All API errors logged via Rollbar |
-| Prisma Schema Conventions | ✅ PASS | snake_case DB columns, camelCase fields, @@map directives |
-| GitHub Actions Deployment | ✅ PASS | No manual deployments |
-| Performance Budget | ✅ PASS | LCP < 2.5s target aligned with NFRs |
-| German Localization | ✅ PASS | All UI text in informal German ("Du") |
+| Gate                       | Status  | Notes                                                        |
+| -------------------------- | ------- | ------------------------------------------------------------ |
+| Test-First Development     | ✅ PASS | Contract tests defined before implementation                 |
+| Prettier/ESLint Compliance | ✅ PASS | Standard tooling applies                                     |
+| Clerk Authentication       | ✅ PASS | All dashboard routes protected via middleware                |
+| Stripe Security            | ✅ PASS | Invoice access restricted to booking owner, server-side only |
+| Rollbar Error Monitoring   | ✅ PASS | All API errors logged via Rollbar                            |
+| Prisma Schema Conventions  | ✅ PASS | snake_case DB columns, camelCase fields, @@map directives    |
+| GitHub Actions Deployment  | ✅ PASS | No manual deployments                                        |
+| Performance Budget         | ✅ PASS | LCP < 2.5s target aligned with NFRs                          |
+| German Localization        | ✅ PASS | All UI text in informal German ("Du")                        |
 
 ## Project Structure
 
@@ -147,17 +147,20 @@ _Prerequisites: research.md complete_
 ### Entities from Feature Spec
 
 **Booking** (Extended):
+
 - `stripeInvoiceId`: String? - Stripe Invoice ID
 - `stripeInvoiceUrl`: String? - Hosted invoice URL
 - `stripeInvoicePdfUrl`: String? - Direct PDF download URL
 
 **Course** (Existing - enhancement needed):
+
 - Already has `startDate`, `startTime`, `endTime`, `locationId`
 - Need to add `endDate` field for multi-day course support
 
 ### API Contracts
 
 **GET /api/bookings** (Enhanced Response):
+
 ```typescript
 {
   success: boolean;
@@ -181,18 +184,31 @@ _Prerequisites: research.md complete_
       hasParticipation: boolean;
       stripeInvoicePdfUrl: string | null;
     }>;
-  };
+  }
 }
 ```
 
 **GET /api/bookings/[bookingId]/invoice**:
+
 ```typescript
 // Success: 302 Redirect to Stripe PDF URL
 // Error responses:
-{ success: false; error: 'Unauthorized' }     // 401
-{ success: false; error: 'Booking not found' } // 404
-{ success: false; error: 'Forbidden' }         // 403
-{ success: false; error: 'Invoice not available' } // 404
+{
+  success: false;
+  error: 'Unauthorized';
+} // 401
+{
+  success: false;
+  error: 'Booking not found';
+} // 404
+{
+  success: false;
+  error: 'Forbidden';
+} // 403
+{
+  success: false;
+  error: 'Invoice not available';
+} // 404
 ```
 
 ### Test Scenarios from User Stories
@@ -244,6 +260,7 @@ _This section describes what the /tasks command will do - DO NOT execute during 
    - E2E test suite
 
 **Ordering Strategy**:
+
 - TDD order: Tests before implementation
 - Dependency order: Schema → API → Components → Pages
 - Mark [P] for parallel execution (independent files)
@@ -254,11 +271,11 @@ _This section describes what the /tasks command will do - DO NOT execute during 
 
 _No complexity deviations required - design follows existing patterns._
 
-| Aspect | Decision | Rationale |
-|--------|----------|-----------|
-| 4 Dashboard Sections | Simple conditional rendering | Uses existing booking data + participation check |
-| Invoice Download | Redirect to Stripe PDF URL | No file storage needed, uses Stripe-hosted PDF |
-| Course Detail Page | New route /my-courses/[bookingId] | Extends existing /my-courses pattern |
+| Aspect               | Decision                          | Rationale                                        |
+| -------------------- | --------------------------------- | ------------------------------------------------ |
+| 4 Dashboard Sections | Simple conditional rendering      | Uses existing booking data + participation check |
+| Invoice Download     | Redirect to Stripe PDF URL        | No file storage needed, uses Stripe-hosted PDF   |
+| Course Detail Page   | New route /my-courses/[bookingId] | Extends existing /my-courses pattern             |
 
 ## Progress Tracking
 

@@ -36,6 +36,7 @@ Der Workflow `daily-backup.yml` läuft jeden Tag um **03:00 UTC** (04:00 MEZ).
 ### Backup-Inhalt
 
 Das Backup enthält JSON-Dateien für jede Tabelle:
+
 - `User.json`
 - `Course.json`
 - `Booking.json`
@@ -75,12 +76,14 @@ npm run db:restore:courses -- ./backup_restore_temp/db-backup-123/backup_2026-01
 ```
 
 Das Script:
+
 - Lädt `DATABASE_URL` automatisch aus `.env.local` oder `.env`
 - Fragt vor dem Überschreiben um Bestätigung
 - Löscht bestehende Daten und importiert das Backup
 - Beachtet die richtige Reihenfolge für Foreign Keys
 
 Der kursspezifische Restore:
+
 - ist nur für Notfälle gedacht
 - schreibt Kurse und Locations gezielt aus dem angegebenen Backup zurück
 - ersetzt keinen regulären Seed- oder Laufzeitpfad
@@ -116,6 +119,7 @@ Der Workflow wird automatisch aktiviert, sobald die Datei `.github/workflows/dai
 ### 3. Manueller Trigger mit Umgebungs-Auswahl
 
 Beim manuellen Trigger kann gewählt werden:
+
 - **both** (Standard): Beide Umgebungen sichern
 - **production**: Nur Produktion
 - **development**: Nur Development

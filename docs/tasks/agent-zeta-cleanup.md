@@ -25,7 +25,7 @@ other minor issues across the codebase.
 - [ ] Prefix intentionally unused parameters with `_`
 - [ ] Convert unused function parameters to `_param`
 - [ ] Add `// eslint-disable-next-line @typescript-eslint/no-unused-vars` where removal isn't
-      possible
+  possible
 
 **Example**:
 

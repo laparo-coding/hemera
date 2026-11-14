@@ -8,16 +8,16 @@
 
 ### Requirements Summary
 
-| Requirement | Database Implication |
-|-------------|---------------------|
-| One testimonial per booking | Unique constraint on `bookingId` |
-| Link to participant | Foreign key to `User` or store `userId` |
-| Link to course | Foreign key to `Course` via booking |
-| Name display format (A/B/C/D) | Enum field |
-| Statement text | Text/VarChar field |
-| Profile photo | Cached URL string (from Clerk) |
-| Publication status | Enum or Boolean |
-| Timestamps | Standard `createdAt`, `updatedAt` |
+| Requirement                   | Database Implication                    |
+| ----------------------------- | --------------------------------------- |
+| One testimonial per booking   | Unique constraint on `bookingId`        |
+| Link to participant           | Foreign key to `User` or store `userId` |
+| Link to course                | Foreign key to `Course` via booking     |
+| Name display format (A/B/C/D) | Enum field                              |
+| Statement text                | Text/VarChar field                      |
+| Profile photo                 | Cached URL string (from Clerk)          |
+| Publication status            | Enum or Boolean                         |
+| Timestamps                    | Standard `createdAt`, `updatedAt`       |
 
 ### Model Options Evaluated
 
@@ -36,12 +36,14 @@ Testimonial
 ```
 
 **Pros:**
+
 - Natural 1:1 relationship enforces "one per booking"
 - Direct access to course and user via booking relation
 - Consistent with existing `CourseParticipation` pattern
 - Simple query: `booking.testimonial`
 
 **Cons:**
+
 - Requires booking to exist (intentional constraint)
 
 #### Option B: Testimonial linked directly to User + Course
@@ -56,9 +58,11 @@ Testimonial
 ```
 
 **Pros:**
+
 - Independent of booking system
 
 **Cons:**
+
 - Cannot verify participant eligibility without separate booking check
 - Duplicate constraint logic vs booking's existing `@@unique([userId, courseId])`
 - Inconsistent with participation flow pattern
@@ -68,10 +72,12 @@ Testimonial
 Add testimonial fields directly to `CourseParticipation` model.
 
 **Pros:**
+
 - No new table
 - Already linked to booking
 
 **Cons:**
+
 - Violates single responsibility (participation ≠ testimonial)
 - Bloats participation model
 - Harder to query testimonials independently
@@ -79,10 +85,11 @@ Add testimonial fields directly to `CourseParticipation` model.
 ### Recommendation: Option A (Testimonial → Booking)
 
 **Rationale:**
+
 1. **Consistency**: Mirrors `CourseParticipation` pattern already in schema
 2. **Integrity**: Booking guarantees paid participant
 3. **Simplicity**: One testimonial per booking via `@unique` on `bookingId`
-4. **Query efficiency**: 
+4. **Query efficiency**:
    - Course detail page: `SELECT * FROM testimonials WHERE course_id = ? AND status = 'PUBLISHED'`
    - User dashboard: `SELECT * FROM testimonials WHERE booking_id IN (user's bookings)`
 
@@ -114,11 +121,11 @@ For MVP without moderation: `DRAFT` → `PUBLISHED` only.
 
 Store computed display values at write time to avoid Clerk API calls on read:
 
-| Field | Source | Reason |
-|-------|--------|--------|
-| `cachedDisplayName` | Computed from Clerk + format | Avoid runtime computation |
-| `cachedPhotoUrl` | Clerk `imageUrl` | Clerk URLs may change; cache for stability |
-| `cachedCity` | Clerk metadata | Only needed for format A |
+| Field               | Source                       | Reason                                     |
+| ------------------- | ---------------------------- | ------------------------------------------ |
+| `cachedDisplayName` | Computed from Clerk + format | Avoid runtime computation                  |
+| `cachedPhotoUrl`    | Clerk `imageUrl`             | Clerk URLs may change; cache for stability |
+| `cachedCity`        | Clerk metadata               | Only needed for format A                   |
 
 **Trade-off**: Requires update if user changes profile. Acceptable since testimonials are point-in-time snapshots.
 

@@ -4,16 +4,16 @@
 
 ### `CourseMaterial` — Extended
 
-| Field | Type | Default | Constraint | Map | Notes |
-|-------|------|---------|------------|-----|-------|
-| id | String | `cuid()` | `@id` | — | Existing |
-| identifier | String | — | `@unique` | — | Existing |
-| title | String | — | — | — | Existing |
-| **type** | **CourseMaterialType** | **`CONTENT`** | — | **`@map("type")`** | **NEW** — `CONTENT` or `SLIDE_CONTROL` |
-| blobUrl | String | — | — | `@map("blob_url")` | Existing |
-| blobPathname | String | — | — | `@map("blob_pathname")` | Existing |
-| createdAt | DateTime | `now()` | — | `@map("created_at")` | Existing |
-| updatedAt | DateTime | `@updatedAt` | — | `@map("updated_at")` | Existing |
+| Field        | Type                   | Default       | Constraint | Map                     | Notes                                  |
+| ------------ | ---------------------- | ------------- | ---------- | ----------------------- | -------------------------------------- |
+| id           | String                 | `cuid()`      | `@id`      | —                       | Existing                               |
+| identifier   | String                 | —             | `@unique`  | —                       | Existing                               |
+| title        | String                 | —             | —          | —                       | Existing                               |
+| **type**     | **CourseMaterialType** | **`CONTENT`** | —          | **`@map("type")`**      | **NEW** — `CONTENT` or `SLIDE_CONTROL` |
+| blobUrl      | String                 | —             | —          | `@map("blob_url")`      | Existing                               |
+| blobPathname | String                 | —             | —          | `@map("blob_pathname")` | Existing                               |
+| createdAt    | DateTime               | `now()`       | —          | `@map("created_at")`    | Existing                               |
+| updatedAt    | DateTime               | `@updatedAt`  | —          | `@map("updated_at")`    | Existing                               |
 
 **Table**: `seminar_materials` (unchanged `@@map`)
 
@@ -67,9 +67,9 @@ model CourseMaterial {
 
 ### Blob Storage Pathnames
 
-| Type | Pattern | Example |
-|------|---------|---------|
-| CONTENT | `course-material/{identifier}.html` | `course-material/einfuehrung-chirurgie.html` |
+| Type          | Pattern                                    | Example                                         |
+| ------------- | ------------------------------------------ | ----------------------------------------------- |
+| CONTENT       | `course-material/{identifier}.html`        | `course-material/einfuehrung-chirurgie.html`    |
 | SLIDE_CONTROL | `course-material/slides/{identifier}.html` | `course-material/slides/modul-1-steuerung.html` |
 
 ## State Transitions

@@ -47,17 +47,17 @@ flyout drawer. Create dedicated pages for Nachbereitung (video catalog) and Verh
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| I. Test-First Development | ✅ PASS | Unit tests for new components; contract tests for stepper logic |
-| II. Code Quality & Formatting | ✅ PASS | All new code through Biome lint/format; TypeScript strict mode |
-| III. Feature Development Workflow | ✅ PASS | Spec-first approach followed; Prisma migration for 2 new fields |
-| IV. Authentication & Security | ✅ PASS | All pages use `requireAuthenticatedUser()`; booking ownership check preserved |
-| V. Component Architecture | ✅ PASS | MUI components; design tokens; accessible stepper with ARIA states |
-| VI. Holistic Error Handling | ✅ PASS | Rollbar for API/server errors; Error Boundaries on client components |
-| VII. Stripe Integration | ✅ N/A | No payment flow changes |
-| Deployment Standards | ✅ PASS | GitHub Actions only; PR → preview → merge → production |
-| German Localization | ✅ PASS | All labels in informal German |
+| Gate                              | Status  | Notes                                                                         |
+| --------------------------------- | ------- | ----------------------------------------------------------------------------- |
+| I. Test-First Development         | ✅ PASS | Unit tests for new components; contract tests for stepper logic               |
+| II. Code Quality & Formatting     | ✅ PASS | All new code through Biome lint/format; TypeScript strict mode                |
+| III. Feature Development Workflow | ✅ PASS | Spec-first approach followed; Prisma migration for 2 new fields               |
+| IV. Authentication & Security     | ✅ PASS | All pages use `requireAuthenticatedUser()`; booking ownership check preserved |
+| V. Component Architecture         | ✅ PASS | MUI components; design tokens; accessible stepper with ARIA states            |
+| VI. Holistic Error Handling       | ✅ PASS | Rollbar for API/server errors; Error Boundaries on client components          |
+| VII. Stripe Integration           | ✅ N/A  | No payment flow changes                                                       |
+| Deployment Standards              | ✅ PASS | GitHub Actions only; PR → preview → merge → production                        |
+| German Localization               | ✅ PASS | All labels in informal German                                                 |
 
 **No violations. Proceeding to Phase 0.**
 

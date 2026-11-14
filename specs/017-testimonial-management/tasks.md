@@ -207,12 +207,14 @@ T004-T008 (tests) ──► T009-T011 (API) ──► T012-T015 (components)
 ## Parallel Execution Groups
 
 ### Group 1: Schema & Foundation (sequential)
+
 ```bash
 # Run T001 first (blocks everything)
 Task: "Add Testimonial model and enums to prisma/schema.prisma"
 ```
 
 ### Group 2: Validation & Service (parallel after T001)
+
 ```bash
 # Launch T002, T003 together:
 Task: "Create Zod validation schema in lib/schemas/testimonial.ts"
@@ -220,6 +222,7 @@ Task: "Create testimonial service in lib/services/testimonialService.ts"
 ```
 
 ### Group 3: Contract Tests (parallel after T002, T003)
+
 ```bash
 # Launch T004-T006 together:
 Task: "Contract test POST /api/testimonials in tests/api/testimonials/create.test.ts"
@@ -228,6 +231,7 @@ Task: "Contract test PATCH /api/testimonials/[id] in tests/api/testimonials/upda
 ```
 
 ### Group 4: E2E Tests (parallel with Group 3)
+
 ```bash
 # Launch T007, T008 together:
 Task: "Integration test participant flow in tests/e2e/testimonials-participant.spec.ts"
@@ -235,6 +239,7 @@ Task: "Integration test admin approval in tests/e2e/testimonials-admin.spec.ts"
 ```
 
 ### Group 5: API Routes (sequential after tests)
+
 ```bash
 # Run T009, T010, T011 sequentially (shared dependencies)
 Task: "Create API route GET/POST in app/api/testimonials/route.ts"
@@ -243,6 +248,7 @@ Task: "Create server actions in lib/actions/testimonials.ts"
 ```
 
 ### Group 6: Components (parallel after API)
+
 ```bash
 # Launch T012, T013 together:
 Task: "Create TestimonialCard component in components/testimonials/TestimonialCard.tsx"
@@ -254,6 +260,7 @@ Task: "Create TestimonialAdminList component in components/testimonials/Testimon
 ```
 
 ### Group 7: Pages (sequential after components)
+
 ```bash
 # Run T016, T017, T018 sequentially
 Task: "Add TestimonialSection to course detail page app/courses/[slug]/page.tsx"
@@ -262,6 +269,7 @@ Task: "Create admin testimonials page app/admin/testimonials/page.tsx"
 ```
 
 ### Group 8: Polish (parallel at end)
+
 ```bash
 # Launch T019, T020, T022 together:
 Task: "Unit tests for testimonialService in tests/unit/testimonialService.test.ts"
@@ -276,12 +284,12 @@ Task: "Run E2E tests and verify quickstart.md steps"
 
 ## Estimated Effort
 
-| Phase | Tasks | Parallel Groups | Est. Time |
-|-------|-------|-----------------|-----------|
-| Setup | T001-T003 | 2 | 1-2h |
-| Tests | T004-T008 | 2 | 2-3h |
-| API | T009-T011 | 1 | 2-3h |
-| Components | T012-T015 | 2 | 3-4h |
-| Pages | T016-T018 | 1 | 2h |
-| Polish | T019-T022 | 2 | 2h |
-| **Total** | **22 tasks** | **10 groups** | **~12-16h** |
+| Phase      | Tasks        | Parallel Groups | Est. Time   |
+| ---------- | ------------ | --------------- | ----------- |
+| Setup      | T001-T003    | 2               | 1-2h        |
+| Tests      | T004-T008    | 2               | 2-3h        |
+| API        | T009-T011    | 1               | 2-3h        |
+| Components | T012-T015    | 2               | 3-4h        |
+| Pages      | T016-T018    | 1               | 2h          |
+| Polish     | T019-T022    | 2               | 2h          |
+| **Total**  | **22 tasks** | **10 groups**   | **~12-16h** |

@@ -1,35 +1,35 @@
 version: 2
 updates:
   # NPM dependencies (workspace root)
-  - package-ecosystem: 'npm'
-    directory: '/'
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '05:00'
-      timezone: 'Europe/Berlin'
-    rebase-strategy: 'auto'
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "Europe/Berlin"
+    rebase-strategy: "auto"
     open-pull-requests-limit: 10
     assignees:
-      - 'Laparo'
+      - "Laparo"
     # reviewers: not supported in dependabot.yml
     groups:
       minor-and-patch:
         applies-to: version-updates
         update-types:
-          - 'minor'
-          - 'patch'
+          - "minor"
+          - "patch"
 
   # GitHub Actions
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '05:30'
-      timezone: 'Europe/Berlin'
-    rebase-strategy: 'auto'
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    rebase-strategy: "auto"
     open-pull-requests-limit: 10
     assignees:
-      - 'Laparo'
+      - "Laparo"
     # reviewers: not supported in dependabot.yml

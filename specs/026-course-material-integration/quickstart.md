@@ -48,10 +48,12 @@ npm run dev
 ## 5. Verify Edit Page
 
 ### CONTENT material
+
 1. Click edit on the CONTENT material → SlideEditor loads with existing HTML.
 2. Change title, submit → Updates correctly.
 
 ### SLIDE_CONTROL material
+
 1. Click edit on the SLIDE_CONTROL material → Upload form loads.
 2. Current file name and download link visible.
 3. Upload a replacement `.html` file, submit → Old blob replaced, new URL stored.

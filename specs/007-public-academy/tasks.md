@@ -17,9 +17,9 @@ This list is generated from Phase 1 design and requirements.
 5. [ ] API route test for /api/courses/{id} computes availableSpots correctly
 6. [ ] Locale/Intl tests: DE/EUR formatting for prices and dates (FR-013)
 7. [ ] Course list shows required fields: title, short description, duration/scope, availability
-       (FR-002)
+   (FR-002)
 8. [ ] Course detail shows required fields: learning objectives, target audience, prerequisites,
-       dates/variants (FR-003)
+   dates/variants (FR-003)
 
 ## E2E Tests
 
@@ -41,7 +41,7 @@ This list is generated from Phase 1 design and requirements.
 2. [ ] Ensure headings structure and aria-disabled for CTA when disabled
 3. [ ] Define measurable SEO acceptance: title + meta description set; JSON-LD passes validation
 4. [ ] Accessibility acceptance: axe checks pass on list and detail; keyboard navigation over CTAs
-       works
+   works
 
 ## CI/CD & Deployment
 
@@ -49,8 +49,8 @@ This list is generated from Phase 1 design and requirements.
 2. [ ] Enforce Node 22.x in workflows
 3. [ ] Confirm no manual CLI deployments; workflows only
 4. [ ] Live Monitoring of Deploy workflows (Preview/Production) via GitHub Actions VS Code extension
-       documented and enforced (Runbook link; acceptance includes log following, status
-       verification, artifact review)
+   documented and enforced (Runbook link; acceptance includes log following, status
+   verification, artifact review)
 
 ## Docs & Quickstart
 

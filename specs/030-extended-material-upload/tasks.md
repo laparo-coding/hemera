@@ -43,11 +43,12 @@ Polish & Documentation
 Create test HTML file for upload scenarios. This fixture will be reused across contract, integration, and E2E tests.
 
 **Acceptance Criteria**:
-- [X] File exists at `tests/fixtures/advanced-css.html`
-- [X] File is valid HTML (doctype, head, body structure)
-- [X] File size is 5 MB (typical course material size)
-- [X] Content includes meaningful course material (headings, sections, lists)
-- [X] File can be read and served without errors
+
+- [x] File exists at `tests/fixtures/advanced-css.html`
+- [x] File is valid HTML (doctype, head, body structure)
+- [x] File size is 5 MB (typical course material size)
+- [x] Content includes meaningful course material (headings, sections, lists)
+- [x] File can be read and served without errors
 
 **Implementation Notes**:
 Use the template from quickstart.md. Ensure file is valid HTML5 with UTF-8 encoding.
@@ -64,18 +65,19 @@ Use the template from quickstart.md. Ensure file is valid HTML5 with UTF-8 encod
 Contract test for the POST /api/admin/course-material endpoint. Tests API specification compliance without implementation.
 
 **Acceptance Criteria**:
-- [X] Test file created with correct structure (Vitest)
-- [X] Test imports contract spec from `../../specs/030-extended-material-upload/contracts/upload-html-content-material.md`
-- [X] Test case: "Should accept FormData with title, identifier, file"
-- [X] Test case: "Should reject non-.html files (400 error)"
-- [X] Test case: "Should reject files > 20 MB (400 error)"
-- [X] Test case: "Should require title field (400 error)"
-- [X] Test case: "Should return 201 with material metadata on success"
-- [X] Test case: "Should return 401 for unauthenticated requests"
-- [X] Test case: "Should return 403 for non-admin users"
-- [X] Mock Clerk auth for test scenarios
-- [X] Mock Vercel Blob storage responses
-- [X] All tests fail initially (no implementation)
+
+- [x] Test file created with correct structure (Vitest)
+- [x] Test imports contract spec from `../../specs/030-extended-material-upload/contracts/upload-html-content-material.md`
+- [x] Test case: "Should accept FormData with title, identifier, file"
+- [x] Test case: "Should reject non-.html files (400 error)"
+- [x] Test case: "Should reject files > 20 MB (400 error)"
+- [x] Test case: "Should require title field (400 error)"
+- [x] Test case: "Should return 201 with material metadata on success"
+- [x] Test case: "Should return 401 for unauthenticated requests"
+- [x] Test case: "Should return 403 for non-admin users"
+- [x] Mock Clerk auth for test scenarios
+- [x] Mock Vercel Blob storage responses
+- [x] All tests fail initially (no implementation)
 
 **Implementation Notes**:
 Reference Feature 026 contract tests for auth/blob mocking patterns. Use mock-http or similar for API testing. Tests must fail until T003 is complete.
@@ -92,18 +94,19 @@ Reference Feature 026 contract tests for auth/blob mocking patterns. Use mock-ht
 Integration test for full upload flow: file → validation → Blob storage → DB insert → response.
 
 **Acceptance Criteria**:
-- [X] Test file created with correct structure (Vitest)
-- [X] Setup: Admin user authenticated, test course created in DB
-- [X] Test case: "Should upload HTML file and create CourseMaterial record"
-  - [X] File uploaded to Blob storage
-  - [X] Material stored in DB with type: CONTENT
-  - [X] blobPathname matches pattern `course-material/content/{identifier}.html`
-  - [X] blobUrl is public read-only
-- [X] Test case: "Should auto-generate identifier if not provided"
-- [X] Test case: "Should reject invalid HTML gracefully" (optional validation)
-- [X] Test case: "Error handling: generic client message, detailed server log"
-- [X] Test case: "Concurrent uploads don't cause ID collisions"
-- [X] All tests fail initially (no implementation)
+
+- [x] Test file created with correct structure (Vitest)
+- [x] Setup: Admin user authenticated, test course created in DB
+- [x] Test case: "Should upload HTML file and create CourseMaterial record"
+  - [x] File uploaded to Blob storage
+  - [x] Material stored in DB with type: CONTENT
+  - [x] blobPathname matches pattern `course-material/content/{identifier}.html`
+  - [x] blobUrl is public read-only
+- [x] Test case: "Should auto-generate identifier if not provided"
+- [x] Test case: "Should reject invalid HTML gracefully" (optional validation)
+- [x] Test case: "Error handling: generic client message, detailed server log"
+- [x] Test case: "Concurrent uploads don't cause ID collisions"
+- [x] All tests fail initially (no implementation)
 
 **Implementation Notes**:
 Reuse DB test setup from hemera (Prisma Testcontainers or test database). Mock Blob storage or use test blob bucket. Reference Feature 026 integration tests for patterns.
@@ -120,24 +123,25 @@ Reuse DB test setup from hemera (Prisma Testcontainers or test database). Mock B
 E2E test for material type selection screen and upload flow via browser.
 
 **Acceptance Criteria**:
-- [X] Test file created with correct structure (Playwright)
-- [X] Setup: Run dev server, login as admin, navigate to `/admin/course-material/new`
-- [X] Test case: "Material type selection screen renders 3 tiles in 2-1 layout"
-  - [X] Tile 1: "Ich möchte eine Inhaltsseite hinzufügen." (top-left)
-  - [X] Tile 2: "Ich möchte eine Inhaltsseite anlegen." (top-right)
-  - [X] Tile 3: "Ich möchte eine Steuerdatei hinzufügen." (bottom)
-- [X] Test case: "Clicking 'hinzufügen' tile opens upload form"
-  - [X] Route to `/admin/course-material/new?type=upload`
-  - [X] Form displays title, identifier, file upload zone
-- [X] Test case: "Upload HTML file and verify success"
-  - [X] Select file via drag-and-drop
-  - [X] Click "Speichern"
-  - [X] Upload completes < 5 seconds
-  - [X] Success notification appears
-  - [X] Redirect to material list
-- [X] Test case: "Material appears in list with type badge 'Inhaltsseite'"
-- [X] Test case: "Clicking 'anlegen' tile opens SlideEditor (regression)"
-- [X] All tests fail initially (no UI implementation)
+
+- [x] Test file created with correct structure (Playwright)
+- [x] Setup: Run dev server, login as admin, navigate to `/admin/course-material/new`
+- [x] Test case: "Material type selection screen renders 3 tiles in 2-1 layout"
+  - [x] Tile 1: "Ich möchte eine Inhaltsseite hinzufügen." (top-left)
+  - [x] Tile 2: "Ich möchte eine Inhaltsseite anlegen." (top-right)
+  - [x] Tile 3: "Ich möchte eine Steuerdatei hinzufügen." (bottom)
+- [x] Test case: "Clicking 'hinzufügen' tile opens upload form"
+  - [x] Route to `/admin/course-material/new?type=upload`
+  - [x] Form displays title, identifier, file upload zone
+- [x] Test case: "Upload HTML file and verify success"
+  - [x] Select file via drag-and-drop
+  - [x] Click "Speichern"
+  - [x] Upload completes < 5 seconds
+  - [x] Success notification appears
+  - [x] Redirect to material list
+- [x] Test case: "Material appears in list with type badge 'Inhaltsseite'"
+- [x] Test case: "Clicking 'anlegen' tile opens SlideEditor (regression)"
+- [x] All tests fail initially (no UI implementation)
 
 **Implementation Notes**:
 Use Playwright best practices. Reference Feature 026 E2E tests. Use test fixtures created in T001.
@@ -154,35 +158,36 @@ Use Playwright best practices. Reference Feature 026 E2E tests. Use test fixture
 Extend POST /api/admin/course-material handler to support HTML file upload (from T002 & T003 contract/integration tests). The handler lives in the App Router route file alongside auth and request-ID handling, consistent with the rest of the stack.
 
 **Acceptance Criteria**:
-- [X] Handler accepts FormData with title, identifier, file
-- [X] Server-side validation:
-  - [X] File extension: .html only
-  - [X] Content-Type: text/html
-  - [X] File size: ≤ 20 MB
-- [X] Blob storage:
-  - [X] Upload file to Vercel Blob at `course-material/content/{identifier}.html`
-  - [X] Set access: 'public'
-  - [X] Return blobUrl and blobPathname
-- [X] Database:
-  - [X] Create CourseMaterial record with:
-    - [X] title (required, 1-255 chars)
-    - [X] identifier (auto-generated if omitted)
-    - [X] type: 'CONTENT'
-    - [X] blobPathname
-    - [X] blobUrl
-    - [X] htmlContent: null
-- [X] Error handling:
-  - [X] Validation errors: 400 Bad Request (generic message to client, detailed log)
-  - [X] Auth errors: 401/403 (reuse from Feature 026)
-  - [X] Blob errors: 500 (generic to client, full error logged)
-  - [X] DB errors: 500 (generic to client, full error logged)
-  - [X] All server-side errors logged via `serverInstance.error()` from `@/lib/monitoring/rollbar-official`
-  - [X] No `console.error` statements in new code (constitution v1.8.0)
-- [X] Idempotency:
-  - [X] Reject duplicate identifier with 409 Conflict (idempotency protection)
-- [X] Response: 201 Created with material metadata
-- [X] Contract tests (T002) now pass
-- [X] Integration tests (T003) now pass
+
+- [x] Handler accepts FormData with title, identifier, file
+- [x] Server-side validation:
+  - [x] File extension: .html only
+  - [x] Content-Type: text/html
+  - [x] File size: ≤ 20 MB
+- [x] Blob storage:
+  - [x] Upload file to Vercel Blob at `course-material/content/{identifier}.html`
+  - [x] Set access: 'public'
+  - [x] Return blobUrl and blobPathname
+- [x] Database:
+  - [x] Create CourseMaterial record with:
+    - [x] title (required, 1-255 chars)
+    - [x] identifier (auto-generated if omitted)
+    - [x] type: 'CONTENT'
+    - [x] blobPathname
+    - [x] blobUrl
+    - [x] htmlContent: null
+- [x] Error handling:
+  - [x] Validation errors: 400 Bad Request (generic message to client, detailed log)
+  - [x] Auth errors: 401/403 (reuse from Feature 026)
+  - [x] Blob errors: 500 (generic to client, full error logged)
+  - [x] DB errors: 500 (generic to client, full error logged)
+  - [x] All server-side errors logged via `serverInstance.error()` from `@/lib/monitoring/rollbar-official`
+  - [x] No `console.error` statements in new code (constitution v1.8.0)
+- [x] Idempotency:
+  - [x] Reject duplicate identifier with 409 Conflict (idempotency protection)
+- [x] Response: 201 Created with material metadata
+- [x] Contract tests (T002) now pass
+- [x] Integration tests (T003) now pass
 
 **Implementation Notes**:
 Reference Feature 026 PUT handler. Reuse blob-storage.ts helper. No sanitization of HTML. Error messages in informal German.
@@ -199,19 +204,20 @@ Reference Feature 026 PUT handler. Reuse blob-storage.ts helper. No sanitization
 Create new client component for material type selection (tile selection UI).
 
 **Acceptance Criteria**:
-- [X] Component file created at `app/admin/course-material/new/create-client.tsx`
-- [X] Renders 3 tiles in CSS Grid 2-1 layout:
-  - [X] Tile 1: "Ich möchte eine Inhaltsseite hinzufügen." (routes to upload form)
-  - [X] Tile 2: "Ich möchte eine Inhaltsseite anlegen." (routes to SlideEditor)
-  - [X] Tile 3: "Ich möchte eine Steuerdatei hinzufügen." (routes to control file upload)
-- [X] Tiles styled with MUI `Card` + `Button` (reuse from Feature 026)
-- [X] Icons reuse existing upload icon from "Steuerdatei hinzufügen" tile
-- [X] Layout responsive (mobile: stack vertically)
-- [X] Tiles keyboard-navigable (Tab, Enter)
-- [X] Focus management: visible focus indicators on all tiles
-- [X] ARIA roles: tiles announced as buttons to screen readers
-- [X] Click tile: Route to appropriate upload/edit form (via Next.js router)
-- [X] E2E tests (T004) for tile layout pass
+
+- [x] Component file created at `app/admin/course-material/new/create-client.tsx`
+- [x] Renders 3 tiles in CSS Grid 2-1 layout:
+  - [x] Tile 1: "Ich möchte eine Inhaltsseite hinzufügen." (routes to upload form)
+  - [x] Tile 2: "Ich möchte eine Inhaltsseite anlegen." (routes to SlideEditor)
+  - [x] Tile 3: "Ich möchte eine Steuerdatei hinzufügen." (routes to control file upload)
+- [x] Tiles styled with MUI `Card` + `Button` (reuse from Feature 026)
+- [x] Icons reuse existing upload icon from "Steuerdatei hinzufügen" tile
+- [x] Layout responsive (mobile: stack vertically)
+- [x] Tiles keyboard-navigable (Tab, Enter)
+- [x] Focus management: visible focus indicators on all tiles
+- [x] ARIA roles: tiles announced as buttons to screen readers
+- [x] Click tile: Route to appropriate upload/edit form (via Next.js router)
+- [x] E2E tests (T004) for tile layout pass
 
 **Implementation Notes**:
 This is a simple wrapper component. Reuse design tokens and MUI styling from Feature 026. No new CSS needed. Mark component as `'use client'`.
@@ -228,33 +234,34 @@ This is a simple wrapper component. Reuse design tokens and MUI styling from Fea
 Create form component for HTML file upload (reuses pattern from Feature 026 slide control upload).
 
 **Acceptance Criteria**:
-- [X] Component file created at `app/admin/course-material/new/html-upload-form.tsx`
-- [X] Form fields:
-  - [X] Title (required, text input, 1-255 chars)
-  - [X] Identifier (optional, text input, auto-generated if empty)
-- [X] File upload zone:
-  - [X] Drag-and-drop zone with visual feedback
-  - [X] "Datei auswählen" button (click to browse files)
-  - [X] Display file name + size after selection
-  - [X] Preview: "5.0 MB" format
-- [X] Form buttons:
-  - [X] "Speichern" (submit)
-  - [X] "Abbrechen" (cancel/back)
-- [X] Validation (client-side):
-  - [X] Title required before submit
-  - [X] File required before submit
-  - [X] File extension check: .html only
-  - [X] Show validation errors inline
-- [X] Upload handling:
-  - [X] Show progress indicator during upload
-  - [X] POST to `/api/admin/course-material` with FormData
-  - [X] Success: show toast, redirect to material list
-  - [X] Error: show toast with generic error message
-  - [X] Server errors logged via Rollbar (`serverInstance.error()`); no `console.error`
-- [X] Accessibility:
-  - [X] Drag-and-drop zone labeled (aria-label)
-  - [X] File input keyboard-accessible
-  - [X] Form labels properly associated
+
+- [x] Component file created at `app/admin/course-material/new/html-upload-form.tsx`
+- [x] Form fields:
+  - [x] Title (required, text input, 1-255 chars)
+  - [x] Identifier (optional, text input, auto-generated if empty)
+- [x] File upload zone:
+  - [x] Drag-and-drop zone with visual feedback
+  - [x] "Datei auswählen" button (click to browse files)
+  - [x] Display file name + size after selection
+  - [x] Preview: "5.0 MB" format
+- [x] Form buttons:
+  - [x] "Speichern" (submit)
+  - [x] "Abbrechen" (cancel/back)
+- [x] Validation (client-side):
+  - [x] Title required before submit
+  - [x] File required before submit
+  - [x] File extension check: .html only
+  - [x] Show validation errors inline
+- [x] Upload handling:
+  - [x] Show progress indicator during upload
+  - [x] POST to `/api/admin/course-material` with FormData
+  - [x] Success: show toast, redirect to material list
+  - [x] Error: show toast with generic error message
+  - [x] Server errors logged via Rollbar (`serverInstance.error()`); no `console.error`
+- [x] Accessibility:
+  - [x] Drag-and-drop zone labeled (aria-label)
+  - [x] File input keyboard-accessible
+  - [x] Form labels properly associated
 
 **Implementation Notes**:
 Reuse upload zone component from Feature 026. Reuse FormData handling pattern. Error handling: generic message to user, errors logged server-side. Mark component as `'use client'`.
@@ -271,17 +278,18 @@ Reuse upload zone component from Feature 026. Reuse FormData handling pattern. E
 Extend existing page.tsx to integrate MaterialTypeSelection component and route based on query param.
 
 **Acceptance Criteria**:
-- [X] Page.tsx remains server component
-- [X] Dynamic import MaterialTypeSelection with `ssr: false`
-- [X] Check searchParams.type:
-  - [X] No type / type=select: Show MaterialTypeSelection
-  - [X] type=upload: Show HTMLContentUploadForm
-  - [X] type=editor: Show existing SlideEditor (no changes)
-  - [X] type=control: Show existing slide control upload (from Feature 026)
-- [X] Loading state shown during dynamic import
-- [X] Focus management: keyboard focus moves to new content when route changes
-- [X] Existing routes still work (backward compatibility)
-- [X] E2E tests (T004) for routing pass
+
+- [x] Page.tsx remains server component
+- [x] Dynamic import MaterialTypeSelection with `ssr: false`
+- [x] Check searchParams.type:
+  - [x] No type / type=select: Show MaterialTypeSelection
+  - [x] type=upload: Show HTMLContentUploadForm
+  - [x] type=editor: Show existing SlideEditor (no changes)
+  - [x] type=control: Show existing slide control upload (from Feature 026)
+- [x] Loading state shown during dynamic import
+- [x] Focus management: keyboard focus moves to new content when route changes
+- [x] Existing routes still work (backward compatibility)
+- [x] E2E tests (T004) for routing pass
 
 **Implementation Notes**:
 Minimal changes to existing page.tsx. Reuse existing layout and styling. Reference Feature 026 for existing routes. Next.js App Router `searchParams` prop available in server component.
@@ -298,15 +306,16 @@ Minimal changes to existing page.tsx. Reuse existing layout and styling. Referen
 Extend existing material list page to display type badge (MUI Chip) for each material.
 
 **Acceptance Criteria**:
-- [X] Material list renders existing materials + new uploaded materials
-- [X] For each material, display type badge:
-  - [X] "Inhaltsseite" for type: CONTENT
-  - [X] "Steuerdatei" for type: SLIDE_CONTROL
-- [X] Badge styled with MUI `Chip` component
-- [X] Badge color matches design tokens (use existing colors from Feature 026)
-- [X] Badge appears next to material title
-- [X] Existing list functionality unchanged
-- [X] E2E test (T004) for type badge display passes
+
+- [x] Material list renders existing materials + new uploaded materials
+- [x] For each material, display type badge:
+  - [x] "Inhaltsseite" for type: CONTENT
+  - [x] "Steuerdatei" for type: SLIDE_CONTROL
+- [x] Badge styled with MUI `Chip` component
+- [x] Badge color matches design tokens (use existing colors from Feature 026)
+- [x] Badge appears next to material title
+- [x] Existing list functionality unchanged
+- [x] E2E test (T004) for type badge display passes
 
 **Implementation Notes**:
 Type badges already implemented in Feature 026 (`CourseMaterialTable.tsx`). No changes needed — both CONTENT (uploaded and editor-created) and SLIDE_CONTROL materials display correct badges.
@@ -323,11 +332,12 @@ Type badges already implemented in Feature 026 (`CourseMaterialTable.tsx`). No c
 Run complete test suite to ensure all contract, integration, and E2E tests pass.
 
 **Acceptance Criteria**:
-- [X] Contract tests (T002) all pass: `npm run test -- tests/contracts/upload-html-content-material.spec.ts`
-- [X] Integration tests (T003) all pass: `npm run test -- tests/integration/course-material-upload.spec.ts`
-- [X] E2E tests (T004) all pass: `npm run test:e2e -- tests/e2e/course-material-upload.spec.ts`
-- [X] No console errors or warnings in test output
-- [X] Code coverage meets minimum threshold (if configured)
+
+- [x] Contract tests (T002) all pass: `npm run test -- tests/contracts/upload-html-content-material.spec.ts`
+- [x] Integration tests (T003) all pass: `npm run test -- tests/integration/course-material-upload.spec.ts`
+- [x] E2E tests (T004) all pass: `npm run test:e2e -- tests/e2e/course-material-upload.spec.ts`
+- [x] No console errors or warnings in test output
+- [x] Code coverage meets minimum threshold (if configured)
 
 **Implementation Notes**:
 Run after all implementation tasks (T005-T009) are complete. Fix any failing tests before proceeding.
@@ -344,6 +354,7 @@ Run after all implementation tasks (T005-T009) are complete. Fix any failing tes
 Execute quickstart.md scenario manually to validate happy-path user experience.
 
 **Acceptance Criteria**:
+
 - [ ] Start dev server: `npm run dev`
 - [ ] Login as admin (Clerk test credentials)
 - [ ] Navigate to `/admin/course-material/new`
@@ -370,12 +381,13 @@ Follow exact steps from quickstart.md. Document any deviations or bugs. Verify U
 Run repository quality gates to ensure no new lint/type errors.
 
 **Acceptance Criteria**:
-- [X] `npm run lint` passes (Biome check)
-- [X] `npm run typecheck` passes (TypeScript strict mode)
-- [X] `npm run build` succeeds without errors
-- [X] No new type errors in modified files
-- [X] No import order violations
-- [X] No unused imports or variables
+
+- [x] `npm run lint` passes (Biome check)
+- [x] `npm run typecheck` passes (TypeScript strict mode)
+- [x] `npm run build` succeeds without errors
+- [x] No new type errors in modified files
+- [x] No import order violations
+- [x] No unused imports or variables
 
 **Implementation Notes**:
 Run after all implementation tasks. Fix any violations before PR.
@@ -392,10 +404,11 @@ Run after all implementation tasks. Fix any violations before PR.
 Update copilot-instructions.md to document Feature 030 changes for future development context.
 
 **Acceptance Criteria**:
-- [X] Add Feature 030 to "Recent Changes" section (keep last 3 features)
-- [X] Document: "030-extended-material-upload: Added new tile for uploading HTML content files to course material interface (Material type selection, HTML upload form, API endpoint)"
-- [X] Preserve existing recent changes from Features 029, 028, 026
-- [X] Keep section under 150 lines for token efficiency
+
+- [x] Add Feature 030 to "Recent Changes" section (keep last 3 features)
+- [x] Document: "030-extended-material-upload: Added new tile for uploading HTML content files to course material interface (Material type selection, HTML upload form, API endpoint)"
+- [x] Preserve existing recent changes from Features 029, 028, 026
+- [x] Keep section under 150 lines for token efficiency
 
 **Implementation Notes**:
 Reference the existing copilot-instructions.md format. Run update-agent-context.sh if available, or manually edit.
@@ -405,16 +418,19 @@ Reference the existing copilot-instructions.md format. Run update-agent-context.
 ## Parallel Execution Groups
 
 ### Group 1: Tests (can run in parallel)
+
 - **T002**: Contract test
 - **T003**: Integration test
 - **T004**: E2E test
 
 ### Group 2: UI Components (can run in parallel after T005)
+
 - **T006**: MaterialTypeSelection component
 - **T007**: HTMLContentUploadForm component
 - **T009**: Update material list
 
 ### Execution Example:
+
 ```bash
 # Sequential setup
 npm run test -- tests/fixtures/  # T001 fixture exists
@@ -446,7 +462,8 @@ npm run build
 **Validation**: 3 (T010-T012) [P]  
 **Documentation**: 1 (T013)
 
-**Estimated Effort**: 
+**Estimated Effort**:
+
 - Setup: 15 min
 - Tests: 90 min (write 3 test files)
 - API Implementation: 60 min (extend handler)

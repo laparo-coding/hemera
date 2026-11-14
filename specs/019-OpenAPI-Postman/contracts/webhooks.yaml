@@ -62,7 +62,7 @@ paths:
                 - type
                 - data
       responses:
-        '200':
+        "200":
           description: Webhook processed successfully
           content:
             application/json:
@@ -72,24 +72,24 @@ paths:
                   received:
                     type: boolean
                     example: true
-        '400':
+        "400":
           description: Invalid webhook payload or signature
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Invalid or missing Stripe-Signature
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Webhook processing error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /webhooks/clerk:
     post:
@@ -145,7 +145,7 @@ paths:
                 - type
                 - data
       responses:
-        '200':
+        "200":
           description: Webhook processed successfully
           content:
             application/json:
@@ -155,15 +155,15 @@ paths:
                   received:
                     type: boolean
                     example: true
-        '400':
+        "400":
           description: Invalid webhook payload
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Invalid signature
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"

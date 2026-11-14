@@ -20,6 +20,7 @@
 ## Summary
 
 Überarbeitung des Admin Dashboards mit:
+
 - Einheitlichem Layout (Standardbreite 1280px für alle Admin-Seiten)
 - Breadcrumb-Navigation auf allen Unterseiten
 - 3-Spalten-Grid mit 6 Dashboard-Karten
@@ -45,14 +46,14 @@
 
 _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Rule | Status | Notes |
-|------|--------|-------|
-| German Language (informal "Du") | ✅ PASS | Spec requires German localization |
-| Rollbar Error Logging | ✅ PASS | Will use existing monitoring infrastructure |
-| GitHub Actions Deployment | ✅ PASS | No deployment changes needed |
-| Stripe Integration | N/A | No payment features in this spec |
-| Error Handling | ✅ PLAN | API endpoints will follow existing patterns |
-| Test Coverage | ✅ PLAN | Contract tests for new APIs, E2E for UI |
+| Rule                            | Status  | Notes                                       |
+| ------------------------------- | ------- | ------------------------------------------- |
+| German Language (informal "Du") | ✅ PASS | Spec requires German localization           |
+| Rollbar Error Logging           | ✅ PASS | Will use existing monitoring infrastructure |
+| GitHub Actions Deployment       | ✅ PASS | No deployment changes needed                |
+| Stripe Integration              | N/A     | No payment features in this spec            |
+| Error Handling                  | ✅ PLAN | API endpoints will follow existing patterns |
+| Test Coverage                   | ✅ PLAN | Contract tests for new APIs, E2E for UI     |
 
 ## Project Structure
 
@@ -216,6 +217,7 @@ _This checklist is updated during execution flow_
 - [x] Complexity deviations documented (none required) ✅
 
 **Generated Artifacts**:
+
 - `research.md` - Technology decisions and patterns
 - `data-model.md` - View models and existing entity usage
 - `contracts/admin-users-api.yaml` - User management API contract

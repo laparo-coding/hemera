@@ -45,9 +45,15 @@ export async function createCheckoutSession(
 }
 
 interface WebhookEventHandler {
-  'checkout.session.completed': (session: Stripe.Checkout.Session) => Promise<void>;
-  'payment_intent.succeeded': (paymentIntent: Stripe.PaymentIntent) => Promise<void>;
-  'customer.subscription.updated': (subscription: Stripe.Subscription) => Promise<void>;
+  'checkout.session.completed': (
+    session: Stripe.Checkout.Session
+  ) => Promise<void>;
+  'payment_intent.succeeded': (
+    paymentIntent: Stripe.PaymentIntent
+  ) => Promise<void>;
+  'customer.subscription.updated': (
+    subscription: Stripe.Subscription
+  ) => Promise<void>;
 }
 
 type WebhookEventType = keyof WebhookEventHandler;
@@ -417,7 +423,10 @@ function isPushNotification(n: Notification): n is PushNotification {
 ### Safe Partial Updates
 
 ```typescript
-async function updateUser(id: string, params: Partial<UpdateUserParams>): Promise<UserProfile> {
+async function updateUser(
+  id: string,
+  params: Partial<UpdateUserParams>
+): Promise<UserProfile> {
   const updateData: Prisma.UserUpdateInput = {};
 
   if (params.name !== undefined) updateData.name = params.name;

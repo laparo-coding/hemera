@@ -93,30 +93,32 @@ As an administrator, I need to manage location information for courses so that s
 
 #### Location Entity
 
-| Field | Description | Required |
-|-------|-------------|----------|
-| id | Unique identifier | Yes (auto) |
-| slug | URL-friendly identifier (auto-generated from name) | Yes (unique) |
-| name | Display name of the venue | Yes |
-| description | Brief description of the venue | No |
-| address | Street address | Yes |
-| zipCode | Postal/ZIP code | No |
-| city | City name | Yes |
-| email | Contact email address | No |
-| phone | Contact telephone number | No |
-| website | Website URL | No |
-| imageUrl | URL to venue exterior image | No |
-| roomImageUrl | URL to room/interior image | No |
-| latitude | Geo-coordinate latitude (from Nominatim) | No |
-| longitude | Geo-coordinate longitude (from Nominatim) | No |
-| createdAt | Creation timestamp | Yes (auto) |
-| updatedAt | Last update timestamp | Yes (auto) |
+| Field        | Description                                        | Required     |
+| ------------ | -------------------------------------------------- | ------------ |
+| id           | Unique identifier                                  | Yes (auto)   |
+| slug         | URL-friendly identifier (auto-generated from name) | Yes (unique) |
+| name         | Display name of the venue                          | Yes          |
+| description  | Brief description of the venue                     | No           |
+| address      | Street address                                     | Yes          |
+| zipCode      | Postal/ZIP code                                    | No           |
+| city         | City name                                          | Yes          |
+| email        | Contact email address                              | No           |
+| phone        | Contact telephone number                           | No           |
+| website      | Website URL                                        | No           |
+| imageUrl     | URL to venue exterior image                        | No           |
+| roomImageUrl | URL to room/interior image                         | No           |
+| latitude     | Geo-coordinate latitude (from Nominatim)           | No           |
+| longitude    | Geo-coordinate longitude (from Nominatim)          | No           |
+| createdAt    | Creation timestamp                                 | Yes (auto)   |
+| updatedAt    | Last update timestamp                              | Yes (auto)   |
 
 **Relationships:**
+
 - A Location can be referenced by zero or more Courses (one-to-many)
 - Courses reference Location via an optional foreign key
 
 **Field Name Corrections Applied:**
+
 - `telehphone` → `phone` (typo corrected, shortened for clarity)
 - `photo_location` → `imageUrl` (consistent with thumbnailUrl pattern)
 - `photo_room` → `roomImageUrl` (clearer naming)
@@ -128,23 +130,23 @@ As an administrator, I need to manage location information for courses so that s
 
 Following the established convention from `.github/copilot-instructions.md`:
 
-| Prisma Field | Database Column |
-|--------------|-----------------|
-| `slug` | `slug` |
-| `name` | `name` |
-| `description` | `description` |
-| `address` | `address` |
-| `zipCode` | `zip_code` |
-| `city` | `city` |
-| `email` | `email` |
-| `phone` | `phone` |
-| `website` | `website` |
-| `imageUrl` | `image_url` |
+| Prisma Field   | Database Column  |
+| -------------- | ---------------- |
+| `slug`         | `slug`           |
+| `name`         | `name`           |
+| `description`  | `description`    |
+| `address`      | `address`        |
+| `zipCode`      | `zip_code`       |
+| `city`         | `city`           |
+| `email`        | `email`          |
+| `phone`        | `phone`          |
+| `website`      | `website`        |
+| `imageUrl`     | `image_url`      |
 | `roomImageUrl` | `room_image_url` |
-| `latitude` | `latitude` |
-| `longitude` | `longitude` |
-| `createdAt` | `created_at` |
-| `updatedAt` | `updated_at` |
+| `latitude`     | `latitude`       |
+| `longitude`    | `longitude`      |
+| `createdAt`    | `created_at`     |
+| `updatedAt`    | `updated_at`     |
 
 Table name: `locations` (snake_case plural)
 
@@ -158,23 +160,26 @@ Table name: `locations` (snake_case plural)
 
 **Evaluated Options:**
 
-| Option | Pros | Cons |
-|--------|------|------|
-| Google Maps Embed (`@next/third-parties`) | Native Next.js integration, familiar UX | API key required (costs), DSGVO concerns |
-| **React Leaflet + OpenStreetMap** ✅ | Free, open-source, DSGVO-friendly, highly customizable | Requires dynamic import for SSR |
+| Option                                    | Pros                                                   | Cons                                     |
+| ----------------------------------------- | ------------------------------------------------------ | ---------------------------------------- |
+| Google Maps Embed (`@next/third-parties`) | Native Next.js integration, familiar UX                | API key required (costs), DSGVO concerns |
+| **React Leaflet + OpenStreetMap** ✅      | Free, open-source, DSGVO-friendly, highly customizable | Requires dynamic import for SSR          |
 
 **Rationale:**
+
 1. **Cost-effective**: No API fees, free for any usage volume
 2. **DSGVO-compliant**: No data sent to Google, suitable for German market
 3. **Matches FR-ADM-042**: Explicitly requires "open-source map service (e.g., OpenStreetMap/Leaflet)"
 4. **High trust score**: Leaflet has Trust Score 9.5 with 1852 code snippets in Context7
 
 **Implementation Notes:**
+
 - Use `dynamic(() => import(...), { ssr: false })` for Next.js App Router compatibility
 - Import Leaflet CSS: `import 'leaflet/dist/leaflet.css'`
 - Components: `MapContainer`, `TileLayer`, `Marker`, `Popup` from `react-leaflet`
 
 **Dependencies:**
+
 ```bash
 npm install react-leaflet leaflet
 npm install -D @types/leaflet
@@ -185,16 +190,19 @@ npm install -D @types/leaflet
 **Decision**: Use OpenStreetMap Nominatim API for address-to-coordinate conversion.
 
 **Rationale:**
+
 1. **OSM-Konsistenz**: Passt zur Leaflet/OpenStreetMap-Kartenentscheidung
 2. **Kostenlos**: Keine API-Kosten
 3. **Rate-Limit**: 1 Request/Sekunde (ausreichend für Admin-Nutzung)
 4. **Caching**: Koordinaten werden in DB gespeichert (`latitude`, `longitude`) – Nominatim wird nur beim Speichern aufgerufen
 
 **Fallback-Verhalten:**
+
 - Wenn Geocoding fehlschlägt: Karte wird ausgeblendet, nur Adresse angezeigt
 - Admin kann Location trotzdem speichern (Koordinaten bleiben null)
 
 **API-Endpoint:**
+
 ```
 https://nominatim.openstreetmap.org/search?q={address}&format=json&limit=1
 ```
@@ -236,6 +244,7 @@ As a prospective student or course participant, I want to view detailed informat
 ### Functional Requirements (Landing Page)
 
 #### Display Requirements
+
 - **FR-LP-001**: System MUST display the location name as the page title/heading
 - **FR-LP-002**: System MUST display the location description when provided
 - **FR-LP-003**: System MUST display the full address (street address, ZIP code, city) in a formatted block
@@ -244,28 +253,33 @@ As a prospective student or course participant, I want to view detailed informat
 - **FR-LP-006**: System MUST render the room/interior image (roomImageUrl) when available
 
 #### Map Integration
+
 - **FR-LP-007**: System MUST embed an interactive map view using React Leaflet with OpenStreetMap tiles showing the location based on its address
 - **FR-LP-008**: System MUST provide a clearly labeled button/link to "Open in Apple Maps"
 - **FR-LP-009**: System MUST provide a clearly labeled button/link to "Open in Google Maps"
 - **FR-LP-010**: Map links MUST open in a new browser tab/window or the native maps application
 
 #### Contact Interactivity
+
 - **FR-LP-011**: Email address MUST be a clickable mailto: link
 - **FR-LP-012**: Phone number MUST be a clickable tel: link for mobile devices
 - **FR-LP-013**: Website URL MUST be a clickable link opening in a new tab
 
 #### Navigation & SEO
+
 - **FR-LP-014**: Each location MUST have a unique, SEO-friendly URL (e.g., /locations/[slug])
 - **FR-LP-015**: Page MUST include appropriate meta tags for search engines
 - **FR-LP-016**: Courses referencing this location SHOULD link to the location landing page
 
 #### Design & UX
+
 - **FR-LP-017**: Page layout MUST use MUI components consistent with the site's design system
 - **FR-LP-018**: Page MUST be fully responsive for mobile, tablet, and desktop viewports
 - **FR-LP-019**: All images MUST have appropriate alt text for accessibility
 - **FR-LP-020**: Map buttons MUST use recognizable icons (Apple Maps logo, Google Maps logo)
 
 #### Mobile Optimization
+
 - **FR-LP-021**: Page MUST be optimized as mobile-first design
 - **FR-LP-022**: Touch targets (buttons, links) MUST be at least 44x44 pixels for easy tapping
 - **FR-LP-023**: Images MUST be responsive and load optimized sizes for mobile bandwidth
@@ -278,18 +292,18 @@ As a prospective student or course participant, I want to view detailed informat
 
 ### Field Display Mapping
 
-| Field | Display Usage |
-|-------|---------------|
-| name | Page title and main heading |
-| description | Descriptive text section |
-| address | Address block line 1 |
-| zipCode | Address block with city |
-| city | Address block line 2 |
-| email | Contact section - clickable mailto link |
-| phone | Contact section - clickable tel link |
-| website | Contact section - clickable external link |
-| imageUrl | Hero/featured image of venue exterior |
-| roomImageUrl | Secondary image of interior/room |
+| Field        | Display Usage                             |
+| ------------ | ----------------------------------------- |
+| name         | Page title and main heading               |
+| description  | Descriptive text section                  |
+| address      | Address block line 1                      |
+| zipCode      | Address block with city                   |
+| city         | Address block line 2                      |
+| email        | Contact section - clickable mailto link   |
+| phone        | Contact section - clickable tel link      |
+| website      | Contact section - clickable external link |
+| imageUrl     | Hero/featured image of venue exterior     |
+| roomImageUrl | Secondary image of interior/room          |
 
 ---
 
@@ -329,11 +343,13 @@ As an administrator, I want a dedicated admin page for managing locations so tha
 ### Functional Requirements (Admin Page)
 
 #### Navigation & Access
+
 - **FR-ADM-001**: Main admin page MUST include a link/navigation item to the Locations admin page
 - **FR-ADM-002**: Locations admin page MUST be accessible only to authenticated administrators
 - **FR-ADM-003**: Page MUST provide clear navigation back to the main admin area
 
 #### List View
+
 - **FR-ADM-004**: System MUST display all locations in a tabular/list format
 - **FR-ADM-005**: List MUST show at minimum: name, city, and address for each location
 - **FR-ADM-006**: List SHOULD show the number of courses using each location
@@ -342,6 +358,7 @@ As an administrator, I want a dedicated admin page for managing locations so tha
 - **FR-ADM-009**: Empty state MUST show a helpful message encouraging creation of first location
 
 #### Create & Edit
+
 - **FR-ADM-010**: System MUST provide a form to create new locations
 - **FR-ADM-011**: System MUST provide a form to edit existing locations
 - **FR-ADM-012**: Form MUST validate required fields (name, address, city) before submission
@@ -356,12 +373,14 @@ As an administrator, I want a dedicated admin page for managing locations so tha
 When an administrator invokes "Add New Location", the system MUST provide a standard form for manual data entry.
 
 **Phase 1 (MVP):**
+
 - **FR-ADM-030**: System MUST provide a form with all location fields for manual entry
 - **FR-ADM-031**: Form MUST validate required fields (name, address, city) before submission
 - **FR-ADM-032**: Form MUST support image URL input for venue and room photos
 
 **Phase 2 (Future Enhancement - Website Scanning):**
 The following requirements are deferred to a future phase:
+
 - ~~FR-ADM-033~~: System scans website for hero/banner image
 - ~~FR-ADM-034~~: System displays detected hero image as venue image
 - ~~FR-ADM-035~~: Admin can replace auto-detected image
@@ -373,28 +392,33 @@ The following requirements are deferred to a future phase:
 - ~~FR-ADM-041~~: System indicates which fields were auto-populated
 
 **Step 3: Map & Navigation**
+
 - **FR-ADM-042**: System MUST generate a map preview using React Leaflet with OpenStreetMap tiles
 - **FR-ADM-043**: System MUST auto-generate Apple Maps route link from the address
 - **FR-ADM-044**: System MUST auto-generate Google Maps route link from the address
 - **FR-ADM-045**: Map preview MUST update when address fields are modified
 
 **Step 4: Room Image**
+
 - **FR-ADM-046**: System MUST provide an upload function for the room/interior image (roomImageUrl)
 - **FR-ADM-047**: Upload function MUST support common image formats (JPEG, PNG, WebP)
 - **FR-ADM-048**: System SHOULD display a preview of the uploaded room image
 
 **Fallback Behavior**
+
 - ~~FR-ADM-049~~: Deferred to Phase 2
 - ~~FR-ADM-050~~: Deferred to Phase 2
 - ~~FR-ADM-051~~: Deferred to Phase 2
 
 #### Delete
+
 - **FR-ADM-018**: System MUST allow deletion of locations not referenced by any courses
 - **FR-ADM-019**: System MUST prevent deletion of locations referenced by courses
 - **FR-ADM-020**: When deletion is blocked, system MUST display which courses reference the location
 - **FR-ADM-021**: Delete action MUST require confirmation before execution
 
 #### Design & UX
+
 - **FR-ADM-022**: Page layout MUST follow the same pattern as the Course admin page
 - **FR-ADM-023**: Page MUST use MUI components consistent with the site's design system
 - **FR-ADM-024**: Page MUST be fully responsive for tablet and desktop viewports
@@ -429,6 +453,7 @@ As a system component (admin page, landing page, or external integration), I nee
 ### Functional Requirements (API)
 
 #### Endpoints
+
 - **FR-API-001**: System MUST provide a GET endpoint to retrieve all locations
 - **FR-API-002**: System MUST provide a GET endpoint to retrieve a single location by ID
 - **FR-API-003**: System MUST provide a POST endpoint to create a new location
@@ -436,6 +461,7 @@ As a system component (admin page, landing page, or external integration), I nee
 - **FR-API-005**: System MUST provide a DELETE endpoint to remove a location
 
 #### Authentication & Authorization
+
 - **FR-API-006**: All mutating endpoints (POST, PUT, PATCH, DELETE) MUST require authentication
 - **FR-API-007**: All mutating endpoints MUST require administrator role
 - **FR-API-008**: GET endpoints for public location data MAY be accessible without authentication
@@ -443,12 +469,14 @@ As a system component (admin page, landing page, or external integration), I nee
 - **FR-API-010**: System MUST return 403 Forbidden for non-admin mutating requests
 
 #### Validation
+
 - **FR-API-011**: API MUST validate required fields (name, address, city) on create/update
 - **FR-API-012**: API MUST validate email format when provided
 - **FR-API-013**: API MUST validate website URL format when provided
 - **FR-API-014**: API MUST return 400 Bad Request with descriptive error messages for validation failures
 
 #### Business Logic
+
 - **FR-API-015**: DELETE endpoint MUST check for course references before deletion
 - **FR-API-016**: DELETE endpoint MUST return 409 Conflict when location is referenced by courses
 - **FR-API-017**: Error response for blocked deletion MUST include list of referencing course IDs/names
@@ -456,12 +484,14 @@ As a system component (admin page, landing page, or external integration), I nee
 - **FR-API-019**: API MUST automatically update updatedAt timestamp on modification
 
 **Note**: Delete operation MUST follow the same implementation pattern as the Course delete API, including:
+
 - Same authorization checks
 - Same error response format
 - Same referential integrity validation approach
 - Same confirmation/soft-delete behavior if applicable
 
 #### Response Format
+
 - **FR-API-020**: All responses MUST use consistent JSON format
 - **FR-API-021**: Successful responses MUST include the location data
 - **FR-API-022**: Error responses MUST include error code and human-readable message
