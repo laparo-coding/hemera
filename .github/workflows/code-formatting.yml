@@ -17,8 +17,8 @@ jobs:
 
       - name: Setup Biome
         uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2.7.1
-        with:
-          version: latest
+        # Version is auto-detected from the lockfile so CI stays in sync
+        # with the pinned @biomejs/biome dependency.
 
       - name: Run Biome
         run: biome ci .
