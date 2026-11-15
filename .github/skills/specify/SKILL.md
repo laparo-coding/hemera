@@ -7,9 +7,9 @@ disable-model-invocation: true
 
 The user input may be provided directly in the invoking message or as an argument to this skill; always use it (if not empty).
 
-The text the user typed after the invoking message **is** the feature description.
-Assume you always have it available in this conversation even if it appears only in the invoking
-message. Do not ask the user to repeat it unless they provided an empty command.
+The text the user typed after `/specify` in the invoking message **is** the feature description.
+Assume you always have it available in this conversation. Do not ask the user to repeat it unless
+they provided an empty command.
 
 Given that feature description, do this:
 

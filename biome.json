@@ -12,6 +12,7 @@
       "!**/node_modules",
       "!**/.next",
       "!**/.vscode",
+      "!**/.github/skills",
       "!**/playwright-report",
       "!**/playwright-report-external",
       "!**/test-results",
