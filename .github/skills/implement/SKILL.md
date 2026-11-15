@@ -1,15 +1,11 @@
 ---
-
-description:
-Execute the implementation plan by processing and executing all tasks defined in tasks.md
+name: implement
+description: "Execute the implementation plan by processing and executing all tasks defined in tasks.md"
+user-invocable: true
+disable-model-invocation: true
 ---
 
-The user input can be provided directly by the agent or as a command argument - you **MUST**
-consider it before proceeding with the prompt (if not empty).
-
-User input:
-
-$ARGUMENTS
+The user input may be provided directly in the invoking message or as an argument to this skill; always use it (if not empty).
 
 1. Run `.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` from
    repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.

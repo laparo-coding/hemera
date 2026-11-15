@@ -1,16 +1,11 @@
 ---
-
-description:
-Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md,
-and tasks.md after task generation.
+name: analyze
+description: "Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation."
+user-invocable: true
+disable-model-invocation: true
 ---
 
-The user input to you can be provided directly by the agent or as a command argument - you **MUST**
-consider it before proceeding with the prompt (if not empty).
-
-User input:
-
-$ARGUMENTS
+The user input may be provided directly in the invoking message or as an argument to this skill; always use it (if not empty).
 
 Goal: Identify inconsistencies, duplications, ambiguities, and underspecified items across the three
 core artifacts (`spec.md`, `plan.md`, `tasks.md`) before implementation. This command MUST run only
@@ -120,4 +115,4 @@ Behavior rules:
 - LIMIT total findings in the main table to 50; aggregate remainder in a summarized overflow note.
 - If zero issues found, emit a success report with coverage statistics and proceed recommendation.
 
-Context: $ARGUMENTS
+Context: the user input and arguments from the invoking message.

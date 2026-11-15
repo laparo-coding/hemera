@@ -1,13 +1,11 @@
 ---
+name: clarify
+description: "Identify underspecified areas in the current feature spec by asking up to 5 highly targeted clarification questions."
+user-invocable: true
+disable-model-invocation: true
+---
 
-## description: Identify underspecified areas in the current feature spec by asking up to 5 highly targeted clarification questions.
-
-The user input to you can be provided directly by the agent or as a command argument - you **MUST**
-consider it before proceeding with the prompt (if not empty).
-
-User input:
-
-$ARGUMENTS
+The user input may be provided directly in the invoking message or as an argument to this skill; always use it (if not empty).
 
 Goal: Detect and reduce ambiguity or missing decision points in the active feature specification and
 record the clarifications directly in the spec file.
@@ -105,12 +103,12 @@ Execution steps:
    - Present EXACTLY ONE question at a time.
    - For multiple‑choice questions render options as a Markdown table:
 
-     | Option | Description |
+     | Option | Description                                  |
      | ------ | -------------------------------------------- | ------------------------------------------------------ |
-     | A | <Option A description> |
-     | B | <Option B description> |
-     | C | <Option C description> | (add D/E as needed up to 5) |
-     | Short | Provide a different short answer (<=5 words) | (Include only if free-form alternative is appropriate) |
+     | A      | <Option A description>                       |
+     | B      | <Option B description>                       |
+     | C      | <Option C description>                       | (add D/E as needed up to 5)                            |
+     | Short  | Provide a different short answer (<=5 words) | (Include only if free-form alternative is appropriate) |
 
    - For short‑answer style (no meaningful discrete options), output a single line after the
      question: `Format: Short answer (<=5 words)`.
@@ -189,4 +187,4 @@ Behavior rules:
 - If quota reached with unresolved high-impact categories remaining, explicitly flag them under
   Deferred with rationale.
 
-Context for prioritization: $ARGUMENTS
+Context for prioritization: the user input and arguments from the invoking message.

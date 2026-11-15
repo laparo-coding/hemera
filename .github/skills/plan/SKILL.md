@@ -1,15 +1,11 @@
 ---
-
-description:
-Execute the implementation planning workflow using the plan template to generate design artifacts.
+name: plan
+description: "Execute the implementation planning workflow using the plan template to generate design artifacts."
+user-invocable: true
+disable-model-invocation: true
 ---
 
-The user input to you can be provided directly by the agent or as a command argument - you **MUST**
-consider it before proceeding with the prompt (if not empty).
-
-User input:
-
-$ARGUMENTS
+The user input may be provided directly in the invoking message or as an argument to this skill; always use it (if not empty).
 
 Given the implementation details provided as an argument, do this:
 
@@ -39,7 +35,8 @@ Given the implementation details provided as an argument, do this:
      - Phase 0 generates research.md
      - Phase 1 generates data-model.md, contracts/, quickstart.md
      - Phase 2 generates tasks.md
-   - Incorporate user-provided details from arguments into Technical Context: $ARGUMENTS
+   - Incorporate user-provided details from the invoking message (including any arguments)
+     into Technical Context.
    - Update Progress Tracking as you complete each phase
 
 5. Verify execution completed:

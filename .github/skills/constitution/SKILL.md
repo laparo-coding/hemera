@@ -1,16 +1,11 @@
 ---
-
-description:
-Create or update the project constitution from interactive or provided principle inputs, ensuring
-all dependent templates stay in sync.
+name: constitution
+description: "Create or update the project constitution from interactive or provided principle inputs, ensuring all dependent templates stay in sync."
+user-invocable: true
+disable-model-invocation: true
 ---
 
-The user input to you can be provided directly by the agent or as a command argument - you **MUST**
-consider it before proceeding with the prompt (if not empty).
-
-User input:
-
-$ARGUMENTS
+The user input may be provided directly in the invoking message or as an argument to this skill; always use it (if not empty).
 
 You are updating the project constitution at `.specify/memory/constitution.md`. This file is a
 TEMPLATE containing placeholder tokens in square brackets (e.g. `[PROJECT_NAME]`,

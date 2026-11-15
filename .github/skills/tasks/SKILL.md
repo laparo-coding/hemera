@@ -1,16 +1,11 @@
 ---
-
-description:
-Generate an actionable, dependency-ordered tasks.md for the feature based on available design
-artifacts.
+name: tasks
+description: "Generate an actionable, dependency-ordered tasks.md for the feature based on available design artifacts."
+user-invocable: true
+disable-model-invocation: true
 ---
 
-The user input to you can be provided directly by the agent or as a command argument - you **MUST**
-consider it before proceeding with the prompt (if not empty).
-
-User input:
-
-$ARGUMENTS
+The user input may be provided directly in the invoking message or as an argument to this skill; always use it (if not empty).
 
 1. Run `.specify/scripts/bash/check-prerequisites.sh --json` from repo root and parse FEATURE_DIR
    and AVAILABLE_DOCS list. All paths must be absolute.
@@ -62,7 +57,7 @@ $ARGUMENTS
    - Dependency notes
    - Parallel execution guidance
 
-Context for task generation: $ARGUMENTS
+Context for task generation: the user input and arguments from the invoking message.
 
 The tasks.md should be immediately executable - each task must be specific enough that an LLM can
 complete it without additional context.
